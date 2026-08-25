@@ -13,7 +13,7 @@
     "payload": "payload",
     "generate:importmap": "payload generate:importmap",
     "generate:types": "payload generate:types",
-    "seed": "tsx src/seed.ts",
+    "seed": "tsx --env-file=.env src/seed.ts",
     "typecheck": "tsc --noEmit",
     "test": "npm run test:int && npm run test:e2e",
     "test:int": "vitest run --config ./vitest.config.mts",

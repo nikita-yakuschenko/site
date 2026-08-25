@@ -1,7 +1,18 @@
-import 'dotenv/config'
-import { getPayload } from 'payload'
+import dotenv from 'dotenv'
+import path from 'path'
+import { fileURLToPath } from 'url'
 import { copy } from './lib/copy'
-import config from './payload.config'
+
+const rootDir = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
+dotenv.config({ path: path.join(rootDir, '.env') })
+
+function assertEnv(): void {
+  const missing = ['PAYLOAD_SECRET', 'DATABASE_URL'].filter((key) => !process.env[key])
+  if (!missing.length) return
+  throw new Error(
+    `Нет ${missing.join(', ')}. Скопируй окружение и повтори:\ncopy .env.example .env\nnpm run seed`,
+  )
+}
 
 const HOME_LAYOUT = [
   {
@@ -45,6 +56,9 @@ const HOME_LAYOUT = [
 ]
 
 export async function seed(): Promise<void> {
+  assertEnv()
+  const { getPayload } = await import('payload')
+  const { default: config } = await import('./payload.config')
   const payload = await getPayload({ config })
   const ctx = { disableRevalidate: true }
 
