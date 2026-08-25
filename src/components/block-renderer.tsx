@@ -1,0 +1,236 @@
+import { isRegisteredBlock } from '../blocks/registry'
+import { copy } from '../lib/copy'
+import { mediaUrl, splitHeadline } from '../lib/media'
+import type { CatalogProject } from '../lib/catalog/types'
+import { LeadForm } from './lead-form'
+import { ProjectCard } from './project-card'
+
+type Action = { label?: string | null; href?: string | null }
+type MediaLike = { url?: string | null } | number | string | null | undefined
+
+export type LayoutBlock = { blockType: string } & Record<string, unknown>
+
+export type SiteContacts = {
+  phone?: string | null
+  email?: string | null
+  address?: string | null
+}
+
+function Hero({ block }: { block: LayoutBlock }) {
+  const [greenPart, darkPart] = splitHeadline(String(block.heading || ''))
+  const src = mediaUrl(block.media as MediaLike)
+  const primary = block.primaryAction as Action | null
+  const secondary = block.secondaryAction as Action | null
+  return (
+    <section className={`hero hero--${block.size || 'large'}`}>
+      {src ? <img src={src} alt="" /> : null}
+      <div className="hero__veil" />
+      <div className="hero__content">
+        <h1>
+          <span className="hero__green">{greenPart}</span>
+          {darkPart ? <> {darkPart}</> : null}
+        </h1>
+        {block.description ? <p>{String(block.description)}</p> : null}
+        <div className="hero__actions">
+          {primary?.href && primary.label ? (
+            <a className="btn btn-yellow" href={primary.href}>
+              {primary.label}
+            </a>
+          ) : null}
+          {secondary?.href && secondary.label ? (
+            <a className="btn btn-outline" href={secondary.href}>
+              {secondary.label}
+            </a>
+          ) : null}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function PopularProjects({ block, projects }: { block: LayoutBlock; projects: CatalogProject[] }) {
+  return (
+    <section className="section">
+      <div className="section__inner">
+        <div className="section__head">
+          <div>
+            {block.eyebrow ? <p className="eyebrow">{String(block.eyebrow)}</p> : null}
+            <h2>{String(block.heading)}</h2>
+          </div>
+          {block.catalogHref ? (
+            <a className="btn btn-outline-dark" href={String(block.catalogHref)}>
+              {String(block.catalogLabel || copy.allProjects)}
+            </a>
+          ) : null}
+        </div>
+        <div className="grid-3">
+          {projects.map((project) => (
+            <ProjectCard key={project.id} project={project} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function TextSection({ block }: { block: LayoutBlock }) {
+  return (
+    <section className="section">
+      <div className="section__inner">
+        {block.heading ? <h2>{String(block.heading)}</h2> : null}
+        <p>{String(block.body)}</p>
+      </div>
+    </section>
+  )
+}
+
+function Cta({ block }: { block: LayoutBlock }) {
+  return (
+    <section className="section">
+      <div className="section__inner">
+        <h2>{String(block.heading)}</h2>
+        {block.body ? <p>{String(block.body)}</p> : null}
+        <a className="btn btn-yellow" href={String(block.href)}>
+          {String(block.label)}
+        </a>
+      </div>
+    </section>
+  )
+}
+
+function Production({ block }: { block: LayoutBlock }) {
+  const items = (block.items as Array<{ label?: string }> | undefined) || []
+  const src = mediaUrl(block.media as MediaLike)
+  return (
+    <section className="section">
+      <div className="section__inner production">
+        <div>
+          <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
+          <h2>{String(block.heading)}</h2>
+          <p>{String(block.body)}</p>
+          <ul>
+            {items.map((item, index) => (
+              <li key={index}>{item.label}</li>
+            ))}
+          </ul>
+          {block.ctaHref && block.ctaLabel ? (
+            <a className="btn btn-primary" href={String(block.ctaHref)}>
+              {String(block.ctaLabel)}
+            </a>
+          ) : null}
+        </div>
+        {src ? <img src={src} alt="" /> : null}
+      </div>
+    </section>
+  )
+}
+
+function Contacts({ block, contacts }: { block: LayoutBlock; contacts?: SiteContacts | null }) {
+  const useSite = block.useSiteContacts !== false
+  const phone = useSite ? contacts?.phone : (block.phone as string | undefined)
+  const email = useSite ? contacts?.email : (block.email as string | undefined)
+  const address = useSite ? contacts?.address : (block.address as string | undefined)
+  return (
+    <section className="section section--muted">
+      <div className="section__inner">
+        <h2>{String(block.heading)}</h2>
+        {block.body ? <p>{String(block.body)}</p> : null}
+        <ul className="contact-list">
+          {phone ? (
+            <li>
+              <a href={`tel:${phone}`}>{phone}</a>
+            </li>
+          ) : null}
+          {email ? (
+            <li>
+              <a href={`mailto:${email}`}>{email}</a>
+            </li>
+          ) : null}
+          {address ? <li>{address}</li> : null}
+        </ul>
+      </div>
+    </section>
+  )
+}
+
+function Faq({ block }: { block: LayoutBlock }) {
+  const items = (block.items as Array<{ question?: string; answer?: string }> | undefined) || []
+  return (
+    <section className="section">
+      <div className="section__inner">
+        <h2>{String(block.heading)}</h2>
+        <dl className="faq">
+          {items.map((item, index) => (
+            <div key={index}>
+              <dt>{item.question}</dt>
+              <dd>{item.answer}</dd>
+            </div>
+          ))}
+        </dl>
+      </div>
+    </section>
+  )
+}
+
+function UnknownBlock({ type }: { type: string }) {
+  return (
+    <section className="unknown-block" data-unknown-block={type}>
+      {copy.unknownBlock}: {type}
+    </section>
+  )
+}
+
+export function BlockRenderer({
+  blocks,
+  projects,
+  contacts,
+  siteId,
+  pageId,
+}: {
+  blocks: LayoutBlock[] | null | undefined
+  projects: CatalogProject[]
+  contacts?: SiteContacts | null
+  siteId: number
+  pageId?: number
+}) {
+  return (
+    <>
+      {(blocks || []).map((block, index) => {
+        if (!isRegisteredBlock(block.blockType)) {
+          return <UnknownBlock key={`${block.blockType}-${index}`} type={block.blockType} />
+        }
+        if (block.blockType === 'hero') return <Hero key={index} block={block} />
+        if (block.blockType === 'popularProjects') {
+          return <PopularProjects key={index} block={block} projects={projects} />
+        }
+        if (block.blockType === 'textSection') return <TextSection key={index} block={block} />
+        if (block.blockType === 'cta') return <Cta key={index} block={block} />
+        if (block.blockType === 'productionSection') return <Production key={index} block={block} />
+        if (block.blockType === 'contactsSection') {
+          return <Contacts key={index} block={block} contacts={contacts} />
+        }
+        if (block.blockType === 'leadForm') {
+          return (
+            <section key={index} className="section" id="lead">
+              <div className="section__inner">
+                <LeadForm
+                  siteId={siteId}
+                  pageId={pageId}
+                  heading={String(block.heading)}
+                  body={block.body ? String(block.body) : null}
+                  submitLabel={block.submitLabel ? String(block.submitLabel) : null}
+                  successText={block.successText ? String(block.successText) : null}
+                />
+              </div>
+            </section>
+          )
+        }
+        if (block.blockType === 'projectsCatalog') {
+          return <PopularProjects key={index} block={block} projects={projects} />
+        }
+        if (block.blockType === 'faq') return <Faq key={index} block={block} />
+        return <UnknownBlock key={index} type={block.blockType} />
+      })}
+    </>
+  )
+}

@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: payload
+      POSTGRES_PASSWORD: payload
+      POSTGRES_DB: avgst_web
+    ports:
+      - '5433:5432'
+    volumes:
+      - avgst_web_pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U payload -d avgst_web']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  avgst_web_pg:
