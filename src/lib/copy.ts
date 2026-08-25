@@ -90,3 +90,7 @@ export const copy = {
   seoDescription: 'Avangard Stroy: проекты домов, расчёт стоимости и строительство.',
   notFound: 'Страница не найдена',
 } as const
+
+export function footerAboutFor(name: string): string {
+  return `${name} помогает выбрать проект, рассчитать смету и построить дом.`
+}

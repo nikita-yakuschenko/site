@@ -12,9 +12,10 @@ function joinPath(parentPath: string | undefined, slug: string, isHome: boolean)
 
 export const Pages: CollectionConfig = {
   slug: 'pages',
+  labels: { singular: 'Страница', plural: 'Страницы' },
   admin: {
     useAsTitle: 'title',
-    group: 'Content',
+    group: 'Контент',
     defaultColumns: ['title', 'fullPath', 'site', '_status'],
     livePreview: {
       url: ({ data }) => generatePreviewUrl(String(data?.fullPath || '/')),
@@ -36,61 +37,69 @@ export const Pages: CollectionConfig = {
   fields: [
     {
       name: 'site',
+      label: 'Сайт',
       type: 'relationship',
       relationTo: 'sites',
       required: true,
       index: true,
     },
-    { name: 'title', type: 'text', required: true },
-    { name: 'slug', type: 'text', required: true, index: true },
+    { name: 'title', label: 'Заголовок', type: 'text', required: true },
+    { name: 'slug', label: 'Слаг', type: 'text', required: true, index: true },
     {
       name: 'pageType',
+      label: 'Тип страницы',
       type: 'select',
       required: true,
       defaultValue: 'content',
       options: [
-        { label: 'Content', value: 'content' },
-        { label: 'Product', value: 'product' },
-        { label: 'Application', value: 'application' },
+        { label: 'Контент', value: 'content' },
+        { label: 'Продукт', value: 'product' },
+        { label: 'Заявка', value: 'application' },
       ],
     },
     {
       name: 'isHome',
+      label: 'Главная страница',
       type: 'checkbox',
       defaultValue: false,
     },
     {
       name: 'parent',
+      label: 'Родительская страница',
       type: 'relationship',
       relationTo: 'pages',
       admin: { condition: (_, sibling) => !sibling?.isHome },
     },
     {
       name: 'fullPath',
+      label: 'Полный путь',
       type: 'text',
       index: true,
-      admin: { readOnly: true, description: 'Unique within a site. Computed from parent + slug.' },
+      admin: { readOnly: true, description: 'Уникален в пределах сайта. Собирается из родителя и слага.' },
     },
     {
       name: 'layout',
+      label: 'Блоки',
       type: 'blocks',
       blocks: pageBlocks,
     },
     {
       name: 'seo',
+      label: 'Поисковая оптимизация',
       type: 'group',
       fields: [
-        { name: 'title', type: 'text' },
-        { name: 'description', type: 'textarea' },
-        { name: 'image', type: 'upload', relationTo: 'media' },
-        { name: 'canonical', type: 'text' },
+        { name: 'title', label: 'Заголовок', type: 'text' },
+        { name: 'description', label: 'Описание', type: 'textarea' },
+        { name: 'image', label: 'Изображение', type: 'upload', relationTo: 'media' },
+        { name: 'canonical', label: 'Канонический URL', type: 'text' },
         {
           name: 'robots',
+          label: 'Индексация',
           type: 'select',
           defaultValue: 'index',
           options: [
-            { label: 'Index', value: 'index' },
-            { label: 'Noindex', value: 'noindex' },
+            { label: 'Индексировать', value: 'index' },
+            { label: 'Не индексировать', value: 'noindex' },
           ],
         },
       ],
@@ -132,7 +141,7 @@ export const Pages: CollectionConfig = {
             overrideAccess: true,
           })
           if (clash.totalDocs > 0) {
-            throw new Error(`Path already exists on this site: ${data.fullPath}`)
+            throw new Error(`Путь уже занят на этом сайте: ${data.fullPath}`)
           }
         }
         return data

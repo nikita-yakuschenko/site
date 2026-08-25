@@ -10,6 +10,8 @@ import { RefreshRouteOnSave } from '../../../components/refresh-preview'
 import { SiteChrome } from '../../../components/site-chrome'
 import { createCatalogProvider } from '../../../lib/catalog/fixture-provider'
 import { canonicalUrl } from '../../../lib/canonical'
+import { footerAboutFor } from '../../../lib/copy'
+import { OG_LOCALE } from '../../../lib/locale'
 import { loadSiteForHost } from '../../../lib/request-site'
 
 type Args = { params: Promise<{ slug?: string[] }> }
@@ -23,7 +25,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const resolved = await loadPage(pathFromSlug(slug))
   const { isEnabled: isDraft } = await draftMode()
-  if (!resolved?.page) return { title: 'AVGST', robots: isDraft ? { index: false, follow: false } : undefined }
+  if (!resolved?.page) return { title: 'Авангард Строй', robots: isDraft ? { index: false, follow: false } : undefined }
   const headerList = await headers()
   const host = headerList.get('x-forwarded-host') || headerList.get('host') || 'localhost'
   const title = resolved.page.seo?.title || resolved.page.title || resolved.site.defaultSeo?.title || resolved.site.name
@@ -34,7 +36,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     description,
     alternates: { canonical },
     robots: isDraft || resolved.page.seo?.robots === 'noindex' ? { index: false, follow: false } : { index: true },
-    openGraph: { title, description, url: canonical },
+    openGraph: { title, description, url: canonical, locale: OG_LOCALE },
   }
 }
 
@@ -88,9 +90,12 @@ export default async function Page({ params }: Args) {
         name={resolved.site.name}
         logo={resolved.site.brand?.logo}
         phone={resolved.site.contacts?.phone}
+        email={resolved.site.contacts?.email}
+        address={resolved.site.contacts?.address}
         navigation={resolved.site.navigation}
         overlay={hasHero}
         footer={resolved.site.footer?.legal}
+        about={footerAboutFor(resolved.site.name)}
       >
         <main>
           <BlockRenderer

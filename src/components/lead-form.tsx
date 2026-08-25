@@ -11,6 +11,7 @@ export function LeadForm({
   body,
   submitLabel,
   successText,
+  variant = 'page',
 }: {
   siteId: number
   pageId?: number
@@ -19,6 +20,7 @@ export function LeadForm({
   body?: string | null
   submitLabel?: string | null
   successText?: string | null
+  variant?: 'page' | 'card'
 }) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
 
@@ -51,23 +53,29 @@ export function LeadForm({
   }
 
   return (
-    <form className="lead-form" onSubmit={onSubmit}>
-      <h2>{heading}</h2>
-      {body ? <p>{body}</p> : null}
+    <form className={variant === 'card' ? 'lead-card' : 'lead-form'} onSubmit={onSubmit}>
+      <div>
+        <p className="lead-card__title">{heading}</p>
+        {body ? <p className="lead-card__body">{body}</p> : null}
+      </div>
       <label>
         {copy.name}
-        <input name="name" required minLength={2} autoComplete="name" />
+        <input name="name" required minLength={2} autoComplete="name" placeholder={copy.namePlaceholder} />
       </label>
       <label>
         {copy.phone}
         <input name="phone" required autoComplete="tel" inputMode="tel" />
       </label>
+      <label>
+        {copy.message}
+        <textarea name="message" rows={5} placeholder={copy.messagePlaceholder} />
+      </label>
       <label className="lead-form__consent">
         <input name="consent" type="checkbox" required />
         {copy.consent}
       </label>
-      <button className="btn btn-primary" type="submit" disabled={status === 'sending'}>
-        {submitLabel || copy.sendLead}
+      <button className="btn btn-yellow lead-card__submit" type="submit" disabled={status === 'sending'}>
+        {status === 'sending' ? copy.sending : submitLabel || copy.sendLead}
       </button>
       {status === 'ok' ? <p role="status">{successText || copy.leadOk}</p> : null}
       {status === 'error' ? <p role="alert">{copy.leadError}</p> : null}

@@ -10,7 +10,8 @@ import { ProjectGallery } from '../../../../components/project-gallery'
 import { SiteChrome } from '../../../../components/site-chrome'
 import { createCatalogProvider } from '../../../../lib/catalog/fixture-provider'
 import { canonicalUrl } from '../../../../lib/canonical'
-import { copy } from '../../../../lib/copy'
+import { copy, footerAboutFor } from '../../../../lib/copy'
+import { OG_LOCALE } from '../../../../lib/locale'
 import { splitProjectName } from '../../../../lib/media'
 import { loadSiteForHost } from '../../../../lib/request-site'
 
@@ -24,7 +25,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { isEnabled: isDraft } = await draftMode()
   const site = await loadSiteForHost(payload, host, isDraft)
   const project = await createCatalogProvider().getBySlug(slug, { siteCode: String(site?.code || 'corporate') })
-  if (!project) return { title: 'AVGST' }
+  if (!project) return { title: 'Авангард Строй' }
   const title = project.name
   const description = project.description
   const url = canonicalUrl(host, project.href)
@@ -32,7 +33,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
     title,
     description,
     alternates: { canonical: url },
-    openGraph: { title, description, url, images: [{ url: project.imageUrl }] },
+    openGraph: { title, description, url, locale: OG_LOCALE, images: [{ url: project.imageUrl }] },
   }
 }
 
@@ -83,9 +84,12 @@ export default async function ProjectPage({ params }: Args) {
         name={site.name}
         logo={site.brand?.logo}
         phone={site.contacts?.phone}
+        email={site.contacts?.email}
+        address={site.contacts?.address}
         navigation={site.navigation}
         overlay
         footer={site.footer?.legal}
+        about={footerAboutFor(site.name)}
       >
         <section className="hero hero--large">
           <img src={project.imageUrl} alt="" />
@@ -101,10 +105,18 @@ export default async function ProjectPage({ params }: Args) {
               {text} {digits ? <span className="hero__green">{digits}</span> : null}
             </h1>
             <ul className="specs specs--on-dark">
-              <li>{project.area}</li>
-              <li>{project.floors}</li>
-              <li>{project.bedrooms}</li>
-              <li>{project.bathrooms}</li>
+              <li>
+                {project.area} {copy.specArea}
+              </li>
+              <li>
+                {project.floors} {copy.specFloors}
+              </li>
+              <li>
+                {project.bedrooms} {copy.specBed}
+              </li>
+              <li>
+                {project.bathrooms} {copy.specBath}
+              </li>
             </ul>
             <p className="price price--on-dark">{project.priceLabel}</p>
             <a className="btn btn-yellow" href="#lead">
@@ -122,8 +134,15 @@ export default async function ProjectPage({ params }: Args) {
         <ProjectGallery title={copy.floorPlans} images={project.floorPlans} />
         <ProjectConfigurator options={project.options} basePrice={project.priceAmount} />
         <section className="section" id="lead">
-          <div className="section__inner">
-            <LeadForm siteId={site.id} projectExternalId={project.id} heading={copy.consult} />
+          <div className="section__inner contacts">
+            <LeadForm
+              siteId={site.id}
+              projectExternalId={project.id}
+              heading={copy.haveQuestion}
+              body={copy.haveQuestionBody}
+              submitLabel={copy.askQuestion}
+              variant="card"
+            />
           </div>
         </section>
       </SiteChrome>

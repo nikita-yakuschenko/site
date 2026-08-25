@@ -1,6 +1,48 @@
 import 'dotenv/config'
 import { getPayload } from 'payload'
+import { copy } from './lib/copy'
 import config from './payload.config'
+
+const HOME_LAYOUT = [
+  {
+    blockType: 'hero' as const,
+    heading: copy.heroHeadline,
+    description: copy.heroText,
+    theme: 'dark' as const,
+    size: 'large' as const,
+    primaryAction: { label: copy.consult, href: '/#contacts' },
+    secondaryAction: { label: copy.catalogCta, href: '/projects' },
+  },
+  {
+    blockType: 'popularProjects' as const,
+    eyebrow: copy.popularEyebrow,
+    heading: copy.popularHeading,
+    catalogHref: '/projects',
+    catalogLabel: copy.allProjects,
+  },
+  {
+    blockType: 'productionSection' as const,
+    eyebrow: copy.production,
+    heading: copy.productionHeading,
+    body: copy.productionBody,
+    items: copy.productionItems.map((label) => ({ label })),
+    ctaLabel: copy.factoryTour,
+    ctaHref: '/#contacts',
+    theme: 'light' as const,
+  },
+  {
+    blockType: 'contactsSection' as const,
+    heading: copy.contacts,
+    body: copy.contactsBody,
+    useSiteContacts: true,
+  },
+  {
+    blockType: 'leadForm' as const,
+    heading: copy.haveQuestion,
+    body: copy.haveQuestionBody,
+    submitLabel: copy.askQuestion,
+  },
+]
 
 export async function seed(): Promise<void> {
   const payload = await getPayload({ config })
@@ -13,26 +55,39 @@ export async function seed(): Promise<void> {
     overrideAccess: true,
   })
 
-  const corporate =
-    existingCorporate.docs[0] ||
-    (await payload.create({
-      collection: 'sites',
-      overrideAccess: true,
-      context: ctx,
-      data: {
-        name: 'Avangard Stroy',
-        code: 'corporate',
-        type: 'corporate',
-        status: 'published',
-        customDomains: [{ hostname: 'localhost' }, { hostname: 'avgst.ru' }],
-        contacts: { phone: '+7 800 000-00-00', email: 'hello@avgst.ru' },
-        navigation: [
-          { label: 'Home', href: '/' },
-          { label: 'Catalog', href: '/projects' },
-        ],
-        defaultSeo: { title: 'Avangard Stroy', description: 'Factory-built houses' },
-      },
-    }))
+  const corporateData = {
+    name: 'Avangard Stroy',
+    code: 'corporate',
+    type: 'corporate' as const,
+    status: 'published' as const,
+    customDomains: [{ hostname: 'localhost' }, { hostname: 'avgst.ru' }],
+    contacts: {
+      phone: '8 (800) 000-00-00',
+      email: 'hello@avgst.ru',
+      address: 'Нижний Новгород',
+    },
+    navigation: [
+      { label: copy.catalogProjects, href: '/projects' },
+      { label: copy.contacts, href: '/#contacts' },
+    ],
+    footer: { legal: copy.offerDisclaimer },
+    defaultSeo: { title: copy.seoTitle, description: copy.seoDescription },
+  }
+
+  const corporate = existingCorporate.docs[0]
+    ? await payload.update({
+        collection: 'sites',
+        id: existingCorporate.docs[0].id,
+        overrideAccess: true,
+        context: ctx,
+        data: corporateData,
+      })
+    : await payload.create({
+        collection: 'sites',
+        overrideAccess: true,
+        context: ctx,
+        data: corporateData,
+      })
 
   const existingPartner = await payload.find({
     collection: 'sites',
@@ -40,25 +95,34 @@ export async function seed(): Promise<void> {
     limit: 1,
     overrideAccess: true,
   })
-  if (!existingPartner.totalDocs) {
+  const partnerData = {
+    name: 'Партнёр НН',
+    code: 'partner-nn',
+    type: 'partner' as const,
+    status: 'published' as const,
+    subdomain: 'nn',
+    customDomains: [{ hostname: 'nn.example.test' }],
+    partnerExternalId: 'partner-nn',
+    contacts: { phone: '8 (831) 000-00-00', email: 'nn@avgst.ru', address: 'Нижний Новгород' },
+    navigation: [
+      { label: copy.catalogProjects, href: '/projects' },
+      { label: copy.contacts, href: '/#contacts' },
+    ],
+  }
+  if (existingPartner.docs[0]) {
+    await payload.update({
+      collection: 'sites',
+      id: existingPartner.docs[0].id,
+      overrideAccess: true,
+      context: ctx,
+      data: partnerData,
+    })
+  } else {
     await payload.create({
       collection: 'sites',
       overrideAccess: true,
       context: ctx,
-      data: {
-        name: 'Partner NN',
-        code: 'partner-nn',
-        type: 'partner',
-        status: 'published',
-        subdomain: 'nn',
-        customDomains: [{ hostname: 'nn.example.test' }],
-        partnerExternalId: 'partner-nn',
-        contacts: { phone: '+7 831 000-00-00' },
-        navigation: [
-          { label: 'Home', href: '/' },
-          { label: 'Catalog', href: '/projects' },
-        ],
-      },
+      data: partnerData,
     })
   }
 
@@ -72,62 +136,32 @@ export async function seed(): Promise<void> {
     draft: true,
   })
 
-  if (!existingHome.totalDocs) {
+  const homeData = {
+    site: corporate.id,
+    title: copy.breadcrumbsHome,
+    slug: 'home',
+    isHome: true,
+    pageType: 'content' as const,
+    _status: 'published' as const,
+    layout: HOME_LAYOUT,
+  }
+
+  if (existingHome.docs[0]) {
+    await payload.update({
+      collection: 'pages',
+      id: existingHome.docs[0].id,
+      overrideAccess: true,
+      context: ctx,
+      draft: false,
+      data: homeData,
+    })
+  } else {
     await payload.create({
       collection: 'pages',
       overrideAccess: true,
       context: ctx,
       draft: false,
-      data: {
-        site: corporate.id,
-        title: 'Home',
-        slug: 'home',
-        isHome: true,
-        pageType: 'content',
-        _status: 'published',
-        layout: [
-          {
-            blockType: 'hero',
-            heading: 'Factory-built houses in modern architecture',
-            description: 'Choose a project, calculate the package, order without extra uncertainty.',
-            theme: 'dark',
-            size: 'large',
-            primaryAction: { label: 'Catalog', href: '/projects' },
-            secondaryAction: { label: 'Consultation', href: '#lead' },
-          },
-          {
-            blockType: 'popularProjects',
-            eyebrow: 'Catalog',
-            heading: 'Popular projects',
-            catalogHref: '/projects',
-            catalogLabel: 'All projects',
-          },
-          {
-            blockType: 'productionSection',
-            eyebrow: 'Factory',
-            heading: 'Avangard Stroy factory',
-            body: 'House kits are manufactured in Nizhny Novgorod: cutting, painting, panel assembly and roof trusses.',
-            items: [
-              { label: 'CNC processing line' },
-              { label: 'Panel cutting section' },
-              { label: 'Painting lines' },
-            ],
-            ctaLabel: 'Factory tour',
-            ctaHref: '#lead',
-            theme: 'light',
-          },
-          {
-            blockType: 'contactsSection',
-            heading: 'Contacts',
-            useSiteContacts: true,
-          },
-          {
-            blockType: 'leadForm',
-            heading: 'Request a consultation',
-            body: 'We will call back and help pick a project.',
-          },
-        ],
-      },
+      data: homeData,
     })
   }
 
@@ -148,12 +182,12 @@ export async function seed(): Promise<void> {
       draft: true,
       data: {
         site: corporate.id,
-        title: 'Hidden draft',
+        title: 'Скрытый черновик',
         slug: 'hidden-draft',
         isHome: false,
         pageType: 'content',
         _status: 'draft',
-        layout: [{ blockType: 'textSection', heading: 'Draft', body: 'Should not be public.' }],
+        layout: [{ blockType: 'textSection', heading: 'Черновик', body: 'Страница не должна быть опубликована.' }],
       },
     })
   }

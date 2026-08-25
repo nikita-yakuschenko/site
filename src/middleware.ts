@@ -9,9 +9,10 @@ export function middleware(request: NextRequest) {
 
   const isAdmin = pathname.startsWith('/admin') || pathname.startsWith('/api')
   if (!isAdmin) {
+    const scriptSrc = process.env.NODE_ENV === 'development' ? "'self' 'unsafe-inline' 'unsafe-eval'" : "'self' 'unsafe-inline'"
     response.headers.set(
       'Content-Security-Policy',
-      "default-src 'self'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self'; frame-ancestors 'self'",
+      `default-src 'self'; img-src 'self' https: data: blob:; media-src 'self' https: blob:; script-src ${scriptSrc}; style-src 'self' 'unsafe-inline'; font-src 'self' data:; connect-src 'self' ws: wss:; frame-src 'self' https://kinescope.io; frame-ancestors 'self'`,
     )
   }
 

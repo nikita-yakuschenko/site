@@ -3,24 +3,26 @@ import { authenticated, fieldHqOnly, hqOnly, isLoggedIn, usersCreate } from '../
 
 export const Users: CollectionConfig = {
   slug: 'users',
+  labels: { singular: 'Пользователь', plural: 'Пользователи' },
   admin: {
     useAsTitle: 'email',
-    group: 'System',
+    group: 'Система',
   },
   auth: true,
   fields: [
     {
       name: 'role',
+      label: 'Роль',
       type: 'select',
       required: true,
       defaultValue: 'viewer',
       options: [
-        { label: 'Super admin', value: 'super-admin' },
-        { label: 'HQ admin', value: 'hq-admin' },
-        { label: 'HQ editor', value: 'hq-editor' },
-        { label: 'Partner owner', value: 'partner-owner' },
-        { label: 'Partner editor', value: 'partner-editor' },
-        { label: 'Viewer', value: 'viewer' },
+        { label: 'Суперадмин', value: 'super-admin' },
+        { label: 'Админ штаба', value: 'hq-admin' },
+        { label: 'Редактор штаба', value: 'hq-editor' },
+        { label: 'Владелец партнёра', value: 'partner-owner' },
+        { label: 'Редактор партнёра', value: 'partner-editor' },
+        { label: 'Наблюдатель', value: 'viewer' },
       ],
       access: {
         update: fieldHqOnly,
@@ -28,9 +30,10 @@ export const Users: CollectionConfig = {
     },
     {
       name: 'partnerExternalId',
+      label: 'ID партнёра',
       type: 'text',
       admin: {
-        description: 'Stable partner id from the operational system. Empty for HQ users.',
+        description: 'Стабильный идентификатор партнёра из операционной системы. Для сотрудников штаба оставьте пустым.',
       },
       access: {
         update: fieldHqOnly,

@@ -2,6 +2,7 @@ import { isRegisteredBlock } from '../blocks/registry'
 import { copy } from '../lib/copy'
 import { mediaUrl, splitHeadline } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
+import { FactoryVideo } from './factory-video'
 import { LeadForm } from './lead-form'
 import { ProjectCard } from './project-card'
 
@@ -16,14 +17,14 @@ export type SiteContacts = {
   address?: string | null
 }
 
-function Hero({ block }: { block: LayoutBlock }) {
-  const [greenPart, darkPart] = splitHeadline(String(block.heading || ''))
-  const src = mediaUrl(block.media as MediaLike)
+function Hero({ block, fallbackImage }: { block: LayoutBlock; fallbackImage?: string }) {
+  const [greenPart, darkPart] = splitHeadline(String(block.heading || copy.heroHeadline))
+  const src = mediaUrl(block.media as MediaLike) || fallbackImage || '/fixtures/house-1.jpg'
   const primary = block.primaryAction as Action | null
   const secondary = block.secondaryAction as Action | null
   return (
     <section className={`hero hero--${block.size || 'large'}`}>
-      {src ? <img src={src} alt="" /> : null}
+      <img src={src} alt="" className="landing-ken" />
       <div className="hero__veil" />
       <div className="hero__content">
         <h1>
@@ -54,14 +55,12 @@ function PopularProjects({ block, projects }: { block: LayoutBlock; projects: Ca
       <div className="section__inner">
         <div className="section__head">
           <div>
-            {block.eyebrow ? <p className="eyebrow">{String(block.eyebrow)}</p> : null}
-            <h2>{String(block.heading)}</h2>
+            <p className="eyebrow">{String(block.eyebrow || copy.popularEyebrow)}</p>
+            <h2>{String(block.heading || copy.popularHeading)}</h2>
           </div>
-          {block.catalogHref ? (
-            <a className="btn btn-outline-dark" href={String(block.catalogHref)}>
-              {String(block.catalogLabel || copy.allProjects)}
-            </a>
-          ) : null}
+          <a className="btn btn-outline-dark" href={String(block.catalogHref || '/projects')}>
+            {String(block.catalogLabel || copy.allProjects)}
+          </a>
         </div>
         <div className="grid-3">
           {projects.map((project) => (
@@ -100,54 +99,87 @@ function Cta({ block }: { block: LayoutBlock }) {
 
 function Production({ block }: { block: LayoutBlock }) {
   const items = (block.items as Array<{ label?: string }> | undefined) || []
-  const src = mediaUrl(block.media as MediaLike)
+  const src = mediaUrl(block.media as MediaLike) || '/fixtures/factory.jpg'
   return (
-    <section className="section">
+    <section className="section section--factory">
       <div className="section__inner production">
-        <div>
+        <div className="production__media">
+          <FactoryVideo src={src} alt={copy.factoryAlt} />
+        </div>
+        <div className="production__copy">
           <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
           <h2>{String(block.heading)}</h2>
           <p>{String(block.body)}</p>
-          <ul>
+          <ul className="production__list">
             {items.map((item, index) => (
               <li key={index}>{item.label}</li>
             ))}
           </ul>
           {block.ctaHref && block.ctaLabel ? (
-            <a className="btn btn-primary" href={String(block.ctaHref)}>
+            <a className="btn btn-yellow" href={String(block.ctaHref)}>
               {String(block.ctaLabel)}
             </a>
           ) : null}
         </div>
-        {src ? <img src={src} alt="" /> : null}
       </div>
     </section>
   )
 }
 
-function Contacts({ block, contacts }: { block: LayoutBlock; contacts?: SiteContacts | null }) {
+function Contacts({
+  block,
+  contacts,
+  siteId,
+  pageId,
+  form,
+}: {
+  block: LayoutBlock
+  contacts?: SiteContacts | null
+  siteId: number
+  pageId?: number
+  form?: LayoutBlock | null
+}) {
   const useSite = block.useSiteContacts !== false
   const phone = useSite ? contacts?.phone : (block.phone as string | undefined)
   const email = useSite ? contacts?.email : (block.email as string | undefined)
   const address = useSite ? contacts?.address : (block.address as string | undefined)
   return (
-    <section className="section section--muted">
-      <div className="section__inner">
-        <h2>{String(block.heading)}</h2>
-        {block.body ? <p>{String(block.body)}</p> : null}
-        <ul className="contact-list">
-          {phone ? (
-            <li>
-              <a href={`tel:${phone}`}>{phone}</a>
-            </li>
-          ) : null}
-          {email ? (
-            <li>
-              <a href={`mailto:${email}`}>{email}</a>
-            </li>
-          ) : null}
-          {address ? <li>{address}</li> : null}
-        </ul>
+    <section className="section" id="contacts">
+      <div className="section__inner contacts">
+        <div>
+          <p className="eyebrow">{copy.contactsEyebrow}</p>
+          <h2>{String(block.heading || copy.contacts)}</h2>
+          <p className="contacts__lead">{block.body ? String(block.body) : copy.contactsBody}</p>
+          <div className="contact-list">
+            {phone ? (
+              <div>
+                <p>{copy.phoneLabel}</p>
+                <a href={`tel:${phone}`}>{phone}</a>
+              </div>
+            ) : null}
+            {email ? (
+              <div>
+                <p>{copy.emailLabel}</p>
+                <a href={`mailto:${email}`}>{email}</a>
+              </div>
+            ) : null}
+            {address ? (
+              <div>
+                <p>{copy.addressLabel}</p>
+                <span>{address}</span>
+              </div>
+            ) : null}
+          </div>
+        </div>
+        <LeadForm
+          siteId={siteId}
+          pageId={pageId}
+          variant="card"
+          heading={form?.heading ? String(form.heading) : copy.haveQuestion}
+          body={form?.body ? String(form.body) : copy.haveQuestionBody}
+          submitLabel={form?.submitLabel ? String(form.submitLabel) : copy.askQuestion}
+          successText={form?.successText ? String(form.successText) : null}
+        />
       </div>
     </section>
   )
@@ -193,13 +225,20 @@ export function BlockRenderer({
   siteId: number
   pageId?: number
 }) {
+  const list = blocks || []
+  const formBlock = list.find((block) => block.blockType === 'leadForm') || null
+  const hasContacts = list.some((block) => block.blockType === 'contactsSection')
+  const heroImage = projects.find((project) => project.imageUrl)?.imageUrl
+
   return (
     <>
-      {(blocks || []).map((block, index) => {
+      {list.map((block, index) => {
         if (!isRegisteredBlock(block.blockType)) {
           return <UnknownBlock key={`${block.blockType}-${index}`} type={block.blockType} />
         }
-        if (block.blockType === 'hero') return <Hero key={index} block={block} />
+        if (block.blockType === 'hero') {
+          return <Hero key={index} block={block} fallbackImage={heroImage} />
+        }
         if (block.blockType === 'popularProjects') {
           return <PopularProjects key={index} block={block} projects={projects} />
         }
@@ -207,15 +246,26 @@ export function BlockRenderer({
         if (block.blockType === 'cta') return <Cta key={index} block={block} />
         if (block.blockType === 'productionSection') return <Production key={index} block={block} />
         if (block.blockType === 'contactsSection') {
-          return <Contacts key={index} block={block} contacts={contacts} />
+          return (
+            <Contacts
+              key={index}
+              block={block}
+              contacts={contacts}
+              siteId={siteId}
+              pageId={pageId}
+              form={formBlock}
+            />
+          )
         }
         if (block.blockType === 'leadForm') {
+          if (hasContacts) return null
           return (
             <section key={index} className="section" id="lead">
-              <div className="section__inner">
+              <div className="section__inner contacts">
                 <LeadForm
                   siteId={siteId}
                   pageId={pageId}
+                  variant="card"
                   heading={String(block.heading)}
                   body={block.body ? String(block.body) : null}
                   submitLabel={block.submitLabel ? String(block.submitLabel) : null}

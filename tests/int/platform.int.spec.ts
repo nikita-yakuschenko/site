@@ -90,8 +90,8 @@ describe('catalog provider', () => {
   })
 
   it('returns project page data without storing price in CMS shape', async () => {
-    const project = await createCatalogProvider().getBySlug('barn-90', { siteCode: 'corporate' })
-    expect(project?.priceAmount).toBeTypeOf('number')
+    const project = await createCatalogProvider().getBySlug('barn-113', { siteCode: 'corporate' })
+    expect(project?.priceLabel).toBeTruthy()
     expect(project?.options.length).toBeGreaterThan(0)
   })
 })
@@ -144,6 +144,19 @@ describe('canonical and preview', () => {
 
 describe('project name accent', () => {
   it('splits trailing digits', () => {
-    expect(splitProjectName('Barnhaus 90')).toEqual({ text: 'Barnhaus', digits: '90' })
+    expect(splitProjectName('Барнхаус 113')).toEqual({ text: 'Барнхаус', digits: '113' })
+  })
+})
+
+describe('russian locale', () => {
+  it('formats money as Russian rubles', async () => {
+    const { formatRub } = await import('../../src/lib/locale')
+    expect(formatRub(4213000)).toMatch(/4[\s\u00a0]?213[\s\u00a0]?000/)
+    expect(formatRub(4213000)).toMatch(/₽|RUB/)
+  })
+
+  it('formats dates as dd.mm.yyyy in Moscow time', async () => {
+    const { formatDate } = await import('../../src/lib/locale')
+    expect(formatDate('2026-08-25T12:00:00+03:00')).toBe('25.08.2026')
   })
 })

@@ -3,6 +3,10 @@ import { anyone, authenticated, hqOnly } from '../access'
 
 export const Media: CollectionConfig = {
   slug: 'media',
+  labels: { singular: 'Файл', plural: 'Файлы' },
+  admin: {
+    group: 'Контент',
+  },
   access: {
     read: anyone,
     create: authenticated,
@@ -12,6 +16,7 @@ export const Media: CollectionConfig = {
   fields: [
     {
       name: 'alt',
+      label: 'Альтернативный текст',
       type: 'text',
       required: true,
     },

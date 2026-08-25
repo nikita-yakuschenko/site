@@ -3,9 +3,10 @@ import { hqOnly, leadRead } from '../access'
 
 export const Leads: CollectionConfig = {
   slug: 'leads',
+  labels: { singular: 'Заявка', plural: 'Заявки' },
   admin: {
     useAsTitle: 'name',
-    group: 'Operations',
+    group: 'Операции',
     defaultColumns: ['name', 'phone', 'site', 'createdAt'],
   },
   access: {
@@ -15,12 +16,13 @@ export const Leads: CollectionConfig = {
     delete: hqOnly,
   },
   fields: [
-    { name: 'name', type: 'text', required: true },
-    { name: 'phone', type: 'text', required: true },
-    { name: 'site', type: 'relationship', relationTo: 'sites', required: true },
-    { name: 'page', type: 'relationship', relationTo: 'pages' },
-    { name: 'projectExternalId', type: 'text' },
-    { name: 'sourcePath', type: 'text' },
-    { name: 'utm', type: 'json' },
+    { name: 'name', label: 'Имя', type: 'text', required: true },
+    { name: 'phone', label: 'Телефон', type: 'text', required: true },
+    { name: 'site', label: 'Сайт', type: 'relationship', relationTo: 'sites', required: true },
+    { name: 'page', label: 'Страница', type: 'relationship', relationTo: 'pages' },
+    { name: 'projectExternalId', label: 'ID проекта', type: 'text' },
+    { name: 'sourcePath', label: 'Страница источника', type: 'text' },
+    { name: 'utm', label: 'UTM-метки', type: 'json' },
   ],
+  timestamps: true,
 }

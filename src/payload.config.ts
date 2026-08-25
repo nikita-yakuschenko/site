@@ -1,5 +1,6 @@
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { ru } from '@payloadcms/translations/languages/ru'
 import path from 'path'
 import { buildConfig } from 'payload'
 import { fileURLToPath } from 'url'
@@ -11,6 +12,7 @@ import { Sites } from './collections/Sites'
 import { Pages } from './collections/Pages'
 import { Leads } from './collections/Leads'
 import { ProjectContent } from './collections/ProjectContent'
+import { DATETIME_FORMAT, TIMEZONE, russianTimezones } from './lib/locale'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -18,16 +20,28 @@ const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
 export default buildConfig({
   serverURL,
+  i18n: {
+    fallbackLanguage: 'ru',
+    supportedLanguages: { ru },
+  },
   admin: {
     user: Users.slug,
+    meta: {
+      titleSuffix: '— Авангард Строй',
+    },
+    dateFormat: DATETIME_FORMAT,
+    timezones: {
+      defaultTimezone: TIMEZONE,
+      supportedTimezones: [...russianTimezones],
+    },
     importMap: {
       baseDir: path.resolve(dirname),
     },
     livePreview: {
       collections: ['pages'],
       breakpoints: [
-        { label: 'Mobile', name: 'mobile', width: 375, height: 812 },
-        { label: 'Desktop', name: 'desktop', width: 1440, height: 900 },
+        { label: 'Мобильный', name: 'mobile', width: 375, height: 812 },
+        { label: 'Десктоп', name: 'desktop', width: 1440, height: 900 },
       ],
     },
   },

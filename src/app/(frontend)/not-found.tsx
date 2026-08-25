@@ -1,7 +1,9 @@
+import { copy } from '../../lib/copy'
+
 export default function NotFound() {
   return (
     <main className="empty">
-      <h1>Not found</h1>
+      <h1>{copy.notFound}</h1>
     </main>
   )
 }

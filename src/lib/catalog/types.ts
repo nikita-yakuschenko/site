@@ -49,6 +49,4 @@ export interface ProjectCatalogProvider {
   getBySlug(slug: string, context: SiteCatalogContext): Promise<CatalogProject | null>
 }
 
-export function formatRub(amount: number): string {
-  return new Intl.NumberFormat('ru-RU').format(amount) + ' \u20bd'
-}
+export { formatRub } from '../locale'

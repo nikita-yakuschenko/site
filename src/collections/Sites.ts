@@ -4,9 +4,10 @@ import { assertUniqueHostnames, normalizeHost, type SiteHostRecord } from '../li
 
 export const Sites: CollectionConfig = {
   slug: 'sites',
+  labels: { singular: 'Сайт', plural: 'Сайты' },
   admin: {
     useAsTitle: 'name',
-    group: 'Platform',
+    group: 'Платформа',
     defaultColumns: ['name', 'code', 'type', 'status'],
   },
   access: {
@@ -16,9 +17,10 @@ export const Sites: CollectionConfig = {
     delete: siteWrite,
   },
   fields: [
-    { name: 'name', type: 'text', required: true },
+    { name: 'name', label: 'Название', type: 'text', required: true },
     {
       name: 'code',
+      label: 'Код',
       type: 'text',
       required: true,
       unique: true,
@@ -27,97 +29,111 @@ export const Sites: CollectionConfig = {
     },
     {
       name: 'type',
+      label: 'Тип',
       type: 'select',
       required: true,
       defaultValue: 'corporate',
       options: [
-        { label: 'Corporate', value: 'corporate' },
-        { label: 'Partner', value: 'partner' },
-        { label: 'Regional', value: 'regional' },
-        { label: 'Campaign', value: 'campaign' },
+        { label: 'Корпоративный', value: 'corporate' },
+        { label: 'Партнёрский', value: 'partner' },
+        { label: 'Региональный', value: 'regional' },
+        { label: 'Кампания', value: 'campaign' },
       ],
       access: { update: fieldHqOnly },
     },
     {
       name: 'status',
+      label: 'Статус',
       type: 'select',
       required: true,
       defaultValue: 'draft',
       options: [
-        { label: 'Draft', value: 'draft' },
-        { label: 'Published', value: 'published' },
-        { label: 'Archived', value: 'archived' },
+        { label: 'Черновик', value: 'draft' },
+        { label: 'Опубликован', value: 'published' },
+        { label: 'В архиве', value: 'archived' },
       ],
       access: { update: fieldHqOnly },
     },
-    { name: 'subdomain', type: 'text', access: { update: fieldHqOnly } },
+    { name: 'subdomain', label: 'Поддомен', type: 'text', access: { update: fieldHqOnly } },
     {
       name: 'customDomains',
+      label: 'Свои домены',
+      labels: { singular: 'Домен', plural: 'Домены' },
       type: 'array',
       access: { update: fieldHqOnly },
-      fields: [{ name: 'hostname', type: 'text', required: true }],
+      fields: [{ name: 'hostname', label: 'Хост', type: 'text', required: true }],
     },
     {
       name: 'partnerExternalId',
+      label: 'ID партнёра',
       type: 'text',
-      admin: { description: 'Operational partner id. Required for partner sites.' },
+      admin: { description: 'Идентификатор партнёра в операционной системе. Обязателен для партнёрских сайтов.' },
       access: { update: fieldHqOnly },
     },
     {
       name: 'brand',
+      label: 'Бренд',
       type: 'group',
       fields: [
-        { name: 'logo', type: 'upload', relationTo: 'media' },
-        { name: 'mobileLogo', type: 'upload', relationTo: 'media' },
-        { name: 'favicon', type: 'upload', relationTo: 'media' },
+        { name: 'logo', label: 'Логотип', type: 'upload', relationTo: 'media' },
+        { name: 'mobileLogo', label: 'Мобильный логотип', type: 'upload', relationTo: 'media' },
+        { name: 'favicon', label: 'Фавикон', type: 'upload', relationTo: 'media' },
         {
           name: 'permittedTheme',
+          label: 'Тема',
           type: 'select',
           defaultValue: 'brand',
           options: [
-            { label: 'Light', value: 'light' },
-            { label: 'Dark', value: 'dark' },
-            { label: 'Brand', value: 'brand' },
+            { label: 'Светлая', value: 'light' },
+            { label: 'Тёмная', value: 'dark' },
+            { label: 'Брендовая', value: 'brand' },
           ],
         },
       ],
     },
     {
       name: 'contacts',
+      label: 'Контакты',
       type: 'group',
       fields: [
-        { name: 'phone', type: 'text' },
-        { name: 'email', type: 'email' },
-        { name: 'address', type: 'textarea' },
+        { name: 'phone', label: 'Телефон', type: 'text' },
+        { name: 'email', label: 'Почта', type: 'email' },
+        { name: 'address', label: 'Адрес', type: 'textarea' },
       ],
     },
     {
       name: 'socialLinks',
+      label: 'Соцсети',
+      labels: { singular: 'Ссылка', plural: 'Ссылки' },
       type: 'array',
       fields: [
-        { name: 'label', type: 'text', required: true },
-        { name: 'href', type: 'text', required: true },
+        { name: 'label', label: 'Подпись', type: 'text', required: true },
+        { name: 'href', label: 'Адрес', type: 'text', required: true },
       ],
     },
     {
       name: 'navigation',
+      label: 'Навигация',
+      labels: { singular: 'Пункт', plural: 'Пункты' },
       type: 'array',
       fields: [
-        { name: 'label', type: 'text', required: true },
-        { name: 'href', type: 'text', required: true },
+        { name: 'label', label: 'Подпись', type: 'text', required: true },
+        { name: 'href', label: 'Адрес', type: 'text', required: true },
       ],
     },
     {
       name: 'footer',
+      label: 'Подвал',
       type: 'group',
-      fields: [{ name: 'legal', type: 'textarea' }],
+      fields: [{ name: 'legal', label: 'Правовая информация', type: 'textarea' }],
     },
     {
       name: 'defaultSeo',
+      label: 'Поисковая оптимизация по умолчанию',
       type: 'group',
       fields: [
-        { name: 'title', type: 'text' },
-        { name: 'description', type: 'textarea' },
+        { name: 'title', label: 'Заголовок', type: 'text' },
+        { name: 'description', label: 'Описание', type: 'textarea' },
       ],
     },
   ],
@@ -146,7 +162,7 @@ export const Sites: CollectionConfig = {
         const incoming = hosts.map((row: { hostname: string }) => row.hostname)
         const clash = incoming.filter((host: string) => duplicates.includes(host))
         if (clash.length) {
-          throw new Error(`Domain already used: ${clash.join(', ')}`)
+          throw new Error(`Домен уже занят: ${clash.join(', ')}`)
         }
         return next
       },

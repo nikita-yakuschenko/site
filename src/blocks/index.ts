@@ -2,52 +2,56 @@ import type { Block } from 'payload'
 
 const themeField = {
   name: 'theme',
+  label: 'Тема',
   type: 'select' as const,
   required: true,
   defaultValue: 'dark',
   options: [
-    { label: 'Light', value: 'light' },
-    { label: 'Dark', value: 'dark' },
-    { label: 'Brand', value: 'brand' },
+    { label: 'Светлая', value: 'light' },
+    { label: 'Тёмная', value: 'dark' },
+    { label: 'Брендовая', value: 'brand' },
   ],
 }
 
 const sizeField = {
   name: 'size',
+  label: 'Размер',
   type: 'select' as const,
   required: true,
   defaultValue: 'standard',
   options: [
-    { label: 'Compact', value: 'compact' },
-    { label: 'Standard', value: 'standard' },
-    { label: 'Accent', value: 'large' },
+    { label: 'Компактный', value: 'compact' },
+    { label: 'Обычный', value: 'standard' },
+    { label: 'Крупный', value: 'large' },
   ],
 }
 
 export const HeroBlock: Block = {
   slug: 'hero',
   interfaceName: 'HeroBlock',
-  labels: { singular: 'Hero', plural: 'Hero' },
+  labels: { singular: 'Первый экран', plural: 'Первые экраны' },
   fields: [
-    { name: 'heading', type: 'text', required: true },
-    { name: 'description', type: 'textarea' },
-    { name: 'media', type: 'upload', relationTo: 'media' },
+    { name: 'heading', label: 'Заголовок', type: 'text', required: true },
+    { name: 'description', label: 'Описание', type: 'textarea' },
+    { name: 'media', label: 'Изображение', type: 'upload', relationTo: 'media' },
     themeField,
     { ...sizeField, defaultValue: 'large' },
     {
       name: 'primaryAction',
+      label: 'Основная кнопка',
       type: 'group',
       fields: [
-        { name: 'label', type: 'text' },
-        { name: 'href', type: 'text' },
+        { name: 'label', label: 'Текст', type: 'text' },
+        { name: 'href', label: 'Ссылка', type: 'text' },
       ],
     },
     {
       name: 'secondaryAction',
+      label: 'Вторая кнопка',
       type: 'group',
       fields: [
-        { name: 'label', type: 'text' },
-        { name: 'href', type: 'text' },
+        { name: 'label', label: 'Текст', type: 'text' },
+        { name: 'href', label: 'Ссылка', type: 'text' },
       ],
     },
   ],
@@ -56,17 +60,19 @@ export const HeroBlock: Block = {
 export const PopularProjectsBlock: Block = {
   slug: 'popularProjects',
   interfaceName: 'PopularProjectsBlock',
-  labels: { singular: 'Popular projects', plural: 'Popular projects' },
+  labels: { singular: 'Популярные проекты', plural: 'Популярные проекты' },
   fields: [
-    { name: 'eyebrow', type: 'text' },
-    { name: 'heading', type: 'text', required: true },
-    { name: 'catalogHref', type: 'text', defaultValue: '/projects' },
-    { name: 'catalogLabel', type: 'text' },
+    { name: 'eyebrow', label: 'Надзаголовок', type: 'text' },
+    { name: 'heading', label: 'Заголовок', type: 'text', required: true },
+    { name: 'catalogHref', label: 'Ссылка на каталог', type: 'text', defaultValue: '/projects' },
+    { name: 'catalogLabel', label: 'Текст ссылки', type: 'text' },
     {
       name: 'projectIds',
+      label: 'Проекты',
+      labels: { singular: 'Проект', plural: 'Проекты' },
       type: 'array',
-      admin: { description: 'Operational project ids. Empty = fixture default set.' },
-      fields: [{ name: 'id', type: 'text', required: true }],
+      admin: { description: 'ID проектов из каталога. Пусто — набор по умолчанию.' },
+      fields: [{ name: 'id', label: 'ID проекта', type: 'text', required: true }],
     },
   ],
 }
@@ -74,41 +80,43 @@ export const PopularProjectsBlock: Block = {
 export const TextSectionBlock: Block = {
   slug: 'textSection',
   interfaceName: 'TextSectionBlock',
-  labels: { singular: 'Text section', plural: 'Text sections' },
+  labels: { singular: 'Текстовый блок', plural: 'Текстовые блоки' },
   fields: [
-    { name: 'heading', type: 'text' },
-    { name: 'body', type: 'textarea', required: true },
+    { name: 'heading', label: 'Заголовок', type: 'text' },
+    { name: 'body', label: 'Текст', type: 'textarea', required: true },
   ],
 }
 
 export const CtaBlock: Block = {
   slug: 'cta',
   interfaceName: 'CtaBlock',
-  labels: { singular: 'CTA', plural: 'CTA' },
+  labels: { singular: 'Призыв к действию', plural: 'Призывы к действию' },
   fields: [
-    { name: 'heading', type: 'text', required: true },
-    { name: 'body', type: 'textarea' },
-    { name: 'label', type: 'text', required: true },
-    { name: 'href', type: 'text', required: true },
+    { name: 'heading', label: 'Заголовок', type: 'text', required: true },
+    { name: 'body', label: 'Текст', type: 'textarea' },
+    { name: 'label', label: 'Текст кнопки', type: 'text', required: true },
+    { name: 'href', label: 'Ссылка', type: 'text', required: true },
   ],
 }
 
 export const ProductionSectionBlock: Block = {
   slug: 'productionSection',
   interfaceName: 'ProductionSectionBlock',
-  labels: { singular: 'Production', plural: 'Production' },
+  labels: { singular: 'Производство', plural: 'Производство' },
   fields: [
-    { name: 'eyebrow', type: 'text' },
-    { name: 'heading', type: 'text', required: true },
-    { name: 'body', type: 'textarea', required: true },
+    { name: 'eyebrow', label: 'Надзаголовок', type: 'text' },
+    { name: 'heading', label: 'Заголовок', type: 'text', required: true },
+    { name: 'body', label: 'Текст', type: 'textarea', required: true },
     {
       name: 'items',
+      label: 'Линии',
+      labels: { singular: 'Пункт', plural: 'Пункты' },
       type: 'array',
-      fields: [{ name: 'label', type: 'text', required: true }],
+      fields: [{ name: 'label', label: 'Текст', type: 'text', required: true }],
     },
-    { name: 'ctaLabel', type: 'text' },
-    { name: 'ctaHref', type: 'text' },
-    { name: 'media', type: 'upload', relationTo: 'media' },
+    { name: 'ctaLabel', label: 'Текст кнопки', type: 'text' },
+    { name: 'ctaHref', label: 'Ссылка кнопки', type: 'text' },
+    { name: 'media', label: 'Изображение', type: 'upload', relationTo: 'media' },
     themeField,
   ],
 }
@@ -116,52 +124,54 @@ export const ProductionSectionBlock: Block = {
 export const ContactsSectionBlock: Block = {
   slug: 'contactsSection',
   interfaceName: 'ContactsSectionBlock',
-  labels: { singular: 'Contacts', plural: 'Contacts' },
+  labels: { singular: 'Контакты', plural: 'Контакты' },
   fields: [
-    { name: 'heading', type: 'text', required: true },
-    { name: 'body', type: 'textarea' },
-    { name: 'useSiteContacts', type: 'checkbox', defaultValue: true },
-    { name: 'phone', type: 'text' },
-    { name: 'email', type: 'email' },
-    { name: 'address', type: 'textarea' },
+    { name: 'heading', label: 'Заголовок', type: 'text', required: true },
+    { name: 'body', label: 'Текст', type: 'textarea' },
+    { name: 'useSiteContacts', label: 'Брать контакты с сайта', type: 'checkbox', defaultValue: true },
+    { name: 'phone', label: 'Телефон', type: 'text' },
+    { name: 'email', label: 'Почта', type: 'email' },
+    { name: 'address', label: 'Адрес', type: 'textarea' },
   ],
 }
 
 export const LeadFormBlock: Block = {
   slug: 'leadForm',
   interfaceName: 'LeadFormBlock',
-  labels: { singular: 'Lead form', plural: 'Lead forms' },
+  labels: { singular: 'Форма заявки', plural: 'Формы заявок' },
   fields: [
-    { name: 'heading', type: 'text', required: true },
-    { name: 'body', type: 'textarea' },
-    { name: 'submitLabel', type: 'text' },
-    { name: 'successText', type: 'text' },
+    { name: 'heading', label: 'Заголовок', type: 'text', required: true },
+    { name: 'body', label: 'Текст', type: 'textarea' },
+    { name: 'submitLabel', label: 'Текст кнопки', type: 'text' },
+    { name: 'successText', label: 'Текст после отправки', type: 'text' },
   ],
 }
 
 export const ProjectsCatalogBlock: Block = {
   slug: 'projectsCatalog',
   interfaceName: 'ProjectsCatalogBlock',
-  labels: { singular: 'Projects catalog', plural: 'Projects catalogs' },
+  labels: { singular: 'Каталог проектов', plural: 'Каталоги проектов' },
   fields: [
-    { name: 'heading', type: 'text', required: true },
-    { name: 'body', type: 'textarea' },
+    { name: 'heading', label: 'Заголовок', type: 'text', required: true },
+    { name: 'body', label: 'Текст', type: 'textarea' },
   ],
 }
 
 export const FaqBlock: Block = {
   slug: 'faq',
   interfaceName: 'FaqBlock',
-  labels: { singular: 'FAQ', plural: 'FAQ' },
+  labels: { singular: 'Вопрос-ответ', plural: 'Вопросы-ответы' },
   fields: [
-    { name: 'heading', type: 'text', required: true },
+    { name: 'heading', label: 'Заголовок', type: 'text', required: true },
     {
       name: 'items',
+      label: 'Вопросы',
+      labels: { singular: 'Вопрос', plural: 'Вопросы' },
       type: 'array',
       required: true,
       fields: [
-        { name: 'question', type: 'text', required: true },
-        { name: 'answer', type: 'textarea', required: true },
+        { name: 'question', label: 'Вопрос', type: 'text', required: true },
+        { name: 'answer', label: 'Ответ', type: 'textarea', required: true },
       ],
     },
   ],

@@ -13,53 +13,17 @@
  * via the `definition` "supportedTimezones".
  */
 export type SupportedTimezones =
-  | 'Pacific/Midway'
-  | 'Pacific/Niue'
-  | 'Pacific/Honolulu'
-  | 'Pacific/Rarotonga'
-  | 'America/Anchorage'
-  | 'Pacific/Gambier'
-  | 'America/Los_Angeles'
-  | 'America/Tijuana'
-  | 'America/Denver'
-  | 'America/Phoenix'
-  | 'America/Chicago'
-  | 'America/Guatemala'
-  | 'America/New_York'
-  | 'America/Bogota'
-  | 'America/Caracas'
-  | 'America/Santiago'
-  | 'America/Buenos_Aires'
-  | 'America/Sao_Paulo'
-  | 'Atlantic/South_Georgia'
-  | 'Atlantic/Azores'
-  | 'Atlantic/Cape_Verde'
-  | 'Europe/London'
-  | 'Europe/Berlin'
-  | 'Africa/Lagos'
-  | 'Europe/Athens'
-  | 'Africa/Cairo'
+  | 'Europe/Kaliningrad'
   | 'Europe/Moscow'
-  | 'Asia/Riyadh'
-  | 'Asia/Dubai'
-  | 'Asia/Baku'
-  | 'Asia/Karachi'
-  | 'Asia/Tashkent'
-  | 'Asia/Calcutta'
-  | 'Asia/Dhaka'
-  | 'Asia/Almaty'
-  | 'Asia/Jakarta'
-  | 'Asia/Bangkok'
-  | 'Asia/Shanghai'
-  | 'Asia/Singapore'
-  | 'Asia/Tokyo'
-  | 'Asia/Seoul'
-  | 'Australia/Brisbane'
-  | 'Australia/Sydney'
-  | 'Pacific/Guam'
-  | 'Pacific/Noumea'
-  | 'Pacific/Auckland'
-  | 'Pacific/Fiji';
+  | 'Europe/Samara'
+  | 'Asia/Yekaterinburg'
+  | 'Asia/Omsk'
+  | 'Asia/Krasnoyarsk'
+  | 'Asia/Irkutsk'
+  | 'Asia/Yakutsk'
+  | 'Asia/Vladivostok'
+  | 'Asia/Magadan'
+  | 'Asia/Kamchatka';
 
 export interface Config {
   auth: {
@@ -133,7 +97,7 @@ export interface User {
   id: number;
   role: 'super-admin' | 'hq-admin' | 'hq-editor' | 'partner-owner' | 'partner-editor' | 'viewer';
   /**
-   * Stable partner id from the operational system. Empty for HQ users.
+   * Стабильный идентификатор партнёра из операционной системы. Для сотрудников штаба оставьте пустым.
    */
   partnerExternalId?: string | null;
   updatedAt: string;
@@ -192,7 +156,7 @@ export interface Site {
       }[]
     | null;
   /**
-   * Operational partner id. Required for partner sites.
+   * Идентификатор партнёра в операционной системе. Обязателен для партнёрских сайтов.
    */
   partnerExternalId?: string | null;
   brand?: {
@@ -243,7 +207,7 @@ export interface Page {
   isHome?: boolean | null;
   parent?: (number | null) | Page;
   /**
-   * Unique within a site. Computed from parent + slug.
+   * Уникален в пределах сайта. Собирается из родителя и слага.
    */
   fullPath?: string | null;
   layout?:
@@ -302,7 +266,7 @@ export interface PopularProjectsBlock {
   catalogHref?: string | null;
   catalogLabel?: string | null;
   /**
-   * Operational project ids. Empty = fixture default set.
+   * ID проектов из каталога. Пусто — набор по умолчанию.
    */
   projectIds?:
     | {
@@ -438,7 +402,7 @@ export interface Lead {
   createdAt: string;
 }
 /**
- * Editorial overlay for an operational project. Do not store prices here.
+ * Редакторская обложка операционного проекта. Цены здесь не хранятся.
  *
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "project-content".

@@ -9,7 +9,8 @@ import { ProjectCard } from '../../../components/project-card'
 import { SiteChrome } from '../../../components/site-chrome'
 import { createCatalogProvider } from '../../../lib/catalog/fixture-provider'
 import { canonicalUrl } from '../../../lib/canonical'
-import { copy } from '../../../lib/copy'
+import { copy, footerAboutFor } from '../../../lib/copy'
+import { OG_LOCALE } from '../../../lib/locale'
 import { loadSiteForHost } from '../../../lib/request-site'
 
 type Args = { searchParams: Promise<{ floors?: string; minArea?: string }> }
@@ -18,8 +19,9 @@ export async function generateMetadata(): Promise<Metadata> {
   const headerList = await headers()
   const host = headerList.get('x-forwarded-host') || headerList.get('host') || 'localhost'
   return {
-    title: copy.catalog,
+    title: copy.catalogProjects,
     alternates: { canonical: canonicalUrl(host, '/projects') },
+    openGraph: { locale: OG_LOCALE, title: copy.catalogProjects },
   }
 }
 
@@ -48,13 +50,16 @@ export default async function CatalogPage({ searchParams }: Args) {
         name={site.name}
         logo={site.brand?.logo}
         phone={site.contacts?.phone}
+        email={site.contacts?.email}
+        address={site.contacts?.address}
         navigation={site.navigation}
         footer={site.footer?.legal}
+        about={footerAboutFor(site.name)}
       >
         <main className="section">
           <div className="section__inner">
-            <p className="eyebrow">{site.name}</p>
-            <h1>{copy.catalog}</h1>
+            <p className="eyebrow">{copy.catalog}</p>
+            <h1>{copy.catalogProjects}</h1>
             <CatalogFilters floors={params.floors} minArea={params.minArea} />
             <div className="grid-3">
               {items.map((project) => (
