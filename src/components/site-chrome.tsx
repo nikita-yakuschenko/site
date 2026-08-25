@@ -1,9 +1,10 @@
 'use client'
 
 import { useEffect, useState, type ReactNode } from 'react'
-import { IconMenu2, IconX } from '@tabler/icons-react'
+import { IconFileTextShield, IconMenu2, IconX } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import { mediaUrl } from '../lib/media'
+import { RegionSwitch } from './region-switch'
 
 type NavItem = { label?: string | null; href?: string | null }
 type MediaLike = { url?: string | null } | number | string | null | undefined
@@ -52,9 +53,21 @@ export function SiteChrome({
     <div className="site-shell">
       <header className={overlay ? 'site-header site-header--overlay' : 'site-header site-header--solid'}>
         <div className="site-header__inner">
+          <div className="site-header__meta">
+            <RegionSwitch />
+            <span className="site-escrow" aria-label={copy.escrow}>
+              <IconFileTextShield className="site-escrow__mark" size={16} stroke={1.75} aria-hidden="true" />
+              <span aria-hidden="true">
+                <span className="site-escrow__full">{copy.escrow}</span>
+                <span className="site-escrow__short">{copy.escrowShort}</span>
+              </span>
+            </span>
+          </div>
+
           <div className="site-header__plaque">
-            <a href="/" className="site-header__brand">
-              <img src={src} alt={name} />
+            <a href="/" className="site-header__brand" aria-label={name}>
+              <img className="site-header__logo site-header__logo--lg" src={src} alt="" />
+              <img className="site-header__logo site-header__logo--sm" src="/logo.svg" alt="" />
             </a>
 
             <nav className="site-header__nav" aria-label={copy.navAria}>
@@ -72,8 +85,7 @@ export function SiteChrome({
                 </a>
               ) : null}
               <a className="btn btn-yellow site-header__cta" href="/#contacts">
-                <span className="site-header__cta-full">{copy.askQuestion}</span>
-                <span className="site-header__cta-short">{copy.askQuestionShort}</span>
+                {copy.askQuestion}
               </a>
               <button
                 type="button"

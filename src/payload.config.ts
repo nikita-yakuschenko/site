@@ -2,7 +2,7 @@ import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { ru } from '@payloadcms/translations/languages/ru'
 import path from 'path'
-import { buildConfig } from 'payload'
+import { buildConfig, type PayloadEmailAdapter } from 'payload'
 import { fileURLToPath } from 'url'
 import sharp from 'sharp'
 
@@ -18,8 +18,16 @@ const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
 const serverURL = process.env.NEXT_PUBLIC_SERVER_URL || 'http://localhost:3000'
 
+const localEmail: PayloadEmailAdapter = () => ({
+  name: 'console',
+  defaultFromAddress: 'noreply@avgst.ru',
+  defaultFromName: 'Авангард Строй',
+  sendEmail: async () => undefined,
+})
+
 export default buildConfig({
   serverURL,
+  email: localEmail,
   i18n: {
     fallbackLanguage: 'ru',
     supportedLanguages: { ru },

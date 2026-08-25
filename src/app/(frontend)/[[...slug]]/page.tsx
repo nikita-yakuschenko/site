@@ -10,7 +10,7 @@ import { RefreshRouteOnSave } from '../../../components/refresh-preview'
 import { SiteChrome } from '../../../components/site-chrome'
 import { createCatalogProvider } from '../../../lib/catalog/fixture-provider'
 import { canonicalUrl } from '../../../lib/canonical'
-import { footerAboutFor } from '../../../lib/copy'
+import { copy, footerAboutFor } from '../../../lib/copy'
 import { OG_LOCALE } from '../../../lib/locale'
 import { loadSiteForHost } from '../../../lib/request-site'
 
@@ -25,10 +25,15 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { slug } = await params
   const resolved = await loadPage(pathFromSlug(slug))
   const { isEnabled: isDraft } = await draftMode()
-  if (!resolved?.page) return { title: 'Авангард Строй', robots: isDraft ? { index: false, follow: false } : undefined }
+  if (!resolved?.page) return { title: copy.seoTitle, robots: isDraft ? { index: false, follow: false } : undefined }
   const headerList = await headers()
   const host = headerList.get('x-forwarded-host') || headerList.get('host') || 'localhost'
-  const title = resolved.page.seo?.title || resolved.page.title || resolved.site.defaultSeo?.title || resolved.site.name
+  const isHome = !slug?.length
+  const title =
+    resolved.page.seo?.title ||
+    (isHome ? copy.seoTitle : resolved.page.title) ||
+    resolved.site.defaultSeo?.title ||
+    copy.seoTitle
   const description = resolved.page.seo?.description || resolved.site.defaultSeo?.description || ''
   const canonical = resolved.page.seo?.canonical || canonicalUrl(host, resolved.page.fullPath || '/')
   return {

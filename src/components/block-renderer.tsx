@@ -1,12 +1,12 @@
 import { isRegisteredBlock } from '../blocks/registry'
 import { copy } from '../lib/copy'
-import { mediaUrl, splitHeadline } from '../lib/media'
+import { mediaUrl } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
 import { FactoryVideo } from './factory-video'
+import { HeroCarousel } from './hero-carousel'
 import { LeadForm } from './lead-form'
 import { ProjectCard } from './project-card'
 
-type Action = { label?: string | null; href?: string | null }
 type MediaLike = { url?: string | null } | number | string | null | undefined
 
 export type LayoutBlock = { blockType: string } & Record<string, unknown>
@@ -17,36 +17,8 @@ export type SiteContacts = {
   address?: string | null
 }
 
-function Hero({ block, fallbackImage }: { block: LayoutBlock; fallbackImage?: string }) {
-  const [greenPart, darkPart] = splitHeadline(String(block.heading || copy.heroHeadline))
-  const src = mediaUrl(block.media as MediaLike) || fallbackImage || '/fixtures/house-1.jpg'
-  const primary = block.primaryAction as Action | null
-  const secondary = block.secondaryAction as Action | null
-  return (
-    <section className={`hero hero--${block.size || 'large'}`}>
-      <img src={src} alt="" className="landing-ken" />
-      <div className="hero__veil" />
-      <div className="hero__content">
-        <h1>
-          <span className="hero__green">{greenPart}</span>
-          {darkPart ? <> {darkPart}</> : null}
-        </h1>
-        {block.description ? <p>{String(block.description)}</p> : null}
-        <div className="hero__actions">
-          {primary?.href && primary.label ? (
-            <a className="btn btn-yellow" href={primary.href}>
-              {primary.label}
-            </a>
-          ) : null}
-          {secondary?.href && secondary.label ? (
-            <a className="btn btn-outline" href={secondary.href}>
-              {secondary.label}
-            </a>
-          ) : null}
-        </div>
-      </div>
-    </section>
-  )
+function Hero() {
+  return <HeroCarousel />
 }
 
 function PopularProjects({ block, projects }: { block: LayoutBlock; projects: CatalogProject[] }) {
@@ -228,7 +200,6 @@ export function BlockRenderer({
   const list = blocks || []
   const formBlock = list.find((block) => block.blockType === 'leadForm') || null
   const hasContacts = list.some((block) => block.blockType === 'contactsSection')
-  const heroImage = projects.find((project) => project.imageUrl)?.imageUrl
 
   return (
     <>
@@ -237,7 +208,7 @@ export function BlockRenderer({
           return <UnknownBlock key={`${block.blockType}-${index}`} type={block.blockType} />
         }
         if (block.blockType === 'hero') {
-          return <Hero key={index} block={block} fallbackImage={heroImage} />
+          return <Hero key={index} />
         }
         if (block.blockType === 'popularProjects') {
           return <PopularProjects key={index} block={block} projects={projects} />

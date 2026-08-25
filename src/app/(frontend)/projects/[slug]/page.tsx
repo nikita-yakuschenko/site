@@ -25,7 +25,7 @@ export async function generateMetadata({ params }: Args): Promise<Metadata> {
   const { isEnabled: isDraft } = await draftMode()
   const site = await loadSiteForHost(payload, host, isDraft)
   const project = await createCatalogProvider().getBySlug(slug, { siteCode: String(site?.code || 'corporate') })
-  if (!project) return { title: 'Авангард Строй' }
+  if (!project) return { title: copy.seoTitle }
   const title = project.name
   const description = project.description
   const url = canonicalUrl(host, project.href)

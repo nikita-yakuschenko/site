@@ -54,6 +54,8 @@ npm run dev
 
 `npm audit fix --force` не запускать: он ломает пины Payload (`sharp` / `vitest`), а дыру `drizzle-kit` внутри `@payloadcms/db-postgres` всё равно не закрывает.
 
+Если в терминале сыпется hydration mismatch с `bis_skin_checked` / `bis_register` — это расширение Bitrix в Chrome, не баг сайта. Отключи его на `localhost`.
+
 ## Где что лежит
 
 ```text
