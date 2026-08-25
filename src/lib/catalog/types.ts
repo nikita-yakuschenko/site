@@ -49,4 +49,4 @@ export interface ProjectCatalogProvider {
   getBySlug(slug: string, context: SiteCatalogContext): Promise<CatalogProject | null>
 }
 
-export { formatRub } from '../locale'
+export { formatFromRub, formatRub } from '../locale'

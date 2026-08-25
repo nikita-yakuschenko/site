@@ -17,9 +17,9 @@ export function CatalogFilters({ floors, minArea }: { floors?: string; minArea?:
           {copy.area}
           <select name="minArea" defaultValue={minArea || ''}>
             <option value="">—</option>
-            <option value="90">90</option>
-            <option value="110">110</option>
-            <option value="120">120</option>
+            <option value="90">от 90 {copy.specArea}</option>
+            <option value="110">от 110 {copy.specArea}</option>
+            <option value="120">от 120 {copy.specArea}</option>
           </select>
         </label>
         <button className="btn btn-primary" type="submit">

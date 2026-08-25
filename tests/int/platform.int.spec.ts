@@ -159,4 +159,9 @@ describe('russian locale', () => {
     const { formatDate } = await import('../../src/lib/locale')
     expect(formatDate('2026-08-25T12:00:00+03:00')).toBe('25.08.2026')
   })
+
+  it('formats date-time as 24-hour Moscow time', async () => {
+    const { formatDateTime } = await import('../../src/lib/locale')
+    expect(formatDateTime('2026-08-25T19:25:00+03:00')).toBe('25.08.2026 19:25')
+  })
 })

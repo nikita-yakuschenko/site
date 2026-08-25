@@ -1,5 +1,5 @@
 import { copy } from '../copy'
-import { formatRub, type CatalogProject, type ProjectCatalogProvider, type ProjectQuery, type SiteCatalogContext } from './types'
+import { formatFromRub, type CatalogProject, type ProjectCatalogProvider, type ProjectQuery, type SiteCatalogContext } from './types'
 
 const IMG = {
   barn113: '/fixtures/house-1.jpg',
@@ -22,7 +22,7 @@ function project(
   return {
     ...partial,
     href: `/projects/${partial.slug}`,
-    priceLabel: partial.priceAmount == null ? copy.priceOnRequest : `от ${formatRub(partial.priceAmount)}`,
+    priceLabel: partial.priceAmount == null ? copy.priceOnRequest : formatFromRub(partial.priceAmount),
     options: partial.options ?? OPTIONS,
   }
 }

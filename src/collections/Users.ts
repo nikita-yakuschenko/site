@@ -7,9 +7,17 @@ export const Users: CollectionConfig = {
   admin: {
     useAsTitle: 'email',
     group: 'Система',
+    defaultColumns: ['email', 'role', 'createdAt'],
   },
   auth: true,
   fields: [
+    {
+      name: 'email',
+      type: 'email',
+      label: 'Почта',
+      required: true,
+      unique: true,
+    },
     {
       name: 'role',
       label: 'Роль',

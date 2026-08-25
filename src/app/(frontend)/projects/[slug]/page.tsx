@@ -7,12 +7,12 @@ import { LeadForm } from '../../../../components/lead-form'
 import { PreviewBanner } from '../../../../components/preview-banner'
 import { ProjectConfigurator } from '../../../../components/project-configurator'
 import { ProjectGallery } from '../../../../components/project-gallery'
+import { ProjectHero } from '../../../../components/project-hero'
 import { SiteChrome } from '../../../../components/site-chrome'
 import { createCatalogProvider } from '../../../../lib/catalog/fixture-provider'
 import { canonicalUrl } from '../../../../lib/canonical'
 import { copy, footerAboutFor } from '../../../../lib/copy'
 import { OG_LOCALE } from '../../../../lib/locale'
-import { splitProjectName } from '../../../../lib/media'
 import { loadSiteForHost } from '../../../../lib/request-site'
 
 type Args = { params: Promise<{ slug: string }> }
@@ -63,7 +63,6 @@ export default async function ProjectPage({ params }: Args) {
   const extraImages = (overlay?.additionalMedia || [])
     .map((row) => (typeof row.image === 'object' && row.image?.url ? row.image.url : ''))
     .filter(Boolean)
-  const { text, digits } = splitProjectName(title)
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -91,39 +90,7 @@ export default async function ProjectPage({ params }: Args) {
         footer={site.footer?.legal}
         about={footerAboutFor(site.name)}
       >
-        <section className="hero hero--large">
-          <img src={project.imageUrl} alt="" />
-          <div className="hero__veil" />
-          <div className="hero__content">
-            <nav className="crumbs" aria-label="Breadcrumb">
-              <a href="/">{copy.breadcrumbsHome}</a>
-              <span>/</span>
-              <a href="/projects">{copy.breadcrumbsCatalog}</a>
-            </nav>
-            <p className="badge badge--on-dark">{project.technologyBadge}</p>
-            <h1>
-              {text} {digits ? <span className="hero__green">{digits}</span> : null}
-            </h1>
-            <ul className="specs specs--on-dark">
-              <li>
-                {project.area} {copy.specArea}
-              </li>
-              <li>
-                {project.floors} {copy.specFloors}
-              </li>
-              <li>
-                {project.bedrooms} {copy.specBed}
-              </li>
-              <li>
-                {project.bathrooms} {copy.specBath}
-              </li>
-            </ul>
-            <p className="price price--on-dark">{project.priceLabel}</p>
-            <a className="btn btn-yellow" href="#lead">
-              {copy.consult}
-            </a>
-          </div>
-        </section>
+        <ProjectHero project={project} title={title} />
         <section className="section">
           <div className="section__inner glass-panel">
             <p>{description}</p>

@@ -64,7 +64,7 @@ export function LeadForm({
       </label>
       <label>
         {copy.phone}
-        <input name="phone" required autoComplete="tel" inputMode="tel" />
+        <input name="phone" required autoComplete="tel" inputMode="tel" placeholder={copy.phonePlaceholder} />
       </label>
       <label>
         {copy.message}

@@ -56,7 +56,7 @@ export async function seed(): Promise<void> {
   })
 
   const corporateData = {
-    name: 'Avangard Stroy',
+    name: 'Авангард Строй',
     code: 'corporate',
     type: 'corporate' as const,
     status: 'published' as const,

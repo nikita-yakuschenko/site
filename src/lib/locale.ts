@@ -5,16 +5,6 @@ export const CURRENCY = 'RUB'
 export const DATE_FORMAT = 'dd.MM.yyyy'
 export const DATETIME_FORMAT = 'dd.MM.yyyy HH:mm'
 
-const dateTime = new Intl.DateTimeFormat(LOCALE, {
-  timeZone: TIMEZONE,
-  day: '2-digit',
-  month: '2-digit',
-  year: 'numeric',
-  hour: '2-digit',
-  minute: '2-digit',
-  hour12: false,
-})
-
 const dateOnly = new Intl.DateTimeFormat(LOCALE, {
   timeZone: TIMEZONE,
   day: '2-digit',
@@ -22,9 +12,17 @@ const dateOnly = new Intl.DateTimeFormat(LOCALE, {
   year: 'numeric',
 })
 
+const timeOnly = new Intl.DateTimeFormat(LOCALE, {
+  timeZone: TIMEZONE,
+  hour: '2-digit',
+  minute: '2-digit',
+  hourCycle: 'h23',
+})
+
 const money = new Intl.NumberFormat(LOCALE, {
   style: 'currency',
   currency: CURRENCY,
+  currencyDisplay: 'symbol',
   maximumFractionDigits: 0,
 })
 
@@ -34,8 +32,12 @@ export function formatDate(value: Date | string | number): string {
   return dateOnly.format(new Date(value))
 }
 
+export function formatTime(value: Date | string | number): string {
+  return timeOnly.format(new Date(value))
+}
+
 export function formatDateTime(value: Date | string | number): string {
-  return dateTime.format(new Date(value))
+  return `${formatDate(value)} ${formatTime(value)}`
 }
 
 export function formatNumber(value: number): string {
@@ -44,6 +46,10 @@ export function formatNumber(value: number): string {
 
 export function formatRub(amount: number): string {
   return money.format(amount)
+}
+
+export function formatFromRub(amount: number): string {
+  return `от ${formatRub(amount)}`
 }
 
 export const russianTimezones = [

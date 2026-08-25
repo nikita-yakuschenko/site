@@ -32,7 +32,7 @@ export function SiteChrome({
   about?: string | null
 }) {
   const [menuOpen, setMenuOpen] = useState(false)
-  const src = mediaUrl(logo)
+  const src = mediaUrl(logo) || '/logo_lg.svg'
   const items = (navigation?.filter((item) => item.label && item.href && item.href !== '/') || [
     { label: copy.catalogProjects, href: '/projects' },
     { label: copy.contacts, href: '/#contacts' },
@@ -54,10 +54,10 @@ export function SiteChrome({
         <div className="site-header__inner">
           <div className="site-header__plaque">
             <a href="/" className="site-header__brand">
-              {src ? <img src={src} alt="" /> : <strong>{name}</strong>}
+              <img src={src} alt={name} />
             </a>
 
-            <nav className="site-header__nav" aria-label="Site">
+            <nav className="site-header__nav" aria-label={copy.navAria}>
               {items.map((item) => (
                 <a key={`${item.href}-${item.label}`} href={item.href}>
                   {item.label}
@@ -120,8 +120,8 @@ export function SiteChrome({
       <footer className="site-footer">
         <div className="footer-grid">
           <div>
-            <a href="/" className="site-header__brand">
-              {src ? <img src={src} alt="" /> : <strong>{name}</strong>}
+            <a href="/" className="site-footer__brand">
+              <img src={src} alt={name} />
             </a>
             <p className="footer-about">{about || copy.footerAbout}</p>
             <a className="footer-muted" href="/#contacts">

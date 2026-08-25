@@ -207,7 +207,7 @@ export interface Page {
   isHome?: boolean | null;
   parent?: (number | null) | Page;
   /**
-   * Уникален в пределах сайта. Собирается из родителя и слага.
+   * Уникален в пределах сайта. Собирается из родителя и адреса в URL.
    */
   fullPath?: string | null;
   layout?:

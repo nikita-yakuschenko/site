@@ -23,11 +23,28 @@ export default buildConfig({
   i18n: {
     fallbackLanguage: 'ru',
     supportedLanguages: { ru },
+    translations: {
+      ru: {
+        general: {
+          email: 'Почта',
+          emailAddress: 'Электронная почта',
+        },
+        authentication: {
+          emailSent: 'Письмо отправлено',
+          forgotPasswordEmailInstructions:
+            'Введите адрес электронной почты. Вы получите письмо с инструкцией по восстановлению пароля.',
+        },
+        validation: {
+          emailAddress: 'Введите корректный адрес электронной почты.',
+        },
+      },
+    },
   },
   admin: {
     user: Users.slug,
     meta: {
       titleSuffix: '— Авангард Строй',
+      icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' }],
     },
     dateFormat: DATETIME_FORMAT,
     timezones: {

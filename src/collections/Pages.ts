@@ -44,7 +44,7 @@ export const Pages: CollectionConfig = {
       index: true,
     },
     { name: 'title', label: 'Заголовок', type: 'text', required: true },
-    { name: 'slug', label: 'Слаг', type: 'text', required: true, index: true },
+    { name: 'slug', label: 'Адрес в URL', type: 'text', required: true, index: true },
     {
       name: 'pageType',
       label: 'Тип страницы',
@@ -75,7 +75,7 @@ export const Pages: CollectionConfig = {
       label: 'Полный путь',
       type: 'text',
       index: true,
-      admin: { readOnly: true, description: 'Уникален в пределах сайта. Собирается из родителя и слага.' },
+      admin: { readOnly: true, description: 'Уникален в пределах сайта. Собирается из родителя и адреса в URL.' },
     },
     {
       name: 'layout',
