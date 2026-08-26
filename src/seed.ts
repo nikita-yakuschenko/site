@@ -55,12 +55,100 @@ const HOME_LAYOUT = [
   },
 ]
 
+const CATALOG_SEED = [
+  {
+    name: 'Барнхаус 113',
+    slug: 'barn-113',
+    technology: 'modular' as const,
+    area: 116,
+    floors: 1,
+    bedrooms: 3,
+    bathrooms: 2,
+    description: 'Одноэтажный модульный барнхаус с террасой и готовой заводской комплектацией.',
+  },
+  {
+    name: 'Барнхаус 115',
+    slug: 'barn-115',
+    technology: 'panel-frame' as const,
+    area: 115,
+    floors: 1,
+    bedrooms: 3,
+    bathrooms: 1,
+    description: 'Панельно-каркасный барнхаус с кухней-гостиной и отдельной мастер-спальней.',
+  },
+  {
+    name: 'Барнхаус 121',
+    slug: 'barn-121',
+    technology: 'modular' as const,
+    area: 122,
+    floors: 1,
+    bedrooms: 3,
+    bathrooms: 1,
+    description: 'Модульный дом с панорамным остеклением и готовой заводской отделкой.',
+  },
+  {
+    name: 'Барнхаус 134',
+    slug: 'barn-134',
+    technology: 'modular' as const,
+    area: 134,
+    floors: 1,
+    bedrooms: 3,
+    bathrooms: 2,
+    description: 'Просторный одноэтажный барнхаус с двумя санузлами и широкой террасой.',
+  },
+  {
+    name: 'Барнхаус 147',
+    slug: 'barn-147',
+    technology: 'panel-frame' as const,
+    area: 147,
+    floors: 2,
+    bedrooms: 4,
+    bathrooms: 2,
+    description: 'Двухэтажный панельно-каркасный барнхаус с четырьмя спальнями.',
+  },
+  {
+    name: 'Барнхаус 74',
+    slug: 'barn-74',
+    technology: 'modular' as const,
+    area: 76,
+    floors: 1,
+    bedrooms: 2,
+    bathrooms: 1,
+    description: 'Компактный модульный дом для постоянного проживания и отдыха.',
+  },
+]
+
 export async function seed(): Promise<void> {
   assertEnv()
   const { getPayload } = await import('payload')
   const { default: config } = await import('./payload.config')
   const payload = await getPayload({ config })
   const ctx = { disableRevalidate: true }
+
+  for (const item of CATALOG_SEED) {
+    const existing = await payload.find({
+      collection: 'catalog',
+      where: { slug: { equals: item.slug } },
+      limit: 1,
+      overrideAccess: true,
+    })
+    if (existing.docs[0]) {
+      await payload.update({
+        collection: 'catalog',
+        id: existing.docs[0].id,
+        overrideAccess: true,
+        context: ctx,
+        data: item,
+      })
+    } else {
+      await payload.create({
+        collection: 'catalog',
+        overrideAccess: true,
+        context: ctx,
+        data: item,
+      })
+    }
+  }
 
   const existingCorporate = await payload.find({
     collection: 'sites',

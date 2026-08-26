@@ -5,7 +5,7 @@ export const Media: CollectionConfig = {
   slug: 'media',
   labels: { singular: 'Файл', plural: 'Файлы' },
   admin: {
-    group: 'Контент',
+    group: 'Управление контентом',
   },
   access: {
     read: anyone,

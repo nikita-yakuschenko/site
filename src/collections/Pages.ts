@@ -15,7 +15,7 @@ export const Pages: CollectionConfig = {
   labels: { singular: 'Страница', plural: 'Страницы' },
   admin: {
     useAsTitle: 'title',
-    group: 'Контент',
+    group: 'Управление контентом',
     defaultColumns: ['title', 'fullPath', 'site', '_status'],
     livePreview: {
       url: ({ data }) => generatePreviewUrl(String(data?.fullPath || '/')),

@@ -67,12 +67,14 @@ export const PopularProjectsBlock: Block = {
     { name: 'catalogHref', label: 'Ссылка на каталог', type: 'text', defaultValue: '/projects' },
     { name: 'catalogLabel', label: 'Текст ссылки', type: 'text' },
     {
-      name: 'projectIds',
+      name: 'projects',
       label: 'Проекты',
-      labels: { singular: 'Проект', plural: 'Проекты' },
-      type: 'array',
-      admin: { description: 'ID проектов из каталога. Пусто — набор по умолчанию.' },
-      fields: [{ name: 'id', label: 'ID проекта', type: 'text', required: true }],
+      type: 'relationship',
+      relationTo: 'catalog',
+      hasMany: true,
+      admin: {
+        description: 'Пусто — покажем проекты из каталога по умолчанию (первые по списку).',
+      },
     },
   ],
 }

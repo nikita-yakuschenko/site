@@ -11,7 +11,7 @@ import { Media } from './collections/Media'
 import { Sites } from './collections/Sites'
 import { Pages } from './collections/Pages'
 import { Leads } from './collections/Leads'
-import { ProjectContent } from './collections/ProjectContent'
+import { Catalog } from './collections/Catalog'
 import { DATETIME_FORMAT, TIMEZONE, russianTimezones } from './lib/locale'
 
 const filename = fileURLToPath(import.meta.url)
@@ -50,6 +50,9 @@ export default buildConfig({
   },
   admin: {
     user: Users.slug,
+    avatar: {
+      Component: '/components/admin/AdminAccount#AdminAccount',
+    },
     meta: {
       titleSuffix: '— Авангард Строй',
       icons: [{ rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' }],
@@ -62,6 +65,18 @@ export default buildConfig({
     importMap: {
       baseDir: path.resolve(dirname),
     },
+    components: {
+      providers: ['/components/admin/AdminChrome#AdminChrome'],
+      actions: ['/components/admin/AdminLogout#AdminLogout'],
+      logout: {
+        Button: '/components/admin/AdminLogout#AdminNavLogout',
+      },
+      beforeNavLinks: ['/components/admin/AdminGraphics#AdminNavBrand'],
+      graphics: {
+        Logo: '/components/admin/AdminGraphics#AdminLogo',
+        Icon: '/components/admin/AdminGraphics#AdminIcon',
+      },
+    },
     livePreview: {
       collections: ['pages'],
       breakpoints: [
@@ -70,7 +85,7 @@ export default buildConfig({
       ],
     },
   },
-  collections: [Users, Media, Sites, Pages, Leads, ProjectContent],
+  collections: [Media, Pages, Catalog, Sites, Leads, Users],
   editor: lexicalEditor(),
   secret: process.env.PAYLOAD_SECRET || '',
   typescript: {

@@ -6,10 +6,13 @@ const PARTNER_ROLES = new Set(['partner-owner', 'partner-editor'])
 type AuthedUser = {
   role?: string | null
   partnerExternalId?: string | null
+  blocked?: boolean | null
 }
 
 function authed(user: unknown): AuthedUser | null {
-  return (user as AuthedUser | null) ?? null
+  const next = (user as AuthedUser | null) ?? null
+  if (!next || next.blocked) return null
+  return next
 }
 
 export function isHqRole(role: string | null | undefined): boolean {
@@ -22,17 +25,17 @@ export function isPartnerRole(role: string | null | undefined): boolean {
 
 export const anyone: Access = () => true
 
-export const authenticated: Access = ({ req }) => Boolean(req.user)
+export const authenticated: Access = ({ req }) => Boolean(authed(req.user))
 
 export const hqOnly: Access = ({ req }) => isHqRole(authed(req.user)?.role)
 
 export const publishedOrAuthenticated: Access = ({ req }) => {
-  if (req.user) return true
+  if (authed(req.user)) return true
   const where: Where = { _status: { equals: 'published' } }
   return where
 }
 
-export const isLoggedIn = ({ req }: { req: PayloadRequest }): boolean => Boolean(req.user)
+export const isLoggedIn = ({ req }: { req: PayloadRequest }): boolean => Boolean(authed(req.user))
 
 async function siteIdsForPartner(req: PayloadRequest, partnerExternalId: string): Promise<number[]> {
   const sites = await req.payload.find({

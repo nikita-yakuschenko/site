@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import { partnerCannotSeeForeignSite } from '../../src/access'
 import { isRegisteredBlock } from '../../src/blocks/registry'
 import { canonicalUrl } from '../../src/lib/canonical'
-import { createCatalogProvider } from '../../src/lib/catalog/fixture-provider'
+import { FixtureCatalogProvider } from '../../src/lib/catalog/fixture-provider'
 import { allowLeadAttempt, leadInputSchema } from '../../src/lib/leads'
 import { assertUniqueHostnames, normalizeHost, resolveSiteByHost } from '../../src/lib/host'
 import { isPreviewSecretValid } from '../../src/lib/preview'
@@ -83,14 +83,14 @@ describe('tenant isolation', () => {
 
 describe('catalog provider', () => {
   it('filters by floors', async () => {
-    const provider = createCatalogProvider()
+    const provider = new FixtureCatalogProvider()
     const { items } = await provider.list({ siteCode: 'corporate', floors: 1 })
     expect(items.length).toBeGreaterThan(0)
     expect(items.every((item) => item.floorsValue === 1)).toBe(true)
   })
 
   it('returns project page data without storing price in CMS shape', async () => {
-    const project = await createCatalogProvider().getBySlug('barn-113', { siteCode: 'corporate' })
+    const project = await new FixtureCatalogProvider().getBySlug('barn-113', { siteCode: 'corporate' })
     expect(project?.priceLabel).toBeTruthy()
     expect(project?.options.length).toBeGreaterThan(0)
   })

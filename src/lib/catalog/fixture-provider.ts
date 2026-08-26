@@ -138,6 +138,10 @@ const FIXTURES: CatalogProject[] = [
   }),
 ]
 
+export function getFixtureBySlug(slug: string): CatalogProject | null {
+  return FIXTURES.find((item) => item.slug === slug) ?? null
+}
+
 export class FixtureCatalogProvider implements ProjectCatalogProvider {
   constructor(private readonly source = FIXTURES) {}
 
@@ -162,8 +166,4 @@ export class FixtureCatalogProvider implements ProjectCatalogProvider {
   async getBySlug(slug: string, _context: SiteCatalogContext): Promise<CatalogProject | null> {
     return this.source.find((item) => item.slug === slug) ?? null
   }
-}
-
-export function createCatalogProvider(): ProjectCatalogProvider {
-  return new FixtureCatalogProvider()
 }

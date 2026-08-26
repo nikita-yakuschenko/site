@@ -8,7 +8,7 @@ import { BlockRenderer, type LayoutBlock } from '../../../components/block-rende
 import { PreviewBanner } from '../../../components/preview-banner'
 import { RefreshRouteOnSave } from '../../../components/refresh-preview'
 import { SiteChrome } from '../../../components/site-chrome'
-import { createCatalogProvider } from '../../../lib/catalog/fixture-provider'
+import { createCatalogProvider } from '../../../lib/catalog/payload-provider'
 import { canonicalUrl } from '../../../lib/canonical'
 import { copy, footerAboutFor } from '../../../lib/copy'
 import { OG_LOCALE } from '../../../lib/locale'
@@ -73,10 +73,12 @@ export default async function Page({ params }: Args) {
   if (!resolved?.page) notFound()
 
   const ids = (resolved.page.layout || [])
-    .filter((block) => block.blockType === 'popularProjects' || block.blockType === 'projectsCatalog')
+    .filter((block) => block.blockType === 'popularProjects')
     .flatMap((block) => {
-      const rows = (block as { projectIds?: Array<{ id?: string }> }).projectIds || []
-      return rows.map((row) => row.id).filter((id): id is string => Boolean(id))
+      const rows = (block as { projects?: Array<number | { id?: number | string }> }).projects || []
+      return rows
+        .map((row) => (typeof row === 'object' && row ? String(row.id ?? '') : String(row)))
+        .filter(Boolean)
     })
 
   const catalog = createCatalogProvider()

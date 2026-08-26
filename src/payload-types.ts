@@ -31,12 +31,12 @@ export interface Config {
   };
   blocks: {};
   collections: {
-    users: User;
     media: Media;
-    sites: Site;
     pages: Page;
+    catalog: Catalog;
+    sites: Site;
     leads: Lead;
-    'project-content': ProjectContent;
+    users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
@@ -44,12 +44,12 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
-    users: UsersSelect<false> | UsersSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
-    sites: SitesSelect<false> | SitesSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
+    catalog: CatalogSelect<false> | CatalogSelect<true>;
+    sites: SitesSelect<false> | SitesSelect<true>;
     leads: LeadsSelect<false> | LeadsSelect<true>;
-    'project-content': ProjectContentSelect<false> | ProjectContentSelect<true>;
+    users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
     'payload-preferences': PayloadPreferencesSelect<false> | PayloadPreferencesSelect<true>;
@@ -91,36 +91,6 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users".
- */
-export interface User {
-  id: number;
-  role: 'super-admin' | 'hq-admin' | 'hq-editor' | 'partner-owner' | 'partner-editor' | 'viewer';
-  /**
-   * Стабильный идентификатор партнёра из операционной системы. Для сотрудников штаба оставьте пустым.
-   */
-  partnerExternalId?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  email: string;
-  resetPasswordToken?: string | null;
-  resetPasswordExpiration?: string | null;
-  salt?: string | null;
-  hash?: string | null;
-  loginAttempts?: number | null;
-  lockUntil?: string | null;
-  sessions?:
-    | {
-        id: string;
-        createdAt?: string | null;
-        expiresAt: string;
-      }[]
-    | null;
-  password?: string | null;
-  collection: 'users';
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
@@ -137,6 +107,46 @@ export interface Media {
   height?: number | null;
   focalX?: number | null;
   focalY?: number | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  site: number | Site;
+  title: string;
+  slug: string;
+  pageType: 'content' | 'product' | 'application';
+  isHome?: boolean | null;
+  parent?: (number | null) | Page;
+  /**
+   * Уникален в пределах сайта. Собирается из родителя и адреса в URL.
+   */
+  fullPath?: string | null;
+  layout?:
+    | (
+        | HeroBlock
+        | PopularProjectsBlock
+        | TextSectionBlock
+        | CtaBlock
+        | ProductionSectionBlock
+        | ContactsSectionBlock
+        | LeadFormBlock
+        | ProjectsCatalogBlock
+        | FaqBlock
+      )[]
+    | null;
+  seo?: {
+    title?: string | null;
+    description?: string | null;
+    image?: (number | null) | Media;
+    canonical?: string | null;
+    robots?: ('index' | 'noindex') | null;
+  };
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -196,46 +206,6 @@ export interface Site {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "pages".
- */
-export interface Page {
-  id: number;
-  site: number | Site;
-  title: string;
-  slug: string;
-  pageType: 'content' | 'product' | 'application';
-  isHome?: boolean | null;
-  parent?: (number | null) | Page;
-  /**
-   * Уникален в пределах сайта. Собирается из родителя и адреса в URL.
-   */
-  fullPath?: string | null;
-  layout?:
-    | (
-        | HeroBlock
-        | PopularProjectsBlock
-        | TextSectionBlock
-        | CtaBlock
-        | ProductionSectionBlock
-        | ContactsSectionBlock
-        | LeadFormBlock
-        | ProjectsCatalogBlock
-        | FaqBlock
-      )[]
-    | null;
-  seo?: {
-    title?: string | null;
-    description?: string | null;
-    image?: (number | null) | Media;
-    canonical?: string | null;
-    robots?: ('index' | 'noindex') | null;
-  };
-  updatedAt: string;
-  createdAt: string;
-  _status?: ('draft' | 'published') | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "HeroBlock".
  */
 export interface HeroBlock {
@@ -266,16 +236,84 @@ export interface PopularProjectsBlock {
   catalogHref?: string | null;
   catalogLabel?: string | null;
   /**
-   * ID проектов из каталога. Пусто — набор по умолчанию.
+   * Пусто — покажем проекты из каталога по умолчанию (первые по списку).
    */
-  projectIds?:
-    | {
-        id: string;
-      }[]
-    | null;
+  projects?: (number | Catalog)[] | null;
   id?: string | null;
   blockName?: string | null;
   blockType: 'popularProjects';
+}
+/**
+ * Карточки домов для сайта. Не привязаны к сайту — в блоках страницы выбираешь, какие проекты показать.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "catalog".
+ */
+export interface Catalog {
+  id: number;
+  name: string;
+  /**
+   * Например barnhouse-113. Если пусто — соберём из названия.
+   */
+  slug: string;
+  description?: string | null;
+  cover?: (number | null) | Media;
+  technology: 'modular' | 'panel-frame';
+  area: number;
+  floors: number;
+  bedrooms: number;
+  bathrooms: number;
+  /**
+   * Пусто — «цена по запросу».
+   */
+  priceAmount?: number | null;
+  /**
+   * Необязательно. Нужен, когда появится синхронизация с 1С / ОС.
+   */
+  externalId?: string | null;
+  floorPlans?:
+    | {
+        title?: string | null;
+        image: number | Media;
+        /**
+         * Список помещений и площадей. Метки на плане — по желанию.
+         */
+        rooms?:
+          | {
+              name: string;
+              area?: number | null;
+              markX?: number | null;
+              markY?: number | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  exteriors?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  interiors?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  options?:
+    | {
+        name: string;
+        price?: number | null;
+        defaultSelected?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -402,25 +440,38 @@ export interface Lead {
   createdAt: string;
 }
 /**
- * Редакторская обложка операционного проекта. Цены здесь не хранятся.
- *
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "project-content".
+ * via the `definition` "users".
  */
-export interface ProjectContent {
+export interface User {
   id: number;
-  externalProjectId: string;
-  site: number | Site;
-  editorialTitle?: string | null;
-  editorialDescription?: string | null;
-  additionalMedia?:
-    | {
-        image: number | Media;
-        id?: string | null;
-      }[]
-    | null;
+  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  role: 'super-admin' | 'hq-admin' | 'hq-editor' | 'partner-owner' | 'partner-editor' | 'viewer';
+  /**
+   * Из операционной системы. Для сотрудников штаба оставьте пустым.
+   */
+  partnerExternalId?: string | null;
+  blocked?: boolean | null;
   updatedAt: string;
   createdAt: string;
+  email: string;
+  resetPasswordToken?: string | null;
+  resetPasswordExpiration?: string | null;
+  salt?: string | null;
+  hash?: string | null;
+  loginAttempts?: number | null;
+  lockUntil?: string | null;
+  sessions?:
+    | {
+        id: string;
+        createdAt?: string | null;
+        expiresAt: string;
+      }[]
+    | null;
+  password?: string | null;
+  collection: 'users';
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -447,28 +498,28 @@ export interface PayloadLockedDocument {
   id: number;
   document?:
     | ({
-        relationTo: 'users';
-        value: number | User;
-      } | null)
-    | ({
         relationTo: 'media';
         value: number | Media;
-      } | null)
-    | ({
-        relationTo: 'sites';
-        value: number | Site;
       } | null)
     | ({
         relationTo: 'pages';
         value: number | Page;
       } | null)
     | ({
+        relationTo: 'catalog';
+        value: number | Catalog;
+      } | null)
+    | ({
+        relationTo: 'sites';
+        value: number | Site;
+      } | null)
+    | ({
         relationTo: 'leads';
         value: number | Lead;
       } | null)
     | ({
-        relationTo: 'project-content';
-        value: number | ProjectContent;
+        relationTo: 'users';
+        value: number | User;
       } | null);
   globalSlug?: string | null;
   user: {
@@ -514,30 +565,6 @@ export interface PayloadMigration {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "users_select".
- */
-export interface UsersSelect<T extends boolean = true> {
-  role?: T;
-  partnerExternalId?: T;
-  updatedAt?: T;
-  createdAt?: T;
-  email?: T;
-  resetPasswordToken?: T;
-  resetPasswordExpiration?: T;
-  salt?: T;
-  hash?: T;
-  loginAttempts?: T;
-  lockUntil?: T;
-  sessions?:
-    | T
-    | {
-        id?: T;
-        createdAt?: T;
-        expiresAt?: T;
-      };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
@@ -553,66 +580,6 @@ export interface MediaSelect<T extends boolean = true> {
   height?: T;
   focalX?: T;
   focalY?: T;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "sites_select".
- */
-export interface SitesSelect<T extends boolean = true> {
-  name?: T;
-  code?: T;
-  type?: T;
-  status?: T;
-  subdomain?: T;
-  customDomains?:
-    | T
-    | {
-        hostname?: T;
-        id?: T;
-      };
-  partnerExternalId?: T;
-  brand?:
-    | T
-    | {
-        logo?: T;
-        mobileLogo?: T;
-        favicon?: T;
-        permittedTheme?: T;
-      };
-  contacts?:
-    | T
-    | {
-        phone?: T;
-        email?: T;
-        address?: T;
-      };
-  socialLinks?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-        id?: T;
-      };
-  navigation?:
-    | T
-    | {
-        label?: T;
-        href?: T;
-        id?: T;
-      };
-  footer?:
-    | T
-    | {
-        legal?: T;
-      };
-  defaultSeo?:
-    | T
-    | {
-        title?: T;
-        description?: T;
-      };
-  updatedAt?: T;
-  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -686,11 +653,7 @@ export interface PopularProjectsBlockSelect<T extends boolean = true> {
   heading?: T;
   catalogHref?: T;
   catalogLabel?: T;
-  projectIds?:
-    | T
-    | {
-        id?: T;
-      };
+  projects?: T;
   id?: T;
   blockName?: T;
 }
@@ -791,6 +754,123 @@ export interface FaqBlockSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "catalog_select".
+ */
+export interface CatalogSelect<T extends boolean = true> {
+  name?: T;
+  slug?: T;
+  description?: T;
+  cover?: T;
+  technology?: T;
+  area?: T;
+  floors?: T;
+  bedrooms?: T;
+  bathrooms?: T;
+  priceAmount?: T;
+  externalId?: T;
+  floorPlans?:
+    | T
+    | {
+        title?: T;
+        image?: T;
+        rooms?:
+          | T
+          | {
+              name?: T;
+              area?: T;
+              markX?: T;
+              markY?: T;
+              id?: T;
+            };
+        id?: T;
+      };
+  exteriors?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  interiors?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  options?:
+    | T
+    | {
+        name?: T;
+        price?: T;
+        defaultSelected?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "sites_select".
+ */
+export interface SitesSelect<T extends boolean = true> {
+  name?: T;
+  code?: T;
+  type?: T;
+  status?: T;
+  subdomain?: T;
+  customDomains?:
+    | T
+    | {
+        hostname?: T;
+        id?: T;
+      };
+  partnerExternalId?: T;
+  brand?:
+    | T
+    | {
+        logo?: T;
+        mobileLogo?: T;
+        favicon?: T;
+        permittedTheme?: T;
+      };
+  contacts?:
+    | T
+    | {
+        phone?: T;
+        email?: T;
+        address?: T;
+      };
+  socialLinks?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  navigation?:
+    | T
+    | {
+        label?: T;
+        href?: T;
+        id?: T;
+      };
+  footer?:
+    | T
+    | {
+        legal?: T;
+      };
+  defaultSeo?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "leads_select".
  */
 export interface LeadsSelect<T extends boolean = true> {
@@ -806,21 +886,31 @@ export interface LeadsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "project-content_select".
+ * via the `definition` "users_select".
  */
-export interface ProjectContentSelect<T extends boolean = true> {
-  externalProjectId?: T;
-  site?: T;
-  editorialTitle?: T;
-  editorialDescription?: T;
-  additionalMedia?:
-    | T
-    | {
-        image?: T;
-        id?: T;
-      };
+export interface UsersSelect<T extends boolean = true> {
+  fullName?: T;
+  firstName?: T;
+  lastName?: T;
+  role?: T;
+  partnerExternalId?: T;
+  blocked?: T;
   updatedAt?: T;
   createdAt?: T;
+  email?: T;
+  resetPasswordToken?: T;
+  resetPasswordExpiration?: T;
+  salt?: T;
+  hash?: T;
+  loginAttempts?: T;
+  lockUntil?: T;
+  sessions?:
+    | T
+    | {
+        id?: T;
+        createdAt?: T;
+        expiresAt?: T;
+      };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

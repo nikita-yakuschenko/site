@@ -9,7 +9,7 @@ import { ProjectConfigurator } from '../../../../components/project-configurator
 import { ProjectGallery } from '../../../../components/project-gallery'
 import { ProjectHero } from '../../../../components/project-hero'
 import { SiteChrome } from '../../../../components/site-chrome'
-import { createCatalogProvider } from '../../../../lib/catalog/fixture-provider'
+import { createCatalogProvider } from '../../../../lib/catalog/payload-provider'
 import { canonicalUrl } from '../../../../lib/canonical'
 import { copy, footerAboutFor } from '../../../../lib/copy'
 import { OG_LOCALE } from '../../../../lib/locale'
@@ -49,20 +49,8 @@ export default async function ProjectPage({ params }: Args) {
   const project = await createCatalogProvider().getBySlug(slug, { siteCode: String(site.code) })
   if (!project) notFound()
 
-  const editorial = await payload.find({
-    collection: 'project-content',
-    where: {
-      and: [{ site: { equals: site.id } }, { externalProjectId: { equals: project.id } }],
-    },
-    limit: 1,
-    depth: 1,
-  })
-  const overlay = editorial.docs[0]
-  const title = overlay?.editorialTitle || project.name
-  const description = overlay?.editorialDescription || project.description
-  const extraImages = (overlay?.additionalMedia || [])
-    .map((row) => (typeof row.image === 'object' && row.image?.url ? row.image.url : ''))
-    .filter(Boolean)
+  const title = project.name
+  const description = project.description
 
   const jsonLd = {
     '@context': 'https://schema.org',
@@ -96,7 +84,7 @@ export default async function ProjectPage({ params }: Args) {
             <p>{description}</p>
           </div>
         </section>
-        <ProjectGallery title={copy.exteriors} images={[...project.exteriors, ...extraImages]} />
+        <ProjectGallery title={copy.exteriors} images={project.exteriors} />
         <ProjectGallery title={copy.interiors} images={project.interiors} />
         <ProjectGallery title={copy.floorPlans} images={project.floorPlans} />
         <ProjectConfigurator options={project.options} basePrice={project.priceAmount} />
