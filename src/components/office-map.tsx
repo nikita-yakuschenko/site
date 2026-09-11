@@ -1,10 +1,11 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import { copy } from '../lib/copy'
 import {
   OFFICE_CENTER,
   OFFICE_MAP_ZOOM,
-  YANDEX_MAPS_KEY,
+  OFFICE_ROUTE_URL,
   yandexMapsLoaderUrl,
 } from '../lib/office'
 import { SITE } from '../lib/site'
@@ -12,12 +13,16 @@ import { SITE } from '../lib/site'
 /**
  * Карта офиса без интерфейса Яндекс.Карт.
  *
- * Загрузчик 2.1 приезжает при первом открытии панели, а не вместе со
- * страницей: в шапке карта нужна редко, а библиотека весит заметно.
- * Органы управления выключены (`controls: []`), блок «Открыть в Яндекс.
- * Картах» подавлен, жесты сняты — карта работает как превью, клик по ней
- * обрабатывает ссылка снаружи. Строка копирайта остаётся: её скрытие
- * нарушало бы лицензию.
+ * Ключ берётся из /api/maps-key в рантайме, а не из NEXT_PUBLIC_-переменной:
+ * такая переменная вшивается на этапе `next build`, который идёт внутри
+ * `docker build`, куда окружение контейнера Dokploy не попадает. С запросом
+ * ключ подхватывается при запуске и меняется без пересборки.
+ *
+ * Библиотека 2.1 приезжает при первом открытии панели, а не вместе со
+ * страницей. Органы управления выключены (`controls: []`), блок «Открыть в
+ * Яндекс.Картах» подавлен, жесты сняты — карта работает как превью, клик по
+ * ней ведёт на маршрут. Строка копирайта остаётся: её скрытие нарушало бы
+ * лицензию.
  */
 
 type YmapsMap = { destroy: () => void }
@@ -43,10 +48,22 @@ declare global {
   var ymaps: Ymaps | undefined
 }
 
-/** Загрузчик один на страницу: панель открывают много раз, скрипт нужен раз. */
+/** Ключ и загрузчик — по одному на страницу: панель открывают много раз. */
+let keyRequest: Promise<string> | null = null
 let loader: Promise<Ymaps> | null = null
 
-function loadYmaps(): Promise<Ymaps> {
+function readKey(): Promise<string> {
+  if (keyRequest) return keyRequest
+  keyRequest = fetch('/api/maps-key')
+    .then((response) => (response.ok ? response.json() : { key: '' }))
+    .then((data: { key?: string }) => data.key ?? '')
+  keyRequest.catch(() => {
+    keyRequest = null
+  })
+  return keyRequest
+}
+
+function loadYmaps(apikey: string): Promise<Ymaps> {
   if (loader) return loader
   loader = new Promise<Ymaps>((resolve, reject) => {
     if (globalThis.ymaps) {
@@ -54,7 +71,7 @@ function loadYmaps(): Promise<Ymaps> {
       return
     }
     const script = document.createElement('script')
-    script.src = yandexMapsLoaderUrl(YANDEX_MAPS_KEY)
+    script.src = yandexMapsLoaderUrl(apikey)
     script.async = true
     script.onload = () => {
       if (globalThis.ymaps) resolve(globalThis.ymaps)
@@ -70,18 +87,20 @@ function loadYmaps(): Promise<Ymaps> {
   return loader
 }
 
-export function OfficeMap() {
+export function OfficeMap({ onNavigate }: { onNavigate?: () => void }) {
   const host = useRef<HTMLDivElement>(null)
-  const [failed, setFailed] = useState(false)
+  const [ready, setReady] = useState(false)
 
   useEffect(() => {
-    // Без ключа выходим молча: состояние не трогаем, рендер и так вернёт null.
-    if (!YANDEX_MAPS_KEY) return
-
     let map: YmapsMap | null = null
     let cancelled = false
 
-    loadYmaps()
+    readKey()
+      .then((apikey) => {
+        // Ключа нет — карта просто не показывается, панель остаётся рабочей.
+        if (!apikey) throw new Error('ключ JS API не задан')
+        return loadYmaps(apikey)
+      })
       .then((ymaps) => {
         ymaps.ready(() => {
           if (cancelled || !host.current) return
@@ -102,10 +121,11 @@ export function OfficeMap() {
             ),
           )
           map = instance
+          setReady(true)
         })
       })
       .catch(() => {
-        if (!cancelled) setFailed(true)
+        // Молча: блок карты остаётся неотрисованным.
       })
 
     return () => {
@@ -114,7 +134,18 @@ export function OfficeMap() {
     }
   }, [])
 
-  if (failed || !YANDEX_MAPS_KEY) return null
-
-  return <div className="site-office__map-canvas" ref={host} aria-hidden="true" />
+  return (
+    <a
+      className={ready ? 'site-office__map is-ready' : 'site-office__map'}
+      href={OFFICE_ROUTE_URL}
+      target="_blank"
+      rel="noopener noreferrer"
+      aria-label={copy.officeMapOpen}
+      aria-hidden={ready ? undefined : true}
+      tabIndex={ready ? undefined : -1}
+      onClick={onNavigate}
+    >
+      <div className="site-office__map-canvas" ref={host} />
+    </a>
+  )
 }

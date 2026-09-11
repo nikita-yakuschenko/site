@@ -1693,7 +1693,14 @@ body.hero-on-light .site-office__label {
 /* Карта-превью между расписанием и остановками: сначала «когда», потом
    «где», потом «как добраться». Рамка на светлой теме нужна — у карты
    Яндекса светлый фон, и без неё она сливается с панелью. */
+/* До готовности карты блок не занимает места: если ключа нет или JS API не
+   загрузился, панель выглядит так же, как до появления карты, без пустой
+   серой заглушки. */
 .site-office__map {
+  display: none;
+}
+
+.site-office__map.is-ready {
   display: block;
   margin: 16px 0 0;
   aspect-ratio: 16 / 10;
@@ -1863,11 +1870,6 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-office__map {
     display: none;
   }
 
-  /* Индикатор справа от надписи: на телефоне статус стоит у правого края,
-     и точка у края читается как принадлежащая строке, а не соседу слева. */
-  .site-office__trigger {
-    flex-direction: row-reverse;
-  }
   .site-office__label--full {
     display: none;
   }

@@ -66,10 +66,10 @@ export const OFFICE_MAP_ZOOM = 16
 /**
  * Ключ уходит в браузер вместе с адресом загрузчика — иначе JS API не
  * работает. Защита здесь не в секретности, а в ограничении по HTTP Referer
- * в кабинете Яндекса.
+ * в кабинете Яндекса. Само значение компонент карты берёт из /api/maps-key,
+ * то есть в рантайме: NEXT_PUBLIC_-переменная вшилась бы на сборке, куда
+ * окружение контейнера не попадает.
  */
-export const YANDEX_MAPS_KEY = process.env.NEXT_PUBLIC_YANDEX_MAPS_KEY ?? ''
-
 export function yandexMapsLoaderUrl(apikey: string): string {
   const params = new URLSearchParams({ apikey, lang: 'ru_RU' })
   return `https://api-maps.yandex.ru/2.1/?${params.toString()}`
