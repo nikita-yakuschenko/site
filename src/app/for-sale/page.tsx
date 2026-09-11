@@ -3,16 +3,16 @@ import { InfoPage } from '../../components/info-page'
 import { copy } from '../../lib/copy'
 
 export const metadata: Metadata = {
-  title: copy.builtHousesTitle,
-  description: copy.builtHousesLead,
+  title: copy.readyHousesTitle,
+  description: copy.readyHousesLead,
 }
 
-export default function BuiltHousesPage() {
+export default function ForSalePage() {
   return (
     <InfoPage
-      eyebrow={copy.builtHouses}
-      title={copy.builtHousesTitle}
-      lead={copy.builtHousesLead}
+      eyebrow={copy.readyHouses}
+      title={copy.readyHousesTitle}
+      lead={copy.readyHousesLead}
       cta={copy.consult}
     />
   )

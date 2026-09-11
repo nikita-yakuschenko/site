@@ -18,13 +18,13 @@ export const HOME_LAYOUT: LayoutBlock[] = [
     theme: 'dark',
     size: 'large',
     primaryAction: { label: copy.consult, href: '/#contacts' },
-    secondaryAction: { label: copy.catalogCta, href: '/projects' },
+    secondaryAction: { label: copy.catalogCta, href: '/catalog' },
   },
   {
     blockType: 'popularProjects',
     eyebrow: copy.popularEyebrow,
     heading: copy.popularHeading,
-    catalogHref: '/projects',
+    catalogHref: '/catalog',
     catalogLabel: copy.allProjects,
   },
   {
