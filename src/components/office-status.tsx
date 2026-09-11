@@ -6,9 +6,9 @@ import { copy } from '../lib/copy'
 import {
   formatRange,
   OFFICE_SCHEDULE,
-  readOfficeStatus,
-  readServerOfficeStatus,
-  rowForDay,
+  readOfficeState,
+  readServerOfficeState,
+  statusHeadline,
   statusLabel,
   subscribeOfficeStatus,
   type OfficeStatus,
@@ -40,15 +40,13 @@ export function OfficeStatusIndicator() {
     if (closeTimer.current) clearTimeout(closeTimer.current)
     closeTimer.current = setTimeout(() => setOpen(false), 220)
   }
-  const status = useSyncExternalStore(
+  // Всё, что зависит от времени, приходит одним снимком: иначе уточнение и
+  // подсветка дня подвисали бы, пока статус остаётся прежним.
+  const { status, detail, todayKey } = useSyncExternalStore(
     subscribeOfficeStatus,
-    readOfficeStatus,
-    readServerOfficeStatus,
+    readOfficeState,
+    readServerOfficeState,
   )
-
-  // Строка расписания за сегодня подсвечивается в панели. До гидратации дня
-  // ещё не знаем, поэтому ничего не выделяем.
-  const todayKey = status === 'unknown' ? null : rowForDay(new Date().getDay())?.key
 
   useEffect(() => () => {
     if (closeTimer.current) clearTimeout(closeTimer.current)
@@ -106,10 +104,13 @@ export function OfficeStatusIndicator() {
 
       {open ? (
         <div className="site-office__panel" role="group" aria-label={copy.officeStatusAria}>
-          <p className="site-office__panel-status">
-            <span className={`site-office__dot site-office__dot--${status}`} aria-hidden="true" />
-            {statusLabel(status)}
-          </p>
+          <div className="site-office__head">
+            <p className="site-office__headline">
+              <span className={`site-office__dot site-office__dot--${status}`} aria-hidden="true" />
+              {statusHeadline(status)}
+            </p>
+            {detail ? <p className="site-office__detail">{detail}</p> : null}
+          </div>
           <dl className="site-office__hours">
             {OFFICE_SCHEDULE.map((row) => (
               <div

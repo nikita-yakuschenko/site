@@ -33,8 +33,6 @@ export const OFFICE_SCHEDULE: readonly ScheduleRow[] = [
 
 export function formatRange(row: ScheduleRow): string {
   if (row.from === null || row.to === null) return copy.officeByArrangement
-  const hhmm = (value: number) =>
-    `${String(Math.floor(value / 60)).padStart(2, '0')}.${String(value % 60).padStart(2, '0')}`
   return `${hhmm(row.from)} – ${hhmm(row.to)}`
 }
 
@@ -97,17 +95,52 @@ export function statusLabel(status: OfficeStatus): string {
 }
 
 /**
- * Источник для useSyncExternalStore: статус зависит от времени, то есть
- * является внешним по отношению к React состоянием. Так компонент обходится
- * без setState в эффекте и не расходится между сервером и клиентом.
+ * Состояние панели целиком, а не один статус.
+ *
+ * Уточнение и подсветка дня зависят от даты не меньше статуса: в пятницу
+ * вечером и в воскресенье днём статус одинаково «закрыто», но «откроемся
+ * завтра» указывает на разные дни. Если хранить только статус, перерисовки
+ * не случится и текст подвиснет — ровно это и происходило через полночь.
+ */
+export type OfficeState = {
+  status: OfficeStatus
+  detail: string | null
+  todayKey: ScheduleRow['key'] | null
+}
+
+const SERVER_STATE: OfficeState = { status: 'unknown', detail: null, todayKey: null }
+
+function computeState(date: Date): OfficeState {
+  const clock = officeClock(date)
+  if (!clock) return SERVER_STATE
+  return {
+    status: officeStatusAt(date),
+    detail: statusDetail(date),
+    todayKey: rowForDay(clock.day)?.key ?? null,
+  }
+}
+
+/**
+ * Источник для useSyncExternalStore: состояние зависит от времени, то есть
+ * является внешним по отношению к React. Так компонент обходится без
+ * setState в эффекте и не расходится между сервером и клиентом.
  */
 const listeners = new Set<() => void>()
 let timer: ReturnType<typeof setInterval> | null = null
-let snapshot: OfficeStatus = 'unknown'
+let snapshot: OfficeState = SERVER_STATE
+// Ключ нужен, чтобы отдавать прежний объект, пока ничего не изменилось:
+// useSyncExternalStore сравнивает снимки по ссылке.
+let snapshotKey = ''
+
+function keyOf(state: OfficeState): string {
+  return `${state.status}|${state.detail ?? ''}|${state.todayKey ?? ''}`
+}
 
 function refresh(): void {
-  const next = officeStatusAt(new Date())
-  if (next === snapshot) return
+  const next = computeState(new Date())
+  const key = keyOf(next)
+  if (key === snapshotKey) return
+  snapshotKey = key
   snapshot = next
   for (const listener of listeners) listener()
 }
@@ -128,13 +161,83 @@ export function subscribeOfficeStatus(listener: () => void): () => void {
   }
 }
 
-export function readOfficeStatus(): OfficeStatus {
-  if (typeof window === 'undefined') return 'unknown'
-  if (!timer) snapshot = officeStatusAt(new Date())
+export function readOfficeState(): OfficeState {
+  if (typeof window === 'undefined') return SERVER_STATE
+  if (!timer) {
+    const next = computeState(new Date())
+    const key = keyOf(next)
+    if (key !== snapshotKey) {
+      snapshotKey = key
+      snapshot = next
+    }
+  }
   return snapshot
 }
 
 /** На сервере времени посетителя ещё нет — отдаём нейтральное состояние. */
-export function readServerOfficeStatus(): OfficeStatus {
-  return 'unknown'
+export function readServerOfficeState(): OfficeState {
+  return SERVER_STATE
+}
+
+/** Дни недели в предложном падеже: «откроемся в среду», «во вторник». */
+const DAY_IN: readonly string[] = [
+  'в воскресенье',
+  'в понедельник',
+  'во вторник',
+  'в среду',
+  'в четверг',
+  'в пятницу',
+  'в субботу',
+]
+
+function hhmm(value: number): string {
+  return `${String(Math.floor(value / 60)).padStart(2, '0')}.${String(value % 60).padStart(2, '0')}`
+}
+
+/**
+ * Заголовок панели.
+ *
+ * Намеренно не повторяет надпись в шапке: состояние человек уже прочитал,
+ * и дублировать его в самой заметной строке панели — терять место впустую.
+ * Статус внутри панели по-прежнему виден по цвету точки.
+ */
+export function statusHeadline(status: OfficeStatus): string {
+  if (status === 'open') return copy.officeWelcome
+  if (status === 'soon-open') return copy.officeAlmostOpen
+  if (status === 'soon-close') return copy.officeStillTime
+  if (status === 'closed') return copy.officeClosedNow
+  return copy.officeHours
+}
+
+/**
+ * Конкретика под заголовком: до скольки сегодня работаем или когда откроемся.
+ * Время называем точкой на часах, а не обратным отсчётом, — так строка не
+ * меняется каждую минуту и не требует возни с падежами.
+ */
+export function statusDetail(date: Date): string | null {
+  const clock = officeClock(date)
+  if (!clock) return null
+  const today = rowForDay(clock.day)
+
+  if (today && today.from !== null && today.to !== null) {
+    const { minutes } = clock
+    if (minutes >= today.from && minutes < today.to) {
+      return `${copy.officeTodayUntil} ${hhmm(today.to)}`
+    }
+    if (minutes < today.from) {
+      return `${copy.officeOpensAt} ${hhmm(today.from)}`
+    }
+  }
+
+  // Ищем ближайший рабочий день вперёд.
+  for (let ahead = 1; ahead <= 7; ahead += 1) {
+    const day = (clock.day + ahead) % 7
+    const row = rowForDay(day)
+    if (!row || row.from === null) continue
+    const when = ahead === 1 ? copy.officeTomorrow : DAY_IN[day]
+    // Предлог здесь свой: officeOpensAt уже несёт «Открываемся в», и от его
+    // переиспользования получалось «откроемся завтра открываемся в 10.00».
+    return `${copy.officeOpensOn} ${when} в ${hhmm(row.from)}`
+  }
+  return null
 }

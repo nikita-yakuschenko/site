@@ -1633,14 +1633,26 @@ body.hero-on-light .site-office__label {
   color: var(--avgst-ink);
 }
 
-.site-office__panel-status {
+.site-office__head {
+  margin-bottom: 16px;
+}
+
+.site-office__headline {
   display: flex;
   align-items: center;
   gap: 10px;
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01em;
+}
+
+/* Конкретика идёт второй строкой и выровнена по тексту заголовка, а не по
+   точке: колонка текста остаётся одной. */
+.site-office__detail {
+  margin: 4px 0 0 17px;
+  font-size: 13px;
+  opacity: 0.7;
 }
 
 .site-office__hours {
@@ -1711,4 +1723,23 @@ body.hero-on-light .site-office__label {
   .site-office__panel {
     min-width: 268px;
   }
+}
+
+/* Светлый баннер: шапка переключается в тёмный текст на светлом фоне, и
+   панель графика работы должна следовать за ней так же, как меню региона.
+   Признак тот же — класс hero-on-light на body, который карусель ставит,
+   определив тон кадра. */
+body.hero-on-light .site-header:not(.site-header--solid) .site-office__panel {
+  background: white;
+  color: var(--avgst-ink);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  border: 1px solid #e8eaee;
+}
+
+body.hero-on-light .site-header:not(.site-header--solid) .site-office__hours {
+  border-color: #e8eaee;
+}
+
+body.hero-on-light .site-header:not(.site-header--solid) .site-office__hours > div.is-today {
+  background: #f3f4f6;
 }
