@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState, type ReactNode } from 'react'
-import { IconFileTextShield, IconMenu2, IconX } from '@tabler/icons-react'
+import { IconMenu2, IconX } from '@tabler/icons-react'
 import Link from 'next/link'
 import { copy } from '../lib/copy'
 import { mediaUrl } from '../lib/media'
@@ -57,13 +57,9 @@ export function SiteChrome({
         <div className="site-header__inner">
           <div className="site-header__meta">
             <RegionSwitch />
-            <span className="site-escrow" aria-label={copy.escrow}>
-              <IconFileTextShield className="site-escrow__mark" size={16} stroke={1.75} aria-hidden="true" />
-              <span aria-hidden="true">
-                <span className="site-escrow__full">{copy.escrow}</span>
-                <span className="site-escrow__short">{copy.escrowShort}</span>
-              </span>
-            </span>
+            <Link className="site-meta-link" href="/mortgage">
+              {copy.mortgage}
+            </Link>
             <OfficeStatusIndicator />
           </div>
 

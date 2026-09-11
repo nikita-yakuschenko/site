@@ -180,16 +180,6 @@ a { color: inherit; text-decoration: none; }
   text-decoration-color: currentColor;
 }
 
-.site-region__chevron {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0.7;
-  transition: transform 0.15s ease;
-}
-
-.site-region__chevron.is-open { transform: rotate(180deg); }
-
 .site-region__menu {
   position: absolute;
   top: calc(100% + 8px);
@@ -244,35 +234,21 @@ a { color: inherit; text-decoration: none; }
   text-decoration: underline;
 }
 
-.site-escrow {
-  display: inline-flex;
-  align-items: center;
+/* Строчная ссылка в служебном ряду. Без подчёркивания: линия в этом ряду
+   спорила с подписью статуса офиса справа. Жёлтой плашки здесь больше нет —
+   она забирала внимание первого экрана, ничего при этом не сообщая. */
+.site-meta-link {
   flex-shrink: 0;
-  gap: 6px;
-  height: 24px;
-  padding: 0 12px 0 10px;
-  border: 0;
-  border-radius: 6px;
-  background: var(--brand-yellow);
-  color: var(--brand-yellow-foreground);
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.site-escrow__short { display: inline; }
-.site-escrow__full { display: none; }
-
-@media (min-width: 720px) {
-  .site-escrow__short { display: none; }
-  .site-escrow__full { display: inline; }
-}
-
-.site-escrow__mark {
-  display: block;
-  flex: 0 0 auto;
   color: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  white-space: nowrap;
+  text-decoration: none;
+  transition: opacity 0.2s var(--ease-out);
+}
+
+.site-meta-link:hover {
+  opacity: 0.7;
 }
 
 .site-header__plaque {
@@ -845,6 +821,41 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: -0.02em;
+}
+
+/* Страница ипотеки. Заглушка под AV4-15: текст, список программ, заявка. */
+.mortgage__lead {
+  max-width: 60ch;
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+.mortgage__programs {
+  display: grid;
+  gap: 10px;
+  margin: 28px 0 32px;
+  padding: 0;
+  list-style: none;
+  font-size: 15px;
+  line-height: 1.4;
+}
+
+.mortgage__programs li {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+/* Маркер точкой, а не буллетом списка: тот же приём, что в блоке завода. */
+.mortgage__programs li::before {
+  content: '';
+  flex: 0 0 auto;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--avgst-green);
 }
 
 .grid-3 {
@@ -1595,6 +1606,10 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   opacity: 0.6;
 }
 
+.site-office__label--short {
+  display: none;
+}
+
 .site-office__label {
   white-space: nowrap;
   text-decoration: underline;
@@ -1673,6 +1688,34 @@ body.hero-on-light .site-office__label {
   font-size: 13px;
   line-height: 1.35;
   opacity: 0.62;
+}
+
+/* Карта-превью между расписанием и остановками: сначала «когда», потом
+   «где», потом «как добраться». Рамка на светлой теме нужна — у карты
+   Яндекса светлый фон, и без неё она сливается с панелью. */
+.site-office__map {
+  display: block;
+  margin: 16px 0 0;
+  aspect-ratio: 16 / 10;
+  border-radius: 10px;
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.06);
+}
+
+.site-header--solid .site-office__map,
+body.hero-on-light .site-header:not(.site-header--solid) .site-office__map {
+  background: #f3f4f6;
+  box-shadow: inset 0 0 0 1px #e8eaee;
+}
+
+.site-office__map-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.site-office__map:focus-visible {
+  outline: 2px solid var(--brand-yellow);
+  outline-offset: 2px;
 }
 
 /* Остановки рядом. Иконочная колонка та же, что у адреса, поэтому левый
@@ -1805,9 +1848,16 @@ body.hero-on-light .site-office__label {
 }
 
 @media (max-width: 768px) {
-  /* В узкой шапке служебный ряд и так тесный: оставляем только точку. */
-  .site-office__label {
+  /* В узкой шапке остаются только город и статус офиса: ссылка «Ипотека»
+     уходит в меню, иначе подпись статуса не помещается в строку. */
+  .site-meta-link {
     display: none;
+  }
+  .site-office__label--full {
+    display: none;
+  }
+  .site-office__label--short {
+    display: inline;
   }
   /* Панель больше не висит узкой колонкой у правого края, наезжая на баннер:
      на узком экране она занимает всю ширину контента. Правый край остаётся

@@ -42,6 +42,39 @@ const OFFICE_COORDS = '56.293760,43.978036'
 
 export const OFFICE_ROUTE_URL = `https://yandex.ru/maps/?rtext=~${OFFICE_COORDS}&rtt=auto&z=17`
 
+/**
+ * Карта-превью в панели: JavaScript API 2.1.
+ *
+ * Ни виджет, ни Static API не подошли. У виджета `map-widget` поверх карты
+ * живут кнопки зума, линейка и ссылка на условия использования, отключить их
+ * параметрами нельзя. Static API этот ключ не принимает — продукта нет в
+ * кабинете. JS API 2.1 позволяет собрать карту без органов управления:
+ * `controls: []` плюс `suppressMapOpenBlock`. Обязательная строка копирайта
+ * остаётся — её скрывать нельзя по лицензии.
+ */
+const [OFFICE_LAT = '0', OFFICE_LON = '0'] = OFFICE_COORDS.split(',')
+
+/** Центр карты для JS API: он ждёт «широта, долгота». */
+export const OFFICE_CENTER: readonly [number, number] = [
+  Number(OFFICE_LAT),
+  Number(OFFICE_LON),
+]
+
+/** 16, а не 17: с одним шагом назад в кадр попадают соседние ориентиры. */
+export const OFFICE_MAP_ZOOM = 16
+
+/**
+ * Ключ уходит в браузер вместе с адресом загрузчика — иначе JS API не
+ * работает. Защита здесь не в секретности, а в ограничении по HTTP Referer
+ * в кабинете Яндекса.
+ */
+export const YANDEX_MAPS_KEY = process.env.NEXT_PUBLIC_YANDEX_MAPS_KEY ?? ''
+
+export function yandexMapsLoaderUrl(apikey: string): string {
+  const params = new URLSearchParams({ apikey, lang: 'ru_RU' })
+  return `https://api-maps.yandex.ru/2.1/?${params.toString()}`
+}
+
 /** Остановки рядом с офисом. Порядок как в исходном списке. */
 export const OFFICE_TRANSIT = [
   { name: 'Гостиница «Ока»', distance: '450 метров' },
@@ -131,6 +164,37 @@ export function statusTrigger(date: Date, status: OfficeStatus): string {
   return statusLabel(status)
 }
 
+/**
+ * Короткая надпись для узкой шапки.
+ *
+ * На телефоне в служебном ряду остаются только город и статус офиса, и на
+ * полные формулировки места физически нет: «Откроемся в понедельник» — это
+ * 171px при 327px всей строки, из которых 162 занимает город. Отсюда первое
+ * лицо и сокращённый день недели.
+ */
+export function statusTriggerShort(date: Date, status: OfficeStatus): string {
+  if (status === 'open') return copy.officeOpenShort
+  if (status === 'soon-open') return copy.officeSoonOpenShort
+  if (status === 'soon-close') return copy.officeSoonCloseShort
+  if (status !== 'closed') return copy.officeHours
+
+  const clock = officeClock(date)
+  if (!clock) return copy.officeHours
+
+  const today = rowForDay(clock.day)
+  if (today && today.from !== null && clock.minutes < today.from) {
+    return `${copy.officeWeOpen} в ${hhmm(today.from)}`
+  }
+
+  for (let ahead = 1; ahead <= 7; ahead += 1) {
+    const day = (clock.day + ahead) % 7
+    const row = rowForDay(day)
+    if (!row || row.from === null) continue
+    return `${copy.officeWeOpen} ${ahead === 1 ? copy.officeTomorrow : DAY_IN_SHORT[day]}`
+  }
+  return copy.officeClosed
+}
+
 export function statusLabel(status: OfficeStatus): string {
   if (status === 'open') return copy.officeOpen
   if (status === 'soon-open') return copy.officeSoonOpen
@@ -151,6 +215,8 @@ export type OfficeState = {
   status: OfficeStatus
   /** Надпись в служебном ряду. Не всегда совпадает со статусом. */
   trigger: string
+  /** Она же для узкой шапки, где места меньше. */
+  triggerShort: string
   detail: string | null
   todayKey: ScheduleRow['key'] | null
 }
@@ -158,6 +224,7 @@ export type OfficeState = {
 const SERVER_STATE: OfficeState = {
   status: 'unknown',
   trigger: copy.officeHours,
+  triggerShort: copy.officeHours,
   detail: null,
   todayKey: null,
 }
@@ -169,6 +236,7 @@ function computeState(date: Date): OfficeState {
   return {
     status,
     trigger: statusTrigger(date, status),
+    triggerShort: statusTriggerShort(date, status),
     detail: statusDetail(date),
     todayKey: rowForDay(clock.day)?.key ?? null,
   }
@@ -187,7 +255,7 @@ let snapshot: OfficeState = SERVER_STATE
 let snapshotKey = ''
 
 function keyOf(state: OfficeState): string {
-  return `${state.status}|${state.trigger}|${state.detail ?? ''}|${state.todayKey ?? ''}`
+  return `${state.status}|${state.trigger}|${state.triggerShort}|${state.detail ?? ''}|${state.todayKey ?? ''}`
 }
 
 function refresh(): void {
@@ -242,6 +310,17 @@ const DAY_IN: readonly string[] = [
   'в четверг',
   'в пятницу',
   'в субботу',
+]
+
+/** То же для узкой шапки: «в понедельник» там не укладывается в строку. */
+const DAY_IN_SHORT: readonly string[] = [
+  'в вс',
+  'в пн',
+  'в вт',
+  'в ср',
+  'в чт',
+  'в пт',
+  'в сб',
 ]
 
 function hhmm(value: number): string {
