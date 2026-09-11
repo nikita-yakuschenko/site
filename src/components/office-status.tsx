@@ -12,7 +12,6 @@ import {
   readServerOfficeState,
   statusHeadline,
   subscribeOfficeStatus,
-  YANDEX_MAPS_KEY,
 } from '../lib/office'
 import { OfficeMap } from './office-map'
 
@@ -120,22 +119,10 @@ export function OfficeStatusIndicator() {
               </div>
             ))}
           </dl>
-          {/* Карта — превью: жесты у неё сняты, клик обрабатывает ссылка и
-              ведёт на маршрут, туда же, куда кнопка ниже. Без ключа JS API
-              компонент карты возвращает null, и остаётся пустая ссылка —
-              поэтому оборачиваем только при наличии ключа. */}
-          {YANDEX_MAPS_KEY ? (
-            <a
-              className="site-office__map"
-              href={OFFICE_ROUTE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              aria-label={copy.officeMapOpen}
-              onClick={() => setOpen(false)}
-            >
-              <OfficeMap />
-            </a>
-          ) : null}
+          {/* Карта — превью: жесты сняты, клик ведёт на маршрут, туда же,
+              куда кнопка ниже. Ключ компонент запрашивает сам; без ключа
+              блок остаётся свёрнутым в ноль и панель работает как прежде. */}
+          <OfficeMap onNavigate={() => setOpen(false)} />
           <ul className="site-office__transit">
             {OFFICE_TRANSIT.map((stop) => (
               <li key={stop.name}>
