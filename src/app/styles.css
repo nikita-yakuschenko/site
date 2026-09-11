@@ -1525,15 +1525,32 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   inset: 0;
   border-radius: 50%;
   /* Кольцо, а не заливка: расходящаяся волна не перекрывает саму точку,
-     иначе статус читался бы как мигание. */
-  border: 1px solid rgb(var(--office-halo) / 0.7);
-  animation: office-pulse 3s var(--ease-out) infinite;
+     иначе статус читался бы как мигание. Линейное время вместо ease-out:
+     с ускорением видимая часть волны проскакивала за полсекунды, и цикл
+     читался как разовая вспышка на загрузке. */
+  border: 1.5px solid rgb(var(--office-halo) / 0.9);
+  animation: office-pulse 2.6s linear infinite;
 }
 
+/* Волна занимает большую часть цикла и лишь в конце уступает место паузе,
+   поэтому пульс читается как ритм, а не как единичное срабатывание. */
 @keyframes office-pulse {
-  0% { transform: scale(1); opacity: 0.8; }
-  50% { transform: scale(3); opacity: 0; }
-  100% { transform: scale(3); opacity: 0; }
+  0% { transform: scale(1); opacity: 0.9; }
+  75% { transform: scale(3.4); opacity: 0; }
+  100% { transform: scale(3.4); opacity: 0; }
+}
+
+/* Сама точка едва заметно дышит: в паузе между волнами индикатор всё равно
+   остаётся живым. */
+.site-office__dot--open,
+.site-office__dot--soon-open,
+.site-office__dot--soon-close {
+  animation: office-breath 2.6s ease-in-out infinite;
+}
+
+@keyframes office-breath {
+  0%, 100% { transform: scale(1); }
+  38% { transform: scale(1.18); }
 }
 .site-office__dot--closed {
   --office-dot: #8a9099;
@@ -1669,14 +1686,15 @@ body.hero-on-light .site-office__label {
 }
 
 .site-office__cta {
+  /* Размер и отступы берём у .btn: кнопка должна совпадать с остальными
+     фирменными кнопками, а не жить по своим правилам. */
   display: flex;
   justify-content: center;
   margin-top: 16px;
-  padding-block: 10px;
-  font-size: 13px;
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .site-office__dot,
   .site-office__dot::after {
     animation: none;
   }
