@@ -1,12 +1,12 @@
 'use client'
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import Link from 'next/link'
 import { IconBus, IconMapPin } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
   formatRange,
   OFFICE_SCHEDULE,
+  OFFICE_ROUTE_URL,
   OFFICE_TRANSIT,
   readOfficeState,
   readServerOfficeState,
@@ -140,13 +140,17 @@ export function OfficeStatusIndicator() {
               <span className="site-office__address-line">{copy.officeAddressLine}</span>
             </span>
           </p>
-          <Link
+          {/* Внешний ресурс, поэтому обычная ссылка, а не Link, и новая
+              вкладка: уводить человека со страницы незачем. */}
+          <a
             className="btn btn-yellow site-office__cta"
-            href="/#contacts"
+            href={OFFICE_ROUTE_URL}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => setOpen(false)}
           >
             {copy.officeVisit}
-          </Link>
+          </a>
         </div>
       ) : null}
     </div>

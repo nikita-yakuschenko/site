@@ -31,6 +31,17 @@ export const OFFICE_SCHEDULE: readonly ScheduleRow[] = [
   { key: 'sunday', label: copy.officeSunday, days: [0], from: null, to: null },
 ]
 
+/**
+ * Маршрут до офиса на Яндекс.Картах.
+ *
+ * Точка назначения — координаты, а не адрес: геокодер по строке может
+ * промахнуться корпусом, координаты ведут ровно к входу. Начальная точка
+ * в rtext пуста, поэтому карты подставят текущее положение человека.
+ */
+const OFFICE_COORDS = '56.293760,43.978036'
+
+export const OFFICE_ROUTE_URL = `https://yandex.ru/maps/?rtext=~${OFFICE_COORDS}&rtt=auto&z=17`
+
 /** Остановки рядом с офисом. Порядок как в исходном списке. */
 export const OFFICE_TRANSIT = [
   { name: 'Гостиница «Ока»', distance: '450 метров' },
