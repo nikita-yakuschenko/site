@@ -701,6 +701,10 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   transform: translateY(-50%);
 }
 
+/* Заполнение обрезается маской, а не растягивается через scaleX: при
+   масштабировании по горизонтали скругление сжималось вместе с формой,
+   и концы полоски выглядели раздавленными. С обрезкой форма совпадает
+   с дорожкой в любой момент. */
 .hero__dots-fill {
   position: absolute;
   left: 0;
@@ -709,12 +713,12 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   height: 4px;
   border-radius: 100px;
   background: var(--brand-yellow);
-  transform: translateY(-50%) scaleX(0);
-  transform-origin: left center;
+  transform: translateY(-50%);
+  clip-path: inset(0 100% 0 0 round 100px);
 }
 
 .hero__dots button.is-done .hero__dots-fill {
-  transform: translateY(-50%) scaleX(1);
+  clip-path: inset(0 0 0 0 round 100px);
 }
 
 .hero__dots button.is-active .hero__dots-fill {
@@ -722,14 +726,14 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
 }
 
 @keyframes hero-progress {
-  from { transform: translateY(-50%) scaleX(0); }
-  to { transform: translateY(-50%) scaleX(1); }
+  from { clip-path: inset(0 100% 0 0 round 100px); }
+  to { clip-path: inset(0 0 0 0 round 100px); }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .hero__dots button.is-active .hero__dots-fill {
     animation: none;
-    transform: translateY(-50%) scaleX(1);
+    clip-path: inset(0 0 0 0 round 100px);
   }
 }
 
