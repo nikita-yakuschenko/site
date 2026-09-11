@@ -19,6 +19,21 @@
   --page-gutter: 24px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --header-solid-shadow: 0 2px 6px rgb(var(--avgst-ink-rgb) / 0.1);
+
+  /* Три размера кнопок, и только три. Раньше высоты стояли числами по
+     месту, и какой размер где — решалось на глаз.
+     sm — служебные элементы в тесных местах: кнопка в плашке шапки,
+          закрытие лайтбокса;
+     md — база: всё, для чего нет причины выделяться, включая кнопки
+          внутри панелей;
+     lg — главное действие экрана: баннер главной, карточка проекта.
+     Отступы по бокам идут вместе с высотой, отдельно их не трогаем. */
+  --btn-h-sm: 36px;
+  --btn-pad-sm: 14px;
+  --btn-h-md: 40px;
+  --btn-pad-md: 16px;
+  --btn-h-lg: 44px;
+  --btn-pad-lg: 18px;
 }
 
 * { box-sizing: border-box; }
@@ -320,7 +335,7 @@ a { color: inherit; text-decoration: none; }
   font-variant-numeric: tabular-nums;
 }
 
-.btn.site-header__cta { display: none; height: 36px; padding: 0 14px; font-size: 14px; }
+.btn.site-header__cta { display: none; height: var(--btn-h-sm); padding: 0 var(--btn-pad-sm); font-size: 14px; }
 
 .site-header__burger {
   display: inline-flex;
@@ -377,8 +392,8 @@ a { color: inherit; text-decoration: none; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  height: 40px;
-  padding: 0 16px;
+  height: var(--btn-h-md);
+  padding: 0 var(--btn-pad-md);
   border-radius: var(--radius);
   font-weight: 600;
   font-size: 14px;
@@ -504,8 +519,8 @@ a { color: inherit; text-decoration: none; }
   gap: 8px;
   width: fit-content;
   margin-top: 32px;
-  height: 44px;
-  padding: 0 18px;
+  height: var(--btn-h-lg);
+  padding: 0 var(--btn-pad-lg);
 }
 
 .hero--graphic {
@@ -1242,8 +1257,8 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
 }
 .lightbox img { max-width: min(1100px, 100%); max-height: 90vh; object-fit: contain; }
 .lightbox__close {
-  height: 36px;
-  padding: 0 14px;
+  height: var(--btn-h-sm);
+  padding: 0 var(--btn-pad-sm);
   border: 0;
   border-radius: var(--radius);
   cursor: pointer;
@@ -1436,8 +1451,8 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
 }
 
 .project-hero__cta {
-  height: 44px;
-  padding: 0 18px;
+  height: var(--btn-h-lg);
+  padding: 0 var(--btn-pad-lg);
   white-space: nowrap;
 }
 
@@ -1668,6 +1683,30 @@ body.hero-on-light .site-office__label {
   color: var(--avgst-ink);
 }
 
+/* Крестик закрытия. На указателе он не нужен — панель закрывается уходом
+   курсора, — поэтому появляется только в узкой шапке. */
+.site-office__close {
+  display: none;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: inherit;
+  opacity: 0.55;
+  cursor: pointer;
+}
+
+.site-office__close:active {
+  opacity: 1;
+}
+
 /* Верх панели — две пары «главное и пояснение»: одна про время, другая про
    место. Внутри пары строки различаются весом и яркостью, между парами
    лежит воздух. Без этого четыре строки одного кегля читались как каша. */
@@ -1703,7 +1742,9 @@ body.hero-on-light .site-office__label {
 .site-office__map.is-ready {
   display: block;
   margin: 16px 0 0;
-  aspect-ratio: 16 / 10;
+  /* 16:9, а не 16:10: логотип Яндекса поверх карты фиксированного размера,
+     и в более низком кадре он занимал слишком большую его долю. */
+  aspect-ratio: 16 / 9;
   border-radius: 10px;
   overflow: hidden;
   background: rgb(255 255 255 / 0.06);
@@ -1862,6 +1903,24 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-office__map {
     --meta-bleed: 12px;
 
     margin-inline: calc(var(--meta-bleed) - var(--page-gutter));
+  }
+
+  /* Оптические отступы по краям ряда здесь не нужны: они выравнивали герб и
+     индикатор по содержимому плашки шапки, а ряд теперь идёт по своим полям,
+     и выравнивать не с чем. Вдобавок они были разными — 16px слева против
+     12px справа, — и ряд выглядел сдвинутым. */
+  .site-region {
+    --region-inset: 0px;
+  }
+  .site-office {
+    --office-inset: 0px;
+  }
+  .site-office__close {
+    display: flex;
+  }
+  /* Место под крестик: иначе он ложится на заголовок панели. */
+  .site-office__head {
+    padding-right: 36px;
   }
 
   /* В узкой шапке остаются только город и статус офиса: ссылка «Ипотека»
