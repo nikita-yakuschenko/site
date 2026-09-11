@@ -80,9 +80,17 @@ a { color: inherit; text-decoration: none; }
 }
 
 .site-region {
+  /* Отступ от края контейнера. Переключатель стоит над плашкой шапки, у
+     которой padding-left: 16px, поэтому без этого отступа он единственный
+     прижимается к самой границе и читается вывалившимся наружу. Значение
+     держим равным отступу плашки, чтобы знак региона вставал по одной
+     вертикали с логотипом бренда. */
+  --region-inset: 16px;
+
   pointer-events: auto;
   position: relative;
   width: max-content;
+  padding-left: var(--region-inset);
   color: inherit;
 }
 
@@ -162,18 +170,10 @@ a { color: inherit; text-decoration: none; }
 
 .site-region__chevron.is-open { transform: rotate(180deg); }
 
-.site-region {
-  /* Оптическая компенсация: у кнопки отступов нет, а внутри меню к иконке
-     добавляются padding контейнера и пункта. Из-за этого выпадашка читается
-     сдвинутой влево относительно триггера. Величина вынесена сюда, чтобы
-     подгонять её на глаз в одном месте. */
-  --region-menu-shift: 4px;
-}
-
 .site-region__menu {
   position: absolute;
   top: calc(100% + 8px);
-  left: var(--region-menu-shift);
+  left: 0;
   z-index: 40;
   min-width: 240px;
   margin: 0;
