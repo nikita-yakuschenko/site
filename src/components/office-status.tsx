@@ -111,13 +111,6 @@ export function OfficeStatusIndicator() {
             <p className="site-office__headline">{statusHeadline(status)}</p>
             {detail ? <p className="site-office__detail">{detail}</p> : null}
           </div>
-          <p className="site-office__address">
-            <IconMapPin size={18} stroke={1.75} aria-hidden="true" />
-            <span>
-              <span className="site-office__address-title">{copy.officeAddressTitle}</span>
-              <span className="site-office__address-line">{copy.officeAddressLine}</span>
-            </span>
-          </p>
           <dl className="site-office__hours">
             {OFFICE_SCHEDULE.map((row) => (
               <div
@@ -130,6 +123,13 @@ export function OfficeStatusIndicator() {
               </div>
             ))}
           </dl>
+          <p className="site-office__address">
+            <IconMapPin size={18} stroke={1.75} aria-hidden="true" />
+            <span>
+              <span className="site-office__address-title">{copy.officeAddressTitle}</span>
+              <span className="site-office__address-line">{copy.officeAddressLine}</span>
+            </span>
+          </p>
           <Link
             className="btn btn-yellow site-office__cta"
             href="/#contacts"
