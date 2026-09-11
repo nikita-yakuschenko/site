@@ -26,10 +26,11 @@ type MetaGroup = {
 const META_LINK_GROUPS: readonly MetaGroup[] = [
   {
     links: [
+      { label: copy.about, href: '/about' },
       { label: copy.mortgage, href: '/mortgage' },
-      { label: copy.production, href: '/manufacture' },
     ],
   },
+  { links: [{ label: copy.exposition, href: '/exposition' }] },
   {
     // Сайт покупательский: разделы для юрлиц первыми уступают место.
     secondary: true,
@@ -38,7 +39,6 @@ const META_LINK_GROUPS: readonly MetaGroup[] = [
       { label: copy.dealers, href: '/dealers' },
     ],
   },
-  { links: [{ label: copy.exposition, href: '/exposition' }] },
 ]
 
 export function SiteChrome({
