@@ -373,7 +373,19 @@ a { color: inherit; text-decoration: none; }
 
 .site-header__nav a:hover { background: rgb(255 255 255 / 0.1); }
 
+/* Столбцы закреплены явно: при скрытой навигации правый блок уезжал в
+   средний столбец, а пустой третий забирал себе зазор сетки — из-за этого
+   бургер отступал от края плашки на 32px против 16px у логотипа. */
+.site-header__brand {
+  grid-column: 1;
+}
+
+.site-header__nav {
+  grid-column: 2;
+}
+
 .site-header__aside {
+  grid-column: 3;
   display: flex;
   align-items: center;
   justify-content: flex-end;
@@ -395,6 +407,11 @@ a { color: inherit; text-decoration: none; }
   justify-content: center;
   width: 36px;
   height: 36px;
+  /* Иконка 22px внутри кнопки 36px оставляет 7px поля с каждой стороны, и
+     визуально бургер отступал от края дальше логотипа. Кнопка выходит за
+     поле плашки на эти 7px — площадь нажатия сохраняется, а иконка встаёт
+     на одну линию с логотипом слева. */
+  margin-right: -7px;
   border: 0;
   border-radius: 8px;
   background: transparent;
