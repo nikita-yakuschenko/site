@@ -152,7 +152,7 @@ export const copy = {
   officeSaturday: 'Суббота',
   officeSunday: 'Воскресенье',
   officeByArrangement: 'По договорённости',
-  officeVisit: 'Посетить офис',
+  officeVisit: 'Построить маршрут',
 } as const
 
 const PREP =
