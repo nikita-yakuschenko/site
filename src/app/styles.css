@@ -1814,6 +1814,24 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-office__map {
   height: 100%;
 }
 
+/* Черта под картой. Сверху её роль играет нижняя граница расписания, снизу
+   же ничего не было — карта висела, прижатая к остановкам. Правило висит на
+   соседстве, а не на самом списке: без ключа карта не рендерится, и линия
+   не должна удваивать границу расписания. */
+.site-office__map.is-ready + .site-office__transit {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+}
+
+.site-header--solid .site-office__map.is-ready + .site-office__transit,
+body.hero-on-light
+  .site-header:not(.site-header--solid)
+  .site-office__map.is-ready
+  + .site-office__transit {
+  border-top-color: #e8eaee;
+}
+
 .site-office__map:focus-visible {
   outline: 2px solid var(--brand-yellow);
   outline-offset: 2px;
