@@ -153,6 +153,16 @@ export const copy = {
   officeSunday: 'Воскресенье',
   officeByArrangement: 'По договорённости',
   officeVisit: 'Построить маршрут',
+  officeWelcome: 'Ждём вас в гости',
+  officeAlmostOpen: 'Скоро открываемся',
+  officeStillTime: 'Ещё успеваете заглянуть',
+  officeClosedNow: 'Сейчас закрыто',
+  officeTodayUntil: 'Сегодня до',
+  officeOpensAt: 'Открываемся в',
+  officeClosesAt: 'Закрываемся в',
+  officeOpensOn: 'Откроемся',
+  officeTomorrow: 'завтра',
+  officeBySunday: 'Воскресенье — по договорённости',
 } as const
 
 const PREP =
