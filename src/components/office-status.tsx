@@ -11,18 +11,8 @@ import {
   readOfficeState,
   readServerOfficeState,
   statusHeadline,
-  statusLabel,
   subscribeOfficeStatus,
-  type OfficeStatus,
 } from '../lib/office'
-
-const STATUS_ORDER: readonly OfficeStatus[] = [
-  'open',
-  'soon-open',
-  'soon-close',
-  'closed',
-  'unknown',
-]
 
 export function OfficeStatusIndicator() {
   const root = useRef<HTMLDivElement>(null)
@@ -44,7 +34,7 @@ export function OfficeStatusIndicator() {
   }
   // Всё, что зависит от времени, приходит одним снимком: иначе уточнение и
   // подсветка дня подвисали бы, пока статус остаётся прежним.
-  const { status, detail, todayKey } = useSyncExternalStore(
+  const { status, trigger, detail, todayKey } = useSyncExternalStore(
     subscribeOfficeStatus,
     readOfficeState,
     readServerOfficeState,
@@ -78,7 +68,12 @@ export function OfficeStatusIndicator() {
         // На тач-устройствах наведения нет: там работает нажатие.
         if (event.pointerType !== 'touch') show()
       }}
-      onPointerLeave={hideSoon}
+      onPointerLeave={(event) => {
+        // На тач-устройствах pointerleave приходит сразу после касания —
+        // панель открывалась и тут же захлопывалась. Уводить курсор там
+        // некуда, закрытие остаётся на повторном нажатии и на тапе вне.
+        if (event.pointerType !== 'touch') hideSoon()
+      }}
       onFocusCapture={show}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false)
@@ -87,21 +82,16 @@ export function OfficeStatusIndicator() {
       <button
         type="button"
         className="site-office__trigger"
-        aria-label={`${copy.officeStatusAria}: ${statusLabel(status)}`}
+        aria-label={`${copy.officeStatusAria}: ${trigger}`}
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
         <span className={`site-office__dot site-office__dot--${status}`} aria-hidden="true" />
-        <span className="site-office__name">
-          {/* Резервируем ширину под самый длинный вариант, чтобы соседние
-              элементы не дёргались при смене статуса. */}
-          <span className="site-office__sizer" aria-hidden="true">
-            {STATUS_ORDER.map((value) => (
-              <span key={value}>{statusLabel(value)}</span>
-            ))}
-          </span>
-          <span className="site-office__label">{statusLabel(status)}</span>
-        </span>
+        {/* Ширина под самый длинный статус больше не резервируется: резерв
+            отрывал точку от надписи на половину строки, а индикатор обязан
+            стоять рядом с тем, к чему относится. Статус меняется пару раз в
+            сутки, так что переток ряда никто не увидит. */}
+        <span className="site-office__label">{trigger}</span>
       </button>
 
       {open ? (

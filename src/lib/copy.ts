@@ -158,11 +158,16 @@ export const copy = {
   officeWelcome: 'Ждём вас в гости',
   officeAlmostOpen: 'Скоро открываемся',
   officeStillTime: 'Ещё успеваете заглянуть',
-  officeClosedNow: 'Сейчас закрыто',
+  officeClosedNow: 'Сейчас офис закрыт',
   officeTodayUntil: 'Сегодня до',
-  officeOpensAt: 'Открываемся в',
+  /* Строка под заголовком зовёт в гости, а не отчитывается о графике:
+     «Откроемся завтра в 10.00» — про нас, «Ждём вас» — про посетителя. */
+  officeWaitingFor: 'Ждём вас',
+  officeToday: 'сегодня',
   officeClosesAt: 'Закрываемся в',
-  officeOpensOn: 'Откроемся',
+  /* Для служебного ряда: подлежащее обязательно. «Откроется завтра» само
+     по себе ни к чему не относится — человек видит строку впервые. */
+  officeOpensShort: 'Офис откроется',
   officeTomorrow: 'завтра',
   officeBySunday: 'Воскресенье — по договорённости',
 } as const
