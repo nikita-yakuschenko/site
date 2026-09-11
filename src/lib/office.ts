@@ -31,6 +31,12 @@ export const OFFICE_SCHEDULE: readonly ScheduleRow[] = [
   { key: 'sunday', label: copy.officeSunday, days: [0], from: null, to: null },
 ]
 
+/** Остановки рядом с офисом. Порядок как в исходном списке. */
+export const OFFICE_TRANSIT = [
+  { name: 'Гостиница «Ока»', distance: '450 метров' },
+  { name: 'Дворец спорта', distance: '350 метров' },
+] as const
+
 export function formatRange(row: ScheduleRow): string {
   if (row.from === null || row.to === null) return copy.officeByArrangement
   return `${hhmm(row.from)} – ${hhmm(row.to)}`

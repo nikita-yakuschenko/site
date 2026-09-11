@@ -1669,6 +1669,38 @@ body.hero-on-light .site-office__label {
   opacity: 0.62;
 }
 
+/* Остановки рядом. Иконочная колонка та же, что у адреса, поэтому левый
+   край текста в нижней части панели не ломается. Расстояние прижато
+   вправо — тем же приёмом, что и время в расписании выше. */
+.site-office__transit {
+  display: grid;
+  gap: 6px;
+  margin: 14px 0 0;
+  padding: 0;
+  list-style: none;
+  font-size: 13px;
+  line-height: 1.35;
+}
+
+.site-office__transit li {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.site-office__transit svg {
+  flex: 0 0 auto;
+  opacity: 0.45;
+}
+
+.site-office__transit-distance {
+  margin-left: auto;
+  padding-left: 12px;
+  opacity: 0.62;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
 /* Адрес стоит под расписанием, прямо над кнопкой маршрута: там метка на
    месте по смыслу и не соседствует с безиконочной парой сверху, из-за
    которой левый край текста шёл рваным. */
