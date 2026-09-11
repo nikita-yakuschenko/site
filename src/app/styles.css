@@ -1978,6 +1978,11 @@ body.hero-on-light
     --office-inset: 0px;
   }
 
+  /* Карта в узкой панели площе: 2:1 вместо 16:9 — полоса вместо кадра. */
+  .site-office__map.is-ready {
+    aspect-ratio: 2 / 1;
+  }
+
   .site-office__close {
     display: flex;
   }
