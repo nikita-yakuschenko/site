@@ -1453,3 +1453,192 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
     scroll-behavior: auto !important;
   }
 }
+
+/* --- Индикатор режима работы офиса ---------------------------------------
+   Статус, а не призыв к действию: ни рамки, ни заливки — цветом говорит
+   только точка. Поведение повторяет переключатель региона, чтобы служебный
+   ряд читался как одна система. */
+
+.site-office {
+  --office-dot: #94a3b8;
+
+  pointer-events: auto;
+  position: relative;
+  margin-left: auto;
+  color: inherit;
+}
+
+.site-office__trigger {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.site-office__dot {
+  width: 7px;
+  height: 7px;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: var(--office-dot);
+}
+
+.site-office__dot--open {
+  --office-dot: #34c759;
+  /* Свечение вместо обводки: заметно, но не превращает статус в кнопку. */
+  box-shadow: 0 0 0 3px rgb(52 199 89 / 0.18);
+}
+.site-office__dot--soon-open,
+.site-office__dot--soon-close {
+  --office-dot: #f0b429;
+  box-shadow: 0 0 0 3px rgb(240 180 41 / 0.18);
+}
+.site-office__dot--closed {
+  --office-dot: #8a9099;
+}
+.site-office__dot--unknown {
+  --office-dot: #8a9099;
+  opacity: 0.6;
+}
+
+/* Ширина резервируется по самому длинному статусу, иначе служебный ряд
+   дёргается при смене состояния. */
+.site-office__name {
+  display: inline-grid;
+  align-items: center;
+  justify-items: end;
+}
+.site-office__sizer,
+.site-office__label {
+  grid-area: 1 / 1;
+}
+.site-office__sizer {
+  display: grid;
+  visibility: hidden;
+  pointer-events: none;
+  height: 0;
+}
+.site-office__label {
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.25);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 4px;
+  transition: text-decoration-color 0.2s var(--ease-out);
+}
+.site-office__trigger:hover .site-office__label {
+  text-decoration-color: currentColor;
+}
+
+.site-header--solid .site-office__label,
+body.hero-on-light .site-office__label {
+  text-decoration-color: rgb(15 18 22 / 0.25);
+}
+
+.site-office__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  min-width: 260px;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgb(15 18 22 / 0.92);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.28);
+  backdrop-filter: blur(12px);
+  color: white;
+  text-align: left;
+}
+
+.site-header--solid .site-office__panel {
+  background: white;
+  border: 1px solid #e8eaee;
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.12);
+  color: var(--avgst-ink);
+}
+
+.site-office__panel-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0 0 10px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.site-office__hours {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+  padding: 10px 0;
+  border-top: 1px solid rgb(255 255 255 / 0.12);
+  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  font-size: 13px;
+}
+
+.site-header--solid .site-office__hours {
+  border-color: #e8eaee;
+}
+
+.site-office__hours > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 3px 6px;
+  margin: 0 -6px;
+  border-radius: 6px;
+}
+
+/* Сегодняшний день подсвечен фоном, а не цветом текста: так строка
+   остаётся читаемой и в светлой шапке. */
+.site-office__hours > div.is-today {
+  background: rgb(255 255 255 / 0.08);
+  font-weight: 600;
+}
+.site-header--solid .site-office__hours > div.is-today {
+  background: #f3f4f6;
+}
+
+.site-office__hours dt {
+  opacity: 0.75;
+}
+.site-office__hours dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+}
+
+.site-office__link {
+  display: inline-block;
+  margin-top: 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-color: rgb(255 255 255 / 0.3);
+  text-underline-offset: 4px;
+}
+.site-header--solid .site-office__link {
+  text-decoration-color: rgb(15 18 22 / 0.3);
+}
+.site-office__link:hover {
+  text-decoration-color: currentColor;
+}
+
+@media (max-width: 768px) {
+  /* В узкой шапке служебный ряд и так тесный: оставляем только точку. */
+  .site-office__name {
+    display: none;
+  }
+  .site-office__panel {
+    min-width: 240px;
+  }
+}
