@@ -5,6 +5,7 @@ import { IconFileTextShield, IconMenu2, IconX } from '@tabler/icons-react'
 import Link from 'next/link'
 import { copy } from '../lib/copy'
 import { mediaUrl } from '../lib/media'
+import { OfficeStatusIndicator } from './office-status'
 import { RegionSwitch } from './region-switch'
 
 type NavItem = { label?: string | null; href?: string | null }
@@ -63,6 +64,7 @@ export function SiteChrome({
                 <span className="site-escrow__short">{copy.escrowShort}</span>
               </span>
             </span>
+            <OfficeStatusIndicator />
           </div>
 
           <div className="site-header__plaque">

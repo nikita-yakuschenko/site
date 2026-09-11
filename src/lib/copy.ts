@@ -142,6 +142,17 @@ export const copy = {
   seoTitle: 'Авангард Строй - Строительство домов "под ключ"',
   seoDescription: 'Авангард Строй: проекты домов, расчёт стоимости и строительство.',
   notFound: 'Страница не найдена',
+  officeHours: 'Часы работы',
+  officeStatusAria: 'Режим работы офиса',
+  officeOpen: 'Офис сейчас открыт',
+  officeSoonOpen: 'Офис скоро откроется',
+  officeSoonClose: 'Офис скоро закроется',
+  officeClosed: 'Офис закрыт',
+  officeWeekdays: 'Будни',
+  officeSaturday: 'Суббота',
+  officeSunday: 'Воскресенье',
+  officeByArrangement: 'По договорённости',
+  officeVisit: 'Посетить офис',
 } as const
 
 const PREP =
