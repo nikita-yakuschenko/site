@@ -87,6 +87,14 @@ a { color: inherit; text-decoration: none; }
 }
 
 .site-region {
+  /* Обёртка растягивается на высоту служебного ряда, чтобы top: 100% у
+     выпадающего меню считался от одной линии с соседями. Иначе панели
+     открываются на разной высоте: у переключателя региона высота задана
+     знаком, у индикатора офиса — строкой текста. */
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+
   /* Отступ от края контейнера. Переключатель стоит над плашкой шапки, у
      которой padding-left: 16px, поэтому без этого отступа он единственный
      прижимается к самой границе и читается вывалившимся наружу. Значение
@@ -1466,6 +1474,10 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
      прижимался бы к самому краю, а не вставал по кнопке «Задать вопрос». */
   --office-inset: 12px;
 
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+
   pointer-events: auto;
   position: relative;
   margin-left: auto;
@@ -1597,7 +1609,9 @@ body.hero-on-light .site-office__label {
 .site-office__panel {
   position: absolute;
   top: calc(100% + 8px);
-  right: var(--office-inset);
+  /* Ноль, а не отступ индикатора: меню региона слева выходит на границу
+     контейнера, и панель справа должна вставать симметрично ему. */
+  right: 0;
   animation: office-panel-in 0.18s var(--ease-out) both;
   z-index: 40;
   min-width: 288px;
@@ -1634,24 +1648,46 @@ body.hero-on-light .site-office__label {
 }
 
 .site-office__head {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .site-office__headline {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   margin: 0;
   font-size: 14px;
   font-weight: 600;
   letter-spacing: -0.01em;
 }
 
-/* Конкретика идёт второй строкой и выровнена по тексту заголовка, а не по
-   точке: колонка текста остаётся одной. */
 .site-office__detail {
-  margin: 4px 0 0 17px;
+  margin: 4px 0 0;
   font-size: 13px;
+  opacity: 0.7;
+}
+
+.site-office__address {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-size: 13px;
+}
+
+.site-office__address svg {
+  flex: 0 0 auto;
+  margin-top: 1px;
+  opacity: 0.6;
+}
+
+.site-office__address span {
+  display: block;
+}
+
+.site-office__address-title {
+  font-weight: 600;
+}
+
+.site-office__address-line {
+  margin-top: 2px;
   opacity: 0.7;
 }
 

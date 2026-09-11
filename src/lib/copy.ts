@@ -153,6 +153,8 @@ export const copy = {
   officeSunday: 'Воскресенье',
   officeByArrangement: 'По договорённости',
   officeVisit: 'Построить маршрут',
+  officeAddressTitle: 'Деловой центр «Ока»',
+  officeAddressLine: 'проспект Гагарина 27А к1',
   officeWelcome: 'Ждём вас в гости',
   officeAlmostOpen: 'Скоро открываемся',
   officeStillTime: 'Ещё успеваете заглянуть',

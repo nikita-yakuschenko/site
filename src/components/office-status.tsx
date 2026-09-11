@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
+import { IconMapPin } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
   formatRange,
@@ -105,12 +106,18 @@ export function OfficeStatusIndicator() {
       {open ? (
         <div className="site-office__panel" role="group" aria-label={copy.officeStatusAria}>
           <div className="site-office__head">
-            <p className="site-office__headline">
-              <span className={`site-office__dot site-office__dot--${status}`} aria-hidden="true" />
-              {statusHeadline(status)}
-            </p>
+            {/* Точки здесь нет намеренно: пульсирующий индикатор уже стоит
+                в шапке, и внутри панели он только отвлекал бы. */}
+            <p className="site-office__headline">{statusHeadline(status)}</p>
             {detail ? <p className="site-office__detail">{detail}</p> : null}
           </div>
+          <p className="site-office__address">
+            <IconMapPin size={18} stroke={1.75} aria-hidden="true" />
+            <span>
+              <span className="site-office__address-title">{copy.officeAddressTitle}</span>
+              <span className="site-office__address-line">{copy.officeAddressLine}</span>
+            </span>
+          </p>
           <dl className="site-office__hours">
             {OFFICE_SCHEDULE.map((row) => (
               <div
