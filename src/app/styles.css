@@ -1497,7 +1497,9 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
 .site-office__trigger {
   display: flex;
   align-items: center;
-  gap: 8px;
+  /* Не 8px: волна расходится до 3.4× от точки, то есть на 8.4px за её край,
+     и пульс заезжал под первую букву. Зазор считаем от размаха волны. */
+  gap: 14px;
   margin: 0;
   padding: 0;
   border: 0;
@@ -1515,6 +1517,8 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   flex: 0 0 auto;
   border-radius: 50%;
   background: var(--office-dot);
+  /* Длительность цикла задаёт статус: у закрытого офиса ритм спокойнее. */
+  --office-pulse: 2.6s;
 }
 
 .site-office__dot--open {
@@ -1532,15 +1536,18 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
 
 /* Живой статус подаёт признак жизни: волна расходится от точки раз в три
    секунды. Пульсирует отдельный слой, а не сама точка, — размер и вёрстка
-   ряда от этого не меняются. Закрытому офису пульсация не нужна. */
+   ряда от этого не меняются. Закрытый офис пульсирует тоже: серая точка
+   читалась как поломка, а не как состояние. */
 .site-office__dot--open,
 .site-office__dot--soon-open,
-.site-office__dot--soon-close {
+.site-office__dot--soon-close,
+.site-office__dot--closed {
   position: relative;
 }
 .site-office__dot--open::after,
 .site-office__dot--soon-open::after,
-.site-office__dot--soon-close::after {
+.site-office__dot--soon-close::after,
+.site-office__dot--closed::after {
   content: '';
   position: absolute;
   inset: 0;
@@ -1550,7 +1557,7 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
      с ускорением видимая часть волны проскакивала за полсекунды, и цикл
      читался как разовая вспышка на загрузке. */
   border: 1.5px solid rgb(var(--office-halo) / 0.9);
-  animation: office-pulse 2.6s linear infinite;
+  animation: office-pulse var(--office-pulse) linear infinite;
 }
 
 /* Волна занимает большую часть цикла и лишь в конце уступает место паузе,
@@ -1565,39 +1572,29 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
    остаётся живым. */
 .site-office__dot--open,
 .site-office__dot--soon-open,
-.site-office__dot--soon-close {
-  animation: office-breath 2.6s ease-in-out infinite;
+.site-office__dot--soon-close,
+.site-office__dot--closed {
+  animation: office-breath var(--office-pulse) ease-in-out infinite;
 }
 
 @keyframes office-breath {
   0%, 100% { transform: scale(1); }
   38% { transform: scale(1.18); }
 }
+
+/* Закрытый офис — тот же фирменный жёлтый, но вдвое медленнее: состояние
+   живое, а не срочное, и не спорит с «скоро откроемся». */
 .site-office__dot--closed {
-  --office-dot: #8a9099;
+  --office-dot: #f0b429;
+  --office-halo: 240 180 41;
+  --office-pulse: 5.2s;
+  box-shadow: 0 0 0 3px rgb(240 180 41 / 0.18);
 }
 .site-office__dot--unknown {
   --office-dot: #8a9099;
   opacity: 0.6;
 }
 
-/* Ширина резервируется по самому длинному статусу, иначе служебный ряд
-   дёргается при смене состояния. */
-.site-office__name {
-  display: inline-grid;
-  align-items: center;
-  justify-items: end;
-}
-.site-office__sizer,
-.site-office__label {
-  grid-area: 1 / 1;
-}
-.site-office__sizer {
-  display: grid;
-  visibility: hidden;
-  pointer-events: none;
-  height: 0;
-}
 .site-office__label {
   white-space: nowrap;
   text-decoration: underline;
@@ -1684,7 +1681,7 @@ body.hero-on-light .site-office__label {
 .site-office__transit {
   display: grid;
   gap: 6px;
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   padding: 0;
   list-style: none;
   font-size: 13px;
@@ -1710,14 +1707,13 @@ body.hero-on-light .site-office__label {
   white-space: nowrap;
 }
 
-/* Адрес стоит под расписанием, прямо над кнопкой маршрута: там метка на
-   месте по смыслу и не соседствует с безиконочной парой сверху, из-за
-   которой левый край текста шёл рваным. */
+/* Адрес стоит под остановками, прямо над кнопкой маршрута: метка там на
+   месте по смыслу и держит ту же иконочную колонку, что остановки выше. */
 .site-office__address {
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  margin: 14px 0 0;
+  margin: 16px 0 0;
   font-size: 13px;
   line-height: 1.35;
 }
@@ -1784,6 +1780,10 @@ body.hero-on-light .site-office__label {
 .site-office__hours dd {
   margin: 0;
   font-variant-numeric: tabular-nums;
+  /* «По договорённости» ломалось на две строки и разъезжалось с соседними
+     значениями. Строка длиннее интервала времени, поэтому именно она и
+     задаёт ширину панели — перенос тут хуже лишних пары десятков пикселей. */
+  white-space: nowrap;
 }
 
 .site-office__cta {
@@ -1791,7 +1791,7 @@ body.hero-on-light .site-office__label {
      фирменными кнопками, а не жить по своим правилам. */
   display: flex;
   justify-content: center;
-  margin-top: 14px;
+  margin-top: 16px;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -1806,11 +1806,25 @@ body.hero-on-light .site-office__label {
 
 @media (max-width: 768px) {
   /* В узкой шапке служебный ряд и так тесный: оставляем только точку. */
-  .site-office__name {
+  .site-office__label {
     display: none;
   }
+  /* Панель больше не висит узкой колонкой у правого края, наезжая на баннер:
+     на узком экране она занимает всю ширину контента. Правый край остаётся
+     на месте (right: 0 у индикатора), а левый доводится до той же границы,
+     по которой выровнен остальной контент, — отсюда двойной --page-gutter.
+     Позиция остаётся absolute: шапка сама уезжает со скроллом, и fixed
+     оторвал бы панель от индикатора. */
   .site-office__panel {
-    min-width: 268px;
+    width: calc(100vw - var(--page-gutter) * 2);
+    min-width: 0;
+    max-height: calc(100vh - 120px);
+    overflow-y: auto;
+  }
+  /* Мостик вверх не нужен: тач-режим держит панель нажатием, а растянутая
+     на всю ширину полоса перехватывала бы касания по служебному ряду. */
+  .site-office__panel::before {
+    content: none;
   }
 }
 

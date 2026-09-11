@@ -103,6 +103,34 @@ export function officeStatusAt(date: Date): OfficeStatus {
   return 'closed'
 }
 
+/**
+ * Надпись в служебном ряду.
+ *
+ * У закрытого офиса «Офис закрыт» — тупик: человек читает шапку, чтобы
+ * решить, ехать ли, и ему нужен следующий шаг, а не констатация. Поэтому
+ * закрытый офис называет момент открытия, остальные статусы говорят о себе.
+ */
+export function statusTrigger(date: Date, status: OfficeStatus): string {
+  if (status !== 'closed') return statusLabel(status)
+  const clock = officeClock(date)
+  if (!clock) return statusLabel(status)
+
+  // Сегодня ещё откроемся — день называть незачем, достаточно времени.
+  const today = rowForDay(clock.day)
+  if (today && today.from !== null && clock.minutes < today.from) {
+    return `${copy.officeOpensShort} в ${hhmm(today.from)}`
+  }
+
+  // Точное время уносим в панель: в ряду важнее день, иначе строка растёт.
+  for (let ahead = 1; ahead <= 7; ahead += 1) {
+    const day = (clock.day + ahead) % 7
+    const row = rowForDay(day)
+    if (!row || row.from === null) continue
+    return `${copy.officeOpensShort} ${ahead === 1 ? copy.officeTomorrow : DAY_IN[day]}`
+  }
+  return statusLabel(status)
+}
+
 export function statusLabel(status: OfficeStatus): string {
   if (status === 'open') return copy.officeOpen
   if (status === 'soon-open') return copy.officeSoonOpen
@@ -121,17 +149,26 @@ export function statusLabel(status: OfficeStatus): string {
  */
 export type OfficeState = {
   status: OfficeStatus
+  /** Надпись в служебном ряду. Не всегда совпадает со статусом. */
+  trigger: string
   detail: string | null
   todayKey: ScheduleRow['key'] | null
 }
 
-const SERVER_STATE: OfficeState = { status: 'unknown', detail: null, todayKey: null }
+const SERVER_STATE: OfficeState = {
+  status: 'unknown',
+  trigger: copy.officeHours,
+  detail: null,
+  todayKey: null,
+}
 
 function computeState(date: Date): OfficeState {
   const clock = officeClock(date)
   if (!clock) return SERVER_STATE
+  const status = officeStatusAt(date)
   return {
-    status: officeStatusAt(date),
+    status,
+    trigger: statusTrigger(date, status),
     detail: statusDetail(date),
     todayKey: rowForDay(clock.day)?.key ?? null,
   }
@@ -150,7 +187,7 @@ let snapshot: OfficeState = SERVER_STATE
 let snapshotKey = ''
 
 function keyOf(state: OfficeState): string {
-  return `${state.status}|${state.detail ?? ''}|${state.todayKey ?? ''}`
+  return `${state.status}|${state.trigger}|${state.detail ?? ''}|${state.todayKey ?? ''}`
 }
 
 function refresh(): void {
@@ -242,19 +279,19 @@ export function statusDetail(date: Date): string | null {
       return `${copy.officeTodayUntil} ${hhmm(today.to)}`
     }
     if (minutes < today.from) {
-      return `${copy.officeOpensAt} ${hhmm(today.from)}`
+      return `${copy.officeWaitingFor} ${copy.officeToday} с ${hhmm(today.from)}`
     }
   }
 
-  // Ищем ближайший рабочий день вперёд.
+  // Ищем ближайший рабочий день вперёд. День и «сегодня» подставляются в одну
+  // и ту же формулу: состояние одно — офис закрыт и ждёт, меняется только
+  // когда именно.
   for (let ahead = 1; ahead <= 7; ahead += 1) {
     const day = (clock.day + ahead) % 7
     const row = rowForDay(day)
     if (!row || row.from === null) continue
     const when = ahead === 1 ? copy.officeTomorrow : DAY_IN[day]
-    // Предлог здесь свой: officeOpensAt уже несёт «Открываемся в», и от его
-    // переиспользования получалось «откроемся завтра открываемся в 10.00».
-    return `${copy.officeOpensOn} ${when} в ${hhmm(row.from)}`
+    return `${copy.officeWaitingFor} ${when} с ${hhmm(row.from)}`
   }
   return null
 }
