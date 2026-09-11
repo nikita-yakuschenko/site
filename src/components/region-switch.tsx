@@ -1,7 +1,6 @@
 'use client'
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { IconChevronDown } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
   readRegionCode,
@@ -58,9 +57,8 @@ export function RegionSwitch() {
           </span>
           <span className="site-region__label">{current.name}</span>
         </span>
-        <span className={open ? 'site-region__chevron is-open' : 'site-region__chevron'}>
-          <IconChevronDown size={14} stroke={2} />
-        </span>
+        {/* Шеврона нет: подчёркивание названия города уже говорит, что сюда
+            можно нажать, а стрелка повторяла то же самое второй раз. */}
       </button>
 
       {open ? (

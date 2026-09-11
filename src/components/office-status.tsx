@@ -12,7 +12,9 @@ import {
   readServerOfficeState,
   statusHeadline,
   subscribeOfficeStatus,
+  YANDEX_MAPS_KEY,
 } from '../lib/office'
+import { OfficeMap } from './office-map'
 
 export function OfficeStatusIndicator() {
   const root = useRef<HTMLDivElement>(null)
@@ -34,7 +36,7 @@ export function OfficeStatusIndicator() {
   }
   // Всё, что зависит от времени, приходит одним снимком: иначе уточнение и
   // подсветка дня подвисали бы, пока статус остаётся прежним.
-  const { status, trigger, detail, todayKey } = useSyncExternalStore(
+  const { status, trigger, triggerShort, detail, todayKey } = useSyncExternalStore(
     subscribeOfficeStatus,
     readOfficeState,
     readServerOfficeState,
@@ -91,7 +93,11 @@ export function OfficeStatusIndicator() {
             отрывал точку от надписи на половину строки, а индикатор обязан
             стоять рядом с тем, к чему относится. Статус меняется пару раз в
             сутки, так что переток ряда никто не увидит. */}
-        <span className="site-office__label">{trigger}</span>
+        {/* Два варианта надписи, переключаются шириной экрана: в узкой шапке
+            рядом остаётся только город, и длинная формулировка выталкивала бы
+            его за край. */}
+        <span className="site-office__label site-office__label--full">{trigger}</span>
+        <span className="site-office__label site-office__label--short">{triggerShort}</span>
       </button>
 
       {open ? (
@@ -114,6 +120,22 @@ export function OfficeStatusIndicator() {
               </div>
             ))}
           </dl>
+          {/* Карта — превью: жесты у неё сняты, клик обрабатывает ссылка и
+              ведёт на маршрут, туда же, куда кнопка ниже. Без ключа JS API
+              компонент карты возвращает null, и остаётся пустая ссылка —
+              поэтому оборачиваем только при наличии ключа. */}
+          {YANDEX_MAPS_KEY ? (
+            <a
+              className="site-office__map"
+              href={OFFICE_ROUTE_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={copy.officeMapOpen}
+              onClick={() => setOpen(false)}
+            >
+              <OfficeMap />
+            </a>
+          ) : null}
           <ul className="site-office__transit">
             {OFFICE_TRANSIT.map((stop) => (
               <li key={stop.name}>
