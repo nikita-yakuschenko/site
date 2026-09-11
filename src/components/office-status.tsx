@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { IconBus, IconMapPin } from '@tabler/icons-react'
+import { IconBus, IconMapPin, IconX } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
   formatRange,
@@ -101,6 +101,17 @@ export function OfficeStatusIndicator() {
 
       {open ? (
         <div className="site-office__panel" role="group" aria-label={copy.officeStatusAria}>
+          {/* Крестик только для тача: указателем панель закрывается уходом
+              курсора, а на телефоне уводить его некуда, и единственным
+              способом оставался тап мимо панели. */}
+          <button
+            type="button"
+            className="site-office__close"
+            aria-label={copy.close}
+            onClick={() => setOpen(false)}
+          >
+            <IconX size={18} stroke={2} aria-hidden="true" />
+          </button>
           <div className="site-office__head">
             {/* Точки здесь нет намеренно: пульсирующий индикатор уже стоит
                 в шапке, и внутри панели он только отвлекал бы. */}
