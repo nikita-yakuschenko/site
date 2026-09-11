@@ -24,7 +24,22 @@ const STATUS_ORDER: readonly OfficeStatus[] = [
 
 export function OfficeStatusIndicator() {
   const root = useRef<HTMLDivElement>(null)
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [open, setOpen] = useState(false)
+
+  // Между строкой и панелью есть зазор. Если закрывать сразу, курсор не
+  // успевает его пересечь и до содержимого панели не добраться: даём фору
+  // и отменяем её, как только указатель вернулся.
+  function show(): void {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    closeTimer.current = null
+    setOpen(true)
+  }
+
+  function hideSoon(): void {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+    closeTimer.current = setTimeout(() => setOpen(false), 220)
+  }
   const status = useSyncExternalStore(
     subscribeOfficeStatus,
     readOfficeStatus,
@@ -34,6 +49,10 @@ export function OfficeStatusIndicator() {
   // Строка расписания за сегодня подсвечивается в панели. До гидратации дня
   // ещё не знаем, поэтому ничего не выделяем.
   const todayKey = status === 'unknown' ? null : rowForDay(new Date().getDay())?.key
+
+  useEffect(() => () => {
+    if (closeTimer.current) clearTimeout(closeTimer.current)
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -57,10 +76,10 @@ export function OfficeStatusIndicator() {
       ref={root}
       onPointerEnter={(event) => {
         // На тач-устройствах наведения нет: там работает нажатие.
-        if (event.pointerType !== 'touch') setOpen(true)
+        if (event.pointerType !== 'touch') show()
       }}
-      onPointerLeave={() => setOpen(false)}
-      onFocusCapture={() => setOpen(true)}
+      onPointerLeave={hideSoon}
+      onFocusCapture={show}
       onBlurCapture={(event) => {
         if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false)
       }}
@@ -103,7 +122,11 @@ export function OfficeStatusIndicator() {
               </div>
             ))}
           </dl>
-          <Link className="site-office__link" href="/#contacts" onClick={() => setOpen(false)}>
+          <Link
+            className="btn btn-yellow site-office__cta"
+            href="/#contacts"
+            onClick={() => setOpen(false)}
+          >
             {copy.officeVisit}
           </Link>
         </div>

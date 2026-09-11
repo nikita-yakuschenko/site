@@ -1461,10 +1461,15 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
 
 .site-office {
   --office-dot: #94a3b8;
+  /* Оптическая компенсация, зеркальная отступу региона слева: у плашки
+     шапки padding-right: 12px, и без этого отступа индикатор единственный
+     прижимался бы к самому краю, а не вставал по кнопке «Задать вопрос». */
+  --office-inset: 12px;
 
   pointer-events: auto;
   position: relative;
   margin-left: auto;
+  padding-right: var(--office-inset);
   color: inherit;
 }
 
@@ -1493,13 +1498,42 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
 
 .site-office__dot--open {
   --office-dot: #34c759;
+  --office-halo: 52 199 89;
   /* Свечение вместо обводки: заметно, но не превращает статус в кнопку. */
   box-shadow: 0 0 0 3px rgb(52 199 89 / 0.18);
 }
 .site-office__dot--soon-open,
 .site-office__dot--soon-close {
   --office-dot: #f0b429;
+  --office-halo: 240 180 41;
   box-shadow: 0 0 0 3px rgb(240 180 41 / 0.18);
+}
+
+/* Живой статус подаёт признак жизни: волна расходится от точки раз в три
+   секунды. Пульсирует отдельный слой, а не сама точка, — размер и вёрстка
+   ряда от этого не меняются. Закрытому офису пульсация не нужна. */
+.site-office__dot--open,
+.site-office__dot--soon-open,
+.site-office__dot--soon-close {
+  position: relative;
+}
+.site-office__dot--open::after,
+.site-office__dot--soon-open::after,
+.site-office__dot--soon-close::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  /* Кольцо, а не заливка: расходящаяся волна не перекрывает саму точку,
+     иначе статус читался бы как мигание. */
+  border: 1px solid rgb(var(--office-halo) / 0.7);
+  animation: office-pulse 3s var(--ease-out) infinite;
+}
+
+@keyframes office-pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(3); opacity: 0; }
+  100% { transform: scale(3); opacity: 0; }
 }
 .site-office__dot--closed {
   --office-dot: #8a9099;
@@ -1546,16 +1580,33 @@ body.hero-on-light .site-office__label {
 .site-office__panel {
   position: absolute;
   top: calc(100% + 8px);
-  right: 0;
+  right: var(--office-inset);
+  animation: office-panel-in 0.18s var(--ease-out) both;
   z-index: 40;
-  min-width: 260px;
-  padding: 12px;
-  border-radius: 10px;
+  min-width: 288px;
+  padding: 18px;
+  border-radius: 12px;
   background: rgb(15 18 22 / 0.92);
   box-shadow: 0 8px 24px rgb(0 0 0 / 0.28);
   backdrop-filter: blur(12px);
   color: white;
   text-align: left;
+}
+
+/* Мостик через зазор между строкой и панелью: без него указатель выходит
+   за пределы элемента по дороге вниз и панель закрывается на полпути. */
+.site-office__panel::before {
+  content: '';
+  position: absolute;
+  right: 0;
+  bottom: 100%;
+  left: 0;
+  height: 10px;
+}
+
+@keyframes office-panel-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
 }
 
 .site-header--solid .site-office__panel {
@@ -1568,17 +1619,18 @@ body.hero-on-light .site-office__label {
 .site-office__panel-status {
   display: flex;
   align-items: center;
-  gap: 8px;
-  margin: 0 0 10px;
-  font-size: 13px;
+  gap: 10px;
+  margin: 0 0 16px;
+  font-size: 14px;
   font-weight: 600;
+  letter-spacing: -0.01em;
 }
 
 .site-office__hours {
   display: grid;
-  gap: 2px;
+  gap: 4px;
   margin: 0;
-  padding: 10px 0;
+  padding: 16px 0;
   border-top: 1px solid rgb(255 255 255 / 0.12);
   border-bottom: 1px solid rgb(255 255 255 / 0.12);
   font-size: 13px;
@@ -1592,10 +1644,10 @@ body.hero-on-light .site-office__label {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 16px;
-  padding: 3px 6px;
-  margin: 0 -6px;
-  border-radius: 6px;
+  gap: 28px;
+  padding: 6px 8px;
+  margin: 0 -8px;
+  border-radius: 8px;
 }
 
 /* Сегодняшний день подсвечен фоном, а не цветом текста: так строка
@@ -1616,21 +1668,21 @@ body.hero-on-light .site-office__label {
   font-variant-numeric: tabular-nums;
 }
 
-.site-office__link {
-  display: inline-block;
-  margin-top: 10px;
+.site-office__cta {
+  display: flex;
+  justify-content: center;
+  margin-top: 16px;
+  padding-block: 10px;
   font-size: 13px;
-  font-weight: 500;
-  color: inherit;
-  text-decoration: underline;
-  text-decoration-color: rgb(255 255 255 / 0.3);
-  text-underline-offset: 4px;
 }
-.site-header--solid .site-office__link {
-  text-decoration-color: rgb(15 18 22 / 0.3);
-}
-.site-office__link:hover {
-  text-decoration-color: currentColor;
+
+@media (prefers-reduced-motion: reduce) {
+  .site-office__dot::after {
+    animation: none;
+  }
+  .site-office__panel {
+    animation: none;
+  }
 }
 
 @media (max-width: 768px) {
@@ -1639,6 +1691,6 @@ body.hero-on-light .site-office__label {
     display: none;
   }
   .site-office__panel {
-    min-width: 240px;
+    min-width: 268px;
   }
 }
