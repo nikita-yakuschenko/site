@@ -13,6 +13,12 @@ import { copy, nbspText } from '../lib/copy'
 const ADVANTAGE_ICONS = [IconHourglass, IconUsers, IconMedal, IconStar]
 
 /**
+ * Временно: кадры баннера отключены, вместо них белый фон.
+ * Вернуть картинки — поставить true, ничего больше править не нужно.
+ */
+const SHOW_SLIDE_IMAGES = false
+
+/**
  * Преимущество в полосе под баннером. Мобильный вариант есть не у каждого,
  * поэтому без явного типа TypeScript сужает объединение литералов и теряет
  * поле mobile у тех элементов, где его нет.
@@ -100,6 +106,13 @@ export function HeroCarousel() {
   }
 
   useLayoutEffect(() => {
+    // Без кадров тон определять не по чему: фон заведомо светлый, и шапка
+    // должна сразу уйти в тёмный текст, иначе он станет белым по белому.
+    if (!SHOW_SLIDE_IMAGES) {
+      document.body.classList.add('hero-on-light')
+      return () => document.body.classList.remove('hero-on-light')
+    }
+
     const hasVeil = current.kind !== 'graphic'
     document.body.classList.toggle('hero-on-light', current.kind === 'graphic')
 
@@ -135,7 +148,13 @@ export function HeroCarousel() {
 
   return (
     <section
-      className={graphic ? 'hero hero--graphic' : 'hero'}
+      className={
+        !SHOW_SLIDE_IMAGES
+          ? 'hero hero--flat'
+          : graphic
+            ? 'hero hero--graphic'
+            : 'hero'
+      }
       aria-roledescription="carousel"
       aria-label={copy.heroCarouselAria}
       style={{ '--hero-slide-ms': `${SLIDE_MS}ms` } as React.CSSProperties}
@@ -152,15 +171,19 @@ export function HeroCarousel() {
             .join(' ')}
           aria-hidden={slideIndex !== index}
         >
-          {slide.kind === 'graphic' && 'imageMobile' in slide ? (
-            <picture>
-              <source media="(min-width: 900px)" srcSet={slide.image} />
-              <img src={slide.imageMobile} alt="" />
-            </picture>
-          ) : (
-            <img src={slide.image} alt="" />
-          )}
-          {slide.kind === 'graphic' ? null : <div className="hero__veil" />}
+          {SHOW_SLIDE_IMAGES ? (
+            <>
+              {slide.kind === 'graphic' && 'imageMobile' in slide ? (
+                <picture>
+                  <source media="(min-width: 900px)" srcSet={slide.image} />
+                  <img src={slide.imageMobile} alt="" />
+                </picture>
+              ) : (
+                <img src={slide.image} alt="" />
+              )}
+              {slide.kind === 'graphic' ? null : <div className="hero__veil" />}
+            </>
+          ) : null}
         </div>
       ))}
 
