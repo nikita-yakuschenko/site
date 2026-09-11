@@ -1669,11 +1669,14 @@ body.hero-on-light .site-office__label {
   opacity: 0.62;
 }
 
+/* Адрес стоит под расписанием, прямо над кнопкой маршрута: там метка на
+   месте по смыслу и не соседствует с безиконочной парой сверху, из-за
+   которой левый край текста шёл рваным. */
 .site-office__address {
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  margin: 0 0 16px;
+  margin: 14px 0 0;
   font-size: 13px;
   line-height: 1.35;
 }
@@ -1747,7 +1750,7 @@ body.hero-on-light .site-office__label {
      фирменными кнопками, а не жить по своим правилам. */
   display: flex;
   justify-content: center;
-  margin-top: 16px;
+  margin-top: 14px;
 }
 
 @media (prefers-reduced-motion: reduce) {
