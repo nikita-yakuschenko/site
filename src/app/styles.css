@@ -916,6 +916,50 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   color: rgb(var(--avgst-ink-rgb) / 0.72);
 }
 
+/* Каталог: счётчик над сеткой и состояние пустого результата. */
+.catalog__count {
+  margin: 20px 0 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.5);
+}
+
+.catalog__empty {
+  margin: 32px 0 0;
+  font-size: 16px;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+/* Фасады в карточке проекта: ряд с прокруткой на узком экране, сетка на
+   широком — кадры разного размера смотрелись бы случайным коллажем. */
+.project-gallery {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(260px, 1fr);
+  gap: 16px;
+  margin-top: 20px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+.project-gallery img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: var(--radius);
+  scroll-snap-align: start;
+}
+
+@media (min-width: 720px) {
+  .project-gallery {
+    grid-auto-flow: row;
+    grid-template-columns: repeat(2, 1fr);
+    overflow-x: visible;
+  }
+}
+
 .info-page__actions {
   display: flex;
   flex-wrap: wrap;
