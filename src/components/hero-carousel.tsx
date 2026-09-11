@@ -75,9 +75,22 @@ export function HeroCarousel() {
   const slides = copy.heroSlides
   const [index, setIndex] = useState(0)
   const [playId, setPlayId] = useState(0)
-  // Пока читают — не листаем. Курсор на баннере или фокус внутри него
-  // останавливают автоплей вместе с полоской прогресса.
+  // Пока читают — не листаем. Раньше пауза висела на всей секции, но баннер
+  // занимает весь первый экран: курсор оказывался над ним почти всегда, и
+  // полоска то замирала, то дёргалась дальше. Теперь пауза только там, где
+  // действительно читают и целятся, — текст и сами переключатели.
   const [paused, setPaused] = useState(false)
+
+  const pauseProps = {
+    onPointerEnter: (event: React.PointerEvent) => {
+      if (event.pointerType !== 'touch') setPaused(true)
+    },
+    onPointerLeave: () => setPaused(false),
+    onFocusCapture: () => setPaused(true),
+    onBlurCapture: (event: React.FocusEvent) => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false)
+    },
+  }
   const current = slides[index] || slides[0]
   const graphic = current.kind === 'graphic'
 
@@ -126,12 +139,6 @@ export function HeroCarousel() {
       aria-roledescription="carousel"
       aria-label={copy.heroCarouselAria}
       style={{ '--hero-slide-ms': `${SLIDE_MS}ms` } as React.CSSProperties}
-      onPointerEnter={() => setPaused(true)}
-      onPointerLeave={() => setPaused(false)}
-      onFocusCapture={() => setPaused(true)}
-      onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false)
-      }}
     >
       {slides.map((slide, slideIndex) => (
         <div
@@ -158,7 +165,7 @@ export function HeroCarousel() {
       ))}
 
       <div className="hero__stage">
-        <div className="hero__copy">
+        <div className="hero__copy" {...pauseProps}>
           <h1>
             {nbspText(current.heading)}
             {current.headingMore ? (
@@ -176,7 +183,7 @@ export function HeroCarousel() {
         </div>
 
         <div className="hero__foot">
-          <div className="hero__dots" role="tablist" aria-label={copy.heroCarouselAria}>
+          <div className="hero__dots" role="tablist" aria-label={copy.heroCarouselAria} {...pauseProps}>
             {slides.map((slide, slideIndex) => {
               const active = slideIndex === index
               const done = slideIndex < index
