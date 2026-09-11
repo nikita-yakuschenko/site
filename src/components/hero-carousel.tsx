@@ -22,7 +22,10 @@ type HeroAdvantage = {
   value: string
   mobile?: { label: readonly string[]; value: string }
 }
-const SLIDE_MS = 6000
+// Длительность слайда. Текста на баннере три-четыре строки, шести секунд
+// на прочтение не хватало. Значение отсюда же уходит в CSS-переменную, чтобы
+// полоска прогресса и смена кадра не разъезжались.
+const SLIDE_MS = 11000
 
 type BannerTone = 'light' | 'dark'
 
@@ -72,6 +75,9 @@ export function HeroCarousel() {
   const slides = copy.heroSlides
   const [index, setIndex] = useState(0)
   const [playId, setPlayId] = useState(0)
+  // Пока читают — не листаем. Курсор на баннере или фокус внутри него
+  // останавливают автоплей вместе с полоской прогресса.
+  const [paused, setPaused] = useState(false)
   const current = slides[index] || slides[0]
   const graphic = current.kind === 'graphic'
 
@@ -103,19 +109,29 @@ export function HeroCarousel() {
   }, [index, current.kind])
 
   useEffect(() => {
+    if (paused) return
     if (slides.length < 2) return
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
-    const id = window.setInterval(() => {
+    // Таймер на один шаг, а не интервал: эффект и так перезапускается на
+    // каждом слайде, и повторяющийся таймер только копил бы расхождение.
+    const id = window.setTimeout(() => {
       setIndex((value) => (value + 1) % slides.length)
     }, SLIDE_MS)
-    return () => window.clearInterval(id)
-  }, [index, slides.length])
+    return () => window.clearTimeout(id)
+  }, [index, paused, slides.length])
 
   return (
     <section
       className={graphic ? 'hero hero--graphic' : 'hero'}
       aria-roledescription="carousel"
       aria-label={copy.heroCarouselAria}
+      style={{ '--hero-slide-ms': `${SLIDE_MS}ms` } as React.CSSProperties}
+      onPointerEnter={() => setPaused(true)}
+      onPointerLeave={() => setPaused(false)}
+      onFocusCapture={() => setPaused(true)}
+      onBlurCapture={(event) => {
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setPaused(false)
+      }}
     >
       {slides.map((slide, slideIndex) => (
         <div
@@ -177,7 +193,14 @@ export function HeroCarousel() {
                   <span
                     className="hero__dots-fill"
                     key={active ? `play-${playId}` : 'idle'}
-                    style={active ? { animationDuration: `${SLIDE_MS}ms` } : undefined}
+                    style={
+                      active
+                        ? {
+                            animationDuration: `${SLIDE_MS}ms`,
+                            animationPlayState: paused ? 'paused' : 'running',
+                          }
+                        : undefined
+                    }
                   />
                 </button>
               )
