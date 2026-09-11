@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { Fragment, useEffect, useState, type ReactNode } from 'react'
 import { IconMenu2, IconX } from '@tabler/icons-react'
 import Link from 'next/link'
 import { copy } from '../lib/copy'
@@ -10,6 +10,36 @@ import { RegionSwitch } from './region-switch'
 
 type NavItem = { label?: string | null; href?: string | null }
 type MediaLike = { url?: string | null } | number | string | null | undefined
+
+/**
+ * Служебная навигация шапки, разбитая на смысловые группы.
+ *
+ * Порядок и состав заданы здесь, а не в CMS: это каркас шапки, а не
+ * редакторское меню — оно живёт в Sites.navigation и рендерится в плашке.
+ */
+type MetaGroup = {
+  /** Уходит первой, когда шапке не хватает ширины. */
+  readonly secondary?: boolean
+  readonly links: readonly { label: string; href: string }[]
+}
+
+const META_LINK_GROUPS: readonly MetaGroup[] = [
+  {
+    links: [
+      { label: copy.mortgage, href: '/mortgage' },
+      { label: copy.production, href: '/manufacture' },
+    ],
+  },
+  {
+    // Сайт покупательский: разделы для юрлиц первыми уступают место.
+    secondary: true,
+    links: [
+      { label: copy.business, href: '/business' },
+      { label: copy.dealers, href: '/dealers' },
+    ],
+  },
+  { links: [{ label: copy.exposition, href: '/exposition' }] },
+]
 
 export function SiteChrome({
   name,
@@ -57,9 +87,26 @@ export function SiteChrome({
         <div className="site-header__inner">
           <div className="site-header__meta">
             <RegionSwitch />
-            <Link className="site-meta-link" href="/mortgage">
-              {copy.mortgage}
-            </Link>
+            {/* Три группы, между ними воздух больше внутреннего: деньги и
+                завод, работа с юрлицами, куда приехать посмотреть. */}
+            <nav className="site-meta-nav" aria-label={copy.metaNavAria}>
+              {META_LINK_GROUPS.map((group) => (
+                <span
+                  key={group.links[0]?.href}
+                  className={
+                    group.secondary
+                      ? 'site-meta-nav__group site-meta-nav__group--secondary'
+                      : 'site-meta-nav__group'
+                  }
+                >
+                  {group.links.map((item) => (
+                    <Link className="site-meta-link" href={item.href} key={item.href}>
+                      {item.label}
+                    </Link>
+                  ))}
+                </span>
+              ))}
+            </nav>
             <OfficeStatusIndicator />
           </div>
 
@@ -112,6 +159,23 @@ export function SiteChrome({
                 <Link key={`m-${item.href}`} href={item.href} onClick={() => setMenuOpen(false)}>
                   {item.label}
                 </Link>
+              ))}
+              {/* Служебные разделы: в узкой шапке ряд со ссылками скрыт,
+                  и без этого списка они были бы недостижимы. Группы
+                  сохраняют порядок, разделяются чертой. */}
+              {META_LINK_GROUPS.map((group, groupIndex) => (
+                <Fragment key={`menu-${group.links[0]?.href}`}>
+                  {groupIndex === 0 ? <span className="site-menu__rule" aria-hidden="true" /> : null}
+                  {group.links.map((item) => (
+                    <Link
+                      key={`menu-${item.href}`}
+                      href={item.href}
+                      onClick={() => setMenuOpen(false)}
+                    >
+                      {item.label}
+                    </Link>
+                  ))}
+                </Fragment>
               ))}
             </nav>
             {phone ? (
