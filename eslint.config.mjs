@@ -7,6 +7,22 @@ const config = [
   { ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts'] },
   ...coreWebVitals,
   ...typescript,
+  {
+    rules: {
+      // Подчёркивание — принятая пометка «аргумент нужен по сигнатуре,
+      // но не используется»: интерфейсы провайдеров требуют параметр целиком.
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          args: 'after-used',
+          argsIgnorePattern: '^_',
+          varsIgnorePattern: '^_',
+          caughtErrorsIgnorePattern: '^_',
+          destructuredArrayIgnorePattern: '^_',
+        },
+      ],
+    },
+  },
 ]
 
 export default config
