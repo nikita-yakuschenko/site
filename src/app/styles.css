@@ -916,6 +916,13 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   color: rgb(var(--avgst-ink-rgb) / 0.72);
 }
 
+.info-page__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
 .info-page__list {
   display: grid;
   gap: 10px;
