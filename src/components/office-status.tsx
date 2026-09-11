@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
 import Link from 'next/link'
-import { IconMapPin } from '@tabler/icons-react'
+import { IconBus, IconMapPin } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
   formatRange,
   OFFICE_SCHEDULE,
+  OFFICE_TRANSIT,
   readOfficeState,
   readServerOfficeState,
   statusHeadline,
@@ -123,6 +124,15 @@ export function OfficeStatusIndicator() {
               </div>
             ))}
           </dl>
+          <ul className="site-office__transit">
+            {OFFICE_TRANSIT.map((stop) => (
+              <li key={stop.name}>
+                <IconBus size={18} stroke={1.75} aria-hidden="true" />
+                <span className="site-office__transit-name">{stop.name}</span>
+                <span className="site-office__transit-distance">{stop.distance}</span>
+              </li>
+            ))}
+          </ul>
           <p className="site-office__address">
             <IconMapPin size={18} stroke={1.75} aria-hidden="true" />
             <span>
