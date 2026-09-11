@@ -266,6 +266,55 @@ a { color: inherit; text-decoration: none; }
   opacity: 0.7;
 }
 
+/* Служебная навигация. Группы разделяет только воздух, без черты: ряд
+   распределён по свободной ширине, и разрывы между группами втрое больше
+   внутренних — этого достаточно, чтобы три связки читались как три.
+   Распределение заодно не даёт ряду сбиться в левый угол. */
+.site-meta-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex: 1 1 auto;
+  min-width: 0;
+  gap: 28px;
+  /* Ряд не подходит вплотную ни к региону, ни к статусу: свои поля больше
+     общего зазора ряда, иначе крайние ссылки липнут к соседям. */
+  margin-inline: 20px;
+}
+
+.site-meta-nav__group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Черта в меню: отделяет служебные разделы от основной навигации. */
+.site-menu__rule {
+  display: block;
+  height: 1px;
+  margin: 6px 0;
+  background: currentColor;
+  opacity: 0.14;
+}
+
+/* Ниже 1025px ряду не хватает ширины: при 837px доступного места
+   «Выставочные площадки» наезжали на статус офиса. Уходит вторая группа —
+   сайт покупательский, разделы для юрлиц нужны здесь реже всего. Из меню
+   они по-прежнему доступны. */
+@media (max-width: 1024px) {
+  .site-meta-nav__group--secondary {
+    display: none;
+  }
+}
+
+/* В узкой шапке ряд не показывается вовсе: там остаются только город и
+   статус офиса, на ссылки места нет. */
+@media (max-width: 768px) {
+  .site-meta-nav {
+    display: none;
+  }
+}
+
 .site-header__plaque {
   pointer-events: auto;
   display: grid;
@@ -841,8 +890,8 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   letter-spacing: -0.02em;
 }
 
-/* Страница ипотеки. Заглушка под AV4-15: текст, список программ, заявка. */
-.mortgage__lead {
+/* Информационные страницы-заглушки под AV4-15: текст, список, заявка. */
+.info-page__lead {
   max-width: 60ch;
   margin: 16px 0 0;
   font-size: 16px;
@@ -850,7 +899,7 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   color: rgb(var(--avgst-ink-rgb) / 0.72);
 }
 
-.mortgage__programs {
+.info-page__list {
   display: grid;
   gap: 10px;
   margin: 28px 0 32px;
@@ -860,14 +909,14 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   line-height: 1.4;
 }
 
-.mortgage__programs li {
+.info-page__list li {
   display: flex;
   align-items: baseline;
   gap: 10px;
 }
 
 /* Маркер точкой, а не буллетом списка: тот же приём, что в блоке завода. */
-.mortgage__programs li::before {
+.info-page__list li::before {
   content: '';
   flex: 0 0 auto;
   width: 6px;
@@ -1919,12 +1968,6 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-office__map {
     padding-right: 36px;
   }
 
-  /* В узкой шапке остаются только город и статус офиса: ссылка «Ипотека»
-     уходит в меню, иначе подпись статуса не помещается в строку. */
-  .site-meta-link {
-    display: none;
-  }
-
   .site-office__label--full {
     display: none;
   }
@@ -1983,4 +2026,14 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-office__hours > d
 
 .hero--flat .hero__dots button::before {
   background: rgb(var(--avgst-ink-rgb) / 0.16);
+}
+
+/* Экраны уже 375px. «Московская область» со статусом требует 314px, а
+   доступно там 312 — название переносилось на вторую строку. Снимаем герб
+   в самой кнопке: он освобождает 26px вместе со своим зазором. В меню
+   выбора региона гербы остаются, места там достаточно. */
+@media (max-width: 374px) {
+  .site-region__trigger .site-region__mark {
+    display: none;
+  }
 }
