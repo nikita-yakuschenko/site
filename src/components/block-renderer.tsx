@@ -30,7 +30,7 @@ function PopularProjects({ block, projects }: { block: LayoutBlock; projects: Ca
             <p className="eyebrow">{String(block.eyebrow || copy.popularEyebrow)}</p>
             <h2>{String(block.heading || copy.popularHeading)}</h2>
           </div>
-          <a className="btn btn-outline-dark" href={String(block.catalogHref || '/projects')}>
+          <a className="btn btn-outline-dark" href={String(block.catalogHref || '/catalog')}>
             {String(block.catalogLabel || copy.allProjects)}
           </a>
         </div>

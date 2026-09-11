@@ -67,7 +67,7 @@ export function SiteChrome({
   const [menuOpen, setMenuOpen] = useState(false)
   const src = mediaUrl(logo) || '/logo_lg.svg'
   const items = (navigation?.filter((item) => item.label && item.href && item.href !== '/') || [
-    { label: copy.catalogProjects, href: '/projects' },
+    { label: copy.catalogProjects, href: '/catalog' },
     { label: copy.contacts, href: '/#contacts' },
   ]) as Array<{ label: string; href: string }>
   const year = new Date().getFullYear()
@@ -209,13 +209,13 @@ export function SiteChrome({
           </div>
           <div>
             <h3>{copy.catalogFooter}</h3>
-            <Link href="/projects">{copy.modularHouses}</Link>
-            <Link href="/projects">{copy.frameHouses}</Link>
+            <Link href="/catalog">{copy.modularHouses}</Link>
+            <Link href="/catalog">{copy.frameHouses}</Link>
           </div>
           <div>
             <h3>{copy.menu}</h3>
             <Link href="/">{copy.breadcrumbsHome}</Link>
-            <Link href="/projects">{copy.catalogProjects}</Link>
+            <Link href="/catalog">{copy.catalogProjects}</Link>
             <Link href="/#contacts">{copy.contacts}</Link>
           </div>
           <div>

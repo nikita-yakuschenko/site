@@ -21,7 +21,7 @@ function project(
 ): CatalogProject {
   return {
     ...partial,
-    href: `/projects/${partial.slug}`,
+    href: `/catalog/${partial.slug}`,
     priceLabel: partial.priceAmount == null ? copy.priceOnRequest : formatFromRub(partial.priceAmount),
     options: partial.options ?? OPTIONS,
   }
