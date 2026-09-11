@@ -17,9 +17,13 @@ export const SITE = {
     email: 'hello@avgst.ru',
     address: 'Нижний Новгород',
   },
+  /* Основная навигация — путь покупателя: выбрать проект, увидеть готовое,
+     проверить производство. Контакты остаются кнопкой «Задать вопрос» в
+     плашке и блоком в подвале. */
   navigation: [
-    { label: copy.catalogProjects, href: '/projects' },
-    { label: copy.contacts, href: '/#contacts' },
+    { label: copy.catalog, href: '/projects' },
+    { label: copy.builtHouses, href: '/built-houses' },
+    { label: copy.production, href: '/manufacture' },
   ],
   footer: { legal: copy.offerDisclaimer },
   defaultSeo: { title: copy.seoTitle, description: copy.seoDescription },
