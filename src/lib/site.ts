@@ -21,7 +21,7 @@ export const SITE = {
      проверить производство. Контакты остаются кнопкой «Задать вопрос» в
      плашке и блоком в подвале. */
   navigation: [
-    { label: copy.catalog, href: '/projects' },
+    { label: copy.projects, href: '/projects' },
     { label: copy.builtHouses, href: '/built-houses' },
     { label: copy.production, href: '/manufacture' },
   ],
