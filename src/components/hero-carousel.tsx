@@ -18,12 +18,21 @@ export type HeroSlide = {
   imageMobile?: string;
 };
 
-/** Кампания поверх кадра: своя плашка в углу, свой срок жизни. */
+/**
+ * Кампания поверх кадра: своя карточка, свой срок жизни.
+ *
+ * Медиа необязательно, но если есть — карточка становится с картинкой или
+ * видео. video старше image: задано и то и другое — играет видео, картинка
+ * остаётся постером на время загрузки.
+ */
 export type HeroPromo = {
+  eyebrow?: string;
   heading: string;
   text?: string;
   cta: string;
   href: string;
+  image?: string;
+  video?: string;
 };
 
 // Длительность слайда. Текста на баннере три-четыре строки, шести секунд
@@ -126,20 +135,40 @@ export function HeroCarousel({
           </a>
         </div>
 
-        <div className="hero__foot">
-          {promo ? (
-            <a className="hero__promo" href={promo.href}>
-              <span className="hero__promo-body">
-                <strong>{nbspText(promo.heading)}</strong>
-                {promo.text ? <span>{nbspText(promo.text)}</span> : null}
+        {promo ? (
+          <a className="hero__promo" href={promo.href}>
+            {promo.video || promo.image ? (
+              <span className="hero__promo-media">
+                {promo.video ? (
+                  <video
+                    src={promo.video}
+                    poster={promo.image}
+                    muted
+                    loop
+                    autoPlay
+                    playsInline
+                  />
+                ) : (
+                  <img src={promo.image} alt="" />
+                )}
               </span>
+            ) : null}
+
+            <span className="hero__promo-body">
+              {promo.eyebrow ? (
+                <span className="hero__promo-eyebrow">{promo.eyebrow}</span>
+              ) : null}
+              <strong>{nbspText(promo.heading)}</strong>
+              {promo.text ? <span>{nbspText(promo.text)}</span> : null}
               <span className="hero__promo-cta">
                 {promo.cta}
                 <IconArrowUpRight size={16} stroke={2} />
               </span>
-            </a>
-          ) : null}
+            </span>
+          </a>
+        ) : null}
 
+        <div className="hero__foot">
           <div
             className="hero__dots"
             role="tablist"
