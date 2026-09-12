@@ -419,13 +419,24 @@ a { color: inherit; text-decoration: none; }
   cursor: pointer;
 }
 
+/* Пороги плашки посчитаны по её содержимому, а не взяты круглыми числами.
+   Пять пунктов навигации, логотип, телефон и кнопка требуют 1104px, а
+   доступная ширина — min(1152, окно − 48). С телефоном это сходится только
+   от 1200px, без телефона — от 1024px, ниже не сходится вовсе и остаётся
+   бургер. Телефон при этом никуда не пропадает: он есть в меню и в подвале. */
 @media (min-width: 900px) {
-  .site-header__nav { display: flex; }
-  .site-header__phone { display: inline; }
-  .site-header__burger { display: none; }
   .btn.site-header__cta { display: inline-flex; }
   .site-header__logo--lg { display: block; }
   .site-header__logo--sm { display: none; }
+}
+
+@media (min-width: 1024px) {
+  .site-header__nav { display: flex; }
+  .site-header__burger { display: none; }
+}
+
+@media (min-width: 1200px) {
+  .site-header__phone { display: inline; }
 }
 
 .site-menu { position: fixed; inset: 0; z-index: 40; }
@@ -1420,11 +1431,20 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   object-fit: cover;
 }
 
+/* Вуаль над кадром. Верхняя полоса держится тёмной до 20% высоты: там
+   лежат крошки и кнопки действий, а верх фотографии почти всегда небо —
+   белый текст на нём давал контраст 1.8:1 при норме 4.5:1. Дальше вуаль
+   отпускает кадр и снова сгущается к низу, под заголовок и плашку ТТХ. */
 .project-hero__veil {
   position: absolute;
   inset: 0;
-  background:
-    linear-gradient(180deg, rgba(15, 18, 22, 0.28) 0%, rgba(15, 18, 22, 0.08) 38%, rgba(15, 18, 22, 0.55) 100%);
+  background: linear-gradient(
+    180deg,
+    rgba(15, 18, 22, 0.75) 0%,
+    rgba(15, 18, 22, 0.72) 20%,
+    rgba(15, 18, 22, 0.1) 42%,
+    rgba(15, 18, 22, 0.55) 100%
+  );
 }
 
 .project-hero__stage {
@@ -1435,7 +1455,15 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   min-height: 100svh;
   max-width: var(--page-width);
   margin: 0 auto;
-  padding: 128px 0 24px;
+  /* Верхнее поле отмеряно от низа плашки шапки: при 128px между ней и
+     рядом с крошками оставалось 15px, и ряд читался её продолжением. */
+  padding: 152px 0 24px;
+}
+
+@media (max-width: 900px) {
+  .project-hero__stage {
+    padding-top: 120px;
+  }
 }
 
 .project-hero__intro {
@@ -1446,13 +1474,59 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   padding: 0 0 40px;
 }
 
+/* Верхний ряд кадра: слева путь, справа действия с проектом. Оптическая
+   компенсация 16px — ровно внутренние поля плашки шапки, чтобы крошки
+   встали под логотипом, а действия под кнопкой «Задать вопрос», а не по
+   внешнему краю плашки. */
+.project-hero__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-inline: 16px;
+}
+
 .project-hero__crumbs {
   display: flex;
   align-items: center;
   gap: 8px;
-  margin: 0 0 20px;
+  margin: 0;
   font-size: 14px;
   color: rgb(255 255 255 / 0.82);
+}
+
+/* Форму задаёт сам контур иконки: ни рамки, ни подложки. Кнопка — это
+   штриховая иконка и число рядом, поверх фотографии это читается легче
+   любой плашки. */
+.project-actions {
+  display: flex;
+  gap: 24px;
+}
+
+.project-actions__btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: white;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  cursor: pointer;
+  transition: color 0.2s var(--ease-out);
+}
+
+.project-actions__btn:hover {
+  color: var(--brand-yellow);
+}
+
+.project-actions__btn[aria-pressed='true'] {
+  color: var(--brand-yellow);
 }
 
 .project-hero__crumbs a {
@@ -1461,15 +1535,19 @@ body.hero-on-light .site-header:not(.site-header--solid) .site-header__nav a:hov
   gap: 4px;
 }
 
+/* Форма та же, что у бейджа в карточке каталога: один и тот же ярлык
+   технологии не должен менять очертания между списком и карточкой. */
 .project-hero__badge {
   width: fit-content;
   margin: 0 0 16px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  background: white;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgb(255 255 255 / 0.95);
   color: var(--avgst-ink);
   font-size: 12px;
   font-weight: 500;
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+  backdrop-filter: blur(8px);
 }
 
 .project-hero h1 {

@@ -9,9 +9,11 @@ import {
   IconRulerMeasure,
   IconStairs,
 } from '@tabler/icons-react'
+import { ProjectActions } from '../../../components/project-actions'
 import { SiteChrome } from '../../../components/site-chrome'
 import { FixtureCatalogProvider } from '../../../lib/catalog/fixture-provider'
 import { copy, footerAboutFor } from '../../../lib/copy'
+import { splitProjectName } from '../../../lib/project-name'
 import { SITE } from '../../../lib/site'
 
 const catalog = new FixtureCatalogProvider()
@@ -40,6 +42,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const project = await catalog.getBySlug(slug, { siteCode: SITE.code })
   if (!project) notFound()
 
+  // Маркировка в заголовке идёт фирменным жёлтым: правило .project-hero h1 span
+  // уже есть в стилях, нужно лишь отделить число от слова.
+  const { head, mark } = splitProjectName(project.name)
+
   const specs = [
     { icon: IconRulerMeasure, label: copy.area, value: `${project.area} ${copy.specArea}` },
     { icon: IconStairs, label: copy.floorsLabel, value: project.floors },
@@ -63,14 +69,24 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <img src={project.imageUrl} alt="" />
           <div className="project-hero__veil" />
           <div className="project-hero__stage">
-            <div className="project-hero__intro">
+            {/* Крошки наверху, где навигацию и ищут, рядом — действия с
+                проектом. Раньше крошки лежали внизу у заголовка и читались
+                как его часть. */}
+            <div className="project-hero__top">
               <nav className="project-hero__crumbs" aria-label={copy.crumbsAria}>
                 <Link href="/">{copy.breadcrumbsHome}</Link>
                 <IconChevronRight size={14} stroke={2} aria-hidden="true" />
                 <Link href="/catalog">{copy.breadcrumbsCatalog}</Link>
               </nav>
+              <ProjectActions project={project} stats={{ likes: 0, shares: 0 }} />
+            </div>
+
+            <div className="project-hero__intro">
               <p className="project-hero__badge">{project.technologyBadge}</p>
-              <h1>{project.name}</h1>
+              <h1>
+                {head}
+                {mark ? <span>{mark}</span> : null}
+              </h1>
             </div>
 
             <div className="project-hero__bar">
