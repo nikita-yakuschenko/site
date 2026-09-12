@@ -63,24 +63,28 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       overlay
       footer={SITE.footer.legal}
       about={footerAboutFor(SITE.name)}
+      subrow={
+        /* Крошки и действия живут во второй строке той же плашки шапки:
+           одна поверхность вместо двух, и над кадром ничего не лежит. */
+        <div className="site-header__subrow">
+          <nav className="project-hero__crumbs" aria-label={copy.crumbsAria}>
+            <Link href="/">{copy.breadcrumbsHome}</Link>
+            <IconChevronRight size={14} stroke={2} aria-hidden="true" />
+            <Link href="/catalog">{copy.breadcrumbsCatalog}</Link>
+            <IconChevronRight size={14} stroke={2} aria-hidden="true" />
+            {/* Текущая страница — не ссылка: вести с неё на неё же
+                некуда, и aria-current сообщает это программам чтения. */}
+            <span aria-current="page">{project.name}</span>
+          </nav>
+          <ProjectActions project={project} stats={{ likes: 0, shares: 0 }} />
+        </div>
+      }
     >
       <main>
         <section className="project-hero">
           <img src={project.imageUrl} alt="" />
           <div className="project-hero__veil" />
           <div className="project-hero__stage">
-            {/* Крошки наверху, где навигацию и ищут, рядом — действия с
-                проектом. Раньше крошки лежали внизу у заголовка и читались
-                как его часть. */}
-            <div className="project-hero__top">
-              <nav className="project-hero__crumbs" aria-label={copy.crumbsAria}>
-                <Link href="/">{copy.breadcrumbsHome}</Link>
-                <IconChevronRight size={14} stroke={2} aria-hidden="true" />
-                <Link href="/catalog">{copy.breadcrumbsCatalog}</Link>
-              </nav>
-              <ProjectActions project={project} stats={{ likes: 0, shares: 0 }} />
-            </div>
-
             <div className="project-hero__intro">
               <p className="project-hero__badge">{project.technologyBadge}</p>
               <h1>

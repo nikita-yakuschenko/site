@@ -16,3 +16,5 @@ Thumbs.db
 next-env.d.ts
 .vscode/
 .idea/
+.claude/
+public/media/factory-video.mp4

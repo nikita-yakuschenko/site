@@ -23,8 +23,8 @@ export const SITE = {
   navigation: [
     { label: copy.projects, href: '/catalog' },
     { label: copy.readyHouses, href: '/for-sale' },
-    { label: copy.production, href: '/manufacture' },
     { label: copy.mortgage, href: '/mortgage' },
+    { label: copy.production, href: '/manufacture' },
     { label: copy.exposition, href: '/exposition' },
   ],
   footer: { legal: copy.offerDisclaimer },
