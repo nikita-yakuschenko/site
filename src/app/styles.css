@@ -745,7 +745,10 @@ a {
      встают на одну линию — этого не получалось, пока слот был отдельно
      позиционированным элементом. */
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 380px;
+  /* Одна колонка: сообщение по центру свободной высоты, лента слотов по
+     нижнему полю во всю ширину содержимого. Двух независимых колонок в
+     кадре больше нет — именно они и разъезжались, связать их было нечем. */
+  grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 1fr auto auto;
   align-items: end;
   column-gap: 48px;
@@ -759,7 +762,11 @@ a {
    Контраст даёт ровный тон по всему кадру — см. .hero__tone. */
 .hero__copy {
   grid-column: 1;
-  grid-row: 2;
+  /* Занимает верхнюю распорку вместе со своей строкой и встаёт по её
+     середине: сообщение читается по центру кадра, а медиа-слоты при этом
+     остаются прижатыми к низу сцены. */
+  grid-row: 1 / 3;
+  align-self: center;
 }
 
 /* Медиа-слоты поверх кадра.
@@ -774,10 +781,14 @@ a {
  */
 .hero__promos {
   position: relative;
-  grid-column: 2;
-  grid-row: 2;
+  grid-column: 1;
+  grid-row: 3;
   width: 100%;
-  /* Кадр ленты: за его краями слоты не видны. */
+}
+
+/* Кадр ленты. Обрезка живёт здесь, а не на блоке слотов: шевроны и полоса
+   прогресса лежат выше ленты и на блоке попали бы под ту же обрезку. */
+.hero__promos-view {
   overflow: hidden;
   border-radius: var(--surface-radius);
 }
@@ -1084,6 +1095,235 @@ a {
   color: var(--brand-yellow-foreground);
 }
 
+/* Лента слотов на широком экране.
+ *
+ * Слоты лежат в ряд по нижнему полю: видно сразу все три, листать нечего —
+ * ни клонов, ни жеста, ни автоповорота, компонент в этом режиме их не
+ * заводит. Опора композиции — нижняя линия кадра, общая у ленты и у полей
+ * страницы; сообщение стоит по центру свободной высоты над ней.
+ *
+ * В кадре два слота, а не три: на треть ширины карточка выходила мелкой,
+ * на половину — читается. Третий приходит листанием, как и в узком режиме;
+ * механика у обоих одна, разная только ширина слота.
+ *
+ * Карточка здесь горизонтальная строка, а не колонка: вертикальная с
+ * крупным медиа не помещалась — заголовки ломались надвое, описания
+ * обрезались. Кнопки нет: нажимается вся карточка, об этом говорит стрелка
+ * в углу.
+ */
+/* Карточка приподнимается на наведении и отбрасывает тень — по вертикали
+   кадру нужен запас. Поля растят область обрезки, отрицательные отступы
+   возвращают ленту на место: по горизонтали обрезка остаётся ровно по краю
+   содержимого страницы. */
+.is-rail .hero__promos-view {
+  margin: -14px 0 -30px;
+  padding: 14px 0 30px;
+  border-radius: 0;
+}
+
+.is-rail .hero__promo {
+  position: relative;
+  flex: 0 0 100%;
+  flex-direction: row;
+  align-items: stretch;
+  gap: 14px;
+  padding: 7px;
+  /* Светлая грань по верхнему краю: без неё стекло читается плоской
+     заливкой, с ней у карточки появляется толщина. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    0 10px 30px rgb(6 9 16 / 0.28);
+  transition:
+    transform 0.24s var(--ease-out),
+    background-color 0.24s var(--ease-out),
+    border-color 0.24s var(--ease-out),
+    box-shadow 0.24s var(--ease-out);
+}
+
+/* Карточка целиком нажимается, и это должно быть видно до нажатия:
+   поднимается, набирает плотность и отрывается тенью от фотографии. */
+.is-rail .hero__promo:hover {
+  transform: translateY(-4px);
+  border-color: rgb(255 255 255 / 0.32);
+  background: rgb(var(--avgst-ink-rgb) / 0.68);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    0 20px 44px rgb(6 9 16 / 0.42);
+}
+
+/* До 1100px слот один и занимает кадр целиком: плашка во всю ширину
+   содержимого. Два слота появляются только там, где половина кадра ещё
+   достаточно широка, чтобы карточка читалась. */
+@media (min-width: 1100px) {
+  /* Зазор участвует в расчёте шага — значение продублировано в компоненте
+     (WIDE_GAP) и меняется только вместе с ним. */
+  .is-rail .hero__promos-track {
+    gap: 16px;
+  }
+
+  /* Половина кадра за вычетом половины зазора: два слота плюс зазор между
+     ними ровно заполняют ленту. */
+  .is-rail .hero__promo {
+    flex: 0 0 calc(50% - 8px);
+  }
+}
+
+/* Стрелка в правом верхнем углу вместо кнопки в каждой карточке: три
+   жёлтые кнопки в ряд спорили с главным действием сообщения, а знак
+   перехода нужен один и маленький. */
+.is-rail .hero__promo::after {
+  content: "↗";
+  position: absolute;
+  top: 9px;
+  right: 12px;
+  font-size: 15px;
+  line-height: 1;
+  color: rgb(255 255 255 / 0.45);
+  transition:
+    color 0.2s var(--ease-out),
+    transform 0.2s var(--ease-out);
+}
+
+.is-rail .hero__promo:hover::after {
+  transform: translate(2px, -2px);
+  color: var(--brand-yellow);
+}
+
+/* Миниатюра узкая и во всю высоту строки. Белое паспарту тонкое: у вырезки
+   оно даёт ей фон, у фотографии остаётся отсекателем от кадра баннера. */
+.is-rail .hero__promo-media {
+  flex: 0 0 168px;
+  /* Высоту задаёт строка, а не пропорция картинки: соседние карточки
+     должны стоять одной высоты при любой длине текста. */
+  aspect-ratio: auto;
+  /* Без белого поля: у фотографии свой фон, и рамка вокруг неё была лишним
+     контуром. Отсекает карточку от кадра её собственное стекло. */
+  padding: 0;
+  border-radius: 9px;
+}
+
+/* Вырезке белое поле нужно: это фон, на котором она отрисована, без него
+   предмет висел бы прямо на стекле. */
+.is-rail .hero__promo-media.is-cutout {
+  padding: 3px;
+  background: white;
+}
+
+.is-rail .hero__promo-media img,
+.is-rail .hero__promo-media video {
+  height: 100%;
+  border-radius: 7px;
+  transition: transform 0.5s var(--ease-out);
+}
+
+.is-rail .hero__promo:hover .hero__promo-media img,
+.is-rail .hero__promo:hover .hero__promo-media video {
+  transform: scale(1.05);
+}
+
+.is-rail .hero__promo-body {
+  justify-content: center;
+  gap: 3px;
+  /* Справа поле под стрелку, снизу полосы прогресса нет — резервировать
+     под неё место незачем. */
+  padding: 11px 14px 11px 0;
+}
+
+/* Заголовок в одну строку: перенос на две ломал ряд и отнимал место у
+   описания. Не поместившееся обрезается, а не переносится. */
+.is-rail .hero__promo-body strong {
+  overflow: hidden;
+  width: 100%;
+  font-size: 1.2rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.is-rail .hero__promo-body > span:not([class]) {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.is-rail .hero__promo-eyebrow {
+  font-size: 11px;
+}
+
+/* Шевроны и полоса прогресса стоят над лентой, а не внутри карточки: в
+   ленте карточек две, и управление, лежащее в одной из них, относилось бы
+   к ней одной. Распорка под медиа-слот здесь не нужна. */
+.is-rail .hero__promo-nav {
+  inset: auto 0 calc(100% + 14px) auto;
+}
+
+.is-rail .hero__promo-nav-spacer {
+  display: none;
+}
+
+.is-rail .hero__promo-nav-row {
+  padding: 0;
+}
+
+.is-rail .hero__promo-progress {
+  right: auto;
+  bottom: calc(100% + 20px);
+  left: 0;
+  width: 168px;
+}
+
+.is-rail .hero__promo-cta {
+  display: none;
+}
+
+/* Пока слот в кадре один, плашке достаётся вся ширина — и медиа с текстом
+   растут вместе с ней: на планшете в портрете карточка высотой 134px
+   терялась в ленте шириной под тысячу пикселей. Выше 1100px слотов два, и
+   размеры возвращаются к обычным. */
+@media (max-width: 1099px) {
+  .is-rail .hero__promo {
+    gap: 18px;
+    padding: 9px;
+  }
+
+  .is-rail .hero__promo-media {
+    flex: 0 0 clamp(168px, 22vw, 248px);
+    border-radius: 11px;
+  }
+
+  .is-rail .hero__promo-body {
+    gap: 5px;
+    padding: 16px 18px 16px 0;
+  }
+
+  .is-rail .hero__promo-body strong {
+    font-size: clamp(1.2rem, 2.4vw, 1.55rem);
+  }
+
+  .is-rail .hero__promo-body > span:not([class]) {
+    font-size: clamp(13.5px, 1.6vw, 15.5px);
+  }
+
+  .is-rail .hero__promo-eyebrow {
+    font-size: 11.5px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .is-rail .hero__promo,
+  .is-rail .hero__promo::after,
+  .is-rail .hero__promo-media img,
+  .is-rail .hero__promo-media video {
+    transition: none;
+  }
+
+  .is-rail .hero__promo:hover {
+    transform: none;
+  }
+}
+
 /* Ниже 1100px правая колонка не помещается: текстовая колонка и слот
    начинают спорить за одно место. Сетка складывается в одну колонку, слот
    уходит под сообщение и становится горизонтальным — в высоте 410px первый
@@ -1101,7 +1341,22 @@ a {
     margin-top: 28px;
   }
 
-  .hero__promo {
+  /* Плашка ленты тянется во всю ширину содержимого: сужать её незачем —
+     слот здесь один, и полоса под сообщением держит ту же ширину, что и
+     само сообщение. */
+  .hero__promos.is-rail {
+    width: 100%;
+  }
+}
+
+/* Промежуток между телефоном и лентой пустует: лента включается с 600px,
+   ниже работает узкая строка телефона. Раскладка ниже осталась от прежнего
+   горизонтального слота и держит этот промежуток.
+
+   Диапазон, а не max-width с исключением ленты: правило с :not() выходило
+   специфичнее телефонных и перебивало их на самой границе. */
+@media (min-width: 600px) and (max-width: 1099px) {
+  .hero__promos:not(.is-rail) .hero__promo {
     flex-direction: row;
     align-items: center;
     gap: 16px;
@@ -1109,30 +1364,29 @@ a {
   }
 
   /* Миниатюра в строку. Пропорцию держит слот, поэтому задаём только
-     ширину: 148px при 16:9 дают 83px высоты. Задавать пропорцию картинке
-     здесь бессмысленно — высоту она больше не определяет. */
-  .hero__promo-media {
+     ширину: 148px при 16:9 дают 83px высоты. */
+  .hero__promos:not(.is-rail) .hero__promo-media {
     flex: 0 0 auto;
     width: 148px;
     padding: 6px;
   }
 
-  .hero__promo-body {
+  .hero__promos:not(.is-rail) .hero__promo-body {
     gap: 4px;
     padding: 0;
   }
 
-  .hero__promo-body strong {
+  .hero__promos:not(.is-rail) .hero__promo-body strong {
     font-size: 1.05rem;
   }
 
   /* Описание убрано: в строку оно не помещается, а срок и заголовок несут
      всё нужное. */
-  .hero__promo-body > span:not([class]) {
+  .hero__promos:not(.is-rail) .hero__promo-body > span:not([class]) {
     display: none;
   }
 
-  .hero__promo-cta {
+  .hero__promos:not(.is-rail) .hero__promo-cta {
     margin-top: 2px;
   }
 }
