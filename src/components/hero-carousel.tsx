@@ -1,7 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { IconArrowUpRight } from "@tabler/icons-react";
+import {
+  IconArrowUpRight,
+  IconChevronLeft,
+  IconChevronRight,
+} from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
 
 /**
@@ -70,6 +74,11 @@ export function HeroCarousel({
         setPaused(false);
     },
   };
+
+  function goTo(next: number) {
+    setIndex((next + promos.length) % promos.length);
+    setPlayId((value) => value + 1);
+  }
 
   useEffect(() => {
     if (paused) return;
@@ -175,45 +184,86 @@ export function HeroCarousel({
                       <IconArrowUpRight size={16} stroke={2} />
                     </span>
                   </span>
-                  {/* Прогресс у нижней границы карточки, а не поверх
-                      картинки: слот — это вся карточка, и полоса отсчитывает
-                      её показ, а не кадрирует фотографию. */}
-                  {promos.length > 1 ? (
-                    <span className="hero__promo-progress">
-                      {promos.map((item, itemIndex) => (
-                        <span
-                          key={`seg-${item.heading}`}
-                          className={
-                            itemIndex < index
-                              ? "is-done"
-                              : itemIndex === index
-                                ? "is-active"
-                                : undefined
-                          }
-                        >
-                          <span
-                            className="hero__promo-progress-fill"
-                            key={
-                              itemIndex === index ? `play-${playId}` : "idle"
-                            }
-                            style={
-                              itemIndex === index
-                                ? {
-                                    animationDuration: `${SLIDE_MS}ms`,
-                                    animationPlayState: paused
-                                      ? "paused"
-                                      : "running",
-                                  }
-                                : undefined
-                            }
-                          />
-                        </span>
-                      ))}
-                    </span>
-                  ) : null}
                 </a>
               );
             })}
+
+            {/* Шевроны на строке надзаголовка. Слоем, а не в карточке:
+                карточка — ссылка, кнопки внутри <a> недопустимы. Распорка
+                16:9 повторяет высоту медиа-слота и опускает ряд ровно на
+                эту строку — без неё пришлось бы задавать отступ числом. */}
+            {promos.length > 1 ? (
+              <div className="hero__promo-nav">
+                <span className="hero__promo-nav-spacer" aria-hidden="true" />
+                <span className="hero__promo-nav-row">
+                  <button
+                    type="button"
+                    aria-label={copy.heroPromoPrev}
+                    onClick={() => goTo(index - 1)}
+                  >
+                    <IconChevronLeft size={18} stroke={2.2} />
+                  </button>
+                  <button
+                    type="button"
+                    aria-label={copy.heroPromoNext}
+                    onClick={() => goTo(index + 1)}
+                  >
+                    <IconChevronRight size={18} stroke={2.2} />
+                  </button>
+                </span>
+              </div>
+            ) : null}
+
+            {/* Переключатель у нижней границы карточки. Он же индикатор:
+                сегмент на слот, пройденные залиты, текущий заполняется по
+                времени показа. Вынесен из ссылки — кнопки внутри <a>
+                недопустимы, а без них слот было нечем переключить: клик в
+                любое место карточки уводил на страницу. */}
+            {promos.length > 1 ? (
+              <div
+                className="hero__promo-progress"
+                role="tablist"
+                aria-label={copy.heroPromosAria}
+              >
+                {promos.map((item, itemIndex) => {
+                  const active = itemIndex === index;
+                  return (
+                    <button
+                      key={`seg-${item.heading}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={active}
+                      aria-label={item.heading}
+                      className={
+                        active
+                          ? "is-active"
+                          : itemIndex < index
+                            ? "is-done"
+                            : undefined
+                      }
+                      onClick={() => goTo(itemIndex)}
+                    >
+                      <span className="hero__promo-progress-track">
+                        <span
+                          className="hero__promo-progress-fill"
+                          key={active ? `play-${playId}` : "idle"}
+                          style={
+                            active
+                              ? {
+                                  animationDuration: `${SLIDE_MS}ms`,
+                                  animationPlayState: paused
+                                    ? "paused"
+                                    : "running",
+                                }
+                              : undefined
+                          }
+                        />
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
           </div>
         ) : null}
       </div>
