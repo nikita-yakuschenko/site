@@ -762,7 +762,7 @@ a {
 .hero__promos-track {
   display: flex;
   align-items: stretch;
-  transition: transform 0.42s var(--ease-out);
+  transition: transform var(--hero-shift-ms, 420ms) var(--ease-out);
 }
 
 /* Во время тяги перехода нет: с ним лента отставала бы от пальца. */
