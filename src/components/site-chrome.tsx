@@ -90,7 +90,10 @@ export function SiteChrome({
             : "site-header site-header--solid"
         }
       >
-        <div className="site-header__inner">
+        {/* Технический ряд — сплошная полоса во всю ширину вьюпорта, поэтому
+            он лежит вне контейнера с ограниченной шириной: полоса тянется от
+            края до края, а содержимое внутри держит ширину страницы. */}
+        <div className="site-header__bar">
           <div className="site-header__meta">
             <RegionSwitch />
             {/* Одна группа: всё покупательское уехало в плашку, служебным
@@ -119,7 +122,9 @@ export function SiteChrome({
             </nav>
             <OfficeStatusIndicator />
           </div>
+        </div>
 
+        <div className="site-header__inner">
           <div className="site-header__plaque">
             <Link href="/" className="site-header__brand" aria-label={name}>
               <img

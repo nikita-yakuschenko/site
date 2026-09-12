@@ -1,5 +1,5 @@
-import type { LayoutBlock } from '../components/block-renderer'
-import { copy } from './copy'
+import type { LayoutBlock } from "../components/block-renderer";
+import { copy } from "./copy";
 
 /**
  * Раскладка главной страницы.
@@ -12,41 +12,43 @@ import { copy } from './copy'
  */
 export const HOME_LAYOUT: LayoutBlock[] = [
   {
-    blockType: 'hero',
-    heading: copy.heroHeadline,
-    description: copy.heroText,
-    theme: 'dark',
-    size: 'large',
-    primaryAction: { label: copy.consult, href: '/#contacts' },
-    secondaryAction: { label: copy.catalogCta, href: '/catalog' },
+    blockType: "hero",
+    slides: copy.heroSlides,
+    promo: copy.heroPromo,
+  },
+  /* Преимущества компании — отдельный блок, а не часть баннера. Они не
+     меняются вместе со слайдами и говорят о компании, а не о кадре. */
+  {
+    blockType: "advantagesBar",
+    items: copy.heroAdvantages,
   },
   {
-    blockType: 'popularProjects',
+    blockType: "popularProjects",
     eyebrow: copy.popularEyebrow,
     heading: copy.popularHeading,
-    catalogHref: '/catalog',
+    catalogHref: "/catalog",
     catalogLabel: copy.allProjects,
   },
   {
-    blockType: 'productionSection',
+    blockType: "productionSection",
     eyebrow: copy.production,
     heading: copy.productionHeading,
     body: copy.productionBody,
     items: copy.productionItems.map((label) => ({ label })),
     ctaLabel: copy.factoryTour,
-    ctaHref: '/#contacts',
-    theme: 'light',
+    ctaHref: "/#contacts",
+    theme: "light",
   },
   {
-    blockType: 'contactsSection',
+    blockType: "contactsSection",
     heading: copy.contacts,
     body: copy.contactsBody,
     useSiteContacts: true,
   },
   {
-    blockType: 'leadForm',
+    blockType: "leadForm",
     heading: copy.haveQuestion,
     body: copy.haveQuestionBody,
     submitLabel: copy.askQuestion,
   },
-]
+];
