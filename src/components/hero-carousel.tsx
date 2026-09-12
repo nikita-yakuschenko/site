@@ -201,14 +201,14 @@ export function HeroCarousel({
                     aria-label={copy.heroPromoPrev}
                     onClick={() => goTo(index - 1)}
                   >
-                    <IconChevronLeft size={18} stroke={2.2} />
+                    <IconChevronLeft size={15} stroke={2.2} />
                   </button>
                   <button
                     type="button"
                     aria-label={copy.heroPromoNext}
                     onClick={() => goTo(index + 1)}
                   >
-                    <IconChevronRight size={18} stroke={2.2} />
+                    <IconChevronRight size={15} stroke={2.2} />
                   </button>
                 </span>
               </div>

@@ -845,24 +845,32 @@ a {
 .hero__promo-nav-row {
   display: flex;
   justify-content: flex-end;
-  gap: 4px;
+  gap: 6px;
   /* Правое поле на 4px меньше текстового: у кнопки прозрачные поля вокруг
      иконки, и при равных 18px шеврон отступал от края дальше текста. */
   padding: 10px 14px 0;
   pointer-events: auto;
 }
 
+/* Поле у шеврона постоянное, а не только на наведении: без него кнопку
+   было не отличить от иконки, пока на неё не наведёшь.
+
+   Форма — суперэллипс: corner-shape задаёт непрерывную кривизну угла,
+   а не дугу окружности, как обычное скругление. border-radius остаётся
+   запасным вариантом — где corner-shape не поддерживается, кнопка
+   получит обычное скругление той же величины. */
 .hero__promo-nav-row button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 0;
   border-radius: 8px;
-  background: transparent;
-  color: rgb(255 255 255 / 0.7);
+  corner-shape: squircle;
+  background: rgb(255 255 255 / 0.12);
+  color: rgb(255 255 255 / 0.82);
   cursor: pointer;
   transition:
     background-color 0.2s var(--ease-out),
@@ -870,7 +878,7 @@ a {
 }
 
 .hero__promo-nav-row button:hover {
-  background: rgb(255 255 255 / 0.12);
+  background: rgb(255 255 255 / 0.26);
   color: white;
 }
 
