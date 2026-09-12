@@ -7,6 +7,7 @@ import {
 import { isRegisteredBlock } from "../blocks/registry";
 import { copy } from "../lib/copy";
 import { mediaUrl } from "../lib/media";
+import { telHref } from "../lib/phone";
 import type { CatalogProject } from "../lib/catalog/types";
 import { FactoryVideo } from "./factory-video";
 import {
@@ -237,7 +238,7 @@ function Contacts({
             {phone ? (
               <div>
                 <p>{copy.phoneLabel}</p>
-                <a href={`tel:${phone}`}>{phone}</a>
+                <a href={telHref(phone)}>{phone}</a>
               </div>
             ) : null}
             {email ? (
