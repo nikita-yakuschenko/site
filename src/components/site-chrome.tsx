@@ -5,6 +5,7 @@ import { IconMenu2, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { copy } from "../lib/copy";
 import { mediaUrl } from "../lib/media";
+import { telHref } from "../lib/phone";
 import { OfficeStatusIndicator } from "./office-status";
 import { RegionSwitch } from "./region-switch";
 
@@ -149,7 +150,7 @@ export function SiteChrome({
 
             <div className="site-header__aside">
               {phone ? (
-                <a className="site-header__phone" href={`tel:${phone}`}>
+                <a className="site-header__phone" href={telHref(phone)}>
                   {phone}
                 </a>
               ) : null}
@@ -223,7 +224,7 @@ export function SiteChrome({
             {phone ? (
               <a
                 className="site-menu__phone"
-                href={`tel:${phone}`}
+                href={telHref(phone)}
                 onClick={() => setMenuOpen(false)}
               >
                 {phone}
@@ -271,7 +272,7 @@ export function SiteChrome({
           <div>
             <h3>{copy.contacts}</h3>
             {address ? <p>{address}</p> : null}
-            {phone ? <a href={`tel:${phone}`}>{phone}</a> : null}
+            {phone ? <a href={telHref(phone)}>{phone}</a> : null}
             {email ? <a href={`mailto:${email}`}>{email}</a> : null}
           </div>
         </div>
