@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   IconArrowUpRight,
   IconChevronLeft,
@@ -62,6 +62,8 @@ export function HeroCarousel({
   // Пока читают — не листаем. Пауза стоит там, где действительно читают и
   // целятся: на самих слотах.
   const [paused, setPaused] = useState(false);
+  // Подсказка про жест показывается один раз, до первого действия.
+  const [hinted, setHinted] = useState(false);
 
   const pauseProps = {
     onPointerEnter: (event: React.PointerEvent) => {
@@ -78,6 +80,50 @@ export function HeroCarousel({
   function goTo(next: number) {
     setIndex((next + promos.length) % promos.length);
     setPlayId((value) => value + 1);
+    // Первый же осознанный жест снимает подсказку: дальше она мешала бы.
+    setHinted(true);
+  }
+
+  /* Перелистывание жестом.
+   *
+   * На телефоне слоты листаются пальцем, поэтому строка ведёт себя как
+   * лента: следует за пальцем с сопротивлением и возвращается, если тяга
+   * не дотянула до порога. Порог 40px — меньше ловило бы случайные касания
+   * при вертикальной прокрутке.
+   *
+   * Смещение пишется прямо в узел, а не через состояние: иначе каждое
+   * движение пальца вызывало бы перерисовку всей карусели.
+   */
+  const rail = useRef<HTMLDivElement>(null);
+  const dragStart = useRef<number | null>(null);
+
+  function setDrag(px: number | null) {
+    const node = rail.current;
+    if (!node) return;
+    if (px === null) node.style.removeProperty("--hero-drag");
+    else node.style.setProperty("--hero-drag", `${px}px`);
+  }
+
+  function onPointerDown(event: React.PointerEvent) {
+    if (promos.length < 2) return;
+    if ((event.target as HTMLElement).closest("button")) return;
+    dragStart.current = event.clientX;
+    // Подсказка снимается на первом же касании, а не на смене слота: её
+    // анимация задаёт transform и перебивала бы слежение за пальцем.
+    setHinted(true);
+  }
+
+  function onPointerMove(event: React.PointerEvent) {
+    if (dragStart.current === null) return;
+    setDrag((event.clientX - dragStart.current) * 0.4);
+  }
+
+  function onPointerEnd(event: React.PointerEvent) {
+    if (dragStart.current === null) return;
+    const dx = event.clientX - dragStart.current;
+    dragStart.current = null;
+    setDrag(null);
+    if (Math.abs(dx) > 40) goTo(index + (dx < 0 ? 1 : -1));
   }
 
   useEffect(() => {
@@ -133,9 +179,14 @@ export function HeroCarousel({
 
         {promos.length ? (
           <div
-            className="hero__promos"
+            ref={rail}
+            className={hinted ? "hero__promos" : "hero__promos is-hint"}
             aria-roledescription="carousel"
             aria-label={copy.heroPromosAria}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerEnd}
+            onPointerCancel={onPointerEnd}
             {...pauseProps}
           >
             {promos.map((promo, promoIndex) => {
