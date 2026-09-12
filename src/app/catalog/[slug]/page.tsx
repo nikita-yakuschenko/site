@@ -64,9 +64,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
       footer={SITE.footer.legal}
       about={footerAboutFor(SITE.name)}
       subrow={
-        /* Крошки и действия живут во второй строке той же плашки шапки:
-           одна поверхность вместо двух, и над кадром ничего не лежит. */
-        <div className="site-header__subrow">
+        /* Ряд собирает SiteChrome — сюда отдаются только два кластера,
+           крошки и действия, чтобы подложка встала под каждый из них. */
+        <>
           <nav className="project-hero__crumbs" aria-label={copy.crumbsAria}>
             <Link href="/">{copy.breadcrumbsHome}</Link>
             <IconChevronRight size={14} stroke={2} aria-hidden="true" />
@@ -77,7 +77,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <span aria-current="page">{project.name}</span>
           </nav>
           <ProjectActions project={project} stats={{ likes: 0, shares: 0 }} />
-        </div>
+        </>
       }
     >
       <main>

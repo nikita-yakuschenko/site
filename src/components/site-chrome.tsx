@@ -59,7 +59,7 @@ export function SiteChrome({
   children: ReactNode;
   footer?: string | null;
   about?: string | null;
-  /** Вторая строка внутри той же плашки: крошки и действия со страницей. */
+  /** Ряд под плашкой: крошки и действия со страницей, лежат на кадре. */
   subrow?: ReactNode;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -120,61 +120,56 @@ export function SiteChrome({
             <OfficeStatusIndicator />
           </div>
 
-          <div
-            className={
-              subrow ? "site-header__plaque has-subrow" : "site-header__plaque"
-            }
-          >
-            <div className="site-header__plaque-main">
-              <Link href="/" className="site-header__brand" aria-label={name}>
-                <img
-                  className="site-header__logo site-header__logo--lg"
-                  src={src}
-                  alt=""
-                />
-                <img
-                  className="site-header__logo site-header__logo--sm"
-                  src="/logo.svg"
-                  alt=""
-                />
-              </Link>
+          <div className="site-header__plaque">
+            <Link href="/" className="site-header__brand" aria-label={name}>
+              <img
+                className="site-header__logo site-header__logo--lg"
+                src={src}
+                alt=""
+              />
+              <img
+                className="site-header__logo site-header__logo--sm"
+                src="/logo.svg"
+                alt=""
+              />
+            </Link>
 
-              <nav className="site-header__nav" aria-label={copy.navAria}>
-                {items.map((item) => (
-                  <Link key={`${item.href}-${item.label}`} href={item.href}>
-                    {item.label}
-                  </Link>
-                ))}
-              </nav>
-
-              <div className="site-header__aside">
-                {phone ? (
-                  <a className="site-header__phone" href={`tel:${phone}`}>
-                    {phone}
-                  </a>
-                ) : null}
-                <Link
-                  className="btn btn-yellow site-header__cta"
-                  href="/#contacts"
-                >
-                  {copy.askQuestion}
+            <nav className="site-header__nav" aria-label={copy.navAria}>
+              {items.map((item) => (
+                <Link key={`${item.href}-${item.label}`} href={item.href}>
+                  {item.label}
                 </Link>
-                <button
-                  type="button"
-                  className="site-header__burger"
-                  aria-label={copy.menu}
-                  aria-expanded={menuOpen}
-                  onClick={() => setMenuOpen((open) => !open)}
-                >
-                  {menuOpen ? <IconX size={22} /> : <IconMenu2 size={22} />}
-                </button>
-              </div>
-            </div>
+              ))}
+            </nav>
 
-            {subrow ? (
-              <div className="site-header__plaque-sub">{subrow}</div>
-            ) : null}
+            <div className="site-header__aside">
+              {phone ? (
+                <a className="site-header__phone" href={`tel:${phone}`}>
+                  {phone}
+                </a>
+              ) : null}
+              <Link
+                className="btn btn-yellow site-header__cta"
+                href="/#contacts"
+              >
+                {copy.askQuestion}
+              </Link>
+              <button
+                type="button"
+                className="site-header__burger"
+                aria-label={copy.menu}
+                aria-expanded={menuOpen}
+                onClick={() => setMenuOpen((open) => !open)}
+              >
+                {menuOpen ? <IconX size={22} /> : <IconMenu2 size={22} />}
+              </button>
+            </div>
           </div>
+
+          {/* Крошки и действия лежат прямо на кадре, отдельно от плашки:
+              это служебный слой страницы, а не часть шапки сайта. Контраст
+              им даёт собственная растушёванная подложка, не общая плашка. */}
+          {subrow ? <div className="site-header__subrow">{subrow}</div> : null}
         </div>
       </header>
 
