@@ -734,6 +734,7 @@ a {
  * кнопка сообщения и низ слота стоят на одной линии.
  */
 .hero__promos {
+  position: relative;
   grid-column: 2;
   grid-row: 2;
   /* Стопка: все слоты в одной ячейке, высоту держит самый высокий, и при
@@ -783,8 +784,14 @@ a {
  * оставались неоднородные белые поля — сверху одно, по бокам другое.
  * Подложки у фотографии тоже нет, она занимает слот целиком.
  */
+/* Соотношение 16:9 задаёт сам слот, а не картинка внутри: у вырезки есть
+   свои поля, и когда высоту держала картинка, слот с вырезкой выходил на
+   28px выше слота с фотографией. Слои управления садятся по этой высоте,
+   поэтому она должна быть одна на все слоты. */
 .hero__promo-media {
+  box-sizing: border-box;
   display: block;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
 }
 
@@ -792,54 +799,129 @@ a {
 .hero__promo-media video {
   display: block;
   width: 100%;
-  height: auto;
-  aspect-ratio: 16 / 9;
+  height: 100%;
   object-fit: cover;
 }
 
 /* Исключение — вырезка на прозрачном фоне: её нельзя кадрировать, иначе
    срежется предмет, и ей нужен тот белый фон, на котором она отрисована.
-   Радиус концентричен карточке: у неё 14px, отступ 8px, значит внутри 6px. */
+   Поля живут внутри тех же 16:9, а белое и скругление — на самой картинке,
+   чтобы высота слота не поехала. Радиус концентричен карточке: у неё 14px,
+   отступ 8px, значит внутри 6px. */
 .hero__promo-media.is-cutout {
-  margin: 8px 8px 0;
-  padding: 10px;
-  border-radius: 6px;
-  background: white;
+  padding: 8px;
 }
 
 .hero__promo-media.is-cutout img,
 .hero__promo-media.is-cutout video {
+  border-radius: 6px;
+  background: white;
   object-fit: contain;
 }
 
-/* Полоса прогресса у нижней границы карточки.
+/* Шевроны на строке надзаголовка.
  *
- * В потоке, последним элементом, а не слоем поверх картинки: слот — это
- * вся карточка, и полоса отсчитывает её показ, а не кадрирует фотографию.
- * Отдельная строка переключателей под баннером, которая была раньше,
- * стояла оторванно от того, что отсчитывает.
+ * Слоем поверх карточки, а не в её потоке: карточка — ссылка, а кнопки
+ * внутри <a> недопустимы. Распорка с тем же 16:9, что у медиа-слота,
+ * опускает ряд ровно на строку надзаголовка — отступ не задан числом и не
+ * разъедется, если слот поменяет пропорцию.
  *
- * Поля совпадают с полями текста карточки, чтобы полоса встала по той же
- * вертикали, что заголовок и кнопка. */
-.hero__promo-progress {
+ * Слой не перехватывает указатель целиком, только сами кнопки: иначе он
+ * накрыл бы карточку и та перестала бы нажиматься. */
+.hero__promo-nav {
+  position: absolute;
+  inset: 1px 1px auto;
+  z-index: 1;
   display: flex;
-  gap: 6px;
-  margin: 0 18px 18px;
+  flex-direction: column;
   pointer-events: none;
 }
 
-.hero__promo-progress > span {
+.hero__promo-nav-spacer {
+  display: block;
+  aspect-ratio: 16 / 9;
+}
+
+.hero__promo-nav-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 4px;
+  /* Правое поле на 4px меньше текстового: у кнопки прозрачные поля вокруг
+     иконки, и при равных 18px шеврон отступал от края дальше текста. */
+  padding: 10px 14px 0;
+  pointer-events: auto;
+}
+
+.hero__promo-nav-row button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: rgb(255 255 255 / 0.7);
+  cursor: pointer;
+  transition:
+    background-color 0.2s var(--ease-out),
+    color 0.2s var(--ease-out);
+}
+
+.hero__promo-nav-row button:hover {
+  background: rgb(255 255 255 / 0.12);
+  color: white;
+}
+
+/* Переключатель слотов у нижней границы карточки. Он же индикатор.
+ *
+ * Лежит слоем поверх низа карточки, а не в её потоке: карточка — ссылка,
+ * а кнопки внутри <a> недопустимы. Место под него карточка резервирует
+ * нижним полем тела, поэтому полоса ни на что не наезжает.
+ *
+ * Поля совпадают с полями текста, чтобы полоса встала по той же вертикали,
+ * что заголовок и кнопка. */
+.hero__promo-progress {
+  position: absolute;
+  right: 18px;
+  bottom: 11px;
+  left: 18px;
+  z-index: 1;
+  display: flex;
+  gap: 6px;
+}
+
+/* Сама полоса 3px, но нажимать в неё было бы нечем: кнопка выше полосы и
+   прозрачна, полоса центрирована внутри. */
+.hero__promo-progress button {
   flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  height: 16px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+
+.hero__promo-progress-track {
+  width: 100%;
   height: 3px;
   overflow: hidden;
   border-radius: 999px;
   background: rgb(255 255 255 / 0.38);
+  transition: background-color 0.2s var(--ease-out);
+}
+
+.hero__promo-progress button:hover .hero__promo-progress-track {
+  background: rgb(255 255 255 / 0.6);
 }
 
 /* Пройденные сегменты залиты целиком, текущий заполняется по времени
    слота — длительность приходит из компонента, чтобы полоса и смена слота
    не разъезжались. */
-.hero__promo-progress > span.is-done {
+.hero__promo-progress button.is-done .hero__promo-progress-track {
   background: var(--brand-yellow);
 }
 
@@ -853,7 +935,7 @@ a {
   transform-origin: left center;
 }
 
-.hero__promo-progress > span.is-active .hero__promo-progress-fill {
+.hero__promo-progress button.is-active .hero__promo-progress-fill {
   animation: hero-progress var(--hero-slide-ms) linear both;
 }
 
@@ -869,7 +951,7 @@ a {
 /* Без анимации полоса не отсчитывает время: показываем текущий сегмент
    залитым, иначе он выглядел бы пустым. */
 @media (prefers-reduced-motion: reduce) {
-  .hero__promo-progress > span.is-active .hero__promo-progress-fill {
+  .hero__promo-progress button.is-active .hero__promo-progress-fill {
     animation: none;
     transform: scaleX(1);
   }
@@ -880,7 +962,7 @@ a {
   align-items: flex-start;
   gap: 6px;
   min-width: 0;
-  padding: 14px 18px 16px;
+  padding: 14px 18px 37px;
 }
 
 /* Срок кампании вынесен над заголовком: это то, из-за чего на неё вообще
@@ -1034,7 +1116,7 @@ a {
 
   .hero__promo-body {
     gap: 6px;
-    padding: 14px 18px 16px;
+    padding: 14px 18px 37px;
   }
 
   /* Описание возвращается: в столбик оно помещается. */
@@ -1042,8 +1124,11 @@ a {
     display: block;
   }
 
+  /* Полоса абсолютная: в столбике её место то же, поля совпадают
+     с полями текста. */
   .hero__promo-progress {
-    margin: 0 18px 18px;
+    right: 18px;
+    left: 18px;
   }
 }
 
