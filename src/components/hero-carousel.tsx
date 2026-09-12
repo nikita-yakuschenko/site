@@ -100,6 +100,21 @@ export function HeroCarousel({
   // Индекс настоящего слота: pos приводится в границы списка.
   const index = count ? ((pos % count) + count) % count : 0;
 
+  /* Подсказка о жесте.
+   *
+   * Слот занимает кадр целиком, соседний из-за края не выглядывает, и о
+   * возможности листать пальцем ничто не сообщает. Поэтому блок слотов
+   * дважды коротко смещается и возвращается.
+   *
+   * Смещается именно блок, а не дорожка внутри него: у блока своей
+   * трансформации нет, поэтому подсказка не спорит с положением ленты.
+   * Пока анимация висела на дорожке и писала сдвиг от нулевого места, смах
+   * до её показа откатывал ленту обратно на первый слот.
+   *
+   * Снимается первым же действием — дальше она мешала бы.
+   */
+  const [hinted, setHinted] = useState(false);
+
   // Пока читают — не листаем. Пауза стоит там, где действительно читают и
   // целятся: на самих слотах.
   const [paused, setPaused] = useState(false);
@@ -149,6 +164,9 @@ export function HeroCarousel({
     // автоповорота сбрасывался бы на каждом рендере.
   }, [count, pos]);
 
+  /* Шаг вперёд или назад. Подсказку тут не снимаем: через step ходит и
+     автоповорот, а он не действие человека — снимают её обработчики
+     кнопок и жеста. */
   const step = useCallback(
     (by: number) => {
       setPos(normalize() + by);
@@ -159,6 +177,7 @@ export function HeroCarousel({
 
   /** Переход к конкретному слоту: считаем от текущего места, а не от нуля. */
   function goTo(next: number) {
+    setHinted(true);
     normalize();
     setPos(next);
     setPlayId((value) => value + 1);
@@ -183,6 +202,7 @@ export function HeroCarousel({
     if (count < 2) return;
     if ((event.target as HTMLElement).closest("button")) return;
     dragFrom.current = event.clientX;
+    setHinted(true);
     applyShift(0);
   }
 
@@ -203,48 +223,6 @@ export function HeroCarousel({
     applyShift(null);
     if (width && Math.abs(dx) > width * SWIPE_RATIO) step(dx < 0 ? 1 : -1);
   }
-
-  /* Подсказка о жесте.
-   *
-   * Слот занимает кадр целиком, соседний из-за края не выглядывает, и о
-   * возможности листать пальцем ничто не сообщает. Поэтому лента дважды
-   * коротко смещается и возвращается.
-   *
-   * Смещение пишется тем же способом, что при тяге пальцем. applyShift здесь
-   * не нужен: он замкнут на текущее место и тянул бы эффект в зависимости,
-   * перезапуская подсказку на каждой смене слота. Место здесь заведомо
-   * нулевое — подсказка играет один раз при появлении блока.
-   *
-   * Только на телефоне: на указателе жест не основной способ.
-   */
-  useEffect(() => {
-    if (count < 2) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    if (!window.matchMedia("(max-width: 599px)").matches) return;
-    const node = track.current;
-    if (!node) return;
-
-    const steps: Array<[number, number]> = [
-      [1200, -18],
-      [1620, 0],
-      [2040, -18],
-      [2460, 0],
-    ];
-    const ids = steps.map(([at, px]) =>
-      window.setTimeout(() => {
-        // Если палец уже на ленте, подсказка молчит.
-        if (dragFrom.current !== null) return;
-        node.classList.toggle("is-dragging", false);
-        node.style.transform = shiftFor(0, px || null);
-      }, at),
-    );
-
-    return () => {
-      ids.forEach((id) => window.clearTimeout(id));
-      node.style.transform = shiftFor(0, null);
-    };
-    // Один раз за жизнь блока: список слотов не меняется.
-  }, [count]);
 
   useEffect(() => {
     if (paused) return;
@@ -313,7 +291,7 @@ export function HeroCarousel({
         </div>
 
         <div
-          className="hero__promos"
+          className={hinted ? "hero__promos" : "hero__promos is-hint"}
           aria-roledescription="carousel"
           aria-label={copy.heroPromosAria}
           onPointerDown={onPointerDown}
@@ -390,14 +368,20 @@ export function HeroCarousel({
                 <button
                   type="button"
                   aria-label={copy.heroPromoPrev}
-                  onClick={() => step(-1)}
+                  onClick={() => {
+                    setHinted(true);
+                    step(-1);
+                  }}
                 >
                   <IconChevronLeft size={15} stroke={2.2} />
                 </button>
                 <button
                   type="button"
                   aria-label={copy.heroPromoNext}
-                  onClick={() => step(1)}
+                  onClick={() => {
+                    setHinted(true);
+                    step(1);
+                  }}
                 >
                   <IconChevronRight size={15} stroke={2.2} />
                 </button>
