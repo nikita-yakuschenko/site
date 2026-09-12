@@ -24,6 +24,8 @@ export const SITE = {
     { label: copy.projects, href: '/catalog' },
     { label: copy.readyHouses, href: '/for-sale' },
     { label: copy.production, href: '/manufacture' },
+    { label: copy.mortgage, href: '/mortgage' },
+    { label: copy.exposition, href: '/exposition' },
   ],
   footer: { legal: copy.offerDisclaimer },
   defaultSeo: { title: copy.seoTitle, description: copy.seoDescription },

@@ -9,26 +9,8 @@ import {
   subscribeFavorites,
   toggleFavorite,
 } from '../lib/favorites'
+import { shareProject } from '../lib/share'
 import type { CatalogProject } from '../lib/catalog/types'
-
-async function shareProject(project: CatalogProject): Promise<void> {
-  const url = new URL(project.href, window.location.origin).href
-  const payload = { title: project.name, text: `Проект «${project.name}»`, url }
-  try {
-    if (typeof navigator.share === 'function') {
-      await navigator.share(payload)
-      return
-    }
-    await navigator.clipboard.writeText(url)
-  } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') return
-    try {
-      await navigator.clipboard.writeText(url)
-    } catch (clipboardError) {
-      console.error(clipboardError)
-    }
-  }
-}
 
 export function ProjectCard({ project }: { project: CatalogProject }) {
   // Подписка на внешнее хранилище вместо синхронизации через эффект.

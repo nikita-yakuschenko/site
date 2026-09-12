@@ -25,16 +25,11 @@ type MetaGroup = {
 
 const META_LINK_GROUPS: readonly MetaGroup[] = [
   {
+    // Всё, что остаётся служебным: рассказ о компании и работа с юрлицами.
+    // Ипотека и выставочные площадки переехали в плашку — за ними приходит
+    // покупатель, а не человек, которому нужна справка.
     links: [
       { label: copy.about, href: '/about' },
-      { label: copy.mortgage, href: '/mortgage' },
-    ],
-  },
-  { links: [{ label: copy.exposition, href: '/exposition' }] },
-  {
-    // Сайт покупательский: разделы для юрлиц первыми уступают место.
-    secondary: true,
-    links: [
       { label: copy.business, href: '/business' },
       { label: copy.dealers, href: '/dealers' },
     ],
@@ -87,8 +82,8 @@ export function SiteChrome({
         <div className="site-header__inner">
           <div className="site-header__meta">
             <RegionSwitch />
-            {/* Три группы, между ними воздух больше внутреннего: деньги и
-                завод, работа с юрлицами, куда приехать посмотреть. */}
+            {/* Одна группа: всё покупательское уехало в плашку, служебным
+                остались рассказ о компании и работа с юрлицами. */}
             <nav className="site-meta-nav" aria-label={copy.metaNavAria}>
               {META_LINK_GROUPS.map((group) => (
                 <span
