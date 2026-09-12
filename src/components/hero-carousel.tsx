@@ -60,14 +60,42 @@ const SWIPE_RATIO = 0.25;
 // двум значениям нельзя.
 const SHIFT_MS = 420;
 
+/* Три режима ленты, и границы те же, что в стилях: разметка и поведение
+ * переключаются вместе.
+ *
+ * От 600px слот — широкая плашка во всю ширину содержимого. От 1100px их в
+ * кадре две: на половину ширины карточка ещё читается, на треть уже нет.
+ * Ниже 600px остаётся узкая строка с жестом.
+ */
+const RAIL_FROM = "(min-width: 600px)";
+const WIDE_FROM = "(min-width: 1100px)";
+
+// Сколько слотов видно одновременно и какой между ними зазор. Зазор
+// участвует в расчёте шага: лента едет на слот плюс зазор, а не на долю
+// ширины, иначе карточки уезжали бы всё дальше от своих мест.
+const WIDE_PER_VIEW = 2;
+const WIDE_GAP = 16;
+const ONE_PER_VIEW = 1;
+const NO_GAP = 0;
+
 /**
  * Сдвиг дорожки.
  *
- * Отсчёт ведётся по местам в дорожке, а не по слотам: нулевое место занимает
- * клон последнего слота, поэтому слот с номером pos лежит на месте pos + 1.
+ * Отсчёт ведётся по местам в дорожке, а не по слотам: перед первым слотом
+ * лежат клоны — столько же, сколько слотов видно одновременно. Поэтому слот
+ * с номером pos занимает место pos + perView.
+ *
+ * Шаг сдвига — доля дорожки на один слот: при двух слотах в кадре каждый
+ * занимает половину ширины, и лента едет на половину, а не на всю.
  */
-function shiftFor(pos: number, dx: number | null): string {
-  const base = `${(pos + 1) * -100}%`;
+function shiftFor(
+  pos: number,
+  dx: number | null,
+  perView: number,
+  gap: number,
+): string {
+  // Шаг — ширина слота вместе с зазором: (ширина кадра + зазор) / слотов.
+  const base = `calc((100% + ${gap}px) * ${-(pos + perView) / perView})`;
   return dx === null
     ? `translate3d(${base}, 0, 0)`
     : `translate3d(calc(${base} + ${dx}px), 0, 0)`;
@@ -95,6 +123,34 @@ export function HeroCarousel({
    * этом не меняется, клон и слот выглядят одинаково. Без этого лента при
    * переходе с последнего на первый отматывалась назад через все слоты.
    */
+  /* Лента или карусель.
+   *
+   * На широком экране слоты лежат рядом и ничего не листается: ни клонов,
+   * ни жеста, ни автоповорота. Стартовое значение — лента: разметка с
+   * сервера приходит для широкого экрана, и на узком её поправит первый же
+   * эффект, до отрисовки жеста. */
+  const [rail, setRail] = useState(true);
+  const [wide, setWide] = useState(true);
+
+  useEffect(() => {
+    const queries: [MediaQueryList, (value: boolean) => void][] = [
+      [window.matchMedia(RAIL_FROM), setRail],
+      [window.matchMedia(WIDE_FROM), setWide],
+    ];
+    const stops = queries.map(([query, set]) => {
+      const apply = () => set(query.matches);
+      apply();
+      query.addEventListener("change", apply);
+      return () => query.removeEventListener("change", apply);
+    });
+    return () => stops.forEach((stop) => stop());
+  }, []);
+
+  const perView = wide ? WIDE_PER_VIEW : ONE_PER_VIEW;
+  const gap = wide ? WIDE_GAP : NO_GAP;
+  // Листать есть что, только если слотов больше, чем помещается в кадр.
+  const rotating = count > perView;
+
   const [pos, setPos] = useState(0);
   const [playId, setPlayId] = useState(0);
   // Индекс настоящего слота: pos приводится в границы списка.
@@ -152,7 +208,7 @@ export function HeroCarousel({
     const node = track.current;
     if (node) {
       node.style.transition = "none";
-      node.style.transform = shiftFor(real, null);
+      node.style.transform = shiftFor(real, null, perView, gap);
       // Чтение вынуждает браузер применить значение до возврата перехода,
       // иначе оба присваивания схлопнутся в одно и доворот проедет с
       // анимацией через всю дорожку.
@@ -162,7 +218,7 @@ export function HeroCarousel({
     return real;
     // Пересоздаётся только при смене места или списка: иначе таймер
     // автоповорота сбрасывался бы на каждом рендере.
-  }, [count, pos]);
+  }, [count, pos, perView, gap]);
 
   /* Шаг вперёд или назад. Подсказку тут не снимаем: через step ходит и
      автоповорот, а он не действие человека — снимают её обработчики
@@ -195,21 +251,26 @@ export function HeroCarousel({
     if (!node) return;
     // Во время тяги переход выключен, иначе лента отставала бы от пальца.
     node.classList.toggle("is-dragging", dx !== null);
-    node.style.transform = shiftFor(pos, dx);
+    node.style.transform = shiftFor(pos, dx, perView, gap);
   }
 
   function onPointerDown(event: React.PointerEvent) {
-    if (count < 2) return;
+    if (!rotating) return;
     if ((event.target as HTMLElement).closest("button")) return;
     dragFrom.current = event.clientX;
     setHinted(true);
     applyShift(0);
   }
 
+  /** Ширина одного слота: в кадре их perView, дорожка шире ровно во столько. */
+  function slotWidth(): number {
+    return ((track.current?.offsetWidth ?? 0) + gap) / perView;
+  }
+
   function onPointerMove(event: React.PointerEvent) {
     if (dragFrom.current === null) return;
     const dx = event.clientX - dragFrom.current;
-    const width = track.current?.offsetWidth ?? 0;
+    const width = slotWidth();
     // Ограничение шириной слота: дальше одного шага за раз лента не уходит,
     // а упора по краям нет — за ними лежат клоны.
     applyShift(Math.max(-width, Math.min(width, dx)));
@@ -218,7 +279,7 @@ export function HeroCarousel({
   function onPointerEnd(event: React.PointerEvent) {
     if (dragFrom.current === null) return;
     const dx = event.clientX - dragFrom.current;
-    const width = track.current?.offsetWidth ?? 0;
+    const width = slotWidth();
     dragFrom.current = null;
     applyShift(null);
     if (width && Math.abs(dx) > width * SWIPE_RATIO) step(dx < 0 ? 1 : -1);
@@ -226,26 +287,40 @@ export function HeroCarousel({
 
   useEffect(() => {
     if (paused) return;
-    if (count < 2) return;
+    if (!rotating) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     // Таймер на один шаг, а не интервал: эффект и так перезапускается на
     // каждом слоте, и повторяющийся таймер только копил бы расхождение.
     const id = window.setTimeout(() => step(1), SLIDE_MS);
     return () => window.clearTimeout(id);
-  }, [pos, paused, count, step]);
+  }, [pos, paused, rotating, step]);
 
   if (!count) return null;
 
-  /* Места в дорожке: клон последнего, все слоты, клон первого.
+  /* Места в дорожке: клоны, все слоты, снова клоны.
+   *
+   * Клонов с каждой стороны столько же, сколько слотов видно одновременно:
+   * при двух в кадре за краем должно лежать два, иначе на последнем шаге
+   * справа открывалась бы пустота.
    *
    * Клоны нужны только для вида, поэтому скрыты от программ чтения и не
-   * получают фокус — иначе один и тот же слот встречался бы в обходе дважды.
+   * получают фокус — иначе один слот встречался бы в обходе дважды.
    */
-  const lane = [
-    { promo: promos[count - 1], key: "clone-last", clone: true },
-    ...promos.map((promo) => ({ promo, key: promo.heading, clone: false })),
-    { promo: promos[0], key: "clone-first", clone: true },
-  ];
+  const lane = rotating
+    ? [
+        ...promos.slice(-perView).map((promo, i) => ({
+          promo,
+          key: `clone-head-${i}`,
+          clone: true,
+        })),
+        ...promos.map((promo) => ({ promo, key: promo.heading, clone: false })),
+        ...promos.slice(0, perView).map((promo, i) => ({
+          promo,
+          key: `clone-tail-${i}`,
+          clone: true,
+        })),
+      ]
+    : promos.map((promo) => ({ promo, key: promo.heading, clone: false }));
 
   return (
     <section
@@ -291,7 +366,15 @@ export function HeroCarousel({
         </div>
 
         <div
-          className={hinted ? "hero__promos" : "hero__promos is-hint"}
+          className={[
+            "hero__promos",
+            rail ? "is-rail" : null,
+            // Подсказка о жесте нужна там, где слот занимает кадр целиком
+            // и соседний из-за края не выглядывает, — в узком режиме.
+            !rail && !hinted ? "is-hint" : null,
+          ]
+            .filter(Boolean)
+            .join(" ")}
           aria-roledescription="carousel"
           aria-label={copy.heroPromosAria}
           onPointerDown={onPointerDown}
@@ -300,68 +383,78 @@ export function HeroCarousel({
           onPointerCancel={onPointerEnd}
           {...pauseProps}
         >
-          <div
-            ref={track}
-            className="hero__promos-track"
-            style={{ transform: shiftFor(pos, null) }}
-          >
-            {lane.map(({ promo, key, clone }, lanePos) => {
-              if (!promo) return null;
-              const active = !clone && lanePos - 1 === index;
-              return (
-                <a
-                  key={key}
-                  className="hero__promo"
-                  href={promo.href}
-                  aria-hidden={!active}
-                  tabIndex={active ? undefined : -1}
-                >
-                  {promo.video || promo.image ? (
-                    <span
-                      className={
-                        promo.cutout
-                          ? "hero__promo-media is-cutout"
-                          : "hero__promo-media"
-                      }
-                    >
-                      {promo.video ? (
-                        <video
-                          src={promo.video}
-                          poster={promo.image}
-                          muted
-                          loop
-                          autoPlay
-                          playsInline
-                        />
-                      ) : (
-                        <img src={promo.image} alt="" />
-                      )}
-                    </span>
-                  ) : null}
-
-                  <span className="hero__promo-body">
-                    {promo.eyebrow ? (
-                      <span className="hero__promo-eyebrow">
-                        {promo.eyebrow}
+          {/* Кадр ленты: за его краями слоты не видны. Отдельным слоем, а
+              не на самом блоке: шевроны и полоса прогресса лежат выше ленты
+              и попали бы под ту же обрезку. */}
+          <div className="hero__promos-view">
+            <div
+              ref={track}
+              className="hero__promos-track"
+              style={{ transform: shiftFor(pos, null, perView, gap) }}
+            >
+              {lane.map(({ promo, key, clone }, lanePos) => {
+                if (!promo) return null;
+                // Доступны только слоты, которые сейчас в кадре: от текущего
+                // и дальше вправо на perView. Клоны из обхода исключены —
+                // иначе один слот встречался бы в нём дважды.
+                const slot = lanePos - (rotating ? perView : 0);
+                const ahead = (((slot - index) % count) + count) % count;
+                const active = !clone && ahead < perView;
+                return (
+                  <a
+                    key={key}
+                    className="hero__promo"
+                    href={promo.href}
+                    aria-hidden={!active}
+                    tabIndex={active ? undefined : -1}
+                  >
+                    {promo.video || promo.image ? (
+                      <span
+                        className={
+                          promo.cutout
+                            ? "hero__promo-media is-cutout"
+                            : "hero__promo-media"
+                        }
+                      >
+                        {promo.video ? (
+                          <video
+                            src={promo.video}
+                            poster={promo.image}
+                            muted
+                            loop
+                            autoPlay
+                            playsInline
+                          />
+                        ) : (
+                          <img src={promo.image} alt="" />
+                        )}
                       </span>
                     ) : null}
-                    <strong>{nbspText(promo.heading)}</strong>
-                    {promo.text ? <span>{nbspText(promo.text)}</span> : null}
-                    <span className="hero__promo-cta">
-                      {promo.cta}
-                      <IconArrowUpRight size={16} stroke={2} />
+
+                    <span className="hero__promo-body">
+                      {promo.eyebrow ? (
+                        <span className="hero__promo-eyebrow">
+                          {promo.eyebrow}
+                        </span>
+                      ) : null}
+                      <strong>{nbspText(promo.heading)}</strong>
+                      {promo.text ? <span>{nbspText(promo.text)}</span> : null}
+                      <span className="hero__promo-cta">
+                        {promo.cta}
+                        <IconArrowUpRight size={16} stroke={2} />
+                      </span>
                     </span>
-                  </span>
-                </a>
-              );
-            })}
+                  </a>
+                );
+              })}
+            </div>
           </div>
 
           {/* Шевроны на строке надзаголовка. Слоем, а не в дорожке: внутри
               они уезжали бы вместе со слотом, и кнопки внутри <a>
               недопустимы. Распорка 16:9 повторяет высоту медиа-слота и
               опускает ряд ровно на эту строку. */}
-          {count > 1 ? (
+          {rotating ? (
             <div className="hero__promo-nav">
               <span className="hero__promo-nav-spacer" aria-hidden="true" />
               <span className="hero__promo-nav-row">
@@ -391,7 +484,7 @@ export function HeroCarousel({
 
           {/* Полоса прогресса, она же переключатель, у нижней границы
               карточки. Слоем по той же причине, что шевроны. */}
-          {count > 1 ? (
+          {rotating ? (
             <div
               className="hero__promo-progress"
               role="tablist"
