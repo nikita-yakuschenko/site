@@ -230,6 +230,10 @@ a {
 
 .site-region__label {
   grid-area: 1 / 1;
+  /* Без переноса: в узком ряду flex сжимал элемент ниже ширины текста,
+     и «Нижний Новгород» ломался на две строки — ряд при этом
+     помещался целиком, ломаться было незачем. */
+  white-space: nowrap;
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
@@ -737,14 +741,45 @@ a {
   position: relative;
   grid-column: 2;
   grid-row: 2;
-  /* Стопка: все слоты в одной ячейке, высоту держит самый высокий, и при
-     смене соседняя колонка не дёргается. */
-  display: grid;
   width: 100%;
+  /* Кадр ленты: за его краями слоты не видны. */
+  overflow: hidden;
+  border-radius: var(--surface-radius);
+}
+
+/* Дорожка со слотами в ряд.
+ *
+ * Сдвиг на целую ширину слота: уходящий полностью покидает кадр, следующий
+ * полностью въезжает. Раньше слоты лежали стопкой и подменялись
+ * затуханием — жест выглядел перетаскиванием с подменой на месте, а
+ * шевроны и палец ехали по-разному. Теперь и то и другое меняет index, а
+ * едет всегда дорожка.
+ *
+ * Значение сдвига задаёт компонент: собранный из var() transform вешал
+ * переход на неанимируемые пользовательские свойства, и браузер оставлял
+ * CSSTransition в состоянии running навсегда — дорожка замирала и больше не
+ * реагировала ни на шевроны, ни на палец. */
+.hero__promos-track {
+  display: flex;
+  align-items: stretch;
+  transition: transform 0.42s var(--ease-out);
+}
+
+/* Во время тяги перехода нет: с ним лента отставала бы от пальца. */
+.hero__promos-track.is-dragging {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero__promos-track {
+    transition: none;
+  }
 }
 
 .hero__promo {
-  grid-area: 1 / 1;
+  /* Слот занимает кадр целиком и не сжимается: ширина шага сдвига должна
+     совпадать с шириной слота. */
+  flex: 0 0 100%;
   display: flex;
   flex-direction: column;
   overflow: hidden;
@@ -754,24 +789,7 @@ a {
   box-shadow: var(--glass-shadow);
   backdrop-filter: var(--glass-blur);
   color: white;
-  /* Неактивные не просто прозрачны, но и не перехватывают указатель:
-     иначе верхний в стопке ловил бы нажатия вместо видимого. */
-  opacity: 0;
-  pointer-events: none;
-  transition:
-    opacity var(--hero-fade) var(--ease-out),
-    border-color 0.2s var(--ease-out);
-}
-
-.hero__promo.is-active {
-  opacity: 1;
-  pointer-events: auto;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .hero__promo {
-    transition: none;
-  }
+  transition: border-color 0.2s var(--ease-out);
 }
 
 .hero__promo:hover {
@@ -1185,40 +1203,6 @@ a {
 
   .hero__promo-nav-row {
     padding: 6px 6px 0;
-  }
-
-  /* Строка следует за пальцем: смещение приходит из компонента уже с
-     сопротивлением, здесь только применяется. */
-  .hero__promos {
-    transform: translateX(var(--hero-drag, 0));
-  }
-
-  /* Подсказка про жест: строка дважды уходит влево и возвращается. Снимается
-     первым же действием — компонент убирает класс. */
-  .hero__promos.is-hint {
-    /* Без заливки both: она удерживала бы transform последнего кадра и
-       перебивала слежение за пальцем даже после окончания анимации. */
-    animation: hero-swipe-hint 1.9s var(--ease-out) 1.2s 2;
-  }
-
-  @keyframes hero-swipe-hint {
-    0%,
-    100% {
-      transform: translateX(0);
-    }
-    18% {
-      transform: translateX(-16px);
-    }
-    36% {
-      transform: translateX(0);
-    }
-  }
-}
-
-/* Без анимации подсказки нет: жест остаётся, но о нём не сообщаем движением. */
-@media (prefers-reduced-motion: reduce) {
-  .hero__promos.is-hint {
-    animation: none;
   }
 }
 
@@ -2822,11 +2806,16 @@ textarea:focus-visible {
   }
 }
 
-/* Экраны уже 375px. «Московская область» со статусом требует 314px, а
-   доступно там 312 — название переносилось на вторую строку. Снимаем герб
-   в самой кнопке: он освобождает 26px вместе со своим зазором. В меню
-   выбора региона гербы остаются, места там достаточно. */
-@media (max-width: 374px) {
+/* Узкие экраны: снимаем герб в кнопке региона, он освобождает 26px вместе
+   со своим зазором. В меню выбора региона гербы остаются, места там
+   достаточно.
+
+   Граница 389px посчитана: ряд с гербом требует 333px («Нижний Новгород» и
+   «Офис откроется послезавтра» с зазором), а ряду достаётся ширина окна
+   минус 48px полей — значит с гербом он помещается от 381px. Прежние 374px
+   были рассчитаны на короткое «откроемся в пн», и с новой надписью статус
+   на 375px выходил за край на 6px. */
+@media (max-width: 389px) {
   .site-region__trigger .site-region__mark {
     display: none;
   }
