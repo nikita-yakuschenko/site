@@ -31,8 +31,8 @@ export type HeroMessage = {
  * постером на время загрузки.
  *
  * cutout отмечает картинку, вырезанную на прозрачный фон: такая вписывается
- * в слот целиком и получает белую подложку. Фотография же кадрируется
- * заливкой — иначе вокруг неё остаются неоднородные поля.
+ * в слот целиком. Фотография кадрируется заливкой — иначе вокруг неё
+ * остаются неоднородные поля.
  */
 export type HeroPromo = {
   eyebrow?: string;
@@ -50,6 +50,19 @@ export type HeroPromo = {
 // полоска прогресса и смена слота не разъезжались.
 const SLIDE_MS = 11000;
 
+// Порог жеста: доля ширины слота, после которой лента доводит до следующего,
+// а не возвращается. Четверть — достаточно, чтобы короткое касание при
+// вертикальной прокрутке не листало слоты.
+const SWIPE_RATIO = 0.25;
+
+/** Сдвиг дорожки: целые шаги по слотам плюс смещение пальца, если оно есть. */
+function shiftFor(index: number, dx: number | null): string {
+  const base = `${index * -100}%`;
+  return dx === null
+    ? `translate3d(${base}, 0, 0)`
+    : `translate3d(calc(${base} + ${dx}px), 0, 0)`;
+}
+
 export function HeroCarousel({
   message,
   promos,
@@ -62,8 +75,6 @@ export function HeroCarousel({
   // Пока читают — не листаем. Пауза стоит там, где действительно читают и
   // целятся: на самих слотах.
   const [paused, setPaused] = useState(false);
-  // Подсказка про жест показывается один раз, до первого действия.
-  const [hinted, setHinted] = useState(false);
 
   const pauseProps = {
     onPointerEnter: (event: React.PointerEvent) => {
@@ -80,51 +91,110 @@ export function HeroCarousel({
   function goTo(next: number) {
     setIndex((next + promos.length) % promos.length);
     setPlayId((value) => value + 1);
-    // Первый же осознанный жест снимает подсказку: дальше она мешала бы.
-    setHinted(true);
   }
 
-  /* Перелистывание жестом.
+  /* Перелистывание: одна дорожка на оба способа.
    *
-   * На телефоне слоты листаются пальцем, поэтому строка ведёт себя как
-   * лента: следует за пальцем с сопротивлением и возвращается, если тяга
-   * не дотянула до порога. Порог 40px — меньше ловило бы случайные касания
-   * при вертикальной прокрутке.
+   * Слоты лежат в ряд, дорожка сдвигается на целую ширину слота — уходящий
+   * полностью покидает кадр, следующий полностью въезжает. До этого слоты
+   * лежали стопкой и подменялись перекрёстным затуханием, из-за чего жест
+   * выглядел перетаскиванием с отскоком и подменой на месте.
    *
-   * Смещение пишется прямо в узел, а не через состояние: иначе каждое
-   * движение пальца вызывало бы перерисовку всей карусели.
+   * Шевроны и жест меняют один и тот же index, поэтому едут одинаково. До
+   * этого кнопки шли через затухание, а палец через сдвиг, и переключение
+   * выглядело двумя разными механизмами.
+   *
+   * Смещение пальца пишется прямо в узел, а не через состояние: иначе
+   * каждое движение вызывало бы перерисовку всей карусели.
    */
-  const rail = useRef<HTMLDivElement>(null);
-  const dragStart = useRef<number | null>(null);
+  const track = useRef<HTMLDivElement>(null);
+  const dragFrom = useRef<number | null>(null);
 
-  function setDrag(px: number | null) {
-    const node = rail.current;
+  /* Сдвиг дорожки пишется конкретным значением, а не через переменную.
+   *
+   * С transform, собранным из var(), переход вешался на неанимируемые
+   * пользовательские свойства: браузер оставлял CSSTransition в состоянии
+   * running навсегда, и он насмерть перекрывал вычисленный сдвиг — дорожка
+   * замирала и больше не реагировала ни на шевроны, ни на палец. */
+  function applyShift(dx: number | null) {
+    const node = track.current;
     if (!node) return;
-    if (px === null) node.style.removeProperty("--hero-drag");
-    else node.style.setProperty("--hero-drag", `${px}px`);
+    // Во время тяги переход выключен, иначе лента отставала бы от пальца.
+    node.classList.toggle("is-dragging", dx !== null);
+    node.style.transform = shiftFor(index, dx);
   }
 
   function onPointerDown(event: React.PointerEvent) {
     if (promos.length < 2) return;
     if ((event.target as HTMLElement).closest("button")) return;
-    dragStart.current = event.clientX;
-    // Подсказка снимается на первом же касании, а не на смене слота: её
-    // анимация задаёт transform и перебивала бы слежение за пальцем.
-    setHinted(true);
+    dragFrom.current = event.clientX;
+    applyShift(0);
   }
 
   function onPointerMove(event: React.PointerEvent) {
-    if (dragStart.current === null) return;
-    setDrag((event.clientX - dragStart.current) * 0.4);
+    if (dragFrom.current === null) return;
+    const dx = event.clientX - dragFrom.current;
+    const width = track.current?.offsetWidth ?? 0;
+    // На краях лента поддаётся втрое меньше: листать дальше некуда, и полный
+    // ход показывал бы пустоту за крайним слотом.
+    const atEdge =
+      (index === 0 && dx > 0) || (index === promos.length - 1 && dx < 0);
+    applyShift(atEdge ? dx / 3 : Math.max(-width, Math.min(width, dx)));
   }
 
   function onPointerEnd(event: React.PointerEvent) {
-    if (dragStart.current === null) return;
-    const dx = event.clientX - dragStart.current;
-    dragStart.current = null;
-    setDrag(null);
-    if (Math.abs(dx) > 40) goTo(index + (dx < 0 ? 1 : -1));
+    if (dragFrom.current === null) return;
+    const dx = event.clientX - dragFrom.current;
+    const width = track.current?.offsetWidth ?? 0;
+    dragFrom.current = null;
+    applyShift(null);
+    if (width && Math.abs(dx) > width * SWIPE_RATIO) {
+      goTo(index + (dx < 0 ? 1 : -1));
+    }
   }
+
+  /* Подсказка о жесте.
+   *
+   * Слот занимает кадр целиком, соседний из-за края не выглядывает, и о
+   * возможности листать пальцем ничто не сообщает. Поэтому лента дважды
+   * коротко смещается и возвращается.
+   *
+   * Смещение пишется тем же способом, что при тяге пальцем: отдельная
+   * анимация на transform спорила бы со сдвигом дорожки. Индекс здесь
+   * заведомо нулевой — подсказка играет один раз при появлении блока, — и
+   * поэтому applyShift не нужен: он замкнут на текущий индекс и тянул бы
+   * эффект в зависимости, перезапуская подсказку на каждой смене слота.
+   *
+   * Только на телефоне: на указателе жест не основной способ.
+   */
+  useEffect(() => {
+    if (promos.length < 2) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    if (!window.matchMedia("(max-width: 599px)").matches) return;
+    const node = track.current;
+    if (!node) return;
+
+    const steps: Array<[number, number]> = [
+      [1200, -18],
+      [1620, 0],
+      [2040, -18],
+      [2460, 0],
+    ];
+    const ids = steps.map(([at, px]) =>
+      window.setTimeout(() => {
+        // Если палец уже на ленте, подсказка молчит.
+        if (dragFrom.current !== null) return;
+        node.classList.toggle("is-dragging", false);
+        node.style.transform = shiftFor(0, px || null);
+      }, at),
+    );
+
+    return () => {
+      ids.forEach((id) => window.clearTimeout(id));
+      node.style.transform = shiftFor(0, null);
+    };
+    // Один раз за жизнь блока: список слотов не меняется.
+  }, [promos.length]);
 
   useEffect(() => {
     if (paused) return;
@@ -179,8 +249,7 @@ export function HeroCarousel({
 
         {promos.length ? (
           <div
-            ref={rail}
-            className={hinted ? "hero__promos" : "hero__promos is-hint"}
+            className="hero__promos"
             aria-roledescription="carousel"
             aria-label={copy.heroPromosAria}
             onPointerDown={onPointerDown}
@@ -189,60 +258,66 @@ export function HeroCarousel({
             onPointerCancel={onPointerEnd}
             {...pauseProps}
           >
-            {promos.map((promo, promoIndex) => {
-              const active = promoIndex === index;
-              return (
-                <a
-                  key={promo.heading}
-                  className={active ? "hero__promo is-active" : "hero__promo"}
-                  href={promo.href}
-                  aria-hidden={!active}
-                  tabIndex={active ? undefined : -1}
-                >
-                  {promo.video || promo.image ? (
-                    <span
-                      className={
-                        promo.cutout
-                          ? "hero__promo-media is-cutout"
-                          : "hero__promo-media"
-                      }
-                    >
-                      {promo.video ? (
-                        <video
-                          src={promo.video}
-                          poster={promo.image}
-                          muted
-                          loop
-                          autoPlay
-                          playsInline
-                        />
-                      ) : (
-                        <img src={promo.image} alt="" />
-                      )}
-                    </span>
-                  ) : null}
-
-                  <span className="hero__promo-body">
-                    {promo.eyebrow ? (
-                      <span className="hero__promo-eyebrow">
-                        {promo.eyebrow}
+            <div
+              ref={track}
+              className="hero__promos-track"
+              style={{ transform: shiftFor(index, null) }}
+            >
+              {promos.map((promo, promoIndex) => {
+                const active = promoIndex === index;
+                return (
+                  <a
+                    key={promo.heading}
+                    className="hero__promo"
+                    href={promo.href}
+                    aria-hidden={!active}
+                    tabIndex={active ? undefined : -1}
+                  >
+                    {promo.video || promo.image ? (
+                      <span
+                        className={
+                          promo.cutout
+                            ? "hero__promo-media is-cutout"
+                            : "hero__promo-media"
+                        }
+                      >
+                        {promo.video ? (
+                          <video
+                            src={promo.video}
+                            poster={promo.image}
+                            muted
+                            loop
+                            autoPlay
+                            playsInline
+                          />
+                        ) : (
+                          <img src={promo.image} alt="" />
+                        )}
                       </span>
                     ) : null}
-                    <strong>{nbspText(promo.heading)}</strong>
-                    {promo.text ? <span>{nbspText(promo.text)}</span> : null}
-                    <span className="hero__promo-cta">
-                      {promo.cta}
-                      <IconArrowUpRight size={16} stroke={2} />
-                    </span>
-                  </span>
-                </a>
-              );
-            })}
 
-            {/* Шевроны на строке надзаголовка. Слоем, а не в карточке:
-                карточка — ссылка, кнопки внутри <a> недопустимы. Распорка
-                16:9 повторяет высоту медиа-слота и опускает ряд ровно на
-                эту строку — без неё пришлось бы задавать отступ числом. */}
+                    <span className="hero__promo-body">
+                      {promo.eyebrow ? (
+                        <span className="hero__promo-eyebrow">
+                          {promo.eyebrow}
+                        </span>
+                      ) : null}
+                      <strong>{nbspText(promo.heading)}</strong>
+                      {promo.text ? <span>{nbspText(promo.text)}</span> : null}
+                      <span className="hero__promo-cta">
+                        {promo.cta}
+                        <IconArrowUpRight size={16} stroke={2} />
+                      </span>
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+
+            {/* Шевроны на строке надзаголовка. Слоем, а не в дорожке: внутри
+                они уезжали бы вместе со слотом, и кнопки внутри <a>
+                недопустимы. Распорка 16:9 повторяет высоту медиа-слота и
+                опускает ряд ровно на эту строку. */}
             {promos.length > 1 ? (
               <div className="hero__promo-nav">
                 <span className="hero__promo-nav-spacer" aria-hidden="true" />
@@ -265,11 +340,8 @@ export function HeroCarousel({
               </div>
             ) : null}
 
-            {/* Переключатель у нижней границы карточки. Он же индикатор:
-                сегмент на слот, пройденные залиты, текущий заполняется по
-                времени показа. Вынесен из ссылки — кнопки внутри <a>
-                недопустимы, а без них слот было нечем переключить: клик в
-                любое место карточки уводил на страницу. */}
+            {/* Полоса прогресса, она же переключатель, у нижней границы
+                карточки. Слоем по той же причине, что шевроны. */}
             {promos.length > 1 ? (
               <div
                 className="hero__promo-progress"
