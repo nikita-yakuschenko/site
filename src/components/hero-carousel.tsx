@@ -5,10 +5,11 @@ import { IconArrowUpRight } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
 
 /**
- * Слайд баннера — самостоятельная композиция: свой кадр, свой заголовок,
- * одно действие. Мобильный кадр необязателен: если его нет, берётся общий.
+ * Сообщение баннера. Постоянное: это то, что компания говорит о себе
+ * всегда, и ротации оно не требует. Мобильный кадр необязателен — если его
+ * нет, берётся общий.
  */
-export type HeroSlide = {
+export type HeroMessage = {
   heading: string;
   headingMore?: string;
   text?: string;
@@ -19,11 +20,15 @@ export type HeroSlide = {
 };
 
 /**
- * Кампания поверх кадра: своя карточка, свой срок жизни.
+ * Медиа-слот поверх кадра. Листаются именно они, а не сообщение баннера.
  *
- * Медиа необязательно, но если есть — карточка становится с картинкой или
- * видео. video старше image: задано и то и другое — играет видео, картинка
- * остаётся постером на время загрузки.
+ * Медиа необязательно, но если есть — в слоте картинка или видео. video
+ * старше image: задано и то и другое — играет видео, картинка остаётся
+ * постером на время загрузки.
+ *
+ * cutout отмечает картинку, вырезанную на прозрачный фон: такая вписывается
+ * в слот целиком и получает белую подложку. Фотография же кадрируется
+ * заливкой — иначе вокруг неё остаются неоднородные поля.
  */
 export type HeroPromo = {
   eyebrow?: string;
@@ -33,26 +38,25 @@ export type HeroPromo = {
   href: string;
   image?: string;
   video?: string;
+  cutout?: boolean;
 };
 
-// Длительность слайда. Текста на баннере три-четыре строки, шести секунд
+// Длительность слота. Текста в карточке три-четыре строки, шести секунд
 // на прочтение не хватало. Значение отсюда же уходит в CSS-переменную, чтобы
-// полоска прогресса и смена кадра не разъезжались.
+// полоска прогресса и смена слота не разъезжались.
 const SLIDE_MS = 11000;
 
 export function HeroCarousel({
-  slides,
-  promo,
+  message,
+  promos,
 }: {
-  slides: readonly HeroSlide[];
-  promo?: HeroPromo | null;
+  message: HeroMessage;
+  promos: readonly HeroPromo[];
 }) {
   const [index, setIndex] = useState(0);
   const [playId, setPlayId] = useState(0);
-  // Пока читают — не листаем. Раньше пауза висела на всей секции, но баннер
-  // занимает весь первый экран: курсор оказывался над ним почти всегда, и
-  // полоска то замирала, то дёргалась дальше. Теперь пауза только там, где
-  // действительно читают и целятся, — текст и сами переключатели.
+  // Пока читают — не листаем. Пауза стоит там, где действительно читают и
+  // целятся: на самих слотах.
   const [paused, setPaused] = useState(false);
 
   const pauseProps = {
@@ -66,147 +70,152 @@ export function HeroCarousel({
         setPaused(false);
     },
   };
-  const current = slides[index] || slides[0];
-
-  function goTo(next: number) {
-    setIndex(next);
-    setPlayId((value) => value + 1);
-  }
 
   useEffect(() => {
     if (paused) return;
-    if (slides.length < 2) return;
+    if (promos.length < 2) return;
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     // Таймер на один шаг, а не интервал: эффект и так перезапускается на
-    // каждом слайде, и повторяющийся таймер только копил бы расхождение.
+    // каждом слоте, и повторяющийся таймер только копил бы расхождение.
     const id = window.setTimeout(() => {
-      setIndex((value) => (value + 1) % slides.length);
+      setIndex((value) => (value + 1) % promos.length);
+      setPlayId((value) => value + 1);
     }, SLIDE_MS);
     return () => window.clearTimeout(id);
-  }, [index, paused, slides.length]);
-
-  if (!current) return null;
+  }, [index, paused, promos.length]);
 
   return (
     <section
       className="hero"
-      aria-roledescription="carousel"
-      aria-label={copy.heroCarouselAria}
       style={{ "--hero-slide-ms": `${SLIDE_MS}ms` } as React.CSSProperties}
     >
-      {slides.map((slide, slideIndex) => (
-        <div
-          key={slide.heading}
-          className={
-            slideIndex === index ? "hero__slide is-active" : "hero__slide"
-          }
-          aria-hidden={slideIndex !== index}
-        >
-          {slide.imageMobile ? (
-            <picture>
-              <source media="(min-width: 900px)" srcSet={slide.image} />
-              <img src={slide.imageMobile} alt="" />
-            </picture>
-          ) : (
-            <img src={slide.image} alt="" />
-          )}
-        </div>
-      ))}
+      {/* Кадр один: он часть постоянного сообщения и вместе со слотами не
+          меняется. */}
+      {message.imageMobile ? (
+        <picture className="hero__frame">
+          <source media="(min-width: 900px)" srcSet={message.image} />
+          <img src={message.imageMobile} alt="" />
+        </picture>
+      ) : (
+        <img className="hero__frame" src={message.image} alt="" />
+      )}
 
-      {/* Скрим один на все слайды: он привязан к текстовой колонке, а не
-          к кадру, и при смене слайда ему меняться не за чем. */}
-      <div className="hero__veil" aria-hidden="true" />
+      {/* Ровный тон по кадру: без градиента и без формы, одна плотность во
+          всех точках. Ни плашки под текстом, ни тени по фотографии. */}
+      <div className="hero__tone" aria-hidden="true" />
 
       <div className="hero__stage">
-        <div className="hero__copy" {...pauseProps}>
+        <div className="hero__copy">
           <h1>
-            {nbspText(current.heading)}
-            {current.headingMore ? (
+            {nbspText(message.heading)}
+            {message.headingMore ? (
               <>
                 <br />
-                {nbspText(current.headingMore)}
+                {nbspText(message.headingMore)}
               </>
             ) : null}
           </h1>
-          {current.text ? <p>{nbspText(current.text)}</p> : null}
-          <a className="btn btn-yellow hero__cta" href={current.href}>
-            {current.cta}
+          {message.text ? <p>{nbspText(message.text)}</p> : null}
+          <a className="btn btn-yellow hero__cta" href={message.href}>
+            {message.cta}
             <IconArrowUpRight size={18} stroke={2} />
           </a>
         </div>
 
-        {promo ? (
-          <a className="hero__promo" href={promo.href}>
-            {promo.video || promo.image ? (
-              <span className="hero__promo-media">
-                {promo.video ? (
-                  <video
-                    src={promo.video}
-                    poster={promo.image}
-                    muted
-                    loop
-                    autoPlay
-                    playsInline
-                  />
-                ) : (
-                  <img src={promo.image} alt="" />
-                )}
-              </span>
-            ) : null}
-
-            <span className="hero__promo-body">
-              {promo.eyebrow ? (
-                <span className="hero__promo-eyebrow">{promo.eyebrow}</span>
-              ) : null}
-              <strong>{nbspText(promo.heading)}</strong>
-              {promo.text ? <span>{nbspText(promo.text)}</span> : null}
-              <span className="hero__promo-cta">
-                {promo.cta}
-                <IconArrowUpRight size={16} stroke={2} />
-              </span>
-            </span>
-          </a>
-        ) : null}
-
-        <div className="hero__foot">
+        {promos.length ? (
           <div
-            className="hero__dots"
-            role="tablist"
-            aria-label={copy.heroCarouselAria}
+            className="hero__promos"
+            aria-roledescription="carousel"
+            aria-label={copy.heroPromosAria}
             {...pauseProps}
           >
-            {slides.map((slide, slideIndex) => {
-              const active = slideIndex === index;
-              const done = slideIndex < index;
+            {promos.map((promo, promoIndex) => {
+              const active = promoIndex === index;
               return (
-                <button
-                  key={`dot-${slide.heading}`}
-                  type="button"
-                  role="tab"
-                  className={
-                    active ? "is-active" : done ? "is-done" : undefined
-                  }
-                  aria-selected={active}
-                  aria-label={`${slideIndex + 1} / ${slides.length}`}
-                  onClick={() => goTo(slideIndex)}
+                <a
+                  key={promo.heading}
+                  className={active ? "hero__promo is-active" : "hero__promo"}
+                  href={promo.href}
+                  aria-hidden={!active}
+                  tabIndex={active ? undefined : -1}
                 >
-                  <span
-                    className="hero__dots-fill"
-                    key={active ? `play-${playId}` : "idle"}
-                    style={
-                      active
-                        ? {
-                            animationDuration: `${SLIDE_MS}ms`,
-                            animationPlayState: paused ? "paused" : "running",
+                  {promo.video || promo.image ? (
+                    <span
+                      className={
+                        promo.cutout
+                          ? "hero__promo-media is-cutout"
+                          : "hero__promo-media"
+                      }
+                    >
+                      {promo.video ? (
+                        <video
+                          src={promo.video}
+                          poster={promo.image}
+                          muted
+                          loop
+                          autoPlay
+                          playsInline
+                        />
+                      ) : (
+                        <img src={promo.image} alt="" />
+                      )}
+                    </span>
+                  ) : null}
+
+                  <span className="hero__promo-body">
+                    {promo.eyebrow ? (
+                      <span className="hero__promo-eyebrow">
+                        {promo.eyebrow}
+                      </span>
+                    ) : null}
+                    <strong>{nbspText(promo.heading)}</strong>
+                    {promo.text ? <span>{nbspText(promo.text)}</span> : null}
+                    <span className="hero__promo-cta">
+                      {promo.cta}
+                      <IconArrowUpRight size={16} stroke={2} />
+                    </span>
+                  </span>
+                  {/* Прогресс у нижней границы карточки, а не поверх
+                      картинки: слот — это вся карточка, и полоса отсчитывает
+                      её показ, а не кадрирует фотографию. */}
+                  {promos.length > 1 ? (
+                    <span className="hero__promo-progress">
+                      {promos.map((item, itemIndex) => (
+                        <span
+                          key={`seg-${item.heading}`}
+                          className={
+                            itemIndex < index
+                              ? "is-done"
+                              : itemIndex === index
+                                ? "is-active"
+                                : undefined
                           }
-                        : undefined
-                    }
-                  />
-                </button>
+                        >
+                          <span
+                            className="hero__promo-progress-fill"
+                            key={
+                              itemIndex === index ? `play-${playId}` : "idle"
+                            }
+                            style={
+                              itemIndex === index
+                                ? {
+                                    animationDuration: `${SLIDE_MS}ms`,
+                                    animationPlayState: paused
+                                      ? "paused"
+                                      : "running",
+                                  }
+                                : undefined
+                            }
+                          />
+                        </span>
+                      ))}
+                    </span>
+                  ) : null}
+                </a>
               );
             })}
           </div>
-        </div>
+        ) : null}
       </div>
     </section>
   );

@@ -13,8 +13,8 @@ import { copy } from "./copy";
 export const HOME_LAYOUT: LayoutBlock[] = [
   {
     blockType: "hero",
-    slides: copy.heroSlides,
-    promo: copy.heroPromo,
+    message: copy.hero,
+    promos: copy.heroPromos,
   },
   /* Преимущества компании — отдельный блок, а не часть баннера. Они не
      меняются вместе со слайдами и говорят о компании, а не о кадре. */

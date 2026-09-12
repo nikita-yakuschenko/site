@@ -9,7 +9,11 @@ import { copy } from "../lib/copy";
 import { mediaUrl } from "../lib/media";
 import type { CatalogProject } from "../lib/catalog/types";
 import { FactoryVideo } from "./factory-video";
-import { HeroCarousel, type HeroPromo, type HeroSlide } from "./hero-carousel";
+import {
+  HeroCarousel,
+  type HeroMessage,
+  type HeroPromo,
+} from "./hero-carousel";
 import { LeadForm } from "./lead-form";
 import { ProjectCard } from "./project-card";
 
@@ -39,17 +43,17 @@ export type SiteContacts = {
 /**
  * Баннер первого экрана.
  *
- * Слайды и кампания приходят из раскладки, а не берутся компонентом из
- * copy напрямую: на Payload это поля блока, и редактор должен уметь их
- * менять. Пустой список слайдов — законный случай, блок просто не выводится.
+ * Сообщение и медиа-слоты приходят из раскладки, а не берутся компонентом
+ * из copy напрямую: на Payload это поля блока, и редактор должен уметь их
+ * менять. Блок без сообщения не выводится, пустой список слотов законен.
  */
 function Hero({ block }: { block: LayoutBlock }) {
-  const slides = Array.isArray(block.slides)
-    ? (block.slides as HeroSlide[])
+  const message = block.message as HeroMessage | undefined;
+  if (!message?.heading) return null;
+  const promos = Array.isArray(block.promos)
+    ? (block.promos as HeroPromo[])
     : [];
-  if (!slides.length) return null;
-  const promo = (block.promo as HeroPromo | undefined) || null;
-  return <HeroCarousel slides={slides} promo={promo} />;
+  return <HeroCarousel message={message} promos={promos} />;
 }
 
 /**
