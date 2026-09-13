@@ -2212,13 +2212,25 @@ a {
   padding: 88px 0;
 }
 
+/* Порядок на узком экране: заголовок, кадр, текст, действия. Раздел
+   начинается с того, о чём он, а не с картинки. */
 .production {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.production__copy p {
+/* Между заголовком и кадром зазор меньше общего: подпись и кадр читаются
+   одной группой, а текст под ними уже отдельной. */
+.production__head + .production__media {
+  margin-top: -8px;
+}
+
+/* Надзаголовок исключён: он тоже абзац, и общее правило перекрашивало его
+   в серый, хотя во всех остальных разделах он зелёный. Первый абзац лежит
+   в заголовочном блоке, поэтому правило распространяется и на него. */
+.production__head p:not(.eyebrow),
+.production__copy p:not(.eyebrow) {
   max-width: 36rem;
   color: #475569;
   line-height: 1.6;
@@ -2233,17 +2245,42 @@ a {
  *
  * Горизонталь выбрана осознанно: колонкой ряд читался бы перечнем этапов,
  * строкой — набором участков, стоящих рядом. */
+.production__shops-wrap {
+  margin-top: 40px;
+  padding-top: 28px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+}
+
+/* Подзаголовок ряда: связывает карточки с рассказом выше. Набран
+   надзаголовочным кеглем, а не заголовочным, — он ведёт ряд, а не спорит
+   с названием раздела. */
+.production__shops-title {
+  margin: 0 0 20px;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
 .production__shops {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 24px;
-  margin: 40px 0 0;
-  padding: 32px 0 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  gap: 0;
+  margin: 0;
+  padding: 0;
   list-style: none;
 }
 
-.production__shops h3 {
+/* Пока колонок нет, участки идут строками, и делить их должна черта:
+   иначе четыре абзаца подряд сливаются в сплошной текст. */
+.production__shops li + li {
+  margin-top: 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+}
+
+.production__shops h4 {
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
@@ -2258,10 +2295,24 @@ a {
   line-height: 1.55;
 }
 
+/* Две колонки: черта делит теперь не соседей по строке, а строки между
+   собой, поэтому она достаётся третьему и четвёртому участку. */
 @media (min-width: 760px) {
   .production__shops {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 32px 40px;
+    column-gap: 40px;
+  }
+
+  .production__shops li + li {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .production__shops li:nth-child(n + 3) {
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
   }
 }
 
@@ -2272,6 +2323,14 @@ a {
   .production__shops {
     grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
     gap: 32px;
+  }
+
+  /* В один ряд горизонтальные черты не нужны: соседей делят вертикальные
+     линии на левом крае каждой колонки. */
+  .production__shops li:nth-child(n + 3) {
+    margin-top: 0;
+    padding-top: 0;
+    border-top: 0;
   }
 
   /* Линия делит соседей, поэтому живёт на левом крае каждого участка,
@@ -2302,24 +2361,41 @@ a {
   width: fit-content;
 }
 
+/* Широкий экран: кадр слева на всю высоту, справа заголовок и текст под
+   ним, ряд участков под обоими. Раскладка задана областями — порядок в
+   разметке подчинён узкому экрану, и переставлять блоки местами приходится
+   именно здесь. */
 @media (min-width: 900px) {
   .production {
     display: grid;
     grid-template-columns: 1fr 1fr;
+    grid-template-areas:
+      "media head"
+      "media copy"
+      "shops shops";
+    grid-template-rows: auto 1fr auto;
     align-items: start;
-    gap: 48px;
+    column-gap: 48px;
+    row-gap: 16px;
   }
+
+  .production__head {
+    grid-area: head;
+  }
+
   .production__media {
-    order: 0;
+    grid-area: media;
+    margin-top: 0;
   }
+
   .production__copy {
-    order: 0;
+    grid-area: copy;
   }
 
   /* Ряд участков идёт под обеими колонками, а не в одной из них: это
      сведения обо всём цехе, а не продолжение правой колонки. */
-  .production__shops {
-    grid-column: 1 / -1;
+  .production__shops-wrap {
+    grid-area: shops;
   }
 }
 
@@ -2335,11 +2411,27 @@ a {
   background: var(--avgst-ink);
 }
 
-.factory-video > img {
+.factory-video > img,
+.factory-video picture,
+.factory-video picture img {
   display: block;
   width: 100%;
-  aspect-ratio: 4 / 3;
+}
+
+.factory-video > img,
+.factory-video picture img {
+  /* Вертикальная пропорция: на узком экране кадр снят вертикально, и
+     широкая обрезка выбрасывала половину пролёта. С 900px кадр
+     горизонтальный — там он стоит в колонке рядом с текстом. */
+  aspect-ratio: 3 / 4;
   object-fit: cover;
+}
+
+@media (min-width: 900px) {
+  .factory-video > img,
+  .factory-video picture img {
+    aspect-ratio: 4 / 3;
+  }
 }
 
 /* Плашка поверх кадра сделана как медиа-слот баннера: то же стекло, тот
@@ -2456,6 +2548,22 @@ a {
 .factory-video:hover .factory-video__card em {
   background: var(--brand-yellow);
   color: var(--brand-yellow-foreground);
+}
+
+/* Телефон: плашка тянется во всю ширину кадра с равными полями по бокам.
+   Компактная карточка у левого края на узком экране выглядела случайно
+   приклеенной, а не частью кадра. */
+@media (max-width: 899px) {
+  .factory-video__card {
+    right: 10px;
+    bottom: 10px;
+    left: 10px;
+    max-width: none;
+  }
+
+  .factory-video__card strong {
+    max-width: none;
+  }
 }
 
 .factory-video__modal {
