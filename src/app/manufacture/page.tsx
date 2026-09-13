@@ -1,11 +1,11 @@
-import type { Metadata } from 'next'
-import { InfoPage } from '../../components/info-page'
-import { copy } from '../../lib/copy'
+import type { Metadata } from "next";
+import { InfoPage } from "../../components/info-page";
+import { copy } from "../../lib/copy";
 
 export const metadata: Metadata = {
   title: copy.productionTitle,
   description: copy.productionLead,
-}
+};
 
 export default function ManufacturePage() {
   return (
@@ -13,8 +13,8 @@ export default function ManufacturePage() {
       eyebrow={copy.production}
       title={copy.productionTitle}
       lead={copy.productionLead}
-      items={copy.productionItems}
+      items={copy.productionSteps.map((step) => step.title)}
       cta={copy.factoryTour}
     />
-  )
+  );
 }
