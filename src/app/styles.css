@@ -124,9 +124,49 @@ a {
 }
 
 .site-header__inner {
+  position: relative;
   max-width: var(--page-width);
   margin: 0 auto;
   padding: 12px 0 0;
+}
+
+/* Уведомление о стадии разработки.
+ *
+ * Отдельный слой под шапкой: стоит вне потока, поэтому ни на первый экран,
+ * ни на страницы внутри ничего не сдвигает — отступы считаются так, будто
+ * его нет. Снимается удалением разметки, пересчитывать ничего не придётся.
+ *
+ * Жёлтая плашка, а не стеклянная: это временное служебное сообщение, и
+ * заметность ему нужнее, чем встроенность в композицию. */
+.site-notice {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  left: 0;
+  z-index: 1;
+  pointer-events: auto;
+  padding: 10px 18px;
+  border-radius: var(--surface-radius);
+  background: var(--brand-yellow);
+  color: var(--avgst-ink);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.site-notice a {
+  color: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 899px) {
+  .site-notice {
+    top: calc(100% + 8px);
+    padding: 9px 14px;
+    font-size: 12px;
+  }
 }
 
 .site-header__meta {
