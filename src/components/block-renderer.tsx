@@ -1,4 +1,5 @@
 import {
+  IconArrowUpRight,
   IconHourglass,
   IconMedal,
   IconStar,
@@ -135,11 +136,15 @@ function PopularProjects({
             </p>
             <h2>{String(block.heading || copy.popularHeading)}</h2>
           </div>
+          {/* Строковая ссылка со стрелкой, а не кнопка: это переход в
+              соседний раздел, а не действие. Кнопки на сайте оставлены за
+              действиями, и пилюль среди них нет. */}
           <a
-            className="btn btn-outline-dark"
+            className="section__link"
             href={String(block.catalogHref || "/catalog")}
           >
             {String(block.catalogLabel || copy.allProjects)}
+            <IconArrowUpRight size={18} stroke={2} />
           </a>
         </div>
         <div className="grid-3">
