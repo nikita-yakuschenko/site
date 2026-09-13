@@ -9,6 +9,10 @@ import { telHref } from "../lib/phone";
 import { OfficeStatusIndicator } from "./office-status";
 import { RegionSwitch } from "./region-switch";
 
+// Отметка о закрытом уведомлении. Живёт в браузере посетителя и никуда не
+// отправляется: это его выбор, а не наши данные.
+const NOTICE_KEY = "avgst-dev-notice";
+
 type NavItem = { label?: string | null; href?: string | null };
 type MediaLike = { url?: string | null } | number | string | null | undefined;
 
@@ -64,6 +68,31 @@ export function SiteChrome({
   subrow?: ReactNode;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+
+  /* Уведомление о стадии разработки закрывается и больше не возвращается.
+     Начальное состояние — показано: на сервере localStorage нет, и если
+     стартовать со скрытого, разметка сервера и браузера разойдутся. Отметку
+     снимаем уже после монтирования. */
+  const [noticeClosed, setNoticeClosed] = useState(false);
+
+  useEffect(() => {
+    try {
+      if (window.localStorage.getItem(NOTICE_KEY) === "off") {
+        setNoticeClosed(true);
+      }
+    } catch {
+      // Приватный режим и запрет хранилища: уведомление просто останется.
+    }
+  }, []);
+
+  function closeNotice() {
+    setNoticeClosed(true);
+    try {
+      window.localStorage.setItem(NOTICE_KEY, "off");
+    } catch {
+      // Не сохранилось — закроется на эту сессию, вернётся при перезагрузке.
+    }
+  }
   const src = mediaUrl(logo) || "/logo_lg.svg";
   const items = (navigation?.filter(
     (item) => item.label && item.href && item.href !== "/",
@@ -181,16 +210,28 @@ export function SiteChrome({
               плашкой: на поток страницы оно не влияет и ничего не сдвигает,
               поэтому снять его можно в одну строку, не пересчитывая
               отступы первого экрана. */}
-          <div className="site-notice" role="status">
-            {copy.noticeText}{" "}
-            <a
-              href={copy.noticeLinkHref}
-              target="_blank"
-              rel="noreferrer noopener"
-            >
-              {copy.noticeLinkLabel}
-            </a>
-          </div>
+          {noticeClosed ? null : (
+            <div className="site-notice" role="status">
+              <span>
+                {copy.noticeText}{" "}
+                <a
+                  href={copy.noticeLinkHref}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                >
+                  {copy.noticeLinkLabel}
+                </a>
+              </span>
+              <button
+                type="button"
+                className="site-notice__close"
+                aria-label={copy.close}
+                onClick={closeNotice}
+              >
+                <IconX size={18} stroke={2.2} />
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
