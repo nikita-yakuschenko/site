@@ -1906,6 +1906,48 @@ a {
   transform: translate(2px, -2px);
 }
 
+/* Телефон: переход встаёт в строку надзаголовка, а не отдельной строкой под
+   заголовком. Под заголовком он читался обрывком следующего блока —
+   висел слева сам по себе, без связи с тем, что над ним.
+   
+   Обёртка надзаголовка с заголовком на этой ширине раскрывается
+   (display: contents), чтобы обе строки стали ячейками одной сетки: иначе
+   ссылку не поставить в один ряд с надзаголовком, не трогая разметку. */
+@media (max-width: 599px) {
+  .section__head {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 4px;
+  }
+
+  .section__head > div {
+    display: contents;
+  }
+
+  .section__head .eyebrow {
+    grid-column: 1;
+  }
+
+  .section__head h2 {
+    grid-column: 1 / -1;
+  }
+
+  .section__link {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    /* Поле под заголовок здесь не нужно: ссылка стоит в своей строке.
+       Вместо него — область нажатия: поля растят её до 34px по высоте, а
+       отрицательные отступы возвращают строку на место, чтобы ряд не
+       разъезжался. Пальцем в строку 18px не попасть. */
+    padding: 8px 0 8px 12px;
+    margin: -8px 0 -8px -12px;
+    font-size: 14px;
+  }
+}
+
 .eyebrow {
   margin: 0;
   font-size: 12px;
