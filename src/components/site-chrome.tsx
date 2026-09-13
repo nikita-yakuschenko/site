@@ -176,6 +176,21 @@ export function SiteChrome({
               это служебный слой страницы, а не часть шапки сайта. Контраст
               им даёт собственная растушёванная подложка, не общая плашка. */}
           {subrow ? <div className="site-header__subrow">{subrow}</div> : null}
+
+          {/* Уведомление о стадии разработки. Лежит отдельным слоем под
+              плашкой: на поток страницы оно не влияет и ничего не сдвигает,
+              поэтому снять его можно в одну строку, не пересчитывая
+              отступы первого экрана. */}
+          <div className="site-notice" role="status">
+            {copy.noticeText}{" "}
+            <a
+              href={copy.noticeLinkHref}
+              target="_blank"
+              rel="noreferrer noopener"
+            >
+              {copy.noticeLinkLabel}
+            </a>
+          </div>
         </div>
       </header>
 
