@@ -1,6 +1,12 @@
 "use client";
 
-import { Fragment, useEffect, useState, type ReactNode } from "react";
+import {
+  Fragment,
+  useEffect,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { IconMenu2, IconX } from "@tabler/icons-react";
 import Link from "next/link";
 import { copy } from "../lib/copy";
@@ -9,9 +15,45 @@ import { telHref } from "../lib/phone";
 import { OfficeStatusIndicator } from "./office-status";
 import { RegionSwitch } from "./region-switch";
 
-// Отметка о закрытом уведомлении. Живёт в браузере посетителя и никуда не
-// отправляется: это его выбор, а не наши данные.
+/* Отметка о закрытом уведомлении. Живёт в браузере посетителя и никуда не
+   отправляется: это его выбор, а не наши данные.
+
+   Читается через useSyncExternalStore, а не через эффект с setState:
+   состояние приходит извне React, и эффект, который сразу после монтирования
+   дёргает setState, вызывает лишний каскад перерисовок. Серверный снимок
+   всегда «не закрыто» — на сервере localStorage нет, и если ответить иначе,
+   разметка сервера и браузера разойдутся. */
 const NOTICE_KEY = "avgst-dev-notice";
+
+const noticeListeners = new Set<() => void>();
+
+function subscribeNotice(listener: () => void) {
+  noticeListeners.add(listener);
+  // Чужая вкладка закрыла уведомление — эта должна узнать.
+  window.addEventListener("storage", listener);
+  return () => {
+    noticeListeners.delete(listener);
+    window.removeEventListener("storage", listener);
+  };
+}
+
+function noticeClosedNow() {
+  try {
+    return window.localStorage.getItem(NOTICE_KEY) === "off";
+  } catch {
+    // Приватный режим или запрет хранилища: уведомление просто остаётся.
+    return false;
+  }
+}
+
+function closeNotice() {
+  try {
+    window.localStorage.setItem(NOTICE_KEY, "off");
+  } catch {
+    // Не сохранилось — закроется до перезагрузки страницы.
+  }
+  noticeListeners.forEach((listener) => listener());
+}
 
 type NavItem = { label?: string | null; href?: string | null };
 type MediaLike = { url?: string | null } | number | string | null | undefined;
@@ -69,30 +111,11 @@ export function SiteChrome({
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  /* Уведомление о стадии разработки закрывается и больше не возвращается.
-     Начальное состояние — показано: на сервере localStorage нет, и если
-     стартовать со скрытого, разметка сервера и браузера разойдутся. Отметку
-     снимаем уже после монтирования. */
-  const [noticeClosed, setNoticeClosed] = useState(false);
-
-  useEffect(() => {
-    try {
-      if (window.localStorage.getItem(NOTICE_KEY) === "off") {
-        setNoticeClosed(true);
-      }
-    } catch {
-      // Приватный режим и запрет хранилища: уведомление просто останется.
-    }
-  }, []);
-
-  function closeNotice() {
-    setNoticeClosed(true);
-    try {
-      window.localStorage.setItem(NOTICE_KEY, "off");
-    } catch {
-      // Не сохранилось — закроется на эту сессию, вернётся при перезагрузке.
-    }
-  }
+  const noticeClosed = useSyncExternalStore(
+    subscribeNotice,
+    noticeClosedNow,
+    () => false,
+  );
   const src = mediaUrl(logo) || "/logo_lg.svg";
   const items = (navigation?.filter(
     (item) => item.label && item.href && item.href !== "/",
