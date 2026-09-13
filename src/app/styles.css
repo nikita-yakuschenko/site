@@ -141,7 +141,12 @@ a {
  *
  * Жёлтая плашка, а не стеклянная: это временное служебное сообщение, и
  * заметность ему нужнее, чем встроенность в композицию. */
+/* Кнопка закрытия прижата к правому краю, текст занимает остальное.
+   Отметка о закрытии хранится у посетителя в браузере — см. NOTICE_KEY. */
 .site-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
@@ -155,6 +160,38 @@ a {
   font-size: 13px;
   font-weight: 500;
   line-height: 1.45;
+}
+
+.site-notice > span {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.site-notice__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  /* Поля вынесены в саму кнопку: область нажатия 32px, а видимый крестик
+     остаётся мелким и не спорит с текстом. */
+  width: 32px;
+  height: 32px;
+  margin: -6px -6px -6px 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--avgst-ink);
+  cursor: pointer;
+  opacity: 0.6;
+  transition:
+    opacity 0.2s var(--ease-out),
+    background-color 0.2s var(--ease-out);
+}
+
+.site-notice__close:hover {
+  opacity: 1;
+  background: rgb(var(--avgst-ink-rgb) / 0.1);
 }
 
 .site-notice a {
@@ -1546,6 +1583,12 @@ a {
 @media (max-width: 599px) {
   .hero__stage {
     padding: 104px 0 28px;
+  }
+
+  /* Сообщение опущено на 18px: сверху над ним висит плашка шапки, и без
+     этого зазора заголовок начинался сразу под ней. */
+  .hero__copy {
+    margin-top: 18px;
   }
 
   .hero__copy {
