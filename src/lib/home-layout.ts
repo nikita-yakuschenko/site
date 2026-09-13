@@ -34,6 +34,7 @@ export const HOME_LAYOUT: LayoutBlock[] = [
     /* Снимок собственного цеха. Тот же кадр стоит у партнёров на
        domaizi.ru — фотография наша, они используют её по соглашению. */
     media: { url: "/production/factory.jpg" },
+    mediaMobile: { url: "/production/factory-portrait.jpg" },
     eyebrow: copy.production,
     heading: copy.productionHeading,
     body: copy.productionBody,

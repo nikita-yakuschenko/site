@@ -6,7 +6,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import { isRegisteredBlock } from "../blocks/registry";
-import { copy } from "../lib/copy";
+import { copy, nbspText } from "../lib/copy";
 import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
 import type { CatalogProject } from "../lib/catalog/types";
@@ -186,23 +186,34 @@ function Production({ block }: { block: LayoutBlock }) {
   const steps =
     (block.steps as Array<{ title?: string; text?: string }> | undefined) || [];
   const src = mediaUrl(block.media as MediaLike) || "/fixtures/factory.jpg";
+  const srcMobile = mediaUrl(block.mediaMobile as MediaLike) || undefined;
+  /* Первый абзац живёт в заголовочном блоке, остальные в текстовой колонке:
+     на узком экране он должен стоять между заголовком и кадром, а не после
+     кадра вместе с остальным текстом. На широком порядок тот же, что и был,
+     — сразу под заголовком. */
+  const paragraphs = (
+    Array.isArray(block.body) ? block.body : [block.body]
+  ).filter(Boolean);
+  const [lead, ...rest] = paragraphs;
   return (
     <section className="section section--factory">
       <div className="section__inner production">
+        {/* Заголовок вынесен из текстовой колонки отдельным блоком: на узком
+            экране раздел должен начинаться с него, а не с кадра, и без
+            отдельного блока его оттуда не достать. На широком он встаёт над
+            текстом в правой колонке, как и был. */}
+        <div className="production__head">
+          <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
+          <h2>{nbspText(String(block.heading))}</h2>
+          {lead ? <p>{nbspText(String(lead))}</p> : null}
+        </div>
         <div className="production__media">
-          <FactoryVideo src={src} alt={copy.factoryAlt} />
+          <FactoryVideo src={src} srcMobile={srcMobile} alt={copy.factoryAlt} />
         </div>
         <div className="production__copy">
-          <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
-          <h2>{String(block.heading)}</h2>
-          {/* Текст блока — несколько абзацев: изготовление, различие
-              технологий, вывод. Одной строкой это не умещается, а склеивать
-              их в абзац значит терять шаги рассуждения. */}
-          {(Array.isArray(block.body) ? block.body : [block.body])
-            .filter(Boolean)
-            .map((paragraph, index) => (
-              <p key={index}>{String(paragraph)}</p>
-            ))}
+          {rest.map((paragraph, index) => (
+            <p key={index}>{nbspText(String(paragraph))}</p>
+          ))}
           {/* Список без порядка: участки цеха равноправны, часть из них
               работает параллельно. Нумерация выдумывала бы цепочку. */}
           {/* Две кнопки разного веса. Жёлтая — главный выход блока, второй
@@ -229,15 +240,22 @@ function Production({ block }: { block: LayoutBlock }) {
           ) : null}
         </div>
 
+        {/* Подзаголовок связывает ряд с рассказом выше: без него четыре
+            карточки читаются как новый блок, начавшийся сам по себе. */}
         {steps.length ? (
-          <ul className="production__shops">
-            {steps.map((step) => (
-              <li key={step.title}>
-                <h3>{step.title}</h3>
-                {step.text ? <p>{step.text}</p> : null}
-              </li>
-            ))}
-          </ul>
+          <div className="production__shops-wrap">
+            <h3 className="production__shops-title">
+              {nbspText(String(block.stepsTitle || copy.productionStepsTitle))}
+            </h3>
+            <ul className="production__shops">
+              {steps.map((step) => (
+                <li key={step.title}>
+                  <h4>{nbspText(String(step.title))}</h4>
+                  {step.text ? <p>{nbspText(step.text)}</p> : null}
+                </li>
+              ))}
+            </ul>
+          </div>
         ) : null}
       </div>
     </section>

@@ -8,9 +8,11 @@ const KINESCOPE_EMBED =
 
 export function FactoryVideo({
   src = "/fixtures/factory.jpg",
+  srcMobile,
   alt = copy.factoryAlt,
 }: {
   src?: string;
+  srcMobile?: string;
   alt?: string;
 }) {
   const [open, setOpen] = useState(false);
@@ -37,7 +39,16 @@ export function FactoryVideo({
         className="factory-video"
         onClick={() => setOpen(true)}
       >
-        <img src={src} alt={alt} />
+        {/* На узком экране кадр вертикальный: снимок цеха снят вертикально,
+            и широкая обрезка выбрасывала половину пролёта. */}
+        {srcMobile ? (
+          <picture>
+            <source media="(min-width: 900px)" srcSet={src} />
+            <img src={srcMobile} alt={alt} />
+          </picture>
+        ) : (
+          <img src={src} alt={alt} />
+        )}
         {/* В плашке кадр из самого ролика, а не отвлечённый значок: по нему
             видно, что там внутри, ещё до нажатия. Значок воспроизведения
             лежит поверх кадра — иначе кадр не отличить от фотографии. */}
