@@ -220,8 +220,8 @@ export const copy = {
       image: "/fixtures/factory.jpg",
     },
   ],
-  popularEyebrow: "Популярные",
-  popularHeading: "Проекты домов",
+  popularEyebrow: "Каталог",
+  popularHeading: "Популярные проекты",
   catalogCta: "Каталог",
   seoTitle: 'Авангард Строй - Строительство домов "под ключ"',
   seoDescription:
