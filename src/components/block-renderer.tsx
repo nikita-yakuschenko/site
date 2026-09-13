@@ -183,7 +183,8 @@ function Cta({ block }: { block: LayoutBlock }) {
 }
 
 function Production({ block }: { block: LayoutBlock }) {
-  const items = (block.items as Array<{ label?: string }> | undefined) || [];
+  const steps =
+    (block.steps as Array<{ title?: string; text?: string }> | undefined) || [];
   const src = mediaUrl(block.media as MediaLike) || "/fixtures/factory.jpg";
   return (
     <section className="section section--factory">
@@ -194,18 +195,50 @@ function Production({ block }: { block: LayoutBlock }) {
         <div className="production__copy">
           <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
           <h2>{String(block.heading)}</h2>
-          <p>{String(block.body)}</p>
-          <ul className="production__list">
-            {items.map((item, index) => (
-              <li key={index}>{item.label}</li>
+          {/* Текст блока — несколько абзацев: изготовление, различие
+              технологий, вывод. Одной строкой это не умещается, а склеивать
+              их в абзац значит терять шаги рассуждения. */}
+          {(Array.isArray(block.body) ? block.body : [block.body])
+            .filter(Boolean)
+            .map((paragraph, index) => (
+              <p key={index}>{String(paragraph)}</p>
             ))}
-          </ul>
-          {block.ctaHref && block.ctaLabel ? (
-            <a className="btn btn-yellow" href={String(block.ctaHref)}>
-              {String(block.ctaLabel)}
-            </a>
+          {/* Список без порядка: участки цеха равноправны, часть из них
+              работает параллельно. Нумерация выдумывала бы цепочку. */}
+          {/* Две кнопки разного веса. Жёлтая — главный выход блока, второй
+              выход идёт контуром. Что из них главное, решает раскладка: у
+              блока просто есть первое действие и второе. */}
+          {(block.ctaHref && block.ctaLabel) ||
+          (block.moreHref && block.moreLabel) ? (
+            <div className="production__actions">
+              {block.ctaHref && block.ctaLabel ? (
+                <a className="btn btn-yellow" href={String(block.ctaHref)}>
+                  {String(block.ctaLabel)}
+                  <IconArrowUpRight size={18} stroke={2} />
+                </a>
+              ) : null}
+              {block.moreHref && block.moreLabel ? (
+                <a
+                  className="btn btn-outline-dark"
+                  href={String(block.moreHref)}
+                >
+                  {String(block.moreLabel)}
+                </a>
+              ) : null}
+            </div>
           ) : null}
         </div>
+
+        {steps.length ? (
+          <ul className="production__shops">
+            {steps.map((step) => (
+              <li key={step.title}>
+                <h3>{step.title}</h3>
+                {step.text ? <p>{step.text}</p> : null}
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </div>
     </section>
   );

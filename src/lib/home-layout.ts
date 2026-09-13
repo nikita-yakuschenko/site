@@ -31,12 +31,24 @@ export const HOME_LAYOUT: LayoutBlock[] = [
   },
   {
     blockType: "productionSection",
+    /* Снимок собственного цеха. Тот же кадр стоит у партнёров на
+       domaizi.ru — фотография наша, они используют её по соглашению. */
+    media: { url: "/production/factory.jpg" },
     eyebrow: copy.production,
     heading: copy.productionHeading,
     body: copy.productionBody,
-    items: copy.productionItems.map((label) => ({ label })),
-    ctaLabel: copy.factoryTour,
-    ctaHref: "/#contacts",
+    steps: copy.productionSteps,
+    /* Два выхода из блока, и главный — переход на страницу производства.
+       К записи на экскурсию человека возвращают многие места сайта, а
+       позвать его почитать про завод больше негде: это единственный такой
+       вход, и он забирает себе главную кнопку.
+
+       Оба выхода нужны здесь, а не только в баннере: лента слотов
+       крутится, и слот про завод человек может не увидеть вовсе. */
+    ctaLabel: copy.factoryMore,
+    ctaHref: "/manufacture",
+    moreLabel: copy.factoryTour,
+    moreHref: "/#contacts",
     theme: "light",
   },
   {
