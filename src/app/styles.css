@@ -16,6 +16,13 @@
      вариантов, rgb() не умеет разбирать hex из переменной. */
   --avgst-ink: #0b1020;
   --avgst-ink-rgb: 11 16 32;
+  /* Тон затемнения поверх фотографий.
+     Фирменный ink для этого не годится: он заметно синий, и на больших
+     площадях при 40–55% прозрачности эта синева ложится на весь кадр и
+     холодит его. Здесь тон почти нейтральный — задача вуали затемнить
+     снимок, а не перекрасить. Чуть тёплее чистого чёрного, чтобы зелень
+     и дерево не уходили в серость. */
+  --veil-rgb: 18 17 16;
   --radius: 0.625rem;
   --font-sans: var(--font-geist-sans), Inter, Arial, sans-serif;
   --page-width: 1152px;
@@ -867,21 +874,21 @@ a {
   background:
     linear-gradient(
       to right,
-      rgb(var(--avgst-ink-rgb) / 0.55) 0%,
-      rgb(var(--avgst-ink-rgb) / 0.42) calc(50% - var(--page-width) / 2 + 190px),
+      rgb(var(--veil-rgb) / 0.55) 0%,
+      rgb(var(--veil-rgb) / 0.42) calc(50% - var(--page-width) / 2 + 190px),
       /* Плотная зона держится до конца строк сообщения и только потом
          начинает таять. Пока она таяла с середины текста, правые окончания
          строк ложились на просветы неба и стены дома: по яркой подложке
          контраст падал до 2.9 при норме 4.5. Правая часть кадра от этого
          не темнеет — растворение просто начинается позже. */
-      rgb(var(--avgst-ink-rgb) / 0.42) calc(50% - var(--page-width) / 2 + 580px),
-      rgb(var(--avgst-ink-rgb) / 0.12) calc(50% - var(--page-width) / 2 + 880px),
-      rgb(var(--avgst-ink-rgb) / 0) calc(50% - var(--page-width) / 2 + 1190px)
+      rgb(var(--veil-rgb) / 0.42) calc(50% - var(--page-width) / 2 + 580px),
+      rgb(var(--veil-rgb) / 0.12) calc(50% - var(--page-width) / 2 + 880px),
+      rgb(var(--veil-rgb) / 0) calc(50% - var(--page-width) / 2 + 1190px)
     ),
     linear-gradient(
       to top,
-      rgb(var(--avgst-ink-rgb) / 0.3) 0%,
-      rgb(var(--avgst-ink-rgb) / 0) 34%
+      rgb(var(--veil-rgb) / 0.3) 0%,
+      rgb(var(--veil-rgb) / 0) 34%
     );
 }
 
