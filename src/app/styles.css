@@ -2306,6 +2306,11 @@ a {
   transition: transform 0.45s var(--ease-out);
 }
 
+/* Классика: конёк в кадре, обрезаем дорожку снизу, а не крышу. */
+.series-bento__tile--classic > img {
+  object-position: 50% 28%;
+}
+
 .series-bento__tile:hover > img {
   transform: scale(1.04);
 }
@@ -2413,12 +2418,9 @@ a {
   }
 
   .series-bento__tile {
-    min-height: 188px;
-  }
-
-  .series-bento__tile--modular,
-  .series-bento__tile--panel {
-    min-height: 220px;
+    height: auto;
+    min-height: 0;
+    aspect-ratio: 16 / 10;
   }
 }
 
