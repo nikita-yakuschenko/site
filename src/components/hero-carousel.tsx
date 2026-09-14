@@ -68,13 +68,19 @@ const SHIFT_MS = 420;
  * Ниже 600px остаётся узкая строка с жестом.
  */
 const RAIL_FROM = "(min-width: 600px)";
-const WIDE_FROM = "(min-width: 1100px)";
 
-// Сколько слотов видно одновременно и какой между ними зазор. Зазор
-// участвует в расчёте шага: лента едет на слот плюс зазор, а не на долю
-// ширины, иначе карточки уезжали бы всё дальше от своих мест.
-const WIDE_PER_VIEW = 2;
-const WIDE_GAP = 16;
+/* Слот в кадре всегда один.
+ *
+ * Два слота рядом занимали по половине ширины, и чтобы текст в них
+ * помещался, карточку приходилось держать высокой — лента выходила
+ * массивной и забирала нижнюю треть кадра. Один слот на три четверти
+ * ширины вмещает тот же текст в меньшую высоту, и картинке хватает
+ * пропорции 16:9 вместо тесной 4:3.
+ *
+ * Зазор при одном слоте не нужен: соседних карточек в кадре нет. Он
+ * остаётся в расчёте шага параметром, потому что от него зависит ширина
+ * сдвига дорожки.
+ */
 const ONE_PER_VIEW = 1;
 const NO_GAP = 0;
 
@@ -130,24 +136,17 @@ export function HeroCarousel({
    * сервера приходит для широкого экрана, и на узком её поправит первый же
    * эффект, до отрисовки жеста. */
   const [rail, setRail] = useState(true);
-  const [wide, setWide] = useState(true);
 
   useEffect(() => {
-    const queries: [MediaQueryList, (value: boolean) => void][] = [
-      [window.matchMedia(RAIL_FROM), setRail],
-      [window.matchMedia(WIDE_FROM), setWide],
-    ];
-    const stops = queries.map(([query, set]) => {
-      const apply = () => set(query.matches);
-      apply();
-      query.addEventListener("change", apply);
-      return () => query.removeEventListener("change", apply);
-    });
-    return () => stops.forEach((stop) => stop());
+    const query = window.matchMedia(RAIL_FROM);
+    const apply = () => setRail(query.matches);
+    apply();
+    query.addEventListener("change", apply);
+    return () => query.removeEventListener("change", apply);
   }, []);
 
-  const perView = wide ? WIDE_PER_VIEW : ONE_PER_VIEW;
-  const gap = wide ? WIDE_GAP : NO_GAP;
+  const perView = ONE_PER_VIEW;
+  const gap = NO_GAP;
   // Листать есть что, только если слотов больше, чем помещается в кадр.
   const rotating = count > perView;
 
