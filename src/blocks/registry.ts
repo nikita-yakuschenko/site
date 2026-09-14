@@ -2,6 +2,7 @@ export const REGISTERED_BLOCKS = [
   'hero',
   'advantagesBar',
   'popularProjects',
+  'seriesBento',
   'textSection',
   'cta',
   'productionSection',

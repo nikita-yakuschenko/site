@@ -255,6 +255,13 @@ export const copy = {
   ],
   popularEyebrow: "Каталог",
   popularHeading: "Популярные проекты",
+  seriesHeading: "Серии домов",
+  seriesEyebrow: "Подборки проектов",
+  seriesAll: "Все серии",
+  seriesModular: "Модульные дома",
+  seriesBarn: "Барнхаусы",
+  seriesClassic: "Классика",
+  seriesPanel: "Панельно-каркасные дома",
   catalogCta: "Каталог",
   seoTitle: 'Авангард Строй - Строительство домов "под ключ"',
   seoDescription:
@@ -315,4 +322,13 @@ export function nbspText(text: string): string {
 
 export function footerAboutFor(name: string): string {
   return `${name} помогает выбрать проект, рассчитать смету и построить дом.`;
+}
+
+export function projectsInSeries(n: number): string {
+  const abs = Math.abs(n) % 100;
+  const last = abs % 10;
+  if (abs > 10 && abs < 20) return `${n} проектов`;
+  if (last === 1) return `${n} проект`;
+  if (last >= 2 && last <= 4) return `${n} проекта`;
+  return `${n} проектов`;
 }
