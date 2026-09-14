@@ -29,6 +29,45 @@ export const HOME_LAYOUT: LayoutBlock[] = [
     catalogHref: "/catalog",
     catalogLabel: copy.allProjects,
   },
+  /* Числа из папок public/catalog, пока нет CMS. Барнхаусы 12,
+     панельно-каркасные 14, классика 7, модульные 4. */
+  {
+    blockType: "seriesBento",
+    heading: copy.seriesHeading,
+    eyebrow: copy.seriesEyebrow,
+    catalogHref: "/catalog",
+    catalogLabel: copy.seriesAll,
+    items: [
+      {
+        id: "panel",
+        title: copy.seriesPanel,
+        href: "/catalog?series=panel",
+        image: "/series/panel.jpg",
+        count: 14,
+      },
+      {
+        id: "barn",
+        title: copy.seriesBarn,
+        href: "/catalog?series=barn",
+        image: "/series/barn.jpg",
+        count: 12,
+      },
+      {
+        id: "classic",
+        title: copy.seriesClassic,
+        href: "/catalog?series=classic",
+        image: "/series/classic.jpg",
+        count: 7,
+      },
+      {
+        id: "modular",
+        title: copy.seriesModular,
+        href: "/catalog?series=modular",
+        image: "/series/modular.jpg",
+        count: 4,
+      },
+    ],
+  },
   {
     blockType: "productionSection",
     /* Снимок собственного цеха. Тот же кадр стоит у партнёров на

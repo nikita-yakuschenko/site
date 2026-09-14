@@ -6,7 +6,7 @@ import {
   IconUsers,
 } from "@tabler/icons-react";
 import { isRegisteredBlock } from "../blocks/registry";
-import { copy, nbspText } from "../lib/copy";
+import { copy, nbspText, projectsInSeries } from "../lib/copy";
 import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
 import type { CatalogProject } from "../lib/catalog/types";
@@ -157,6 +157,62 @@ function PopularProjects({
   );
 }
 
+type SeriesTile = {
+  id: string;
+  title: string;
+  href: string;
+  image: string;
+  count?: number;
+};
+
+function SeriesBento({ block }: { block: LayoutBlock }) {
+  const items = Array.isArray(block.items) ? (block.items as SeriesTile[]) : [];
+  if (!items.length) return null;
+  return (
+    <section className="section section--muted">
+      <div className="section__inner">
+        <div className="section__head">
+          <div>
+            <p className="eyebrow">
+              {String(block.eyebrow || copy.seriesEyebrow)}
+            </p>
+            <h2>{String(block.heading || copy.seriesHeading)}</h2>
+          </div>
+          <a
+            className="section__link"
+            href={String(block.catalogHref || "/catalog")}
+          >
+            {String(block.catalogLabel || copy.seriesAll)}
+            <IconArrowUpRight size={18} stroke={2} />
+          </a>
+        </div>
+        <div className="series-bento">
+          {items.map((item) => (
+            <a
+              key={item.id}
+              className={`series-bento__tile series-bento__tile--${item.id}`}
+              href={item.href}
+            >
+              <img src={item.image} alt="" />
+              {item.count != null ? (
+                <span className="badge series-bento__count">
+                  {projectsInSeries(item.count)}
+                </span>
+              ) : null}
+              <span className="series-bento__go" aria-hidden="true">
+                <IconArrowUpRight size={18} stroke={2} />
+              </span>
+              <span className="series-bento__label">
+                <span className="series-bento__name">{item.title}</span>
+              </span>
+            </a>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function TextSection({ block }: { block: LayoutBlock }) {
   return (
     <section className="section">
@@ -282,7 +338,7 @@ function Contacts({
     ? contacts?.address
     : (block.address as string | undefined);
   return (
-    <section className="section" id="contacts">
+    <section className="section section--muted" id="contacts">
       <div className="section__inner contacts">
         <div>
           <p className="eyebrow">{copy.contactsEyebrow}</p>
@@ -397,6 +453,9 @@ export function BlockRenderer({
           return (
             <PopularProjects key={index} block={block} projects={projects} />
           );
+        }
+        if (block.blockType === "seriesBento") {
+          return <SeriesBento key={index} block={block} />;
         }
         if (block.blockType === "textSection")
           return <TextSection key={index} block={block} />;
