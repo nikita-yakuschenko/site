@@ -237,19 +237,43 @@ function MortgageShowcase() {
   return (
     <section className="section mortgage-showcase" aria-labelledby="mortgage-showcase-title">
       <div className="section__inner mortgage-showcase__grid">
-        <div className="mortgage-showcase__intro">
-          <p className="eyebrow">Ипотека</p>
-          <h2 id="mortgage-showcase-title">Работаем со всеми банками</h2>
-          <p>Поможем подобрать оптимальную ипотечную программу для строительства дома. Сотрудничаем с ведущими банками и <strong>предлагаем выгодные условия кредитования</strong>, сниженные процентные ставки и сопровождение на всех этапах оформления ипотеки.</p>
-          <a className="btn btn-yellow" href="/mortgage"><IconArrowUpRight size={18} stroke={2} />Рассчитать ипотеку</a>
+        {/* Заголовок блока живёт внутри баннера: слева рассказ и действие,
+            справа кадр. Отдельной строкой над баннером он повторял бы то,
+            о чём баннер и так говорит. */}
+        <div className="mortgage-family">
+          <div className="mortgage-family__media">
+            <Image className="mortgage-family__image" src="/persons/family_1.png" alt="" fill sizes="(min-width: 961px) 60vw, 100vw" />
+          </div>
+          <div className="mortgage-family__body">
+            <p className="eyebrow">Семейная ипотека</p>
+            <h2 id="mortgage-showcase-title">Дом в ипотеку от 6%</h2>
+            <p>Семейная ипотека — государственная программа, по которой можно построить частный дом. Подберём банк и <strong>оформим кредит на выгодных условиях</strong>: рассчитаем платёж, поможем собрать документы и проведём сделку на всех этапах — от заявки до получения денег на строительство.</p>
+            <a className="btn btn-yellow" href="/mortgage">
+              Рассчитать ипотеку
+              <IconArrowUpRight size={18} stroke={2} />
+            </a>
+          </div>
         </div>
+        {/* Семейной в ряду нет: ей посвящён баннер выше. */}
         <div className="mortgage-showcase__programs">
-          <a className="mortgage-program mortgage-program--featured" href="/mortgage">
-            <Image className="mortgage-program__image" src="/persons/family.png" alt="" fill sizes="(min-width: 961px) 50vw, 100vw" />
-            <span>Семейная ипотека</span><strong>от 6%</strong><small>Подходит семьям с детьми</small><IconArrowUpRight aria-hidden="true" />
+          <a className="mortgage-program" href="/mortgage">
+            <span>IT-ипотека</span><strong>от 6%</strong><small>Для специалистов IT-компаний</small>
+            <span className="series-bento__go" aria-hidden="true">
+              <IconArrowUpRight size={18} stroke={2} />
+            </span>
           </a>
-          <a className="mortgage-program" href="/mortgage"><span>IT-ипотека</span><strong>от 6%</strong><small>Для специалистов IT-компаний</small><IconArrowUpRight aria-hidden="true" /></a>
-          <a className="mortgage-program" href="/mortgage"><span>Базовые программы</span><strong>Подберём</strong><small>Условия ведущих банков</small><IconArrowUpRight aria-hidden="true" /></a>
+          <a className="mortgage-program" href="/mortgage">
+            <span>Сельская ипотека</span><strong>от 3%</strong><small>Для домов в сельской местности</small>
+            <span className="series-bento__go" aria-hidden="true">
+              <IconArrowUpRight size={18} stroke={2} />
+            </span>
+          </a>
+          <a className="mortgage-program" href="/mortgage">
+            <span>Базовые программы</span><strong>Подберём</strong><small>Условия ведущих банков</small>
+            <span className="series-bento__go" aria-hidden="true">
+              <IconArrowUpRight size={18} stroke={2} />
+            </span>
+          </a>
         </div>
         <div className="mortgage-showcase__partners" aria-label="Банки-партнёры">
           <div className="mortgage-showcase__partner-list">
