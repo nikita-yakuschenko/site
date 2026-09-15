@@ -11,6 +11,7 @@ import { copy, nbspText, projectsInSeries } from "../lib/copy";
 import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
 import type { CatalogProject } from "../lib/catalog/types";
+import { BankStrip } from "./bank-strip";
 import { FactoryVideo } from "./factory-video";
 import {
   HeroCarousel,
@@ -234,12 +235,6 @@ function MortgageShowcase() {
     { name: "Примсоцбанк", src: "/logos/banks/primsoc.svg", inkSrc: "/logos/banks/primsoc-ink.svg" },
     { name: "Центр-инвест", src: "/logos/banks/centr-invest.svg" },
   ];
-  const partnerLogos = () => partners.map(({ name, src, inkSrc }) => inkSrc ? (
-    <span className="mortgage-partner-pair" key={name}>
-      <img className="mortgage-partner mortgage-partner--primsoc" src={inkSrc} alt={name} />
-      <img className="mortgage-partner mortgage-partner--primsoc-brand" src={src} alt="" aria-hidden="true" />
-    </span>
-  ) : <img className="mortgage-partner" key={name} src={src} alt={name} />);
   return (
     <section className="section mortgage-showcase" aria-labelledby="mortgage-showcase-title">
       <div className="section__inner mortgage-showcase__grid">
@@ -289,17 +284,7 @@ function MortgageShowcase() {
             </span>
           </a>
         </div>
-        <div className="mortgage-showcase__partners" aria-label="Банки-партнёры">
-          <div className="mortgage-showcase__partner-list">
-            {/* Набор идёт дважды: на узком экране полоса едет влево ровно на
-                его ширину, и копия встаёт на место первого — шва не видно.
-                Вторую копию читалки пропускают. */}
-            <div className="mortgage-partner-track">
-              <div className="mortgage-partner-row">{partnerLogos()}</div>
-              <div className="mortgage-partner-row" aria-hidden="true">{partnerLogos()}</div>
-            </div>
-          </div>
-        </div>
+        <BankStrip partners={partners} />
       </div>
     </section>
   );
