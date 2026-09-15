@@ -2066,13 +2066,15 @@ a {
   );
 }
 
+/* Текст и кнопка у верхнего края, а не по центру высоты: кадр семьи выше
+   колонки текста, и по центру над набором оставалась пустота. */
 .mortgage-family__body {
   position: relative;
   z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  justify-content: center;
+  justify-content: flex-start;
   min-width: 0;
   padding: var(--gap-split);
 }
