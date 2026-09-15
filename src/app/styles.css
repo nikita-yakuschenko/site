@@ -2032,11 +2032,12 @@ a {
 /* Чересполосица блоков главной: белый / серый / белый / серый.
    Серии и контакты — серые; проекты и производство остаются белыми. */
 .mortgage-showcase { background: var(--page); }
+/* Зазор один по обеим осям: по вертикали стоял шаг между смысловыми
+   группами, и рядом с 16px между карточками он выглядел сбоем ритма. */
 .mortgage-showcase__grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  column-gap: var(--gap-tile);
-  row-gap: var(--gap-stack);
+  gap: var(--gap-tile);
   align-items: start;
 }
 /* Тёмный баннер во всю ширину содержимого: слева рассказ блока и действие,
@@ -2092,6 +2093,15 @@ a {
 
 .mortgage-family__body h2 { color: #fff; }
 
+/* Ставка — то, за чем читают заголовок: крупнее остального набора и в
+   цвете кнопки. Наклон em здесь не нужен. */
+.mortgage-family__body h2 em {
+  font-size: 1.32em;
+  font-style: normal;
+  line-height: 1;
+  color: var(--brand-yellow);
+}
+
 /* Строка набора короче колонки: у самого длинного абзаца она упиралась в
    кадр и текст шёл прямо по семье. */
 .mortgage-family__body > p:not(.eyebrow) {
@@ -2124,9 +2134,49 @@ a {
 .mortgage-program { position:relative; display:flex; min-height:144px; flex-direction:column; align-items:flex-start; padding:var(--page-gutter); border:1px solid rgb(var(--avgst-ink-rgb) / .12); border-radius:var(--surface-radius); background:#fff; color:var(--avgst-ink); text-decoration:none; transition:background-color .2s var(--ease-out), border-color .2s var(--ease-out); }
 .mortgage-program:hover { border-color:rgb(var(--avgst-ink-rgb) / .22); background:#f8fafc; }
 .mortgage-program > span:not(.series-bento__go) { position:relative; padding-right:44px; font-size:12px; font-weight:700; letter-spacing:.08em; line-height:1.25; text-transform:uppercase; }
-.mortgage-program strong { position:relative; z-index:1; margin-top:auto; font-size:32px; line-height:.95; letter-spacing:-.04em; }
+/* Отступ до ставки постоянный, а не остаток высоты: при подписи в две
+   строки остатка не оставалось и ставка липла к названию программы. */
+.mortgage-program strong { position:relative; z-index:1; margin-top:16px; font-size:32px; line-height:.95; letter-spacing:-.04em; }
 .mortgage-program small { position:relative; z-index:1; margin-top:8px; font-size:13px; line-height:1.35; opacity:.65; }
-.mortgage-showcase__partners { grid-column:1 / -1; min-width:0; padding-top:var(--gap-stack); border-top:1px solid #dce1e8; }
+
+/* Кадр уходит за нижнюю кромку — обрезает сама карточка. */
+.mortgage-program--it,
+.mortgage-program--agro,
+.mortgage-program--bank { overflow: hidden; }
+
+/* Место кадра — вся правая половина плашки, от её вертикальной оси до
+   кромки, с выходом на 24px за низ. Кадры обрезаны по сюжету, поэтому
+   contain растягивает каждый до упора в это поле: у кого объект шире, тот
+   упирается в кромки, у кого уже — в высоту. Подгонять размеры по
+   отдельности не нужно. Сверху поле начинается на одной линии со знаком
+   перехода — без этого отступа высокие кадры липли к кромке. */
+.mortgage-program__art {
+  position: absolute;
+  top: 12px;
+  right: 0;
+  width: 50%;
+  height: calc(100% + 12px);
+  object-fit: contain;
+  object-position: center top;
+  pointer-events: none;
+  transition: transform 0.25s var(--ease-out);
+}
+
+/* Кадр чуть приподнимается под курсором — тот же отклик, что у знака
+   перехода в углу, только тише. */
+.mortgage-program:hover .mortgage-program__art {
+  transform: translateY(-5px);
+}
+
+/* Подпись не заходит под кадр. Перенос идёт по словам: в узкой колонке
+   браузер ломал «IT-компаний» по дефису. */
+.mortgage-program--it > small,
+.mortgage-program--agro > small,
+.mortgage-program--bank > small { max-width: 46%; }
+.mortgage-program--it > small > span { white-space: nowrap; }
+/* Ряд знаков стоит в середине между разделителем и низом раздела: сверху
+   отмеряем тот же отступ, которым раздел заканчивается снизу. */
+.mortgage-showcase__partners { grid-column:1 / -1; min-width:0; padding-top:var(--gap-section); border-top:1px solid #dce1e8; }
 .mortgage-showcase__partner-list { display:flex; width:100%; min-width:0; height:48px; align-items:center; justify-content:space-between; gap:24px; overflow:hidden; }
 .mortgage-partner { display:block; flex:1 1 0; min-width:0; max-width:168px; height:40px; object-fit:contain; object-position:center; filter:brightness(0) saturate(100%); opacity:.82; transition:filter .2s var(--ease-out), opacity .2s var(--ease-out); }
 .mortgage-partner:hover { filter:none; opacity:1; }
@@ -2140,10 +2190,18 @@ a {
 .mortgage-partner-pair:hover .mortgage-partner--primsoc { opacity:0; }
 .mortgage-partner-pair:hover .mortgage-partner--primsoc-brand { opacity:1; }
 @media (max-width: 960px) {
-  .mortgage-showcase__partner-list { overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
-  .mortgage-showcase__partner-list::-webkit-scrollbar { display:none; }
+  /* Знаки складываются в сетку, а не уезжают в скролл: в одну строку их
+     шесть, и на узком экране было видно два из шести. */
+  .mortgage-showcase__partner-list {
+    display:grid;
+    grid-template-columns:repeat(3, minmax(0, 1fr));
+    height:auto;
+    gap:var(--gap-stack) var(--gap-tile);
+    place-items:center;
+    overflow:visible;
+  }
   .mortgage-showcase__partner-list > .mortgage-partner,
-  .mortgage-partner-pair { flex:0 0 168px; }
+  .mortgage-partner-pair { width:100%; max-width:168px; }
   .mortgage-showcase__grid { grid-template-columns:1fr; }
   /* Три колонки на планшете узкие: в них не влезала строка «Подберём». */
   .mortgage-showcase__programs { grid-column:1; grid-template-columns:repeat(2, minmax(0, 1fr)); }
@@ -2168,7 +2226,11 @@ a {
   .mortgage-family__body { padding:var(--gap-stack) var(--page-gutter) var(--page-gutter); }
   .mortgage-family__body > p:not(.eyebrow) { max-width:none; }
 }
-@media (max-width: 540px) { .mortgage-showcase__programs { grid-template-columns:1fr; } }
+@media (max-width: 540px) {
+  .mortgage-showcase__programs { grid-template-columns:1fr; }
+  /* В три колонки знаки мельчали до 18px краски — на телефоне их два в ряд. */
+  .mortgage-showcase__partner-list { grid-template-columns:repeat(2, minmax(0, 1fr)); }
+}
 
 .section--muted {
   background: var(--page);
@@ -2520,13 +2582,15 @@ a {
 
 @media (prefers-reduced-motion: reduce) {
   .series-bento__tile > img,
-  .series-bento__go {
+  .series-bento__go,
+  .mortgage-program__art {
     transition: none;
   }
 
   .series-bento__tile:hover > img,
   .series-bento__tile:hover .series-bento__go,
-  .mortgage-program:hover .series-bento__go {
+  .mortgage-program:hover .series-bento__go,
+  .mortgage-program:hover .mortgage-program__art {
     transform: none;
   }
 }

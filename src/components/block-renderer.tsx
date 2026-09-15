@@ -246,8 +246,13 @@ function MortgageShowcase() {
           </div>
           <div className="mortgage-family__body">
             <p className="eyebrow">Семейная ипотека</p>
-            <h2 id="mortgage-showcase-title">Дом в ипотеку от 6%</h2>
-            <p>Семейная ипотека — государственная программа, по которой можно построить частный дом. Подберём банк и <strong>оформим кредит на выгодных условиях</strong>: рассчитаем платёж, поможем собрать документы и проведём сделку на всех этапах — от заявки до получения денег на строительство.</p>
+            <h2 id="mortgage-showcase-title">{nbspText("Дом в ипотеку от ")}<em>6%</em></h2>
+            <p>
+              {/* Тире приклеено к предыдущему слову: иначе оно уходит в начало строки. */}
+              {nbspText("Семейная ипотека\u00a0- государственная программа для семей с детьми, которая позволяет построить дом ")}
+              <strong>{nbspText("по льготной ставке")}</strong>
+              {nbspText(". Подберём банк, рассчитаем платёж, поможем собрать документы и получить одобрение.")}
+            </p>
             <a className="btn btn-yellow" href="/mortgage">
               Рассчитать ипотеку
               <IconArrowUpRight size={18} stroke={2} />
@@ -256,20 +261,23 @@ function MortgageShowcase() {
         </div>
         {/* Семейной в ряду нет: ей посвящён баннер выше. */}
         <div className="mortgage-showcase__programs">
-          <a className="mortgage-program" href="/mortgage">
-            <span>IT-ипотека</span><strong>от 6%</strong><small>Для специалистов IT-компаний</small>
+          <a className="mortgage-program mortgage-program--it" href="/mortgage">
+            <span>IT-ипотека</span><strong>от 6%</strong><small>Для специалистов <span>IT-компаний</span></small>
+            <Image className="mortgage-program__art" src="/persons/it.png" alt="" width={904} height={975} sizes="160px" />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>
           </a>
-          <a className="mortgage-program" href="/mortgage">
+          <a className="mortgage-program mortgage-program--agro" href="/mortgage">
             <span>Сельская ипотека</span><strong>от 3%</strong><small>Для домов в сельской местности</small>
+            <Image className="mortgage-program__art" src="/persons/agro.png" alt="" width={464} height={917} sizes="90px" />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>
           </a>
-          <a className="mortgage-program" href="/mortgage">
-            <span>Базовые программы</span><strong>Подберём</strong><small>Условия ведущих банков</small>
+          <a className="mortgage-program mortgage-program--bank" href="/mortgage">
+            <span>Базовые программы</span><strong>от 16%</strong><small>Подберём лучшие условия от ведущих банков</small>
+            <Image className="mortgage-program__art" src="/persons/bank.png" alt="" width={1052} height={958} sizes="180px" />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>
