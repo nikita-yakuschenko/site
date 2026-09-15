@@ -330,22 +330,19 @@ function Production({ block }: { block: LayoutBlock }) {
   return (
     <section className="section section--factory">
       <div className="section__inner production">
-        {/* Заголовок вынесен из текстовой колонки отдельным блоком: на узком
-            экране раздел должен начинаться с него, а не с кадра, и без
-            отдельного блока его оттуда не достать. На широком он встаёт над
-            текстом в правой колонке, как и был. */}
-        <div className="production__head">
-          <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
-          <h2>{nbspText(String(block.heading))}</h2>
-          {lead ? <p>{nbspText(String(lead))}</p> : null}
-        </div>
-        <div className="production__media">
-          <FactoryVideo src={src} srcMobile={srcMobile} alt={copy.factoryAlt} />
-        </div>
-        <div className="production__copy">
-          {rest.map((paragraph, index) => (
-            <p key={index}>{nbspText(String(paragraph))}</p>
-          ))}
+        {/* На узком экране обёртка прозрачна: заголовок, кадр, текст.
+            На широком она собирает заголовок и текст в одну колонку, чтобы
+            кадр мог остаться 4×3 и не рвать абзацы по разным строкам сетки. */}
+        <div className="production__text">
+          <div className="production__head">
+            <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
+            <h2>{nbspText(String(block.heading))}</h2>
+            {lead ? <p>{nbspText(String(lead))}</p> : null}
+          </div>
+          <div className="production__copy">
+            {rest.map((paragraph, index) => (
+              <p key={index}>{nbspText(String(paragraph))}</p>
+            ))}
           {/* Список без порядка: участки цеха равноправны, часть из них
               работает параллельно. Нумерация выдумывала бы цепочку. */}
           {/* Две кнопки разного веса. Жёлтая — главный выход блока, второй
@@ -370,6 +367,10 @@ function Production({ block }: { block: LayoutBlock }) {
               ) : null}
             </div>
           ) : null}
+          </div>
+        </div>
+        <div className="production__media">
+          <FactoryVideo src={src} srcMobile={srcMobile} alt={copy.factoryAlt} />
         </div>
 
         {/* Подзаголовок связывает ряд с рассказом выше: без него четыре
@@ -380,8 +381,17 @@ function Production({ block }: { block: LayoutBlock }) {
               {nbspText(String(block.stepsTitle || copy.productionStepsTitle))}
             </h3>
             <ul className="production__shops">
-              {steps.map((step) => (
+              {steps.map((step, index) => (
                 <li key={step.title}>
+                  {/* Водяной знак участка, не шаг процедуры. */}
+                  <span
+                    className="production__shops-digit"
+                    style={{
+                      WebkitMaskImage: `url("/img/digits/${index + 1}.png")`,
+                      maskImage: `url("/img/digits/${index + 1}.png")`,
+                    }}
+                    aria-hidden="true"
+                  />
                   <h4>{nbspText(String(step.title))}</h4>
                   {step.text ? <p>{nbspText(step.text)}</p> : null}
                 </li>
