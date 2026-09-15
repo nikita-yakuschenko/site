@@ -2195,28 +2195,34 @@ a {
 .mortgage-partner-pair:hover .mortgage-partner--primsoc { opacity:0; }
 .mortgage-partner-pair:hover .mortgage-partner--primsoc-brand { opacity:1; }
 @media (max-width: 960px) {
-  /* Шесть знаков в строку здесь не встают, поэтому строка едет сама.
+  /* Шесть знаков в строку здесь не встают, поэтому лента едет сама. Под ней
+     обычная горизонтальная прокрутка: так её можно покрутить пальцем, а
+     жест и инерцию считает браузер. Полосу прокрутки убираем — лента едет
+     сама, и мерить ей нечего.
+
      Знаки растворяются у кромок, а не обрубаются: срез посреди логотипа
      читается как обрезанная вёрстка, растворение — как продолжение ряда. */
   .mortgage-showcase__partner-list {
     height:40px;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scrollbar-width:none;
     -webkit-mask-image:linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
     mask-image:linear-gradient(90deg, transparent, #000 24px, #000 calc(100% - 24px), transparent);
   }
+  .mortgage-showcase__partner-list::-webkit-scrollbar { display:none; }
   /* Трек и наборы не сжимаются: как элементы флекса они иначе укладываются
-     в ширину маски, и сдвиг перестаёт попадать на стык. Отступ между
-     наборами взят полем справа, а не зазором, — тогда наборы одной ширины
-     и половина трека равна ровно одному набору. */
-  .mortgage-partner-track { flex:0 0 auto; width:max-content; animation:partners-marquee 30s linear infinite; }
+     в ширину маски и прокручивать становится нечего. Отступ между наборами
+     взят полем справа, а не зазором, — тогда наборы одной ширины и лента
+     повторяется ровно через набор. */
+  .mortgage-partner-track { flex:0 0 auto; width:max-content; }
   .mortgage-partner-row { flex:0 0 auto; width:max-content; gap:32px; padding-right:32px; }
   .mortgage-partner-row[aria-hidden="true"] { display:flex; }
-  /* Ширина знака как на широком экране: строка едет и в ширину экрана не
+  /* Ширина знака как на широком экране: лента едет и в ширину экрана не
      упирается, поэтому ужимать знаки незачем — у широких, вроде Сбера,
      от этого падала высота краски. */
   .mortgage-partner-row > .mortgage-partner,
   .mortgage-partner-pair { flex:0 0 auto; width:168px; }
-  /* Под курсором строка останавливается — знак можно рассмотреть. */
-  .mortgage-showcase__partner-list:hover .mortgage-partner-track { animation-play-state:paused; }
   .mortgage-showcase__grid { grid-template-columns:1fr; }
   /* Три колонки на планшете узкие: в них не влезала строка «Подберём». */
   .mortgage-showcase__programs { grid-column:1; grid-template-columns:repeat(2, minmax(0, 1fr)); }
@@ -2244,16 +2250,12 @@ a {
 @media (max-width: 540px) {
   .mortgage-showcase__programs { grid-template-columns:1fr; }
 }
-@keyframes partners-marquee { to { transform:translateX(-50%); } }
-/* Кому движение мешает, тот листает строку сам: остановленная строка
-   держала бы половину знаков за кромкой. */
+/* Кому движение мешает, тот листает ленту сам: сама она не едет, и запас
+   по краям ей не нужен. Поле справа отмеряло стык с копией — без копий это
+   пустой хвост. */
 @media (prefers-reduced-motion: reduce) {
-  .mortgage-partner-track { animation:none; }
   .mortgage-partner-row[aria-hidden="true"] { display:none; }
-  /* Поле справа отмеряло стык с копией — без копии это пустой хвост. */
   .mortgage-partner-row { padding-right:0; }
-  .mortgage-showcase__partner-list { overflow-x:auto; scrollbar-width:none; }
-  .mortgage-showcase__partner-list::-webkit-scrollbar { display:none; }
 }
 
 .section--muted {
