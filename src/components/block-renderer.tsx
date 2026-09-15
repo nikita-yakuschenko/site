@@ -5,6 +5,7 @@ import {
   IconStar,
   IconUsers,
 } from "@tabler/icons-react";
+import Image from "next/image";
 import { isRegisteredBlock } from "../blocks/registry";
 import { copy, nbspText, projectsInSeries } from "../lib/copy";
 import { mediaUrl } from "../lib/media";
@@ -224,6 +225,47 @@ function TextSection({ block }: { block: LayoutBlock }) {
   );
 }
 
+function MortgageShowcase() {
+  const partners = [
+    { name: "СберБанк", src: "/logos/banks/sber.svg" },
+    { name: "ВТБ", src: "/logos/banks/vtb.svg" },
+    { name: "ДОМ.РФ", src: "/logos/banks/domrf.svg" },
+    { name: "Россельхозбанк", src: "/logos/banks/rshb.svg" },
+    { name: "Примсоцбанк", src: "/logos/banks/primsoc.svg", inkSrc: "/logos/banks/primsoc-ink.svg" },
+    { name: "Центр-инвест", src: "/logos/banks/centr-invest.svg" },
+  ];
+  return (
+    <section className="section mortgage-showcase" aria-labelledby="mortgage-showcase-title">
+      <div className="section__inner mortgage-showcase__grid">
+        <div className="mortgage-showcase__intro">
+          <p className="eyebrow">Ипотека</p>
+          <h2 id="mortgage-showcase-title">Работаем со всеми банками</h2>
+          <p>Поможем подобрать оптимальную ипотечную программу для строительства дома. Сотрудничаем с ведущими банками и <strong>предлагаем выгодные условия кредитования</strong>, сниженные процентные ставки и сопровождение на всех этапах оформления ипотеки.</p>
+          <a className="btn btn-yellow" href="/mortgage"><IconArrowUpRight size={18} stroke={2} />Рассчитать ипотеку</a>
+        </div>
+        <div className="mortgage-showcase__programs">
+          <a className="mortgage-program mortgage-program--featured" href="/mortgage">
+            <Image className="mortgage-program__image" src="/persons/family.png" alt="" fill sizes="(min-width: 961px) 50vw, 100vw" />
+            <span>Семейная ипотека</span><strong>от 6%</strong><small>Подходит семьям с детьми</small><IconArrowUpRight aria-hidden="true" />
+          </a>
+          <a className="mortgage-program" href="/mortgage"><span>IT-ипотека</span><strong>от 6%</strong><small>Для специалистов IT-компаний</small><IconArrowUpRight aria-hidden="true" /></a>
+          <a className="mortgage-program" href="/mortgage"><span>Базовые программы</span><strong>Подберём</strong><small>Условия ведущих банков</small><IconArrowUpRight aria-hidden="true" /></a>
+        </div>
+        <div className="mortgage-showcase__partners" aria-label="Банки-партнёры">
+          <div className="mortgage-showcase__partner-list">
+            {partners.map(({ name, src, inkSrc }) => inkSrc ? (
+              <span className="mortgage-partner-pair" key={name}>
+                <img className="mortgage-partner mortgage-partner--primsoc" src={inkSrc} alt={name} />
+                <img className="mortgage-partner mortgage-partner--primsoc-brand" src={src} alt="" aria-hidden="true" />
+              </span>
+            ) : <img className="mortgage-partner" key={name} src={src} alt={name} />)}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function Cta({ block }: { block: LayoutBlock }) {
   return (
     <section className="section">
@@ -338,7 +380,7 @@ function Contacts({
     ? contacts?.address
     : (block.address as string | undefined);
   return (
-    <section className="section section--muted" id="contacts">
+    <section className="section" id="contacts">
       <div className="section__inner contacts">
         <div>
           <p className="eyebrow">{copy.contactsEyebrow}</p>
@@ -457,6 +499,7 @@ export function BlockRenderer({
         if (block.blockType === "seriesBento") {
           return <SeriesBento key={index} block={block} />;
         }
+        if (block.blockType === "mortgageShowcase") return <MortgageShowcase key={index} />;
         if (block.blockType === "textSection")
           return <TextSection key={index} block={block} />;
         if (block.blockType === "cta") return <Cta key={index} block={block} />;

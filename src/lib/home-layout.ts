@@ -92,6 +92,9 @@ export const HOME_LAYOUT: LayoutBlock[] = [
     theme: "light",
   },
   {
+    blockType: "mortgageShowcase",
+  },
+  {
     blockType: "contactsSection",
     heading: copy.contacts,
     body: copy.contactsBody,

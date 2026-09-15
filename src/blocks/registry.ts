@@ -3,6 +3,7 @@ export const REGISTERED_BLOCKS = [
   'advantagesBar',
   'popularProjects',
   'seriesBento',
+  'mortgageShowcase',
   'textSection',
   'cta',
   'productionSection',
