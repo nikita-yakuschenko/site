@@ -270,14 +270,24 @@ function MortgageShowcase() {
             </span>
           </a>
           <a className="mortgage-program mortgage-program--agro" href="/mortgage">
-            <span>Сельская ипотека</span><strong>от 3%</strong><small>Для домов в сельской местности</small>
+            <span>Сельская ипотека</span><strong>от 3%</strong>
+            <small>
+              {nbspText("Для работников АПК")}
+              <br />
+              {nbspText("и соц. сферы на селе")}
+            </small>
             <Image className="mortgage-program__art" src="/persons/agro.png" alt="" width={464} height={917} sizes="90px" />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>
           </a>
           <a className="mortgage-program mortgage-program--bank" href="/mortgage">
-            <span>Базовые программы</span><strong>от 16%</strong><small>Подберём лучшие условия от ведущих банков</small>
+            <span>Базовые программы</span><strong>от 16%</strong>
+            <small>
+              {nbspText("Лучшие условия")}
+              <br />
+              {nbspText("от ведущих банков")}
+            </small>
             <Image className="mortgage-program__art" src="/persons/bank.png" alt="" width={1052} height={958} sizes="180px" />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />

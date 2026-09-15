@@ -2125,7 +2125,9 @@ a {
 /* Отступ до ставки постоянный, а не остаток высоты: при подписи в две
    строки остатка не оставалось и ставка липла к названию программы. */
 .mortgage-program strong { position:relative; z-index:1; margin-top:16px; font-size:32px; line-height:.95; letter-spacing:-.04em; }
-.mortgage-program small { position:relative; z-index:1; margin-top:8px; font-size:13px; line-height:1.35; opacity:.65; }
+/* Подпись от ставки отделена тем же шагом, что ставка от названия:
+   восемь пикселей оставляли её прилипшей к крупному кеглю. */
+.mortgage-program small { position:relative; z-index:1; margin-top:16px; font-size:13px; line-height:1.35; opacity:.65; }
 
 /* Кадр уходит за нижнюю кромку — обрезает сама карточка. */
 .mortgage-program--it,
