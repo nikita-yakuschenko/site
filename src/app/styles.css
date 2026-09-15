@@ -27,6 +27,16 @@
   --font-sans: var(--font-geist-sans), Inter, Arial, sans-serif;
   --page-width: 1152px;
   --page-gutter: 24px;
+  /* Ритм вёрстки. Шаг 8px, и только он — совпадает с рядом оверлея.
+     tile — между одинаковыми плитками: карточки проектов, серии, программы.
+     split — между двумя крупными колонками секции: текст | медиа.
+     stack — между заголовком блока и его содержимым.
+     section — вертикальный воздух самой секции. */
+  --row: 8px;
+  --gap-tile: 16px;
+  --gap-split: 48px;
+  --gap-stack: 32px;
+  --gap-section: 56px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --header-solid-shadow: 0 2px 6px rgb(var(--avgst-ink-rgb) / 0.1);
 
@@ -38,12 +48,12 @@
           внутри панелей;
      lg — главное действие экрана: баннер главной, карточка проекта.
      Отступы по бокам идут вместе с высотой, отдельно их не трогаем. */
-  --btn-h-sm: 36px;
-  --btn-pad-sm: 14px;
+  --btn-h-sm: 32px;
+  --btn-pad-sm: 16px;
   --btn-h-md: 40px;
   --btn-pad-md: 16px;
-  --btn-h-lg: 44px;
-  --btn-pad-lg: 18px;
+  --btn-h-lg: 48px;
+  --btn-pad-lg: 16px;
 
   /* Две поверхности, и только две. Раньше каждая плашка набирала свои
      значения по месту: на одной странице встречались чёрный 25% и ink 42%,
@@ -137,7 +147,7 @@ a {
   position: relative;
   max-width: var(--page-width);
   margin: 0 auto;
-  padding: 12px 0 0;
+  padding: 16px 0 0;
 }
 
 /* Уведомление о стадии разработки.
@@ -153,14 +163,14 @@ a {
 .site-notice {
   display: flex;
   align-items: flex-start;
-  gap: 12px;
+  gap: 16px;
   position: absolute;
-  top: calc(100% + 10px);
+  top: calc(100% + 8px);
   right: 0;
   left: 0;
   z-index: 1;
   pointer-events: auto;
-  padding: 10px 18px;
+  padding: 8px 16px;
   border-radius: var(--surface-radius);
   background: var(--brand-yellow);
   color: var(--avgst-ink);
@@ -211,7 +221,7 @@ a {
 @media (max-width: 899px) {
   .site-notice {
     top: calc(100% + 8px);
-    padding: 9px 14px;
+    padding: 8px 16px;
     font-size: 12px;
   }
 }
@@ -484,7 +494,7 @@ a {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-top: 12px;
+  margin-top: 16px;
   color: white;
 }
 
@@ -502,7 +512,7 @@ a {
   /* Высота задана явно, а не содержимым: в крошках строка 14px, в кнопках
      иконки 22px, и на одних полях плашки вышли бы 31px против 40px. */
   box-sizing: border-box;
-  min-height: 36px;
+  min-height: 40px;
   padding: 0 14px;
   border-radius: 999px;
   border: var(--glass-border);
@@ -545,7 +555,7 @@ a {
 
 .site-header__logo {
   display: block;
-  height: 36px;
+  height: 40px;
   width: auto;
 }
 
@@ -608,8 +618,8 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   /* Иконка 22px внутри кнопки 36px оставляет 7px поля с каждой стороны, и
      визуально бургер отступал от края дальше логотипа. Кнопка выходит за
      поле плашки на эти 7px — площадь нажатия сохраняется, а иконка встаёт
@@ -906,7 +916,7 @@ a {
   grid-template-columns: minmax(0, 1fr);
   grid-template-rows: 1fr auto auto;
   align-items: end;
-  column-gap: 48px;
+  column-gap: var(--gap-split);
   max-width: var(--page-width);
   min-height: 100svh;
   margin: 0 auto;
@@ -1194,9 +1204,9 @@ a {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 6px;
+  gap: 8px;
   min-width: 0;
-  padding: 14px 18px 37px;
+  padding: 16px 16px 32px;
 }
 
 /* Срок кампании вынесен над заголовком: это то, из-за чего на неё вообще
@@ -1231,13 +1241,16 @@ a {
    сообщения рядом. На наведении карточка целиком подсвечивает кнопку —
    так видно, что нажимается вся карточка. */
 .hero__promo-cta {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
-  margin-top: 6px;
+  gap: 8px;
+  margin-top: 8px;
   height: var(--btn-h-sm);
   padding: 0 var(--btn-pad-sm);
+  width: max-content;
+  max-width: 100%;
+  box-sizing: border-box;
   border-radius: var(--radius);
   border: 1px solid var(--brand-yellow);
   background: transparent;
@@ -1276,8 +1289,8 @@ a {
    возвращают ленту на место: по горизонтали обрезка остаётся ровно по краю
    содержимого страницы. */
 .is-rail .hero__promos-view {
-  margin: -14px 0 -30px;
-  padding: 14px 0 30px;
+  margin: -16px 0 -32px;
+  padding: 16px 0 32px;
   border-radius: 0;
 }
 
@@ -1288,13 +1301,13 @@ a {
      один раз, и карточка с самым длинным описанием не успевала
      вырасти: текст вылезал за нижнее поле. Запас к самому длинному
      описанию — 11px; что длиннее, обрезается по третьей строке. */
-  height: 196px;
+  height: 192px;
   position: relative;
   flex: 0 0 100%;
   flex-direction: row;
   align-items: stretch;
-  gap: 14px;
-  padding: 7px;
+  gap: 16px;
+  padding: 8px;
   /* Светлая грань по верхнему краю: без неё стекло читается плоской
      заливкой, с ней у карточки появляется толщина. */
   box-shadow:
@@ -1322,27 +1335,18 @@ a {
    содержимого. Два слота появляются только там, где половина кадра ещё
    достаточно широка, чтобы карточка читалась. */
 @media (min-width: 1100px) {
-  /* Лента занимает три четверти ширины сцены и стоит слева, под сообщением.
-     Раньше здесь помещались два слота во всю ширину: каждому доставалась
-     половина, текст в узкой карточке шёл в три строки, и высоту приходилось
-     держать большой. Один слот на три четверти вмещает тот же текст в
-     меньшую высоту и не давит на кадр. */
+  /* Две из трёх колонок сетки + плитка 16. Внутри слота не 1fr 1fr:
+     у фото intrinsic-ширина, и оно наезжало на текст. */
   .hero__promos {
-    max-width: 66.6667%;
+    width: calc((100% - 2 * var(--gap-tile)) / 3 * 2 + var(--gap-tile));
+    max-width: none;
   }
 
-  /* Слот один, поэтому занимает кадр ленты целиком, а зазору между
-     соседями места нет — он обнулён и в компоненте (NO_GAP). */
   .is-rail .hero__promo {
     flex: 0 0 100%;
-    /* Высота снова задана числом, и картинка растягивается по ней во всю
-       внутреннюю высоту карточки. Пока высоту задавал текст, картинка
-       центрировалась с люфтом, и поля вокруг неё выходили разными:
-       слева 8px, сверху и снизу по 13px. */
     height: 184px;
-    /* Зазор до текста больше прежних 14px: узкая щель склеивала картинку
-       с колонкой текста. */
-    gap: 20px;
+    gap: var(--gap-tile);
+    padding: 8px;
   }
 }
 
@@ -1388,21 +1392,14 @@ a {
 }
 
 @media (min-width: 1100px) {
-  /* Картинке хватает места на 16:9 — в тесной карточке она была 4:3.
-     Правило стоит после базового намеренно: у них одинаковый вес, и
-     выигрывает то, что ниже в файле.
-
-     Ширина задана числом, высота считается из неё по пропорции — обратный
-     порядок по сравнению с узкой карточкой. Иначе высота карточки и размер
-     картинки зависели бы друг от друга по кругу. */
+  /* Ширину считает 16:9 от высоты карточки, текст забирает остаток. */
   .is-rail .hero__promo-media {
     aspect-ratio: 16 / 9;
-    /* Во всю внутреннюю высоту карточки: поля сверху, снизу и слева
-       задаются одним padding карточки и потому равны. Ширину даёт
-       пропорция — порядок тот же, что был у узкой карточки с 4:3. */
-    align-self: stretch;
+    min-width: 0;
     width: auto;
     height: auto;
+    align-self: stretch;
+    overflow: hidden;
   }
 
   /* Строки распределяются по длине, а не набиваются под завязку с коротким
@@ -1442,15 +1439,14 @@ a {
 }
 
 .is-rail .hero__promo-body {
-  /* Содержимое прижато к верху: надзаголовок и заголовок должны стоять
-     на одной линии во всех слотах ряда. При центрировании они плавали
-     по высоте вслед за длиной описания, и ряд разъезжался. */
+  min-width: 0;
+  flex: 1 1 auto;
   justify-content: flex-start;
   /* Просветы разные, а не один общий: у строк разный вес и разный размер,
      и при равных отступах надзаголовок слипался с заголовком, а заголовок
      с описанием. Задаются они отступами у самих строк — ниже. */
   gap: 0;
-  padding: 13px 14px 13px 0;
+  padding: 16px 16px 16px 0;
 }
 
 /* Надзаголовок набран прописными вразрядку, его верхний и нижний край
@@ -1464,11 +1460,11 @@ a {
 }
 
 .is-rail .hero__promo-eyebrow {
-  margin-bottom: 7px;
+  margin-bottom: 8px;
 }
 
 .is-rail .hero__promo-body strong {
-  margin-bottom: 9px;
+  margin-bottom: 8px;
 }
 
 /* Заголовок в одну строку: перенос на две ломал ряд и отнимал место у
@@ -1510,7 +1506,7 @@ a {
    Наращивать подкладку у самой ленты нельзя — низ сцены закреплён, лента
    вырастает вверх и выдавливает карточку, оставляя под ней пустоту. */
 .is-rail .hero__promo-nav {
-  inset: calc(100% + 14px) 0 auto auto;
+  inset: calc(100% + 16px) 0 auto auto;
 }
 
 .is-rail .hero__promo-nav-spacer {
@@ -1522,7 +1518,7 @@ a {
 }
 
 .is-rail .hero__promo-progress {
-  top: calc(100% + 18px);
+  top: calc(100% + 16px);
   right: auto;
   bottom: auto;
   left: 0;
@@ -1542,13 +1538,13 @@ a {
      кнопкой сообщения. Заливку кнопка получает на наведении карточки. */
   margin-top: auto;
   align-self: flex-start;
-  height: 34px;
+  height: 32px;
   padding: 0 14px;
   font-size: 13px;
 }
 
 .is-rail .hero__promo-body > span:not([class]) {
-  margin-bottom: 14px;
+  margin-bottom: 16px;
 }
 
 /* Пока слот в кадре один, плашке достаётся вся ширина — и медиа с текстом
@@ -1558,9 +1554,9 @@ a {
 @media (max-width: 1099px) {
   .is-rail .hero__promo {
     /* Шрифты в этом режиме крупнее — карточке нужна большая высота. */
-    height: 212px;
-    gap: 18px;
-    padding: 9px;
+    height: 208px;
+    gap: 16px;
+    padding: 8px;
   }
 
   /* Ширину по-прежнему считает пропорция от высоты карточки — задавать её
@@ -1570,7 +1566,9 @@ a {
   }
 
   .is-rail .hero__promo-body {
-    gap: 5px;
+    /* Просветы уже заданы margin у строк. Второй gap на планшете
+       выталкивал кнопку из колонки — контур ломался и наезжал на фото. */
+    gap: 0;
     padding: 16px 18px 16px 0;
   }
 
@@ -1710,21 +1708,21 @@ a {
  * 812. Шапка на телефоне ниже, столько воздуха сверху ей не нужно. */
 @media (max-width: 599px) {
   .hero__stage {
-    padding: 104px 0 28px;
+    padding: 104px 0 24px;
   }
 
   /* Сообщение опущено на 18px: сверху над ним висит плашка шапки, и без
      этого зазора заголовок начинался сразу под ней. */
   .hero__copy {
-    margin-top: 18px;
+    margin-top: 16px;
   }
 
   .hero__copy {
-    padding-bottom: 20px;
+    padding-bottom: 16px;
   }
 
   .hero__promos {
-    margin-top: 20px;
+    margin-top: 16px;
     /* Тянется пальцем: жест перелистывает слоты, вертикальная прокрутка
        страницы при этом остаётся браузеру. */
     touch-action: pan-y;
@@ -1841,7 +1839,7 @@ a {
 
 .hero__copy p {
   max-width: 36rem;
-  margin: 18px 0 0;
+  margin: 16px 0 0;
   font-size: 1.05rem;
   line-height: 1.55;
   color: rgb(255 255 255 / 0.86);
@@ -1861,7 +1859,7 @@ a {
 .advantages {
   background: var(--avgst-ink);
   color: white;
-  padding: 28px 0;
+  padding: var(--page-gutter) 0;
 }
 
 /* Полоса идёт следом за первым экраном, а не замыкает его.
@@ -1877,7 +1875,7 @@ a {
  * внутри центрируется. */
 @media (min-width: 1100px) {
   :root {
-    --advantages-h: 116px;
+    --advantages-h: 112px;
   }
 
   .advantages {
@@ -1910,27 +1908,27 @@ a {
   }
 
   .hero__copy p {
-    margin-top: 12px;
+    margin-top: 16px;
   }
   /* Ещё немного высоты: просвет до кнопки и сама кнопка чуть меньше.
      Заголовки, картинки и полный текст остаются нетронутыми. */
   .is-rail .hero__promo-body > span:not([class]) {
-    margin-bottom: 10px;
+    margin-bottom: 8px;
   }
 
   .is-rail .hero__promo-cta {
-    height: 30px;
+    height: 32px;
   }
 
   .is-rail .hero__promo {
-    height: 180px;
+    height: 184px;
   }
 }
 
 .advantages__list {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: var(--gap-tile);
   width: min(var(--page-width), calc(100% - var(--page-gutter) * 2));
   margin: 0 auto;
   padding: 0;
@@ -1951,8 +1949,8 @@ a {
 .advantages__list svg {
   color: var(--brand-yellow);
   flex-shrink: 0;
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
 }
 
 .advantages__list p {
@@ -1996,8 +1994,8 @@ a {
   }
 
   .advantages__list li {
-    padding: 0 24px;
-    gap: 12px;
+    padding: 0 var(--page-gutter);
+    gap: var(--gap-tile);
   }
 
   .advantages__list li:first-child {
@@ -2028,53 +2026,149 @@ a {
 
 .section {
   background: white;
-  padding: 56px 0;
+  padding: var(--gap-section) 0;
 }
 
 /* Чересполосица блоков главной: белый / серый / белый / серый.
    Серии и контакты — серые; проекты и производство остаются белыми. */
 .mortgage-showcase { background: var(--page); }
-.mortgage-showcase__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:48px; row-gap:32px; align-items:start; }
-.mortgage-showcase__intro { display:flex; flex-direction:column; align-items:flex-start; }
-.mortgage-showcase__intro h2 { max-width:13ch; }
-.mortgage-showcase__intro > p:not(.eyebrow) { max-width:36rem; margin:16px 0 28px; color:#475569; font-size:16px; line-height:1.6; }
-.mortgage-showcase__intro > p:not(.eyebrow) strong { color:var(--avgst-green); font-weight:700; }
-.mortgage-showcase__intro .btn { gap:8px; }
-.mortgage-showcase__programs { display:grid; min-width:0; grid-template-columns:1fr 1fr; gap:12px; }
-.mortgage-program { position:relative; display:flex; min-height:140px; flex-direction:column; align-items:flex-start; padding:22px; border:1px solid rgb(var(--avgst-ink-rgb) / .12); border-radius:var(--surface-radius); background:#fff; color:var(--avgst-ink); text-decoration:none; transition:background-color .2s var(--ease-out), border-color .2s var(--ease-out); }
+.mortgage-showcase__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--gap-tile);
+  row-gap: var(--gap-stack);
+  align-items: start;
+}
+/* Тёмный баннер во всю ширину содержимого: слева рассказ блока и действие,
+   справа кадр. Раньше текст стоял колонкой рядом с плитками программ и
+   делил с ними один ряд. */
+.mortgage-family {
+  position: relative;
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  min-height: 384px;
+  overflow: hidden;
+  border-radius: var(--surface-radius);
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+/* Кадр заходит левее середины и уходит под вуаль: на стыке фотографии с
+   заливкой встык баннер читался склейкой двух блоков. */
+.mortgage-family__media {
+  position: absolute;
+  inset: 0 0 0 38%;
+  z-index: 0;
+}
+
+.mortgage-family__image {
+  object-fit: cover;
+  object-position: center 24%;
+}
+
+.mortgage-family__media::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    rgb(var(--avgst-ink-rgb) / 1) 0%,
+    rgb(var(--avgst-ink-rgb) / 0.68) 22%,
+    rgb(var(--avgst-ink-rgb) / 0) 48%
+  );
+}
+
+.mortgage-family__body {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  min-width: 0;
+  padding: var(--gap-split);
+}
+
+.mortgage-family__body h2 { color: #fff; }
+
+/* Строка набора короче колонки: у самого длинного абзаца она упиралась в
+   кадр и текст шёл прямо по семье. */
+.mortgage-family__body > p:not(.eyebrow) {
+  max-width: 44ch;
+  margin: 16px 0 0;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.mortgage-family__body > p:not(.eyebrow) strong {
+  font-weight: 700;
+  color: var(--avgst-green);
+}
+
+.mortgage-family .btn {
+  gap: 8px;
+  margin-top: var(--gap-stack);
+}
+
+/* Остальные программы идут строкой под баннером, а не справа от текста:
+   баннер занял всю ширину. Семейной в строке нет — ей отдан сам баннер. */
+.mortgage-showcase__programs {
+  display: grid;
+  min-width: 0;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--gap-tile);
+}
+.mortgage-program { position:relative; display:flex; min-height:144px; flex-direction:column; align-items:flex-start; padding:var(--page-gutter); border:1px solid rgb(var(--avgst-ink-rgb) / .12); border-radius:var(--surface-radius); background:#fff; color:var(--avgst-ink); text-decoration:none; transition:background-color .2s var(--ease-out), border-color .2s var(--ease-out); }
 .mortgage-program:hover { border-color:rgb(var(--avgst-ink-rgb) / .22); background:#f8fafc; }
-.mortgage-program--featured { grid-column:1 / -1; min-height:184px; border-color:var(--avgst-ink); background:var(--avgst-ink); color:#fff; overflow:hidden; }
-.mortgage-program--featured:hover { background:var(--avgst-ink); color:#fff; }
-@media (min-width:961px) { .mortgage-program--featured { aspect-ratio:16 / 9; min-height:0; } }
-.mortgage-program__image { object-fit:cover; object-position:center; }
-.mortgage-program--featured > span,
-.mortgage-program--featured > strong,
-.mortgage-program--featured > small,
-.mortgage-program--featured > svg { z-index:1; }
-.mortgage-program span { position:relative; padding-right:28px; font-size:12px; font-weight:700; letter-spacing:.08em; line-height:1.25; text-transform:uppercase; }
+.mortgage-program > span:not(.series-bento__go) { position:relative; padding-right:44px; font-size:12px; font-weight:700; letter-spacing:.08em; line-height:1.25; text-transform:uppercase; }
 .mortgage-program strong { position:relative; z-index:1; margin-top:auto; font-size:32px; line-height:.95; letter-spacing:-.04em; }
-.mortgage-program--featured strong { color:var(--brand-yellow); font-size:46px; line-height:.92; letter-spacing:-.05em; }
 .mortgage-program small { position:relative; z-index:1; margin-top:8px; font-size:13px; line-height:1.35; opacity:.65; }
-.mortgage-program--featured small { color:rgb(255 255 255 / .72); opacity:1; }
-.mortgage-program svg { position:absolute; top:20px; right:20px; width:18px; height:18px; transition:transform .2s var(--ease-out); }
-.mortgage-program:hover svg { transform:translate(2px,-2px); }
-.mortgage-showcase__partners { grid-column:1 / -1; min-width:0; padding-top:28px; border-top:1px solid #dce1e8; }
-.mortgage-showcase__partner-list { display:flex; width:100%; min-width:0; height:52px; align-items:center; justify-content:space-between; gap:22px; overflow:hidden; }
-.mortgage-partner { display:block; flex:1 1 0; min-width:0; max-width:168px; height:42px; object-fit:contain; object-position:center; filter:brightness(0) saturate(100%); opacity:.82; transition:filter .2s var(--ease-out), opacity .2s var(--ease-out); }
+.mortgage-showcase__partners { grid-column:1 / -1; min-width:0; padding-top:var(--gap-stack); border-top:1px solid #dce1e8; }
+.mortgage-showcase__partner-list { display:flex; width:100%; min-width:0; height:48px; align-items:center; justify-content:space-between; gap:24px; overflow:hidden; }
+.mortgage-partner { display:block; flex:1 1 0; min-width:0; max-width:168px; height:40px; object-fit:contain; object-position:center; filter:brightness(0) saturate(100%); opacity:.82; transition:filter .2s var(--ease-out), opacity .2s var(--ease-out); }
 .mortgage-partner:hover { filter:none; opacity:1; }
 /* В исходном SVG ВТБ белая версия — возвращаем фирменный синий на hover. */
 .mortgage-showcase__partner-list > .mortgage-partner:nth-child(2):hover { filter:brightness(0) saturate(100%) invert(22%) sepia(86%) saturate(2291%) hue-rotate(211deg) brightness(88%) contrast(102%); }
 .mortgage-showcase__partner-list > .mortgage-partner:nth-child(3) { filter:grayscale(1); opacity:.92; }
 .mortgage-showcase__partner-list > .mortgage-partner:nth-child(3):hover { filter:none; opacity:1; }
-.mortgage-partner-pair { position:relative; display:block; flex:1 1 0; min-width:0; max-width:168px; height:42px; }
+.mortgage-partner-pair { position:relative; display:block; flex:1 1 0; min-width:0; max-width:168px; height:40px; }
 .mortgage-partner-pair .mortgage-partner { position:absolute; inset:0; width:100%; height:100%; filter:none; opacity:.82; }
 .mortgage-partner-pair .mortgage-partner--primsoc-brand { opacity:0; transition:opacity .2s var(--ease-out); }
 .mortgage-partner-pair:hover .mortgage-partner--primsoc { opacity:0; }
 .mortgage-partner-pair:hover .mortgage-partner--primsoc-brand { opacity:1; }
-@media (prefers-reduced-motion:reduce) { .mortgage-program svg { transition:none; } }
-@media (max-width: 960px) { .mortgage-showcase__partner-list { overflow-x:auto; padding-bottom:4px; scrollbar-width:none; } .mortgage-showcase__partner-list::-webkit-scrollbar { display:none; } .mortgage-showcase__partner-list > .mortgage-partner, .mortgage-partner-pair { flex:0 0 168px; } }
-@media (max-width: 960px) { .mortgage-showcase__grid { grid-template-columns:1fr; } .mortgage-showcase__intro h2 { max-width:15ch; } }
-@media (max-width: 540px) { .mortgage-showcase__programs { grid-template-columns:1fr; } .mortgage-program--featured { grid-column:auto; } }
+@media (max-width: 960px) {
+  .mortgage-showcase__partner-list { overflow-x:auto; padding-bottom:4px; scrollbar-width:none; }
+  .mortgage-showcase__partner-list::-webkit-scrollbar { display:none; }
+  .mortgage-showcase__partner-list > .mortgage-partner,
+  .mortgage-partner-pair { flex:0 0 168px; }
+  .mortgage-showcase__grid { grid-template-columns:1fr; }
+  /* Три колонки на планшете узкие: в них не влезала строка «Подберём». */
+  .mortgage-showcase__programs { grid-column:1; grid-template-columns:repeat(2, minmax(0, 1fr)); }
+
+  /* Баннер складывается: кадр сверху, текст под ним. В половину узкого
+     экрана ни текст, ни семья не читаются. */
+  .mortgage-family { display:block; min-height:0; }
+
+  .mortgage-family__media { position:relative; inset:auto; aspect-ratio:4 / 3; }
+
+  /* Вуаль поворачивается вниз: кадр переходит в заливку тела, а не
+     обрывается по ней чертой. */
+  .mortgage-family__media::after {
+    background: linear-gradient(
+      180deg,
+      rgb(var(--avgst-ink-rgb) / 0) 34%,
+      rgb(var(--avgst-ink-rgb) / 0.72) 74%,
+      rgb(var(--avgst-ink-rgb) / 1) 100%
+    );
+  }
+
+  .mortgage-family__body { padding:var(--gap-stack) var(--page-gutter) var(--page-gutter); }
+  .mortgage-family__body > p:not(.eyebrow) { max-width:none; }
+}
+@media (max-width: 540px) { .mortgage-showcase__programs { grid-template-columns:1fr; } }
 
 .section--muted {
   background: var(--page);
@@ -2090,7 +2184,7 @@ a {
   flex-wrap: wrap;
   align-items: flex-end;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--gap-tile);
 }
 
 /* Переход в соседний раздел из заголовка секции. Строка со стрелкой, а не
@@ -2137,8 +2231,8 @@ a {
     display: grid;
     grid-template-columns: 1fr auto;
     align-items: center;
-    column-gap: 12px;
-    row-gap: 4px;
+    column-gap: var(--gap-tile);
+    row-gap: 8px;
   }
 
   .section__head > div {
@@ -2217,7 +2311,7 @@ a {
   grid-auto-flow: column;
   grid-auto-columns: minmax(260px, 1fr);
   gap: 16px;
-  margin-top: 20px;
+  margin-top: 16px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
 }
@@ -2241,14 +2335,14 @@ a {
 .info-page__actions {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 28px;
+  gap: 16px;
+  margin-top: 32px;
 }
 
 .info-page__list {
   display: grid;
-  gap: 10px;
-  margin: 28px 0 32px;
+  gap: 8px;
+  margin: 32px 0 32px;
   padding: 0;
   list-style: none;
   font-size: 15px;
@@ -2258,7 +2352,7 @@ a {
 .info-page__list li {
   display: flex;
   align-items: baseline;
-  gap: 10px;
+  gap: 8px;
 }
 
 /* Маркер точкой, а не буллетом списка: тот же приём, что в блоке завода. */
@@ -2273,9 +2367,11 @@ a {
 
 .grid-3 {
   display: grid;
-  gap: 32px;
-  margin-top: 40px;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
 }
+/* Между карточками проектов тот же tile, что у серий и программ:
+   один зазор для одинаковых плиток, а не свой на каждый блок. */
 
 @media (min-width: 640px) {
   .grid-3 {
@@ -2296,8 +2392,8 @@ a {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-rows: 1fr 1fr;
-  gap: 12px;
-  margin-top: 32px;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
   height: clamp(520px, 68vh, 700px);
 }
 
@@ -2365,7 +2461,7 @@ a {
   bottom: 0;
   z-index: 1;
   isolation: isolate;
-  padding: 44px 52px 22px 20px;
+  padding: 40px 48px 24px 16px;
   pointer-events: none;
 }
 
@@ -2415,7 +2511,8 @@ a {
     transform 0.2s var(--ease-out);
 }
 
-.series-bento__tile:hover .series-bento__go {
+.series-bento__tile:hover .series-bento__go,
+.mortgage-program:hover .series-bento__go {
   background: var(--brand-yellow);
   color: var(--avgst-ink);
   transform: translate(2px, -2px);
@@ -2428,7 +2525,8 @@ a {
   }
 
   .series-bento__tile:hover > img,
-  .series-bento__tile:hover .series-bento__go {
+  .series-bento__tile:hover .series-bento__go,
+  .mortgage-program:hover .series-bento__go {
     transform: none;
   }
 }
@@ -2543,8 +2641,8 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   border: 0;
   border-radius: 8px;
   background: rgb(255 255 255 / 0.95);
@@ -2594,14 +2692,14 @@ a {
 }
 
 .price {
-  margin: 4px 0 0;
+  margin: 8px 0 0;
   font-size: 1.125rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
 }
 .card__cta {
   width: fit-content;
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 /* Разделу отдано больше воздуха, чем соседним: он несёт главный довод за
@@ -2616,7 +2714,7 @@ a {
 .production {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--page-gutter);
 }
 
 /* Между заголовком и кадром зазор меньше общего: подпись и кадр читаются
@@ -2645,8 +2743,8 @@ a {
  * Горизонталь выбрана осознанно: колонкой ряд читался бы перечнем этапов,
  * строкой — набором участков, стоящих рядом. */
 .production__shops-wrap {
-  margin-top: 40px;
-  padding-top: 28px;
+  margin-top: var(--gap-stack);
+  padding-top: var(--gap-stack);
   border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
 }
 
@@ -2654,7 +2752,7 @@ a {
    надзаголовочным кеглем, а не заголовочным, — он ведёт ряд, а не спорит
    с названием раздела. */
 .production__shops-title {
-  margin: 0 0 20px;
+  margin: 0 0 var(--gap-tile);
   font-size: 13px;
   font-weight: 700;
   letter-spacing: 0.12em;
@@ -2674,8 +2772,8 @@ a {
 /* Пока колонок нет, участки идут строками, и делить их должна черта:
    иначе четыре абзаца подряд сливаются в сплошной текст. */
 .production__shops li + li {
-  margin-top: 18px;
-  padding-top: 18px;
+  margin-top: var(--gap-tile);
+  padding-top: var(--gap-tile);
   border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
 }
 
@@ -2699,7 +2797,7 @@ a {
 @media (min-width: 760px) {
   .production__shops {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-    column-gap: 40px;
+    column-gap: var(--gap-split);
   }
 
   .production__shops li + li {
@@ -2709,55 +2807,60 @@ a {
   }
 
   .production__shops li:nth-child(n + 3) {
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: var(--gap-tile);
+    padding-top: var(--gap-tile);
     border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
   }
 }
 
 @media (min-width: 1060px) {
-  /* Колонок столько, сколько участков: их число решает содержание, а не
-     вёрстка, и ряд не должен ломаться от того, что участков стало три или
-     пять. Минимум в 200px не даёт колонке сжаться до нечитаемой. */
+  /* Четыре равные колонки, между ними один и тот же split 48.
+     Черта в середине зазора — до текста везде 24px.
+     Раньше пары 16 / 48 / 16: у боковых черт до текста было 8px,
+     у средней 24px. */
   .production__shops {
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 32px;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    column-gap: var(--gap-split);
+    row-gap: 0;
   }
 
-  /* В один ряд горизонтальные черты не нужны: соседей делят вертикальные
-     линии на левом крае каждой колонки. */
   .production__shops li:nth-child(n + 3) {
     margin-top: 0;
     padding-top: 0;
     border-top: 0;
   }
 
-  /* Линия делит соседей, поэтому живёт на левом крае каждого участка,
-     кроме первого: у внешних краёв ряда делить нечего. */
   .production__shops li {
-    padding-left: 32px;
-    border-left: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
-  }
-
-  .production__shops li:first-child {
+    position: relative;
+    min-width: 0;
     padding-left: 0;
     border-left: 0;
   }
+
+  .production__shops li + li::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--gap-split) / -2);
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgb(var(--avgst-ink-rgb) / 0.12);
+  }
 }
 
-/* Ряд действий: кнопки в строку, на узкой ширине переносятся. Отступ задан
-   ряду, а не кнопкам — иначе при переносе вторая кнопка уносила бы с собой
-   лишние 32px. */
+/* На узкой — столбик. На широкой треки совпадают с 3-колоночной сеткой:
+   кнопки по содержимому, левый край на линии колонки, не во всю ширину. */
 .production__actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 32px;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
 }
 
 .production__copy .btn {
   gap: 8px;
   width: fit-content;
+  justify-self: start;
 }
 
 /* Широкий экран: кадр слева на всю высоту, справа заголовок и текст под
@@ -2774,8 +2877,8 @@ a {
       "shops shops";
     grid-template-rows: auto 1fr auto;
     align-items: start;
-    column-gap: 48px;
-    row-gap: 16px;
+    column-gap: var(--gap-split);
+    row-gap: var(--gap-tile);
   }
 
   .production__head {
@@ -2789,6 +2892,20 @@ a {
 
   .production__copy {
     grid-area: copy;
+  }
+
+  /* Правая половина пересекается с 3-колоночной сеткой: кусок 2-й
+     колонки + плитка 16 + целая 3-я. 1fr 1fr резал янтарный зазор пополам. */
+  .production__actions {
+    grid-template-columns:
+      minmax(0, calc((100% - var(--gap-split) - var(--gap-tile)) / 3))
+      minmax(0, 1fr);
+  }
+
+  /* Жёлтая доходит до линии сетки. Вторую не двигаем — её старт это
+     колонка 3, сдвиг сломал бы плитку 16 между ними. */
+  .production__actions .btn:first-child {
+    width: 100%;
   }
 
   /* Ряд участков идёт под обеими колонками, а не в одной из них: это
@@ -2842,12 +2959,12 @@ a {
    ради которой человек сюда и смотрит. */
 .factory-video__card {
   position: absolute;
-  left: 14px;
-  bottom: 14px;
+  left: 16px;
+  bottom: 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  max-width: calc(100% - 28px);
+  gap: 16px;
+  max-width: calc(100% - 32px);
   padding: 8px;
   border-radius: var(--surface-radius);
   border: var(--glass-border);
@@ -2990,13 +3107,13 @@ a {
 
 .contacts {
   display: grid;
-  gap: 40px;
+  gap: var(--gap-stack);
 }
 
 @media (min-width: 1024px) {
   .contacts {
     grid-template-columns: 1fr 1fr;
-    gap: 56px;
+    gap: var(--gap-split);
     align-items: start;
   }
 }
@@ -3007,9 +3124,9 @@ a {
 }
 
 .contact-list {
-  margin-top: 32px;
+  margin-top: var(--gap-stack);
   display: grid;
-  gap: 24px;
+  gap: var(--page-gutter);
 }
 .contact-list p {
   margin: 0;
@@ -3100,7 +3217,7 @@ a {
 .site-footer {
   background: var(--avgst-ink);
   color: rgb(255 255 255 / 0.92);
-  padding: 56px 0 40px;
+  padding: var(--gap-section) 0 40px;
 }
 
 .site-footer__brand {
@@ -3111,7 +3228,7 @@ a {
 
 .site-footer__brand img {
   display: block;
-  height: 44px;
+  height: 40px;
   width: auto;
 }
 
@@ -3119,7 +3236,7 @@ a {
   max-width: var(--page-width);
   margin: 0 auto;
   display: grid;
-  gap: 32px;
+  gap: var(--gap-stack);
 }
 
 @media (min-width: 900px) {
@@ -3129,7 +3246,7 @@ a {
 }
 
 .footer-grid h3 {
-  margin: 0 0 12px;
+  margin: 0 0 16px;
   font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
@@ -3344,7 +3461,7 @@ textarea:focus-visible {
   /* Верхнее поле отмеряно от низа плашки шапки: при 128px между ней и
      рядом с крошками оставалось 15px и ряд читался её продолжением, при
      152px разрыв выходил великоват. */
-  padding: 140px 0 24px;
+  padding: 136px 0 24px;
 }
 
 @media (max-width: 900px) {
@@ -4069,4 +4186,63 @@ textarea:focus-visible {
   .site-region__trigger .site-region__mark {
     display: none;
   }
+}
+
+/* Временная сетка. Показывает два реальных шага: плитки 16 и колонки 48. */
+.site-debug-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 9998;
+  pointer-events: none;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0,
+    transparent 7px,
+    rgb(255 64 64 / 0.14) 7px,
+    rgb(255 64 64 / 0.14) 8px
+  );
+}
+.site-debug-grid__page {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  display: grid;
+  width: min(var(--page-width), calc(100% - var(--page-gutter) * 2));
+  height: 100%;
+}
+.site-debug-grid__page--tiles {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  column-gap: var(--gap-tile);
+}
+.site-debug-grid__page--split {
+  grid-template-columns: 1fr 1fr;
+  column-gap: var(--gap-split);
+}
+.site-debug-grid__page--tiles > span {
+  background: rgb(255 180 0 / 0.07);
+  box-shadow: inset 0 0 0 1px rgb(255 160 0 / 0.28);
+}
+.site-debug-grid__page--split > span {
+  display: flex;
+  justify-content: center;
+  padding-top: 8px;
+  background: rgb(0 200 255 / 0.08);
+  box-shadow: inset 0 0 0 1px rgb(0 200 255 / 0.45);
+  color: rgb(0 40 60 / 0.9);
+  font-size: 11px;
+  font-weight: 800;
+  text-shadow: 0 0 4px #fff;
+}
+.site-debug-grid__legend {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  margin: 0;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: rgb(11 16 32 / 0.82);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 700;
 }
