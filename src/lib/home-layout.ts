@@ -78,17 +78,14 @@ export const HOME_LAYOUT: LayoutBlock[] = [
     heading: copy.productionHeading,
     body: copy.productionBody,
     steps: copy.productionSteps,
-    /* Два выхода из блока, и главный — переход на страницу производства.
-       К записи на экскурсию человека возвращают многие места сайта, а
-       позвать его почитать про завод больше негде: это единственный такой
-       вход, и он забирает себе главную кнопку.
-
-       Оба выхода нужны здесь, а не только в баннере: лента слотов
-       крутится, и слот про завод человек может не увидеть вовсе. */
-    ctaLabel: copy.factoryMore,
-    ctaHref: "/manufacture",
-    moreLabel: copy.factoryTour,
-    moreHref: "/#contacts",
+    /* Главный выход — запись на экскурсию: это действие, а не чтение.
+       Страница завода остаётся второй ссылкой рядом. Оба выхода нужны
+       здесь, а не только в баннере: лента слотов крутится, и слот про
+       завод человек может не увидеть вовсе. */
+    ctaLabel: copy.factoryTour,
+    ctaHref: "/#contacts",
+    moreLabel: copy.factoryMore,
+    moreHref: "/manufacture",
     theme: "light",
   },
   {
