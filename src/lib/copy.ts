@@ -110,6 +110,7 @@ export const copy = {
   close: "Закрыть",
   factoryTour: "Записаться на экскурсию",
   factoryMore: "Подробнее",
+  factoryMoreMobile: "Подробнее о производстве",
   factoryAlt: "Производство модульных и каркасных домов",
   factoryVideoTitle: "Завод «Авангард Строй»",
   factoryWatchLabel: "Посмотреть видео с производства",

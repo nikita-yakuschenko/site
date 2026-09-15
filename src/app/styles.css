@@ -3121,13 +3121,13 @@ a {
   }
 }
 
-/* На узкой — одна строка: жёлтая кнопка и рядом текстовая ссылка.
-   На широкой треки совпадают с 3-колоночной сеткой: кнопки по
-   содержимому, левый край на линии колонки, не во всю ширину. */
+/* На узкой — столбик: жёлтая запись сверху, «Подробнее» ссылкой под ней.
+   В одну строку пара не помещалась и давала горизонтальный скролл. */
 .production__actions {
   display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: flex-start;
   gap: var(--gap-tile);
   margin-top: var(--gap-stack);
 }
@@ -3135,14 +3135,14 @@ a {
 .production__copy .btn {
   gap: 8px;
   width: fit-content;
+  max-width: 100%;
   justify-self: start;
-  flex-shrink: 0;
 }
 
 /* Второй выход на узком — строчная ссылка, не вторая плашка в столбик. */
 .production__actions .btn-outline-dark {
   height: auto;
-  padding: 0;
+  padding: 0 0 0 var(--btn-pad-md);
   border: 0;
   border-radius: 0;
   background: transparent;
@@ -3160,6 +3160,9 @@ a {
   color: var(--avgst-ink);
   text-decoration-thickness: 2px;
 }
+
+.production__more-wide { display: none; }
+.production__more-narrow { display: inline; }
 
 /* Широкий экран: кадр 4×3 слева, справа заголовок и текст одной колонкой.
    Абзацы больше не сидят в разных строках сетки — иначе высота кадра
@@ -3192,10 +3195,9 @@ a {
   /* Правая половина пересекается с 3-колоночной сеткой: кусок 2-й
      колонки + плитка 16 + целая 3-я. 1fr 1fr резал янтарный зазор пополам. */
   .production__actions {
-    display: grid;
-    grid-template-columns:
-      minmax(0, calc((100% - var(--gap-split) - var(--gap-tile)) / 3))
-      minmax(0, 1fr);
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
   /* На широком второй выход снова контурная кнопка — как сосед жёлтой. */
@@ -3214,10 +3216,13 @@ a {
     text-decoration: none;
   }
 
-  /* Жёлтая доходит до линии сетки. Вторую не двигаем — её старт это
-     колонка 3, сдвиг сломал бы плитку 16 между ними. */
+  .production__more-wide { display: inline; }
+  .production__more-narrow { display: none; }
+
+  /* Жёлтая по тексту, не в треть колонки: длинная подпись иначе ломается. */
   .production__actions .btn:first-child {
-    width: 100%;
+    width: auto;
+    white-space: nowrap;
   }
 
   /* Ряд участков идёт под обеими колонками, а не в одной из них: это

@@ -362,7 +362,12 @@ function Production({ block }: { block: LayoutBlock }) {
                   className="btn btn-outline-dark"
                   href={String(block.moreHref)}
                 >
-                  {String(block.moreLabel)}
+                  <span className="production__more-wide">
+                    {String(block.moreLabel)}
+                  </span>
+                  <span className="production__more-narrow">
+                    {copy.factoryMoreMobile}
+                  </span>
                 </a>
               ) : null}
             </div>
