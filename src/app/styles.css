@@ -1733,7 +1733,7 @@ a {
     align-items: stretch;
     /* Без миниатюры поле строки само отжимает текст от края стекла. */
     gap: 0;
-    padding: 10px 12px;
+    padding: 12px 14px;
   }
 
   /* На телефоне кадр слота убран: миниатюра спорила с фотографией баннера
@@ -1745,7 +1745,7 @@ a {
 
   .hero__promo-body {
     justify-content: center;
-    gap: 2px;
+    gap: 6px;
     /* Поля задаёт сама строка: миниатюры слева больше нет, от которой
        раньше отсчитывался зазор. */
     padding: 0;
@@ -2230,7 +2230,13 @@ a {
      экрана ни текст, ни семья не читаются. */
   .mortgage-family { display:block; min-height:0; }
 
-  .mortgage-family__media { position:relative; inset:auto; aspect-ratio:4 / 3; }
+  .mortgage-family__media {
+    position: relative;
+    inset: auto;
+    aspect-ratio: 4 / 3;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
 
   /* На узком силуэт не нужен: кадр сверху, заливка снизу, вуаль — полоса. */
   .mortgage-family::before { content: none; }
@@ -2903,6 +2909,7 @@ a {
 }
 
 .production__shops {
+  --digit-h: 4.5rem;
   display: grid;
   grid-template-columns: 1fr;
   gap: 0;
@@ -2912,17 +2919,21 @@ a {
 }
 
 .production__shops li {
+  --digit-top: 0px;
   position: relative;
   min-width: 0;
+  /* Строка не ниже глифа: иначе цифра следующего участка лезет в этот. */
+  min-height: var(--digit-h);
 }
 
 /* Глиф вырезан из 1024-поля файла: ширина коробочки = пропорция цифры,
    маска сдвинута на bbox, right: 0 — правый край колонки. */
 .production__shops-digit {
-  --digit-h: 7.5rem;
   --digit-canvas: 1024;
   position: absolute;
-  top: 0;
+  /* Совпадает с заголовком, а не с верхней кромкой ячейки: у 2–4 сверху
+     паддинг до черты, и top: 0 поднимал цифру над названием. */
+  top: var(--digit-top);
   /* Не на самой черте: 5px от правого края ячейки. На широкой сетке
      черта стоит в середине split, и край ячейки для зрителя — она. */
   right: 5px;
@@ -2999,15 +3010,18 @@ a {
 /* Пока колонок нет, участки идут строками, и делить их должна черта:
    иначе четыре абзаца подряд сливаются в сплошной текст. */
 .production__shops li + li {
+  --digit-top: var(--gap-tile);
   margin-top: var(--gap-tile);
   padding-top: var(--gap-tile);
   border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  min-height: calc(var(--digit-h) + var(--gap-tile));
 }
 
 .production__shops h4 {
   position: relative;
   z-index: 1;
   margin: 0;
+  padding-right: calc(var(--digit-h) * 0.72);
   font-size: 1rem;
   font-weight: 700;
   letter-spacing: -0.01em;
@@ -3018,6 +3032,7 @@ a {
   position: relative;
   z-index: 1;
   margin: 8px 0 0;
+  padding-right: calc(var(--digit-h) * 0.72);
   color: #475569;
   font-size: 14px;
   line-height: 1.55;
@@ -3027,20 +3042,31 @@ a {
    собой, поэтому она достаётся третьему и четвёртому участку. */
 @media (min-width: 760px) {
   .production__shops {
+    --digit-h: 7.5rem;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     column-gap: var(--gap-split);
   }
 
+  /* На сетке цифра — водяной знак за текстом, поле справа не нужно. */
+  .production__shops h4,
+  .production__shops p {
+    padding-right: 0;
+  }
+
   .production__shops li + li {
+    --digit-top: 0px;
     margin-top: 0;
     padding-top: 0;
     border-top: 0;
+    min-height: var(--digit-h);
   }
 
   .production__shops li:nth-child(n + 3) {
+    --digit-top: var(--gap-tile);
     margin-top: var(--gap-tile);
     padding-top: var(--gap-tile);
     border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+    min-height: calc(var(--digit-h) + var(--gap-tile));
   }
 
   /* Левая колонка ряда: правая граница — черта в середине зазора. */
@@ -3061,9 +3087,11 @@ a {
   }
 
   .production__shops li:nth-child(n + 3) {
+    --digit-top: 0px;
     margin-top: 0;
     padding-top: 0;
     border-top: 0;
+    min-height: var(--digit-h);
   }
 
   .production__shops li {
@@ -3093,11 +3121,13 @@ a {
   }
 }
 
-/* На узкой — столбик. На широкой треки совпадают с 3-колоночной сеткой:
-   кнопки по содержимому, левый край на линии колонки, не во всю ширину. */
+/* На узкой — одна строка: жёлтая кнопка и рядом текстовая ссылка.
+   На широкой треки совпадают с 3-колоночной сеткой: кнопки по
+   содержимому, левый край на линии колонки, не во всю ширину. */
 .production__actions {
-  display: grid;
-  grid-template-columns: 1fr;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
   gap: var(--gap-tile);
   margin-top: var(--gap-stack);
 }
@@ -3106,6 +3136,29 @@ a {
   gap: 8px;
   width: fit-content;
   justify-self: start;
+  flex-shrink: 0;
+}
+
+/* Второй выход на узком — строчная ссылка, не вторая плашка в столбик. */
+.production__actions .btn-outline-dark {
+  height: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--avgst-ink);
+  font-weight: 600;
+  white-space: nowrap;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.production__actions .btn-outline-dark:hover {
+  border-color: transparent;
+  filter: none;
+  color: var(--avgst-ink);
+  text-decoration-thickness: 2px;
 }
 
 /* Широкий экран: кадр 4×3 слева, справа заголовок и текст одной колонкой.
@@ -3139,9 +3192,26 @@ a {
   /* Правая половина пересекается с 3-колоночной сеткой: кусок 2-й
      колонки + плитка 16 + целая 3-я. 1fr 1fr резал янтарный зазор пополам. */
   .production__actions {
+    display: grid;
     grid-template-columns:
       minmax(0, calc((100% - var(--gap-split) - var(--gap-tile)) / 3))
       minmax(0, 1fr);
+  }
+
+  /* На широком второй выход снова контурная кнопка — как сосед жёлтой. */
+  .production__actions .btn-outline-dark {
+    height: var(--btn-h-md);
+    padding: 0 var(--btn-pad-md);
+    border: 1px solid #d4d4d8;
+    border-radius: var(--radius);
+    background: white;
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .production__actions .btn-outline-dark:hover {
+    border-color: var(--avgst-ink);
+    text-decoration: none;
   }
 
   /* Жёлтая доходит до линии сетки. Вторую не двигаем — её старт это
