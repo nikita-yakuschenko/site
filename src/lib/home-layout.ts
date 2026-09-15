@@ -1,4 +1,5 @@
 import type { LayoutBlock } from "../components/block-renderer";
+import { countBySeries } from "./catalog/projects";
 import { copy } from "./copy";
 
 /**
@@ -29,8 +30,7 @@ export const HOME_LAYOUT: LayoutBlock[] = [
     catalogHref: "/catalog",
     catalogLabel: copy.allProjects,
   },
-  /* Числа из папок public/catalog, пока нет CMS. Барнхаусы 12,
-     панельно-каркасные 14, классика 7, модульные 4. */
+  /* Числа считаются из public/catalog, пока нет CMS. */
   {
     blockType: "seriesBento",
     heading: copy.seriesHeading,
@@ -43,28 +43,28 @@ export const HOME_LAYOUT: LayoutBlock[] = [
         title: copy.seriesPanel,
         href: "/catalog?series=panel",
         image: "/series/panel.jpg",
-        count: 14,
+        count: countBySeries("panel"),
       },
       {
         id: "barn",
         title: copy.seriesBarn,
         href: "/catalog?series=barn",
         image: "/series/barn.jpg",
-        count: 12,
+        count: countBySeries("barn"),
       },
       {
         id: "classic",
         title: copy.seriesClassic,
         href: "/catalog?series=classic",
         image: "/series/classic.jpg",
-        count: 7,
+        count: countBySeries("classic"),
       },
       {
         id: "modular",
         title: copy.seriesModular,
         href: "/catalog?series=modular",
         image: "/series/modular.jpg",
-        count: 4,
+        count: countBySeries("modular"),
       },
     ],
   },

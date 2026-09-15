@@ -18,6 +18,11 @@ import { SITE } from '../../../lib/site'
 
 const catalog = new FixtureCatalogProvider()
 
+export async function generateStaticParams() {
+  const { items } = await catalog.list({ siteCode: SITE.code })
+  return items.map((project) => ({ slug: project.slug }))
+}
+
 export async function generateMetadata({
   params,
 }: {
@@ -35,7 +40,8 @@ export async function generateMetadata({
  * Разметка опирается на готовые классы `.project-hero`: кадр на весь первый
  * экран, крошки, значок технологии, заголовок и стеклянная плашка с ТТХ и
  * ценой. Ниже — описание и фасады. Комплектации и планировки появятся
- * вместе с макетом карточки (AV4-15), поля под них в фикстурах уже есть.
+ * вместе с макетом карточки, когда по фото будет понятно, что есть план,
+ * а что интерьер.
  */
 export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params

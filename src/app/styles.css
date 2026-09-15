@@ -2043,10 +2043,14 @@ a {
 
 /* Кадр заходит левее середины и уходит под вуаль: на стыке фотографии с
    заливкой встык баннер читался склейкой двух блоков. */
+/* Своя кромка кадра растворена: иначе на косой границе она читается
+   вертикальной чертой. Кадрирование и масштаб при этом не меняются. */
 .mortgage-family__media {
   position: absolute;
   inset: 0 0 0 38%;
   z-index: 0;
+  -webkit-mask-image: linear-gradient(106deg, transparent 14%, #000 30%);
+  mask-image: linear-gradient(106deg, transparent 14%, #000 30%);
 }
 
 .mortgage-family__image {
@@ -2054,23 +2058,28 @@ a {
   object-position: center 24%;
 }
 
-.mortgage-family__media::after {
+/* Граница заливки — косая: полоса градиента идёт по диагонали, сверху она
+   заходит правее, к низу уходит влево, мимо семьи. */
+.mortgage-family::before {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    90deg,
-    rgb(var(--avgst-ink-rgb) / 1) 0%,
-    rgb(var(--avgst-ink-rgb) / 0.68) 22%,
-    rgb(var(--avgst-ink-rgb) / 0) 48%
-  );
+  z-index: 1;
+  pointer-events: none;
+  background: rgb(var(--avgst-ink-rgb));
+  -webkit-mask-image: linear-gradient(106deg, #000 40%, transparent 58%);
+  mask-image: linear-gradient(106deg, #000 40%, transparent 58%);
+}
+
+.mortgage-family__media::after {
+  content: none;
 }
 
 /* Текст и кнопка у верхнего края, а не по центру высоты: кадр семьи выше
    колонки текста, и по центру над набором оставалась пустота. */
 .mortgage-family__body {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
@@ -2094,7 +2103,7 @@ a {
    кадр и текст шёл прямо по семье. */
 .mortgage-family__body > p:not(.eyebrow) {
   max-width: 44ch;
-  margin: 16px 0 0;
+  margin: var(--gap-stack) 0 0;
   font-size: 16px;
   line-height: 1.6;
   color: rgb(255 255 255 / 0.82);
@@ -2223,9 +2232,15 @@ a {
 
   .mortgage-family__media { position:relative; inset:auto; aspect-ratio:4 / 3; }
 
+  /* На узком силуэт не нужен: кадр сверху, заливка снизу, вуаль — полоса. */
+  .mortgage-family::before { content: none; }
+
   /* Вуаль поворачивается вниз: кадр переходит в заливку тела, а не
      обрывается по ней чертой. */
   .mortgage-family__media::after {
+    content: "";
+    position: absolute;
+    inset: 0;
     background: linear-gradient(
       180deg,
       rgb(var(--avgst-ink-rgb) / 0) 34%,
@@ -2380,6 +2395,18 @@ a {
   margin: 32px 0 0;
   font-size: 16px;
   color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+.catalog-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 24px 0 0;
+}
+
+.catalog-filters .btn {
+  height: 36px;
+  padding: 0 14px;
 }
 
 /* Фасады в карточке проекта: ряд с прокруткой на узком экране, сетка на
@@ -2789,36 +2816,71 @@ a {
   padding: 88px 0;
 }
 
-/* Порядок на узком экране: заголовок, кадр, текст, действия. Раздел
-   начинается с того, о чём он, а не с картинки. */
+/* Порядок: заголовок, кадр, текст, действия. Обёртка текста прозрачна,
+   иначе кадр оказался бы после обоих абзацев. */
 .production {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-areas:
+    "head"
+    "media"
+    "copy"
+    "shops";
   gap: var(--page-gutter);
 }
 
-/* Между заголовком и кадром зазор меньше общего: подпись и кадр читаются
-   одной группой, а текст под ними уже отдельной. */
-.production__head + .production__media {
+.production__text {
+  display: contents;
+}
+
+.production__head {
+  grid-area: head;
+}
+
+.production__media {
+  grid-area: media;
+  /* Между заголовком и кадром зазор меньше общего: подпись и кадр
+     читаются одной группой, а текст под ними уже отдельной. */
   margin-top: -8px;
+}
+
+.production__copy {
+  grid-area: copy;
+}
+
+.production__shops-wrap {
+  grid-area: shops;
 }
 
 /* Надзаголовок исключён: он тоже абзац, и общее правило перекрашивало его
    в серый, хотя во всех остальных разделах он зелёный. Первый абзац лежит
    в заголовочном блоке, поэтому правило распространяется и на него. */
 .production__head p:not(.eyebrow),
-.production__copy p:not(.eyebrow) {
+.production__copy > p {
   max-width: 36rem;
   color: #475569;
   line-height: 1.6;
 }
 
+/* Под заголовком — шаг сетки. На широком второй абзац идёт следом через
+   gap колонки, не через отдельную строку сетки. */
+.production__head p:not(.eyebrow) {
+  margin: var(--gap-stack) 0 0;
+}
+
+.production__copy > p {
+  margin: 0;
+}
+
+.production__copy > p + p {
+  margin-top: var(--gap-tile);
+}
+
 /* Участки цеха: ряд равных фактов во всю ширину содержимого.
  *
- * Ни номеров, ни соединительной линии: часть участков работает
- * параллельно, и любая цепочка между ними была бы выдумкой. Вместо
- * контейнеров — вертикальные волосяные линии, как в технической
- * спецификации: они делят, но не превращают факты в карточки.
+ * Соединительной линии нет: часть участков работает параллельно.
+ * Цифра — водяной знак сзади текста, не номер шага. Вместо контейнеров —
+ * вертикальные волосяные линии, как в технической спецификации: они
+ * делят, но не превращают факты в карточки.
  *
  * Горизонталь выбрана осознанно: колонкой ряд читался бы перечнем этапов,
  * строкой — набором участков, стоящих рядом. */
@@ -2849,6 +2911,91 @@ a {
   list-style: none;
 }
 
+.production__shops li {
+  position: relative;
+  min-width: 0;
+}
+
+/* Глиф вырезан из 1024-поля файла: ширина коробочки = пропорция цифры,
+   маска сдвинута на bbox, right: 0 — правый край колонки. */
+.production__shops-digit {
+  --digit-h: 7.5rem;
+  --digit-canvas: 1024;
+  position: absolute;
+  top: 0;
+  /* Не на самой черте: 5px от правого края ячейки. На широкой сетке
+     черта стоит в середине split, и край ячейки для зрителя — она. */
+  right: 5px;
+  z-index: 0;
+  width: calc(var(--digit-h) * var(--gw) / var(--gh));
+  height: var(--digit-h);
+  pointer-events: none;
+  background-color: rgb(var(--avgst-ink-rgb) / 0.06);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
+  mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
+  -webkit-mask-position: calc(-1 * var(--digit-h) * var(--gx) / var(--gh))
+    calc(-1 * var(--digit-h) * var(--gy) / var(--gh));
+  mask-position: calc(-1 * var(--digit-h) * var(--gx) / var(--gh))
+    calc(-1 * var(--digit-h) * var(--gy) / var(--gh));
+  transform: translateY(0);
+  transform-origin: 100% 100%;
+  /* В покое почти плоские: тень иначе держит цифру поверх текста. */
+  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.35));
+}
+
+.production__shops li:nth-child(1) .production__shops-digit {
+  --gx: 412;
+  --gy: 282;
+  --gw: 158;
+  --gh: 456;
+}
+
+.production__shops li:nth-child(2) .production__shops-digit {
+  --gx: 350;
+  --gy: 272;
+  --gw: 326;
+  --gh: 466;
+}
+
+.production__shops li:nth-child(3) .production__shops-digit {
+  --gx: 346;
+  --gy: 272;
+  --gw: 334;
+  --gh: 476;
+}
+
+.production__shops li:nth-child(4) .production__shops-digit {
+  --gx: 340;
+  --gy: 282;
+  --gw: 346;
+  --gh: 456;
+}
+
+@media (hover: hover) {
+  .production__shops-digit {
+    transition:
+      transform 0.22s var(--ease-out),
+      filter 0.22s var(--ease-out),
+      background-color 0.22s var(--ease-out);
+  }
+
+  .production__shops li:hover .production__shops-digit {
+    background-color: color-mix(in srgb, var(--brand-yellow) 78%, white);
+    transform: translateY(-8px);
+    filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.9))
+      drop-shadow(1px 3px 0 rgb(196 150 8 / 0.35))
+      drop-shadow(0 16px 20px rgb(var(--avgst-ink-rgb) / 0.18));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .production__shops li:hover .production__shops-digit {
+    transform: none;
+  }
+}
+
 /* Пока колонок нет, участки идут строками, и делить их должна черта:
    иначе четыре абзаца подряд сливаются в сплошной текст. */
 .production__shops li + li {
@@ -2858,6 +3005,8 @@ a {
 }
 
 .production__shops h4 {
+  position: relative;
+  z-index: 1;
   margin: 0;
   font-size: 1rem;
   font-weight: 700;
@@ -2866,6 +3015,8 @@ a {
 }
 
 .production__shops p {
+  position: relative;
+  z-index: 1;
   margin: 8px 0 0;
   color: #475569;
   font-size: 14px;
@@ -2890,6 +3041,11 @@ a {
     margin-top: var(--gap-tile);
     padding-top: var(--gap-tile);
     border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  }
+
+  /* Левая колонка ряда: правая граница — черта в середине зазора. */
+  .production__shops li:nth-child(odd) .production__shops-digit {
+    right: calc(5px - var(--gap-split) / 2);
   }
 }
 
@@ -2926,6 +3082,15 @@ a {
     width: 1px;
     background: rgb(var(--avgst-ink-rgb) / 0.12);
   }
+
+  /* У всех кроме последней правый край — черта, не край текста. */
+  .production__shops li:nth-child(odd) .production__shops-digit {
+    right: 5px;
+  }
+
+  .production__shops li:not(:nth-child(4n)) .production__shops-digit {
+    right: calc(5px - var(--gap-split) / 2);
+  }
 }
 
 /* На узкой — столбик. На широкой треки совпадают с 3-колоночной сеткой:
@@ -2943,35 +3108,32 @@ a {
   justify-self: start;
 }
 
-/* Широкий экран: кадр слева на всю высоту, справа заголовок и текст под
-   ним, ряд участков под обоими. Раскладка задана областями — порядок в
-   разметке подчинён узкому экрану, и переставлять блоки местами приходится
-   именно здесь. */
+/* Широкий экран: кадр 4×3 слева, справа заголовок и текст одной колонкой.
+   Абзацы больше не сидят в разных строках сетки — иначе высота кадра
+   снова рвала бы их дырой. */
 @media (min-width: 900px) {
   .production {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-areas:
-      "media head"
-      "media copy"
+      "media text"
       "shops shops";
-    grid-template-rows: auto 1fr auto;
+    grid-template-rows: auto auto;
     align-items: start;
     column-gap: var(--gap-split);
     row-gap: var(--gap-tile);
   }
 
-  .production__head {
-    grid-area: head;
+  .production__text {
+    display: flex;
+    flex-direction: column;
+    gap: var(--gap-tile);
+    grid-area: text;
   }
 
   .production__media {
     grid-area: media;
     margin-top: 0;
-  }
-
-  .production__copy {
-    grid-area: copy;
   }
 
   /* Правая половина пересекается с 3-колоночной сеткой: кусок 2-й
@@ -3163,19 +3325,65 @@ a {
 }
 
 .factory-video__modal {
+  position: relative;
   width: min(960px, 100%);
   background: var(--avgst-ink);
   border-radius: 12px;
   overflow: hidden;
 }
 
-.factory-video__modal-bar {
+/* Хром поверх кадра: градиент только чтобы буквы читались, полосы над
+   роликом нет. Клики проходят в плеер, кроме крестика. */
+.factory-video__overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 1;
   display: flex;
-  justify-content: space-between;
   align-items: center;
+  justify-content: space-between;
   gap: 12px;
-  padding: 12px 16px;
-  color: white;
+  padding: 12px 12px 36px 16px;
+  pointer-events: none;
+  color: #fff;
+  background: linear-gradient(
+    to bottom,
+    rgb(0 0 0 / 0.72) 0%,
+    rgb(0 0 0 / 0) 100%
+  );
+}
+
+.factory-video__overlay p {
+  min-width: 0;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-shadow: 0 1px 8px rgb(0 0 0 / 0.45);
+}
+
+.factory-video__close {
+  pointer-events: auto;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(0 0 0 / 0.45);
+  color: #fff;
+  cursor: pointer;
+}
+
+.factory-video__close:hover {
+  background: rgb(0 0 0 / 0.65);
 }
 
 .factory-video__modal iframe {

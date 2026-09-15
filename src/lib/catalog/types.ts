@@ -1,7 +1,16 @@
+export const CATALOG_SERIES = ['panel', 'barn', 'classic', 'modular'] as const
+
+export type CatalogSeries = (typeof CATALOG_SERIES)[number]
+
+export function isCatalogSeries(value: string): value is CatalogSeries {
+  return (CATALOG_SERIES as readonly string[]).includes(value)
+}
+
 export type ProjectQuery = {
   siteCode: string
   ids?: string[]
   limit?: number
+  series?: CatalogSeries
   floors?: number
   minArea?: number
   maxArea?: number
@@ -28,6 +37,7 @@ export type CatalogProject = {
   priceAmount: number | null
   imageUrl: string
   technologyBadge: string
+  series: CatalogSeries
   href: string
   description: string
   exteriors: string[]

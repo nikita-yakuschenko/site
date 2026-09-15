@@ -1,5 +1,6 @@
 "use client";
 
+import { IconX } from "@tabler/icons-react";
 import { useEffect, useId, useState } from "react";
 import { copy } from "../lib/copy";
 
@@ -77,14 +78,17 @@ export function FactoryVideo({
             className="factory-video__modal"
             onClick={(event) => event.stopPropagation()}
           >
-            <div className="factory-video__modal-bar">
+            {/* Название и крестик лежат на кадре, а не отдельной полосой
+                над ним: ролик занимает всё окно, хром его не надстраивает. */}
+            <div className="factory-video__overlay">
               <p id={titleId}>{copy.factoryVideoTitle}</p>
               <button
                 type="button"
-                className="lightbox__close"
+                className="factory-video__close"
+                aria-label={copy.close}
                 onClick={() => setOpen(false)}
               >
-                {copy.close}
+                <IconX size={20} stroke={2.2} />
               </button>
             </div>
             <iframe
