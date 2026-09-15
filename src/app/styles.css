@@ -2033,6 +2033,49 @@ a {
 
 /* Чересполосица блоков главной: белый / серый / белый / серый.
    Серии и контакты — серые; проекты и производство остаются белыми. */
+.mortgage-showcase { background: var(--page); }
+.mortgage-showcase__grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); column-gap:48px; row-gap:32px; align-items:start; }
+.mortgage-showcase__intro { display:flex; flex-direction:column; align-items:flex-start; }
+.mortgage-showcase__intro h2 { max-width:13ch; }
+.mortgage-showcase__intro > p:not(.eyebrow) { max-width:36rem; margin:16px 0 28px; color:#475569; font-size:16px; line-height:1.6; }
+.mortgage-showcase__intro > p:not(.eyebrow) strong { color:var(--avgst-green); font-weight:700; }
+.mortgage-showcase__intro .btn { gap:8px; }
+.mortgage-showcase__programs { display:grid; min-width:0; grid-template-columns:1fr 1fr; gap:12px; }
+.mortgage-program { position:relative; display:flex; min-height:140px; flex-direction:column; align-items:flex-start; padding:22px; border:1px solid rgb(var(--avgst-ink-rgb) / .12); border-radius:var(--surface-radius); background:#fff; color:var(--avgst-ink); text-decoration:none; transition:background-color .2s var(--ease-out), border-color .2s var(--ease-out); }
+.mortgage-program:hover { border-color:rgb(var(--avgst-ink-rgb) / .22); background:#f8fafc; }
+.mortgage-program--featured { grid-column:1 / -1; min-height:184px; border-color:var(--avgst-ink); background:var(--avgst-ink); color:#fff; overflow:hidden; }
+.mortgage-program--featured:hover { background:var(--avgst-ink); color:#fff; }
+@media (min-width:961px) { .mortgage-program--featured { aspect-ratio:16 / 9; min-height:0; } }
+.mortgage-program__image { object-fit:cover; object-position:center; }
+.mortgage-program--featured > span,
+.mortgage-program--featured > strong,
+.mortgage-program--featured > small,
+.mortgage-program--featured > svg { z-index:1; }
+.mortgage-program span { position:relative; padding-right:28px; font-size:12px; font-weight:700; letter-spacing:.08em; line-height:1.25; text-transform:uppercase; }
+.mortgage-program strong { position:relative; z-index:1; margin-top:auto; font-size:32px; line-height:.95; letter-spacing:-.04em; }
+.mortgage-program--featured strong { color:var(--brand-yellow); font-size:46px; line-height:.92; letter-spacing:-.05em; }
+.mortgage-program small { position:relative; z-index:1; margin-top:8px; font-size:13px; line-height:1.35; opacity:.65; }
+.mortgage-program--featured small { color:rgb(255 255 255 / .72); opacity:1; }
+.mortgage-program svg { position:absolute; top:20px; right:20px; width:18px; height:18px; transition:transform .2s var(--ease-out); }
+.mortgage-program:hover svg { transform:translate(2px,-2px); }
+.mortgage-showcase__partners { grid-column:1 / -1; min-width:0; padding-top:28px; border-top:1px solid #dce1e8; }
+.mortgage-showcase__partner-list { display:flex; width:100%; min-width:0; height:52px; align-items:center; justify-content:space-between; gap:22px; overflow:hidden; }
+.mortgage-partner { display:block; flex:1 1 0; min-width:0; max-width:168px; height:42px; object-fit:contain; object-position:center; filter:brightness(0) saturate(100%); opacity:.82; transition:filter .2s var(--ease-out), opacity .2s var(--ease-out); }
+.mortgage-partner:hover { filter:none; opacity:1; }
+/* В исходном SVG ВТБ белая версия — возвращаем фирменный синий на hover. */
+.mortgage-showcase__partner-list > .mortgage-partner:nth-child(2):hover { filter:brightness(0) saturate(100%) invert(22%) sepia(86%) saturate(2291%) hue-rotate(211deg) brightness(88%) contrast(102%); }
+.mortgage-showcase__partner-list > .mortgage-partner:nth-child(3) { filter:grayscale(1); opacity:.92; }
+.mortgage-showcase__partner-list > .mortgage-partner:nth-child(3):hover { filter:none; opacity:1; }
+.mortgage-partner-pair { position:relative; display:block; flex:1 1 0; min-width:0; max-width:168px; height:42px; }
+.mortgage-partner-pair .mortgage-partner { position:absolute; inset:0; width:100%; height:100%; filter:none; opacity:.82; }
+.mortgage-partner-pair .mortgage-partner--primsoc-brand { opacity:0; transition:opacity .2s var(--ease-out); }
+.mortgage-partner-pair:hover .mortgage-partner--primsoc { opacity:0; }
+.mortgage-partner-pair:hover .mortgage-partner--primsoc-brand { opacity:1; }
+@media (prefers-reduced-motion:reduce) { .mortgage-program svg { transition:none; } }
+@media (max-width: 960px) { .mortgage-showcase__partner-list { overflow-x:auto; padding-bottom:4px; scrollbar-width:none; } .mortgage-showcase__partner-list::-webkit-scrollbar { display:none; } .mortgage-showcase__partner-list > .mortgage-partner, .mortgage-partner-pair { flex:0 0 168px; } }
+@media (max-width: 960px) { .mortgage-showcase__grid { grid-template-columns:1fr; } .mortgage-showcase__intro h2 { max-width:15ch; } }
+@media (max-width: 540px) { .mortgage-showcase__programs { grid-template-columns:1fr; } .mortgage-program--featured { grid-column:auto; } }
+
 .section--muted {
   background: var(--page);
 }
