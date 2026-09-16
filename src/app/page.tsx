@@ -9,7 +9,8 @@ export default async function HomePage() {
   // Каталог берётся из фикстур — тех же, что используются на main, когда база
   // недоступна. Провайдер меняется на payload-provider в AV4-10.
   const catalog = new FixtureCatalogProvider()
-  const { items } = await catalog.list({ siteCode: SITE.code, limit: 12 })
+  // На главной в «Популярных» только 6 проектов, не весь каталог.
+  const { items } = await catalog.list({ siteCode: SITE.code, limit: 6 })
 
   const hasHero = HOME_LAYOUT.some((block) => block.blockType === 'hero')
 
