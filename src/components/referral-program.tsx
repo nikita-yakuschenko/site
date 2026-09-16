@@ -476,7 +476,7 @@ export function ReferralProgram({
               target="_blank"
               rel="noopener noreferrer"
             >
-              {data.rulesLabel}
+              {data.rulesFooterLabel}
             </a>
           </p>
         </div>

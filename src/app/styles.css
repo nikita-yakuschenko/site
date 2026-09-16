@@ -2255,6 +2255,7 @@ a {
 
   .mortgage-family__body { padding:var(--gap-stack) var(--page-gutter) var(--page-gutter); }
   .mortgage-family__body > p:not(.eyebrow) { max-width:none; }
+  .mortgage-family .btn { align-self: center; }
 }
 @media (max-width: 540px) {
   .mortgage-showcase__programs { grid-template-columns:1fr; }
@@ -2914,7 +2915,8 @@ a {
   isolation: isolate;
   min-width: 0;
   aspect-ratio: 9 / 16;
-  padding: 28px 20px 52px;
+  /* Низ запасён под absolute-футер с правилами. */
+  padding: 24px 18px 64px;
   border-radius: calc(var(--surface-radius) + 6px);
   color: var(--avgst-ink);
   background: var(--avgst-ink);
@@ -2974,12 +2976,13 @@ a {
 }
 
 .referral.section .referral__copy h2 {
-  margin: 0 0 20px;
-  font-size: 24px;
-  line-height: 1.3;
+  margin: 0 0 14px;
+  /* Ровно 2 строки из headingLines: nowrap + кегль, чтобы первая строка влезла. */
+  font-size: clamp(16px, 4.5vw, 19px);
+  line-height: 1.2;
   font-weight: 800;
   text-transform: none;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   color: #000;
   white-space: nowrap;
 }
@@ -2987,19 +2990,20 @@ a {
 .referral__copy p {
   margin: 0;
   max-width: 42ch;
-  font-size: 16px;
-  line-height: 1.55;
+  font-size: 15px;
+  line-height: 1.5;
   color: #000;
 }
 
 .referral__copy p + p {
-  margin-top: 12px;
+  margin-top: 10px;
 }
 
 .referral__open {
-  align-self: flex-start;
+  align-self: center;
   gap: 8px;
   margin-top: var(--gap-stack);
+  /* Не auto: иначе кнопка падает на absolute-футер и всё слипается. */
 }
 
 .referral__slot {
@@ -3151,12 +3155,14 @@ a {
   z-index: 3;
   left: 20px;
   right: 20px;
-  bottom: 24px;
+  bottom: 20px;
   margin: 0;
-  font-size: 11px;
+  font-size: 13px;
   line-height: 1.45;
-  color: rgb(255 255 255 / 0.72);
-  text-shadow: 0 1px 8px rgb(0 0 0 / 0.85);
+  color: rgb(255 255 255 / 0.92);
+  text-shadow:
+    0 1px 2px rgb(0 0 0 / 0.9),
+    0 2px 12px rgb(0 0 0 / 0.75);
   transition: opacity 0.3s var(--ease-out);
 }
 
@@ -3377,11 +3383,19 @@ a {
     font-size: 32px;
     color: #fff;
     text-shadow: 0 1px 12px rgb(0 0 0 / 0.85);
+    white-space: nowrap;
   }
 
   .referral__copy p {
+    font-size: 16px;
+    line-height: 1.55;
     color: #fff;
     text-shadow: 0 1px 10px rgb(0 0 0 / 0.8);
+  }
+
+  .referral__open {
+    align-self: flex-start;
+    margin-top: var(--gap-stack);
   }
 
   .referral__slot {
@@ -4802,6 +4816,8 @@ a {
 .contacts__address > span {
   display: block;
   min-width: 0;
+  /* Запас под 2 строки: у производства есть пояснение, у офиса — нет. */
+  min-height: calc(1.35em * 2 + 2px);
 }
 
 .contacts__address-title,
@@ -4821,6 +4837,9 @@ a {
 .contacts__transit {
   display: grid;
   gap: 8px;
+  align-content: start;
+  /* Запас под 3 остановки производства — офис не сжимает плашку. */
+  min-height: calc(18px * 3 + 8px * 2);
   margin: 14px 0 0;
   padding: 14px 0 0;
   border-top: 1px solid rgb(255 255 255 / 0.12);

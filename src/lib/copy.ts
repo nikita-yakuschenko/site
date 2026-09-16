@@ -281,6 +281,7 @@ export const copy = {
     rulesLabel: "Правилами реферальной программы",
     rulesHref: "https://avgst.ru/referral",
     rulesFooterPrefix: "Подробности в ",
+    rulesFooterLabel: "Правилах реферальной программы",
     submitLabel: "Зарегистрироваться",
     successTitle: "Спасибо за регистрацию!",
     successBody:
