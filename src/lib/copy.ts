@@ -89,7 +89,7 @@ export const copy = {
   askQuestion: "Задать вопрос",
   askQuestionShort: "Вопрос",
   name: "Имя",
-  namePlaceholder: "Как к вам обращаться",
+  namePlaceholder: "",
   phone: "Телефон",
   phonePlaceholder: "+7 (900) 000-00-00",
   message: "Сообщение",
