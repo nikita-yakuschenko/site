@@ -177,7 +177,7 @@ export const copy = {
     "Расчёты через эскроу-счёт",
   ],
   mortgageCta: "Рассчитать платёж",
-  mortgageMore: "Подробнее",
+  mortgageMore: "Подробнее об ипотеке",
   mortgageMoreHref: "/mortgage",
   /* Четыре обзора канала «Малоэтажная Страна» на VK Video. */
   independentReview: {

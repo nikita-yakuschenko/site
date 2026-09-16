@@ -1318,6 +1318,12 @@ a {
     transform: scaleX(1);
   }
 }
+/* Угловая стрелка слота — через ::after у is-rail. Разметка corner
+   без абсолюта попадала в поток между кадром и текстом. */
+.hero__promo-corner {
+  display: none;
+}
+
 .hero__promo-body {
   display: flex;
   flex-direction: column;
@@ -1862,7 +1868,7 @@ a {
   }
 
   .hero__promo-body {
-    justify-content: center;
+    justify-content: flex-start;
     gap: 6px;
     /* Поля задаёт сама строка: миниатюры слева больше нет, от которой
        раньше отсчитывался зазор. */
@@ -1886,25 +1892,17 @@ a {
     display: none;
   }
 
-  /* Надзаголовок уступает место шевронам — они лежат слоем в том же углу. */
-  .hero__promo-eyebrow {
-    padding-right: 62px;
+  /* Стрелка перехода и шевроны на телефоне не нужны: слот и так
+     целиком ссылка, а слоты листаются жестом. Без абсолютного угла
+     corner оставался в потоке слева от текста — отсюда стрелка слева. */
+  .hero__promo-nav {
+    display: none;
   }
 
   /* Полосы прогресса на телефоне нет: при трёх слотах и жесте она только
      занимает место. */
   .hero__promo-progress {
     display: none;
-  }
-
-  /* Шевроны в правый верхний угол строки. Распорка убрана — она опускала ряд
-     на высоту кадра 16:9, которого здесь больше нет. */
-  .hero__promo-nav-spacer {
-    display: none;
-  }
-
-  .hero__promo-nav-row {
-    padding: 6px 6px 0;
   }
 
   /* Подсказка о жесте: блок слотов дважды коротко уходит влево и
@@ -2235,7 +2233,7 @@ a {
   flex-direction: column;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: var(--gap-tile);
+  gap: 20px;
   margin-top: var(--gap-stack);
 }
 
@@ -2407,10 +2405,11 @@ a {
     );
   }
 
-  .mortgage-family__body { padding:var(--gap-stack) var(--page-gutter) var(--page-gutter); }
+  /* Снизу больше воздуха: у ссылки подчёркивание съедает поле, и 24px
+     до края блока читались вплотную. */
+  .mortgage-family__body { padding:var(--gap-stack) var(--page-gutter) var(--gap-stack); }
   .mortgage-family__body > p:not(.eyebrow) { max-width:none; }
-  .mortgage-family__actions { align-items: center; }
-  .mortgage-family__more { padding: 0; }
+  .mortgage-family__actions { align-items: flex-start; }
 }
 @media (max-width: 540px) {
   .mortgage-showcase__programs { grid-template-columns:1fr; }
@@ -4597,7 +4596,7 @@ a {
   flex-direction: column;
   flex-wrap: wrap;
   align-items: flex-start;
-  gap: var(--gap-tile);
+  gap: 20px;
   margin-top: var(--gap-stack);
 }
 
@@ -4610,7 +4609,9 @@ a {
 
 /* Второй выход на узком — строчная ссылка, не вторая плашка в столбик. */
 .production__actions .btn-outline-dark {
+  /* Оптическая компенсация: тот же левый паддинг, что у жёлтой кнопки. */
   height: auto;
+  justify-content: flex-start;
   padding: 0 0 0 var(--btn-pad-md);
   border: 0;
   border-radius: 0;
@@ -5054,6 +5055,12 @@ a {
 }
 
 @media (min-width: 1024px) {
+  /* Тёмная плашка при равных верхах кажется чуть ниже белой формы:
+     масса и контраст тянут взгляд вниз — поднимаем на 1px. */
+  .contacts__place {
+    transform: translateY(-1px);
+  }
+
   .contacts__place:has(.contacts__map.is-loading),
   .contacts__place:has(.contacts__map.is-ready) {
     grid-template-columns: minmax(12rem, 0.9fr) minmax(0, 1.1fr);
