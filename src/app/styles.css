@@ -770,6 +770,13 @@ a {
   }
 }
 
+/* Переключатель темы в полосе только там, где нет бургера. */
+@media (max-width: 1023px) {
+  .site-header__bar .site-tech-theme {
+    display: none;
+  }
+}
+
 @media (min-width: 1200px) {
   .site-header__phone {
     display: inline;
@@ -813,6 +820,33 @@ a {
 .site-menu__phone {
   font-weight: 700;
   font-variant-numeric: tabular-nums;
+}
+
+.site-menu__theme {
+  display: none;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  margin-top: auto;
+  padding: 12px 0;
+  border: 0;
+  background: transparent;
+  color: rgb(255 255 255 / 0.72);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  cursor: pointer;
+}
+
+.site-menu__theme:hover {
+  color: #fff;
+}
+
+@media (max-width: 1023px) {
+  .site-menu__theme {
+    display: inline-flex;
+  }
 }
 
 .btn {
@@ -6264,6 +6298,13 @@ textarea:focus-visible {
   }
   .site-office {
     --office-inset: 0px;
+    /* Панель якорится к meta-ряду, а не к узкому индикатору — иначе
+       right:0 даёт узкую колонку у статуса. К переключателю темы не
+       привязано. */
+    position: static;
+  }
+  .site-header__meta {
+    position: relative;
   }
   .site-tech-theme {
     margin-right: 0;
@@ -6290,10 +6331,14 @@ textarea:focus-visible {
   .site-office__label--short {
     display: inline;
   }
-  /* Ширина панели та же, что на десктопе (min-width: 288px у правого края).
-     Растягивать на весь ряд не нужно: на планшете в портрете это давало
-     огромную плашку во всю ширину экрана. */
+  /* На всю ширину meta (уже с page-gutter), без 100vw — тот не вылезает
+     за экран из-за скроллбара. */
   .site-office__panel {
+    top: 100%;
+    left: 0;
+    right: 0;
+    width: auto;
+    min-width: 0;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
   }

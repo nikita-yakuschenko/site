@@ -55,11 +55,12 @@ function subscribeTechBarTheme(listener: () => void) {
 
 function readTechBarTheme(): TechBarTheme {
   try {
-    return window.localStorage.getItem(TECH_BAR_THEME_KEY) === "light"
-      ? "light"
-      : "dark";
+    // Явно тёмная — иначе светлая (дефолт для сверки с маркетологом).
+    return window.localStorage.getItem(TECH_BAR_THEME_KEY) === "dark"
+      ? "dark"
+      : "light";
   } catch {
-    return "dark";
+    return "light";
   }
 }
 
@@ -164,8 +165,12 @@ export function SiteChrome({
   const techBarTheme = useSyncExternalStore(
     subscribeTechBarTheme,
     readTechBarTheme,
-    () => "dark" as TechBarTheme,
+    () => "light" as TechBarTheme,
   );
+
+  function toggleTechBarTheme() {
+    writeTechBarTheme(techBarTheme === "light" ? "dark" : "light");
+  }
   const src = mediaUrl(logo) || "/logo_lg.svg";
   const items = (navigation?.filter(
     (item) => item.label && item.href && item.href !== "/",
@@ -224,15 +229,13 @@ export function SiteChrome({
               ))}
             </nav>
             <OfficeStatusIndicator />
-            {/* Временный переключатель: только сверка светлой полосы. */}
+            {/* Временный переключатель: на мобилке прячется в бургер. */}
             <button
               type="button"
               className="site-tech-theme"
               aria-label={copy.techBarThemeAria}
               aria-pressed={techBarTheme === "light"}
-              onClick={() =>
-                writeTechBarTheme(techBarTheme === "light" ? "dark" : "light")
-              }
+              onClick={toggleTechBarTheme}
             >
               {techBarTheme === "light" ? (
                 <IconMoon size={18} stroke={1.75} aria-hidden="true" />
@@ -382,6 +385,25 @@ export function SiteChrome({
             >
               {copy.askQuestion}
             </Link>
+            {/* Тема полосы: в ряду на узком экране давала горизонтальный скролл. */}
+            <button
+              type="button"
+              className="site-menu__theme"
+              aria-label={copy.techBarThemeAria}
+              aria-pressed={techBarTheme === "light"}
+              onClick={toggleTechBarTheme}
+            >
+              {techBarTheme === "light" ? (
+                <IconMoon size={20} stroke={1.75} aria-hidden="true" />
+              ) : (
+                <IconSun size={20} stroke={1.75} aria-hidden="true" />
+              )}
+              <span>
+                {techBarTheme === "light"
+                  ? copy.techBarThemeToDark
+                  : copy.techBarThemeToLight}
+              </span>
+            </button>
           </div>
         </div>
       ) : null}
