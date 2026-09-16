@@ -411,7 +411,7 @@ export function SiteChrome({
 
       {children}
 
-      <footer className="site-footer">
+      <footer className="site-footer" id="footer">
         <div className="footer-grid">
           <div className="footer-brand-col">
             <Link href="/" className="site-footer__brand">
@@ -419,13 +419,13 @@ export function SiteChrome({
             </Link>
             <p className="footer-about">{about || copy.footerAbout}</p>
             <div className="footer-policies">
-              <Link className="footer-policy" href={copy.privacyHref}>
-                <IconFileText size={16} stroke={1.75} aria-hidden="true" />
-                {copy.privacy}
-              </Link>
               <Link className="footer-policy" href={copy.personalDataHref}>
                 <IconFileText size={16} stroke={1.75} aria-hidden="true" />
                 {copy.personalData}
+              </Link>
+              <Link className="footer-policy" href={copy.cookiePolicyHref}>
+                <IconFileText size={16} stroke={1.75} aria-hidden="true" />
+                {copy.cookiePolicy}
               </Link>
             </div>
             <p className="footer-muted footer-offer">
@@ -438,16 +438,38 @@ export function SiteChrome({
               <p className="footer-muted">ИНН 5261106177</p>
             </div>
           </div>
-          <div>
-            <h3>{copy.catalogFooter}</h3>
-            <Link href="/catalog">{copy.modularHouses}</Link>
-            <Link href="/catalog">{copy.frameHouses}</Link>
-          </div>
-          <div>
-            <h3>{copy.menu}</h3>
-            <Link href="/">{copy.breadcrumbsHome}</Link>
-            <Link href="/catalog">{copy.catalogProjects}</Link>
-            <Link href="/#contacts">{copy.contacts}</Link>
+          <div className="footer-mid">
+            <div className="footer-section">
+              <h3>{copy.footerClients}</h3>
+              <nav className="footer-nav" aria-label={copy.footerClients}>
+                <Link href="/exposition">{copy.exposition}</Link>
+                <Link href="/for-sale">{copy.readyHouses}</Link>
+                <Link href="/mortgage">{copy.mortgage}</Link>
+              </nav>
+            </div>
+            <div className="footer-section">
+              <h3>{copy.footerBusiness}</h3>
+              <nav className="footer-nav" aria-label={copy.footerBusiness}>
+                <Link href="/business">{copy.business}</Link>
+                <Link href="/dealers">{copy.dealers}</Link>
+              </nav>
+            </div>
+            <div className="footer-section">
+              <h3>{copy.catalogFooter}</h3>
+              <nav className="footer-nav" aria-label={copy.catalogFooter}>
+                <Link href="/catalog">{copy.catalog}</Link>
+                <Link href="/catalog?series=modular">{copy.seriesModular}</Link>
+                <Link href="/catalog?series=panel">{copy.seriesPanel}</Link>
+                <Link href="/catalog?series=barn">{copy.seriesBarn}</Link>
+              </nav>
+            </div>
+            <div className="footer-section">
+              <h3>{copy.footerGroupAbout}</h3>
+              <nav className="footer-nav" aria-label={copy.footerGroupAbout}>
+                <Link href="/about">{copy.about}</Link>
+                <Link href="/manufacture">{copy.production}</Link>
+              </nav>
+            </div>
           </div>
           <div>
             <h3>{copy.contacts}</h3>

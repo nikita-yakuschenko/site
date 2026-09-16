@@ -1,6 +1,8 @@
 'use client'
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useConsent } from '../consent/ConsentProvider'
+import { canPersistFunctional } from '../consent/functional-persist'
 import { copy } from '../lib/copy'
 import {
   readRegionCode,
@@ -12,6 +14,7 @@ import {
 } from '../lib/regions'
 
 export function RegionSwitch() {
+  const { openConsentSettings } = useConsent()
   const root = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
   const code = useSyncExternalStore(subscribeRegion, readRegionCode, readServerRegionCode)
@@ -34,6 +37,11 @@ export function RegionSwitch() {
   }, [open])
 
   function select(next: RegionCode): void {
+    if (!canPersistFunctional()) {
+      openConsentSettings()
+      setOpen(false)
+      return
+    }
     writeRegionCode(next)
     setOpen(false)
   }

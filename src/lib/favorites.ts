@@ -1,3 +1,5 @@
+import { canPersistFunctional } from '../consent/functional-persist'
+
 export const FAVORITES_KEY = 'avgst:favorites'
 
 const EMPTY: string[] = []
@@ -61,11 +63,17 @@ export function subscribeFavorites(listener: () => void): () => void {
 }
 
 export function writeFavorites(ids: string[]): void {
+  // Без functional consent не создаём persistent identifier.
+  if (!canPersistFunctional()) {
+    notify()
+    return
+  }
   window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids))
   notify()
 }
 
 export function toggleFavorite(id: string): string[] {
+  if (!canPersistFunctional()) return readFavorites()
   const current = readFavorites()
   const next = current.includes(id) ? current.filter((item) => item !== id) : [...current, id]
   writeFavorites(next)

@@ -1,9 +1,9 @@
 import type { ReactNode } from "react";
 
 /**
- * Узкий рендер markdown для юридических документов: заголовки, абзацы,
- * списки, таблицы GFM и **жирный**. Без внешних зависимостей — документ
- * лежит в docs/ и читается на сборке.
+ * Узкий рендер markdown для юридических документов.
+ * Выход — разметка в стиле doc-rules (как страница реферальных правил):
+ * шапка, секции, группы с жёлтым подзаголовком, списки, таблица.
  */
 
 function stripMd(text: string): string {
@@ -12,7 +12,8 @@ function stripMd(text: string): string {
 
 function inline(text: string, keyPrefix: string): ReactNode[] {
   const parts: ReactNode[] = [];
-  const re = /\*\*(.+?)\*\*/g;
+  // Ссылки, жирный и инлайн-код — как в остальных legal-страницах.
+  const re = /(\[([^\]]+)\]\(([^)]+)\))|(\*\*(.+?)\*\*)|(`([^`]+)`)/g;
   let last = 0;
   let match: RegExpExecArray | null;
   let i = 0;
@@ -20,7 +21,17 @@ function inline(text: string, keyPrefix: string): ReactNode[] {
     if (match.index > last) {
       parts.push(text.slice(last, match.index));
     }
-    parts.push(<strong key={`${keyPrefix}-b${i++}`}>{match[1]}</strong>);
+    if (match[2] && match[3]) {
+      parts.push(
+        <a key={`${keyPrefix}-a${i++}`} href={match[3]}>
+          {match[2]}
+        </a>,
+      );
+    } else if (match[5]) {
+      parts.push(<strong key={`${keyPrefix}-b${i++}`}>{match[5]}</strong>);
+    } else if (match[7]) {
+      parts.push(<code key={`${keyPrefix}-c${i++}`}>{match[7]}</code>);
+    }
     last = match.index + match[0].length;
   }
   if (last < text.length) parts.push(text.slice(last));
@@ -56,65 +67,21 @@ function parseField(line: string): { label: string; value: string } | null {
   return { label: match[1] ?? "", value: match[2] ?? "" };
 }
 
-function renderRequisites(
-  titleLine: string,
-  fieldLines: string[],
-  key: string,
-): ReactNode {
-  const fields = fieldLines
-    .map(parseField)
-    .filter((field): field is { label: string; value: string } => Boolean(field));
+type Block =
+  | { kind: "h1"; text: string }
+  | { kind: "h2"; text: string }
+  | { kind: "h3"; text: string }
+  | { kind: "meta"; text: string }
+  | { kind: "p"; chunks: string[]; breaks: boolean[] }
+  | { kind: "ul"; items: string[] }
+  | { kind: "ol"; items: string[] }
+  | { kind: "table"; rows: string[] }
+  | { kind: "requisites"; title: string; fields: string[] };
 
-  return (
-    <p key={key} className="legal-doc__requisites">
-      {inline(titleLine, `${key}-n`)}
-      {fields.map((field, idx) => (
-        <span key={`${key}-f${idx}`}>
-          <br />
-          {field.label}: <strong>{field.value}</strong>
-        </span>
-      ))}
-    </p>
-  );
-}
-
-function renderTable(rows: string[], key: string): ReactNode {
-  const bodyRows = rows.filter((row) => !isSeparator(row));
-  const headRow = bodyRows[0];
-  if (!headRow) return null;
-  const head = splitCells(headRow);
-  const data = bodyRows.slice(1).map(splitCells);
-  return (
-    <div key={key} className="legal-doc__table-wrap">
-      <table className="legal-doc__table">
-        <thead>
-          <tr>
-            {head.map((cell, i) => (
-              <th key={`${key}-h${i}`}>{inline(cell, `${key}-h${i}`)}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {data.map((cells, r) => (
-            <tr key={`${key}-r${r}`}>
-              {cells.map((cell, c) => (
-                <td key={`${key}-r${r}c${c}`}>
-                  {inline(cell, `${key}-r${r}c${c}`)}
-                </td>
-              ))}
-            </tr>
-          ))}
-        </tbody>
-      </table>
-    </div>
-  );
-}
-
-export function renderMdDoc(source: string): ReactNode[] {
-  const lines = source.replace(/\r\n/g, "\n").split("\n");
-  const nodes: ReactNode[] = [];
+function parseBlocks(source: string): Block[] {
+  const lines = source.replace(/^\uFEFF/, "").replace(/\r\n/g, "\n").split("\n");
+  const blocks: Block[] = [];
   let i = 0;
-  let block = 0;
 
   while (i < lines.length) {
     const line = lines[i] ?? "";
@@ -124,37 +91,37 @@ export function renderMdDoc(source: string): ReactNode[] {
       continue;
     }
 
+    // Горизонтальные правила MD не рендерим — только разделители в исходнике.
+    if (/^(-{3,}|\*{3,}|_{3,})\s*$/.test(line.trim())) {
+      i += 1;
+      continue;
+    }
+
     if (line.startsWith("# ")) {
-      nodes.push(
-        <h1 key={`b${block++}`}>{inline(line.slice(2), `h1-${block}`)}</h1>,
-      );
+      blocks.push({ kind: "h1", text: line.slice(2) });
       i += 1;
       continue;
     }
     if (line.startsWith("## ")) {
-      nodes.push(
-        <h2 key={`b${block++}`}>{inline(line.slice(3), `h2-${block}`)}</h2>,
-      );
+      blocks.push({ kind: "h2", text: line.slice(3) });
       i += 1;
       continue;
     }
     if (line.startsWith("### ")) {
-      nodes.push(
-        <h3 key={`b${block++}`}>{inline(line.slice(4), `h3-${block}`)}</h3>,
-      );
+      blocks.push({ kind: "h3", text: line.slice(4) });
       i += 1;
       continue;
     }
 
     if (line.trim().startsWith("|")) {
-      const table: string[] = [];
+      const rows: string[] = [];
       while (i < lines.length) {
         const row = lines[i] ?? "";
         if (!row.trim().startsWith("|")) break;
-        table.push(row);
+        rows.push(row);
         i += 1;
       }
-      nodes.push(renderTable(table, `t${block++}`));
+      blocks.push({ kind: "table", rows });
       continue;
     }
 
@@ -166,16 +133,7 @@ export function renderMdDoc(source: string): ReactNode[] {
         items.push(row.trim().replace(/^\d+\.\s/, ""));
         i += 1;
       }
-      const listKey = block++;
-      nodes.push(
-        <ol key={`b${listKey}`} className="legal-doc__list">
-          {items.map((item, idx) => (
-            <li key={`o${listKey}-${idx}`}>
-              {inline(item, `o${listKey}-${idx}`)}
-            </li>
-          ))}
-        </ol>,
-      );
+      blocks.push({ kind: "ol", items });
       continue;
     }
 
@@ -187,56 +145,35 @@ export function renderMdDoc(source: string): ReactNode[] {
         items.push(row.trim().slice(2));
         i += 1;
       }
-      const listKey = block++;
-      nodes.push(
-        <ul key={`b${listKey}`} className="legal-doc__list">
-          {items.map((item, idx) => (
-            <li key={`u${listKey}-${idx}`}>
-              {inline(item, `u${listKey}-${idx}`)}
-            </li>
-          ))}
-        </ul>,
-      );
+      blocks.push({ kind: "ul", items });
       continue;
     }
 
-    // Реквизиты оператора: название + ИНН / ОГРН / адрес отдельной карточкой.
     if (isCompanyLine(line)) {
-      const titleLine = line.trim().replace(/\s+$/, "");
+      const title = line.trim().replace(/\s+$/, "");
       i += 1;
       const fields: string[] = [];
       while (i < lines.length) {
         const row = (lines[i] ?? "").trim();
-        if (!row) break;
-        if (!isRequisiteField(row)) break;
+        if (!row || !isRequisiteField(row)) break;
         fields.push(row);
         i += 1;
       }
       if (fields.length) {
-        nodes.push(renderRequisites(titleLine, fields, `req${block++}`));
-        continue;
+        blocks.push({ kind: "requisites", title, fields });
+      } else {
+        blocks.push({ kind: "p", chunks: [title], breaks: [false] });
       }
-      // Название без полей — обычный абзац.
-      nodes.push(
-        <p key={`b${block++}`}>{inline(titleLine, `p${block}`)}</p>,
-      );
       continue;
     }
 
-    // Дата редакции — компактная мета, не «жирный абзац».
     if (/^Редакция\b/i.test(stripMd(line))) {
-      nodes.push(
-        <p key={`b${block++}`} className="legal-doc__meta">
-          {inline(line.trim(), `meta-${block}`)}
-        </p>,
-      );
+      blocks.push({ kind: "meta", text: line.trim() });
       i += 1;
       continue;
     }
 
-    // Абзац: склеиваем соседние непустые строки без разметки блока.
-    // Жёсткий перенос markdown (два пробела в конце) сохраняем через <br />.
-    const para: string[] = [];
+    const chunks: string[] = [];
     const breaks: boolean[] = [];
     while (i < lines.length) {
       const row = lines[i] ?? "";
@@ -250,35 +187,250 @@ export function renderMdDoc(source: string): ReactNode[] {
       ) {
         break;
       }
-      const hardBreak = / {2}$/.test(row);
-      para.push(row.trim());
-      breaks.push(hardBreak);
+      breaks.push(/ {2}$/.test(row));
+      chunks.push(row.trim());
       i += 1;
-      // Без жёсткого переноса соседняя строка — продолжение того же абзаца.
-      if (!hardBreak) {
-        // продолжаем собирать, пока строки идут подряд
-      }
     }
-
-    const paraKey = block++;
-    const hasHardBreak = breaks.some(Boolean);
-    if (hasHardBreak) {
-      nodes.push(
-        <p key={`b${paraKey}`}>
-          {para.map((chunk, idx) => (
-            <span key={`p${paraKey}-${idx}`}>
-              {inline(chunk, `p${paraKey}-${idx}`)}
-              {idx < para.length - 1 && breaks[idx] ? <br /> : " "}
-            </span>
-          ))}
-        </p>,
-      );
-    } else {
-      nodes.push(
-        <p key={`b${paraKey}`}>{inline(para.join(" "), `p${paraKey}`)}</p>,
-      );
+    if (chunks.length) {
+      blocks.push({ kind: "p", chunks, breaks });
     }
   }
 
-  return nodes;
+  return blocks;
+}
+
+function renderParagraph(
+  chunks: string[],
+  breaks: boolean[],
+  key: string,
+): ReactNode {
+  const hasHardBreak = breaks.some(Boolean);
+  if (hasHardBreak) {
+    return (
+      <p key={key}>
+        {chunks.map((chunk, idx) => (
+          <span key={`${key}-${idx}`}>
+            {inline(chunk, `${key}-${idx}`)}
+            {idx < chunks.length - 1 && breaks[idx] ? <br /> : " "}
+          </span>
+        ))}
+      </p>
+    );
+  }
+  return <p key={key}>{inline(chunks.join(" "), key)}</p>;
+}
+
+function renderBodyBlock(block: Block, key: string): ReactNode {
+  switch (block.kind) {
+    case "p":
+      return renderParagraph(block.chunks, block.breaks, key);
+    case "ul":
+      // Обычный список; текст в одном span, чтобы flex/grid не рвали фразы.
+      return (
+        <ul key={key} className="referral-rules__bullets">
+          {block.items.map((item, idx) => (
+            <li key={`${key}-${idx}`}>
+              <span>{inline(item, `${key}-${idx}`)}</span>
+            </li>
+          ))}
+        </ul>
+      );
+    case "ol":
+      return (
+        <ol key={key} className="referral-rules__list">
+          {block.items.map((item, idx) => (
+            <li key={`${key}-${idx}`} className="referral-rules__item">
+              <span className="referral-rules__num">{idx + 1}.</span>
+              <p>{inline(item, `${key}-${idx}`)}</p>
+            </li>
+          ))}
+        </ol>
+      );
+    case "table": {
+      const bodyRows = block.rows.filter((row) => !isSeparator(row));
+      const headRow = bodyRows[0];
+      if (!headRow) return null;
+      const head = splitCells(headRow);
+      const data = bodyRows.slice(1).map(splitCells);
+      return (
+        <div key={key} className="referral-rules__table-wrap">
+          <table className="referral-rules__table">
+            <thead>
+              <tr>
+                {head.map((cell, i) => (
+                  <th key={`${key}-h${i}`}>{inline(cell, `${key}-h${i}`)}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {data.map((cells, r) => (
+                <tr key={`${key}-r${r}`}>
+                  {cells.map((cell, c) => (
+                    <td key={`${key}-r${r}c${c}`}>
+                      {inline(cell, `${key}-r${r}c${c}`)}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    }
+    case "requisites": {
+      const fields = block.fields
+        .map(parseField)
+        .filter(
+          (field): field is { label: string; value: string } => Boolean(field),
+        );
+      return (
+        <p key={key} className="referral-rules__requisites">
+          {inline(block.title, `${key}-n`)}
+          {fields.map((field, idx) => (
+            <span key={`${key}-f${idx}`}>
+              <br />
+              {field.label}: <strong>{field.value}</strong>
+            </span>
+          ))}
+        </p>
+      );
+    }
+    default:
+      return null;
+  }
+}
+
+function renderGroupBody(blocks: Block[], keyPrefix: string): ReactNode[] {
+  return blocks
+    .map((block, idx) => renderBodyBlock(block, `${keyPrefix}-${idx}`))
+    .filter(Boolean);
+}
+
+function renderGroup(
+  title: string,
+  body: Block[],
+  key: string,
+): ReactNode {
+  return (
+    <div key={key} className="referral-rules__group">
+      <h3 className="referral-rules__group-title">
+        {inline(title, `${key}-t`)}
+      </h3>
+      {renderGroupBody(body, key)}
+    </div>
+  );
+}
+
+/**
+ * Тот же визуальный контракт, что у referral-rules:
+ * шапка, секции, серые группы с жёлтым заголовком, нумерованные пункты.
+ */
+export function renderMdDoc(
+  source: string,
+  options?: { backHref?: string; backLabel?: string },
+): ReactNode {
+  const blocks = parseBlocks(source);
+  const head: ReactNode[] = [];
+  const body: ReactNode[] = [];
+  let i = 0;
+  let sid = 0;
+
+  if (blocks[0]?.kind === "h1") {
+    head.push(<h1 key="title">{inline(blocks[0].text, "h1")}</h1>);
+    i = 1;
+  }
+
+  while (i < blocks.length && blocks[i]?.kind !== "h2") {
+    const block = blocks[i];
+    if (!block) break;
+    if (block.kind === "meta") {
+      head.push(
+        <p key={`meta-${i}`} className="referral-rules__meta">
+          {inline(block.text, `meta-${i}`)}
+        </p>,
+      );
+    } else if (block.kind === "p" && head.length <= 2) {
+      head.push(
+        <p key={`intro-${i}`} className="referral-rules__intro">
+          {inline(block.chunks.join(" "), `intro-${i}`)}
+        </p>,
+      );
+    } else {
+      const node = renderBodyBlock(block, `head-${i}`);
+      if (node) head.push(node);
+    }
+    i += 1;
+  }
+
+  while (i < blocks.length) {
+    const h2 = blocks[i];
+    if (h2?.kind !== "h2") {
+      i += 1;
+      continue;
+    }
+    i += 1;
+
+    const beforeGroups: Block[] = [];
+    const groups: { title: string; body: Block[] }[] = [];
+    let current: { title: string; body: Block[] } | null = null;
+
+    while (i < blocks.length && blocks[i]?.kind !== "h2") {
+      const block = blocks[i];
+      if (!block) break;
+
+      if (block.kind === "h3") {
+        current = { title: block.text, body: [] };
+        groups.push(current);
+        i += 1;
+        continue;
+      }
+
+      if (current) {
+        current.body.push(block);
+      } else {
+        beforeGroups.push(block);
+      }
+      i += 1;
+    }
+
+    // Есть ### — подпункты = серые группы. Вводный текст до первого ###
+    // тоже в серой группе с заголовком ##, иначе он «висит» на белом.
+    // Нет ### — весь раздел = одна серая группа.
+    if (groups.length > 0) {
+      body.push(
+        <section key={`sec-${sid}`} className="referral-rules__section">
+          {beforeGroups.length > 0 ? (
+            renderGroup(h2.text, beforeGroups, `g${sid}-pre`)
+          ) : (
+            <h2>{inline(h2.text, `h2-${sid}`)}</h2>
+          )}
+          {groups.map((group, gid) =>
+            renderGroup(group.title, group.body, `g${sid}-${gid}`),
+          )}
+        </section>,
+      );
+    } else {
+      body.push(
+        renderGroup(h2.text, beforeGroups, `g${sid}`),
+      );
+    }
+    sid += 1;
+  }
+
+  return (
+    <article className="referral-rules">
+      <header className="referral-rules__head">{head}</header>
+      {body}
+      {options?.backHref ? (
+        <footer className="referral-rules__footer">
+          <a
+            className="btn btn-yellow referral-rules__back"
+            href={options.backHref}
+          >
+            {options.backLabel ?? "Вернуться на главную"}
+          </a>
+        </footer>
+      ) : null}
+    </article>
+  );
 }

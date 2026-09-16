@@ -16,76 +16,77 @@ import { SITE } from '../lib/site'
  * Ключ берётся из /api/maps-key в рантайме, а не из NEXT_PUBLIC_-переменной:
  * такая переменная вшивается на этапе `next build`, который идёт внутри
  * `docker build`, куда окружение контейнера Dokploy не попадает. С запросом
- * ключ подхватывается при запуске и меняется без пересборки.
+ * к собственному API ключ читается уже из runtime env работающего контейнера.
  *
- * Библиотека 2.1 приезжает при первом открытии панели, а не вместе со
- * страницей. Органы управления выключены (`controls: []`), блок «Открыть в
- * Яндекс.Картах» подавлен, жесты сняты — карта работает как превью, клик по
- * ней ведёт на маршрут. Строка копирайта остаётся: её скрытие нарушало бы
- * лицензию.
+ * Карта офиса/производства — necessary: показывает адрес компании, без неё
+ * блок контактов не выполняет свою задачу. JS API грузится сразу.
  */
 
 type YmapsMap = {
   destroy: () => void
+  behaviors: { disable: (list: string[]) => void }
+  geoObjects: { add: (obj: unknown) => void }
   container: { fitToViewport: () => void }
 }
 
-type Ymaps = {
-  ready: (callback: () => void) => void
+type YmapsNs = {
+  ready: (cb: () => void) => void
   Map: new (
-    element: HTMLElement,
-    state: { center: readonly [number, number]; zoom: number; controls: readonly string[] },
-    options: { suppressMapOpenBlock: boolean; yandexMapDisablePoiInteractivity: boolean },
-  ) => YmapsMap & {
-    behaviors: { disable: (names: readonly string[]) => void }
-    geoObjects: { add: (object: unknown) => void }
-  }
+    el: HTMLElement,
+    state: { center: readonly [number, number]; zoom: number; controls: string[] },
+    options?: Record<string, unknown>,
+  ) => YmapsMap
   Placemark: new (
     coords: readonly [number, number],
-    properties: Record<string, unknown>,
-    options: Record<string, unknown>,
+    properties?: Record<string, unknown>,
+    options?: Record<string, unknown>,
   ) => unknown
 }
 
 declare global {
-  var ymaps: Ymaps | undefined
+  interface Window {
+    ymaps?: YmapsNs
+  }
 }
 
-/** Ключ и загрузчик — по одному на страницу: панель открывают много раз. */
-let keyRequest: Promise<string> | null = null
-let loader: Promise<Ymaps> | null = null
+let loader: Promise<YmapsNs> | null = null
 
-function readKey(): Promise<string> {
-  if (keyRequest) return keyRequest
-  keyRequest = fetch('/api/maps-key')
-    .then((response) => (response.ok ? response.json() : { key: '' }))
-    .then((data: { key?: string }) => data.key ?? '')
-  keyRequest.catch(() => {
-    keyRequest = null
-  })
-  return keyRequest
+function readKey(): Promise<string | null> {
+  return fetch('/api/maps-key')
+    .then((r) => (r.ok ? r.json() : null))
+    .then((data: { key?: string } | null) => data?.key || null)
+    .catch(() => null)
 }
 
-function loadYmaps(apikey: string): Promise<Ymaps> {
+function loadYmaps(apikey: string): Promise<YmapsNs> {
+  if (typeof window === 'undefined') {
+    return Promise.reject(new Error('ymaps: no window'))
+  }
+  if (window.ymaps) return Promise.resolve(window.ymaps)
   if (loader) return loader
-  loader = new Promise<Ymaps>((resolve, reject) => {
-    if (globalThis.ymaps) {
-      resolve(globalThis.ymaps)
+  loader = new Promise<YmapsNs>((resolve, reject) => {
+    const existing = document.querySelector<HTMLScriptElement>('script[data-ymaps-loader]')
+    if (existing) {
+      existing.addEventListener('load', () => {
+        if (window.ymaps) resolve(window.ymaps)
+        else reject(new Error('ymaps missing after load'))
+      })
+      existing.addEventListener('error', () => reject(new Error('ymaps script error')))
       return
     }
     const script = document.createElement('script')
     script.src = yandexMapsLoaderUrl(apikey)
     script.async = true
+    script.dataset.ymapsLoader = '1'
     script.onload = () => {
-      if (globalThis.ymaps) resolve(globalThis.ymaps)
-      else reject(new Error('ymaps не появился после загрузки скрипта'))
+      if (window.ymaps) resolve(window.ymaps)
+      else reject(new Error('ymaps missing after load'))
     }
-    script.onerror = () => reject(new Error('не удалось загрузить JS API Яндекс.Карт'))
+    script.onerror = () => reject(new Error('ymaps script error'))
     document.head.appendChild(script)
-  })
-  // Неудачную попытку не кешируем: при следующем открытии панели пробуем снова.
-  loader.catch(() => {
+  }).catch((err) => {
     loader = null
+    throw err
   })
   return loader
 }

@@ -434,6 +434,9 @@ export function HeroCarousel({
                       </span>
                     ) : null}
 
+                    <span className="hero__promo-corner" aria-hidden="true">
+                      <IconArrowUpRight size={15} stroke={2} />
+                    </span>
                     <span className="hero__promo-body">
                       {promo.eyebrow ? (
                         <span className="hero__promo-eyebrow">

@@ -1,6 +1,9 @@
-# Commit + push (+ optional deploy) without Cursor Co-authored-by.
+# Commit + push without Cursor Co-authored-by.
 # Cursor injects the trailer via cmd\git.exe wrapper on `git commit`.
 # This script creates commits with mingw64 git commit-tree instead.
+#
+# Deploy: Dokploy autoDeploy на push в av4 — флаг -Deploy только для
+# совместимости вызовов, второй API-deploy не запускает (иначе дубль).
 #
 # Usage:
 #   powershell -File scripts/git-ship.ps1 -Message "Short description" -Deploy
@@ -154,16 +157,7 @@ if (-not $Deploy) {
   exit 0
 }
 
-if (-not $DokployUrl -or -not $DokployToken) {
-  Write-Host "deploy: missing DOKPLOY_URL/DOKPLOY_TOKEN; deploy from agent/UI"
-  Write-Host "deploy appId: $DokployAppId"
-  exit 0
-}
-
-$endpoint = $DokployUrl.TrimEnd("/") + "/api/application.deploy"
-$payload = @{ applicationId = $DokployAppId; title = $Message } | ConvertTo-Json
-Invoke-RestMethod -Method Post -Uri $endpoint -Headers @{
-  Authorization = "Bearer $DokployToken"
-  "Content-Type" = "application/json"
-} -Body $payload | Out-Null
-Write-Host "deploy: ok ($DokployAppId)"
+# В Dokploy у приложения autoDeploy=true на push в av4. Повторный
+# application.deploy после push даёт второй одинаковый билд в истории.
+Write-Host "deploy: уже идёт через Dokploy autoDeploy на push; API-вызов пропущен ($DokployAppId)"
+exit 0

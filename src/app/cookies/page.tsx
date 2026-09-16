@@ -2,19 +2,19 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Metadata } from "next";
 import { SiteChrome } from "../../components/site-chrome";
+import { CookieSettingsButton } from "../../consent/CookieSettingsButton";
 import { copy, footerAboutFor } from "../../lib/copy";
 import { renderMdDoc } from "../../lib/md-doc";
 import { SITE } from "../../lib/site";
 
 export const metadata: Metadata = {
-  title: copy.personalDataTitle,
-  description: copy.personalDataLead,
+  title: copy.cookiePolicyTitle,
+  description: copy.cookiePolicyLead,
 };
 
-/** Политика обработки персональных данных. */
-export default function PrivacyPage() {
+export default function CookiePolicyPage() {
   const source = readFileSync(
-    join(process.cwd(), "docs/politika_obrabotki_personalnyh_dannyh_final.md"),
+    join(process.cwd(), "docs/cookie-policy-final.md"),
     "utf8",
   );
 
@@ -36,6 +36,9 @@ export default function PrivacyPage() {
               backHref: "/#footer",
               backLabel: "Вернуться на главную",
             })}
+            <div className="legal-doc__consent-actions">
+              <CookieSettingsButton />
+            </div>
           </div>
         </section>
       </main>

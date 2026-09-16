@@ -1,37 +1,41 @@
-"use client";
+'use client'
 
-import { IconX } from "@tabler/icons-react";
-import { useEffect, useId, useState } from "react";
-import { copy } from "../lib/copy";
+import { IconX } from '@tabler/icons-react'
+import { useEffect, useId, useState } from 'react'
+import { useConsent } from '../consent/ConsentProvider'
+import { EmbedPlaceholder } from '../consent/EmbedPlaceholder'
+import { copy } from '../lib/copy'
 
 const KINESCOPE_EMBED =
-  "https://kinescope.io/embed/npS4zk5fgxhM7XbFGRkoq7?autoplay=1&muted=0";
+  'https://kinescope.io/embed/npS4zk5fgxhM7XbFGRkoq7?autoplay=1&muted=0'
 
 export function FactoryVideo({
-  src = "/fixtures/factory.jpg",
+  src = '/fixtures/factory.jpg',
   srcMobile,
   alt = copy.factoryAlt,
 }: {
-  src?: string;
-  srcMobile?: string;
-  alt?: string;
+  src?: string
+  srcMobile?: string
+  alt?: string
 }) {
-  const [open, setOpen] = useState(false);
-  const titleId = useId();
+  const { hasConsent } = useConsent()
+  const allowed = hasConsent('functional')
+  const [open, setOpen] = useState(false)
+  const titleId = useId()
 
   useEffect(() => {
-    if (!open) return;
+    if (!open) return
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") setOpen(false);
-    };
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKey);
+      if (event.key === 'Escape') setOpen(false)
+    }
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', onKey)
     return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [open]);
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [open])
 
   return (
     <>
@@ -91,15 +95,22 @@ export function FactoryVideo({
                 <IconX size={20} stroke={2.2} />
               </button>
             </div>
-            <iframe
-              title={copy.factoryVideoTitle}
-              src={KINESCOPE_EMBED}
-              allow="autoplay; fullscreen"
-              allowFullScreen
-            />
+            {allowed ? (
+              <iframe
+                title={copy.factoryVideoTitle}
+                src={KINESCOPE_EMBED}
+                allow="autoplay; fullscreen"
+                allowFullScreen
+              />
+            ) : (
+              <EmbedPlaceholder
+                title={copy.factoryVideoTitle}
+                message="Для просмотра видео разрешите функциональные cookie."
+              />
+            )}
           </div>
         </div>
       ) : null}
     </>
-  );
+  )
 }

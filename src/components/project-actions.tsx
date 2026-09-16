@@ -2,6 +2,8 @@
 
 import { useSyncExternalStore } from 'react'
 import { IconHeart, IconShare3 } from '@tabler/icons-react'
+import { useConsent } from '../consent/ConsentProvider'
+import { canPersistFunctional } from '../consent/functional-persist'
 import { copy } from '../lib/copy'
 import {
   readFavorites,
@@ -29,8 +31,21 @@ export function ProjectActions({
   project: CatalogProject
   stats: ProjectStats
 }) {
-  const favorites = useSyncExternalStore(subscribeFavorites, readFavorites, readServerFavorites)
+  const { openConsentSettings } = useConsent()
+  const favorites = useSyncExternalStore(
+    subscribeFavorites,
+    readFavorites,
+    readServerFavorites,
+  )
   const favorite = favorites.includes(project.id)
+
+  function onFavorite() {
+    if (!canPersistFunctional()) {
+      openConsentSettings()
+      return
+    }
+    toggleFavorite(project.id)
+  }
 
   return (
     <div className="project-actions">
@@ -39,7 +54,7 @@ export function ProjectActions({
         className="project-actions__btn"
         aria-label={favorite ? copy.favoriteRemove : copy.favoriteAdd}
         aria-pressed={favorite}
-        onClick={() => toggleFavorite(project.id)}
+        onClick={onFavorite}
       >
         <IconHeart
           size={26}

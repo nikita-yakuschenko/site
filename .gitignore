@@ -18,3 +18,7 @@ next-env.d.ts
 .idea/
 .claude/
 public/media/factory-video.mp4
+data/
+test-results/
+playwright-report/
+playwright/.cache/

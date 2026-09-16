@@ -1,3 +1,4 @@
+import { canPersistFunctional } from '../consent/functional-persist'
 import { copy } from './copy'
 
 export const REGIONS = [
@@ -24,6 +25,10 @@ export function readRegionCode(): RegionCode {
 }
 
 export function writeRegionCode(code: RegionCode): void {
+  if (!canPersistFunctional()) {
+    notifyRegion()
+    return
+  }
   window.localStorage.setItem(STORAGE_KEY, code)
   notifyRegion()
 }

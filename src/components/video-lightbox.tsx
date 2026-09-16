@@ -1,8 +1,10 @@
-"use client";
+'use client'
 
-import { IconX } from "@tabler/icons-react";
-import { useEffect, useId } from "react";
-import { copy } from "../lib/copy";
+import { IconX } from '@tabler/icons-react'
+import { useEffect, useId } from 'react'
+import { useConsent } from '../consent/ConsentProvider'
+import { EmbedPlaceholder } from '../consent/EmbedPlaceholder'
+import { copy } from '../lib/copy'
 
 /** Модалка с iframe: один хром для обзоров и отзывов. */
 export function VideoLightbox({
@@ -10,24 +12,26 @@ export function VideoLightbox({
   embedSrc,
   onClose,
 }: {
-  title: string;
-  embedSrc: string;
-  onClose: () => void;
+  title: string
+  embedSrc: string
+  onClose: () => void
 }) {
-  const titleId = useId();
+  const { hasConsent } = useConsent()
+  const allowed = hasConsent('functional')
+  const titleId = useId()
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
-    };
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    window.addEventListener("keydown", onKey);
+      if (event.key === 'Escape') onClose()
+    }
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    window.addEventListener('keydown', onKey)
     return () => {
-      document.body.style.overflow = prev;
-      window.removeEventListener("keydown", onKey);
-    };
-  }, [onClose]);
+      document.body.style.overflow = prev
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [onClose])
 
   return (
     <div
@@ -52,32 +56,38 @@ export function VideoLightbox({
             <IconX size={20} stroke={2.2} />
           </button>
         </div>
-        <iframe
-          title={title}
-          src={embedSrc}
-          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
-          allowFullScreen
-        />
+        {allowed ? (
+          <iframe
+            title={title}
+            src={embedSrc}
+            allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
+            allowFullScreen
+          />
+        ) : (
+          <EmbedPlaceholder
+            title={title}
+            message="Для просмотра видео разрешите функциональные cookie."
+          />
+        )}
       </div>
     </div>
-  );
+  )
 }
 
 export function kinescopeEmbed(id: string): string {
-  return `https://kinescope.io/embed/${id}?autoplay=1&muted=0`;
+  return `https://kinescope.io/embed/${id}?autoplay=1&muted=0`
 }
 
 /** Embed VK Video: oid отрицательный у сообщества, id ролика. */
 export function vkEmbed(oid: number, id: string): string {
-  return `https://vk.com/video_ext.php?oid=${oid}&id=${id}&hd=2&autoplay=1`;
+  return `https://vk.com/video_ext.php?oid=${oid}&id=${id}&hd=2&autoplay=1`
 }
 
 export type ReviewEmbed =
-  | { provider: "kinescope"; id: string }
-  | { provider: "vk"; oid: number; id: string };
+  | { provider: 'kinescope'; id: string }
+  | { provider: 'vk'; oid: number; id: string }
 
 export function reviewEmbedSrc(video: ReviewEmbed): string {
-  if (video.provider === "vk") return vkEmbed(video.oid, video.id);
-  return kinescopeEmbed(video.id);
+  if (video.provider === 'vk') return vkEmbed(video.oid, video.id)
+  return kinescopeEmbed(video.id)
 }
-

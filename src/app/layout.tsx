@@ -1,6 +1,13 @@
 import type { ReactNode } from 'react'
 import type { Metadata, Viewport } from 'next'
+import { cookies } from 'next/headers'
 import { GeistSans } from 'geist/font/sans'
+import { ConsentShell } from '../consent/ConsentShell'
+import { parseConsent } from '../consent/storage'
+import {
+  CONSENT_COOKIE,
+  isConsentDecided,
+} from '../consent/types'
 import { copy } from '../lib/copy'
 import { OG_LOCALE } from '../lib/locale'
 import './styles.css'
@@ -25,10 +32,18 @@ export const viewport: Viewport = {
   initialScale: 1,
 }
 
-export default function RootLayout({ children }: { children: ReactNode }) {
+export default async function RootLayout({ children }: { children: ReactNode }) {
+  const jar = await cookies()
+  const raw = jar.get(CONSENT_COOKIE)?.value
+  const parsed = parseConsent(raw)
+  const initialState =
+    parsed && isConsentDecided(parsed) ? parsed : null
+
   return (
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
-      <body suppressHydrationWarning>{children}</body>
+      <body suppressHydrationWarning>
+        <ConsentShell initialState={initialState}>{children}</ConsentShell>
+      </body>
     </html>
   )
 }

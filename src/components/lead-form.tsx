@@ -1,6 +1,7 @@
 'use client'
 
 import { useRef, useState } from 'react'
+import Link from 'next/link'
 import { IconArrowUpRight } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
@@ -13,6 +14,7 @@ import {
   phoneE164,
   sanitizeName,
 } from '../lib/phone'
+import { noAutofillFieldProps, noAutofillFormProps } from '../lib/no-autofill'
 
 export function LeadForm({
   siteId,
@@ -83,9 +85,10 @@ export function LeadForm({
 
   return (
     <form
-      className={variant === 'card' ? 'lead-card' : 'lead-form'}
+      className={`${variant === 'card' ? 'lead-card' : 'lead-form'} ym-disable-submit`}
       onSubmit={onSubmit}
       noValidate
+      {...noAutofillFormProps}
     >
       <div>
         <p className="lead-card__title">{heading}</p>
@@ -95,10 +98,12 @@ export function LeadForm({
         {copy.name}
         <input
           name="name"
-          autoComplete="name"
+          {...noAutofillFieldProps}
           placeholder={copy.namePlaceholder}
           aria-invalid={invalid.name || undefined}
-          className={invalid.name ? 'is-invalid' : undefined}
+          className={['ym-disable-keys', 'ym-hide-content', invalid.name ? 'is-invalid' : '']
+            .filter(Boolean)
+            .join(' ') || undefined}
           onInput={(e) => {
             const el = e.currentTarget
             const pos = el.selectionStart || 0
@@ -123,11 +128,13 @@ export function LeadForm({
           name="phone"
           type="tel"
           inputMode="tel"
-          autoComplete="tel"
+          {...noAutofillFieldProps}
           placeholder={copy.phonePlaceholder}
           value={phone}
           aria-invalid={invalid.phone || undefined}
-          className={invalid.phone ? 'is-invalid' : undefined}
+          className={['ym-disable-keys', 'ym-hide-content', invalid.phone ? 'is-invalid' : '']
+            .filter(Boolean)
+            .join(' ') || undefined}
           onFocus={() => {
             if (!nationalPhoneDigits(phone)) {
               setPhone('+7')
@@ -176,7 +183,13 @@ export function LeadForm({
       </label>
       <label>
         {copy.message}
-        <textarea name="message" rows={5} placeholder={copy.messagePlaceholder} />
+        <textarea
+          name="message"
+          rows={5}
+          placeholder={copy.messagePlaceholder}
+          className="ym-disable-keys ym-hide-content"
+          {...noAutofillFieldProps}
+        />
       </label>
       <label
         className={
@@ -190,7 +203,16 @@ export function LeadForm({
           type="checkbox"
           onChange={() => setInvalid((prev) => ({ ...prev, consent: false }))}
         />
-        {copy.consent}
+        <span>
+          {copy.consentPrefix}
+          <Link
+            className="lead-form__consent-link"
+            href={copy.personalDataHref}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {copy.consentLinkLabel}
+          </Link>
+        </span>
       </label>
       <button className="btn btn-yellow lead-card__submit" type="submit" disabled={status === 'sending'}>
         {status === 'sending' ? copy.sending : submitLabel || copy.sendLead}

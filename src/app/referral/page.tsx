@@ -1,23 +1,16 @@
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
 import type { Metadata } from "next";
+import { ReferralRules } from "../../components/referral-rules";
 import { SiteChrome } from "../../components/site-chrome";
 import { copy, footerAboutFor } from "../../lib/copy";
-import { renderMdDoc } from "../../lib/md-doc";
 import { SITE } from "../../lib/site";
 
 export const metadata: Metadata = {
-  title: copy.personalDataTitle,
-  description: copy.personalDataLead,
+  title: copy.referralRulesTitle,
+  description: copy.referralRulesLead,
 };
 
-/** Политика обработки персональных данных. */
-export default function PrivacyPage() {
-  const source = readFileSync(
-    join(process.cwd(), "docs/politika_obrabotki_personalnyh_dannyh_final.md"),
-    "utf8",
-  );
-
+/** Правила реферальной программы. */
+export default function ReferralRulesPage() {
   return (
     <SiteChrome
       name={SITE.name}
@@ -32,10 +25,7 @@ export default function PrivacyPage() {
       <main>
         <section className="section legal-doc">
           <div className="section__inner legal-doc__inner">
-            {renderMdDoc(source, {
-              backHref: "/#footer",
-              backLabel: "Вернуться на главную",
-            })}
+            <ReferralRules />
           </div>
         </section>
       </main>

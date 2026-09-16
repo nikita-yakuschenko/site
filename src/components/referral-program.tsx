@@ -4,6 +4,7 @@ import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
+import { noAutofillFieldProps, noAutofillFormProps } from "../lib/no-autofill";
 
 type Status = "idle" | "open" | "sending" | "ok" | "error";
 
@@ -259,7 +260,12 @@ export function ReferralProgram({
                     ×
                   </button>
 
-                  <form className="referral__form" onSubmit={onSubmit} noValidate>
+                  <form
+                    className="referral__form ym-disable-submit"
+                    onSubmit={onSubmit}
+                    noValidate
+                    {...noAutofillFormProps}
+                  >
                     <div className="referral__fields">
                       <p className="referral__lead" id="referral-lead">
                         {nbspText(data.formLead)}
@@ -271,8 +277,14 @@ export function ReferralProgram({
                           ref={nameRef}
                           name="name"
                           type="text"
-                          autoComplete="name"
-                          className={invalid.name ? "is-invalid" : undefined}
+                          {...noAutofillFieldProps}
+                          className={[
+                            "ym-disable-keys",
+                            "ym-hide-content",
+                            invalid.name ? "is-invalid" : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ") || undefined}
                           onInput={(e) => {
                             const el = e.currentTarget;
                             const pos = el.selectionStart || 0;
@@ -295,9 +307,15 @@ export function ReferralProgram({
                           name="phone"
                           type="tel"
                           inputMode="tel"
-                          autoComplete="tel"
+                          {...noAutofillFieldProps}
                           value={phone}
-                          className={invalid.phone ? "is-invalid" : undefined}
+                          className={[
+                            "ym-disable-keys",
+                            "ym-hide-content",
+                            invalid.phone ? "is-invalid" : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ") || undefined}
                           onFocus={() => {
                             if (!nationalDigits(phone)) {
                               setPhone("+7");
@@ -353,8 +371,14 @@ export function ReferralProgram({
                           name="email"
                           type="email"
                           inputMode="email"
-                          autoComplete="email"
-                          className={invalid.email ? "is-invalid" : undefined}
+                          {...noAutofillFieldProps}
+                          className={[
+                            "ym-disable-keys",
+                            "ym-hide-content",
+                            invalid.email ? "is-invalid" : "",
+                          ]
+                            .filter(Boolean)
+                            .join(" ") || undefined}
                           onInput={() =>
                             setInvalid((prev) => ({ ...prev, email: false }))
                           }
@@ -382,8 +406,6 @@ export function ReferralProgram({
                           <a
                             className="referral__link"
                             href={data.rulesHref}
-                            target="_blank"
-                            rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
                           >
                             {data.rulesLabel}
@@ -470,12 +492,7 @@ export function ReferralProgram({
 
           <p className="referral__foot">
             {data.rulesFooterPrefix}
-            <a
-              className="referral__link"
-              href={data.rulesHref}
-              target="_blank"
-              rel="noopener noreferrer"
-            >
+            <a className="referral__link" href={data.rulesHref}>
               {data.rulesFooterLabel}
             </a>
           </p>
