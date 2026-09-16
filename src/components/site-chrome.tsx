@@ -10,6 +10,7 @@ import {
 import {
   IconBuilding,
   IconBuildingFactory2,
+  IconFileText,
   IconMail,
   IconMenu2,
   IconMoon,
@@ -417,9 +418,16 @@ export function SiteChrome({
               <img src={src} alt={name} />
             </Link>
             <p className="footer-about">{about || copy.footerAbout}</p>
-            <Link className="footer-muted" href={copy.privacyHref}>
-              {copy.privacy}
-            </Link>
+            <div className="footer-policies">
+              <Link className="footer-policy" href={copy.privacyHref}>
+                <IconFileText size={16} stroke={1.75} aria-hidden="true" />
+                {copy.privacy}
+              </Link>
+              <Link className="footer-policy" href={copy.personalDataHref}>
+                <IconFileText size={16} stroke={1.75} aria-hidden="true" />
+                {copy.personalData}
+              </Link>
+            </div>
             <p className="footer-muted footer-offer">
               {footer || copy.offerDisclaimer}
             </p>

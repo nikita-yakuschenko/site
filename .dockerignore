@@ -4,6 +4,7 @@ node_modules
 .github
 *.md
 !README.md
+!docs/**/*.md
 .env
 .env.*
 !.env.example

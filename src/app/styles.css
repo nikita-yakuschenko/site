@@ -1105,12 +1105,18 @@ a {
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  margin: 0;
+  padding: 0;
   border-radius: var(--surface-radius);
   border: var(--glass-border);
   background: var(--glass-bg);
   box-shadow: var(--glass-shadow);
   backdrop-filter: var(--glass-blur);
   color: white;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  appearance: none;
   transition: border-color 0.2s var(--ease-out);
 }
 
@@ -3725,6 +3731,116 @@ a {
   color: rgb(var(--avgst-ink-rgb) / 0.72);
 }
 
+/* Юридический документ: читаемый длинный текст и широкая таблица целей. */
+.legal-doc__inner {
+  max-width: 72rem;
+}
+
+.legal-doc h1 {
+  margin: 0;
+  font-size: clamp(1.35rem, 2vw, 1.75rem);
+  font-weight: 750;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+}
+
+.legal-doc__meta {
+  display: inline-flex;
+  margin: 14px 0 0;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: rgb(72 176 98 / 0.12);
+  color: #2f7a43;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.3;
+  max-width: none;
+}
+
+.legal-doc h2 {
+  margin: 2.75rem 0 0.85rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  font-size: 1.15rem;
+  line-height: 1.3;
+}
+
+.legal-doc h2:first-of-type {
+  border-top: 0;
+  padding-top: 0;
+}
+
+.legal-doc h3 {
+  margin: 1.75rem 0 0.55rem;
+  font-size: 1rem;
+  line-height: 1.4;
+  color: rgb(var(--avgst-ink-rgb) / 0.92);
+}
+
+.legal-doc p {
+  margin: 0.75rem 0 0;
+  max-width: 72ch;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgb(var(--avgst-ink-rgb) / 0.84);
+}
+
+.legal-doc__list {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+  max-width: 72ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgb(var(--avgst-ink-rgb) / 0.84);
+}
+
+.legal-doc__list li + li {
+  margin-top: 0.35rem;
+}
+
+/* Реквизиты: каждая строка с новой линии, без отдельной «карточки». */
+.legal-doc__requisites {
+  margin: 0.75rem 0 0;
+  max-width: 72ch;
+  font-size: 15px;
+  line-height: 1.65;
+  color: rgb(var(--avgst-ink-rgb) / 0.84);
+}
+
+.legal-doc__table-wrap {
+  margin: 1.25rem 0 0;
+  overflow-x: auto;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-radius: var(--radius);
+}
+
+.legal-doc__table {
+  width: 100%;
+  min-width: 56rem;
+  border-collapse: collapse;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.legal-doc__table th,
+.legal-doc__table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  text-align: left;
+  vertical-align: top;
+}
+
+.legal-doc__table th {
+  background: rgb(var(--avgst-ink-rgb) / 0.04);
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.legal-doc__table tr:last-child td {
+  border-bottom: 0;
+}
+
+
 /* Каталог: счётчик над сеткой и состояние пустого результата. */
 .catalog__count {
   margin: 20px 0 0;
@@ -5357,6 +5473,26 @@ a {
   margin: 0;
   color: rgb(255 255 255 / 0.72);
   line-height: 1.5;
+}
+
+.footer-policies {
+  display: grid;
+  gap: 10px;
+}
+
+.footer-grid .footer-policy {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  color: var(--avgst-green);
+  font-size: 13px;
+  line-height: 1.45;
+  text-decoration: none;
+}
+
+.footer-grid .footer-policy:hover {
+  color: #5fc478;
 }
 
 .footer-offer {

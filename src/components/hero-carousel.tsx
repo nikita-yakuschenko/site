@@ -39,7 +39,8 @@ export type HeroPromo = {
   heading: string;
   text?: string;
   cta: string;
-  href: string;
+  /** Раньше вёл на страницу; слот теперь открывает форму заявки. */
+  href?: string;
   image?: string;
   video?: string;
   cutout?: boolean;
@@ -400,12 +401,15 @@ export function HeroCarousel({
                 const ahead = (((slot - index) % count) + count) % count;
                 const active = !clone && ahead < perView;
                 return (
-                  <a
+                  <button
                     key={key}
+                    type="button"
                     className="hero__promo"
-                    href={promo.href}
                     aria-hidden={!active}
                     tabIndex={active ? undefined : -1}
+                    onClick={() => {
+                      // Форму заявки подключим отдельно; слот не уводит со страницы.
+                    }}
                   >
                     {promo.video || promo.image ? (
                       <span
@@ -443,16 +447,15 @@ export function HeroCarousel({
                         <IconArrowUpRight size={16} stroke={2} />
                       </span>
                     </span>
-                  </a>
+                  </button>
                 );
               })}
             </div>
           </div>
 
           {/* Шевроны на строке надзаголовка. Слоем, а не в дорожке: внутри
-              они уезжали бы вместе со слотом, и кнопки внутри <a>
-              недопустимы. Распорка 16:9 повторяет высоту медиа-слота и
-              опускает ряд ровно на эту строку. */}
+              они уезжали бы вместе со слотом. Распорка 16:9 повторяет высоту
+              медиа-слота и опускает ряд ровно на эту строку. */}
           {rotating ? (
             <div className="hero__promo-nav">
               <span className="hero__promo-nav-spacer" aria-hidden="true" />
