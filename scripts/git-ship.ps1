@@ -75,15 +75,18 @@ if ($Paths.Count -gt 0) {
 
 if ($Amend) {
   $tree = Get-GitOut @("rev-parse", "HEAD^{tree}")
-  $parents = @(Get-GitOut @("rev-list", "--parents", "-n", "1", "HEAD") -split " " | Select-Object -Skip 1)
+  $parentLine = Get-GitOut @("rev-list", "--parents", "-n", "1", "HEAD")
+  $parents = @($parentLine -split "\s+" | Select-Object -Skip 1 | Where-Object { $_ -match '^[0-9a-f]{40}$' })
+  if ($parents.Count -eq 0) {
+    throw "Cannot amend: HEAD has no parents ($parentLine)."
+  }
 } else {
   $tree = Get-GitOut @("write-tree")
   $parents = @(Get-GitOut @("rev-parse", "HEAD"))
 }
 
 $msgFile = Join-Path $env:TEMP ("git-ship-{0}.txt" -f [guid]::NewGuid().ToString("n"))
-$utf8 = New-Object System.Text.UTF8Encoding $false
-[System.IO.File]::WriteAllText($msgFile, ($Message.TrimEnd() + "`n"), $utf8)
+[System.IO.File]::WriteAllLines($msgFile, @(($Message.TrimEnd() -split "`r?`n")))
 
 $authorName = Get-GitOut @("config", "user.name")
 $authorEmail = Get-GitOut @("config", "user.email")
@@ -105,9 +108,16 @@ if ($Amend) {
   Remove-Item Env:GIT_COMMITTER_DATE -ErrorAction SilentlyContinue
 }
 
+if ($Amend -and $parents.Count -eq 0) {
+  throw "Amend would create an orphan commit (no parents). Aborting."
+}
+
 $commitArgs = @("commit-tree", $tree)
 foreach ($p in $parents) {
-  if ($p) { $commitArgs += @("-p", $p) }
+  if ($p -match '^[0-9a-f]{40}$') { $commitArgs += @("-p", $p) }
+}
+if ($Amend -and ($commitArgs -notcontains "-p")) {
+  throw "Amend lost parent oid. Aborting."
 }
 $commitArgs += @("-F", $msgFile)
 
@@ -119,6 +129,9 @@ if ($commit -notmatch '^[0-9a-f]{40}$') {
 $body = Get-GitOut @("cat-file", "-p", $commit)
 if ($body -match "(?m)^Co-authored-by:") {
   throw "Co-authored-by still present; aborting."
+}
+if ($Amend -and $body -notmatch "(?m)^parent ") {
+  throw "Amend produced orphan commit; aborting."
 }
 
 Invoke-Git @("update-ref", "HEAD", $commit)
