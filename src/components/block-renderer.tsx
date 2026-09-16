@@ -13,6 +13,7 @@ import { telHref } from "../lib/phone";
 import type { CatalogProject } from "../lib/catalog/types";
 import { BankStrip } from "./bank-strip";
 import { ContactsPlace } from "./contacts-place";
+import { CopyButton } from "./copy-button";
 import { FactoryVideo } from "./factory-video";
 import {
   HeroCarousel,
@@ -443,18 +444,27 @@ function Contacts({
               {phone ? (
                 <div>
                   <p>{copy.phoneLabel}</p>
-                  <a href={telHref(phone)}>{phone}</a>
+                  <div className="contact-list__value">
+                    <a href={telHref(phone)}>{phone}</a>
+                    <CopyButton value={phone} />
+                  </div>
                 </div>
               ) : null}
               {email ? (
                 <div>
                   <p>{copy.emailLabel}</p>
-                  <a href={`mailto:${email}`}>{email}</a>
+                  <div className="contact-list__value">
+                    <a href={`mailto:${email}`}>{email}</a>
+                    <CopyButton value={email} />
+                  </div>
                 </div>
               ) : null}
               <div>
                 <p>{copy.addressLabel}</p>
-                <span>{nbspText(copy.officeAddressLine)}</span>
+                <div className="contact-list__value">
+                  <span>{nbspText(copy.officeAddressLine)}</span>
+                  <CopyButton value={copy.officeAddressLine} />
+                </div>
               </div>
             </div>
           </div>

@@ -5,13 +5,53 @@ import { IconArrowUpRight, IconBus, IconMapPin } from '@tabler/icons-react'
 import { copy, nbspText } from '../lib/copy'
 import {
   CONTACT_PLACES,
+  type ContactPlace,
   type ContactPlaceId,
 } from '../lib/office'
 import { OfficeMap } from './office-map'
 
+/** Адрес и остановки одного места — и для живого слоя, и для сайзера. */
+function PlaceCopyBody({ place }: { place: ContactPlace }) {
+  return (
+    <>
+      <p className="contacts__address">
+        <IconMapPin size={18} stroke={1.75} aria-hidden="true" />
+        <span>
+          <span className="contacts__address-title">
+            {nbspText(place.title)}
+          </span>
+          {place.line ? (
+            <span className="contacts__address-line">
+              {nbspText(place.line)}
+            </span>
+          ) : null}
+        </span>
+      </p>
+      <ul className="contacts__transit">
+        {place.transit.map((stop) => (
+          <li key={stop.name}>
+            <IconBus size={18} stroke={1.75} aria-hidden="true" />
+            <span className="contacts__transit-name">
+              {nbspText(stop.name)}
+            </span>
+            <span className="contacts__transit-distance">
+              {stop.distance}
+            </span>
+          </li>
+        ))}
+      </ul>
+    </>
+  )
+}
+
 /**
  * Плашка «где мы»: офис и производство на одних табах.
  * Карта пересоздаётся по key места — иначе JS API оставляет старый центр.
+ *
+ * Высота copy фиксируется сайзером: все места лежат в одной клетке grid,
+ * невидимые задают max-высоту. Иначе на мобилке офис (1 строка адреса,
+ * 2 остановки) короче производства (2 строки, 3 остановки) — карта и
+ * кнопка прыгают. На десктопе прыжок маскировал 1fr у колонки.
  */
 export function ContactsPlace() {
   const [placeId, setPlaceId] = useState<ContactPlaceId>('office')
@@ -45,32 +85,18 @@ export function ContactsPlace() {
       </div>
 
       <div className="contacts__place-copy">
-        <p className="contacts__address">
-          <IconMapPin size={18} stroke={1.75} aria-hidden="true" />
-          <span>
-            <span className="contacts__address-title">
-              {nbspText(place.title)}
-            </span>
-            {place.line ? (
-              <span className="contacts__address-line">
-                {nbspText(place.line)}
-              </span>
-            ) : null}
-          </span>
-        </p>
-        <ul className="contacts__transit">
-          {place.transit.map((stop) => (
-            <li key={stop.name}>
-              <IconBus size={18} stroke={1.75} aria-hidden="true" />
-              <span className="contacts__transit-name">
-                {nbspText(stop.name)}
-              </span>
-              <span className="contacts__transit-distance">
-                {stop.distance}
-              </span>
-            </li>
-          ))}
-        </ul>
+        {CONTACT_PLACES.map((item) => (
+          <div
+            key={`sizer-${item.id}`}
+            className="contacts__place-sizer"
+            aria-hidden="true"
+          >
+            <PlaceCopyBody place={item} />
+          </div>
+        ))}
+        <div className="contacts__place-live">
+          <PlaceCopyBody place={place} />
+        </div>
       </div>
 
       <OfficeMap

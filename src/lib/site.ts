@@ -30,3 +30,16 @@ export const SITE = {
   footer: { legal: copy.offerDisclaimer },
   defaultSeo: { title: copy.seoTitle, description: copy.seoDescription },
 } as const
+
+/** Год основания компании — нижняя граница копирайта в подвале. */
+export const SITE_FOUNDED_YEAR = 2014
+
+/**
+ * Диапазон лет для строки «© … 2014 - 2026».
+ * Верхняя граница — текущий календарный год; сама обновляется каждый год.
+ */
+export function copyrightYears(now: Date = new Date()): string {
+  const end = now.getFullYear()
+  if (end <= SITE_FOUNDED_YEAR) return String(SITE_FOUNDED_YEAR)
+  return `${SITE_FOUNDED_YEAR} - ${end}`
+}

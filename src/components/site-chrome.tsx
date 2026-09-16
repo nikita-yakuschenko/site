@@ -7,9 +7,19 @@ import {
   useSyncExternalStore,
   type ReactNode,
 } from "react";
-import { IconMenu2, IconX } from "@tabler/icons-react";
+import {
+  IconBuilding,
+  IconBuildingFactory2,
+  IconMail,
+  IconMenu2,
+  IconMoon,
+  IconPhone,
+  IconSun,
+  IconX,
+} from "@tabler/icons-react";
 import Link from "next/link";
 import { copy } from "../lib/copy";
+import { copyrightYears } from "../lib/site";
 import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
 import { OfficeStatusIndicator } from "./office-status";
@@ -26,6 +36,41 @@ import { RegionSwitch } from "./region-switch";
 const NOTICE_KEY = "avgst-dev-notice";
 
 const noticeListeners = new Set<() => void>();
+
+/* Временная тема только технической полосы. Хранится у посетителя, на
+   сервер не уходит. Снять вместе с кнопкой в meta-ряду. */
+const TECH_BAR_THEME_KEY = "avgst:tech-bar-theme";
+type TechBarTheme = "dark" | "light";
+
+const techBarThemeListeners = new Set<() => void>();
+
+function subscribeTechBarTheme(listener: () => void) {
+  techBarThemeListeners.add(listener);
+  window.addEventListener("storage", listener);
+  return () => {
+    techBarThemeListeners.delete(listener);
+    window.removeEventListener("storage", listener);
+  };
+}
+
+function readTechBarTheme(): TechBarTheme {
+  try {
+    return window.localStorage.getItem(TECH_BAR_THEME_KEY) === "light"
+      ? "light"
+      : "dark";
+  } catch {
+    return "dark";
+  }
+}
+
+function writeTechBarTheme(theme: TechBarTheme) {
+  try {
+    window.localStorage.setItem(TECH_BAR_THEME_KEY, theme);
+  } catch {
+    // Не сохранилось — тема живёт до перезагрузки.
+  }
+  techBarThemeListeners.forEach((listener) => listener());
+}
 
 function subscribeNotice(listener: () => void) {
   noticeListeners.add(listener);
@@ -88,7 +133,6 @@ export function SiteChrome({
   logo,
   phone,
   email,
-  address,
   navigation,
   overlay,
   children,
@@ -100,6 +144,7 @@ export function SiteChrome({
   logo?: MediaLike;
   phone?: string | null;
   email?: string | null;
+  /** Раньше одной строкой в футере; адрес теперь из copy (улица + ДЦ). */
   address?: string | null;
   navigation?: NavItem[] | null;
   overlay?: boolean;
@@ -116,6 +161,11 @@ export function SiteChrome({
     noticeClosedNow,
     () => false,
   );
+  const techBarTheme = useSyncExternalStore(
+    subscribeTechBarTheme,
+    readTechBarTheme,
+    () => "dark" as TechBarTheme,
+  );
   const src = mediaUrl(logo) || "/logo_lg.svg";
   const items = (navigation?.filter(
     (item) => item.label && item.href && item.href !== "/",
@@ -123,7 +173,7 @@ export function SiteChrome({
     { label: copy.catalogProjects, href: "/catalog" },
     { label: copy.contacts, href: "/#contacts" },
   ]) as Array<{ label: string; href: string }>;
-  const year = new Date().getFullYear();
+  const years = copyrightYears();
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -146,7 +196,7 @@ export function SiteChrome({
         {/* Технический ряд — сплошная полоса во всю ширину вьюпорта, поэтому
             он лежит вне контейнера с ограниченной шириной: полоса тянется от
             края до края, а содержимое внутри держит ширину страницы. */}
-        <div className="site-header__bar">
+        <div className="site-header__bar" data-tech-theme={techBarTheme}>
           <div className="site-header__meta">
             <RegionSwitch />
             {/* Одна группа: всё покупательское уехало в плашку, служебным
@@ -174,6 +224,22 @@ export function SiteChrome({
               ))}
             </nav>
             <OfficeStatusIndicator />
+            {/* Временный переключатель: только сверка светлой полосы. */}
+            <button
+              type="button"
+              className="site-tech-theme"
+              aria-label={copy.techBarThemeAria}
+              aria-pressed={techBarTheme === "light"}
+              onClick={() =>
+                writeTechBarTheme(techBarTheme === "light" ? "dark" : "light")
+              }
+            >
+              {techBarTheme === "light" ? (
+                <IconMoon size={18} stroke={1.75} aria-hidden="true" />
+              ) : (
+                <IconSun size={18} stroke={1.75} aria-hidden="true" />
+              )}
+            </button>
           </div>
         </div>
 
@@ -324,18 +390,23 @@ export function SiteChrome({
 
       <footer className="site-footer">
         <div className="footer-grid">
-          <div>
+          <div className="footer-brand-col">
             <Link href="/" className="site-footer__brand">
               <img src={src} alt={name} />
             </Link>
             <p className="footer-about">{about || copy.footerAbout}</p>
-            <Link className="footer-muted" href="/#contacts">
+            <Link className="footer-muted" href={copy.privacyHref}>
               {copy.privacy}
             </Link>
-            <p className="footer-muted">{footer || copy.offerDisclaimer}</p>
-            <p className="footer-muted">
-              © {year} {name}
+            <p className="footer-muted footer-offer">
+              {footer || copy.offerDisclaimer}
             </p>
+            <div className="footer-legal">
+              <p className="footer-muted">
+                © {name} {years}
+              </p>
+              <p className="footer-muted">ИНН 5261106177</p>
+            </div>
           </div>
           <div>
             <h3>{copy.catalogFooter}</h3>
@@ -350,9 +421,62 @@ export function SiteChrome({
           </div>
           <div>
             <h3>{copy.contacts}</h3>
-            {address ? <p>{address}</p> : null}
-            {phone ? <a href={telHref(phone)}>{phone}</a> : null}
-            {email ? <a href={`mailto:${email}`}>{email}</a> : null}
+            <div className="footer-contacts">
+              <div className="footer-contacts__place">
+                <span className="footer-contacts__eyebrow">
+                  {copy.contactsPlaceOffice}
+                </span>
+                <p className="footer-contacts__row">
+                  <IconBuilding size={18} stroke={1.75} aria-hidden="true" />
+                  <span>
+                    <span className="footer-contacts__primary">
+                      {copy.officeAddressLine}
+                    </span>
+                    <span className="footer-contacts__hint">
+                      {copy.officeAddressTitle}
+                    </span>
+                  </span>
+                </p>
+              </div>
+              <div className="footer-contacts__place">
+                <span className="footer-contacts__eyebrow">
+                  {copy.contactsPlaceFactory}
+                </span>
+                <p className="footer-contacts__row">
+                  <IconBuildingFactory2
+                    size={18}
+                    stroke={1.75}
+                    aria-hidden="true"
+                  />
+                  <span>
+                    <span className="footer-contacts__primary">
+                      {copy.factoryAddressTitle}
+                    </span>
+                    <span className="footer-contacts__hint">
+                      {copy.factoryAddressLine}
+                    </span>
+                  </span>
+                </p>
+              </div>
+              {phone ? (
+                <a
+                  className="footer-contacts__row footer-contacts__row--link"
+                  href={telHref(phone)}
+                >
+                  <IconPhone size={18} stroke={1.75} aria-hidden="true" />
+                  <span>{phone}</span>
+                </a>
+              ) : null}
+              {email ? (
+                <a
+                  className="footer-contacts__row footer-contacts__row--link"
+                  href={`mailto:${email}`}
+                >
+                  <IconMail size={18} stroke={1.75} aria-hidden="true" />
+                  <span>{email}</span>
+                </a>
+              ) : null}
+            </div>
           </div>
         </div>
       </footer>

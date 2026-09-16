@@ -136,11 +136,48 @@ a {
 /* Технический ряд: сплошная полоса от края до края вьюпорта. Без стекла и
    прозрачности — это служебная строка, а не поверхность поверх кадра, и
    просвечивать ей незачем. Заодно снимается вопрос контраста: на сплошном
-   фоне белый текст читается при любой фотографии под баннером. */
+   фоне текст читается при любой фотографии под баннером.
+
+   Тема полосы локальна: data-tech-theme на самой полосе. Светлый вариант
+   и временный переключатель — только здесь, плашку шапки не трогают. */
 .site-header__bar {
+  /* Токены технической полосы. Темная — база; светлая переопределяет ниже. */
+  --tech-bar-bg: var(--avgst-ink);
+  --tech-bar-fg: #fff;
+  --tech-bar-underline: rgb(255 255 255 / 0.45);
+  --tech-bar-underline-soft: rgb(255 255 255 / 0.25);
+  --tech-panel-bg: var(--avgst-ink);
+  --tech-panel-fg: #fff;
+  --tech-panel-line: rgb(255 255 255 / 0.12);
+  --tech-panel-soft: rgb(255 255 255 / 0.08);
+  --tech-panel-shadow: 0 8px 24px rgb(var(--avgst-ink-rgb) / 0.28);
+
   pointer-events: auto;
-  background: var(--avgst-ink);
-  color: white;
+  background: var(--tech-bar-bg);
+  color: var(--tech-bar-fg);
+}
+
+/* Светлая тема только технической полосы: белый фон, ink-текст, светлые
+   панели региона и офиса. Гербы инвертируются зеркально к тёмной теме. */
+.site-header__bar[data-tech-theme="light"] {
+  --tech-bar-bg: #fff;
+  --tech-bar-fg: var(--avgst-ink);
+  --tech-bar-underline: rgb(var(--avgst-ink-rgb) / 0.35);
+  --tech-bar-underline-soft: rgb(var(--avgst-ink-rgb) / 0.22);
+  --tech-panel-bg: #fff;
+  --tech-panel-fg: var(--avgst-ink);
+  --tech-panel-line: rgb(var(--avgst-ink-rgb) / 0.1);
+  --tech-panel-soft: rgb(var(--avgst-ink-rgb) / 0.06);
+  --tech-panel-shadow: 0 8px 24px rgb(var(--avgst-ink-rgb) / 0.12);
+  /* Нижняя грань, иначе белая полоса сливается со светлым кадром/страницей. */
+  box-shadow: inset 0 -1px 0 rgb(var(--avgst-ink-rgb) / 0.1);
+}
+
+/* Тень панели только вниз и в стороны: вверх на стыке с полосой она
+   даёт грязную полосу между двумя белыми поверхностями. */
+.site-header__bar[data-tech-theme="light"] .site-region__menu,
+.site-header__bar[data-tech-theme="light"] .site-office__panel {
+  clip-path: inset(0 -40px -40px -40px);
 }
 
 .site-header__inner {
@@ -241,7 +278,7 @@ a {
   width: min(var(--page-width), calc(100% - var(--page-gutter) * 2));
   margin: 0 auto;
   padding-block: var(--meta-pad-y);
-  color: white;
+  color: inherit;
 }
 
 @media (min-width: 720px) {
@@ -251,9 +288,42 @@ a {
   }
 }
 
-/* Полоса одинакова на всех страницах: сплошной иссиня-чёрный и белый текст
-   и поверх кадра, и на сплошной шапке — отдельного светлого варианта у неё
-   больше нет. */
+/* Временный переключатель темы полосы. Стиль как у meta-ссылок, чтобы не
+   спорил с регионом и статусом. Убрать вместе с кнопкой в site-chrome. */
+.site-tech-theme {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  /* Слева зазор от статуса, справа — прежний inset края ряда. */
+  margin: 0 16px 0 8px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  opacity: 0.78;
+  transition:
+    opacity 0.2s var(--ease-out),
+    background-color 0.2s var(--ease-out);
+}
+
+.site-tech-theme:hover {
+  opacity: 1;
+  background: rgb(255 255 255 / 0.1);
+}
+
+.site-header__bar[data-tech-theme="light"] .site-tech-theme:hover {
+  background: rgb(var(--avgst-ink-rgb) / 0.08);
+}
+
+/* Пока живёт временный переключатель — правый inset у офиса снимаем. */
+.site-header__meta:has(.site-tech-theme) .site-office {
+  --office-inset: 0px;
+}
 
 .site-region {
   /* Обёртка растягивается на высоту служебного ряда, чтобы top: 100% у
@@ -300,12 +370,18 @@ a {
 }
 
 /* Нижегородский герб залит почти чёрным (#050625), московский — белым.
-   Техническая полоса и её панели теперь тёмные на всех страницах, поэтому
-   тёмный герб выбеливается всегда, а светлый не трогаем. Условие по типу
-   шапки убрано: без него на сплошных страницах герб оставался чёрным
-   по чёрному. */
+   На тёмной полосе тёмный герб выбеливается, светлый не трогаем. На светлой
+   — наоборот: белый герб чернеет, тёмный остаётся как есть. */
 .site-region__mark--dark {
   filter: brightness(0) invert(1);
+}
+
+.site-header__bar[data-tech-theme="light"] .site-region__mark--dark {
+  filter: none;
+}
+
+.site-header__bar[data-tech-theme="light"] .site-region__mark--light {
+  filter: brightness(0);
 }
 
 .site-region__name {
@@ -334,7 +410,7 @@ a {
   text-decoration: underline;
   text-underline-offset: 3px;
   text-decoration-thickness: 1px;
-  text-decoration-color: rgb(255 255 255 / 0.45);
+  text-decoration-color: var(--tech-bar-underline);
 }
 
 .site-region__trigger:hover .site-region__label {
@@ -354,8 +430,9 @@ a {
   padding: 6px;
   list-style: none;
   border-radius: 0 0 var(--surface-radius) var(--surface-radius);
-  background: var(--panel-bg);
-  box-shadow: var(--panel-shadow);
+  background: var(--tech-panel-bg);
+  color: var(--tech-panel-fg);
+  box-shadow: var(--tech-panel-shadow);
 }
 
 .site-region__menu .site-region__mark {
@@ -4706,18 +4783,63 @@ a {
   color: rgb(var(--avgst-ink-rgb) / 0.5);
 }
 
-.contact-list a,
-.contact-list span {
+.contact-list__value {
   display: block;
+  width: fit-content;
+  max-width: 100%;
   margin-top: 4px;
   font-size: 1.125rem;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
+  line-height: 1.25;
   color: var(--avgst-ink);
 }
 
-.contact-list a:hover {
+.contact-list__value a,
+.contact-list__value > span {
+  display: inline;
+  color: inherit;
+  font: inherit;
+}
+
+.contact-list__value a:hover {
   text-decoration: underline;
+}
+
+/* Надстрочный индекс у значения: глиф сверху справа, клик шире иконки. */
+.contact-copy {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: super;
+  margin: 0 0 0 1px;
+  /* Слева почти без поля — иначе иконка визуально отъезжает от текста. */
+  padding: 5px 5px 5px 1px;
+  border: 0;
+  border-radius: 0;
+  background: transparent !important;
+  color: var(--avgst-ink);
+  opacity: 0.34;
+  line-height: 0;
+  cursor: pointer;
+  transition: opacity 0.18s var(--ease-out), color 0.18s var(--ease-out);
+}
+
+.contact-copy:hover,
+.contact-copy:focus-visible {
+  opacity: 0.78;
+  background: transparent !important;
+}
+
+.contact-copy.is-done {
+  color: var(--avgst-green);
+  opacity: 0.9;
+}
+
+.contact-copy.is-done:hover,
+.contact-copy.is-done:focus-visible {
+  opacity: 1;
+  background: transparent !important;
 }
 
 /* Широкая тёмная плашка: табы, слева место и ориентиры, справа карта. */
@@ -4796,6 +4918,19 @@ a {
 .contacts__place-copy {
   grid-area: copy;
   min-width: 0;
+  /* Сайзер и живой слой в одной клетке: высота = max по местам. */
+  display: grid;
+}
+
+.contacts__place-sizer,
+.contacts__place-live {
+  grid-area: 1 / 1;
+  min-width: 0;
+}
+
+.contacts__place-sizer {
+  visibility: hidden;
+  pointer-events: none;
 }
 
 .contacts__address {
@@ -4816,8 +4951,6 @@ a {
 .contacts__address > span {
   display: block;
   min-width: 0;
-  /* Запас под 2 строки: у производства есть пояснение, у офиса — нет. */
-  min-height: calc(1.35em * 2 + 2px);
 }
 
 .contacts__address-title,
@@ -4838,8 +4971,6 @@ a {
   display: grid;
   gap: 8px;
   align-content: start;
-  /* Запас под 3 остановки производства — офис не сжимает плашку. */
-  min-height: calc(18px * 3 + 8px * 2);
   margin: 14px 0 0;
   padding: 14px 0 0;
   border-top: 1px solid rgb(255 255 255 / 0.12);
@@ -5084,6 +5215,28 @@ a {
   background: white;
   font: inherit;
 }
+
+.lead-card input.is-invalid,
+.lead-form input.is-invalid {
+  border-color: #e85d4a;
+  box-shadow: 0 0 0 2px rgb(232 93 74 / 0.25);
+}
+
+.lead-field__error {
+  font-size: 12px;
+  font-weight: 500;
+  color: #c2410c;
+}
+
+.lead-card .lead-form__consent.is-invalid,
+.lead-form .lead-form__consent.is-invalid {
+  padding: 8px 10px;
+  margin: -8px -10px;
+  border-radius: 10px;
+  border: 1px solid #e85d4a;
+  box-shadow: 0 0 0 2px rgb(232 93 74 / 0.2);
+}
+
 .lead-card textarea,
 .lead-form textarea {
   height: auto;
@@ -5104,13 +5257,49 @@ a {
 .site-footer__brand {
   display: inline-flex;
   align-items: center;
-  margin: 0 0 16px;
+  margin: 0;
 }
 
 .site-footer__brand img {
   display: block;
   height: 40px;
   width: auto;
+}
+
+/* Левая колонка: воздух между смысловыми блоками, не между каждой строкой. */
+.footer-brand-col {
+  display: grid;
+  align-content: start;
+  gap: var(--gap-tile);
+}
+
+.footer-grid .footer-brand-col a,
+.footer-grid .footer-brand-col p {
+  margin: 0;
+}
+
+.footer-about {
+  max-width: 22rem;
+  margin: 0;
+  color: rgb(255 255 255 / 0.72);
+  line-height: 1.5;
+}
+
+.footer-offer {
+  max-width: 22rem;
+  line-height: 1.5;
+}
+
+.footer-muted {
+  color: rgb(255 255 255 / 0.48);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+/* Копирайт и ИНН — одна пачка, без воздуха между строками. */
+.footer-legal {
+  display: grid;
+  gap: 2px;
 }
 
 .footer-grid {
@@ -5139,15 +5328,73 @@ a {
   display: block;
   margin: 0 0 8px;
 }
-.footer-about {
-  max-width: 22rem;
-  color: rgb(255 255 255 / 0.72);
-  line-height: 1.5;
+
+/* Контакты в футере: иконка слева, текст справа. Специфичнее .footer-grid a/p,
+   иначе display:block там ломает ряд в колонку. */
+.footer-contacts {
+  display: grid;
+  gap: var(--gap-tile);
 }
-.footer-muted {
+
+.footer-grid .footer-contacts__row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  margin: 0;
+  color: inherit;
+  text-decoration: none;
+  line-height: 1.4;
+}
+
+/* Телефон и почта чуть отделены от двух адресов. */
+.footer-grid .footer-contacts__row--link {
+  margin-top: 4px;
+}
+
+.footer-grid .footer-contacts__row--link + .footer-contacts__row--link {
+  margin-top: 0;
+}
+
+.footer-contacts__row svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  opacity: 0.45;
+}
+
+.footer-contacts__place {
+  display: grid;
+  gap: 6px;
+}
+
+/* Надстрочник в колонке текста, не над иконкой: отступ = иконка 18 + gap 10. */
+.footer-contacts__eyebrow {
+  margin-left: 28px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--avgst-green);
+}
+
+.footer-contacts__row > span {
+  display: grid;
+  gap: 4px;
+  min-width: 0;
+}
+
+.footer-contacts__primary {
+  display: block;
+}
+
+.footer-contacts__hint {
+  display: block;
   color: rgb(255 255 255 / 0.48);
   font-size: 13px;
-  line-height: 1.45;
+}
+
+.footer-grid a.footer-contacts__row:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .empty,
@@ -5759,7 +6006,7 @@ textarea:focus-visible {
 .site-office__label {
   white-space: nowrap;
   text-decoration: underline;
-  text-decoration-color: rgb(255 255 255 / 0.25);
+  text-decoration-color: var(--tech-bar-underline-soft);
   text-decoration-thickness: 1px;
   text-underline-offset: 4px;
   transition: text-decoration-color 0.2s var(--ease-out);
@@ -5781,9 +6028,9 @@ textarea:focus-visible {
   min-width: 288px;
   padding: 18px;
   border-radius: 0 0 var(--surface-radius) var(--surface-radius);
-  background: var(--panel-bg);
-  box-shadow: var(--panel-shadow);
-  color: white;
+  background: var(--tech-panel-bg);
+  box-shadow: var(--tech-panel-shadow);
+  color: var(--tech-panel-fg);
   text-align: left;
 }
 
@@ -5877,7 +6124,7 @@ textarea:focus-visible {
 .site-office__map.is-ready + .site-office__transit {
   margin-top: 16px;
   padding-top: 16px;
-  border-top: 1px solid rgb(255 255 255 / 0.12);
+  border-top: 1px solid var(--tech-panel-line);
 }
 
 .site-office__map:focus-visible {
@@ -5955,8 +6202,8 @@ textarea:focus-visible {
   gap: 4px;
   margin: 0;
   padding: 16px 0;
-  border-top: 1px solid rgb(255 255 255 / 0.12);
-  border-bottom: 1px solid rgb(255 255 255 / 0.12);
+  border-top: 1px solid var(--tech-panel-line);
+  border-bottom: 1px solid var(--tech-panel-line);
   font-size: 13px;
 }
 
@@ -5971,9 +6218,9 @@ textarea:focus-visible {
 }
 
 /* Сегодняшний день подсвечен фоном, а не цветом текста: так строка
-   остаётся читаемой и в светлой шапке. */
+   остаётся читаемой и в светлой, и в тёмной теме полосы. */
 .site-office__hours > div.is-today {
-  background: rgb(255 255 255 / 0.08);
+  background: var(--tech-panel-soft);
   font-weight: 600;
 }
 
@@ -6018,6 +6265,9 @@ textarea:focus-visible {
   .site-office {
     --office-inset: 0px;
   }
+  .site-tech-theme {
+    margin-right: 0;
+  }
 
   /* Карта в узкой панели выше: 4:3 вместо 16:9. Логотип Яндекса поверх неё
      фиксированного размера, и в более высоком кадре он занимает меньшую
@@ -6040,15 +6290,10 @@ textarea:focus-visible {
   .site-office__label--short {
     display: inline;
   }
-  /* Панель больше не висит узкой колонкой у правого края, наезжая на баннер:
-     на узком экране она занимает всю доступную ширину. Правый край остаётся
-     на месте (right: 0 у индикатора), а левый доводится до того же поля, по
-     которому выровнен остальной контент, — отсюда двойной --page-gutter.
-     Позиция остаётся absolute: шапка сама уезжает со скроллом, и fixed
-     оторвал бы панель от индикатора. */
+  /* Ширина панели та же, что на десктопе (min-width: 288px у правого края).
+     Растягивать на весь ряд не нужно: на планшете в портрете это давало
+     огромную плашку во всю ширину экрана. */
   .site-office__panel {
-    width: calc(100vw - var(--page-gutter) * 2);
-    min-width: 0;
     max-height: calc(100vh - 120px);
     overflow-y: auto;
   }
