@@ -259,10 +259,16 @@ function MortgageShowcase() {
               <strong>{nbspText("по льготной ставке")}</strong>
               {nbspText(". Подберём банк, рассчитаем платёж, поможем собрать документы и получить одобрение.")}
             </p>
-            <a className="btn btn-yellow" href="/mortgage">
-              Рассчитать ипотеку
-              <IconArrowUpRight size={18} stroke={2} />
-            </a>
+            <div className="mortgage-family__actions">
+              {/* Форму расчёта подключим отдельно; кнопка уже на месте. */}
+              <button type="button" className="btn btn-yellow">
+                {copy.mortgageCta}
+                <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
+              </button>
+              <a className="mortgage-family__more" href={copy.mortgageMoreHref}>
+                {copy.mortgageMore}
+              </a>
+            </div>
           </div>
         </div>
         {/* Семейной в ряду нет: ей посвящён баннер выше. */}

@@ -2223,9 +2223,45 @@ a {
   color: var(--avgst-green);
 }
 
-.mortgage-family .btn {
-  gap: 8px;
+.mortgage-family__actions {
+  display: flex;
+  flex-direction: column;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--gap-tile);
   margin-top: var(--gap-stack);
+}
+
+.mortgage-family__actions .btn {
+  gap: 8px;
+  margin-top: 0;
+}
+
+.mortgage-family__more {
+  padding: 0 0 0 var(--btn-pad-md);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  white-space: nowrap;
+}
+
+.mortgage-family__more:hover {
+  text-decoration-thickness: 2px;
+}
+
+@media (min-width: 900px) {
+  .mortgage-family__actions {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .mortgage-family__more {
+    padding: 0;
+  }
 }
 
 /* Остальные программы идут строкой под баннером, а не справа от текста:
@@ -2366,7 +2402,8 @@ a {
 
   .mortgage-family__body { padding:var(--gap-stack) var(--page-gutter) var(--page-gutter); }
   .mortgage-family__body > p:not(.eyebrow) { max-width:none; }
-  .mortgage-family .btn { align-self: center; }
+  .mortgage-family__actions { align-items: center; }
+  .mortgage-family__more { padding: 0; }
 }
 @media (max-width: 540px) {
   .mortgage-showcase__programs { grid-template-columns:1fr; }
@@ -3972,6 +4009,20 @@ a {
     grid-row: auto;
   }
 
+  /* Мобильный порядок: панели → модульные → барн → классика. */
+  .series-bento__tile--panel {
+    order: 1;
+  }
+  .series-bento__tile--modular {
+    order: 2;
+  }
+  .series-bento__tile--barn {
+    order: 3;
+  }
+  .series-bento__tile--classic {
+    order: 4;
+  }
+
   .series-bento__tile {
     height: auto;
     min-height: 0;
@@ -4501,20 +4552,9 @@ a {
     align-items: center;
   }
 
-  /* На широком второй выход снова контурная кнопка — как сосед жёлтой. */
+  /* На широком «Подробнее» остаётся строчной ссылкой рядом с жёлтой. */
   .production__actions .btn-outline-dark {
-    height: var(--btn-h-md);
-    padding: 0 var(--btn-pad-md);
-    border: 1px solid #d4d4d8;
-    border-radius: var(--radius);
-    background: white;
-    text-decoration: none;
-    white-space: nowrap;
-  }
-
-  .production__actions .btn-outline-dark:hover {
-    border-color: var(--avgst-ink);
-    text-decoration: none;
+    padding: 0;
   }
 
   .production__more-wide { display: inline; }

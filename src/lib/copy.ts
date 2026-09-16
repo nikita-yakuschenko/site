@@ -175,6 +175,8 @@ export const copy = {
     "Расчёты через эскроу-счёт",
   ],
   mortgageCta: "Рассчитать платёж",
+  mortgageMore: "Подробнее",
+  mortgageMoreHref: "/mortgage",
   /* Четыре обзора канала «Малоэтажная Страна» на VK Video. */
   independentReview: {
     eyebrow: "Независимый обзор",
@@ -191,7 +193,7 @@ export const copy = {
         provider: "vk" as const,
         oid: -71425780,
         id: "456240282",
-        title: "Норвегия 132",
+        title: "Норвегия 115",
         subtitle: "Обзор дома по проекту",
         duration: "10:00",
         poster: "/media/reviews/review-norway.jpg",
