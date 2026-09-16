@@ -99,6 +99,10 @@ export const HOME_LAYOUT: LayoutBlock[] = [
   {
     blockType: "videoTestimonials",
   },
+  /* Реферальная программа сразу после историй — чересполосица: отзывы muted, реферал белый. */
+  {
+    blockType: "referralProgram",
+  },
   {
     blockType: "contactsSection",
     heading: copy.contacts,

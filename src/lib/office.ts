@@ -94,6 +94,70 @@ export const OFFICE_TRANSIT = [
   { name: "Дворец спорта", distance: "350 метров" },
 ] as const;
 
+/**
+ * Производство: ул. Зайцева 31, территория ЗКПД-4.
+ * Координаты — точка пина от заказчика.
+ */
+const FACTORY_COORDS = "56.366007,43.791908";
+
+export const FACTORY_ROUTE_URL =
+  `https://yandex.ru/maps/?rtext=~${FACTORY_COORDS}&rtt=auto&z=17`;
+
+const [FACTORY_LAT = "0", FACTORY_LON = "0"] = FACTORY_COORDS.split(",");
+
+export const FACTORY_CENTER: readonly [number, number] = [
+  Number(FACTORY_LAT),
+  Number(FACTORY_LON),
+];
+
+export const FACTORY_MAP_ZOOM = 16;
+
+export const FACTORY_TRANSIT = [
+  { name: "ЗКПД-4", distance: "900 метров" },
+  { name: "улица Зайцева", distance: "850 метров" },
+  { name: "Церковь Всех Святых", distance: "1,13 км" },
+] as const;
+
+export type ContactPlaceId = "office" | "factory";
+
+export type ContactPlace = {
+  id: ContactPlaceId;
+  tab: string;
+  title: string;
+  /** Вторая строка под заголовком места, если нужна. */
+  line?: string;
+  transit: readonly { name: string; distance: string }[];
+  center: readonly [number, number];
+  zoom: number;
+  routeUrl: string;
+  mapLabel: string;
+};
+
+/** Места в блоке контактов: офис и производство на одной плашке. */
+export const CONTACT_PLACES: readonly ContactPlace[] = [
+  {
+    id: "office",
+    tab: copy.contactsPlaceOffice,
+    title: copy.officeAddressTitle,
+    transit: OFFICE_TRANSIT,
+    center: OFFICE_CENTER,
+    zoom: OFFICE_MAP_ZOOM,
+    routeUrl: OFFICE_ROUTE_URL,
+    mapLabel: copy.officeMapOpen,
+  },
+  {
+    id: "factory",
+    tab: copy.contactsPlaceFactory,
+    title: copy.factoryAddressTitle,
+    line: copy.factoryAddressLine,
+    transit: FACTORY_TRANSIT,
+    center: FACTORY_CENTER,
+    zoom: FACTORY_MAP_ZOOM,
+    routeUrl: FACTORY_ROUTE_URL,
+    mapLabel: copy.factoryMapOpen,
+  },
+];
+
 export function formatRange(row: ScheduleRow): string {
   if (row.from === null || row.to === null) return copy.officeByArrangement;
   return `${hhmm(row.from)} – ${hhmm(row.to)}`;

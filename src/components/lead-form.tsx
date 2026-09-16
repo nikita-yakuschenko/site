@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { IconArrowUpRight } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 
 export function LeadForm({
@@ -76,6 +77,9 @@ export function LeadForm({
       </label>
       <button className="btn btn-yellow lead-card__submit" type="submit" disabled={status === 'sending'}>
         {status === 'sending' ? copy.sending : submitLabel || copy.sendLead}
+        {status !== 'sending' ? (
+          <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
+        ) : null}
       </button>
       {status === 'ok' ? <p role="status">{successText || copy.leadOk}</p> : null}
       {status === 'error' ? <p role="alert">{copy.leadError}</p> : null}

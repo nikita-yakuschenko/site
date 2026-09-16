@@ -25,7 +25,10 @@ import { SITE } from '../lib/site'
  * лицензию.
  */
 
-type YmapsMap = { destroy: () => void }
+type YmapsMap = {
+  destroy: () => void
+  container: { fitToViewport: () => void }
+}
 
 type Ymaps = {
   ready: (callback: () => void) => void
@@ -87,13 +90,32 @@ function loadYmaps(apikey: string): Promise<Ymaps> {
   return loader
 }
 
-export function OfficeMap({ onNavigate }: { onNavigate?: () => void }) {
+export function OfficeMap({
+  onNavigate,
+  className = 'site-office__map',
+  skeleton = false,
+  center = OFFICE_CENTER,
+  zoom = OFFICE_MAP_ZOOM,
+  routeUrl = OFFICE_ROUTE_URL,
+  ariaLabel = copy.officeMapOpen,
+}: {
+  onNavigate?: () => void
+  /** Класс обёртки: панель офиса и блок контактов делят один компонент. */
+  className?: string
+  /** Показать скелетон, пока JS API не отрисовал карту (нужно в контактах). */
+  skeleton?: boolean
+  center?: readonly [number, number]
+  zoom?: number
+  routeUrl?: string
+  ariaLabel?: string
+}) {
   const host = useRef<HTMLDivElement>(null)
-  const [ready, setReady] = useState(false)
+  const [status, setStatus] = useState<'pending' | 'ready' | 'failed'>('pending')
 
   useEffect(() => {
     let map: YmapsMap | null = null
     let cancelled = false
+    let resizeObserver: ResizeObserver | null = null
 
     readKey()
       .then((apikey) => {
@@ -106,7 +128,7 @@ export function OfficeMap({ onNavigate }: { onNavigate?: () => void }) {
           if (cancelled || !host.current) return
           const instance = new ymaps.Map(
             host.current,
-            { center: OFFICE_CENTER, zoom: OFFICE_MAP_ZOOM, controls: [] },
+            { center, zoom, controls: [] },
             // Организации на карте не должны перехватывать клик: он наш.
             { suppressMapOpenBlock: true, yandexMapDisablePoiInteractivity: true },
           )
@@ -115,36 +137,57 @@ export function OfficeMap({ onNavigate }: { onNavigate?: () => void }) {
           // ширине текста. Точечный пин молчал о том, чей это адрес.
           instance.geoObjects.add(
             new ymaps.Placemark(
-              OFFICE_CENTER,
+              center,
               { iconContent: SITE.name },
               { preset: 'islands#redStretchyIcon' },
             ),
           )
           map = instance
-          setReady(true)
+          setStatus('ready')
+          // Контейнер контактов тянется по высоте — карта должна
+          // пересчитать кадр, иначе остаётся дыра или обрезок.
+          resizeObserver = new ResizeObserver(() => {
+            map?.container.fitToViewport()
+          })
+          resizeObserver.observe(host.current)
         })
       })
       .catch(() => {
-        // Молча: блок карты остаётся неотрисованным.
+        if (!cancelled) setStatus('failed')
       })
 
     return () => {
       cancelled = true
+      resizeObserver?.disconnect()
       map?.destroy()
     }
-  }, [])
+  }, [center, zoom])
+
+  const stateClass =
+    status === 'ready'
+      ? 'is-ready'
+      : skeleton && status === 'pending'
+        ? 'is-loading'
+        : skeleton && status === 'failed'
+          ? 'is-failed'
+          : ''
+  const interactive = status === 'ready' || skeleton
 
   return (
     <a
-      className={ready ? 'site-office__map is-ready' : 'site-office__map'}
-      href={OFFICE_ROUTE_URL}
+      className={[className, stateClass].filter(Boolean).join(' ')}
+      href={routeUrl}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label={copy.officeMapOpen}
-      aria-hidden={ready ? undefined : true}
-      tabIndex={ready ? undefined : -1}
+      aria-label={ariaLabel}
+      aria-busy={skeleton && status === 'pending' ? true : undefined}
+      aria-hidden={interactive ? undefined : true}
+      tabIndex={interactive ? undefined : -1}
       onClick={onNavigate}
     >
+      {skeleton && status === 'pending' ? (
+        <span className="office-map-skeleton" aria-hidden="true" />
+      ) : null}
       <div className="site-office__map-canvas" ref={host} />
     </a>
   )

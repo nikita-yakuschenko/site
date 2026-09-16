@@ -12,6 +12,7 @@ import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
 import type { CatalogProject } from "../lib/catalog/types";
 import { BankStrip } from "./bank-strip";
+import { ContactsPlace } from "./contacts-place";
 import { FactoryVideo } from "./factory-video";
 import {
   HeroCarousel,
@@ -21,6 +22,7 @@ import {
 import { IndependentReview } from "./independent-review";
 import { LeadForm } from "./lead-form";
 import { ProjectCard } from "./project-card";
+import { ReferralProgram } from "./referral-program";
 import { VideoTestimonials } from "./video-testimonials";
 
 const ADVANTAGE_ICONS = [IconHourglass, IconUsers, IconMedal, IconStar];
@@ -427,38 +429,37 @@ function Contacts({
   const useSite = block.useSiteContacts !== false;
   const phone = useSite ? contacts?.phone : (block.phone as string | undefined);
   const email = useSite ? contacts?.email : (block.email as string | undefined);
-  const address = useSite
-    ? contacts?.address
-    : (block.address as string | undefined);
   return (
-    <section className="section" id="contacts">
+    <section className="section section--muted" id="contacts">
       <div className="section__inner contacts">
-        <div>
-          <p className="eyebrow">{copy.contactsEyebrow}</p>
-          <h2>{String(block.heading || copy.contacts)}</h2>
-          <p className="contacts__lead">
-            {block.body ? String(block.body) : copy.contactsBody}
-          </p>
-          <div className="contact-list">
-            {phone ? (
-              <div>
-                <p>{copy.phoneLabel}</p>
-                <a href={telHref(phone)}>{phone}</a>
-              </div>
-            ) : null}
-            {email ? (
-              <div>
-                <p>{copy.emailLabel}</p>
-                <a href={`mailto:${email}`}>{email}</a>
-              </div>
-            ) : null}
-            {address ? (
+        <div className="contacts__col">
+          <div className="contacts__intro">
+            <p className="eyebrow">{copy.contactsEyebrow}</p>
+            <h2>{String(block.heading || copy.contacts)}</h2>
+            <p className="contacts__lead">
+              {block.body ? String(block.body) : copy.contactsBody}
+            </p>
+            <div className="contact-list">
+              {phone ? (
+                <div>
+                  <p>{copy.phoneLabel}</p>
+                  <a href={telHref(phone)}>{phone}</a>
+                </div>
+              ) : null}
+              {email ? (
+                <div>
+                  <p>{copy.emailLabel}</p>
+                  <a href={`mailto:${email}`}>{email}</a>
+                </div>
+              ) : null}
               <div>
                 <p>{copy.addressLabel}</p>
-                <span>{address}</span>
+                <span>{nbspText(copy.officeAddressLine)}</span>
               </div>
-            ) : null}
+            </div>
           </div>
+
+          <ContactsPlace />
         </div>
         <LeadForm
           siteId={siteId}
@@ -555,6 +556,10 @@ export function BlockRenderer({
           return <IndependentReview key={index} />;
         if (block.blockType === "videoTestimonials")
           return <VideoTestimonials key={index} />;
+        if (block.blockType === "referralProgram")
+          return (
+            <ReferralProgram key={index} siteId={siteId} pageId={pageId} />
+          );
         if (block.blockType === "textSection")
           return <TextSection key={index} block={block} />;
         if (block.blockType === "cta") return <Cta key={index} block={block} />;

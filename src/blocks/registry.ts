@@ -6,6 +6,7 @@ export const REGISTERED_BLOCKS = [
   'mortgageShowcase',
   'independentReview',
   'videoTestimonials',
+  'referralProgram',
   'textSection',
   'cta',
   'productionSection',
