@@ -435,7 +435,7 @@ export function SiteChrome({
               <p className="footer-muted">
                 © {name} {years}
               </p>
-              <p className="footer-muted">ИНН 5261106177</p>
+              <p className="footer-muted footer-inn">ИНН&nbsp;5261106177</p>
             </div>
           </div>
           <div className="footer-mid">
@@ -471,7 +471,7 @@ export function SiteChrome({
               </nav>
             </div>
           </div>
-          <div>
+          <div className="footer-contacts-col">
             <h3>{copy.contacts}</h3>
             <div className="footer-contacts">
               <div className="footer-contacts__place">

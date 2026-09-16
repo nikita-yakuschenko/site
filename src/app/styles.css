@@ -5525,6 +5525,12 @@ a {
   gap: 2px;
 }
 
+/* INN stays on one line: some phones wrap Cyrillic+digits oddly. */
+.footer-inn {
+  white-space: nowrap;
+}
+
+
 .footer-grid {
   max-width: var(--page-width);
   margin: 0 auto;
@@ -5569,6 +5575,39 @@ a {
 .footer-grid .footer-section p {
   margin: 0;
 }
+
+@media (max-width: 899px) {
+  .footer-grid {
+    gap: var(--gap-stack);
+  }
+
+  /* Contacts matter more on mobile: full width + air above. */
+  .footer-contacts-col {
+    width: 100%;
+    margin-top: 0.75rem;
+    padding-top: 1.75rem;
+    border-top: 1px solid rgb(255 255 255 / 0.1);
+  }
+
+  .footer-contacts-col h3 {
+    margin-bottom: 1rem;
+  }
+
+  .footer-contacts {
+    width: 100%;
+    max-width: none;
+    gap: 1.15rem;
+  }
+
+  .footer-grid .footer-contacts__row {
+    font-size: 15px;
+  }
+
+  .footer-contacts__primary {
+    font-size: 15px;
+  }
+}
+
 
 .footer-grid h3 {
   margin: 0 0 16px;
