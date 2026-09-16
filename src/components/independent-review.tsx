@@ -26,9 +26,12 @@ export function IndependentReview() {
           <div className="independent-review__copy">
             <p className="eyebrow">{data.eyebrow}</p>
             <h2 id="independent-review-title">
-              {nbspText(data.heading)}
-              <br />
-              {nbspText(data.headingLine2)}
+              {data.headingLines.map((line, index) => (
+                <span key={line}>
+                  {index > 0 ? <br /> : null}
+                  {nbspText(line)}
+                </span>
+              ))}
             </h2>
             <p className="independent-review__lead">{nbspText(data.lead)}</p>
 

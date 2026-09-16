@@ -2285,6 +2285,8 @@ a {
 
 .independent-review__copy h2 {
   max-width: none;
+  line-height: 1.15;
+  text-wrap: balance;
 }
 
 .independent-review__lead {
@@ -2292,6 +2294,7 @@ a {
   margin: 16px 0 0;
   font-size: 16px;
   line-height: 1.55;
+  text-wrap: pretty;
   color: rgb(var(--avgst-ink-rgb) / 0.72);
 }
 
@@ -2393,6 +2396,7 @@ a {
 .independent-review__play {
   position: absolute;
   inset: 50% auto auto 50%;
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 72px;
@@ -2516,6 +2520,24 @@ a {
     max-width: none;
   }
 
+  .independent-review__lead {
+    max-width: none;
+  }
+
+  .independent-review__play {
+    width: 48px;
+    height: 48px;
+  }
+
+  .independent-review__play svg {
+    width: 20px;
+    height: 20px;
+  }
+
+  .independent-review__place {
+    display: none;
+  }
+
   .independent-review__playlist {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -2561,28 +2583,48 @@ a {
   }
 }
 
-/* Видеоотзывы: шапка с CTA, крупный кадр + две истории сбоку. */
-.video-stories__head {
-  align-items: flex-end;
+/* Видеоотзывы: intro + CTA сверху на десктопе, плитки ниже;
+   на мобилке CTA уходит под все три плитки. */
+.video-stories__inner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-areas:
+    "intro actions"
+    "stage stage";
+  column-gap: var(--gap-tile);
+  row-gap: var(--gap-stack);
+  align-items: end;
+}
+
+.video-stories__intro {
+  grid-area: intro;
+  min-width: 0;
+}
+
+.video-stories__intro .eyebrow {
+  white-space: nowrap;
 }
 
 .video-stories__lead {
-  max-width: 70ch;
+  max-width: 42rem;
   margin: 12px 0 0;
   font-size: 16px;
   line-height: 1.5;
-  white-space: pre-line;
+  text-wrap: pretty;
   color: rgb(var(--avgst-ink-rgb) / 0.72);
 }
 
 .video-stories__actions {
+  grid-area: actions;
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 16px 20px;
+  align-self: end;
 }
 
 .video-stories__stage {
+  grid-area: stage;
   /* Колонки так, чтобы два боковых 16:9 + зазор = высоте крупного 16:9. */
   --story-gap: var(--gap-tile);
   display: grid;
@@ -2590,8 +2632,8 @@ a {
     minmax(0, 1fr)
     minmax(0, calc((100% - var(--story-gap) * 25 / 9) / 3));
   gap: var(--story-gap);
-  margin-top: var(--gap-stack);
   align-items: start;
+  margin-top: 0;
 }
 
 .video-stories__side {
@@ -2649,7 +2691,7 @@ a {
 .video-story__play {
   position: absolute;
   inset: 50% auto auto 50%;
-  z-index: 2;
+  z-index: 3;
   display: grid;
   place-items: center;
   width: 56px;
@@ -2718,6 +2760,7 @@ a {
   font-weight: 600;
   font-style: normal;
   line-height: 1.25;
+  white-space: nowrap;
   color: #fff;
   background: rgb(0 0 0 / 0.55);
   backdrop-filter: blur(8px);
@@ -2725,15 +2768,13 @@ a {
   pointer-events: none;
 }
 
+.video-story__place-short {
+  display: none;
+}
+
 .video-story__place svg {
   flex: 0 0 auto;
   opacity: 0.92;
-}
-
-.video-story--featured .video-story__place {
-  top: 14px;
-  right: 14px;
-  font-size: 13px;
 }
 
 .video-story__overlay strong {
@@ -2775,44 +2816,78 @@ a {
 }
 
 @media (max-width: 900px) {
-  .video-stories__stage {
+  .video-stories__inner {
     grid-template-columns: 1fr;
+    grid-template-areas:
+      "intro"
+      "stage"
+      "actions";
+    align-items: stretch;
   }
 
-  .video-stories__side {
-    flex-direction: row;
-  }
-
-  .video-stories__side .video-story {
-    flex: 1 1 0;
-    min-width: 0;
-  }
-
-  .video-story--featured .video-story__overlay strong {
-    font-size: 22px;
-  }
-}
-
-@media (max-width: 640px) {
   .video-stories__actions {
-    width: 100%;
+    justify-self: stretch;
   }
 
   .video-stories__actions .btn {
     width: 100%;
   }
 
-  .video-stories__side {
-    flex-direction: column;
+  .video-stories__stage {
+    grid-template-columns: 1fr;
   }
 
+  .video-stories__side {
+    display: contents;
+  }
+
+  /* Узкая ширина: три равноправные карточки с одинаковым chrome. */
   .video-story--featured .video-story__overlay {
     padding: 56px 20px 18px;
   }
 
-  .video-story__quote {
-    font-size: 15px;
-    white-space: normal;
+  .video-story--featured .video-story__overlay strong {
+    font-size: 16px;
+  }
+
+  .video-story__play,
+  .video-story--featured .video-story__play {
+    width: 44px;
+    height: 44px;
+  }
+
+  .video-story__play svg,
+  .video-story--featured .video-story__play svg {
+    width: 18px;
+    height: 18px;
+  }
+
+  .video-story__quote,
+  .video-story__family {
+    display: none;
+  }
+
+  /* Длинные «… область» → «… обл.», чтобы бейдж не переносился. */
+  .video-story__place-full {
+    display: none;
+  }
+
+  .video-story__place-short {
+    display: inline;
+  }
+}
+
+@media (max-width: 640px) {
+  .video-stories__intro .eyebrow {
+    letter-spacing: 0.12em;
+  }
+
+  .video-stories__lead {
+    max-width: none;
+  }
+
+  .video-story__place {
+    max-width: min(58%, 12rem);
   }
 }
 
