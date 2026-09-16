@@ -4852,31 +4852,30 @@ a {
   white-space: nowrap;
 }
 
+/* Мобилка — жёлтая кнопка; с десктопа — строчная ссылка. */
 .contacts__route {
   grid-area: route;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  width: fit-content;
-  max-width: 100%;
-  height: auto;
-  padding: 0;
+  width: 100%;
+  height: var(--btn-h-md);
+  padding: 0 var(--btn-pad-md);
   border: 0;
-  border-radius: 0;
-  background: transparent;
-  color: #fff;
+  border-radius: var(--radius);
+  background: var(--brand-yellow);
+  color: var(--brand-yellow-foreground);
   font: inherit;
   font-size: 14px;
   font-weight: 600;
   white-space: nowrap;
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
+  text-decoration: none;
   cursor: pointer;
 }
 
 .contacts__route:hover {
-  text-decoration-thickness: 2px;
+  filter: brightness(0.97);
 }
 
 .contacts__route svg {
@@ -4886,6 +4885,27 @@ a {
 
 .contacts__route:hover svg {
   transform: translate(2px, -2px);
+}
+
+@media (min-width: 1024px) {
+  .contacts__route {
+    width: fit-content;
+    max-width: 100%;
+    height: auto;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #fff;
+    filter: none;
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+  }
+
+  .contacts__route:hover {
+    filter: none;
+    text-decoration-thickness: 2px;
+  }
 }
 
 /* Карта в контактах: слот всегда занят скелетоном или картой, иначе при

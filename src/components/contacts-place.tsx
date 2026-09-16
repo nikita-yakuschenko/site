@@ -15,7 +15,10 @@ import { OfficeMap } from './office-map'
  */
 export function ContactsPlace() {
   const [placeId, setPlaceId] = useState<ContactPlaceId>('office')
-  const place = CONTACT_PLACES.find((item) => item.id === placeId) ?? CONTACT_PLACES[0]
+  const place =
+    CONTACT_PLACES.find((item) => item.id === placeId) ?? CONTACT_PLACES[0]
+  // CONTACT_PLACES не пустой: офис и производство заданы в office.ts.
+  if (!place) return null
 
   return (
     <div className="contacts__place">
