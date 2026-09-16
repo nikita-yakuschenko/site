@@ -4,6 +4,8 @@ export const REGISTERED_BLOCKS = [
   'popularProjects',
   'seriesBento',
   'mortgageShowcase',
+  'independentReview',
+  'videoTestimonials',
   'textSection',
   'cta',
   'productionSection',

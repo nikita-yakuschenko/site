@@ -91,6 +91,14 @@ export const HOME_LAYOUT: LayoutBlock[] = [
   {
     blockType: "mortgageShowcase",
   },
+  /* Редизайн блоков со старого avgst.ru: независимый обзор канала
+     и видеоотзывы семей — сразу после ипотеки, до контактов. */
+  {
+    blockType: "independentReview",
+  },
+  {
+    blockType: "videoTestimonials",
+  },
   {
     blockType: "contactsSection",
     heading: copy.contacts,

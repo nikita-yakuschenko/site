@@ -18,8 +18,10 @@ import {
   type HeroMessage,
   type HeroPromo,
 } from "./hero-carousel";
+import { IndependentReview } from "./independent-review";
 import { LeadForm } from "./lead-form";
 import { ProjectCard } from "./project-card";
+import { VideoTestimonials } from "./video-testimonials";
 
 const ADVANTAGE_ICONS = [IconHourglass, IconUsers, IconMedal, IconStar];
 
@@ -549,6 +551,10 @@ export function BlockRenderer({
           return <SeriesBento key={index} block={block} />;
         }
         if (block.blockType === "mortgageShowcase") return <MortgageShowcase key={index} />;
+        if (block.blockType === "independentReview")
+          return <IndependentReview key={index} />;
+        if (block.blockType === "videoTestimonials")
+          return <VideoTestimonials key={index} />;
         if (block.blockType === "textSection")
           return <TextSection key={index} block={block} />;
         if (block.blockType === "cta") return <Cta key={index} block={block} />;
