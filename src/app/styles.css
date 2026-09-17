@@ -7663,14 +7663,6 @@ textarea:focus-visible {
   background: #e8edf3;
 }
 
-/* Знак перехода жёлтый сразу, а не только под курсором: на плитках серий
-   он лежит на тёмной фотографии и белым читается сам, а здесь стоит на
-   светлом кадре и терялся в нём. */
-.mortgage-finance__card .series-bento__go {
-  background: var(--brand-yellow);
-  color: var(--avgst-ink);
-}
-
 .mortgage-finance__media img {
   object-fit: cover;
   transition: transform 0.45s var(--ease-out);
@@ -7720,20 +7712,9 @@ textarea:focus-visible {
 /* Кнопка прижата к низу: описания разной длины, и без этого кнопки
    стояли на разной высоте. Разницу забирает просвет над кнопкой. */
 .mortgage-finance__cta {
-  display: inline-flex;
-  align-items: center;
   align-self: flex-start;
   gap: 6px;
   margin-top: auto;
-  padding-top: 6px;
-  font-size: 14px;
-  font-weight: 600;
-  color: var(--avgst-ink);
-}
-
-.mortgage-finance__card:hover .mortgage-finance__cta {
-  text-decoration: underline;
-  text-underline-offset: 3px;
 }
 
 .mortgage-conditions {

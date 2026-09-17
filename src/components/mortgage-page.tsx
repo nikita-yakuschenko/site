@@ -214,7 +214,7 @@ function MortgageFinance({ projectCount }: { projectCount: number }) {
                     {/* Кнопка прижата к низу плашки: описания разной длины,
                         и без этого кнопки стояли на разной высоте. Разницу
                         забирает просвет над кнопкой, а не сама кнопка. */}
-                    <span className="mortgage-finance__cta">
+                    <span className="btn btn-yellow mortgage-finance__cta">
                       {item.cta}
                       <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
                     </span>
