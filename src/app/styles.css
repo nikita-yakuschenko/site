@@ -5446,25 +5446,80 @@ a {
   font: inherit;
 }
 
-.lead-card input.is-invalid,
-.lead-form input.is-invalid {
-  border-color: #e85d4a;
-  box-shadow: 0 0 0 2px rgb(232 93 74 / 0.25);
-}
-
 .lead-field__error {
   font-size: 12px;
   font-weight: 500;
   color: #c2410c;
 }
 
+/* Ошибка не меняет высоту формы — ни короткой, ни полной.
+   Текст ошибки уводится из потока и остаётся только для скринридера,
+   а видимый сигнал даёт сама подпись поля — она краснеет. Обводки
+   рисуются тенью, а не рамкой: рамка добавляла бы по пикселю сверху и
+   снизу каждому полю, и форма подрастала бы на ровном месте. */
+.lead-field__error.is-quiet {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* Сигнал об ошибке — краснеющая подпись и знак в поле. Своих обводок
+   тут нет: поле и так получает зелёное кольцо фокуса от глобального
+   input:focus-visible, и вместе с красной рамкой и тенью на одном
+   инпуте горели три кольца разом. */
+.lead-card label:has(.lead-field__error.is-quiet),
+.lead-form label:has(.lead-field__error.is-quiet) {
+  position: relative;
+  color: #e85d4a;
+}
+
+/* Знак стоит у правого края поля: поле — последняя строка подписи,
+   поэтому отсчёт от низа. Высота формы не меняется. */
+.lead-card label:has(.lead-field__error.is-quiet)::after,
+.lead-form label:has(.lead-field__error.is-quiet)::after {
+  content: "!";
+  position: absolute;
+  right: 1px;
+  bottom: 1px;
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 38px;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #e85d4a;
+  pointer-events: none;
+}
+
+/* Место под знак, чтобы ввод под него не заезжал. Меняется только
+   внутреннее поле по горизонтали — на высоту это не влияет. */
+.lead-card input.is-invalid,
+.lead-form input.is-invalid {
+  padding-right: 34px;
+}
+
+/* Согласие: обводим сам чекбокс, а не заворачиваем строку в рамку с
+   полями — та сдвигала всё под собой. */
 .lead-card .lead-form__consent.is-invalid,
 .lead-form .lead-form__consent.is-invalid {
-  padding: 8px 10px;
-  margin: -8px -10px;
-  border-radius: 10px;
-  border: 1px solid #e85d4a;
-  box-shadow: 0 0 0 2px rgb(232 93 74 / 0.2);
+  padding: 0;
+  margin: 0;
+  border: 0;
+  box-shadow: none;
+  color: #e85d4a;
+}
+
+.lead-card .lead-form__consent.is-invalid input[type="checkbox"],
+.lead-form .lead-form__consent.is-invalid input[type="checkbox"] {
+  outline: 2px solid #e85d4a;
+  outline-offset: 1px;
+  border-radius: 3px;
 }
 
 .lead-card textarea,
@@ -7375,48 +7430,6 @@ textarea:focus-visible {
   color: rgb(var(--avgst-ink-rgb) / 0.72);
 }
 
-.mortgage-metrics {
-  grid-column: 1 / -1;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 1px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  overflow: hidden;
-  border-radius: var(--surface-radius);
-  background: #dce1e8;
-  border: 1px solid #dce1e8;
-}
-
-@media (min-width: 720px) {
-  .mortgage-metrics {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-  }
-}
-
-.mortgage-metrics li {
-  display: grid;
-  gap: 6px;
-  padding: 18px 20px;
-  background: #fff;
-}
-
-.mortgage-metrics p {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
-}
-
-.mortgage-metrics strong {
-  font-size: 22px;
-  letter-spacing: -0.03em;
-  line-height: 1.15;
-}
-
 /* Условия — слепок плашки программы.
    Разметка и стили те же: класс .mortgage-program несёт и название капсом,
    и крупную строку, и кадр в правой половине. Отличий три — плашка никуда
@@ -7717,6 +7730,112 @@ textarea:focus-visible {
   margin-top: auto;
 }
 
+/* Форма внутри плашки «Что можно оформить».
+
+   Форма занимает плашку целиком, вместе с местом кадра: обе половины
+   лежат в одной клетке грида и перекрещиваются прозрачностью. Граница
+   плашки, её высота и кнопка при этом не двигаются — меняется только
+   то, что внутри. */
+.mortgage-finance__card:has(.finance-reveal__slot) {
+  position: relative;
+  display: grid;
+}
+
+.finance-reveal__copy,
+.finance-reveal__slot {
+  grid-column: 1;
+  grid-row: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.finance-reveal__copy {
+  transition: opacity 0.3s var(--ease-out);
+}
+
+.mortgage-finance__card.is-open .finance-reveal__copy {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Поля формы стоят по тем же полям, что подпись плашки, поэтому кнопка
+   садится ровно на место той, что форму открыла. */
+.finance-reveal__slot {
+  z-index: 1;
+  padding: var(--page-gutter);
+  pointer-events: none;
+}
+
+.finance-reveal__card {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.3s var(--ease-out),
+    visibility 0.3s var(--ease-out);
+}
+
+.mortgage-finance__card.is-open .finance-reveal__card {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Заголовок формы стоит там же, где название плашки, и держит поля на
+   той же высоте, на какой стоял текст под названием. */
+.finance-reveal__lead {
+  /* Справа место под знак в углу: первая строка заезжала под него. */
+  padding-right: 40px;
+  margin-bottom: 14px;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  color: var(--avgst-ink);
+}
+
+/* Коробка — сама плашка, своей у формы нет. */
+.finance-reveal__card .lead-card,
+.finance-reveal__card .lead-form {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+/* Кнопка ровно там же и такая же, как та, что форму открыла. */
+.finance-reveal__card .lead-card__submit {
+  align-self: flex-start;
+  width: auto;
+  gap: 6px;
+  margin-top: auto;
+}
+
+.finance-reveal__card .lead-card__submit svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* Знак в углу кадра — настоящая кнопка: открывает форму и закрывает.
+   Лежит поверх обоих состояний, поэтому не гаснет вместе с кадром. */
+.mortgage-finance__toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  z-index: 2;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
 /* Условия программы — спецификация: столбец значений и столбец раскрытия,
    разделённые волосяной линией. Рамок и белых плашек нет: секция идёт на
    муте, и лист на ней читается спокойнее сетки карточек, которых на
@@ -7945,6 +8064,150 @@ textarea:focus-visible {
   /* Боковой отступ был --page-gutter: 24px — токен уровня страницы,
      оказавшийся внутри панели. Текст лип к стыку с кадром. */
   padding: var(--gap-split) 40px;
+}
+
+/* Кнопка и форма в одной клетке: по нажатию текст гаснет, форма
+   проявляется на его месте. Приём тот же, что у реферального баннера
+   (.referral__slot) — человека никуда не уводят, и высота блока не
+   скачет, потому что обе половины лежат одна над другой. */
+.lead-reveal {
+  display: grid;
+  min-width: 0;
+}
+
+.lead-reveal__copy,
+.lead-reveal__slot {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.lead-reveal__copy {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+  align-content: center;
+  transition: opacity 0.3s var(--ease-out);
+}
+
+.lead-reveal.is-open .lead-reveal__copy {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.lead-reveal__slot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  /* Карточка занимает всю клетку: поля встают сверху, на место текста,
+     кнопка — снизу, на место кнопки, которая форму открыла. Разрыв между
+     согласием и кнопкой при этом больше, чем внутри формы, и так и надо:
+     читается как подмена содержимого, а не как перестройка блока. */
+  align-content: stretch;
+  pointer-events: none;
+}
+
+.lead-reveal__card {
+  position: relative;
+  width: 100%;
+  /* Формы-плашки здесь нет: баннер сам себе коробка, а белый
+     прямоугольник поверх фотографии читался заплаткой. Подписи остаются
+     белыми, как весь текст баннера. */
+  color: #fff;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.3s var(--ease-out),
+    visibility 0.3s var(--ease-out);
+}
+
+.lead-reveal.is-open .lead-reveal__card{
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Форма в баннере: без рамки, фона и внутренних полей — только поля
+   ввода, согласие и кнопка, в один столбец.
+   Ширина ограничена: имя и телефон коротки, и на всю колонку поля
+   выглядели растянутыми впустую. */
+.lead-reveal__card {
+  /* Высота подписи с просветом: на неё поднимается первое поле, чтобы
+     его рамка легла на верх заголовка, и на неё же — крестик, чтобы
+     остаться в строке подписи, а не на поле. */
+  --lead-caption: 23px;
+  max-width: 340px;
+  height: 100%;
+}
+
+.lead-reveal__card .lead-card,
+.lead-reveal__card .lead-form {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+/* Первая подпись уходит вверх на свою высоту: выровнять по верху надо
+   рамку поля, а не слово над ней — поле замещает первую строку текста. */
+.lead-reveal__card .lead-card > label:first-of-type,
+.lead-reveal__card .lead-form > label:first-of-type {
+  margin-top: calc(var(--lead-caption) * -1);
+}
+
+/* Кнопка прижата к низу — туда, где стояла кнопка, открывшая форму. */
+.lead-reveal__card .lead-card__submit {
+  margin-top: auto;
+}
+
+/* Кнопка по своей надписи, а не во всю колонку: она должна совпасть с
+   той кнопкой, которая эту форму открыла — и размером, и местом. */
+.lead-reveal__card .lead-card button[type="submit"],
+.lead-reveal__card .lead-form button[type="submit"] {
+  /* .lead-card__submit ставит width: 100% и gap: 8px — кнопка выходила
+     вдвое шире той, что форму открыла, и на 8px длиннее её по надписи.
+     Обе величины возвращаются к обычной кнопке.
+     align-self, а не justify-self: форма здесь колоночный flex, и в нём
+     элементы растягиваются по ширине сами. */
+  align-self: flex-start;
+  width: auto;
+  gap: normal;
+}
+
+.lead-reveal__card .lead-card label,
+.lead-reveal__card .lead-form label {
+  color: rgb(255 255 255 / 0.82);
+}
+
+.lead-reveal__card .lead-form__consent {
+  color: rgb(255 255 255 / 0.72);
+}
+
+/* Крестик стоит в строке подписи первого поля, у правого края: выше он
+   вылезал за верх карточки. Поле у него по размеру знака — промахнуться
+   нестрашно, закрытие не единственный выход. */
+.lead-reveal__close {
+  position: absolute;
+  top: calc(var(--lead-caption, 0px) * -1);
+  right: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: rgb(255 255 255 / 0.55);
+  cursor: pointer;
+}
+
+.lead-reveal__close:hover {
+  color: #fff;
 }
 
 .mortgage-mid-cta__body h2 {
@@ -8418,6 +8681,85 @@ textarea:focus-visible {
   white-space: nowrap;
   font-variant-numeric: tabular-nums;
   text-align: right;
+}
+
+/* Карточка результата: расчёт и форма в одной клетке. Перекрещиваются
+   прозрачностью, поэтому ни карточка, ни то, что вокруг неё, не двигается
+   — человек видит подмену содержимого, а не перестройку страницы. */
+.mortgage-calc__reveal {
+  display: grid;
+  min-width: 0;
+  height: 100%;
+}
+
+.mortgage-calc__reveal-copy,
+.mortgage-calc__reveal-slot {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.mortgage-calc__reveal-copy {
+  display: grid;
+  /* Не start: содержимое на несколько пикселей короче клетки, и кнопка
+     расчёта не доставала до низа — форма, прижатая к низу, садилась
+     мимо неё. space-between дотягивает кнопку до края, разница уходит
+     в просветы между строками расчёта. */
+  align-content: space-between;
+  gap: inherit;
+  transition: opacity 0.3s var(--ease-out);
+}
+
+.mortgage-calc__reveal.is-open .mortgage-calc__reveal-copy {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mortgage-calc__reveal-slot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  /* Форма прижата к низу: её кнопка встаёт ровно туда, где стояла
+     кнопка расчёта. Иначе при раскрытии кнопка уезжает, и подмена
+     читается как прыжок. */
+  align-content: end;
+  pointer-events: none;
+}
+
+/* Карточка расчёта светлая: базовый белый крестик на ней был невидим. */
+.mortgage-calc__reveal-card .lead-reveal__close {
+  color: rgb(var(--avgst-ink-rgb) / 0.45);
+}
+
+.mortgage-calc__reveal-card .lead-reveal__close:hover {
+  color: var(--avgst-ink);
+}
+
+.mortgage-calc__reveal-card {
+  position: relative;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.3s var(--ease-out),
+    visibility 0.3s var(--ease-out);
+}
+
+.mortgage-calc__reveal.is-open .mortgage-calc__reveal-card{
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+/* Внутри карточки результата форма без своей рамки и фона: коробкой
+   служит сама карточка. */
+.mortgage-calc__reveal-card .lead-card,
+.mortgage-calc__reveal-card .lead-form {
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
 }
 
 .mortgage-calc__result-cta {

@@ -25,6 +25,8 @@ export function LeadForm({
   submitLabel,
   successText,
   variant = 'page',
+  compact = false,
+  meta,
 }: {
   siteId: number | string
   pageId?: number | string
@@ -34,6 +36,23 @@ export function LeadForm({
   submitLabel?: string | null
   successText?: string | null
   variant?: 'page' | 'card'
+  /**
+   * Короткая форма: только имя, телефон, согласие и кнопка.
+   *
+   * Нужна там, где форма проявляется внутри баннера и не должна менять
+   * его высоту. Заголовок с подзаголовком там лишние — их роль играет сам
+   * баннер, — а поле «Сообщение» бессмысленно: человек дошёл до кнопки,
+   * уже прочитав условия, вопросы задаст по телефону.
+   */
+  compact?: boolean
+  /**
+   * Произвольные данные, уходящие вместе с заявкой.
+   *
+   * Калькулятор кладёт сюда параметры расчёта: что человек накликал, на
+   * каком платеже остановился и какую программу выбрал. Без этого заявка
+   * приходит голой, и разговор начинается с «а что вы там считали?».
+   */
+  meta?: Record<string, unknown>
 }) {
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
   const [phone, setPhone] = useState('+7')
@@ -70,6 +89,7 @@ export function LeadForm({
           pageId,
           projectExternalId,
           sourcePath: window.location.pathname,
+          ...(meta ? { meta } : {}),
         }),
       })
       if (!response.ok) throw new Error('lead-failed')
@@ -90,10 +110,12 @@ export function LeadForm({
       noValidate
       {...noAutofillFormProps}
     >
-      <div>
-        <p className="lead-card__title">{heading}</p>
-        {body ? <p className="lead-card__body">{body}</p> : null}
-      </div>
+      {compact ? null : (
+        <div>
+          <p className="lead-card__title">{heading}</p>
+          {body ? <p className="lead-card__body">{body}</p> : null}
+        </div>
+      )}
       <label>
         {copy.name}
         <input
@@ -116,7 +138,7 @@ export function LeadForm({
           }}
         />
         {invalid.name ? (
-          <span className="lead-field__error" role="alert">
+          <span className="lead-field__error is-quiet" role="alert">
             {copy.leadNameInvalid}
           </span>
         ) : null}
@@ -176,21 +198,23 @@ export function LeadForm({
           }}
         />
         {invalid.phone ? (
-          <span className="lead-field__error" role="alert">
+          <span className="lead-field__error is-quiet" role="alert">
             {copy.leadPhoneInvalid}
           </span>
         ) : null}
       </label>
-      <label>
-        {copy.message}
-        <textarea
-          name="message"
-          rows={5}
-          placeholder={copy.messagePlaceholder}
-          className="ym-disable-keys ym-hide-content"
-          {...noAutofillFieldProps}
-        />
-      </label>
+      {compact ? null : (
+        <label>
+          {copy.message}
+          <textarea
+            name="message"
+            rows={5}
+            placeholder={copy.messagePlaceholder}
+            className="ym-disable-keys ym-hide-content"
+            {...noAutofillFieldProps}
+          />
+        </label>
+      )}
       <label
         className={
           invalid.consent

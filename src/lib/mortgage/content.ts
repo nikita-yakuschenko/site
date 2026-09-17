@@ -46,7 +46,6 @@ export type MortgageContent = {
   lead: string;
   midCtaHeading: string;
   midCtaLead: string;
-  metrics: readonly { label: string; value: string }[];
   /* Изображение первого экрана. У семейной это фотография, у остальных —
      тот же предметный знак, которым программа обозначена в карточках:
      ноутбук, колосья, здание банка. Знак вписывается в кадр целиком, а

@@ -15,10 +15,13 @@ import { telHref } from "../lib/phone";
 import { SITE } from "../lib/site";
 import { ContactsPlace } from "./contacts-place";
 import { CopyButton } from "./copy-button";
+import { FinanceLeadCard } from "./finance-lead-card";
+import { LeadReveal } from "./lead-reveal";
 import { LeadForm } from "./lead-form";
 import { MortgageCalculator } from "./mortgage-calculator";
 import { MortgageFaq } from "./mortgage-faq";
 import { MortgageWhoFits } from "./mortgage-who-fits";
+import { ScrollTo } from "./scroll-to";
 import { MortgageOtherPrograms } from "./mortgage-other-programs";
 import type { CatalogProject } from "../lib/catalog/types";
 import type { MortgageProgramId } from "../lib/mortgage";
@@ -96,25 +99,16 @@ function MortgageHero({ content }: { content: MortgageContent }) {
             </h1>
             <p>{nbspText(content.lead)}</p>
             <div className="mortgage-family__actions">
-              <a className="btn btn-yellow" href="#mortgage-calc">
+              <ScrollTo className="btn btn-yellow" target="mortgage-calc">
                 {copy.mortgageCalcCta}
                 <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
-              </a>
+              </ScrollTo>
               <Link className="mortgage-family__more" href="/catalog">
                 {copy.mortgageChooseProject}
               </Link>
             </div>
           </div>
         </div>
-
-        <ul className="mortgage-metrics">
-          {content.metrics.map((item) => (
-            <li key={item.label}>
-              <p>{item.label}</p>
-              <strong>{item.value}</strong>
-            </li>
-          ))}
-        </ul>
       </div>
     </section>
   );
@@ -175,6 +169,24 @@ function MortgageFinance({ projectCount }: { projectCount: number }) {
         <ul className="mortgage-finance">
           {fm.finance.map((item) => {
             const count = counts[item.href];
+            if (item.form) {
+              /* У участка нет своей страницы: вместо перехода плашка
+                 раскрывает форму внутри себя. */
+              return (
+                <li key={item.title}>
+                  <FinanceLeadCard
+                    siteId={SITE.id}
+                    title={item.title}
+                    text={item.text}
+                    cta={item.cta}
+                    image={item.image}
+                    formLead={item.formLead}
+                    heading={fm.formHeading}
+                    body={fm.formBody}
+                  />
+                </li>
+              );
+            }
             return (
               <li key={item.title}>
                 <Link className="mortgage-finance__card" href={item.href}>
@@ -315,13 +327,23 @@ function MortgageMidCta({ content }: { content: MortgageContent }) {
             sizes="(min-width: 900px) 40vw, 100vw"
           />
         </div>
+        {/* Приглашение зовёт к разговору, а не к расчёту: форма
+            проявляется прямо здесь, на месте текста. Прежде кнопка уводила
+            к калькулятору — тому самому, который человек только что
+            пролистал. */}
         <div className="mortgage-mid-cta__body">
-          <h2 id="mortgage-mid-cta-title">{nbspText(content.midCtaHeading)}</h2>
-          <p>{nbspText(content.midCtaLead)}</p>
-          <a className="btn btn-yellow" href="#mortgage-calc">
-            {copy.mortgageCalcCta}
-            <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
-          </a>
+          <LeadReveal
+            siteId={SITE.id}
+            label={fm.formHeading}
+            heading={fm.formHeading}
+            body={fm.formBody}
+            submitLabel={fm.formHeading}
+          >
+            <h2 id="mortgage-mid-cta-title">
+              {nbspText(content.midCtaHeading)}
+            </h2>
+            <p>{nbspText(content.midCtaLead)}</p>
+          </LeadReveal>
         </div>
       </div>
     </section>

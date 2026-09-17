@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { IconX } from "@tabler/icons-react";
 import {
   useEffect,
   useEffectEvent,
@@ -12,7 +13,9 @@ import {
 } from "react";
 import { trackEvent } from "../consent/analytics";
 import type { CatalogProject } from "../lib/catalog/types";
+import { LeadForm } from "./lead-form";
 import { formatRub } from "../lib/locale";
+import { SITE } from "../lib/site";
 import { copy, projectsInSeries } from "../lib/copy";
 import {
   calculateMaxPropertyPrice,
@@ -79,6 +82,9 @@ export function MortgageCalculator({
     readRegionCode,
     readServerRegionCode,
   );
+  /* Форма заявки проявляется на месте карточки результата. */
+  const [leadOpen, setLeadOpen] = useState(false);
+  const fm = copy.familyMortgage;
   const [mode, setMode] = useState<Mode>("payment");
   const [programId, setProgramId] =
     useState<MortgageProgramId>(initialProgramId);
@@ -147,6 +153,27 @@ export function MortgageCalculator({
     mode === "payment" ? paymentResult : budgetPack.result;
   const budgetPrice =
     mode === "budget" ? budgetPack.maxPropertyPrice : propertyPrice;
+
+  /* Снимок расчёта уходит вместе с заявкой: что человек накрутил и на чём
+     остановился. Разговор начинается не с «а что вы там считали?». */
+  const leadMeta = useMemo(
+    () => ({
+      calc_mode: mode,
+      program: programId,
+      property_price: Math.round(budgetPrice),
+      down_payment: Math.round(downPayment),
+      term_years: termYears,
+      monthly_payment: Math.round(activeResult.monthlyPayment),
+      loan_amount: Math.round(activeResult.loanAmount),
+      is_combined: activeResult.isCombined,
+      parts: activeResult.parts.map((part) => ({
+        kind: part.kind,
+        principal: Math.round(part.principal),
+        rate: part.annualRate,
+      })),
+    }),
+    [mode, programId, budgetPrice, downPayment, termYears, activeResult],
+  );
 
   const eligible = useMemo(
     () => getEligibleProjects(projects, budgetPrice, 3),
@@ -385,6 +412,18 @@ export function MortgageCalculator({
           </div>
 
           <aside className="mortgage-calc__result">
+            {/* Содержимое карточки и форма лежат в одной клетке и
+                перекрещиваются прозрачностью: по нажатию расчёт гаснет,
+                форма проявляется ровно в его габаритах. Ни карточка, ни
+                соседние блоки при этом не двигаются. */}
+            <div
+              className={
+                leadOpen
+                  ? "mortgage-calc__reveal is-open"
+                  : "mortgage-calc__reveal"
+              }
+            >
+              <div className="mortgage-calc__reveal-copy">
             <p className="mortgage-calc__hero-num">
               {mode === "payment"
                 ? formatRub(Math.round(activeResult.monthlyPayment))
@@ -445,12 +484,39 @@ export function MortgageCalculator({
               )}
             </div>
 
-            <Link
+            <button
+              type="button"
               className="btn btn-yellow mortgage-calc__result-cta"
-              href="#contacts"
+              onClick={() => setLeadOpen(true)}
             >
               {t.resultCta}
-            </Link>
+            </button>
+              </div>
+
+              <div className="mortgage-calc__reveal-slot" aria-hidden={!leadOpen}>
+                <div className="mortgage-calc__reveal-card">
+                  {/* Крестик в строке подписи первого поля, у правого края. */}
+                  <button
+                    type="button"
+                    className="lead-reveal__close"
+                    aria-label={copy.close}
+                    onClick={() => setLeadOpen(false)}
+                  >
+                    <IconX size={14} stroke={2.4} />
+                  </button>
+                  <LeadForm
+                    siteId={SITE.id}
+                    variant="card"
+                    compact
+                    heading={fm.formHeading}
+                    submitLabel={t.resultCta}
+                    meta={leadMeta}
+                  />
+                </div>
+              </div>
+            </div>
+            {/* Подпись общая для обоих состояний: не гаснет и держит
+                кнопку на одном месте — до раскрытия и после. */}
             <p className="mortgage-calc__result-note">{t.resultNote}</p>
           </aside>
 
