@@ -60,9 +60,9 @@ const PROGRAM_CARDS: readonly {
     title: "Сельская ипотека",
     rate: "от 3%",
     image: "/persons/agro.png",
-    imageW: 1400,
-    imageH: 1200,
-    sizes: "150px",
+    imageW: 587,
+    imageH: 918,
+    sizes: "110px",
     note: (
       <>
         {nbspText("Для работников АПК")}
