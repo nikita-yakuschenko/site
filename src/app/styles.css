@@ -8488,3 +8488,28 @@ textarea:focus-visible {
 .mortgage-program--family .mortgage-program__art {
   --art-flip: -1;
 }
+
+/* Первый экран программ без фотографии.
+   Тёмная плашка нужна фотографии: она держит белый текст поверх кадра и
+   растворяет его край вуалью. Предметному знаку на прозрачном фоне она ни к
+   чему — знак на ней висит пятном, а раздел выглядит чужим среди светлых
+   соседей. Поэтому здесь белое поле с тонкой гранью и обычный тёмный набор. */
+.mortgage-family--light {
+  background: #fff;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  color: var(--avgst-ink);
+}
+
+/* Вуаль снимается вместе с фоном: растушёвывать нечего. */
+.mortgage-family--light::before {
+  content: none;
+}
+
+.mortgage-family--light .mortgage-family__body h1,
+.mortgage-family--light .mortgage-family__body h2 {
+  color: var(--avgst-ink);
+}
+
+.mortgage-family--light .mortgage-family__body > p:not(.eyebrow) {
+  color: rgb(var(--avgst-ink-rgb) / 0.68);
+}

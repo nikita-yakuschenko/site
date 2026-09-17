@@ -79,7 +79,13 @@ function MortgageHero({ content }: { content: MortgageContent }) {
       aria-labelledby="mortgage-hero-title"
     >
       <div className="section__inner mortgage-showcase__grid">
-        <div className="mortgage-family">
+        <div
+          className={
+            content.heroCutout
+              ? "mortgage-family mortgage-family--light"
+              : "mortgage-family"
+          }
+        >
           <div
             className={
               content.heroCutout
