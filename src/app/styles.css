@@ -2294,6 +2294,7 @@ a {
 .mortgage-program small { position:relative; z-index:1; margin-top:16px; font-size:13px; line-height:1.35; opacity:.65; }
 
 /* Кадр уходит за нижнюю кромку — обрезает сама карточка. */
+.mortgage-program--family,
 .mortgage-program--it,
 .mortgage-program--agro,
 .mortgage-program--bank { overflow: hidden; }
@@ -2305,6 +2306,11 @@ a {
    отдельности не нужно. Сверху поле начинается на одной линии со знаком
    перехода — без этого отступа высокие кадры липли к кромке. */
 .mortgage-program__art {
+  /* Отражение кадра живёт в переменной, а не в transform напрямую: подъём
+     под курсором записывает transform целиком и стирал бы отражение — при
+     наведении домик семейной программы переворачивался обратно. */
+  --art-flip: 1;
+
   position: absolute;
   top: 12px;
   right: 0;
@@ -2313,17 +2319,19 @@ a {
   object-fit: contain;
   object-position: center top;
   pointer-events: none;
+  transform: scaleX(var(--art-flip));
   transition: transform 0.25s var(--ease-out);
 }
 
 /* Кадр чуть приподнимается под курсором — тот же отклик, что у знака
    перехода в углу, только тише. */
 .mortgage-program:hover .mortgage-program__art {
-  transform: translateY(-5px);
+  transform: translateY(-5px) scaleX(var(--art-flip));
 }
 
 /* Подпись не заходит под кадр. Перенос идёт по словам: в узкой колонке
    браузер ломал «IT-компаний» по дефису. */
+.mortgage-program--family > small,
 .mortgage-program--it > small,
 .mortgage-program--agro > small,
 .mortgage-program--bank > small { max-width: 46%; }
@@ -8476,8 +8484,7 @@ textarea:focus-visible {
 
 /* Домик семейной программы отражён по горизонтали: в исходном кадре труба
    стоит справа сверху и упирается в стрелку перехода — знак обрезает её.
-   Отражение уводит трубу влево, к свободному углу, и кадр перестаёт
-   спорить со стрелкой. */
+   Отражение уводит трубу влево, к свободному углу. */
 .mortgage-program--family .mortgage-program__art {
-  transform: scaleX(-1);
+  --art-flip: -1;
 }
