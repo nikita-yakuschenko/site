@@ -7466,10 +7466,26 @@ textarea:focus-visible {
 
 /* Знак доступности — рамка, а не предмет: срез по нижней кромке читается
    у неё браком, тогда как лапы мишки и дно рюкзака уходят под край
-   естественно. Этот кадр вписан в плашку целиком. */
+   естественно. Этот кадр вписан в плашку целиком.
+
+   И он же плотнее соседей: сплошной квадрат весит в плашке больше, чем
+   мишка в рост, поэтому занимает меньше ширины — иначе он подпирал бы
+   самую длинную из трёх строк. */
 .mortgage-who li:last-child .mortgage-program__art {
-  top: 14px;
-  height: calc(100% - 28px);
+  top: 50%;
+  right: 20px;
+  width: 27%;
+  height: calc(100% - 36px);
+  transform: translateY(-50%) scaleX(var(--art-flip));
+}
+
+.mortgage-who li:last-child:hover .mortgage-program__art {
+  transform: translateY(calc(-50% - 5px)) scaleX(var(--art-flip));
+}
+
+.mortgage-who li:last-child .mortgage-who__card strong,
+.mortgage-who li:last-child > span {
+  max-width: 68%;
 }
 
 .mortgage-who__card strong {
