@@ -7729,49 +7729,80 @@ textarea:focus-visible {
 }
 
 /* —— Ипотечный калькулятор: текст | поля | результат —— */
+/* Высота блока — отдельное требование: расчёт и подобранные проекты должны
+   помещаться на экран целиком, иначе связь «поменял параметр — увидел другие
+   дома» рвётся прокруткой. Блок собран в бюджет высоты, и каждое значение
+   ниже подчинено ему. На 1920×1080 секция занимала 1215px. */
+.mortgage-calc {
+  padding: 40px 0;
+}
+
+/* Шапка калькулятора — обычный заголовок секции, как у соседних блоков.
+   Колонкой внутри панели он забирал треть ширины у полей и результата и
+   ломал ритм страницы: у всех секций заголовок сверху, здесь был сбоку. */
+.mortgage-calc__head {
+  margin: 0 0 16px;
+}
+
+.mortgage-calc__head h2 {
+  margin: 0;
+  max-width: 34ch;
+  font-size: clamp(22px, 1.5vw, 28px);
+  line-height: 1.15;
+}
+
+.mortgage-calc__lead {
+  margin: 6px 0 0;
+  max-width: 64ch;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgb(var(--avgst-ink-rgb) / 0.62);
+}
+
+/* Панель — одна карточка, а не серая заливка: у неё белый фон, тонкая
+   грань и единственная мягкая тень. Прежняя заливка 4% превращала блок в
+   бесформенное пятно, внутри которого плавали ещё несколько поверхностей. */
 .mortgage-calc__panel {
   display: grid;
   gap: 16px;
   padding: 16px;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
   border-radius: calc(var(--surface-radius) + 4px);
-  background: rgb(var(--avgst-ink-rgb) / 0.04);
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(var(--avgst-ink-rgb) / 0.04);
 }
 
 @media (min-width: 960px) {
+  /* Две колонки вместо трёх: поля и результат. Поля шире — там работа,
+     результат ровно настолько, чтобы суммы не переносились. */
+  /* Ширину задают колонки, а не ограничение внутри них.
+     Пока поля были ужаты до 620px внутри колонки в 772px, разница в 150px
+     висела пустотой посреди карточки. Теперь колонка сама равна полям, а
+     панель — сумме колонок: свободное место уходит за пределы карточки, где
+     читается полем страницы, а не дырой в блоке.
+
+     Поля при этом не растягиваются на всю полосу: на 690px ползунок теряет
+     цену деления, глаз перестаёт связывать ручку с подписью. */
   .mortgage-calc__panel {
-    grid-template-columns: minmax(160px, 0.72fr) minmax(0, 1.35fr) minmax(240px, 0.95fr);
-    align-items: stretch;
-    gap: 16px;
+    max-width: 1008px;
+    grid-template-columns: minmax(0, 620px) 340px;
+    align-items: start;
+    column-gap: 16px;
+    row-gap: 18px;
   }
 
-  /* Лишняя высота уходит в плитки полей, отступы между ними равные. */
   .mortgage-calc__controls {
-    height: 100%;
     grid-template-rows: auto auto 1fr 1fr 1fr;
   }
 
   .mortgage-calc__tile {
     align-content: space-evenly;
   }
-}
 
-.mortgage-calc__intro {
-  min-width: 0;
-}
-
-.mortgage-calc__intro h2 {
-  margin: 0 0 8px;
-  max-width: 14ch;
-  font-size: clamp(18px, 2vw, 24px);
-  line-height: 1.15;
-}
-
-.mortgage-calc__intro-lead {
-  margin: 0;
-  max-width: 32ch;
-  font-size: 13px;
-  line-height: 1.4;
-  color: rgb(var(--avgst-ink-rgb) / 0.68);
+  /* Проекты лежат под обеими колонками, внутри той же карточки. */
+  .mortgage-calc__matches {
+    grid-column: 1 / -1;
+  }
 }
 
 /* Компактный сегмент: по содержимому, не на всю колонку. */
@@ -7982,6 +8013,9 @@ textarea:focus-visible {
 }
 
 .mortgage-calc__result {
+  /* Не липкая. Пока панель была короткой, ездить карточке было некуда;
+     с проектами внутри панель выросла, и карточка поехала вниз прямо по
+     ним. Держать её в кадре незачем: сумма видна там же, где её считают. */
   display: grid;
   gap: 8px;
   align-content: start;
@@ -7991,13 +8025,6 @@ textarea:focus-visible {
   background: #fff;
   color: var(--avgst-ink);
   box-shadow: 0 10px 32px rgb(var(--avgst-ink-rgb) / 0.1);
-}
-
-@media (min-width: 960px) {
-  .mortgage-calc__result {
-    position: sticky;
-    top: 96px;
-  }
 }
 
 .mortgage-calc__hero-num {
@@ -8082,26 +8109,6 @@ textarea:focus-visible {
   text-align: right;
 }
 
-.mortgage-calc__result-projects {
-  justify-self: stretch;
-  box-sizing: border-box;
-  min-height: 36px;
-  margin: 0;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: rgb(var(--avgst-ink-rgb) / 0.04);
-  font-size: 13px;
-  font-weight: 700;
-  line-height: 1.3;
-  text-align: center;
-  color: var(--avgst-ink);
-  transition: background-color 0.2s var(--ease-out);
-}
-
-.mortgage-calc__result-projects:hover {
-  background: rgb(var(--avgst-ink-rgb) / 0.08);
-}
-
 .mortgage-calc__result-cta {
   justify-self: stretch;
   text-align: center;
@@ -8119,25 +8126,91 @@ textarea:focus-visible {
   text-align: center;
 }
 
-.mortgage-calc__projects {
+/* Подбор проектов внутри панели.
+   Отделён волосяной линией, а не отступом в целую секцию: это продолжение
+   расчёта, а не самостоятельный блок. */
+.mortgage-calc__matches {
   display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-section);
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
 }
 
-.mortgage-calc__projects-count {
+.mortgage-calc__matches-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.mortgage-calc__matches-head h3 {
   margin: 0;
   font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
 }
 
-.mortgage-calc__catalog-cta {
-  justify-self: start;
+/* Число — единственное место, где оно названо. Раньше то же значение стояло
+   ещё и в карточке результата, и на жёлтой кнопке под карточками. */
+.mortgage-calc__matches-head strong {
+  color: var(--avgst-ink);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Тихая ссылка вместо второй жёлтой кнопки: главное действие в блоке одно —
+   «Получить консультацию», и спорить с ним здесь нечему. */
+.mortgage-calc__matches-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--avgst-ink);
+  text-decoration: none;
+}
+
+.mortgage-calc__matches-all svg {
+  transition: transform 0.16s var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mortgage-calc__matches-all:hover svg {
+    transform: translate(2px, -2px);
+  }
+}
+
+.mortgage-calc__matches-all:active {
+  transform: scale(0.97);
+}
+
+/* Ровно три колонки, как в каталоге. auto-fill на полосе в 1112px нарезал
+   четыре места под три карточки: они ужимались до 266px, характеристики
+   переносились на вторую строку, и карточка из горизонтальной становилась
+   вертикальной. */
+.mortgage-calc__matches-grid {
+  display: grid;
+  gap: var(--gap-tile);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+@media (min-width: 960px) {
+  .mortgage-calc__matches-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.mortgage-calc__matches-empty {
+  margin: 0;
+  font-size: 14px;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
 }
 
 .mortgage-calc__disclaimer {
-  margin: var(--gap-stack) 0 0;
+  margin: 14px 0 0;
   max-width: 46rem;
-  font-size: 13px;
+  font-size: 12px;
   line-height: 1.45;
   color: rgb(var(--avgst-ink-rgb) / 0.55);
 }
@@ -8245,4 +8318,64 @@ textarea:focus-visible {
     animation: none;
     transition: none;
   }
+}
+
+/* Компактная карточка проекта внутри калькулятора.
+   Каталожная карточка занимает 381px — на неё одну уходит треть экрана, и
+   блок перестаёт помещаться целиком. Здесь карточка играет другую роль: она
+   не витрина, а ответ на расчёт — показать, что дома в бюджете есть, и
+   увести в каталог.
+
+   Высота снимается разворотом, а не обрезкой кадра. Сильнее кадрировать
+   нельзя: на пропорции 12:5 дом резался по крыше и переднему плану. Поэтому
+   фото уходит влево, сохраняя свои 16:9, а текст встаёт рядом. */
+.mortgage-calc__matches .card {
+  display: flex;
+  align-items: stretch;
+}
+
+.mortgage-calc__matches .card__top {
+  flex: 0 0 clamp(132px, 42%, 168px);
+}
+
+.mortgage-calc__matches .card__media {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.mortgage-calc__matches .card__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  padding: 10px 12px;
+  gap: 2px;
+}
+
+.mortgage-calc__matches .card h3 {
+  font-size: 0.9375rem;
+  line-height: 1.25;
+}
+
+.mortgage-calc__matches .specs {
+  margin: 4px 0 0;
+  gap: 2px 10px;
+  font-size: 12px;
+}
+
+.mortgage-calc__matches .price {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+}
+
+/* Жёлтая кнопка снята: карточка кликабельна по фото и названию, а три
+   жёлтые кнопки в ряд спорили с единственным действием блока. */
+.mortgage-calc__matches .card__cta {
+  display: none;
+}
+
+/* Бейдж технологии и кнопки «поделиться» на маленьком кадре только мешают:
+   они закрывают собой дом, ради которого кадр и показан. */
+.mortgage-calc__matches .badge,
+.mortgage-calc__matches .card__actions {
+  display: none;
 }

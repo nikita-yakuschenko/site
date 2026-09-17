@@ -1,4 +1,10 @@
 export {
+  MORTGAGE_ROUTES,
+  mortgageHref,
+  programBySlug,
+  type MortgageSlug,
+} from "./routes";
+export {
   MORTGAGE_PROGRAMS,
   getMortgageProgram,
   maxLoanAmount,

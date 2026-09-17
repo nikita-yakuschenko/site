@@ -261,11 +261,11 @@ function MortgageShowcase() {
             </p>
             <div className="mortgage-family__actions">
               {/* Форму расчёта подключим отдельно; кнопка уже на месте. */}
-              <a className="btn btn-yellow" href="/mortgage#mortgage-calc">
+              <a className="btn btn-yellow" href="/family-mortgage#mortgage-calc">
                 {copy.mortgageCta}
                 <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
               </a>
-              <a className="mortgage-family__more" href="/mortgage#mortgage-calc">
+              <a className="mortgage-family__more" href="/family-mortgage#mortgage-calc">
                 {copy.mortgageMore}
               </a>
             </div>
@@ -273,14 +273,14 @@ function MortgageShowcase() {
         </div>
         {/* Семейной в ряду нет: ей посвящён баннер выше. */}
         <div className="mortgage-showcase__programs">
-          <a className="mortgage-program mortgage-program--it" href="/mortgage">
+          <a className="mortgage-program mortgage-program--it" href="/it-mortgage">
             <span>IT-ипотека</span><strong>от 6%</strong><small>Для специалистов <span>IT-компаний</span></small>
             <Image className="mortgage-program__art" src="/persons/it.png" alt="" width={904} height={975} sizes="160px" />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>
           </a>
-          <a className="mortgage-program mortgage-program--agro" href="/mortgage">
+          <a className="mortgage-program mortgage-program--agro" href="/agro-mortgage">
             <span>Сельская ипотека</span><strong>от 3%</strong>
             <small>
               {nbspText("Для работников АПК")}
@@ -292,7 +292,7 @@ function MortgageShowcase() {
               <IconArrowUpRight size={18} stroke={2} />
             </span>
           </a>
-          <a className="mortgage-program mortgage-program--bank" href="/mortgage">
+          <a className="mortgage-program mortgage-program--bank" href="/basic-mortgage">
             <span>Базовые программы</span><strong>от 16%</strong>
             <small>
               {nbspText("Лучшие условия")}

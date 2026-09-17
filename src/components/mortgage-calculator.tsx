@@ -28,6 +28,7 @@ import {
   readServerRegionCode,
   subscribeRegion,
 } from "../lib/regions";
+import { IconArrowUpRight } from "@tabler/icons-react";
 import { ProjectCard } from "./project-card";
 
 const t = copy.mortgageCalc;
@@ -229,13 +230,15 @@ export function MortgageCalculator({
       aria-labelledby="mortgage-calc-title"
     >
       <div className="section__inner">
-        <div className="mortgage-calc__panel">
-          <div className="mortgage-calc__intro">
-            <p className="eyebrow">{t.eyebrow}</p>
-            <h2 id="mortgage-calc-title">{t.heading}</h2>
-            <p className="mortgage-calc__intro-lead">{t.lead}</p>
-          </div>
+        {/* Заголовок вынесен из панели в шапку секции. Колонкой он забирал
+            треть ширины у полей и результата, а сам стоял почти пустым. */}
+        <header className="mortgage-calc__head">
+          <p className="eyebrow">{t.eyebrow}</p>
+          <h2 id="mortgage-calc-title">{t.heading}</h2>
+          <p className="mortgage-calc__lead">{t.lead}</p>
+        </header>
 
+        <div className="mortgage-calc__panel">
           <div className="mortgage-calc__controls">
             <div
               className="mortgage-calc__modes"
@@ -420,24 +423,6 @@ export function MortgageCalculator({
               ) : null}
             </div>
 
-            {eligible.total > 0 ? (
-              <Link
-                className="mortgage-calc__result-projects"
-                href={catalogHrefWithMaxPrice(budgetPrice)}
-                onClick={() =>
-                  trackEvent({
-                    type: "mortgage_catalog_clicked",
-                    program: programId,
-                    available_budget: Math.round(budgetPrice),
-                  })
-                }
-              >
-                {eligible.total} {t.projectsInBudget}
-              </Link>
-            ) : (
-              <p className="mortgage-calc__result-note">{t.projectsEmpty}</p>
-            )}
-
             <Link
               className="btn btn-yellow mortgage-calc__result-cta"
               href="#contacts"
@@ -446,45 +431,58 @@ export function MortgageCalculator({
             </Link>
             <p className="mortgage-calc__result-note">{t.resultNote}</p>
           </aside>
-        </div>
 
-        <div className="mortgage-calc__projects" id="mortgage-calc-projects">
-          <p className="mortgage-calc__projects-count">
-            {t.suitable} <strong>{projectsInSeries(eligible.total)}</strong>
-          </p>
-          {eligible.items.length ? (
-            <div className="grid-3">
-              {eligible.items.map((project) => (
-                <div
-                  key={project.id}
-                  onClickCapture={() =>
+          {/* Проекты — часть калькулятора, а не отдельный блок под ним: ради
+              них расчёт и затевается. Число выводится здесь один раз; в
+              карточке результата и на кнопке его больше нет. */}
+          <section
+            className="mortgage-calc__matches"
+            id="mortgage-calc-projects"
+            aria-live="polite"
+          >
+            <div className="mortgage-calc__matches-head">
+              <h3>
+                {t.suitable} <strong>{projectsInSeries(eligible.total)}</strong>
+              </h3>
+              {eligible.total > 0 ? (
+                <Link
+                  className="mortgage-calc__matches-all"
+                  href={catalogHrefWithMaxPrice(budgetPrice)}
+                  onClick={() =>
                     trackEvent({
-                      type: "mortgage_project_clicked",
+                      type: "mortgage_catalog_clicked",
                       program: programId,
-                      projectId: project.id,
+                      available_budget: Math.round(budgetPrice),
                     })
                   }
                 >
-                  <ProjectCard project={project} />
-                </div>
-              ))}
+                  {t.viewAll}
+                  <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
+                </Link>
+              ) : null}
             </div>
-          ) : null}
-          {eligible.total > 0 ? (
-            <Link
-              className="btn btn-yellow mortgage-calc__catalog-cta"
-              href={catalogHrefWithMaxPrice(budgetPrice)}
-              onClick={() =>
-                trackEvent({
-                  type: "mortgage_catalog_clicked",
-                  program: programId,
-                  available_budget: Math.round(budgetPrice),
-                })
-              }
-            >
-              {t.viewAll} ({eligible.total})
-            </Link>
-          ) : null}
+
+            {eligible.items.length ? (
+              <div className="mortgage-calc__matches-grid">
+                {eligible.items.map((project) => (
+                  <div
+                    key={project.id}
+                    onClickCapture={() =>
+                      trackEvent({
+                        type: "mortgage_project_clicked",
+                        program: programId,
+                        projectId: project.id,
+                      })
+                    }
+                  >
+                    <ProjectCard project={project} />
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="mortgage-calc__matches-empty">{t.projectsEmpty}</p>
+            )}
+          </section>
         </div>
 
         <p className="mortgage-calc__disclaimer">{t.disclaimer}</p>

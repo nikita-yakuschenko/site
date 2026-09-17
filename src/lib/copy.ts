@@ -180,7 +180,7 @@ export const copy = {
   ],
   mortgageCta: "Рассчитать платёж",
   mortgageMore: "Подробнее об ипотеке",
-  mortgageMoreHref: "/mortgage",
+  mortgageMoreHref: "/family-mortgage",
   mortgageCalcCta: "Рассчитать ипотеку",
   mortgageChooseProject: "Выбрать проект",
   mortgageOtherPrograms: {

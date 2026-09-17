@@ -23,7 +23,7 @@ export const SITE = {
   navigation: [
     { label: copy.projects, href: '/catalog' },
     { label: copy.readyHouses, href: '/for-sale' },
-    { label: copy.mortgage, href: '/mortgage' },
+    { label: copy.mortgage, href: '/family-mortgage' },
     { label: copy.production, href: '/manufacture' },
     { label: copy.exposition, href: '/exposition' },
   ],
