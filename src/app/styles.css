@@ -7486,95 +7486,8 @@ textarea:focus-visible {
 
    Разное поведение отделяет правила от условий надёжнее, чем разный
    оттенок заливки, а развёрнутый текст получает полную ширину раздела. */
-/* Строка держит прежний рост, а знак крупнее её: выход за кромку
-   срезается самой строкой. Поднимать строку под знак нельзя — три
-   правила расходились бы на треть экрана. */
-.mortgage-rules .ui-accordion__item {
-  position: relative;
-  overflow: hidden;
-}
-
-/* Строка не ниже глифа: при 18px отбивки цифра следующего правила лезла
-   в предыдущую строку. Тот же расчёт, что у участков производства. */
-.mortgage-rules .ui-accordion__trigger {
-  padding: 22px 0;
-  min-height: 62px;
-}
-
-/* Знак правила — та же высота и то же место, что занимал глиф цифры:
-   левее шеврона, по центру всей высоты пункта, чтобы при раскрытии он не
-   уезжал вместе с текстом. */
-.mortgage-rules__mark {
-  /* Подъём под курсором живёт в переменной: центрирование задано тем же
-     transform, и подъём, записанный напрямую, стирал бы его. */
-  --digit-lift: 0px;
-  /* Поворот и подъём живут в переменных: центрирование задано тем же
-     transform, и записанные напрямую они стирали бы его. */
-  --mark-turn: 90deg;
-  position: absolute;
-  top: 50%;
-  right: 24px;
-  z-index: 0;
-  width: 88px;
-  height: 88px;
-  pointer-events: none;
-  /* Прозрачность задана всему знаку, а не его цвету.
-     Обводка стрелки сама себя перекрывает там, где наконечник сходится с
-     древком: два полупрозрачных штриха складывались, и стык выходил
-     толще и темнее остальной линии. Непрозрачный цвет плюс opacity гасит
-     уже собранную фигуру, и стык не отличается от линии. */
-  color: var(--avgst-ink);
-  opacity: var(--ghost-mark);
-  transform: translateY(calc(-50% + var(--digit-lift))) rotate(var(--mark-turn));
-  transition:
-    transform 0.24s var(--ease-out),
-    opacity 0.22s var(--ease-out),
-    color 0.22s var(--ease-out);
-}
-
-/* Знак работает как шеврон: свёрнутое правило — стрелка вниз-вправо,
-   раскрытое — вверх-вправо. Поворот на четверть оборота, поэтому мелкий
-   шеврон рядом снят: два указателя одного состояния спорят друг с другом. */
-.mortgage-rules .ui-accordion__item[data-state="open"] .mortgage-rules__mark {
-  --mark-turn: 0deg;
-  opacity: 0.14;
-}
-
-.mortgage-rules .ui-accordion__chevron {
-  display: none;
-}
-
-/* Заголовок поверх знака, иначе длинное название уходит под него. */
-.mortgage-rules .ui-accordion__header {
-  position: relative;
-  z-index: 1;
-}
-
-@media (hover: hover) {
-  .mortgage-rules .ui-accordion__item:hover .mortgage-rules__mark {
-    color: var(--brand-yellow);
-    opacity: 0.9;
-    --digit-lift: -6px;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mortgage-rules__mark {
-    transition: color 0.22s var(--ease-out);
-  }
-
-  .mortgage-rules .ui-accordion__item:hover .mortgage-rules__mark {
-    --digit-lift: 0px;
-  }
-}
-
 .mortgage-rules dd {
   margin: 0;
-}
-
-/* Курсор говорит, что текст тоже нажимается. */
-.mortgage-rules .ui-accordion__content {
-  cursor: pointer;
 }
 
 .mortgage-rules .ui-accordion__content-inner {
@@ -8485,8 +8398,93 @@ textarea:focus-visible {
   border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
 }
 
+/* Строка держит свой рост, а знак крупнее её: выход за кромку срезается
+   самой строкой. Поднимать строку под знак нельзя — список разошёлся бы
+   на пол-экрана. */
 .ui-accordion__item {
+  position: relative;
+  overflow: hidden;
   border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+}
+
+/* Знак состояния — та же стрелка, что ведёт в карточках: свёрнутый пункт
+   показывает её вниз-вправо, раскрытый поворачивает вверх-вправо. */
+.ui-accordion__mark {
+  /* Поворот и подъём живут в переменных: центрирование задано тем же
+     transform, и записанные напрямую они стирали бы его. */
+  --digit-lift: 0px;
+  --mark-turn: 90deg;
+  position: absolute;
+  top: 50%;
+  right: 24px;
+  z-index: 0;
+  width: 88px;
+  height: 88px;
+  pointer-events: none;
+  /* Прозрачность задана всему знаку, а не его цвету. Обводка стрелки сама
+     себя перекрывает там, где наконечник сходится с древком: два
+     полупрозрачных штриха складывались, и стык выходил толще и темнее
+     линии. Непрозрачный цвет с opacity гасит уже собранную фигуру. */
+  color: var(--avgst-ink);
+  opacity: var(--ghost-mark);
+  transform: translateY(calc(-50% + var(--digit-lift))) rotate(var(--mark-turn));
+  transition:
+    transform 0.24s var(--ease-out),
+    opacity 0.22s var(--ease-out),
+    color 0.22s var(--ease-out);
+}
+
+.ui-accordion__item[data-state="open"] .ui-accordion__mark {
+  --mark-turn: 0deg;
+  opacity: 0.14;
+}
+
+/* Заголовок поверх знака, иначе длинное название уходит под него. */
+.ui-accordion__header {
+  position: relative;
+  z-index: 1;
+}
+
+/* Курсор говорит, что текст тоже нажимается. */
+.ui-accordion__content {
+  cursor: pointer;
+}
+
+/* Ширина полосы, которую занимает знак. Ни заголовок, ни ответ в неё не
+   заходят: стрелка стоит позади текста, и строки проходили прямо сквозь
+   неё — на длинных ответах это читалось грязью, а не водяным знаком. */
+.ui-accordion {
+  --mark-lane: 128px;
+}
+
+@media (max-width: 899px) {
+  .ui-accordion {
+    --mark-lane: 76px;
+  }
+
+  .ui-accordion__mark {
+    right: 12px;
+    width: 56px;
+    height: 56px;
+  }
+}
+
+@media (hover: hover) {
+  .ui-accordion__item:hover .ui-accordion__mark {
+    --digit-lift: -6px;
+    color: var(--brand-yellow);
+    opacity: 0.9;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-accordion__mark {
+    transition: opacity 0.22s var(--ease-out), color 0.22s var(--ease-out);
+  }
+
+  .ui-accordion__item:hover .ui-accordion__mark {
+    --digit-lift: 0px;
+  }
 }
 
 .ui-accordion__header {
@@ -8500,7 +8498,7 @@ textarea:focus-visible {
   justify-content: space-between;
   gap: 16px;
   margin: 0;
-  padding: 18px 0;
+  padding: 18px var(--mark-lane) 18px 0;
   border: 0;
   background: transparent;
   color: inherit;
@@ -8521,16 +8519,6 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
-.ui-accordion__chevron {
-  flex: 0 0 auto;
-  color: rgb(var(--avgst-ink-rgb) / 0.45);
-  transition: transform 0.2s var(--ease-out);
-}
-
-.ui-accordion__trigger[data-state="open"] .ui-accordion__chevron {
-  transform: rotate(180deg);
-}
-
 .ui-accordion__content {
   overflow: hidden;
 }
@@ -8544,7 +8532,7 @@ textarea:focus-visible {
 }
 
 .ui-accordion__content-inner {
-  padding: 0 0 18px;
+  padding: 0 var(--mark-lane) 18px 0;
   font-size: 15px;
   line-height: 1.55;
   color: rgb(var(--avgst-ink-rgb) / 0.72);
@@ -8569,7 +8557,6 @@ textarea:focus-visible {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .ui-accordion__chevron,
   .ui-accordion__content[data-state="open"],
   .ui-accordion__content[data-state="closed"] {
     animation: none;

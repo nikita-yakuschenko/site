@@ -1,6 +1,5 @@
 "use client";
 
-import { IconArrowUpRight } from "@tabler/icons-react";
 import Image from "next/image";
 import { Fragment } from "react";
 import { nbspText } from "../lib/copy";
@@ -79,42 +78,8 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
           >
             {content.rules.map((rule, index) => (
               <AccordionItem key={rule.title} value={`rule-${index}`}>
-                {/* Знак правила. Цифры отсюда ушли: правила не идут по
-                    порядку, их сверяют между собой, и счёт им ни к чему —
-                    в отличие от шагов ипотеки, где он ведёт по процессу. */}
-                <IconArrowUpRight
-                  className="mortgage-rules__mark"
-                  size={88}
-                  stroke={1.75}
-                  aria-hidden="true"
-                />
                 <AccordionTrigger>{rule.title}</AccordionTrigger>
-                {/* Раскрытый пункт сворачивается кликом в любое место, а не
-                    только по заголовку: раскрытый текст занимает почти всю
-                    высоту правила, и попадать обратно в узкую строку
-                    заголовка неудобно.
-
-                    Выделение текста при этом не ломается: если что-то
-                    выделено, клик его не схлопывает — иначе пункт
-                    закрывался бы на отпускании мыши посреди фразы.
-
-                    Нажатие адресуется самому заголовку, поэтому клавиатура
-                    и экранные читалки работают как работали: доступный
-                    элемент здесь один, а это дубль для мыши. */}
-                <AccordionContent
-                  onClick={(event) => {
-                    const selection = window.getSelection();
-                    if (selection && !selection.isCollapsed) return;
-                    event.currentTarget
-                      .closest(".ui-accordion__item")
-                      ?.querySelector<HTMLButtonElement>(
-                        ".ui-accordion__trigger",
-                      )
-                      ?.click();
-                  }}
-                >
-                  {nbspText(rule.text)}
-                </AccordionContent>
+                <AccordionContent>{nbspText(rule.text)}</AccordionContent>
               </AccordionItem>
             ))}
           </Accordion>
