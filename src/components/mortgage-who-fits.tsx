@@ -1,5 +1,6 @@
 "use client";
 
+import { IconArrowUpRight } from "@tabler/icons-react";
 import Image from "next/image";
 import { Fragment } from "react";
 import { nbspText } from "../lib/copy";
@@ -78,14 +79,13 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
           >
             {content.rules.map((rule, index) => (
               <AccordionItem key={rule.title} value={`rule-${index}`}>
-                {/* Водяной знак правила — тот же глиф из /img/digits, что
-                    нумерует участки производства на главной. */}
-                <span
-                  className="mortgage-rules__digit"
-                  style={{
-                    WebkitMaskImage: `url("/img/digits/${index + 1}.png")`,
-                    maskImage: `url("/img/digits/${index + 1}.png")`,
-                  }}
+                {/* Знак правила. Цифры отсюда ушли: правила не идут по
+                    порядку, их сверяют между собой, и счёт им ни к чему —
+                    в отличие от шагов ипотеки, где он ведёт по процессу. */}
+                <IconArrowUpRight
+                  className="mortgage-rules__mark"
+                  size={54}
+                  stroke={1.25}
                   aria-hidden="true"
                 />
                 <AccordionTrigger>{rule.title}</AccordionTrigger>
