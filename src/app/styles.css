@@ -7481,15 +7481,19 @@ textarea:focus-visible {
 
    Разное поведение отделяет правила от условий надёжнее, чем разный
    оттенок заливки, а развёрнутый текст получает полную ширину раздела. */
+/* Строка держит прежний рост, а знак крупнее её: выход за кромку
+   срезается самой строкой. Поднимать строку под знак нельзя — три
+   правила расходились бы на треть экрана. */
 .mortgage-rules .ui-accordion__item {
   position: relative;
+  overflow: hidden;
 }
 
 /* Строка не ниже глифа: при 18px отбивки цифра следующего правила лезла
    в предыдущую строку. Тот же расчёт, что у участков производства. */
 .mortgage-rules .ui-accordion__trigger {
   padding: 22px 0;
-  min-height: calc(3.4rem + 8px);
+  min-height: 62px;
 }
 
 /* Знак правила — та же высота и то же место, что занимал глиф цифры:
@@ -7499,15 +7503,40 @@ textarea:focus-visible {
   /* Подъём под курсором живёт в переменной: центрирование задано тем же
      transform, и подъём, записанный напрямую, стирал бы его. */
   --digit-lift: 0px;
+  /* Поворот и подъём живут в переменных: центрирование задано тем же
+     transform, и записанные напрямую они стирали бы его. */
+  --mark-turn: 90deg;
   position: absolute;
   top: 50%;
-  right: 44px;
+  right: 24px;
   z-index: 0;
-  width: 54px;
-  height: 54px;
+  width: 88px;
+  height: 88px;
   pointer-events: none;
-  color: rgb(var(--avgst-ink-rgb) / 0.1);
-  transform: translateY(calc(-50% + var(--digit-lift)));
+  /* Прозрачность задана всему знаку, а не его цвету.
+     Обводка стрелки сама себя перекрывает там, где наконечник сходится с
+     древком: два полупрозрачных штриха складывались, и стык выходил
+     толще и темнее остальной линии. Непрозрачный цвет плюс opacity гасит
+     уже собранную фигуру, и стык не отличается от линии. */
+  color: var(--avgst-ink);
+  opacity: 0.09;
+  transform: translateY(calc(-50% + var(--digit-lift))) rotate(var(--mark-turn));
+  transition:
+    transform 0.24s var(--ease-out),
+    opacity 0.22s var(--ease-out),
+    color 0.22s var(--ease-out);
+}
+
+/* Знак работает как шеврон: свёрнутое правило — стрелка вниз-вправо,
+   раскрытое — вверх-вправо. Поворот на четверть оборота, поэтому мелкий
+   шеврон рядом снят: два указателя одного состояния спорят друг с другом. */
+.mortgage-rules .ui-accordion__item[data-state="open"] .mortgage-rules__mark {
+  --mark-turn: 0deg;
+  opacity: 0.14;
+}
+
+.mortgage-rules .ui-accordion__chevron {
+  display: none;
 }
 
 /* Заголовок поверх знака, иначе длинное название уходит под него. */
@@ -7517,19 +7546,18 @@ textarea:focus-visible {
 }
 
 @media (hover: hover) {
-  .mortgage-rules__mark {
-    transition:
-      transform 0.22s var(--ease-out),
-      color 0.22s var(--ease-out);
-  }
-
   .mortgage-rules .ui-accordion__item:hover .mortgage-rules__mark {
     color: var(--brand-yellow);
+    opacity: 0.9;
     --digit-lift: -6px;
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .mortgage-rules__mark {
+    transition: color 0.22s var(--ease-out);
+  }
+
   .mortgage-rules .ui-accordion__item:hover .mortgage-rules__mark {
     --digit-lift: 0px;
   }

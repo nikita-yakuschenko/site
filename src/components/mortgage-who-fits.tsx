@@ -84,8 +84,8 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
                     в отличие от шагов ипотеки, где он ведёт по процессу. */}
                 <IconArrowUpRight
                   className="mortgage-rules__mark"
-                  size={54}
-                  stroke={1.25}
+                  size={88}
+                  stroke={1.75}
                   aria-hidden="true"
                 />
                 <AccordionTrigger>{rule.title}</AccordionTrigger>
