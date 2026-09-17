@@ -7536,6 +7536,93 @@ textarea:focus-visible {
 
    Разное поведение отделяет правила от условий надёжнее, чем разный
    оттенок заливки, а развёрнутый текст получает полную ширину раздела. */
+.mortgage-rules .ui-accordion__item {
+  position: relative;
+}
+
+/* Строка не ниже глифа: при 18px отбивки цифра следующего правила лезла
+   в предыдущую строку. Тот же расчёт, что у участков производства. */
+.mortgage-rules .ui-accordion__trigger {
+  padding: 22px 0;
+  min-height: calc(3.4rem + 8px);
+}
+
+/* Цифра правила: тот же глиф и та же механика выреза из 1024-поля, что у
+   участков производства на главной. Стоит левее шеврона, чтобы не спорить
+   с ним за угол, и привязана к строке заголовка — при раскрытии пункта
+   она не уезжает вместе с текстом. */
+.mortgage-rules__digit {
+  --digit-h: 3.4rem;
+  --digit-canvas: 1024;
+  position: absolute;
+  top: 6px;
+  right: 44px;
+  z-index: 0;
+  width: calc(var(--digit-h) * var(--gw) / var(--gh));
+  height: var(--digit-h);
+  pointer-events: none;
+  background-color: rgb(var(--avgst-ink-rgb) / 0.07);
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
+  mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
+  -webkit-mask-position: calc(-1 * var(--digit-h) * var(--gx) / var(--gh))
+    calc(-1 * var(--digit-h) * var(--gy) / var(--gh));
+  mask-position: calc(-1 * var(--digit-h) * var(--gx) / var(--gh))
+    calc(-1 * var(--digit-h) * var(--gy) / var(--gh));
+  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.35));
+}
+
+.mortgage-rules .ui-accordion__item:nth-child(1) .mortgage-rules__digit {
+  --gx: 412;
+  --gy: 282;
+  --gw: 158;
+  --gh: 456;
+}
+
+.mortgage-rules .ui-accordion__item:nth-child(2) .mortgage-rules__digit {
+  --gx: 350;
+  --gy: 272;
+  --gw: 326;
+  --gh: 466;
+}
+
+.mortgage-rules .ui-accordion__item:nth-child(3) .mortgage-rules__digit {
+  --gx: 346;
+  --gy: 272;
+  --gw: 334;
+  --gh: 476;
+}
+
+/* Заголовок поверх знака, иначе длинное название уходит под цифру. */
+.mortgage-rules .ui-accordion__header {
+  position: relative;
+  z-index: 1;
+}
+
+@media (hover: hover) {
+  .mortgage-rules__digit {
+    transition:
+      transform 0.22s var(--ease-out),
+      filter 0.22s var(--ease-out),
+      background-color 0.22s var(--ease-out);
+  }
+
+  .mortgage-rules .ui-accordion__item:hover .mortgage-rules__digit {
+    background-color: color-mix(in srgb, var(--brand-yellow) 78%, white);
+    transform: translateY(-6px);
+    filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.9))
+      drop-shadow(1px 3px 0 rgb(196 150 8 / 0.35))
+      drop-shadow(0 16px 20px rgb(var(--avgst-ink-rgb) / 0.18));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mortgage-rules .ui-accordion__item:hover .mortgage-rules__digit {
+    transform: none;
+  }
+}
+
 .mortgage-rules dd {
   margin: 0;
 }

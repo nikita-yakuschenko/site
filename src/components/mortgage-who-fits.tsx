@@ -72,6 +72,16 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
           >
             {content.rules.map((rule, index) => (
               <AccordionItem key={rule.title} value={`rule-${index}`}>
+                {/* Водяной знак правила — тот же глиф из /img/digits, что
+                    нумерует участки производства на главной. */}
+                <span
+                  className="mortgage-rules__digit"
+                  style={{
+                    WebkitMaskImage: `url("/img/digits/${index + 1}.png")`,
+                    maskImage: `url("/img/digits/${index + 1}.png")`,
+                  }}
+                  aria-hidden="true"
+                />
                 <AccordionTrigger>{rule.title}</AccordionTrigger>
                 <AccordionContent>{nbspText(rule.text)}</AccordionContent>
               </AccordionItem>
