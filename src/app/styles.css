@@ -8390,11 +8390,23 @@ textarea:focus-visible {
 
 .mortgage-calc__matches .card__top {
   flex: 0 0 clamp(132px, 42%, 168px);
+  /* Колонка кадра тянется по высоте карточки и режет всё, что выйдет за
+     её пределы. Без этого высокая картинка вылезала бы из-под скруглённого
+     нижнего угла: карточка обрезает содержимое по себе, а вложенная
+     колонка — нет. */
+  align-self: stretch;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .mortgage-calc__matches .card__media {
   height: 100%;
   aspect-ratio: auto;
+}
+
+.mortgage-calc__matches .card__media img {
+  height: 100%;
+  object-fit: cover;
 }
 
 .mortgage-calc__matches .card__body {
