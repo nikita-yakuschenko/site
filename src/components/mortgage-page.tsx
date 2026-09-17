@@ -1,12 +1,9 @@
 import {
   IconArrowUpRight,
-  IconBabyCarriage,
   IconBuildingBank,
-  IconDisabled,
   IconHomeHeart,
   IconPercentage,
   IconShieldCheck,
-  IconUsersGroup,
   IconWallet,
 } from "@tabler/icons-react";
 import Image from "next/image";
@@ -18,7 +15,6 @@ import {
   mortgageContent,
   type MortgageContent,
   type WithConditions,
-  type WithWho,
 } from "../lib/mortgage/content";
 import { copy, nbspText } from "../lib/copy";
 import { telHref } from "../lib/phone";
@@ -28,13 +24,13 @@ import { CopyButton } from "./copy-button";
 import { LeadForm } from "./lead-form";
 import { MortgageCalculator } from "./mortgage-calculator";
 import { MortgageFaq } from "./mortgage-faq";
+import { MortgageWhoFits } from "./mortgage-who-fits";
 import { MortgageOtherPrograms } from "./mortgage-other-programs";
 import type { CatalogProject } from "../lib/catalog/types";
 import type { MortgageProgramId } from "../lib/mortgage";
 
 const fm = copy.familyMortgage;
 
-const WHO_ICONS = [IconBabyCarriage, IconUsersGroup, IconDisabled] as const;
 const CONDITION_ICONS = [
   IconPercentage,
   IconWallet,
@@ -133,45 +129,6 @@ function MortgageHero({ content }: { content: MortgageContent }) {
             </li>
           ))}
         </ul>
-      </div>
-    </section>
-  );
-}
-
-function MortgageWhoFits({ content }: { content: WithWho }) {
-  return (
-    <section className="section" aria-labelledby="mortgage-who-title">
-      <div className="section__inner">
-        <p className="eyebrow">{content.whoEyebrow}</p>
-        <h2 id="mortgage-who-title">{content.whoHeading}</h2>
-        <p className="mortgage-page__lead">{nbspText(content.whoLead)}</p>
-
-        <ul className="mortgage-who">
-          {content.whoFits.map((item, index) => {
-            const Icon = WHO_ICONS[index] ?? IconHomeHeart;
-            return (
-              <li key={item.title}>
-                <Icon size={28} stroke={1.5} aria-hidden="true" />
-                <strong>{item.title}</strong>
-              </li>
-            );
-          })}
-        </ul>
-
-        {/* Правила — не плашки, а список «правило → пояснение». Плашками
-            они вставали вторым рядом того же вида, что и условия, и шесть
-            карточек читались одним списком из шести равных пунктов. К тому
-            же внутри каждой лежит абзац на полсотни слов: в узкой колонке
-            он набирался мелко и в двенадцать строк. */}
-        <h3 className="mortgage-rules__title">{content.rulesHeading}</h3>
-        <dl className="mortgage-rules">
-          {content.rules.map((rule) => (
-            <div key={rule.title}>
-              <dt>{rule.title}</dt>
-              <dd>{nbspText(rule.text)}</dd>
-            </div>
-          ))}
-        </dl>
       </div>
     </section>
   );

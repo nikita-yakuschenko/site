@@ -7410,12 +7410,29 @@ textarea:focus-visible {
   line-height: 1.15;
 }
 
+/* Условия — тёмная полоса на три ячейки.
+   Их три, и достаточно любого: общая плашка говорит «это один выбор», а
+   разделители с «или» — какой именно.
+
+   Полоса тёмная, знаки жёлтые, текст белый — тот же приём, которым на
+   главной набрана полоса преимуществ. Белой плашкой этот ряд выходил
+   полем 1152x145 под три короткие строки: знаки в нём терялись, а справа
+   от каждой подписи оставалась треть пустой ширины. Тёмная полоса для
+   того и сделана, чтобы занимать ширину целиком.
+
+   Высота строки текста зарезервирована под две: в узкой колонке средняя
+   формулировка переносится, и без резерва её первая строка уезжала выше
+   соседних — ряд терял общую линию. Тот же приём, что у подписей на
+   главной. */
 .mortgage-who {
   display: grid;
-  gap: var(--gap-tile);
-  margin: 0 0 var(--gap-stack);
+  margin: 0 0 var(--gap-section);
   padding: 0;
   list-style: none;
+  border-radius: 16px;
+  background: var(--avgst-ink);
+  color: #fff;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
 }
 
 @media (min-width: 900px) {
@@ -7424,84 +7441,107 @@ textarea:focus-visible {
   }
 }
 
-/* Плашка по содержимому: иконка слева, формулировка справа.
-   Колонкой она стояла коробкой в 113px с одной строкой текста и пустотой
-   под ней — после того, как из карточки ушло пояснение, дословно
-   повторявшее заголовок. */
 .mortgage-who li {
+  position: relative;
   display: flex;
-  gap: 14px;
-  /* По верху, а не по центру: формулировка в средней плашке занимает две
-     строки, и при центрировании её первая строка уезжала выше соседних —
-     ряд терял общую линию. */
+  gap: 16px;
   align-items: flex-start;
-  padding: 18px var(--page-gutter);
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
-  border-radius: var(--surface-radius);
-  background: #fff;
+  padding: 28px 32px;
 }
 
-.mortgage-who svg {
+.mortgage-who__icon {
   flex: 0 0 auto;
-  /* Знак выше строки текста: сдвиг сажает их на общую оптическую линию. */
-  margin-top: -3px;
-  color: var(--avgst-green);
+  color: var(--brand-yellow);
 }
 
 .mortgage-who strong {
-  font-size: 18px;
-  letter-spacing: -0.02em;
-  line-height: 1.25;
+  min-height: 2.7em;
+  /* Перенос делит формулировку пополам, а не оставляет «лет» одно на
+     второй строке. */
+  text-wrap: balance;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.35;
 }
 
-.mortgage-who p {
-  margin: 0;
-  font-size: 15px;
-  line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.7);
+/* Разделитель с «или» посередине: на широком — вертикаль между колонками,
+   на узком — горизонталь между строками. Подложка слова того же цвета,
+   что полоса, поэтому линия под ним разрывается. */
+.mortgage-who li + li::before {
+  content: "";
+  position: absolute;
+  background: rgb(255 255 255 / 0.16);
+}
+
+.mortgage-who li + li::after {
+  content: "или";
+  position: absolute;
+  padding: 3px 8px;
+  background: var(--avgst-ink);
+  color: rgb(255 255 255 / 0.5);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+@media (min-width: 900px) {
+  .mortgage-who li + li::before {
+    top: 24px;
+    bottom: 24px;
+    left: 0;
+    width: 1px;
+  }
+
+  .mortgage-who li + li::after {
+    top: 50%;
+    left: 0;
+    transform: translate(-50%, -50%);
+  }
+}
+
+@media (max-width: 899px) {
+  .mortgage-who strong {
+    min-height: 0;
+  }
+
+  .mortgage-who li + li::before {
+    top: 0;
+    right: 32px;
+    left: 32px;
+    height: 1px;
+  }
+
+  .mortgage-who li + li::after {
+    top: 0;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
 }
 
 .mortgage-rules__title {
-  margin: 0 0 20px;
+  margin: 0 0 4px;
   font-size: 20px;
   letter-spacing: -0.02em;
   line-height: 1.25;
 }
 
-/* Правила — плашки той же формы, что и всё остальное на странице.
-   Список с волосяными линейками и подписью в колонке слева читался как
-   вёрстка договора, а не как раздел сайта. Отделяет их от условий выше
-   не форма, а подпись над рядом и заливка вместо грани. */
-.mortgage-rules {
-  display: grid;
-  gap: var(--gap-tile);
-  margin: 0;
-}
+/* Правила — аккордеон, первое открыто.
+   Они действуют всегда, их читают не все и не сразу, и каждое — абзац на
+   полсотни слов. Плашками они вставали вторым рядом того же вида, что и
+   условия, и шесть карточек читались одним списком из шести равных
+   пунктов; в колонке 373px абзац набирался двенадцатью строками.
 
-@media (min-width: 900px) {
-  .mortgage-rules {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.mortgage-rules > div {
-  padding: var(--page-gutter);
-  border-radius: var(--surface-radius);
-  background: rgb(var(--avgst-ink-rgb) / 0.04);
-}
-
-.mortgage-rules dt {
-  margin: 0 0 10px;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.3;
-}
-
+   Разное поведение отделяет правила от условий надёжнее, чем разный
+   оттенок заливки, а развёрнутый текст получает полную ширину раздела. */
 .mortgage-rules dd {
   margin: 0;
-  font-size: 14px;
-  line-height: 1.5;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+.mortgage-rules .ui-accordion__content-inner {
+  max-width: 78ch;
 }
 
 .mortgage-steps {
