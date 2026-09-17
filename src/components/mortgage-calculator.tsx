@@ -59,6 +59,12 @@ function maxDigits(max: number): number {
   return String(Math.floor(Math.max(0, max))).length;
 }
 
+/** Знаков в самом длинном значении поля: цифры плюс пробелы между разрядами. */
+function fieldWidthInChars(max: number): number {
+  const digits = maxDigits(max);
+  return digits + Math.floor((digits - 1) / 3);
+}
+
 export function MortgageCalculator({
   projects,
   initialPropertyPrice,
@@ -344,6 +350,7 @@ export function MortgageCalculator({
                   : 12_000_000
               }
               step={10_000}
+              widthFrom={PRICE_MAX}
               onChange={(v) => {
                 setDownPayment(v);
                 scheduleAnalytics();
@@ -406,10 +413,13 @@ export function MortgageCalculator({
               </div>
             </div>
 
-            <div
-              className="mortgage-calc__parts-slot"
-              aria-hidden={!activeResult.isCombined}
-            >
+            {/* Бокс под разбивкой кредита. У программ без комбинирования
+                разбивки нет, и место пустовало — туда встало предупреждение
+                о предварительности расчёта. Раньше оно шло отдельной строкой
+                под всей панелью, где к расчёту не относилось ни визуально,
+                ни по месту. Высота бокса задана, поэтому появление разбивки
+                не дёргает карточку. */}
+            <div className="mortgage-calc__parts-slot">
               {activeResult.isCombined ? (
                 <div className="mortgage-calc__parts">
                   {activeResult.parts.map((part) => (
@@ -426,7 +436,9 @@ export function MortgageCalculator({
                     </p>
                   ))}
                 </div>
-              ) : null}
+              ) : (
+                <p className="mortgage-calc__disclaimer">{t.disclaimer}</p>
+              )}
             </div>
 
             <Link
@@ -490,8 +502,6 @@ export function MortgageCalculator({
             )}
           </section>
         </div>
-
-        <p className="mortgage-calc__disclaimer">{t.disclaimer}</p>
       </div>
     </section>
   );
@@ -505,6 +515,7 @@ function CalcField({
   max,
   step,
   onChange,
+  widthFrom,
   leading,
   trailing,
   pills,
@@ -517,11 +528,16 @@ function CalcField({
   max: number;
   step: number;
   onChange: (value: number) => void;
+  widthFrom?: number;
   leading?: ReactNode;
   trailing?: ReactNode;
   pills?: FieldPill[];
   pillsSlot?: boolean;
 }) {
+  /* Ширина считается от потолка поля, а не от текущего предела: у первого
+     взноса предел зависит от стоимости дома, и без этого поле меняло бы
+     ширину при движении соседнего ползунка. */
+  const widthInChars = fieldWidthInChars(widthFrom ?? max);
   const [text, setText] = useState(displayMoney(value));
   useEffect(() => {
     setText(displayMoney(value));
@@ -555,14 +571,16 @@ function CalcField({
         <span className="mortgage-calc__tile-label">{label}</span>
         <div className="mortgage-calc__tile-value">
           {leading}
-          {/* size по длине значения. Без него поле держит ширину под два
-              десятка знаков и рисует пустую коробку под миллиарды, которых
-              в этих полях не бывает: верхняя граница — 30 млн. */}
+          {/* Ширина считается от предельного значения поля, а не от текущего
+              текста. По тексту она дышала на каждом символе — набор выглядел
+              сломанным. По умолчанию же браузер держит ширину под два десятка
+              знаков и рисует пустую коробку под миллиарды, которых в этих
+              полях не бывает: потолок — 30 млн. */}
           <input
             type="text"
             inputMode="numeric"
             aria-label={label}
-            size={Math.max(2, text.length)}
+            size={widthInChars}
             maxLength={maxDigits(max) + Math.floor(maxDigits(max) / 3)}
             value={text}
             onChange={(e) => commit(e.target.value, true)}
