@@ -38,6 +38,11 @@
   --gap-stack: 32px;
   --gap-section: 56px;
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+
+  /* Плотность водяного знака — цифры шага и стрелки правила. Одно число
+     на оба: знаки стоят на соседних экранах, и расхождение в пару сотых
+     читалось как разный серый. */
+  --ghost-mark: 0.08;
   --header-solid-shadow: 0 2px 6px rgb(var(--avgst-ink-rgb) / 0.1);
 
   /* Три размера кнопок, и только три. Раньше высоты стояли числами по
@@ -4423,7 +4428,7 @@ a {
   width: calc(var(--digit-h) * var(--gw) / var(--gh));
   height: var(--digit-h);
   pointer-events: none;
-  background-color: rgb(var(--avgst-ink-rgb) / 0.06);
+  background-color: rgb(var(--avgst-ink-rgb) / var(--ghost-mark));
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
@@ -7519,7 +7524,7 @@ textarea:focus-visible {
      толще и темнее остальной линии. Непрозрачный цвет плюс opacity гасит
      уже собранную фигуру, и стык не отличается от линии. */
   color: var(--avgst-ink);
-  opacity: 0.09;
+  opacity: var(--ghost-mark);
   transform: translateY(calc(-50% + var(--digit-lift))) rotate(var(--mark-turn));
   transition:
     transform 0.24s var(--ease-out),
@@ -7612,7 +7617,7 @@ textarea:focus-visible {
   width: calc(var(--digit-h) * var(--gw) / var(--gh));
   height: var(--digit-h);
   pointer-events: none;
-  background-color: rgb(var(--avgst-ink-rgb) / 0.06);
+  background-color: rgb(var(--avgst-ink-rgb) / var(--ghost-mark));
   -webkit-mask-repeat: no-repeat;
   mask-repeat: no-repeat;
   -webkit-mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
