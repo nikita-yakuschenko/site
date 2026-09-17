@@ -36,11 +36,7 @@ export function MortgageFaq({ content }: { content: WithFaq }) {
         <h2 id="mortgage-faq-title">{content.faqHeading}</h2>
         {/* Несколько ответов открытыми сразу: вопросы читают вразнобой и
             сверяют между собой, а не идут по одному. */}
-        <Accordion
-          type="multiple"
-          className="ui-accordion mortgage-faq"
-          defaultValue={["faq-0"]}
-        >
+        <Accordion type="multiple" className="ui-accordion mortgage-faq">
           {content.faq.map((item, index) => (
             <AccordionItem key={item.question} value={`faq-${index}`}>
               <AccordionTrigger>{item.question}</AccordionTrigger>

@@ -71,11 +71,7 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
           <h3 className="mortgage-rules__title">{content.rulesHeading}</h3>
           {/* Несколько правил открытыми одновременно: это не вопросы, где
               читают одно, а условия, которые сверяют между собой. */}
-          <Accordion
-            type="multiple"
-            className="ui-accordion mortgage-rules"
-            defaultValue={["rule-0"]}
-          >
+          <Accordion type="multiple" className="ui-accordion mortgage-rules">
             {content.rules.map((rule, index) => (
               <AccordionItem key={rule.title} value={`rule-${index}`}>
                 <AccordionTrigger>{rule.title}</AccordionTrigger>

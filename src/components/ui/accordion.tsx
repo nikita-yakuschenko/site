@@ -3,13 +3,55 @@
 import * as AccordionPrimitive from "@radix-ui/react-accordion";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import {
+  Children,
   forwardRef,
+  isValidElement,
   type ComponentPropsWithoutRef,
   type ComponentRef,
 } from "react";
 
 /** Accordion на Radix — тот же примитив, что у shadcn/ui, без Tailwind. */
-const Accordion = AccordionPrimitive.Root;
+/**
+ * Первый пункт раскрыт по умолчанию.
+ *
+ * Список, где закрыто всё, выглядит выключенным: не видно ни того, что
+ * внутри, ни того, что пункты вообще раскрываются. Открытый первый
+ * показывает и содержимое, и сам механизм.
+ *
+ * Значение подставляется здесь, а не на каждом вызове: правило общее, и
+ * про него легко забыть, заводя очередной список. Явно переданное
+ * defaultValue или управляемый value имеют приоритет.
+ */
+function Accordion({
+  children,
+  ...props
+}: ComponentPropsWithoutRef<typeof AccordionPrimitive.Root>) {
+  const first = Children.toArray(children).find(
+    (child) =>
+      isValidElement<{ value?: string }>(child) &&
+      typeof child.props.value === "string",
+  );
+
+  const firstValue =
+    isValidElement<{ value?: string }>(first) && first.props.value
+      ? first.props.value
+      : undefined;
+
+  const needsDefault =
+    props.value === undefined &&
+    props.defaultValue === undefined &&
+    firstValue !== undefined;
+
+  const rootProps = needsDefault
+    ? props.type === "multiple"
+      ? { ...props, defaultValue: [firstValue] }
+      : { ...props, defaultValue: firstValue }
+    : props;
+
+  return (
+    <AccordionPrimitive.Root {...rootProps}>{children}</AccordionPrimitive.Root>
+  );
+}
 
 const AccordionItem = forwardRef<
   ComponentRef<typeof AccordionPrimitive.Item>,
