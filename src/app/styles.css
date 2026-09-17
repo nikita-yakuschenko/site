@@ -7735,6 +7735,20 @@ textarea:focus-visible {
    ниже подчинено ему. На 1920×1080 секция занимала 1215px. */
 .mortgage-calc {
   padding: 40px 0;
+
+  /* Шкала скруглений блока.
+     Радиус убывает вглубь: панель — карточки внутри неё — плитки и мелкие
+     поверхности. Разница между ступенями заметная, иначе вложенность не
+     читается: панель 18 и карточка 16 отличались на два пикселя и выглядели
+     одним уровнем.
+
+     Второе правило — соразмерность. Радиус держится около десятой доли
+     меньшей стороны: каталожная карточка с её 16px рассчитана на высоту
+     381px, а на компактной в 102px те же 16px давали 15.7% и делали её
+     вдвое круглее соседей. */
+  --calc-radius-panel: 18px;
+  --calc-radius-card: 12px;
+  --calc-radius-tile: 10px;
 }
 
 /* Шапка калькулятора — обычный заголовок секции, как у соседних блоков.
@@ -7767,7 +7781,7 @@ textarea:focus-visible {
   gap: 16px;
   padding: 16px;
   border: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
-  border-radius: calc(var(--surface-radius) + 4px);
+  border-radius: var(--calc-radius-panel);
   background: #fff;
   box-shadow: 0 1px 2px rgb(var(--avgst-ink-rgb) / 0.04);
 }
@@ -7783,21 +7797,33 @@ textarea:focus-visible {
 
      Поля при этом не растягиваются на всю полосу: на 690px ползунок теряет
      цену деления, глаз перестаёт связывать ручку с подписью. */
+  /* Панель во всю полосу страницы: карточка уже соседних блоков читается
+     как сбой вёрстки, а не как замысел. Ширина уходит не в растянутые
+     ползунки, а в дело — поля встают в две колонки.
+
+     Стоимость и взнос получают по 350px: на такой длине у ползунка видна
+     цена деления. Срок занимает обе колонки — он самый грубый по шагу, и
+     длина ему не вредит, зато ряд не остаётся с пустой ячейкой. */
   .mortgage-calc__panel {
-    max-width: 1008px;
-    grid-template-columns: minmax(0, 620px) 340px;
+    grid-template-columns: minmax(0, 1fr) 380px;
     align-items: start;
     column-gap: 16px;
     row-gap: 18px;
   }
 
   .mortgage-calc__controls {
-    grid-template-rows: auto auto 1fr 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto auto auto;
+    align-content: start;
+    column-gap: 16px;
   }
 
-  .mortgage-calc__tile {
-    align-content: space-evenly;
+  .mortgage-calc__modes,
+  .mortgage-calc__programs,
+  .mortgage-calc__tile:last-child {
+    grid-column: 1 / -1;
   }
+
 
   /* Проекты лежат под обеими колонками, внутри той же карточки. */
   .mortgage-calc__matches {
@@ -7914,9 +7940,9 @@ textarea:focus-visible {
   background: #fff;
 }
 
-.mortgage-calc__tile:focus-within {
-  box-shadow: 0 0 0 2px rgb(var(--avgst-ink-rgb) / 0.14);
-}
+/* Плитка на фокус не реагирует. Кольцо в 2px по всей её ширине сообщало
+   «активна вся карточка», хотя редактируется одно число в углу: отклик
+   оказывался оторван от места ввода и выглядел сбоем, а не подсветкой. */
 
 .mortgage-calc__tile-head {
   display: flex;
@@ -7957,9 +7983,21 @@ textarea:focus-visible {
   text-align: right;
 }
 
-.mortgage-calc__tile-value input:focus,
-.mortgage-calc__tile-value input:focus-visible {
+/* Подсветка — у самого числа, а не у плитки.
+   Фон и кольцо нарисованы тенью, а не padding: иначе число при фокусе
+   прыгало бы, сдвигая соседние подписи. Для клавиатуры сверху добавляется
+   контурное кольцо — им пользуются, когда доходят до поля табом. */
+.mortgage-calc__tile-value input:focus {
   outline: none;
+  border-radius: 5px;
+  background: rgb(var(--avgst-ink-rgb) / 0.05);
+  box-shadow: 0 0 0 5px rgb(var(--avgst-ink-rgb) / 0.05);
+}
+
+.mortgage-calc__tile-value input:focus-visible {
+  box-shadow:
+    0 0 0 5px rgb(var(--avgst-ink-rgb) / 0.05),
+    0 0 0 7px rgb(var(--avgst-ink-rgb) / 0.18);
 }
 
 .mortgage-calc__tile-value span,
@@ -8021,10 +8059,12 @@ textarea:focus-visible {
   align-content: start;
   min-width: 0;
   padding: 12px 14px;
-  border-radius: calc(var(--surface-radius) + 2px);
+  border-radius: var(--calc-radius-card);
   background: #fff;
   color: var(--avgst-ink);
-  box-shadow: 0 10px 32px rgb(var(--avgst-ink-rgb) / 0.1);
+  /* Тень мягче: карточка лежит внутри панели, а не парит над страницей.
+     Прежние 32px размытия на 10% отрывали её от собственного контейнера. */
+  box-shadow: 0 4px 16px rgb(var(--avgst-ink-rgb) / 0.06);
 }
 
 .mortgage-calc__hero-num {
@@ -8209,7 +8249,9 @@ textarea:focus-visible {
 
 .mortgage-calc__disclaimer {
   margin: 14px 0 0;
-  max-width: 46rem;
+  /* Ширина не ограничена: при 46rem строка ломалась так, что на вторую
+     уходило одно слово «банк», хотя под текстом свободна вся полоса.
+     Висячее слово в сноске заметнее самой сноски. */
   font-size: 12px;
   line-height: 1.45;
   color: rgb(var(--avgst-ink-rgb) / 0.55);
@@ -8332,6 +8374,7 @@ textarea:focus-visible {
 .mortgage-calc__matches .card {
   display: flex;
   align-items: stretch;
+  border-radius: var(--calc-radius-tile);
 }
 
 .mortgage-calc__matches .card__top {
