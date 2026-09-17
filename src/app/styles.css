@@ -7490,10 +7490,6 @@ textarea:focus-visible {
   margin: 0;
 }
 
-.mortgage-rules .ui-accordion__content-inner {
-  max-width: 78ch;
-}
-
 .mortgage-steps {
   display: grid;
   gap: var(--gap-tile);
@@ -8532,6 +8528,10 @@ textarea:focus-visible {
 }
 
 .ui-accordion__content-inner {
+  /* Мера строки одна на все аккордеоны. У правил стояла своя, и соседние
+     списки одного вида ломали строку в разных местах: ответы шли во всю
+     ширину раздела, правила — вдвое уже. */
+  max-width: 78ch;
   padding: 0 var(--mark-lane) 18px 0;
   font-size: 15px;
   line-height: 1.55;
