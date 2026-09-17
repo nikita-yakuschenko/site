@@ -7459,33 +7459,9 @@ textarea:focus-visible {
 /* Крупная строка — слова, а не ставка: тридцать два пункта на «С
    инвалидностью» дают перенос и распирают ряд. */
 /* Кадр занимает не половину плашки, а меньше: у программ в левой половине
-   стоит короткая ставка, здесь — фраза, и половины ей не хватало. */
+   стоит короткая ставка, здесь — слово и сноска под ним. */
 .mortgage-who__card .mortgage-program__art {
-  width: 38%;
-}
-
-/* Знак доступности — рамка, а не предмет: срез по нижней кромке читается
-   у неё браком, тогда как лапы мишки и дно рюкзака уходят под край
-   естественно. Этот кадр вписан в плашку целиком.
-
-   И он же плотнее соседей: сплошной квадрат весит в плашке больше, чем
-   мишка в рост, поэтому занимает меньше ширины — иначе он подпирал бы
-   самую длинную из трёх строк. */
-.mortgage-who li:last-child .mortgage-program__art {
-  top: 50%;
-  right: 20px;
-  width: 27%;
-  height: calc(100% - 36px);
-  transform: translateY(-50%) scaleX(var(--art-flip));
-}
-
-.mortgage-who li:last-child:hover .mortgage-program__art {
-  transform: translateY(calc(-50% - 5px)) scaleX(var(--art-flip));
-}
-
-.mortgage-who li:last-child .mortgage-who__card strong,
-.mortgage-who li:last-child > span {
-  max-width: 68%;
+  width: 40%;
 }
 
 .mortgage-who__card strong {
@@ -7502,6 +7478,17 @@ textarea:focus-visible {
   max-width: 58%;
   min-height: 2.5em;
   padding-right: 0;
+}
+
+/* Сноска — точная формулировка под словом, как «Для семей с детьми» под
+   ставкой у плашки программы. Две строки зарезервированы, чтобы плашки
+   держали общую высоту при разной длине формулировок. */
+.mortgage-who__card small {
+  max-width: 58%;
+  min-height: 2.7em;
+  /* Перенос делит формулировку пополам, а не оставляет «лет» одно на
+     второй строке. */
+  text-wrap: balance;
 }
 
 .mortgage-rules__title {

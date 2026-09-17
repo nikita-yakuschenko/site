@@ -52,6 +52,7 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
                 <li className="mortgage-program mortgage-who__card">
                   <span>{nbspText(item.label)}</span>
                   <strong>{nbspText(item.title)}</strong>
+                  <small>{nbspText(item.note)}</small>
                   <Image
                     className="mortgage-program__art"
                     src={item.image}
