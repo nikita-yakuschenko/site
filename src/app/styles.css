@@ -5491,8 +5491,68 @@ a {
 .footer-about {
   max-width: 22rem;
   margin: 0;
-  color: rgb(255 255 255 / 0.72);
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgb(255 255 255 / 0.55);
+}
+
+/* Соцсети между логотипом и описанием: light → original на hover. */
+.footer-socials {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  max-width: 22rem;
+  margin: 12px 0;
+  padding: 0;
+}
+
+.footer-social {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+}
+
+/* YouTube SVG шире квадрата (435×300) — иначе contain сжимает его по высоте. */
+.footer-social--youtube {
+  width: 32px;
+}
+
+.footer-social--youtube .footer-social__icon {
+  width: 32px;
+  height: 22px;
+}
+
+.footer-social__icon {
+  display: block;
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  transition: opacity 0.2s var(--ease-out);
+}
+
+.footer-social__icon--original {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.footer-social:hover .footer-social__icon--light,
+.footer-social:focus-visible .footer-social__icon--light {
+  opacity: 0;
+}
+
+.footer-social:hover .footer-social__icon--original,
+.footer-social:focus-visible .footer-social__icon--original {
+  opacity: 1;
+}
+
+.footer-social:focus-visible {
+  outline: 2px solid var(--brand-yellow);
+  outline-offset: 3px;
 }
 
 .footer-policies {

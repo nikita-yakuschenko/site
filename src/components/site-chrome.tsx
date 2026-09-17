@@ -20,9 +20,14 @@ import {
 } from "@tabler/icons-react";
 import Link from "next/link";
 import { copy } from "../lib/copy";
-import { copyrightYears } from "../lib/site";
+import { copyrightYears, FOOTER_SOCIALS, footerSocialHref } from "../lib/site";
 import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
+import {
+  readRegionCode,
+  readServerRegionCode,
+  subscribeRegion,
+} from "../lib/regions";
 import { OfficeStatusIndicator } from "./office-status";
 import { RegionSwitch } from "./region-switch";
 
@@ -167,6 +172,11 @@ export function SiteChrome({
     subscribeTechBarTheme,
     readTechBarTheme,
     () => "light" as TechBarTheme,
+  );
+  const regionCode = useSyncExternalStore(
+    subscribeRegion,
+    readRegionCode,
+    readServerRegionCode,
   );
 
   function toggleTechBarTheme() {
@@ -417,6 +427,35 @@ export function SiteChrome({
             <Link href="/" className="site-footer__brand">
               <img src={src} alt={name} />
             </Link>
+            <nav className="footer-socials" aria-label={copy.socialsAria}>
+              {FOOTER_SOCIALS.map((item) => (
+                <a
+                  key={item.id}
+                  className={`footer-social footer-social--${item.id}`}
+                  href={footerSocialHref(item, regionCode)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={item.label}
+                >
+                  <img
+                    className="footer-social__icon footer-social__icon--light"
+                    src={item.light}
+                    alt=""
+                    width={22}
+                    height={22}
+                    decoding="async"
+                  />
+                  <img
+                    className="footer-social__icon footer-social__icon--original"
+                    src={item.original}
+                    alt=""
+                    width={22}
+                    height={22}
+                    decoding="async"
+                  />
+                </a>
+              ))}
+            </nav>
             <p className="footer-about">{about || copy.footerAbout}</p>
             <div className="footer-policies">
               <Link className="footer-policy" href={copy.personalDataHref}>
