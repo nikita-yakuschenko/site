@@ -261,11 +261,11 @@ function MortgageShowcase() {
             </p>
             <div className="mortgage-family__actions">
               {/* Форму расчёта подключим отдельно; кнопка уже на месте. */}
-              <button type="button" className="btn btn-yellow">
+              <a className="btn btn-yellow" href="/mortgage#mortgage-calc">
                 {copy.mortgageCta}
                 <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
-              </button>
-              <a className="mortgage-family__more" href={copy.mortgageMoreHref}>
+              </a>
+              <a className="mortgage-family__more" href="/mortgage#mortgage-calc">
                 {copy.mortgageMore}
               </a>
             </div>

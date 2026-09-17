@@ -14,6 +14,8 @@ export type ProjectQuery = {
   floors?: number
   minArea?: number
   maxArea?: number
+  /** Верхняя граница ориентировочной цены (₽). */
+  maxPrice?: number
 }
 
 export type CatalogOption = {

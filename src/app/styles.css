@@ -2202,10 +2202,12 @@ a {
   padding: var(--gap-split);
 }
 
+.mortgage-family__body h1,
 .mortgage-family__body h2 { color: #fff; }
 
 /* Ставка — то, за чем читают заголовок: крупнее остального набора и в
    цвете кнопки. Наклон em здесь не нужен. */
+.mortgage-family__body h1 em,
 .mortgage-family__body h2 em {
   font-size: 1.32em;
   font-style: normal;
@@ -7343,5 +7345,904 @@ textarea:focus-visible {
 
   .cookie-settings__panel {
     border-radius: 14px;
+  }
+}
+
+/* —— Страница /mortgage (семейная ипотека) —— */
+.mortgage-page__lead {
+  max-width: 46rem;
+  margin: 0 0 var(--gap-stack);
+  font-size: 17px;
+  line-height: 1.55;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+.mortgage-metrics {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow: hidden;
+  border-radius: var(--surface-radius);
+  background: #dce1e8;
+  border: 1px solid #dce1e8;
+}
+
+@media (min-width: 720px) {
+  .mortgage-metrics {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.mortgage-metrics li {
+  display: grid;
+  gap: 6px;
+  padding: 18px 20px;
+  background: #fff;
+}
+
+.mortgage-metrics p {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.5);
+}
+
+.mortgage-metrics strong {
+  font-size: 22px;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.mortgage-who {
+  display: grid;
+  gap: var(--gap-tile);
+  margin: 0 0 var(--gap-stack);
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .mortgage-who {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.mortgage-who li {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: var(--page-gutter);
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-radius: var(--surface-radius);
+  background: #fff;
+}
+
+.mortgage-who svg {
+  color: var(--avgst-green);
+}
+
+.mortgage-who strong {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.mortgage-who p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: rgb(var(--avgst-ink-rgb) / 0.7);
+}
+
+.mortgage-rules {
+  display: grid;
+  gap: var(--gap-tile);
+}
+
+@media (min-width: 900px) {
+  .mortgage-rules {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.mortgage-rules article {
+  padding: var(--page-gutter);
+  border-radius: var(--surface-radius);
+  background: rgb(var(--avgst-ink-rgb) / 0.04);
+}
+
+.mortgage-rules h3 {
+  margin: 0 0 10px;
+  font-size: 16px;
+  line-height: 1.3;
+}
+
+.mortgage-rules p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+.mortgage-steps {
+  display: grid;
+  gap: var(--gap-tile);
+  margin: var(--gap-stack) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .mortgage-steps {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+.mortgage-steps li {
+  position: relative;
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  min-height: 100%;
+  padding: var(--page-gutter);
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-radius: var(--surface-radius);
+  background: #fff;
+}
+
+.mortgage-steps__num {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: rgb(var(--avgst-ink-rgb) / 0.4);
+}
+
+.mortgage-steps strong {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.mortgage-steps p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgb(var(--avgst-ink-rgb) / 0.7);
+}
+
+.mortgage-finance {
+  display: grid;
+  gap: var(--gap-tile);
+  margin: var(--gap-stack) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .mortgage-finance {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.mortgage-finance li {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-radius: var(--surface-radius);
+  background: #fff;
+}
+
+.mortgage-finance__media {
+  position: relative;
+  aspect-ratio: 16 / 10;
+  background: #e8edf3;
+}
+
+.mortgage-finance__media img {
+  object-fit: cover;
+}
+
+.mortgage-finance__body {
+  display: grid;
+  gap: 10px;
+  padding: var(--page-gutter);
+}
+
+.mortgage-finance__body strong {
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.mortgage-finance__body p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgb(var(--avgst-ink-rgb) / 0.7);
+}
+
+.mortgage-finance__body a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 4px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--avgst-ink);
+  text-decoration: none;
+}
+
+.mortgage-finance__body a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.mortgage-conditions {
+  display: grid;
+  gap: var(--gap-tile);
+  margin: var(--gap-stack) 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 900px) {
+  .mortgage-conditions {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1100px) {
+  .mortgage-conditions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.mortgage-conditions li {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: var(--page-gutter);
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-radius: var(--surface-radius);
+  background: #fff;
+}
+
+.mortgage-conditions svg {
+  color: var(--avgst-green);
+}
+
+.mortgage-conditions strong {
+  font-size: 17px;
+  letter-spacing: -0.02em;
+  line-height: 1.25;
+}
+
+.mortgage-conditions p {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.5;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+.mortgage-conditions__points {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mortgage-conditions__points li {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgb(var(--avgst-ink-rgb) / 0.78);
+}
+
+.mortgage-conditions__points li::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 5px;
+  height: 5px;
+  margin-top: 0.45em;
+  border-radius: 50%;
+  background: var(--avgst-green);
+}
+
+.mortgage-mid-cta__inner {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  border-radius: var(--surface-radius);
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+@media (min-width: 900px) {
+  .mortgage-mid-cta__inner {
+    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+    min-height: 280px;
+  }
+}
+
+.mortgage-mid-cta__media {
+  position: relative;
+  min-height: 200px;
+}
+
+.mortgage-mid-cta__media img {
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.mortgage-mid-cta__body {
+  display: grid;
+  gap: 16px;
+  align-content: center;
+  padding: var(--gap-split) var(--page-gutter);
+}
+
+.mortgage-mid-cta__body h2 {
+  margin: 0;
+  color: #fff;
+  max-width: 18ch;
+}
+
+.mortgage-mid-cta__body p {
+  margin: 0;
+  max-width: 40ch;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgb(255 255 255 / 0.78);
+}
+
+.mortgage-faq {
+  margin-top: var(--gap-stack);
+  margin-bottom: 0;
+}
+
+.mortgage-faq__partners {
+  margin-top: var(--gap-stack);
+}
+
+.mortgage-faq__partners .mortgage-showcase__partners {
+  padding-top: 0;
+  border-top: 0;
+}
+
+.mortgage-other-programs .mortgage-showcase__programs {
+  margin-top: var(--gap-stack);
+}
+
+/* —— Ипотечный калькулятор: текст | поля | результат —— */
+.mortgage-calc__panel {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border-radius: calc(var(--surface-radius) + 4px);
+  background: rgb(var(--avgst-ink-rgb) / 0.04);
+}
+
+@media (min-width: 960px) {
+  .mortgage-calc__panel {
+    grid-template-columns: minmax(160px, 0.72fr) minmax(0, 1.35fr) minmax(240px, 0.95fr);
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  /* Лишняя высота уходит в плитки полей, отступы между ними равные. */
+  .mortgage-calc__controls {
+    height: 100%;
+    grid-template-rows: auto auto 1fr 1fr 1fr;
+  }
+
+  .mortgage-calc__tile {
+    align-content: space-evenly;
+  }
+}
+
+.mortgage-calc__intro {
+  min-width: 0;
+}
+
+.mortgage-calc__intro h2 {
+  margin: 0 0 8px;
+  max-width: 14ch;
+  font-size: clamp(18px, 2vw, 24px);
+  line-height: 1.15;
+}
+
+.mortgage-calc__intro-lead {
+  margin: 0;
+  max-width: 32ch;
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgb(var(--avgst-ink-rgb) / 0.68);
+}
+
+/* Компактный сегмент: по содержимому, не на всю колонку. */
+.mortgage-calc__modes {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: stretch;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  height: 28px;
+  margin: 0;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 8px;
+  background: rgb(var(--avgst-ink-rgb) / 0.08);
+}
+
+.mortgage-calc__mode {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: auto;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 10px;
+  background: transparent;
+  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-align: center;
+  cursor: pointer;
+}
+
+.mortgage-calc__mode.is-active {
+  background: #fff;
+  color: var(--avgst-ink);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+.mortgage-calc__controls {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  align-content: start;
+}
+
+.mortgage-calc__programs {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.mortgage-calc__program-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.mortgage-calc__program {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  min-height: 0;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mortgage-calc__program span {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.mortgage-calc__program strong {
+  font-size: 13px;
+  letter-spacing: -0.02em;
+  color: var(--avgst-green);
+}
+
+.mortgage-calc__program.is-active {
+  border-color: var(--avgst-ink);
+}
+
+.mortgage-calc__tile {
+  display: grid;
+  gap: 4px;
+  min-height: 0;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.mortgage-calc__tile:focus-within {
+  box-shadow: 0 0 0 2px rgb(var(--avgst-ink-rgb) / 0.14);
+}
+
+.mortgage-calc__tile-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+
+.mortgage-calc__tile-label {
+  flex: 0 1 auto;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: rgb(var(--avgst-ink-rgb) / 0.68);
+}
+
+.mortgage-calc__tile-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mortgage-calc__tile-value input {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 12ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.mortgage-calc__tile-value input:focus,
+.mortgage-calc__tile-value input:focus-visible {
+  outline: none;
+}
+
+.mortgage-calc__tile-value span,
+.mortgage-calc__tile-pct {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(var(--avgst-ink-rgb) / 0.45);
+  font-variant-numeric: tabular-nums;
+}
+
+.mortgage-calc__tile-pct {
+  min-width: 4.5ch;
+  text-align: right;
+}
+
+.mortgage-calc__tile input[type="range"] {
+  width: 100%;
+  height: 14px;
+  margin: 0;
+  accent-color: var(--avgst-ink);
+}
+
+.mortgage-calc__pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  min-height: 28px;
+}
+
+.mortgage-calc__pill {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  min-height: 28px;
+  padding: 5px 12px;
+  background: rgb(var(--avgst-ink-rgb) / 0.06);
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.mortgage-calc__pill.is-active {
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+.mortgage-calc__result {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: calc(var(--surface-radius) + 2px);
+  background: #fff;
+  color: var(--avgst-ink);
+  box-shadow: 0 10px 32px rgb(var(--avgst-ink-rgb) / 0.1);
+}
+
+@media (min-width: 960px) {
+  .mortgage-calc__result {
+    position: sticky;
+    top: 96px;
+  }
+}
+
+.mortgage-calc__hero-num {
+  margin: 0;
+  min-height: 1.15em;
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--avgst-green);
+}
+
+.mortgage-calc__hero-label {
+  margin: 0;
+  min-height: 2.6em;
+  font-size: 12px;
+  line-height: 1.3;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.mortgage-calc__result-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 0;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+}
+
+.mortgage-calc__result-metrics strong {
+  display: block;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mortgage-calc__result-metrics span {
+  display: block;
+  margin-top: 1px;
+  font-size: 11px;
+  color: rgb(var(--avgst-ink-rgb) / 0.5);
+}
+
+/* Фиксированный слот — льготные части не двигают карточку. */
+.mortgage-calc__parts-slot {
+  height: 56px;
+}
+
+.mortgage-calc__parts {
+  display: grid;
+  gap: 4px;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgb(var(--avgst-ink-rgb) / 0.04);
+  align-content: center;
+}
+
+.mortgage-calc__parts p {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  align-items: baseline;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.mortgage-calc__parts span {
+  min-width: 0;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.mortgage-calc__parts strong {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.mortgage-calc__result-projects {
+  justify-self: stretch;
+  box-sizing: border-box;
+  min-height: 36px;
+  margin: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: rgb(var(--avgst-ink-rgb) / 0.04);
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1.3;
+  text-align: center;
+  color: var(--avgst-ink);
+  transition: background-color 0.2s var(--ease-out);
+}
+
+.mortgage-calc__result-projects:hover {
+  background: rgb(var(--avgst-ink-rgb) / 0.08);
+}
+
+.mortgage-calc__result-cta {
+  justify-self: stretch;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.mortgage-calc__result-note {
+  box-sizing: border-box;
+  min-height: 36px;
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  text-align: center;
+}
+
+.mortgage-calc__projects {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-section);
+}
+
+.mortgage-calc__projects-count {
+  margin: 0;
+  font-size: 16px;
+}
+
+.mortgage-calc__catalog-cta {
+  justify-self: start;
+}
+
+.mortgage-calc__disclaimer {
+  margin: var(--gap-stack) 0 0;
+  max-width: 46rem;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.catalog__budget-note {
+  margin: 0 0 var(--gap-tile);
+  font-size: 15px;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+/* Radix Accordion (shadcn-примитив) под AV4. */
+.ui-accordion {
+  display: grid;
+  gap: 0;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+}
+
+.ui-accordion__item {
+  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+}
+
+.ui-accordion__header {
+  margin: 0;
+}
+
+.ui-accordion__trigger {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 0;
+  padding: 18px 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+}
+
+.ui-accordion__trigger:hover {
+  color: rgb(var(--avgst-ink-rgb) / 0.82);
+}
+
+.ui-accordion__trigger:focus-visible {
+  outline: 2px solid var(--brand-yellow);
+  outline-offset: 2px;
+}
+
+.ui-accordion__chevron {
+  flex: 0 0 auto;
+  color: rgb(var(--avgst-ink-rgb) / 0.45);
+  transition: transform 0.2s var(--ease-out);
+}
+
+.ui-accordion__trigger[data-state="open"] .ui-accordion__chevron {
+  transform: rotate(180deg);
+}
+
+.ui-accordion__content {
+  overflow: hidden;
+}
+
+.ui-accordion__content[data-state="open"] {
+  animation: ui-accordion-down 0.2s var(--ease-out);
+}
+
+.ui-accordion__content[data-state="closed"] {
+  animation: ui-accordion-up 0.2s var(--ease-out);
+}
+
+.ui-accordion__content-inner {
+  padding: 0 0 18px;
+  font-size: 15px;
+  line-height: 1.55;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+@keyframes ui-accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes ui-accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .ui-accordion__chevron,
+  .ui-accordion__content[data-state="open"],
+  .ui-accordion__content[data-state="closed"] {
+    animation: none;
+    transition: none;
   }
 }

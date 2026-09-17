@@ -38,6 +38,44 @@ export type AnalyticsEvent =
       type: "experiment_exposure";
       experimentId: string;
       variantId: string;
+    }
+  | {
+      type: "mortgage_calculator_open";
+      program?: string;
+    }
+  | {
+      type: "mortgage_program_selected";
+      program: string;
+    }
+  | {
+      type: "mortgage_parameters_changed";
+      program: string;
+      property_price?: number;
+      down_payment?: number;
+      term?: number;
+      monthly_payment?: number;
+      available_budget?: number;
+      mode?: string;
+    }
+  | {
+      type: "mortgage_calculation_completed";
+      program: string;
+      property_price?: number;
+      down_payment?: number;
+      term?: number;
+      monthly_payment?: number;
+      available_budget?: number;
+      mode?: string;
+    }
+  | {
+      type: "mortgage_project_clicked";
+      program: string;
+      projectId: string;
+    }
+  | {
+      type: "mortgage_catalog_clicked";
+      program: string;
+      available_budget?: number;
     };
 
 function assertNoPii(payload: Record<string, unknown>): boolean {

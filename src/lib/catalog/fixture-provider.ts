@@ -1,4 +1,5 @@
 import { CATALOG_PROJECTS } from './projects'
+import { resolveProjectPrice } from '../mortgage/projects'
 import {
   CATALOG_SERIES,
   type CatalogProject,
@@ -35,6 +36,12 @@ export class FixtureCatalogProvider implements ProjectCatalogProvider {
     }
     if (query.maxArea != null) {
       items = items.filter((item) => item.areaValue <= query.maxArea!)
+    }
+    if (query.maxPrice != null) {
+      items = items.filter((item) => {
+        const price = resolveProjectPrice(item)
+        return price != null && price <= query.maxPrice!
+      })
     }
     if (query.limit != null) {
       items = query.series ? items.slice(0, query.limit) : interleave(items, query.limit)
