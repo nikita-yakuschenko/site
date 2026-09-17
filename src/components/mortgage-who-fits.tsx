@@ -1,12 +1,7 @@
 "use client";
 
-import {
-  IconDisabled,
-  IconBabyCarriage,
-  IconHomeHeart,
-  IconUsersGroup,
-} from "@tabler/icons-react";
-import type { ComponentType } from "react";
+import Image from "next/image";
+import { Fragment } from "react";
 import { nbspText } from "../lib/copy";
 import type { WithWho } from "../lib/mortgage/content";
 import {
@@ -15,12 +10,6 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "./ui/accordion";
-
-const WHO_ICONS: ComponentType<{
-  size?: number;
-  stroke?: number;
-  "aria-hidden"?: boolean;
-}>[] = [IconBabyCarriage, IconUsersGroup, IconDisabled];
 
 /**
  * Кому подходит программа.
@@ -50,25 +39,41 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
 
         <ul className="mortgage-who">
           {content.whoFits.map((item, index) => {
-            const Icon = WHO_ICONS[index] ?? IconHomeHeart;
             return (
-              <li key={item.title}>
-                <span className="mortgage-who__icon" aria-hidden="true">
-                  <Icon size={32} stroke={1.6} />
-                </span>
-                <strong>{nbspText(item.title)}</strong>
-              </li>
+              <Fragment key={item.title}>
+                {/* «Или» — своя ячейка сетки, а не знак внутри плашки:
+                    плашка обрезает кадр по кромке, и абсолютный значок
+                    срезался вместе с ним. */}
+                {index > 0 ? (
+                  <li className="mortgage-who__or" aria-hidden="true">
+                    или
+                  </li>
+                ) : null}
+                <li className="mortgage-program mortgage-who__card">
+                  <span>{nbspText(item.label)}</span>
+                  <strong>{nbspText(item.title)}</strong>
+                  <Image
+                    className="mortgage-program__art"
+                    src={item.image}
+                    alt=""
+                    width={item.imageW}
+                    height={item.imageH}
+                    sizes={item.sizes}
+                  />
+                </li>
+              </Fragment>
             );
           })}
         </ul>
 
         <div className="mortgage-who__rules">
           <h3 className="mortgage-rules__title">{content.rulesHeading}</h3>
+          {/* Несколько правил открытыми одновременно: это не вопросы, где
+              читают одно, а условия, которые сверяют между собой. */}
           <Accordion
-            type="single"
-            collapsible
+            type="multiple"
             className="ui-accordion mortgage-rules"
-            defaultValue="rule-0"
+            defaultValue={["rule-0"]}
           >
             {content.rules.map((rule, index) => (
               <AccordionItem key={rule.title} value={`rule-${index}`}>

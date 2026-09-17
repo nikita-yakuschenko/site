@@ -7410,115 +7410,82 @@ textarea:focus-visible {
   line-height: 1.15;
 }
 
-/* Условия — тёмная полоса на три ячейки.
-   Их три, и достаточно любого: общая плашка говорит «это один выбор», а
-   разделители с «или» — какой именно.
-
-   Полоса тёмная, знаки жёлтые, текст белый — тот же приём, которым на
-   главной набрана полоса преимуществ. Белой плашкой этот ряд выходил
-   полем 1152x145 под три короткие строки: знаки в нём терялись, а справа
-   от каждой подписи оставалась треть пустой ширины. Тёмная полоса для
-   того и сделана, чтобы занимать ширину целиком.
-
-   Высота строки текста зарезервирована под две: в узкой колонке средняя
-   формулировка переносится, и без резерва её первая строка уезжала выше
-   соседних — ряд терял общую линию. Тот же приём, что у подписей на
-   главной. */
+/* Условия — слепок плашки программы.
+   Разметка и стили те же: класс .mortgage-program несёт и название капсом,
+   и крупную строку, и кадр в правой половине. Отличий три — плашка никуда
+   не ведёт, поэтому без стрелки перехода и без отклика на наведение, и
+   между плашками стоит «или»: условий три, а достаточно любого. */
 .mortgage-who {
+  position: relative;
   display: grid;
+  gap: var(--gap-tile);
   margin: 0 0 var(--gap-section);
   padding: 0;
   list-style: none;
-  border-radius: 16px;
-  background: var(--avgst-ink);
-  color: #fff;
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
 }
 
 @media (min-width: 900px) {
   .mortgage-who {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    /* Пять колонок: три плашки и два разделителя между ними. */
+    grid-template-columns:
+      minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: stretch;
   }
 }
 
-.mortgage-who li {
-  position: relative;
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
-  padding: 28px 32px;
-}
-
-.mortgage-who__icon {
-  flex: 0 0 auto;
-  color: var(--brand-yellow);
-}
-
-.mortgage-who strong {
-  min-height: 2.7em;
-  /* Перенос делит формулировку пополам, а не оставляет «лет» одно на
-     второй строке. */
-  text-wrap: balance;
-  font-size: 17px;
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  line-height: 1.35;
-}
-
-/* Разделитель с «или» посередине: на широком — вертикаль между колонками,
-   на узком — горизонталь между строками. Подложка слова того же цвета,
-   что полоса, поэтому линия под ним разрывается. */
-.mortgage-who li + li::before {
-  content: "";
-  position: absolute;
-  background: rgb(255 255 255 / 0.16);
-}
-
-.mortgage-who li + li::after {
-  content: "или";
-  position: absolute;
-  padding: 3px 8px;
-  background: var(--avgst-ink);
-  color: rgb(255 255 255 / 0.5);
+.mortgage-who__or {
+  display: grid;
+  place-items: center;
+  color: rgb(var(--avgst-ink-rgb) / 0.42);
   font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   line-height: 1;
   text-transform: uppercase;
 }
 
-@media (min-width: 900px) {
-  .mortgage-who li + li::before {
-    top: 24px;
-    bottom: 24px;
-    left: 0;
-    width: 1px;
-  }
-
-  .mortgage-who li + li::after {
-    top: 50%;
-    left: 0;
-    transform: translate(-50%, -50%);
-  }
+/* Кадр уходит за нижнюю кромку — обрезает сама плашка, как у программ. */
+.mortgage-who__card {
+  overflow: hidden;
 }
 
-@media (max-width: 899px) {
-  .mortgage-who strong {
-    min-height: 0;
-  }
+/* Отклик на наведение тот же, что у плашек программ: грань темнеет,
+   заливка светлеет, кадр приподнимается. */
+.mortgage-who__card:hover .mortgage-program__art {
+  transform: translateY(-5px) scaleX(var(--art-flip));
+}
 
-  .mortgage-who li + li::before {
-    top: 0;
-    right: 32px;
-    left: 32px;
-    height: 1px;
-  }
+/* Крупная строка — слова, а не ставка: тридцать два пункта на «С
+   инвалидностью» дают перенос и распирают ряд. */
+/* Кадр занимает не половину плашки, а меньше: у программ в левой половине
+   стоит короткая ставка, здесь — фраза, и половины ей не хватало. */
+.mortgage-who__card .mortgage-program__art {
+  width: 38%;
+}
 
-  .mortgage-who li + li::after {
-    top: 0;
-    left: 50%;
-    transform: translate(-50%, -50%);
-  }
+/* Знак доступности — рамка, а не предмет: срез по нижней кромке читается
+   у неё браком, тогда как лапы мишки и дно рюкзака уходят под край
+   естественно. Этот кадр вписан в плашку целиком. */
+.mortgage-who li:last-child .mortgage-program__art {
+  top: 14px;
+  height: calc(100% - 28px);
+}
+
+.mortgage-who__card strong {
+  max-width: 58%;
+  font-size: 24px;
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+/* Надзаголовок держит две строки во всех трёх плашках: без резерва
+   крупные строки стояли на разной высоте — где-то под одной строкой
+   названия, где-то под двумя. */
+.mortgage-who__card > span {
+  max-width: 58%;
+  min-height: 2.5em;
+  padding-right: 0;
 }
 
 .mortgage-rules__title {
@@ -7554,9 +7521,15 @@ textarea:focus-visible {
 .mortgage-rules__digit {
   --digit-h: 3.4rem;
   --digit-canvas: 1024;
+  /* Подъём под курсором живёт в переменной: центрирование задано тем же
+     transform, и подъём, записанный напрямую, стирал бы его. */
+  --digit-lift: 0px;
   position: absolute;
-  top: 6px;
+  /* По центру всего пункта, а не строки заголовка: у раскрытого правила
+     цифра стоит посередине его высоты, вместе с текстом. */
+  top: 50%;
   right: 44px;
+  transform: translateY(calc(-50% + var(--digit-lift)));
   z-index: 0;
   width: calc(var(--digit-h) * var(--gw) / var(--gh));
   height: var(--digit-h);
@@ -7610,7 +7583,7 @@ textarea:focus-visible {
 
   .mortgage-rules .ui-accordion__item:hover .mortgage-rules__digit {
     background-color: color-mix(in srgb, var(--brand-yellow) 78%, white);
-    transform: translateY(-6px);
+    --digit-lift: -6px;
     filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.9))
       drop-shadow(1px 3px 0 rgb(196 150 8 / 0.35))
       drop-shadow(0 16px 20px rgb(var(--avgst-ink-rgb) / 0.18));
@@ -7619,7 +7592,7 @@ textarea:focus-visible {
 
 @media (prefers-reduced-motion: reduce) {
   .mortgage-rules .ui-accordion__item:hover .mortgage-rules__digit {
-    transform: none;
+    --digit-lift: 0px;
   }
 }
 
