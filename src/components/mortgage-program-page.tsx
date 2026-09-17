@@ -45,7 +45,7 @@ export async function MortgageProgramPage({
       }
     >
       <main>
-        <MortgagePageContent projects={items} initialProgramId={programId} />
+        <MortgagePageContent projects={items} programId={programId} />
       </main>
     </SiteChrome>
   );

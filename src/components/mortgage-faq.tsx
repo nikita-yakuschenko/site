@@ -1,7 +1,8 @@
 "use client";
 
-import { copy, nbspText } from "../lib/copy";
+import { nbspText } from "../lib/copy";
 import { BankStrip, type BankPartner } from "./bank-strip";
+import type { WithFaq } from "../lib/mortgage/content";
 import {
   Accordion,
   AccordionContent,
@@ -9,7 +10,6 @@ import {
   AccordionTrigger,
 } from "./ui/accordion";
 
-const fm = copy.familyMortgage;
 
 const PARTNERS: BankPartner[] = [
   { name: "СберБанк", src: "/logos/banks/sber.svg" },
@@ -25,22 +25,22 @@ const PARTNERS: BankPartner[] = [
 ];
 
 /** FAQ семейной ипотеки + банки в одной секции (без ложной полосы между ними). */
-export function MortgageFaq() {
+export function MortgageFaq({ content }: { content: WithFaq }) {
   return (
     <section
       className="section section--muted"
       aria-labelledby="mortgage-faq-title"
     >
       <div className="section__inner">
-        <p className="eyebrow">{fm.faqEyebrow}</p>
-        <h2 id="mortgage-faq-title">{fm.faqHeading}</h2>
+        <p className="eyebrow">{content.faqEyebrow}</p>
+        <h2 id="mortgage-faq-title">{content.faqHeading}</h2>
         <Accordion
           type="single"
           collapsible
           className="ui-accordion mortgage-faq"
           defaultValue="faq-0"
         >
-          {fm.faq.map((item, index) => (
+          {content.faq.map((item, index) => (
             <AccordionItem key={item.question} value={`faq-${index}`}>
               <AccordionTrigger>{item.question}</AccordionTrigger>
               <AccordionContent>{nbspText(item.answer)}</AccordionContent>

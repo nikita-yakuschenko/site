@@ -11,6 +11,15 @@ import {
 } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
+import {
+  hasConditions,
+  hasFaq,
+  hasWho,
+  mortgageContent,
+  type MortgageContent,
+  type WithConditions,
+  type WithWho,
+} from "../lib/mortgage/content";
 import { copy, nbspText } from "../lib/copy";
 import { telHref } from "../lib/phone";
 import { SITE } from "../lib/site";
@@ -37,31 +46,33 @@ const CONDITION_ICONS = [
 /** Боевая страница /mortgage — семейная ипотека. */
 export function MortgagePageContent({
   projects,
-  initialProgramId,
+  programId = "family",
 }: {
   projects: CatalogProject[];
-  initialProgramId?: MortgageProgramId;
+  programId?: MortgageProgramId;
 }) {
+  const content = mortgageContent(programId);
+
+  /* Разделы, описывающие саму программу, показываются только там, где для
+     них есть текст. У семейной он написан, у остальных трёх пока нет, и
+     сочинять правила государственных программ вместо заказчика нельзя. */
   return (
     <>
-      <MortgageHero />
-      <MortgageCalculator
-        projects={projects}
-        initialProgramId={initialProgramId}
-      />
-      <MortgageWhoFits />
+      <MortgageHero content={content} />
+      <MortgageCalculator projects={projects} initialProgramId={programId} />
+      {hasWho(content) ? <MortgageWhoFits content={content} /> : null}
       <MortgageSteps />
       <MortgageFinance />
-      <MortgageConditions />
-      <MortgageMidCta />
-      <MortgageFaq />
+      {hasConditions(content) ? <MortgageConditions content={content} /> : null}
+      <MortgageMidCta content={content} />
+      {hasFaq(content) ? <MortgageFaq content={content} /> : null}
       <MortgageOtherPrograms />
       <MortgageContacts />
     </>
   );
 }
 
-function MortgageHero() {
+function MortgageHero({ content }: { content: MortgageContent }) {
   return (
     <section
       className="section mortgage-page mortgage-page--hero"
@@ -84,12 +95,12 @@ function MortgageHero() {
                 «Семейная ипотека» над «Семейная ипотека на дом от 6%».
                 Раздел и так назван крошками строкой выше. */}
             <h1 id="mortgage-hero-title">
-              {nbspText(fm.headingLine)}
+              {nbspText(content.headingLine)}
               <br />
-              {nbspText(fm.headingBefore)}
-              <em>{fm.headingRate}</em>
+              {nbspText(content.headingBefore)}
+              <em>{content.headingRate}</em>
             </h1>
-            <p>{nbspText(fm.lead)}</p>
+            <p>{nbspText(content.lead)}</p>
             <div className="mortgage-family__actions">
               <a className="btn btn-yellow" href="#mortgage-calc">
                 {copy.mortgageCalcCta}
@@ -103,7 +114,7 @@ function MortgageHero() {
         </div>
 
         <ul className="mortgage-metrics">
-          {fm.metrics.map((item) => (
+          {content.metrics.map((item) => (
             <li key={item.label}>
               <p>{item.label}</p>
               <strong>{item.value}</strong>
@@ -115,16 +126,16 @@ function MortgageHero() {
   );
 }
 
-function MortgageWhoFits() {
+function MortgageWhoFits({ content }: { content: WithWho }) {
   return (
     <section className="section" aria-labelledby="mortgage-who-title">
       <div className="section__inner">
-        <p className="eyebrow">{fm.whoEyebrow}</p>
-        <h2 id="mortgage-who-title">{fm.whoHeading}</h2>
-        <p className="mortgage-page__lead">{nbspText(fm.whoLead)}</p>
+        <p className="eyebrow">{content.whoEyebrow}</p>
+        <h2 id="mortgage-who-title">{content.whoHeading}</h2>
+        <p className="mortgage-page__lead">{nbspText(content.whoLead)}</p>
 
         <ul className="mortgage-who">
-          {fm.whoFits.map((item, index) => {
+          {content.whoFits.map((item, index) => {
             const Icon = WHO_ICONS[index] ?? IconHomeHeart;
             return (
               <li key={item.title}>
@@ -137,7 +148,7 @@ function MortgageWhoFits() {
         </ul>
 
         <div className="mortgage-rules">
-          {fm.rules.map((rule) => (
+          {content.rules.map((rule) => (
             <article key={rule.title}>
               <h3>{rule.title}</h3>
               <p>{nbspText(rule.text)}</p>
@@ -204,17 +215,17 @@ function MortgageFinance() {
   );
 }
 
-function MortgageConditions() {
+function MortgageConditions({ content }: { content: WithConditions }) {
   return (
     <section
       className="section section--muted"
       aria-labelledby="mortgage-conditions-title"
     >
       <div className="section__inner">
-        <p className="eyebrow">{fm.conditionsEyebrow}</p>
-        <h2 id="mortgage-conditions-title">{fm.conditionsHeading}</h2>
+        <p className="eyebrow">{content.conditionsEyebrow}</p>
+        <h2 id="mortgage-conditions-title">{content.conditionsHeading}</h2>
         <ul className="mortgage-conditions">
-          {fm.conditions.map((item, index) => {
+          {content.conditions.map((item, index) => {
             const Icon = CONDITION_ICONS[index] ?? IconShieldCheck;
             return (
               <li key={item.title}>
@@ -237,7 +248,7 @@ function MortgageConditions() {
   );
 }
 
-function MortgageMidCta() {
+function MortgageMidCta({ content }: { content: MortgageContent }) {
   return (
     <section className="section mortgage-mid-cta" aria-labelledby="mortgage-mid-cta-title">
       <div className="section__inner mortgage-mid-cta__inner">
@@ -250,8 +261,8 @@ function MortgageMidCta() {
           />
         </div>
         <div className="mortgage-mid-cta__body">
-          <h2 id="mortgage-mid-cta-title">{nbspText(fm.midCtaHeading)}</h2>
-          <p>{nbspText(fm.midCtaLead)}</p>
+          <h2 id="mortgage-mid-cta-title">{nbspText(content.midCtaHeading)}</h2>
+          <p>{nbspText(content.midCtaLead)}</p>
           <a className="btn btn-yellow" href="#mortgage-calc">
             {copy.mortgageCalcCta}
             <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
