@@ -1,11 +1,5 @@
-import {
-  IconArrowUpRight,
-  IconBuildingBank,
-  IconHomeHeart,
-  IconPercentage,
-  IconShieldCheck,
-  IconWallet,
-} from "@tabler/icons-react";
+import { IconArrowUpRight } from "@tabler/icons-react";
+import { Fragment } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -30,14 +24,6 @@ import type { CatalogProject } from "../lib/catalog/types";
 import type { MortgageProgramId } from "../lib/mortgage";
 
 const fm = copy.familyMortgage;
-
-const CONDITION_ICONS = [
-  IconPercentage,
-  IconWallet,
-  IconBuildingBank,
-  IconHomeHeart,
-  IconShieldCheck,
-] as const;
 
 /** Боевая страница /mortgage — семейная ипотека. */
 export function MortgagePageContent({
@@ -252,14 +238,49 @@ function MortgageConditions({ content }: { content: WithConditions }) {
     >
       <div className="section__inner">
         <p className="eyebrow">{content.conditionsEyebrow}</p>
-        <h2 id="mortgage-conditions-title">{content.conditionsHeading}</h2>
-        <ul className="mortgage-conditions">
-          {content.conditions.map((item, index) => {
-            const Icon = CONDITION_ICONS[index] ?? IconShieldCheck;
-            return (
-              <li key={item.title}>
-                <Icon size={26} stroke={1.5} aria-hidden="true" />
-                <strong>{item.title}</strong>
+        {/* Астериск в заголовке и сноска под списком — одна пара: правила
+            выше общие для программы, а банк поверх них ставит свои. */}
+        <h2 id="mortgage-conditions-title">
+          {content.conditionsHeading}
+          <span className="mortgage-conditions__ref" aria-hidden="true">
+            *
+          </span>
+        </h2>
+        {/* Спецификация, а не сетка карточек. Пунктов пять, и в сетке из трёх
+            колонок последний оставался сиротой в пустом ряду; здесь он просто
+            последняя строка. Значения вынесены в свой столбец: цифры условий —
+            самое читаемое на странице, а в заголовках карточек они тонули.
+            Пункт без значения (эскроу — режим расчётов, а не число) получает
+            вместо цифры знак: он единственный такой, и знак его различает. */}
+        {/* Сетка живёт на самом списке, а не на отдельных строках: колонка
+            значений берётся по самому длинному из них и потому общая для
+            всех — иначе цифры разъезжались бы по строкам. */}
+        {/* Обёртка держит сетку, а сам dl раскрыт через display: contents:
+            так dt/dd и сноска стоят в одних колонках, и сноска попадает под
+            текст, а не под колонку значений. */}
+        <div className="mortgage-conditions">
+          <dl className="mortgage-conditions__list">
+          {content.conditions.map((item) => (
+            <Fragment key={item.title}>
+              <dt className="mortgage-conditions__value">
+                {item.value ? (
+                  item.value
+                ) : (
+                  /* Эскроу — единственный пункт без числа: вместо величины
+                     предметный знак, он же и различает строку. */
+                  <Image
+                    className="mortgage-conditions__mark"
+                    src="/persons/escrow.png"
+                    alt=""
+                    width={1254}
+                    height={1254}
+                    sizes="64px"
+                    quality={90}
+                  />
+                )}
+              </dt>
+              <dd className="mortgage-conditions__body">
+                <strong>{nbspText(item.title)}</strong>
                 {item.text ? <p>{nbspText(item.text)}</p> : null}
                 {item.points.length ? (
                   <ul className="mortgage-conditions__points">
@@ -268,10 +289,15 @@ function MortgageConditions({ content }: { content: WithConditions }) {
                     ))}
                   </ul>
                 ) : null}
-              </li>
-            );
-          })}
-        </ul>
+              </dd>
+            </Fragment>
+          ))}
+          </dl>
+          <p className="mortgage-conditions__note">
+            <span aria-hidden="true">*&nbsp;</span>
+            {nbspText(content.conditionsNote)}
+          </p>
+        </div>
       </div>
     </section>
   );

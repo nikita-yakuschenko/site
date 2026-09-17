@@ -252,7 +252,7 @@ function MortgageShowcase() {
           </div>
           <div className="mortgage-family__body">
             <p className="eyebrow">Семейная ипотека</p>
-            <h2 id="mortgage-showcase-title">{nbspText("Дом в ипотеку от ")}<em>6%</em></h2>
+            <h2 id="mortgage-showcase-title">{nbspText("Дом в ипотеку под ")}<em>6%</em></h2>
             <p>
               {/* Тире приклеено к предыдущему слову: иначе оно уходит в начало строки. */}
               {nbspText("Семейная ипотека\u00a0- государственная программа для семей с детьми, которая позволяет построить дом ")}
@@ -274,8 +274,8 @@ function MortgageShowcase() {
         {/* Семейной в ряду нет: ей посвящён баннер выше. */}
         <div className="mortgage-showcase__programs">
           <a className="mortgage-program mortgage-program--it" href="/it-mortgage">
-            <span>IT-ипотека</span><strong>от 6%</strong><small>Для специалистов <span>IT-компаний</span></small>
-            <Image className="mortgage-program__art" src="/persons/it.png" alt="" width={904} height={975} sizes="160px" />
+            <span>IT-ипотека</span><strong>6%</strong><small>Для специалистов <span>IT-компаний</span></small>
+            <Image className="mortgage-program__art" src="/persons/it.png" alt="" width={904} height={975} sizes="160px" quality={90} />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>
@@ -287,7 +287,7 @@ function MortgageShowcase() {
               <br />
               {nbspText("и соц. сферы на селе")}
             </small>
-            <Image className="mortgage-program__art" src="/persons/agro.png" alt="" width={464} height={917} sizes="90px" />
+            <Image className="mortgage-program__art" src="/persons/agro.png" alt="" width={587} height={918} sizes="90px" quality={90} />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>
@@ -299,7 +299,7 @@ function MortgageShowcase() {
               <br />
               {nbspText("от ведущих банков")}
             </small>
-            <Image className="mortgage-program__art" src="/persons/bank.png" alt="" width={1052} height={958} sizes="180px" />
+            <Image className="mortgage-program__art" src="/persons/bank.png" alt="" width={1052} height={958} sizes="180px" quality={90} />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>

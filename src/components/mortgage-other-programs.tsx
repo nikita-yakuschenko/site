@@ -32,7 +32,7 @@ const PROGRAM_CARDS: readonly {
     id: "family",
     className: "mortgage-program--family",
     title: "Семейная ипотека",
-    rate: "от 6%",
+    rate: "6%",
     image: "/persons/family2.png",
     imageW: 1024,
     imageH: 1024,
@@ -43,7 +43,7 @@ const PROGRAM_CARDS: readonly {
     id: "it",
     className: "mortgage-program--it",
     title: "IT-ипотека",
-    rate: "от 6%",
+    rate: "6%",
     image: "/persons/it.png",
     imageW: 904,
     imageH: 975,
@@ -126,6 +126,7 @@ export function MortgageOtherPrograms({
                 width={card.imageW}
                 height={card.imageH}
                 sizes={card.sizes}
+                quality={90}
               />
               <span className="series-bento__go" aria-hidden="true">
                 <IconArrowUpRight size={18} stroke={2} />

@@ -17,6 +17,12 @@ const nextConfig: NextConfig = {
     APP_VERSION: process.env.APP_VERSION ?? '0.1.0',
     APP_COMMIT: process.env.APP_COMMIT ?? 'unknown',
   },
+  // Предметная графика — 3D-рендеры с мягкими градиентами: дефолтные 75
+  // оставляют на них мыло. Значения качества в Next 16 нужно объявлять
+  // заранее, иначе quality={90} у <Image> отбрасывается.
+  images: {
+    qualities: [75, 90],
+  },
   // Политики и правила в корне; старые /legal/* и /personal-data → редирект.
   async redirects() {
     return [

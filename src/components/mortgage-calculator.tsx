@@ -424,15 +424,19 @@ export function MortgageCalculator({
                 <div className="mortgage-calc__parts">
                   {activeResult.parts.map((part) => (
                     <p key={part.kind}>
+                      {/* Ставка стоит при названии части, а не при сумме:
+                          она характеризует часть кредита, а справа тогда
+                          остаются только суммы — и колонка цифр читается
+                          сверху вниз одним столбцом. */}
                       <span>
                         {part.kind === "subsidized"
                           ? t.subsidizedPart
                           : t.marketPart}
+                        <em className="mortgage-calc__part-rate">
+                          {formatRate(part.annualRate)}
+                        </em>
                       </span>
-                      <strong>
-                        {formatRub(Math.round(part.principal))} ·{" "}
-                        {formatRate(part.annualRate)}
-                      </strong>
+                      <strong>{formatRub(Math.round(part.principal))}</strong>
                     </p>
                   ))}
                 </div>

@@ -15,6 +15,7 @@ type ProgramBlocks = Pick<
   | "conditionsEyebrow"
   | "conditionsHeading"
   | "conditions"
+  | "conditionsNote"
   | "faqEyebrow"
   | "faqHeading"
   | "faq"
@@ -68,7 +69,12 @@ export type WithWho = MortgageContent &
   >;
 
 export type WithConditions = MortgageContent &
-  Required<Pick<ProgramBlocks, "conditionsEyebrow" | "conditionsHeading" | "conditions">>;
+  Required<
+    Pick<
+      ProgramBlocks,
+      "conditionsEyebrow" | "conditionsHeading" | "conditions" | "conditionsNote"
+    >
+  >;
 
 export type WithFaq = MortgageContent &
   Required<Pick<ProgramBlocks, "faqEyebrow" | "faqHeading" | "faq">>;

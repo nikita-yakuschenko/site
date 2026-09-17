@@ -7717,47 +7717,122 @@ textarea:focus-visible {
   margin-top: auto;
 }
 
+/* Условия программы — спецификация: столбец значений и столбец раскрытия,
+   разделённые волосяной линией. Рамок и белых плашек нет: секция идёт на
+   муте, и лист на ней читается спокойнее сетки карточек, которых на
+   странице уже три подряд.
+
+   Сетка задана на всём списке, а не построчно: колонка значений берётся
+   по самому длинному из них (max-content) и потому одна на все строки.
+   Жёсткой ширины у неё нет — при 220px рядом с «6%» оставалась дыра в
+   170px, а короткая цифра отрывалась от своего пояснения. */
 .mortgage-conditions {
   display: grid;
-  gap: var(--gap-tile);
   margin: var(--gap-stack) 0 0;
   padding: 0;
-  list-style: none;
 }
 
-@media (min-width: 900px) {
+@media (min-width: 760px) {
   .mortgage-conditions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: max-content minmax(0, 1fr);
+    column-gap: 32px;
+  }
+
+  /* Значения прижаты вправо: при левом выравнивании короткое «6%»
+     отрывалось от своего пояснения на 135px, а длинное «30 / 15 млн»
+     стояло вплотную. Справа они заканчиваются на одной линии, и отбивка
+     до текста одинаковая у всех строк. */
+  .mortgage-conditions dt {
+    justify-self: end;
+    text-align: right;
+  }
+
+  /* Сноска встаёт под текстом, а не под колонкой значений. */
+  .mortgage-conditions__note {
+    grid-column: 2;
   }
 }
 
-@media (min-width: 1100px) {
-  .mortgage-conditions {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
+.mortgage-conditions__list {
+  display: contents;
+}
+
+.mortgage-conditions dt,
+.mortgage-conditions dd {
+  padding: 22px 0;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+}
+
+/* Первая строка без линии сверху: её роль играет заголовок раздела. */
+.mortgage-conditions dt:first-child,
+.mortgage-conditions dt:first-child + dd {
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* На узком экране значение встаёт строкой над пояснением, и линия должна
+   идти только перед значением, иначе она разрежет строку пополам. */
+@media (max-width: 759px) {
+  .mortgage-conditions dd {
+    padding-top: 0;
+    border-top: 0;
+  }
+
+  .mortgage-conditions dt {
+    padding-bottom: 10px;
   }
 }
 
-.mortgage-conditions li {
-  display: grid;
-  gap: 12px;
-  align-content: start;
-  padding: var(--page-gutter);
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
-  border-radius: var(--surface-radius);
-  background: #fff;
-}
-
-.mortgage-conditions svg {
+/* Астериск не набирается заголовочным весом: он ссылка на сноску, а не
+   часть названия раздела. */
+.mortgage-conditions__ref {
+  margin-left: 0.1em;
+  font-weight: 500;
   color: var(--avgst-green);
 }
 
-.mortgage-conditions strong {
+/* Сноска закрывает список: оговорка относится ко всем правилам сразу. */
+.mortgage-conditions__note {
+  margin: 18px 0 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.mortgage-conditions__value {
+  margin: 0;
+  font-size: 26px;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+  color: var(--avgst-ink);
+  /* Цифры одной ширины: значения стоят столбцом и должны выстраиваться. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Эскроу — единственная строка без числа: вместо величины предметный знак,
+   он же её и различает. Размер держится по колонке значений. */
+.mortgage-conditions__mark {
+  display: block;
+  width: 56px;
+  height: auto;
+  margin: -8px 0 -6px -6px;
+}
+
+.mortgage-conditions__body {
+  display: grid;
+  gap: 10px;
+  align-content: start;
+  margin: 0;
+}
+
+.mortgage-conditions__body strong {
   font-size: 17px;
   letter-spacing: -0.02em;
   line-height: 1.25;
 }
 
-.mortgage-conditions p {
+.mortgage-conditions__body p {
   margin: 0;
   font-size: 14px;
   line-height: 1.5;
@@ -7778,9 +7853,6 @@ textarea:focus-visible {
   gap: 8px;
   margin: 0;
   padding: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
   font-size: 14px;
   line-height: 1.45;
   color: rgb(var(--avgst-ink-rgb) / 0.78);
@@ -8284,6 +8356,16 @@ textarea:focus-visible {
 .mortgage-calc__parts span {
   min-width: 0;
   color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+/* Ставка при названии части: не курсив, чуть плотнее подписи, чтобы не
+   слиться с ней и не спорить с суммой справа. */
+.mortgage-calc__part-rate {
+  margin-left: 6px;
+  font-style: normal;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: rgb(var(--avgst-ink-rgb) / 0.8);
 }
 
 .mortgage-calc__parts strong {
