@@ -335,7 +335,8 @@ export const copy = {
   offerDisclaimer:
     "Информация, опубликованная на сайте предназначена для ознакомительных целей и не является публичной офертой, определяемой положениями статьи 437 Гражданского кодекса Российской Федерации",
   footerAbout:
-    "Авангард Строй помогает выбрать проект, рассчитать смету и построить дом.",
+    "Авангард Строй - Производственно-строительная компания полного цикла. Мы проектируем, изготавливаем и строим дома для жизни и отдыха.",
+  footerCopyrightName: "Авангард Строй Нижний Новгород",
   socialsAria: "Мы в социальных сетях",
   heroHeadline:
     "Строим современные каркасные и модульные дома для комфортной жизни, отдыха и постоянного проживания",
@@ -479,8 +480,8 @@ export function nbspText(text: string): string {
   return text.replace(PREP, "$1$2\u00a0");
 }
 
-export function footerAboutFor(name: string): string {
-  return `${name} помогает выбрать проект, рассчитать смету и построить дом.`;
+export function footerAboutFor(_name: string): string {
+  return copy.footerAbout;
 }
 
 export function projectsInSeries(n: number): string {

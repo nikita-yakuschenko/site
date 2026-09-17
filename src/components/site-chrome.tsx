@@ -472,7 +472,7 @@ export function SiteChrome({
             </p>
             <div className="footer-legal">
               <p className="footer-muted">
-                © {name} {years}
+                © {copy.footerCopyrightName} {years}
               </p>
               <p className="footer-muted footer-inn">ИНН&nbsp;5261106177</p>
             </div>
