@@ -7663,6 +7663,14 @@ textarea:focus-visible {
   background: #e8edf3;
 }
 
+/* Знак перехода жёлтый сразу, а не только под курсором: на плитках серий
+   он лежит на тёмной фотографии и белым читается сам, а здесь стоит на
+   светлом кадре и терялся в нём. */
+.mortgage-finance__card .series-bento__go {
+  background: var(--brand-yellow);
+  color: var(--avgst-ink);
+}
+
 .mortgage-finance__media img {
   object-fit: cover;
   transition: transform 0.45s var(--ease-out);
