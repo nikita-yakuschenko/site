@@ -311,6 +311,11 @@ export function MortgageCalculator({
                   setPropertyPrice(v);
                   scheduleAnalytics();
                 }}
+                /* Пустая строка пилюль резервируется и здесь. Соседняя
+                   плитка в ряду их имеет, и без резерва содержимое двух
+                   плиток распределялось по высоте по-разному: бегунки
+                   вставали на разных уровнях. */
+                pillsSlot
               />
             ) : (
               <CalcField
@@ -324,6 +329,7 @@ export function MortgageCalculator({
                   setComfortPayment(v);
                   scheduleAnalytics();
                 }}
+                pillsSlot
               />
             )}
 
@@ -342,15 +348,15 @@ export function MortgageCalculator({
                 setDownPayment(v);
                 scheduleAnalytics();
               }}
-              trailing={
-                <>
-                  <span>₽</span>
-                  <span className="mortgage-calc__tile-pct">
-                    {mode === "payment" && Number.isFinite(downPercent)
-                      ? `${Math.round(downPercent * 10) / 10}%`
-                      : "\u00a0"}
-                  </span>
-                </>
+              /* Доля идёт перед суммой: она отвечает на вопрос «сколько
+                 вносим», а рубли уточняют. В обратном порядке глаз читал
+                 число и возвращался к проценту. */
+              leading={
+                <span className="mortgage-calc__tile-pct">
+                  {mode === "payment" && Number.isFinite(downPercent)
+                    ? `${Math.round(downPercent * 10) / 10}%`
+                    : "\u00a0"}
+                </span>
               }
               pills={downPills}
               pillsSlot
@@ -499,6 +505,7 @@ function CalcField({
   max,
   step,
   onChange,
+  leading,
   trailing,
   pills,
   pillsSlot = false,
@@ -510,6 +517,7 @@ function CalcField({
   max: number;
   step: number;
   onChange: (value: number) => void;
+  leading?: ReactNode;
   trailing?: ReactNode;
   pills?: FieldPill[];
   pillsSlot?: boolean;
@@ -546,10 +554,15 @@ function CalcField({
       <div className="mortgage-calc__tile-head">
         <span className="mortgage-calc__tile-label">{label}</span>
         <div className="mortgage-calc__tile-value">
+          {leading}
+          {/* size по длине значения. Без него поле держит ширину под два
+              десятка знаков и рисует пустую коробку под миллиарды, которых
+              в этих полях не бывает: верхняя граница — 30 млн. */}
           <input
             type="text"
             inputMode="numeric"
             aria-label={label}
+            size={Math.max(2, text.length)}
             maxLength={maxDigits(max) + Math.floor(maxDigits(max) / 3)}
             value={text}
             onChange={(e) => commit(e.target.value, true)}
