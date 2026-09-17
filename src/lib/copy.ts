@@ -292,7 +292,7 @@ export const copy = {
       {
         label: "Ребёнок в семье",
         title: "Дошкольник",
-        note: "Младше семи лет",
+        note: "Младше 7 лет",
         image: "/persons/children.png",
         imageW: 710,
         imageH: 900,
@@ -301,7 +301,7 @@ export const copy = {
       {
         label: "Дети в семье",
         title: "Двое и более",
-        note: "Младше восемнадцати лет",
+        note: "Младше 18 лет",
         image: "/persons/childrens.png",
         imageW: 895,
         imageH: 900,
