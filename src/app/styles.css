@@ -7431,7 +7431,10 @@ textarea:focus-visible {
 .mortgage-who li {
   display: flex;
   gap: 14px;
-  align-items: center;
+  /* По верху, а не по центру: формулировка в средней плашке занимает две
+     строки, и при центрировании её первая строка уезжала выше соседних —
+     ряд терял общую линию. */
+  align-items: flex-start;
   padding: 18px var(--page-gutter);
   border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
   border-radius: var(--surface-radius);
@@ -7440,6 +7443,8 @@ textarea:focus-visible {
 
 .mortgage-who svg {
   flex: 0 0 auto;
+  /* Знак выше строки текста: сдвиг сажает их на общую оптическую линию. */
+  margin-top: -3px;
   color: var(--avgst-green);
 }
 
