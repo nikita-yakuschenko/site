@@ -7424,17 +7424,22 @@ textarea:focus-visible {
   }
 }
 
+/* Плашка по содержимому: иконка слева, формулировка справа.
+   Колонкой она стояла коробкой в 113px с одной строкой текста и пустотой
+   под ней — после того, как из карточки ушло пояснение, дословно
+   повторявшее заголовок. */
 .mortgage-who li {
-  display: grid;
-  gap: 12px;
-  align-content: start;
-  padding: var(--page-gutter);
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  padding: 18px var(--page-gutter);
   border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
   border-radius: var(--surface-radius);
   background: #fff;
 }
 
 .mortgage-who svg {
+  flex: 0 0 auto;
   color: var(--avgst-green);
 }
 
@@ -7458,46 +7463,39 @@ textarea:focus-visible {
   line-height: 1.25;
 }
 
-/* Правила: слева — короткое имя, справа — пояснение.
-   Плашками они вставали вторым рядом того же вида, что и условия выше, и
-   шесть штук читались одним списком из шести равных пунктов; разделял их
-   только оттенок заливки. Строка с именем слева читается как «правило →
-   что оно значит», а не как ещё одна карточка, и длинный абзац получает
-   ширину, на которой он набирается нормальной строкой, а не столбиком в
-   двенадцать строк. */
+/* Правила — плашки той же формы, что и всё остальное на странице.
+   Список с волосяными линейками и подписью в колонке слева читался как
+   вёрстка договора, а не как раздел сайта. Отделяет их от условий выше
+   не форма, а подпись над рядом и заливка вместо грани. */
 .mortgage-rules {
   display: grid;
-  gap: 0;
+  gap: var(--gap-tile);
   margin: 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
-}
-
-.mortgage-rules > div {
-  display: grid;
-  gap: 8px;
-  padding: 20px 0;
-  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
 }
 
 @media (min-width: 900px) {
-  .mortgage-rules > div {
-    grid-template-columns: 260px minmax(0, 1fr);
-    gap: 32px;
-    align-items: start;
+  .mortgage-rules {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
 
+.mortgage-rules > div {
+  padding: var(--page-gutter);
+  border-radius: var(--surface-radius);
+  background: rgb(var(--avgst-ink-rgb) / 0.04);
+}
+
 .mortgage-rules dt {
+  margin: 0 0 10px;
   font-size: 16px;
   font-weight: 600;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .mortgage-rules dd {
-  max-width: 68ch;
   margin: 0;
-  font-size: 15px;
-  line-height: 1.55;
+  font-size: 14px;
+  line-height: 1.5;
   color: rgb(var(--avgst-ink-rgb) / 0.72);
 }
 
