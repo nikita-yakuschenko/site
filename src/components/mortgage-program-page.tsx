@@ -4,7 +4,7 @@ import { MortgagePageContent } from "./mortgage-page";
 import { SiteChrome } from "./site-chrome";
 import { FixtureCatalogProvider } from "../lib/catalog/fixture-provider";
 import { copy, footerAboutFor } from "../lib/copy";
-import { getMortgageProgram, type MortgageProgramId } from "../lib/mortgage";
+import { mortgageTitle, type MortgageProgramId } from "../lib/mortgage";
 import { SITE } from "../lib/site";
 
 const catalog = new FixtureCatalogProvider();
@@ -23,7 +23,6 @@ export async function MortgageProgramPage({
   programId: MortgageProgramId;
 }) {
   const { items } = await catalog.list({ siteCode: SITE.code });
-  const program = getMortgageProgram(programId);
 
   return (
     <SiteChrome
@@ -39,11 +38,9 @@ export async function MortgageProgramPage({
         <nav className="project-hero__crumbs" aria-label={copy.crumbsAria}>
           <Link href="/">{copy.breadcrumbsHome}</Link>
           <IconChevronRight size={14} stroke={2} aria-hidden="true" />
-          {/* Название берём как есть: приведение к нижнему регистру ломало
-              аббревиатуру — в крошке выходило «Ипотека — it». */}
-          <span aria-current="page">
-            {copy.mortgage} — {program.label}
-          </span>
+          {/* Полное название программы, а не «Ипотека — Семейная»: то была
+              опись из раздела и ярлыка, а не имя страницы. */}
+          <span aria-current="page">{mortgageTitle(programId)}</span>
         </nav>
       }
     >

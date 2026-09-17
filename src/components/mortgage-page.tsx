@@ -80,7 +80,9 @@ function MortgageHero() {
             />
           </div>
           <div className="mortgage-family__body">
-            <p className="eyebrow">{fm.eyebrow}</p>
+            {/* Надстроки нет: она повторяла первые два слова заголовка —
+                «Семейная ипотека» над «Семейная ипотека на дом от 6%».
+                Раздел и так назван крошками строкой выше. */}
             <h1 id="mortgage-hero-title">
               {nbspText(fm.headingBefore)}
               <em>{fm.headingRate}</em>

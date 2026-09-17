@@ -1,6 +1,7 @@
 export {
   MORTGAGE_ROUTES,
   mortgageHref,
+  mortgageTitle,
   programBySlug,
   type MortgageSlug,
 } from "./routes";

@@ -599,16 +599,19 @@ a {
   backdrop-filter: var(--glass-blur);
 }
 
-/* На сплошной шапке кадра под рядом нет: тёмный текст лежит на своём
-   фоне, и плашка ему не нужна. */
+/* На сплошной шапке кадра под рядом нет, и стекло здесь не из чего делать:
+   размывать нечего, тень не на чем лежать. Но форма остаётся прежней —
+   пилюля по содержимому, те же поля и та же грань, только в светлом
+   материале. Так крошки на странице программы и на карточке проекта
+   читаются одним элементом, а не двумя разными решениями. */
 .site-header--solid .site-header__subrow {
   color: var(--avgst-ink);
 }
 
 .site-header--solid .site-header__subrow > * {
-  padding: 0;
-  border: 0;
-  background: none;
+  min-height: 36px;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  background: rgb(var(--avgst-ink-rgb) / 0.04);
   box-shadow: none;
   backdrop-filter: none;
 }

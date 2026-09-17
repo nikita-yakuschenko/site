@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { MortgageProgramPage } from "../../components/mortgage-program-page";
 import { copy } from "../../lib/copy";
+import { mortgageTitle } from "../../lib/mortgage";
 
 export const metadata: Metadata = {
-  title: "IT-ипотека",
+  title: mortgageTitle("it"),
   description: copy.mortgageLead,
 };
 
