@@ -7877,16 +7877,56 @@ textarea:focus-visible {
   color: #fff;
 }
 
-@media (min-width: 900px) {
-  .mortgage-mid-cta__inner {
-    grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-    min-height: 280px;
-  }
-}
-
+/* Базовое правило раньше медиазапроса: ниже кадр выводится из потока,
+   и position: relative отсюда перебил бы absolute там. */
 .mortgage-mid-cta__media {
   position: relative;
   min-height: 200px;
+}
+
+@media (min-width: 900px) {
+  .mortgage-mid-cta__inner {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    min-height: 300px;
+  }
+
+  /* Кадр уходит под вуаль, а не стыкуется с заливкой встык — тем же
+     приёмом, что в первом экране (.mortgage-family), только зеркально:
+     там фотография справа, здесь слева, поэтому угол 254deg вместо 106.
+     Встык блок читался склейкой двух прямоугольников. */
+  .mortgage-mid-cta__media {
+    position: absolute;
+    /* Кадр держит ровно половину: шире его тянуть нельзя — object-fit
+       перекадрирует фотографию и режет лица. Мягкость стыка даёт вуаль,
+       а не растягивание бокса; здесь растворяется только правая кромка. */
+    inset: 0 50% 0 0;
+    z-index: 0;
+    /* Кромка растворяется строго по горизонтали. Косая полоса (254deg)
+       пересекала вертикальный срез бокса наискось: вверху кадр успевал
+       погаснуть, внизу обрывался непрозрачным — стык и был виден там. */
+    -webkit-mask-image: linear-gradient(270deg, transparent 0%, #000 34%);
+    mask-image: linear-gradient(270deg, transparent 0%, #000 34%);
+  }
+
+  /* Граница заливки косая: сверху заходит левее, к низу уходит вправо. */
+  .mortgage-mid-cta__inner::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: rgb(var(--avgst-ink-rgb));
+    -webkit-mask-image: linear-gradient(254deg, #000 46%, transparent 68%);
+    mask-image: linear-gradient(254deg, #000 46%, transparent 68%);
+  }
+
+  /* Кадр выведен из потока, и в сетке остаётся один элемент — колонку
+     ему надо назвать явно, иначе встанет в первую, под фотографию. */
+  .mortgage-mid-cta__body {
+    position: relative;
+    z-index: 2;
+    grid-column: 2;
+  }
 }
 
 .mortgage-mid-cta__media img {
@@ -7896,9 +7936,15 @@ textarea:focus-visible {
 
 .mortgage-mid-cta__body {
   display: grid;
+  /* Содержимое по своей ширине, а не во всю колонку: у заголовка и абзаца
+     свой max-width, а кнопка его не имела и растягивалась на 586px при
+     надписи в два слова. */
+  justify-items: start;
   gap: 16px;
   align-content: center;
-  padding: var(--gap-split) var(--page-gutter);
+  /* Боковой отступ был --page-gutter: 24px — токен уровня страницы,
+     оказавшийся внутри панели. Текст лип к стыку с кадром. */
+  padding: var(--gap-split) 40px;
 }
 
 .mortgage-mid-cta__body h2 {
