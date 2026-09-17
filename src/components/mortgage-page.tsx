@@ -84,6 +84,8 @@ function MortgageHero() {
                 «Семейная ипотека» над «Семейная ипотека на дом от 6%».
                 Раздел и так назван крошками строкой выше. */}
             <h1 id="mortgage-hero-title">
+              {nbspText(fm.headingLine)}
+              <br />
               {nbspText(fm.headingBefore)}
               <em>{fm.headingRate}</em>
             </h1>
