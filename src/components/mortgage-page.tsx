@@ -66,7 +66,7 @@ export function MortgagePageContent({
       {hasConditions(content) ? <MortgageConditions content={content} /> : null}
       <MortgageMidCta content={content} />
       {hasFaq(content) ? <MortgageFaq content={content} /> : null}
-      <MortgageOtherPrograms />
+      <MortgageOtherPrograms current={programId} />
       <MortgageContacts />
     </>
   );
@@ -80,10 +80,16 @@ function MortgageHero({ content }: { content: MortgageContent }) {
     >
       <div className="section__inner mortgage-showcase__grid">
         <div className="mortgage-family">
-          <div className="mortgage-family__media">
+          <div
+            className={
+              content.heroCutout
+                ? "mortgage-family__media mortgage-family__media--cutout"
+                : "mortgage-family__media"
+            }
+          >
             <Image
               className="mortgage-family__image"
-              src="/persons/family_1.png"
+              src={content.heroImage}
               alt=""
               fill
               priority

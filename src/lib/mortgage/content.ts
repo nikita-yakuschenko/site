@@ -45,6 +45,12 @@ export type MortgageContent = {
   midCtaHeading: string;
   midCtaLead: string;
   metrics: readonly { label: string; value: string }[];
+  /* Изображение первого экрана. У семейной это фотография, у остальных —
+     тот же предметный знак, которым программа обозначена в карточках:
+     ноутбук, колосья, здание банка. Знак вписывается в кадр целиком, а
+     фотография заполняет его — отсюда признак cutout. */
+  heroImage: string;
+  heroCutout?: boolean;
 } & Partial<ProgramBlocks>;
 
 export type WithWho = MortgageContent &

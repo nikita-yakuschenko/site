@@ -195,6 +195,8 @@ export const copy = {
      требуют текстов от заказчика — до тех пор страница их не показывает,
      вместо того чтобы выдумывать правила государственных программ. */
   itMortgage: {
+    heroImage: "/persons/it.png",
+    heroCutout: true,
     headingLine: "Успейте купить дом",
     headingBefore: "по IT-ипотеке под ",
     headingRate: "6%",
@@ -211,6 +213,8 @@ export const copy = {
       "Оставьте контакты: проверим условия, посчитаем платёж и подскажем, какие документы понадобятся.",
   },
   ruralMortgage: {
+    heroImage: "/persons/agro.png",
+    heroCutout: true,
     headingLine: "Постройте дом за городом",
     headingBefore: "по сельской ипотеке под ",
     headingRate: "3%",
@@ -227,6 +231,8 @@ export const copy = {
       "Оставьте контакты: проверим условия, посчитаем платёж и подскажем, какие документы понадобятся.",
   },
   marketMortgage: {
+    heroImage: "/persons/bank.png",
+    heroCutout: true,
     headingLine: "Постройте дом",
     headingBefore: "по рыночной ипотеке от ",
     headingRate: "16%",
@@ -247,6 +253,7 @@ export const copy = {
     eyebrow: "Семейная ипотека",
     /* Заголовок в две строки: первая зовёт к действию, вторая называет
        условие. Ставка вынесена отдельно — она набирается акцентом. */
+    heroImage: "/persons/family_1.png",
     headingLine: "Успейте купить дом",
     headingBefore: "по семейной ипотеке под ",
     headingRate: "6%",
