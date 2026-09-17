@@ -4096,6 +4096,7 @@ a {
 }
 
 .series-bento__tile:hover .series-bento__go,
+.mortgage-finance__card:hover .series-bento__go,
 .mortgage-program:hover .series-bento__go {
   background: var(--brand-yellow);
   color: var(--avgst-ink);
@@ -7631,26 +7632,68 @@ textarea:focus-visible {
 
 .mortgage-finance li {
   display: flex;
+  min-width: 0;
+}
+
+/* Вся плашка — одна ссылка: кликается кадр, название и кнопка, а не
+   только строка внизу. */
+.mortgage-finance__card {
+  display: flex;
+  flex: 1 1 auto;
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
   border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
   border-radius: var(--surface-radius);
   background: #fff;
+  color: var(--avgst-ink);
+  text-decoration: none;
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.mortgage-finance__card:hover {
+  border-color: rgb(var(--avgst-ink-rgb) / 0.22);
 }
 
 .mortgage-finance__media {
   position: relative;
+  display: block;
+  overflow: hidden;
   aspect-ratio: 16 / 10;
   background: #e8edf3;
 }
 
 .mortgage-finance__media img {
   object-fit: cover;
+  transition: transform 0.45s var(--ease-out);
+}
+
+/* Кадр наезжает под курсором — тот же отклик, что у плиток серий. */
+.mortgage-finance__card:hover .mortgage-finance__media img {
+  transform: scale(1.04);
+}
+
+/* Счётчик в левом верхнем углу кадра, знак перехода — в правом. */
+.mortgage-finance__count {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  z-index: 2;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.95);
+  color: var(--avgst-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
+  backdrop-filter: blur(8px);
 }
 
 .mortgage-finance__body {
-  display: grid;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
   gap: 10px;
   padding: var(--page-gutter);
 }
@@ -7660,25 +7703,27 @@ textarea:focus-visible {
   letter-spacing: -0.02em;
 }
 
-.mortgage-finance__body p {
-  margin: 0;
+.mortgage-finance__text {
   font-size: 14px;
   line-height: 1.45;
   color: rgb(var(--avgst-ink-rgb) / 0.7);
 }
 
-.mortgage-finance__body a {
+/* Кнопка прижата к низу: описания разной длины, и без этого кнопки
+   стояли на разной высоте. Разницу забирает просвет над кнопкой. */
+.mortgage-finance__cta {
   display: inline-flex;
   align-items: center;
+  align-self: flex-start;
   gap: 6px;
-  margin-top: 4px;
+  margin-top: auto;
+  padding-top: 6px;
   font-size: 14px;
   font-weight: 600;
   color: var(--avgst-ink);
-  text-decoration: none;
 }
 
-.mortgage-finance__body a:hover {
+.mortgage-finance__card:hover .mortgage-finance__cta {
   text-decoration: underline;
   text-underline-offset: 3px;
 }

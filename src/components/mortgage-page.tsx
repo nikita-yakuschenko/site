@@ -58,7 +58,7 @@ export function MortgagePageContent({
       <MortgageCalculator projects={projects} initialProgramId={programId} />
       {hasWho(content) ? <MortgageWhoFits content={content} /> : null}
       <MortgageSteps />
-      <MortgageFinance />
+      <MortgageFinance projectCount={projects.length} />
       {hasConditions(content) ? <MortgageConditions content={content} /> : null}
       <MortgageMidCta content={content} />
       {hasFaq(content) ? <MortgageFaq content={content} /> : null}
@@ -166,37 +166,82 @@ function MortgageSteps() {
   );
 }
 
-function MortgageFinance() {
+/**
+ * Что можно оформить.
+ *
+ * Плашка устроена как плитка серии на главной: кадр во всю ширину, знак
+ * перехода в правом верхнем углу, счётчик доступного — в левом. Под
+ * курсором кадр наезжает, а знак желтеет.
+ *
+ * Счётчик показывается только там, где число берётся из данных: писать
+ * «столько-то домов» на глаз нельзя, а пустая плашка честнее выдуманной.
+ */
+function MortgageFinance({ projectCount }: { projectCount: number }) {
+  const counts: Partial<Record<string, string>> = {
+    "/catalog": plural(projectCount, ["проект", "проекта", "проектов"]),
+  };
+
   return (
     <section className="section" aria-labelledby="mortgage-finance-title">
       <div className="section__inner">
         <p className="eyebrow">{fm.financeEyebrow}</p>
         <h2 id="mortgage-finance-title">{fm.financeHeading}</h2>
         <ul className="mortgage-finance">
-          {fm.finance.map((item) => (
-            <li key={item.title}>
-              <div className="mortgage-finance__media">
-                <Image
-                  src={item.image}
-                  alt=""
-                  fill
-                  sizes="(min-width: 900px) 30vw, 100vw"
-                />
-              </div>
-              <div className="mortgage-finance__body">
-                <strong>{item.title}</strong>
-                <p>{nbspText(item.text)}</p>
-                <Link href={item.href}>
-                  {item.cta}
-                  <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
+          {fm.finance.map((item) => {
+            const count = counts[item.href];
+            return (
+              <li key={item.title}>
+                <Link className="mortgage-finance__card" href={item.href}>
+                  <span className="mortgage-finance__media">
+                    <Image
+                      src={item.image}
+                      alt=""
+                      fill
+                      sizes="(min-width: 900px) 30vw, 100vw"
+                    />
+                    {count ? (
+                      <span className="mortgage-finance__count">{count}</span>
+                    ) : null}
+                    <span className="series-bento__go" aria-hidden="true">
+                      <IconArrowUpRight size={18} stroke={2} />
+                    </span>
+                  </span>
+                  <span className="mortgage-finance__body">
+                    <strong>{item.title}</strong>
+                    <span className="mortgage-finance__text">
+                      {nbspText(item.text)}
+                    </span>
+                    {/* Кнопка прижата к низу плашки: описания разной длины,
+                        и без этого кнопки стояли на разной высоте. Разницу
+                        забирает просвет над кнопкой, а не сама кнопка. */}
+                    <span className="mortgage-finance__cta">
+                      {item.cta}
+                      <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
+                    </span>
+                  </span>
                 </Link>
-              </div>
-            </li>
-          ))}
+              </li>
+            );
+          })}
         </ul>
       </div>
     </section>
   );
+}
+
+/** Число со словом в нужном падеже: 1 проект, 2 проекта, 37 проектов. */
+function plural(value: number, forms: [string, string, string]): string {
+  const mod100 = value % 100;
+  const mod10 = value % 10;
+  const form =
+    mod100 >= 11 && mod100 <= 14
+      ? forms[2]
+      : mod10 === 1
+        ? forms[0]
+        : mod10 >= 2 && mod10 <= 4
+          ? forms[1]
+          : forms[2];
+  return `${value} ${form}`;
 }
 
 function MortgageConditions({ content }: { content: WithConditions }) {
