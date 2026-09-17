@@ -7952,8 +7952,16 @@ textarea:focus-visible {
   min-width: 0;
 }
 
+/* Подпись держится в одну строку. На узкой плитке двухколоночной раскладки
+   длинное число отжимало её, и «Первоначальный взнос» ломался пополам:
+   поле выглядело съехавшим, хотя место было. Сжиматься теперь умеет само
+   число — оно набрано моноширинными цифрами и переносов не боится. */
 .mortgage-calc__tile-label {
   flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 14px;
   font-weight: 500;
   line-height: 1.25;
@@ -7983,21 +7991,21 @@ textarea:focus-visible {
   text-align: right;
 }
 
-/* Подсветка — у самого числа, а не у плитки.
-   Фон и кольцо нарисованы тенью, а не padding: иначе число при фокусе
-   прыгало бы, сдвигая соседние подписи. Для клавиатуры сверху добавляется
-   контурное кольцо — им пользуются, когда доходят до поля табом. */
+/* Ввод мышью не подсвечивается вовсе: место правки показывает каретка,
+   а любая плашка вокруг числа — лишний шум.
+
+   Для клавиатуры остаётся волосяная линия. Именно outline, а не фон и не
+   тень: он рисуется поверх раскладки и не занимает места, поэтому его
+   появление и исчезновение не двигают ни число, ни соседние подписи.
+   Прежняя плашка на тени была толстой, серой и выглядела артефактом. */
 .mortgage-calc__tile-value input:focus {
   outline: none;
-  border-radius: 5px;
-  background: rgb(var(--avgst-ink-rgb) / 0.05);
-  box-shadow: 0 0 0 5px rgb(var(--avgst-ink-rgb) / 0.05);
 }
 
 .mortgage-calc__tile-value input:focus-visible {
-  box-shadow:
-    0 0 0 5px rgb(var(--avgst-ink-rgb) / 0.05),
-    0 0 0 7px rgb(var(--avgst-ink-rgb) / 0.18);
+  outline: 1px solid rgb(var(--avgst-ink-rgb) / 0.3);
+  outline-offset: 3px;
+  border-radius: 4px;
 }
 
 .mortgage-calc__tile-value span,
