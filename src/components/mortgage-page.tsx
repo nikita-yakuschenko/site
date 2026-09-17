@@ -153,20 +153,25 @@ function MortgageWhoFits({ content }: { content: WithWho }) {
               <li key={item.title}>
                 <Icon size={28} stroke={1.5} aria-hidden="true" />
                 <strong>{item.title}</strong>
-                <p>{nbspText(item.text)}</p>
               </li>
             );
           })}
         </ul>
 
-        <div className="mortgage-rules">
+        {/* Правила — не плашки, а список «правило → пояснение». Плашками
+            они вставали вторым рядом того же вида, что и условия, и шесть
+            карточек читались одним списком из шести равных пунктов. К тому
+            же внутри каждой лежит абзац на полсотни слов: в узкой колонке
+            он набирался мелко и в двенадцать строк. */}
+        <h3 className="mortgage-rules__title">{content.rulesHeading}</h3>
+        <dl className="mortgage-rules">
           {content.rules.map((rule) => (
-            <article key={rule.title}>
-              <h3>{rule.title}</h3>
-              <p>{nbspText(rule.text)}</p>
-            </article>
+            <div key={rule.title}>
+              <dt>{rule.title}</dt>
+              <dd>{nbspText(rule.text)}</dd>
+            </div>
           ))}
-        </div>
+        </dl>
       </div>
     </section>
   );

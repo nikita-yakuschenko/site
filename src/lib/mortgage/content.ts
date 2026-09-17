@@ -10,6 +10,7 @@ type ProgramBlocks = Pick<
   | "whoHeading"
   | "whoLead"
   | "whoFits"
+  | "rulesHeading"
   | "rules"
   | "conditionsEyebrow"
   | "conditionsHeading"
@@ -54,7 +55,17 @@ export type MortgageContent = {
 } & Partial<ProgramBlocks>;
 
 export type WithWho = MortgageContent &
-  Required<Pick<ProgramBlocks, "whoEyebrow" | "whoHeading" | "whoLead" | "whoFits" | "rules">>;
+  Required<
+    Pick<
+      ProgramBlocks,
+      | "whoEyebrow"
+      | "whoHeading"
+      | "whoLead"
+          | "whoFits"
+      | "rulesHeading"
+      | "rules"
+    >
+  >;
 
 export type WithConditions = MortgageContent &
   Required<Pick<ProgramBlocks, "conditionsEyebrow" | "conditionsHeading" | "conditions">>;
