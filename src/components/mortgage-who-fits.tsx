@@ -92,12 +92,18 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
         <h2 id="mortgage-who-title">{content.whoHeading}</h2>
         <p className="mortgage-page__lead">{nbspText(content.whoLead)}</p>
 
+        {/* Четыре условия не встают в ряд: плашке нужна половина ширины под
+            кадр, и на четверти экрана от текста остаётся сотня пикселей.
+            Поэтому четыре складываются по две в ряд, а три остаются
+            строкой. */}
         <ul
-          className={
-            content.whoJoiner
-              ? "mortgage-who"
-              : "mortgage-who mortgage-who--plain"
-          }
+          className={[
+            "mortgage-who",
+            content.whoJoiner ? "" : "mortgage-who--plain",
+            content.whoFits.length === 4 ? "mortgage-who--quad" : "",
+          ]
+            .filter(Boolean)
+            .join(" ")}
         >
           {content.whoFits.map((item, index) => {
             const target = item.opensRule;

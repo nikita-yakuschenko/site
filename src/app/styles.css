@@ -7463,6 +7463,12 @@ textarea:focus-visible {
     gap: var(--gap-tile);
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  /* Четыре условия — две колонки: в четырёх плашка сузилась бы до
+     четверти экрана, а половину её ширины занимает кадр. */
+  .mortgage-who--quad {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .mortgage-who__or {
