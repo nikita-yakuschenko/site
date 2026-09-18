@@ -17,6 +17,9 @@ import { mortgageHref, type MortgageProgramId } from "../lib/mortgage";
  * сельской, здание банка у базовых. Семейной в этом ряду достаётся family2 —
  * кадр под квадратную карточку, а не под широкий первый экран.
  */
+/* Заявленная ширина кадра не меньше нарисованной: у сельской стояло
+   110px при рисуемых 173px — браузер брал вариант в 128 пикселей и
+   растягивал его, отчего колосья и мылили. */
 const PROGRAM_CARDS: readonly {
   id: MortgageProgramId;
   className: string;
@@ -36,7 +39,7 @@ const PROGRAM_CARDS: readonly {
     image: "/persons/family2.png",
     imageW: 1024,
     imageH: 1024,
-    sizes: "170px",
+    sizes: "190px",
     note: nbspText("Для семей с детьми"),
   },
   {
@@ -47,7 +50,7 @@ const PROGRAM_CARDS: readonly {
     image: "/persons/it.png",
     imageW: 904,
     imageH: 975,
-    sizes: "160px",
+    sizes: "190px",
     note: (
       <>
         Для специалистов <span>IT-компаний</span>
@@ -62,7 +65,7 @@ const PROGRAM_CARDS: readonly {
     image: "/persons/agro.png",
     imageW: 587,
     imageH: 918,
-    sizes: "110px",
+    sizes: "190px",
     note: (
       <>
         {nbspText("Для работников АПК")}
@@ -79,7 +82,7 @@ const PROGRAM_CARDS: readonly {
     image: "/persons/bank.png",
     imageW: 1052,
     imageH: 958,
-    sizes: "180px",
+    sizes: "190px",
     note: (
       <>
         {nbspText("Лучшие условия")}
