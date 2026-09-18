@@ -9591,13 +9591,17 @@ textarea:focus-visible {
     background-color 0.2s var(--ease-out);
 }
 
-.mortgage-calc__rate-chip:hover {
+.mortgage-calc__result-metrics .mortgage-calc__rate-chip:hover {
   border-color: rgb(var(--avgst-ink-rgb) / 0.3);
   background: rgb(var(--avgst-ink-rgb) / 0.06);
 }
 
-.mortgage-calc__rate-chip:focus-within {
-  border-color: var(--brand-yellow);
+/* Фокус той же волосяной гранью, что у денежных полей калькулятора, а не
+   жёлтой: жёлтая обводка в панели больше нигде не встречается и читалась
+   чужой. Фон при этом белеет — плашка перестаёт быть кнопкой и становится
+   полем, в котором стоит каретка. */
+.mortgage-calc__result-metrics .mortgage-calc__rate-chip:focus-within {
+  border-color: rgb(var(--avgst-ink-rgb) / 0.35);
   background: #fff;
 }
 
@@ -9607,8 +9611,10 @@ textarea:focus-visible {
 }
 
 .mortgage-calc__rate-edit input {
-  /* Три знака: два под значение и один про запас. */
-  width: 3ch;
+  /* Пять знаков: «15,99» — ставка с сотыми встречается не реже целой.
+     Это запас для браузеров, которые не умеют мерить поле по содержимому;
+     там, где умеют, ширина всё равно идёт по набору. */
+  width: 5ch;
   padding: 0;
   border: 0;
   background: transparent;
@@ -9628,7 +9634,7 @@ textarea:focus-visible {
     width: auto;
     field-sizing: content;
     min-width: 2ch;
-    max-width: 4ch;
+    max-width: 5ch;
   }
 }
 

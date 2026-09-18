@@ -69,14 +69,14 @@ function parseRate(value: string): number | undefined {
   return pct / 100;
 }
 
-/** Оставляет только цифры и одну запятую, не больше одного знака после
- *  неё: ставки называют с десятыми, «16,35» банки не объявляют. */
+/** Оставляет только цифры и одну запятую, не больше двух знаков после
+ *  неё: банки объявляют и сотые — 15,99 встречается не реже 16,3. */
 function cleanRateInput(value: string): string {
   const digits = value.replace(/[^\d,.]/g, "").replace(".", ",");
   const [whole = "", fraction] = digits.split(",");
   const head = whole.slice(0, 2);
   if (fraction === undefined) return head;
-  return `${head},${fraction.slice(0, 1)}`;
+  return `${head},${fraction.slice(0, 2)}`;
 }
 
 function formatRate(rate: number): string {
