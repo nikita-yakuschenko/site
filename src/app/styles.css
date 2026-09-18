@@ -7617,6 +7617,14 @@ textarea:focus-visible {
   .mortgage-steps {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+
+  /* Шесть шагов: первый и последний шире вдвое. Строки заполняются
+     целиком, а крайние шаги — проверка на входе и регистрация на выходе —
+     получают вес, который им и полагается. */
+  .mortgage-steps--bento li:first-child,
+  .mortgage-steps--bento li:last-child {
+    grid-column: span 2;
+  }
 }
 
 .mortgage-steps li {
@@ -7685,6 +7693,22 @@ textarea:focus-visible {
   --gy: 282;
   --gw: 346;
   --gh: 456;
+}
+
+/* Пятый и шестой шаги: у сельской процесс длиннее, и без своих рамок
+   выреза глиф не рисовался вовсе — маске нечего было считать. */
+.mortgage-steps li:nth-child(5) .mortgage-steps__num {
+  --gx: 347;
+  --gy: 280;
+  --gw: 332;
+  --gh: 470;
+}
+
+.mortgage-steps li:nth-child(6) .mortgage-steps__num {
+  --gx: 348;
+  --gy: 270;
+  --gw: 330;
+  --gh: 480;
 }
 
 /* Текст поверх знака: описание шага длиннее названия и заходило под цифру. */

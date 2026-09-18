@@ -55,7 +55,28 @@ type ProgramBlocks = {
     text: string;
     points: readonly string[];
   }[];
-  conditionsNote: string;
+  /* Сноска под спецификацией. Строк может быть несколько: одной строкой
+     «банки вправе устанавливать дополнительные условия» теряется главное —
+     что соответствие программе не гарантирует выдачу, и решение за
+     банком. */
+  conditionsNote: readonly string[];
+  /* Что можно оформить и как это происходит.
+     Блоки необязательные: где своего текста нет, страница показывает
+     общий — тот, что написан для семейной. У IT и сельской он свой,
+     потому что там появляются эскроу, домокомплект и сроки стройки. */
+  financeHeading: string;
+  finance: readonly {
+    title: string;
+    text: string;
+    href: string;
+    cta: string;
+    image: string;
+    /* Плашка без своей страницы: вместо перехода раскрывает форму. */
+    form?: boolean;
+    formLead?: string;
+  }[];
+  stepsHeading: string;
+  steps: readonly { title: string; text: string }[];
   faqEyebrow: string;
   faqHeading: string;
   faq: readonly { question: string; answer: string }[];

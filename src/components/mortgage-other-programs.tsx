@@ -62,9 +62,9 @@ const PROGRAM_CARDS: readonly {
     className: "mortgage-program--agro",
     title: "Сельская ипотека",
     rate: "от 3%",
-    image: "/persons/agro.png",
-    imageW: 587,
-    imageH: 918,
+    image: "/img/cards/wheat.png",
+    imageW: 919,
+    imageH: 1100,
     sizes: "190px",
     note: (
       <>

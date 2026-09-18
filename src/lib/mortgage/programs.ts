@@ -60,7 +60,9 @@ export const MORTGAGE_PROGRAMS: readonly MortgageProgram[] = [
     rate: 0.03,
     minDownPaymentPercent: 0.2,
     minTermYears: 1,
-    maxTermYears: 30,
+    /* Двадцать пять лет, а не тридцать: у сельской свой потолок срока, и
+       общий тридцатилетний давал платёж, которого по программе не бывает. */
+    maxTermYears: 25,
     subsidizedLimitByRegion: { nn: 6_000_000, msk: 6_000_000 },
     maxLoanByRegion: { nn: 6_000_000, msk: 6_000_000 },
     marketRate: 0.185,

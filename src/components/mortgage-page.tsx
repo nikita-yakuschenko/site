@@ -46,8 +46,8 @@ export function MortgagePageContent({
       <MortgageHero content={content} />
       <MortgageCalculator projects={projects} initialProgramId={programId} />
       {hasWho(content) ? <MortgageWhoFits content={content} /> : null}
-      <MortgageSteps />
-      <MortgageFinance projectCount={projects.length} />
+      <MortgageSteps content={content} />
+      <MortgageFinance content={content} projectCount={projects.length} />
       {hasConditions(content) ? <MortgageConditions content={content} /> : null}
       <MortgageMidCta content={content} />
       {hasFaq(content) ? <MortgageFaq content={content} /> : null}
@@ -114,14 +114,29 @@ function MortgageHero({ content }: { content: MortgageContent }) {
   );
 }
 
-function MortgageSteps() {
+function MortgageSteps({ content }: { content: MortgageContent }) {
+  /* Свои шаги, если программа их описала: у IT и сельской в процессе
+     появляются эскроу, проверка территории и регистрация в доме. */
+  const steps = content.steps ?? fm.steps;
   return (
     <section className="section section--muted" aria-labelledby="mortgage-steps-title">
       <div className="section__inner">
         <p className="eyebrow">{fm.stepsEyebrow}</p>
-        <h2 id="mortgage-steps-title">{fm.stepsHeading}</h2>
-        <ol className="mortgage-steps">
-          {fm.steps.map((step, index) => (
+        <h2 id="mortgage-steps-title">
+          {content.stepsHeading ?? fm.stepsHeading}
+        </h2>
+        {/* Шесть шагов в ряду по четыре разваливаются: два последних
+            остаются сиротами в пустой строке. Бенто раскладывает их на
+            четыре колонки, где первый и последний занимают по две — обе
+            строки заполнены целиком. */}
+        <ol
+          className={
+            steps.length === 6
+              ? "mortgage-steps mortgage-steps--bento"
+              : "mortgage-steps"
+          }
+        >
+          {steps.map((step, index) => (
             <li key={step.title}>
               {/* Номер шага — тот же глиф из /img/digits, которым занумерованы
                   участки производства на главной и правила программы. Мелкая
@@ -156,7 +171,14 @@ function MortgageSteps() {
  * Счётчик показывается только там, где число берётся из данных: писать
  * «столько-то домов» на глаз нельзя, а пустая плашка честнее выдуманной.
  */
-function MortgageFinance({ projectCount }: { projectCount: number }) {
+function MortgageFinance({
+  content,
+  projectCount,
+}: {
+  content: MortgageContent;
+  projectCount: number;
+}) {
+  const items = content.finance ?? fm.finance;
   const counts: Partial<Record<string, string>> = {
     "/catalog": plural(projectCount, ["проект", "проекта", "проектов"]),
   };
@@ -165,9 +187,11 @@ function MortgageFinance({ projectCount }: { projectCount: number }) {
     <section className="section" aria-labelledby="mortgage-finance-title">
       <div className="section__inner">
         <p className="eyebrow">{fm.financeEyebrow}</p>
-        <h2 id="mortgage-finance-title">{fm.financeHeading}</h2>
+        <h2 id="mortgage-finance-title">
+          {content.financeHeading ?? fm.financeHeading}
+        </h2>
         <ul className="mortgage-finance">
-          {fm.finance.map((item) => {
+          {items.map((item) => {
             const count = counts[item.href];
             if (item.form) {
               /* У участка нет своей страницы: вместо перехода плашка
@@ -305,10 +329,16 @@ function MortgageConditions({ content }: { content: WithConditions }) {
             </Fragment>
           ))}
           </dl>
-          <p className="mortgage-conditions__note">
-            <span aria-hidden="true">*&nbsp;</span>
-            {nbspText(content.conditionsNote)}
-          </p>
+          <div className="mortgage-conditions__note">
+            {content.conditionsNote.map((line, index) => (
+              <p key={line}>
+                {/* Звёздочка только у первой строки: она отсылает к
+                    заголовку раздела, а не открывает каждый абзац. */}
+                {index === 0 ? <span aria-hidden="true">*&nbsp;</span> : null}
+                {nbspText(line)}
+              </p>
+            ))}
+          </div>
         </div>
       </div>
     </section>

@@ -30,7 +30,8 @@ export function FinanceLeadCard({
   cta: string
   image: string
   /** Заголовок раскрытой формы: без него остаются два поля ни о чём. */
-  formLead: string
+  /* Подзаголовок формы есть не у всякой плашки. */
+  formLead?: string
   heading: string
   body?: string | null
 }) {

@@ -287,7 +287,7 @@ function MortgageShowcase() {
               <br />
               {nbspText("и соц. сферы на селе")}
             </small>
-            <Image className="mortgage-program__art" src="/persons/agro.png" alt="" width={587} height={918} sizes="90px" quality={90} />
+            <Image className="mortgage-program__art" src="/img/cards/wheat.png" alt="" width={919} height={1100} sizes="190px" quality={90} />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>
