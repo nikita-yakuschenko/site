@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { IconX } from "@tabler/icons-react";
+import {
+  IconPencil,
+  IconX,
+} from "@tabler/icons-react";
 import {
   useEffect,
   useEffectEvent,
@@ -496,20 +499,36 @@ export function MortgageCalculator({
                     четырёх. */}
                 {editableRate ? (
                   <strong className="mortgage-calc__rate-edit">
-                    <input
-                      type="text"
-                      inputMode="decimal"
-                      value={rateInput}
-                      aria-label={t.rateAria}
-                      onChange={(event) =>
-                        setRateInput(cleanRateInput(event.target.value))
-                      }
-                      onBlur={() =>
-                        setRateInput(
-                          formatRateValue(parseRate(rateInput) ?? program.rate),
-                        )
-                      }
-                    />
+                    {/* Плашка обводит только число: знак процента к правке
+                        не относится и стоит за ней, как единица измерения
+                        у денежных полей. */}
+                    <span className="mortgage-calc__rate-chip">
+                      <input
+                        type="text"
+                        inputMode="decimal"
+                        value={rateInput}
+                        aria-label={t.rateAria}
+                        onChange={(event) =>
+                          setRateInput(cleanRateInput(event.target.value))
+                        }
+                        onBlur={() =>
+                          setRateInput(
+                            formatRateValue(
+                              parseRate(rateInput) ?? program.rate,
+                            ),
+                          )
+                        }
+                      />
+                      {/* Карандаш — единственное, что отличает ставку от
+                          соседней суммы кредита, которая только читается.
+                          Без него поле выглядит такой же строкой отчёта. */}
+                      <IconPencil
+                        className="mortgage-calc__rate-pen"
+                        size={13}
+                        stroke={2}
+                        aria-hidden="true"
+                      />
+                    </span>
                     <span aria-hidden="true">%</span>
                   </strong>
                 ) : (

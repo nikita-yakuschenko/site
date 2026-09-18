@@ -9552,32 +9552,63 @@ textarea:focus-visible {
 
 /* Ставка, которую набирают.
 
-   Поле стоит на месте самой ставки и набрано ею же. Правила взяты у
-   денежных полей калькулятора: ввод мышью не подсвечивается — место
-   правки показывает каретка, — а для клавиатуры остаётся волосяная линия
-   поверх раскладки, которая не занимает места и ничего не двигает.
+   Поле стоит на месте самой ставки. Плашка обводит только число с
+   карандашом — знак процента к правке не относится и стоит за ней, как
+   единица измерения у денежных полей.
 
-   Свои inline-flex и пунктир снизу пришлось снять: первый проигрывал по
-   весу правилу .mortgage-calc__result-metrics strong { display: block },
-   и процент уезжал на свою строку, а второй выглядел чужим среди полей,
-   где подчёркивания нет ни у одного.
-
-   Селектор с именем блока — чтобы перевесить то самое display: block. */
+   Карандаш нужен потому, что рядом лежит сумма кредита, которая только
+   читается: без него ставка выглядит такой же строкой отчёта, и нажать в
+   неё никто не догадается. */
 .mortgage-calc__result-metrics .mortgage-calc__rate-edit {
   display: flex;
   align-items: baseline;
-  gap: 2px;
+  gap: 5px;
+  width: fit-content;
+}
+
+/* Правило .mortgage-calc__result-metrics span набрано для единицы
+   измерения — одиннадцатым кеглем в половину силы. Плашка тоже span и
+   попадала под него: число выглядело подписью, а не значением. Здесь
+   возвращается вид соседней суммы кредита. */
+.mortgage-calc__result-metrics .mortgage-calc__rate-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 0;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: var(--avgst-ink);
+  /* Поля и грань гасятся отрицательными полями ровно на свою величину:
+     плашка не прибавляет строке высоты, и подпись «ставка» остаётся на
+     одной линии с «сумма кредита». */
+  padding: 1px 6px;
+  margin: -2px -6px;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  border-radius: 7px;
+  background: rgb(var(--avgst-ink-rgb) / 0.03);
+  transition:
+    border-color 0.2s var(--ease-out),
+    background-color 0.2s var(--ease-out);
+}
+
+.mortgage-calc__rate-chip:hover {
+  border-color: rgb(var(--avgst-ink-rgb) / 0.3);
+  background: rgb(var(--avgst-ink-rgb) / 0.06);
+}
+
+.mortgage-calc__rate-chip:focus-within {
+  border-color: var(--brand-yellow);
+  background: #fff;
+}
+
+.mortgage-calc__rate-pen {
+  flex: 0 0 auto;
+  color: rgb(var(--avgst-ink-rgb) / 0.4);
 }
 
 .mortgage-calc__rate-edit input {
-  /* Ширина по содержимому, но в узких границах: между «16» и «%» не
-     остаётся пустоты, а разбег при наборе — от двух знаков до четырёх,
-     и панель от него не дёргается. Где field-sizing не поддержан,
-     остаётся фиксированная ширина под «16,3». */
-  width: 4ch;
-  field-sizing: content;
-  min-width: 2ch;
-  max-width: 4ch;
+  /* Три знака: два под значение и один про запас. */
+  width: 3ch;
   padding: 0;
   border: 0;
   background: transparent;
@@ -9587,12 +9618,23 @@ textarea:focus-visible {
   text-align: left;
 }
 
-.mortgage-calc__rate-edit input:focus {
-  outline: none;
+/* Где браузер умеет мерить поле по содержимому, ширина следует набору:
+   в покое ровно под «16», а при наборе десятых растягивается на знак и
+   возвращается обратно. Прежде это не работало вовсе — field-sizing
+   действует только при width: auto, а стояла жёсткая ширина, которая его
+   и перебивала. */
+@supports (field-sizing: content) {
+  .mortgage-calc__rate-edit input {
+    width: auto;
+    field-sizing: content;
+    min-width: 2ch;
+    max-width: 4ch;
+  }
 }
 
+/* Своей обводки у поля нет: фокус показывает плашка, и вторая рамка
+   внутри первой читалась бы ошибкой. */
+.mortgage-calc__rate-edit input:focus,
 .mortgage-calc__rate-edit input:focus-visible {
-  outline: 1px solid rgb(var(--avgst-ink-rgb) / 0.3);
-  outline-offset: 3px;
-  border-radius: 4px;
+  outline: none;
 }
