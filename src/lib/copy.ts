@@ -1348,6 +1348,7 @@ export const copy = {
     budgetSub: "доступная стоимость дома",
     loanSub: "сумма кредита",
     rateSub: "ставка",
+    rateAria: "Процентная ставка банка, % годовых",
     resultPayment: "Ежемесячный платёж",
     resultBudget: "Доступная стоимость дома",
     about: "примерно до",

@@ -9548,3 +9548,51 @@ textarea:focus-visible {
     max-width: 60%;
   }
 }
+
+
+/* Ставка, которую набирают.
+
+   Поле стоит на месте самой ставки и набрано ею же. Правила взяты у
+   денежных полей калькулятора: ввод мышью не подсвечивается — место
+   правки показывает каретка, — а для клавиатуры остаётся волосяная линия
+   поверх раскладки, которая не занимает места и ничего не двигает.
+
+   Свои inline-flex и пунктир снизу пришлось снять: первый проигрывал по
+   весу правилу .mortgage-calc__result-metrics strong { display: block },
+   и процент уезжал на свою строку, а второй выглядел чужим среди полей,
+   где подчёркивания нет ни у одного.
+
+   Селектор с именем блока — чтобы перевесить то самое display: block. */
+.mortgage-calc__result-metrics .mortgage-calc__rate-edit {
+  display: flex;
+  align-items: baseline;
+  gap: 2px;
+}
+
+.mortgage-calc__rate-edit input {
+  /* Ширина по содержимому, но в узких границах: между «16» и «%» не
+     остаётся пустоты, а разбег при наборе — от двух знаков до четырёх,
+     и панель от него не дёргается. Где field-sizing не поддержан,
+     остаётся фиксированная ширина под «16,3». */
+  width: 4ch;
+  field-sizing: content;
+  min-width: 2ch;
+  max-width: 4ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+
+.mortgage-calc__rate-edit input:focus {
+  outline: none;
+}
+
+.mortgage-calc__rate-edit input:focus-visible {
+  outline: 1px solid rgb(var(--avgst-ink-rgb) / 0.3);
+  outline-offset: 3px;
+  border-radius: 4px;
+}

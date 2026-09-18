@@ -61,6 +61,11 @@ function buildParts(
   program: MortgageProgram,
   region: RegionCode,
   termMonths: number,
+  /* Ставка, заданная вручную. Нужна там, где государственной ставки нет
+     и её называет банк: человек приходит с конкретным предложением на
+     руках и хочет посчитать по нему, а не по средней цифре с витрины.
+     У программ с льготной частью не применяется — там ставка не его. */
+  rateOverride?: number,
 ): { parts: LoanPart[]; isCombined: boolean } {
   const limit = subsidizedLimit(program, region);
   const useSplit =
@@ -69,7 +74,7 @@ function buildParts(
     loanAmount > limit;
 
   if (!useSplit) {
-    const rate = program.rate;
+    const rate = rateOverride ?? program.rate;
     return {
       isCombined: false,
       parts: [
@@ -120,6 +125,8 @@ export type CalculateMortgageInput = {
   propertyPrice: number;
   downPayment: number;
   termYears: number;
+  /** Годовая ставка долей (0.163 = 16,3%), если её задал человек. */
+  rateOverride?: number;
 };
 
 export function calculateMortgage(
@@ -159,6 +166,7 @@ export function calculateMortgage(
     program,
     input.region,
     termMonths,
+    input.rateOverride,
   );
   const monthlyPayment = parts.reduce((s, p) => s + p.monthlyPayment, 0);
   const totalPayment = monthlyPayment * termMonths;
@@ -192,6 +200,7 @@ export function calculateMaxPropertyPrice(input: {
   monthlyPayment: number;
   downPayment: number;
   termYears: number;
+  rateOverride?: number;
 }): {
   maxLoan: number;
   maxPropertyPrice: number;
@@ -217,6 +226,7 @@ export function calculateMaxPropertyPrice(input: {
       program,
       input.region,
       termMonths,
+      input.rateOverride,
     );
     if (pay <= payment) lo = mid;
     else hi = mid;
@@ -242,6 +252,7 @@ export function calculateMaxPropertyPrice(input: {
   const result = calculateMortgage({
     programId: input.programId,
     region: input.region,
+    rateOverride: input.rateOverride,
     propertyPrice: maxPropertyPrice,
     downPayment: Math.min(
       downPayment,
@@ -258,8 +269,15 @@ function paymentForLoan(
   program: MortgageProgram,
   region: RegionCode,
   termMonths: number,
+  rateOverride?: number,
 ): number {
-  const { parts } = buildParts(loanAmount, program, region, termMonths);
+  const { parts } = buildParts(
+    loanAmount,
+    program,
+    region,
+    termMonths,
+    rateOverride,
+  );
   return parts.reduce((s, p) => s + p.monthlyPayment, 0);
 }
 

@@ -48,6 +48,34 @@ const TERM_YEAR_PILLS = [10, 15, 20, 25, 30] as const;
 
 type FieldPill = { value: number; label: string; active?: boolean };
 
+/** Доля → строка для поля: 0.163 → «16,3». Без знака процента: он стоит
+ *  в разметке отдельно и не попадает под редактирование. */
+function formatRateValue(rate: number): string {
+  const pct = rate * 100;
+  return Number.isInteger(pct)
+    ? String(pct)
+    : pct.toFixed(2).replace(/0$/, "").replace(".", ",");
+}
+
+/** Строка поля → доля. Пустая или бессмысленная строка даёт undefined, и
+ *  расчёт идёт по ставке программы: обнулять платёж на полпути к числу
+ *  незачем. Потолок — 99: три знака в поле фиксируют его ширину. */
+function parseRate(value: string): number | undefined {
+  const pct = Number(value.replace(",", "."));
+  if (!Number.isFinite(pct) || pct <= 0 || pct > 99) return undefined;
+  return pct / 100;
+}
+
+/** Оставляет только цифры и одну запятую, не больше одного знака после
+ *  неё: ставки называют с десятыми, «16,35» банки не объявляют. */
+function cleanRateInput(value: string): string {
+  const digits = value.replace(/[^\d,.]/g, "").replace(".", ",");
+  const [whole = "", fraction] = digits.split(",");
+  const head = whole.slice(0, 2);
+  if (fraction === undefined) return head;
+  return `${head},${fraction.slice(0, 1)}`;
+}
+
 function formatRate(rate: number): string {
   const pct = rate * 100;
   return Number.isInteger(pct) ? `${pct}%` : `${pct.toFixed(1).replace(".", ",")}%`;
@@ -99,6 +127,22 @@ export function MortgageCalculator({
     return Math.round(price * program.minDownPaymentPercent);
   });
   const [termYears, setTermYears] = useState(program.maxTermYears);
+  /* Своя ставка — только у рыночной: государственной ставки там нет, её
+     называет банк, и человек приходит с конкретным предложением на руках.
+     У льготных программ ставка задана программой, и менять её нельзя.
+
+     Хранится строкой, а не числом: в ней набирают «16,3», и промежуточные
+     «16,» при вводе — нормальное состояние, которое число не выражает. */
+  const [rateInput, setRateInput] = useState(() =>
+    formatRateValue(program.rate),
+  );
+
+  useEffect(() => {
+    setRateInput(formatRateValue(program.rate));
+  }, [program.rate]);
+
+  const editableRate = programId === "market";
+  const rateOverride = editableRate ? parseRate(rateInput) : undefined;
 
   const opened = useRef(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -133,8 +177,9 @@ export function MortgageCalculator({
         propertyPrice,
         downPayment,
         termYears,
+        rateOverride,
       }),
-    [programId, region, propertyPrice, downPayment, termYears],
+    [programId, region, propertyPrice, downPayment, termYears, rateOverride],
   );
 
   const budgetPack = useMemo(
@@ -142,11 +187,12 @@ export function MortgageCalculator({
       calculateMaxPropertyPrice({
         programId,
         region,
+        rateOverride,
         monthlyPayment: comfortPayment,
         downPayment,
         termYears,
       }),
-    [programId, region, comfortPayment, downPayment, termYears],
+    [programId, region, comfortPayment, downPayment, termYears, rateOverride],
   );
 
   const activeResult =
@@ -443,11 +489,36 @@ export function MortgageCalculator({
                 <span>{t.loanSub}</span>
               </div>
               <div>
-                <strong>
-                  {activeResult.isCombined
-                    ? `от ${displayRate}`
-                    : displayRate}
-                </strong>
+                {/* У рыночной ставку набирают прямо здесь — в том месте,
+                    где она и показана. Отдельного поля в панели нет
+                    намеренно: строка уже есть, и новое поле сдвинуло бы
+                    всё остальное ради программы, которая одна из
+                    четырёх. */}
+                {editableRate ? (
+                  <strong className="mortgage-calc__rate-edit">
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      value={rateInput}
+                      aria-label={t.rateAria}
+                      onChange={(event) =>
+                        setRateInput(cleanRateInput(event.target.value))
+                      }
+                      onBlur={() =>
+                        setRateInput(
+                          formatRateValue(parseRate(rateInput) ?? program.rate),
+                        )
+                      }
+                    />
+                    <span aria-hidden="true">%</span>
+                  </strong>
+                ) : (
+                  <strong>
+                    {activeResult.isCombined
+                      ? `от ${displayRate}`
+                      : displayRate}
+                  </strong>
+                )}
                 <span>{t.rateSub}</span>
               </div>
             </div>
