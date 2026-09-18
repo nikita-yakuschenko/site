@@ -46,7 +46,7 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
                     срезался вместе с ним. */}
                 {index > 0 ? (
                   <li className="mortgage-who__or" aria-hidden="true">
-                    или
+                    {content.whoJoiner}
                   </li>
                 ) : null}
                 <li className="mortgage-program mortgage-who__card">
