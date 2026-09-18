@@ -19,14 +19,14 @@ const timeOnly = new Intl.DateTimeFormat(LOCALE, {
   hourCycle: 'h23',
 })
 
-const money = new Intl.NumberFormat(LOCALE, {
-  style: 'currency',
-  currency: CURRENCY,
-  currencyDisplay: 'symbol',
-  maximumFractionDigits: 0,
-})
+/* Без style: currency: Intl в русской локали ставит знак ₽, а на сайте
+   деньги пишутся словом «руб.». Форматируем только само число, единицу
+   приписываем сами. */
+const money = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 0 })
 
 const number = new Intl.NumberFormat(LOCALE, { maximumFractionDigits: 1 })
+
+export const RUB_UNIT = 'руб.'
 
 export function formatDate(value: Date | string | number): string {
   return dateOnly.format(new Date(value))
@@ -45,7 +45,7 @@ export function formatNumber(value: number): string {
 }
 
 export function formatRub(amount: number): string {
-  return money.format(amount)
+  return `${money.format(amount)} ${RUB_UNIT}`
 }
 
 export function formatFromRub(amount: number): string {

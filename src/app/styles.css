@@ -89,6 +89,17 @@
   /* Одно скругление на обе поверхности: разные радиусы у соседних плашек
      читались как разные компоненты. */
   --surface-radius: 14px;
+
+  /* Высота липкой полосы поиска в каталоге: 32 сверху, поле 46, 32 снизу.
+     Белое поле по обе стороны нужно, чтобы карточки уходили под полосу
+     чисто, а само поле не липло к краю экрана. От этой высоты отсчитываются
+     все, кто липнет ниже, поэтому число одно и живёт здесь. */
+  --catalog-bar: 110px;
+
+  /* Длина растворения под полосой. Короткое: на длинном переходе карточки
+     успевают побледнеть целой строкой и читаются размытыми, а не уходящими
+     под полосу. */
+  --catalog-fade: 10px;
 }
 
 * {
@@ -177,6 +188,15 @@ a {
   --tech-panel-shadow: 0 8px 24px rgb(var(--avgst-ink-rgb) / 0.12);
   /* Нижняя грань, иначе белая полоса сливается со светлым кадром/страницей. */
   box-shadow: inset 0 -1px 0 rgb(var(--avgst-ink-rgb) / 0.1);
+}
+
+/* На внутренних страницах нижней грани у полосы нет.
+   Она нужна там, где белая полоса лежит на светлом кадре и иначе с ним
+   сливается. Под сплошной шапкой границу и так задаёт тёмная плашка, а
+   вот при прокрутке эта грань остаётся последней видимой строкой пикселей
+   и читается посторонней линией поперёк всего экрана. */
+.site-header--solid .site-header__bar[data-tech-theme="light"] {
+  box-shadow: none;
 }
 
 /* Тень панели только вниз и в стороны: вверх на стыке с полосой она
@@ -624,6 +644,18 @@ a {
 .site-header--solid {
   position: relative;
 }
+/* На странице без кадра плашка встаёт в поток.
+   Вне потока она нужна только над фотографией первого экрана, где обязана
+   лежать поверх неё и ничего не двигать. На сплошной шапке кадра нет, и
+   абсолютная плашка просто ложилась на верх содержимого: это не было видно
+   лишь потому, что у секций сверху стоял большой отступ. В потоке она
+   честно занимает своё место, а после закрытия страница подбирается вверх.*/
+.site-header--solid .site-notice {
+  position: relative;
+  top: 0;
+  margin-top: 8px;
+}
+
 .site-header--solid .site-header__plaque {
   background: var(--avgst-ink);
   box-shadow: var(--header-solid-shadow);
@@ -2473,6 +2505,14 @@ a {
   text-wrap: balance;
 }
 
+/* Куски headingLines не рвутся внутри себя: перенос возможен только по
+   пробелам между ними, то есть по авторским точкам. Жёсткого <br> нет —
+   в узкой колонке строки те же, но если места когда-нибудь хватит,
+   заголовок соберётся сам. text-wrap: balance выбирает из этих же точек. */
+.independent-review__copy h2 .heading-line {
+  white-space: nowrap;
+}
+
 .independent-review__lead {
   max-width: 42ch;
   margin: 16px 0 0;
@@ -2786,6 +2826,14 @@ a {
 }
 
 .video-stories__intro .eyebrow {
+  white-space: nowrap;
+}
+
+/* Заголовок ломается по местам из headingLines, но только когда не влез.
+   На широком экране «Дома, в которых уже живут» встаёт одной строкой:
+   куски не рвутся внутри себя, а пробел между ними — обычная точка
+   переноса. Жёсткого <br> здесь больше нет. */
+.video-stories__intro h2 .heading-line {
   white-space: nowrap;
 }
 
@@ -3886,6 +3934,685 @@ a {
   margin: 32px 0 0;
   font-size: 16px;
   color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+/* ======================================================================
+   Каталог: колонка отбора слева, выдача справа.
+   ====================================================================== */
+
+/* Служебное скрытие: элемент не виден, но остаётся для поиска и
+   скринридера. display: none и visibility: hidden не годятся, они убирают
+   его и оттуда. */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* Каталог начинается сразу, без разгона.
+   У прочих секций сверху стоит --gap-section: он отбивает смысловой блок от
+   соседнего блока страницы. Здесь соседа нет, над секцией только шапка, и
+   56 пикселей превращались в пустую полосу. Шаг взят тот же, что между
+   поиском и выдачей, чтобы вся страница держала один ритм. */
+.catalog-section {
+  /* Верхний отступ отдан липкой полосе поиска: он должен ехать вместе с
+     ней, иначе в закреплённом виде поле встаёт вплотную к краю экрана. */
+  padding-top: 0;
+}
+
+/* Поиск по названию. Наверху и во всю ширину: он не сужает выдачу по
+   свойствам дома, а ищет конкретный проект, который человек уже знает по
+   имени. Поэтому стоит над колонкой отбора, а не внутри неё. */
+.catalog__bar {
+  position: sticky;
+  top: 0;
+  z-index: 6;
+  background: #fff;
+  padding-block: var(--gap-stack);
+  /* Подложка шире колонки. Правый край карточек и правый край полосы стояли
+     ровно на одном иксе, и на общей границе двух слоёв вылезал шов в
+     пиксель, тянувшийся вертикальной линией по всей странице. Вынос за
+     колонку убирает совпадение: карточки уходят под полосу с запасом. */
+  margin-inline: calc(var(--page-gutter) * -1);
+  padding-inline: var(--page-gutter);
+}
+
+/* Растворение под полосой отдельным слоем, а не градиентом в самой
+   подложке: иначе нижний отступ съедался бы прозрачностью и выходил ниже
+   верхнего, хотя по числам они равны. Здесь оба по 32, а мягкий край живёт
+   уже за пределами полосы. */
+.catalog__bar::after {
+  content: "";
+  opacity: 0;
+  transition: opacity 0.15s var(--ease-out);
+  position: absolute;
+  top: 100%;
+  right: 0;
+  left: 0;
+  height: var(--catalog-fade);
+  background: linear-gradient(to bottom, #fff, rgb(255 255 255 / 0));
+  pointer-events: none;
+}
+
+.catalog__bar.is-stuck::after {
+  opacity: 1;
+}
+
+/* Поиск и кнопка отбора одной строкой: на телефоне отдельный ряд под
+   кнопку стоил бы целых 60 пикселей закреплённой высоты, не показывая при
+   этом ни одного дома. */
+.catalog__barrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.catalog__barrow .catalog-search {
+  flex: 1;
+  min-width: 0;
+}
+
+.catalog-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  height: 46px;
+  padding: 0 14px;
+  margin: 0;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  border-radius: 10px;
+  background: #fff;
+  color: rgb(var(--avgst-ink-rgb) / 0.4);
+}
+
+/* Фокус показывает вся коробка, а не инпут внутри неё: глобальное кольцо
+   на самом поле рисовало прямоугольник внутри скруглённой рамки, и это
+   выглядело как чужая обводка поверх нашей. Кольцо убирать нельзя, по нему
+   ориентируются с клавиатуры, поэтому оно просто переехало наружу. */
+.catalog-search:focus-within {
+  border-color: var(--avgst-ink);
+  color: var(--avgst-ink);
+  outline: 2px solid var(--avgst-green);
+  outline-offset: 2px;
+}
+
+.catalog-search input:focus,
+.catalog-search input:focus-visible {
+  outline: none;
+}
+
+.catalog-search input {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  border: 0;
+  outline: 0;
+  background: none;
+  color: var(--avgst-ink);
+  font-size: 15px;
+}
+
+.catalog-search input::placeholder {
+  color: rgb(var(--avgst-ink-rgb) / 0.38);
+}
+
+/* Родная крестовина у type="search" в вебките своя и не по стилю. */
+.catalog-search input::-webkit-search-cancel-button {
+  appearance: none;
+}
+
+.catalog-search button {
+  display: inline-flex;
+  padding: 4px;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(var(--avgst-ink-rgb) / 0.08);
+  color: var(--avgst-ink);
+  cursor: pointer;
+}
+
+.catalog__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap-stack);
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+}
+
+@media (min-width: 640px) {
+  .grid-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+/* Колонка отбора появляется с 1024: уже этого 240 пикселей плюс две
+   колонки карточек в страницу не встают, и до этой ширины панель едет
+   над выдачей. */
+@media (min-width: 1024px) {
+  .catalog__layout {
+    grid-template-columns: 240px minmax(0, 1fr);
+    gap: var(--gap-split);
+    /* align-items здесь не ставим. При start колонка становится ростом со
+       своё содержимое, а липкий блок ездит только в границах родителя, и
+       ехать ему оказывается некуда: панель уходит вверх вместе с выдачей.
+       Растянутая на всю высоту доски колонка это и есть та дорожка, по
+       которой блок едет. */
+  }
+}
+
+.cfilter {
+  min-width: 0;
+}
+
+/* Кнопка раскрытия. Нужна там, где колонка целиком не помещается: с 1024
+   её прячем, ниже она остаётся липкой у верхнего края. Уговор был, что
+   отбор всегда на своём месте, и на телефоне это означает не «занимает
+   пол-экрана всегда», а «дотянуться можно не прокручивая назад». */
+/* Один знак, без коробки под ним: ни рамки, ни подложки, ни подсветки при
+   наведении. Область нажатия ростом с поле поиска минус пиксель сверху и
+   снизу, сам знак обычного размера. */
+.cfilter__toggle {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  min-width: 44px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--avgst-ink);
+  font-size: 15px;
+  cursor: pointer;
+}
+
+/* Сброс: красный только у знака, заливать кнопку тревожным цветом незачем,
+   действие не опасное. */
+.cfilter__toggle.is-reset {
+  color: #e85d4a;
+}
+
+/* В самый узкий экран подпись рядом с полем поиска не встаёт: остаётся
+   значок, смысл которого понятен и без слова. */
+
+
+/* Ниже 1024 колонка раскрывается по кнопке, выше стоит всегда.
+   Липнет здесь весь блок отбора, а не кнопка внутри него: элемент с
+   position: sticky ездит только в границах своего родителя, а колонка в
+   свёрнутом виде ровно с кнопку высотой, и липнуть ей было негде. Поэтому
+   на узком экране раскладка перестаёт быть сеткой: у блочного потомка
+   родителем становится вся доска, и блоку есть куда ехать. */
+@media (max-width: 1023px) {
+  /* Полоса здесь короче, и все, кто от неё отсчитывается, тоже: число
+     одно, поэтому правится в одном месте. */
+  :root {
+    --catalog-bar: 78px;
+  }
+
+  .catalog__layout {
+    display: block;
+  }
+
+  /* На телефоне закреплённое сверху стоит дорого: 110 пикселей полосы плюс
+     кнопка отбора это пятая часть экрана, которая не показывает ни одного
+     дома. Поле дышит вдвое скромнее, высота полосы падает со 110 до 78. */
+  .catalog__bar {
+    padding-block: 16px;
+  }
+
+  .cfilter {
+    position: sticky;
+    /* Плюс растворяющийся край полосы, иначе он ложился бы на кнопку. */
+    top: calc(var(--catalog-bar) + var(--catalog-fade));
+    z-index: 5;
+    /* Шаг между поиском, кнопкой отбора и выдачей один и тот же: свои
+       поля у блока превращали бы его из 16 в 24. */
+    margin-bottom: 16px;
+    background: #fff;
+  }
+
+  .cfilter__sticky {
+    display: none;
+  }
+
+  /* Раскрытая панель это лист во весь оставшийся экран, от полосы поиска до
+     низа. Иначе она встаёт в поток на своём месте и уходит вниз за край:
+     предельная высота считалась бы от закреплённого положения, а в покое
+     панель стоит намного ниже, и кнопка возврата к выдаче оказывалась за
+     пределами экрана. */
+  /* Пока лист открыт, полоса поиска встаёт поверх страницы у верхнего края:
+     лист отсчитывается от неё, а в покое она стоит ниже шапки, и лист
+     накрывал бы её собой. */
+  .catalog__bar.is-sheet {
+    position: fixed;
+    top: 0;
+    right: 0;
+    left: 0;
+    /* Выше шапки сайта: у неё 30, и она накрывала бы собой и полосу, и
+       верх листа. */
+    z-index: 40;
+    margin-inline: 0;
+    padding-inline: var(--page-gutter);
+  }
+
+  .is-catalog-sheet,
+  .is-catalog-sheet body {
+    overflow: hidden;
+  }
+
+  /* Липкий блок с z-index создаёт свой контекст наложения, и лист внутри
+     него не может подняться выше шапки сайта, какое число ему ни ставь.
+     Поэтому поднимается сам блок. */
+  .cfilter:has(.cfilter__sticky.is-open) {
+    z-index: 39;
+  }
+
+  .cfilter__sticky.is-open {
+    position: fixed;
+    top: var(--catalog-bar);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 39;
+    /* Колонка из прокручиваемой части и неподвижного подвала: липкая кнопка
+       внутри прокрутки накрывала собой последние условия. */
+    display: flex;
+    flex-direction: column;
+    padding: 12px var(--page-gutter);
+    background: #fff;
+    overflow: hidden;
+  }
+
+  .cfilter__sticky.is-open .cfilter__scroll {
+    flex: 1;
+    min-height: 0;
+    /* Нижний край растворяется: обрезанная ровной линией строка читается как
+       конец списка, и до оставшихся условий никто не домотает. Снизу оставлен
+       такой же по высоте отступ, поэтому когда список помещается целиком,
+       растворение приходится на пустоту и не видно. */
+    padding-bottom: 20px;
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+/* Липкая: отбор должен быть перед глазами всю прокрутку. Шапка каталога не
+   липкая, поэтому отступ сверху нужен небольшой, только на воздух. */
+@media (min-width: 1024px) {
+  .cfilter__toggle {
+    display: none;
+  }
+
+  .cfilter__sticky {
+    position: sticky;
+    top: calc(var(--catalog-bar) + var(--gap-stack));
+    max-height: calc(100svh - var(--catalog-bar) - var(--gap-stack) * 2);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+}
+
+.cfilter__count {
+  margin: 0 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.5);
+}
+
+.cfilter__group {
+  margin: 0 0 20px;
+  padding: 0;
+  border: 0;
+}
+
+/* Разделительная линия и воздух над ней. padding-top на самом fieldset
+   давать нельзя: legend лежит в его верхней грани, и padding ложится между
+   подписью и содержимым, а не над подписью, отчего разрыв внутри группы
+   становился вдвое больше, чем у соседей. Поэтому воздух уходит в legend. */
+.cfilter__group--quiet {
+  margin-top: 20px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+}
+
+.cfilter__group--quiet .cfilter__legend {
+  padding-top: 16px;
+}
+
+.cfilter__group--fav {
+  margin-bottom: 20px;
+}
+
+.cfilter__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 8px;
+  align-items: baseline;
+  width: 100%;
+  padding: 0;
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.45);
+}
+
+.cfilter__legend span {
+  margin-left: auto;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--avgst-ink);
+}
+
+/* Ползунок сайта. Один на все места: и отбор в каталоге, и калькулятор
+   ипотеки. Раньше калькулятор рисовал нативный input[type=range] с
+   accent-color, то есть вид операционной системы, и рядом с каталогом это
+   выглядело как два разных сайта.
+
+   Дорожка тонкая, ручка крупная: попасть по ней надо и мышью, и пальцем,
+   а видеть достаточно линию. */
+.ui-slider {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 20px;
+  touch-action: none;
+  user-select: none;
+}
+
+.ui-slider__track {
+  position: relative;
+  flex-grow: 1;
+  height: 4px;
+  border-radius: 2px;
+  background: rgb(var(--avgst-ink-rgb) / 0.12);
+}
+
+.ui-slider__range {
+  position: absolute;
+  height: 100%;
+  border-radius: 2px;
+  background: var(--avgst-ink);
+}
+
+.ui-slider__thumb {
+  display: block;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  border: 2px solid var(--avgst-ink);
+  cursor: grab;
+}
+
+.ui-slider__thumb:active {
+  cursor: grabbing;
+}
+
+.ui-slider__thumb:focus-visible {
+  outline: 2px solid var(--avgst-green);
+  outline-offset: 2px;
+}
+
+/* Отдельные бейджи, а не сплошная сегментированная полоса.
+   У полосы разделители шли тёмным по тёмному и на залитых ячейках
+   пропадали: выбранные подряд значения слипались в одну плашку, и сколько
+   их выбрано, прочитать было нельзя. У бейджей граница каждого значения
+   своя и видна всегда, при любом числе выбранного. */
+.cfilter__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.cfilter__badges button {
+  min-width: 42px;
+  height: 34px;
+  padding: 0 13px;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  /* Тот же радиус, что у поля поиска и кнопки избранного рядом: скругление
+     в колонке одно на все элементы. Пилюля со скруглением в половину
+     высоты выбивалась из этого ряда. */
+  border-radius: 8px;
+  background: #fff;
+  color: var(--avgst-ink);
+  font-size: 13px;
+  cursor: pointer;
+}
+
+.cfilter__badges button.is-on {
+  background: var(--avgst-ink);
+  border-color: var(--avgst-ink);
+  color: #fff;
+}
+
+/* Чекбоксы, а не радиокнопки с вариантом «не важно».
+   Отбор здесь множественный, как у спален и этажей: ничего не отмечено это
+   и есть «не важно», отдельная кнопка под это не нужна. Подписи вроде
+   «Панельно-каркасная» в 240 пикселей в строку не встают, поэтому список
+   вертикальный, а родство даёт общий отступ и один кегль. */
+.cfilter__checks {
+  display: grid;
+  gap: 2px;
+}
+
+.cfilter__check {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  min-height: 30px;
+  font-size: 14px;
+  line-height: 1.3;
+  color: var(--avgst-ink);
+  cursor: pointer;
+}
+
+.cfilter__check input {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  accent-color: var(--avgst-ink);
+  cursor: pointer;
+}
+
+.cfilter__fav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  height: 38px;
+  padding: 0 12px;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--avgst-ink);
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.cfilter__fav span {
+  margin-left: auto;
+  font-size: 12px;
+  color: rgb(var(--avgst-ink-rgb) / 0.45);
+}
+
+.cfilter__fav.is-on {
+  background: var(--avgst-ink);
+  border-color: var(--avgst-ink);
+  color: #fff;
+}
+
+.cfilter__fav.is-on span {
+  color: rgb(255 255 255 / 0.6);
+}
+
+/* Снимаемые условия. Дублируют состояние панели нарочно: снять условие
+   надо там же, где видишь результат. */
+.cfilter__active {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  padding-top: 16px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+}
+
+.cfilter__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: 27px;
+  padding: 0 10px;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  border-radius: 999px;
+  background: #fff;
+  color: var(--avgst-ink);
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.cfilter__reset {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border: 0;
+  background: none;
+  padding: 0;
+  font-size: 12px;
+  color: var(--avgst-green);
+  cursor: pointer;
+}
+
+/* Кнопка возврата к выдаче. На широком экране её нет: панель стоит рядом с
+   карточками, уходить неоткуда. Липнет к низу панели, потому что панель
+   прокручивается, и кнопка в конце списка требовала бы домотать до неё. */
+.cfilter__apply {
+  display: none;
+}
+
+@media (max-width: 1023px) {
+  /* Лист плотнее колонки на десктопе: там высота не ограничена, а здесь всё
+     должно поместиться целиком. Ужимаются только шаги между группами и
+     подписями, сами элементы управления остаются прежнего размера, иначе по
+     ним станет труднее попадать пальцем. */
+  .cfilter__sticky.is-open .cfilter__group {
+    margin-bottom: 12px;
+  }
+
+  .cfilter__sticky.is-open .cfilter__group:last-of-type {
+    margin-bottom: 0;
+  }
+
+  .cfilter__sticky.is-open .cfilter__legend {
+    margin-bottom: 6px;
+  }
+
+  .cfilter__sticky.is-open .cfilter__group--quiet {
+    margin-top: 14px;
+  }
+
+  .cfilter__sticky.is-open .cfilter__group--quiet .cfilter__legend {
+    padding-top: 12px;
+  }
+
+  .cfilter__sticky.is-open .cfilter__check {
+    min-height: 28px;
+  }
+
+  .cfilter__sticky.is-open .cfilter__scroll {
+    padding-bottom: 12px;
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 12px), transparent);
+  }
+
+  /* Неподвижный низ листа: избранное, снятые условия и кнопка возврата. */
+  .cfilter__sticky.is-open > .cfilter__group--fav,
+  .cfilter__sticky.is-open > .cfilter__active {
+    flex: none;
+    margin-bottom: 0;
+    padding-top: 10px;
+  }
+
+  .cfilter__sticky.is-open > .cfilter__active {
+    max-height: 30vh;
+    overflow-y: auto;
+  }
+
+  .cfilter__apply {
+    flex: none;
+    display: block;
+    width: 100%;
+    height: 46px;
+    margin-top: 10px;
+    border: 0;
+    border-radius: 10px;
+    background: var(--avgst-ink);
+    color: #fff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+}
+
+.catalog__results {
+  min-width: 0;
+}
+
+.catalog__results .grid-2:first-of-type {
+  margin-top: 0;
+}
+
+/* Граница между подходящими под отбор и остальным каталогом.
+   Выдача не обрывается на последней подходящей карточке, поэтому рубеж
+   должен читаться безошибочно: иначе человек примет хвост за результат
+   отбора. Отсюда и линия сверху, и явный заголовок, а не одна лишь
+   пустота между сетками. */
+/* Это строка состояния, а не заголовок раздела. Глобальный .section h2
+   делает её капсом в 30 пикселей, и над сеткой карточек она начинает
+   кричать. Здесь тот же тихий регистр, что у прочих служебных строк
+   каталога: набор условий поменялся, счёт обновился, кричать не о чем. */
+.section .catalog__band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 4px 10px;
+  margin: 0 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.section .catalog__band--rest {
+  margin-top: 48px;
+  padding-top: 22px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+}
+
+.catalog__band .catalog__count {
+  margin: 0;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+  color: rgb(var(--avgst-ink-rgb) / 0.4);
 }
 
 .catalog-filters {
@@ -8766,13 +9493,6 @@ textarea:focus-visible {
   text-align: right;
 }
 
-.mortgage-calc__tile input[type="range"] {
-  width: 100%;
-  height: 14px;
-  margin: 0;
-  accent-color: var(--avgst-ink);
-}
-
 .mortgage-calc__pills {
   display: flex;
   flex-wrap: wrap;
@@ -9643,4 +10363,14 @@ textarea:focus-visible {
 .mortgage-calc__rate-edit input:focus,
 .mortgage-calc__rate-edit input:focus-visible {
   outline: none;
+}
+
+/* Сброс живёт в полосе поиска, второй такой же кнопке в панели делать
+   нечего. Снимаемые условия рядом остаются: они убирают по одному.
+   Правило стоит в конце файла: базовое описание .cfilter__reset идёт ниже
+   блока узкого экрана, и раньше оно перебивало это скрытие. */
+@media (max-width: 1023px) {
+  .cfilter__reset {
+    display: none;
+  }
 }

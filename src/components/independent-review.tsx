@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { IconBuildingFactory2, IconMapPin } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
 import { VideoLightbox, reviewEmbedSrc } from "./video-lightbox";
@@ -27,10 +27,10 @@ export function IndependentReview() {
             <p className="eyebrow">{data.eyebrow}</p>
             <h2 id="independent-review-title">
               {data.headingLines.map((line, index) => (
-                <span key={line}>
-                  {index > 0 ? <br /> : null}
-                  {nbspText(line)}
-                </span>
+                <Fragment key={line}>
+                  {index > 0 ? " " : null}
+                  <span className="heading-line">{nbspText(line)}</span>
+                </Fragment>
               ))}
             </h2>
             <p className="independent-review__lead">{nbspText(data.lead)}</p>

@@ -6,16 +6,44 @@ export function isCatalogSeries(value: string): value is CatalogSeries {
   return (CATALOG_SERIES as readonly string[]).includes(value)
 }
 
+/**
+ * Технология. Обе разновидности каркасной и отличаются только глубиной
+ * заводской готовности: модульная собирает модули из панелей на заводе,
+ * панельно-каркасная везёт те же панели на участок.
+ */
+export const CATALOG_TECHNOLOGIES = ['panel', 'modular'] as const
+
+export type CatalogTechnology = (typeof CATALOG_TECHNOLOGIES)[number]
+
+export function isCatalogTechnology(value: string): value is CatalogTechnology {
+  return (CATALOG_TECHNOLOGIES as readonly string[]).includes(value)
+}
+
+/** Отрезок с необязательными краями: 80-140, 80-, -140. */
+export type Range = { min?: number; max?: number }
+
+/**
+ * Набор условий отбора. Единственное описание того, по чему вообще можно
+ * фильтровать каталог: разбор адреса, провайдер и панель читают отсюда,
+ * чтобы схема не разъехалась по трём местам.
+ */
+export type CatalogFilters = {
+  /** Поиск по названию проекта. */
+  q?: string
+  series?: CatalogSeries
+  tech?: CatalogTechnology[]
+  area?: Range
+  price?: Range
+  bedrooms?: number[]
+  bathrooms?: number[]
+  floors?: number[]
+}
+
 export type ProjectQuery = {
   siteCode: string
   ids?: string[]
   limit?: number
-  series?: CatalogSeries
-  floors?: number
-  minArea?: number
-  maxArea?: number
-  /** Верхняя граница ориентировочной цены (₽). */
-  maxPrice?: number
+  filters?: CatalogFilters
 }
 
 export type CatalogOption = {
@@ -40,6 +68,7 @@ export type CatalogProject = {
   imageUrl: string
   technologyBadge: string
   series: CatalogSeries
+  technology: CatalogTechnology
   href: string
   description: string
   exteriors: string[]
@@ -49,7 +78,21 @@ export type CatalogProject = {
 }
 
 export type ProjectListResult = {
+  /** Подходящие под все условия отбора. */
   items: CatalogProject[]
+  /**
+   * Остальные проекты каталога.
+   *
+   * Выдача не обрывается на последней подходящей карточке: ниже показываем
+   * всё прочее. Так человек, пришедший по ссылке с готовым отбором, видит,
+   * из чего вообще состоит каталог, и не упирается в пустой экран, когда
+   * под условия не подошло ничего.
+   *
+   * Порядок здесь не алфавитный, а по близости: сначала те, кто не сошёлся
+   * по одному условию, затем по двум и так далее. Иначе этот хвост
+   * превращается в свалку.
+   */
+  rest: CatalogProject[]
 }
 
 export type SiteCatalogContext = {

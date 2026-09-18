@@ -17,6 +17,7 @@ import {
 import { trackEvent } from "../consent/analytics";
 import type { CatalogProject } from "../lib/catalog/types";
 import { LeadForm } from "./lead-form";
+import { RangeSlider } from "./range-slider";
 import { formatRub } from "../lib/locale";
 import { SITE } from "../lib/site";
 import { copy, projectsInSeries } from "../lib/copy";
@@ -384,7 +385,7 @@ export function MortgageCalculator({
             {mode === "payment" ? (
               <CalcField
                 label={t.propertyPrice}
-                suffix="₽"
+                suffix="руб."
                 value={propertyPrice}
                 min={PRICE_MIN}
                 max={PRICE_MAX}
@@ -417,7 +418,7 @@ export function MortgageCalculator({
 
             <CalcField
               label={t.downPayment}
-              suffix="₽"
+              suffix="руб."
               value={downPayment}
               min={mode === "payment" ? minDown : Math.round(500_000)}
               max={
@@ -749,14 +750,16 @@ function CalcField({
           {trailing ?? <span>{suffix}</span>}
         </div>
       </div>
-      <input
-        type="range"
-        aria-label={label}
+      {/* Тот же ползунок, что в отборе каталога. Раньше здесь стоял нативный
+          input[type=range] с accent-color, то есть вид операционной системы,
+          и рядом с каталогом это читалось как два разных сайта. */}
+      <RangeSlider
         min={min}
         max={max}
         step={step}
         value={Math.min(max, Math.max(min, value))}
-        onChange={(e) => onChange(Number(e.target.value))}
+        label={label}
+        onChange={(next) => onChange(next[0] ?? min)}
       />
       {pills?.length || pillsSlot ? (
         <div

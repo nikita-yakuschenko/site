@@ -1,67 +1,64 @@
 import type { Metadata } from 'next'
-import Link from 'next/link'
+import { permanentRedirect } from 'next/navigation'
+import { CatalogBoard, type BoardItem } from '../../components/catalog-board'
 import { ProjectCard } from '../../components/project-card'
 import { SiteChrome } from '../../components/site-chrome'
+import { CATALOG_PROJECTS } from '../../lib/catalog/projects'
 import { FixtureCatalogProvider } from '../../lib/catalog/fixture-provider'
-import { CATALOG_SERIES, isCatalogSeries } from '../../lib/catalog/types'
-import { formatRub } from '../../lib/locale'
-import { copy, footerAboutFor, projectsInSeries, seriesTitle } from '../../lib/copy'
+import {
+  canonicalRedirect,
+  facetsOf,
+  isEmpty,
+  parseFilters,
+} from '../../lib/catalog/filters'
+import { copy, footerAboutFor, seriesTitle } from '../../lib/copy'
 import { SITE } from '../../lib/site'
 
 const catalog = new FixtureCatalogProvider()
+const facets = facetsOf(CATALOG_PROJECTS)
 
-function seriesFrom(value: string | string[] | undefined) {
-  const raw = Array.isArray(value) ? value[0] : value
-  return raw && isCatalogSeries(raw) ? raw : undefined
-}
-
-function maxPriceFrom(value: string | string[] | undefined): number | undefined {
-  const raw = Array.isArray(value) ? value[0] : value
-  if (!raw) return undefined
-  const n = Number(raw)
-  return Number.isFinite(n) && n > 0 ? Math.round(n) : undefined
-}
-
-function catalogHref(parts: { series?: string; maxPrice?: number }) {
-  const q = new URLSearchParams()
-  if (parts.series) q.set('series', parts.series)
-  if (parts.maxPrice != null) q.set('maxPrice', String(parts.maxPrice))
-  const s = q.toString()
-  return s ? `/catalog?${s}` : '/catalog'
-}
+type Search = Promise<Record<string, string | string[] | undefined>>
 
 export async function generateMetadata({
   searchParams,
 }: {
-  searchParams: Promise<{ series?: string | string[]; maxPrice?: string | string[] }>
+  searchParams: Search
 }): Promise<Metadata> {
-  const params = await searchParams
-  const series = seriesFrom(params.series)
-  if (!series) return { title: copy.catalogTitle, description: copy.catalogLead }
-  const title = seriesTitle(series)
-  return { title, description: copy.catalogLead }
+  const filters = parseFilters(await searchParams)
+  const title = filters.series ? seriesTitle(filters.series) : copy.catalogTitle
+  return {
+    title,
+    description: copy.catalogLead,
+    /* Отобранная выдача это тот же каталог под другим углом, а не
+       самостоятельная страница. Без canonical поиск индексирует каждую
+       комбинацию условий как отдельный документ, и они начинают
+       конкурировать между собой. */
+    alternates: { canonical: '/catalog' },
+    robots: isEmpty(filters) ? undefined : { index: false, follow: true },
+  }
 }
 
 /**
  * Список проектов.
  *
- * Серия и maxPrice приходят из адресной строки (калькулятор ипотеки
- * открывает каталог с потолком бюджета).
+ * Условия отбора приходят из адресной строки по схеме, описанной в
+ * lib/catalog/filters.ts. Негодные и посторонние параметры не ошибка:
+ * страница отвечает редиректом на очищенный адрес.
+ *
+ * Карточки рендерятся здесь, на сервере, и уходят в CatalogBoard готовыми:
+ * раскладкой и избранным занимается он, но сам ProjectCard остаётся
+ * серверным.
  */
-export default async function CatalogPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ series?: string | string[]; maxPrice?: string | string[] }>
-}) {
+export default async function CatalogPage({ searchParams }: { searchParams: Search }) {
   const params = await searchParams
-  const series = seriesFrom(params.series)
-  const maxPrice = maxPriceFrom(params.maxPrice)
-  const { items } = await catalog.list({
-    siteCode: SITE.code,
-    series,
-    maxPrice,
-  })
-  const title = series ? seriesTitle(series) : copy.catalogTitle
+  const filters = parseFilters(params)
+
+  const canonical = canonicalRedirect(params, filters)
+  if (canonical) permanentRedirect(canonical)
+
+  const { items, rest } = await catalog.list({ siteCode: SITE.code, filters })
+  const toBoard = (list: typeof items): BoardItem[] =>
+    list.map((project) => ({ id: project.id, card: <ProjectCard project={project} /> }))
 
   return (
     <SiteChrome
@@ -75,50 +72,19 @@ export default async function CatalogPage({
       about={footerAboutFor(SITE.name)}
     >
       <main>
-        <section className="section">
+        <section className="section catalog-section">
           <div className="section__inner">
-            <p className="eyebrow">{copy.catalog}</p>
-            <h1>{title}</h1>
-            <p className="info-page__lead">{copy.catalogLead}</p>
-            {maxPrice != null ? (
-              <p className="catalog__budget-note">
-                {copy.catalogMaxPriceNote} {formatRub(maxPrice)}
-                {' · '}
-                <Link href={catalogHref({ series })}>{copy.catalogClearMaxPrice}</Link>
-              </p>
-            ) : null}
-            <nav className="catalog-filters" aria-label={copy.catalogSeriesAria}>
-              <Link
-                className={`btn ${series ? 'btn-outline-dark' : 'btn-primary'}`}
-                href={catalogHref({ maxPrice })}
-                aria-current={series ? undefined : 'page'}
-              >
-                {copy.catalogAllSeries}
-              </Link>
-              {CATALOG_SERIES.map((id) => (
-                <Link
-                  key={id}
-                  className={`btn ${series === id ? 'btn-primary' : 'btn-outline-dark'}`}
-                  href={catalogHref({ series: id, maxPrice })}
-                  aria-current={series === id ? 'page' : undefined}
-                >
-                  {seriesTitle(id)}
-                </Link>
-              ))}
-            </nav>
-            <p className="catalog__count">{projectsInSeries(items.length)}</p>
-            {items.length ? (
-              <div className="grid-3">
-                {items.map((project) => (
-                  <ProjectCard key={project.id} project={project} />
-                ))}
-              </div>
-            ) : (
-              <p className="catalog__empty">
-                {copy.catalogEmpty}{' '}
-                <Link href="/catalog">{copy.allProjects}</Link>
-              </p>
-            )}
+            {/* Заголовок без картинки: человеку и так видно, куда он попал,
+                а поиску и скринридеру страница без h1 не годится. */}
+            <h1 className="visually-hidden">{copy.catalogTitle}</h1>
+
+            <CatalogBoard
+              filters={filters}
+              facets={facets}
+              matched={toBoard(items)}
+              rest={toBoard(rest)}
+              picked={!isEmpty(filters)}
+            />
           </div>
         </section>
       </main>

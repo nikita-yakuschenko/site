@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Fragment, useState } from "react";
 import { IconArrowUpRight, IconMapPin } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
 import { VideoLightbox, kinescopeEmbed } from "./video-lightbox";
@@ -103,10 +103,10 @@ export function VideoTestimonials() {
           <p className="eyebrow">{data.eyebrow}</p>
           <h2 id="video-stories-title">
             {data.headingLines.map((line, index) => (
-              <span key={line}>
-                {index > 0 ? <br /> : null}
-                {nbspText(line)}
-              </span>
+              <Fragment key={line}>
+                {index > 0 ? " " : null}
+                <span className="heading-line">{nbspText(line)}</span>
+              </Fragment>
             ))}
           </h2>
           <p className="video-stories__lead">{nbspText(data.lead)}</p>

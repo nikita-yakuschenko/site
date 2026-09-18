@@ -16,7 +16,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
-  title: { default: copy.seoTitle, template: '%s — Авангард Строй' },
+  title: { default: copy.seoTitle, template: '%s - Авангард Строй' },
   description: copy.seoDescription,
   icons: {
     icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],

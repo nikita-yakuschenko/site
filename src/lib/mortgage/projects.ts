@@ -40,7 +40,12 @@ export function getEligibleProjects(
   };
 }
 
+/**
+ * Каталог с потолком бюджета. Схема адреса общая для всего каталога:
+ * диапазон это один параметр, открытый край допустим, поэтому «до N»
+ * записывается как price=-N. См. lib/catalog/filters.ts.
+ */
 export function catalogHrefWithMaxPrice(maxPrice: number): string {
   const rounded = Math.max(0, Math.round(maxPrice));
-  return `/catalog?maxPrice=${rounded}`;
+  return `/catalog?price=-${rounded}`;
 }
