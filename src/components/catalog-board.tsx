@@ -36,6 +36,9 @@ import { copy } from "../lib/copy";
  * отбора, и работает он поверх уже отобранного.
  */
 
+/* Класс блокировки прокрутки под раскрытым листом отбора. */
+const SHEET_LOCK = "is-catalog-sheet";
+
 export type BoardItem = { id: string; card: ReactNode };
 
 export function CatalogBoard({
@@ -75,6 +78,7 @@ export function CatalogBoard({
      Прилипание считаем по самой полосе: её верх упёрся в край экрана,
      значит она встала. */
   const bar = useRef<HTMLDivElement>(null);
+  const results = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
 
   useEffect(() => {
@@ -101,13 +105,38 @@ export function CatalogBoard({
   useEffect(() => {
     if (!open) return;
     const root = document.documentElement;
-    root.classList.add("is-catalog-sheet");
-    return () => root.classList.remove("is-catalog-sheet");
+    root.classList.add(SHEET_LOCK);
+    return () => root.classList.remove(SHEET_LOCK);
   }, [open]);
+
+  /* Условия поменялись, значит список стал другим, и оставаться на прежней
+     высоте бессмысленно: под курсором окажутся чужие карточки. Возвращаемся
+     к началу выдачи, а не страницы: полоса поиска и колонка отбора должны
+     остаться на месте, чтобы можно было сразу поправить условие.
+
+     Вверх и только вверх: если человек и так в начале, дёргать экран не за
+     чем. Переход мгновенный, без плавности: список под рукой уже другой, и
+     смотреть, как мимо пролетают чужие карточки, незачем. */
+  const backToStart = () => {
+    const node = results.current;
+    if (!node) return;
+    /* Блокировку читаем из DOM, а не из состояния: обработчик может
+       сработать из замыкания, где лист ещё считался открытым, и проверка по
+       состоянию соврала бы. Пока страница заблокирована, ехать ей некуда. */
+    if (document.documentElement.classList.contains(SHEET_LOCK)) return;
+    const barHeight = Number.parseInt(
+      getComputedStyle(document.documentElement).getPropertyValue("--catalog-bar"),
+      10,
+    );
+    const target = window.scrollY + node.getBoundingClientRect().top - (barHeight || 0);
+    if (window.scrollY <= target) return;
+    window.scrollTo({ top: target, behavior: "auto" });
+  };
 
   const search = (raw: string) => {
     const q = normalizeQuery(raw);
     router.replace(filtersToHref({ ...filters, q: q || undefined }, pathname), { scroll: false });
+    backToStart();
   };
 
   return (
@@ -145,6 +174,7 @@ export function CatalogBoard({
               setOnlyFavorites(false);
               setOpen(false);
               router.replace(pathname, { scroll: false });
+              backToStart();
             }}
           >
             {active ? (
@@ -161,12 +191,21 @@ export function CatalogBoard({
         facets={facets}
         onlyFavorites={onlyFavorites}
         favoritesCount={favorites.length}
-        onToggleFavorites={() => setOnlyFavorites((value) => !value)}
+        onToggleFavorites={() => {
+          setOnlyFavorites((value) => !value);
+          backToStart();
+        }}
         open={open}
-        onApply={() => setOpen(false)}
+        onApply={() => {
+          setOpen(false);
+          /* Блокировка снимается эффектом уже после отрисовки, и прокрутка
+             раньше этого момента обрезалась по высоте закрытого документа. */
+          setTimeout(backToStart, 150);
+        }}
+        onChanged={backToStart}
       />
 
-      <div className="catalog__results">
+      <div ref={results} className="catalog__results">
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку
             не важно, сколько вариантов он отбросил и насколько велик каталог.
             Важно одно, есть ли в нём то, что он искал. Поэтому говорим только

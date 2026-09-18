@@ -74,6 +74,7 @@ export function CatalogFilters({
   onToggleFavorites,
   open,
   onApply,
+  onChanged,
 }: {
   filters: CatalogFilters;
   facets: CatalogFacets;
@@ -84,6 +85,8 @@ export function CatalogFilters({
      здесь: на телефоне отдельная строка под неё стоила бы целого ряда. */
   open: boolean;
   onApply: () => void;
+  /* Условия поменялись: выдача стала другой, и надо вернуться к её началу. */
+  onChanged: () => void;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -116,7 +119,10 @@ export function CatalogFilters({
   const go = (next: CatalogFilters, delay = 0) => {
     if (timer.current) clearTimeout(timer.current);
     const href = filtersToHref(next, pathname);
-    const push = () => router.replace(href, { scroll: false });
+    const push = () => {
+      router.replace(href, { scroll: false });
+      onChanged();
+    };
     if (delay) timer.current = setTimeout(push, delay);
     else push();
   };
