@@ -372,7 +372,7 @@ export const copy = {
            исчезновения кадра и названия остаются два поля ни о чём. */
         formLead:
           "Узнать подробнее о доступных к покупке земельных участках",
-        image: "/series/classic.jpg",
+        image: "/img/cards/uchastok.jpg",
       },
     ],
     conditionsEyebrow: "Условия",
