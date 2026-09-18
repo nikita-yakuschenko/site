@@ -299,7 +299,7 @@ function MortgageConditions({ content }: { content: WithConditions }) {
           {content.conditions.map((item) => (
             <Fragment key={item.title}>
               <dt className="mortgage-conditions__value">
-                {item.value ? (
+                {!item.mark ? (
                   item.value
                 ) : (
                   /* Эскроу — единственный пункт без числа: вместо величины

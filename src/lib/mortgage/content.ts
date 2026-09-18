@@ -20,7 +20,10 @@ type ProgramBlocks = {
   whoJoiner: string;
   /* Требование к участнику: надзаголовок, крупная строка, мерка под ней и
      предметный кадр — та же анатомия, что у плашки программы. */
-  whoFits: readonly {
+  /* Карточек может не быть вовсе: у рыночной ипотеки нет ни категорий
+     участников, ни условий по «или» — требования к заёмщику устанавливает
+     банк, и раздел состоит из одного текста и правил. */
+  whoFits?: readonly {
     label: string;
     title: string;
     note: string;
@@ -54,6 +57,10 @@ type ProgramBlocks = {
     title: string;
     text: string;
     points: readonly string[];
+    /* Предметный знак вместо величины. Раньше его ставила пустая строка
+       значения, и у рыночной, где величин нет ни у одной строки, эскроу
+       нарисовался бы в каждой. */
+    mark?: boolean;
   }[];
   /* Сноска под спецификацией. Строк может быть несколько: одной строкой
      «банки вправе устанавливать дополнительные условия» теряется главное —
@@ -146,7 +153,7 @@ export type WithFaq = MortgageContent &
   Required<Pick<ProgramBlocks, "faqEyebrow" | "faqHeading" | "faq">>;
 
 export function hasWho(content: MortgageContent): content is WithWho {
-  return Boolean(content.whoFits && content.rules);
+  return Boolean(content.rules);
 }
 
 export function hasConditions(content: MortgageContent): content is WithConditions {

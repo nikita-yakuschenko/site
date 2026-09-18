@@ -2419,9 +2419,17 @@ a {
 
      Тот же приём, что в нижнем приглашении, — оба блока складываются
      одинаково и переход в них устроен одинаково. */
-  .mortgage-family__media {
+  .mortgage-family:not(.mortgage-family--light) .mortgage-family__media {
     -webkit-mask-image: linear-gradient(180deg, #000 58%, transparent 100%);
     mask-image: linear-gradient(180deg, #000 58%, transparent 100%);
+  }
+
+  /* Знаку растворять нечего: он лежит на белом поле, стыка с заливкой
+     нет, и вуаль просто гасила ему низ — у ноутбука таяла клавиатура, у
+     снопа стебли. */
+  .mortgage-family--light .mortgage-family__media {
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .mortgage-family__media::after {
@@ -7584,6 +7592,10 @@ textarea:focus-visible {
 .mortgage-who__card strong {
   font-size: 22px;
   line-height: 1.15;
+  /* Не заходит на кадр: у плашки программы крупной строкой стоит ставка
+     «от 6%», которой ширины хватает всегда, а здесь слова, и длинное
+     название уезжало под картинку. */
+  max-width: 54%;
 }
 
 .mortgage-rules__title {
@@ -8137,7 +8149,7 @@ textarea:focus-visible {
    пикселей — столько съедает растворение, и без запаса семья оказывалась
    в самом низу, наполовину в дымке. */
 @media (max-width: 899px) {
-  .mortgage-mid-cta__media {
+  .mortgage-mid-cta__media:not(.mortgage-mid-cta__media--cutout) {
     min-height: 240px;
     -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
     mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
@@ -9466,4 +9478,73 @@ textarea:focus-visible {
    знак не узнают. */
 .mortgage-program--agro .mortgage-program__art {
   height: calc(100% + 108px);
+}
+
+
+/* Плашки на совсем узком экране.
+
+   Кадр занимает половину плашки. На трёхстах пикселях второй половины не
+   хватает даже названию: «Работа на селе» заезжало на крест, «Двое и
+   более» — на рюкзак. Кадр там убирается совсем, а текст получает всю
+   ширину: лучше плашка без картинки, чем картинка поверх слов.
+
+   Граница — 330px. Выше неё кадр уже уступил ширину тексту (36% вместо
+   половины), названия переносятся по заданным местам, и на 360 всё
+   умещается. Прятать картинку остаётся только на совсем старых узких
+   экранах. */
+@media (max-width: 330px) {
+  .mortgage-program__art,
+  .mortgage-who__card .mortgage-program__art {
+    display: none;
+  }
+
+  .mortgage-program > span:not(.series-bento__go),
+  .mortgage-who__card > span,
+  .mortgage-who__card strong,
+  .mortgage-who__card > small,
+  .mortgage-program--family > small,
+  .mortgage-program--it > small,
+  .mortgage-program--agro > small,
+  .mortgage-program--bank > small {
+    max-width: none;
+    padding-right: 0;
+  }
+
+  /* Плашка перестаёт держать высоту под кадр: без него это пустое поле. */
+  .mortgage-program {
+    min-height: 0;
+  }
+}
+
+
+/* Плашки на телефоне.
+
+   Кадр держит половину ширины — мера широкого экрана, где в другой
+   половине помещается строка. На трёхстах пикселях от текста остаётся
+   полторы сотни, и подпись рассыпается на четыре обрывка по два слова, а
+   название заезжает на картинку.
+
+   Кадр уступает: 36% вместо половины, текст получает 60%. Подпись
+   укладывается в две строки, название перестаёт налезать. */
+@media (max-width: 899px) {
+  .mortgage-program__art {
+    width: 36%;
+    /* По центру высоты, а не по верху. На широком плашка ровно в рост
+       кадра, и разницы нет; на телефоне она вытягивается под текст в
+       четыре строки, и прижатый к верху знак повисал в углу, оставляя
+       под собой пустое поле. */
+    object-position: center;
+  }
+
+  .mortgage-program > span:not(.series-bento__go),
+  .mortgage-who__card > span,
+  .mortgage-who__card strong,
+  .mortgage-who__card > small,
+  .mortgage-program--family > small,
+  .mortgage-who__card > small,
+  .mortgage-program--it > small,
+  .mortgage-program--agro > small,
+  .mortgage-program--bank > small {
+    max-width: 60%;
+  }
 }

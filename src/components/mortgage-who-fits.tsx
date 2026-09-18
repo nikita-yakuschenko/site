@@ -37,6 +37,7 @@ const HIGHLIGHT_MS = 2600;
  */
 export function MortgageWhoFits({ content }: { content: WithWho }) {
   const ruleIds = content.rules.map((rule, index) => rule.id ?? `rule-${index}`);
+  const cards = content.whoFits ?? [];
 
   /* Аккордеон управляемый: плашка условия открывает правило, а не только
      сам заголовок. Первое правило раскрыто, как и во всех списках. */
@@ -96,16 +97,17 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
             кадр, и на четверти экрана от текста остаётся сотня пикселей.
             Поэтому четыре складываются по две в ряд, а три остаются
             строкой. */}
+        {content.whoFits ? (
         <ul
           className={[
             "mortgage-who",
             content.whoJoiner ? "" : "mortgage-who--plain",
-            content.whoFits.length === 4 ? "mortgage-who--quad" : "",
+            cards.length === 4 ? "mortgage-who--quad" : "",
           ]
             .filter(Boolean)
             .join(" ")}
         >
-          {content.whoFits.map((item, index) => {
+          {cards.map((item, index) => {
             const target = item.opensRule;
             const body = (
               <>
@@ -163,6 +165,7 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
             );
           })}
         </ul>
+        ) : null}
 
         <div className="mortgage-who__rules">
           <h3 className="mortgage-rules__title">{content.rulesHeading}</h3>
