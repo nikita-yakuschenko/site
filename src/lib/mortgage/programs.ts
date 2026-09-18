@@ -46,8 +46,11 @@ export const MORTGAGE_PROGRAMS: readonly MortgageProgram[] = [
     minDownPaymentPercent: 0.2,
     minTermYears: 1,
     maxTermYears: 30,
-    subsidizedLimitByRegion: { nn: 6_000_000, msk: 12_000_000 },
-    maxLoanByRegion: { nn: 15_000_000, msk: 30_000_000 },
+    /* Лимит один на всю страну: в отличие от семейной, где столица и
+       область считаются отдельно, у IT льготная часть 9 млн и в Нижнем, и
+       в Подмосковье. Здесь стояли семейные цифры — 6 и 12 млн. */
+    subsidizedLimitByRegion: { nn: 9_000_000, msk: 9_000_000 },
+    maxLoanByRegion: { nn: 18_000_000, msk: 18_000_000 },
     marketRate: 0.185,
     allowCombined: true,
   },
