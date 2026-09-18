@@ -188,8 +188,7 @@ export function CatalogBoard({
         {picked && !onlyFavorites && shownRest.length ? (
           <>
             <h2 className="catalog__band catalog__band--rest">
-              {copy.catalogRest}{" "}
-              <span className="catalog__count">{copy.catalogRestLead}</span>
+              <span>{copy.catalogRest}</span>
             </h2>
             <div className="grid-2">
               {shownRest.map((item) => (

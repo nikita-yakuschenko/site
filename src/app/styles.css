@@ -4589,30 +4589,39 @@ a {
    делает её капсом в 30 пикселей, и над сеткой карточек она начинает
    кричать. Здесь тот же тихий регистр, что у прочих служебных строк
    каталога: набор условий поменялся, счёт обновился, кричать не о чем. */
+/* Подпись посередине, линии по бокам: так рубеж читается разделителем
+   между двумя частями одного списка, а не заголовком нового раздела.
+   Прежняя версия капсом и с линией во всю ширину выглядела именно
+   заголовком, и хвост каталога начинал казаться отдельным блоком. */
 .section .catalog__band {
   display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 4px 10px;
+  align-items: center;
+  gap: 16px;
   margin: 0 0 14px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
   color: rgb(var(--avgst-ink-rgb) / 0.55);
 }
 
+/* Воздух одинаковый с обеих сторон: разделитель стоит между двумя частями
+   списка и не должен прижиматься ни к одной из них. Нижнее поле схлопнется
+   с отступом сетки ниже, поэтому оно должно быть не меньше него. */
 .section .catalog__band--rest {
-  margin-top: 48px;
-  padding-top: 22px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  margin-block: var(--gap-split);
 }
 
-.catalog__band .catalog__count {
-  margin: 0;
-  font-weight: 400;
-  letter-spacing: 0.06em;
-  color: rgb(var(--avgst-ink-rgb) / 0.4);
+.catalog__band--rest::before,
+.catalog__band--rest::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgb(var(--avgst-ink-rgb) / 0.14);
+}
+
+.catalog__band--rest span {
+  flex: none;
 }
 
 .catalog-filters {
