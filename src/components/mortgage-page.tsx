@@ -318,10 +318,23 @@ function MortgageConditions({ content }: { content: WithConditions }) {
 function MortgageMidCta({ content }: { content: MortgageContent }) {
   return (
     <section className="section mortgage-mid-cta" aria-labelledby="mortgage-mid-cta-title">
-      <div className="section__inner mortgage-mid-cta__inner">
-        <div className="mortgage-mid-cta__media" aria-hidden="true">
+      <div
+        className={
+          content.midCtaCutout
+            ? "section__inner mortgage-mid-cta__inner mortgage-mid-cta__inner--cutout"
+            : "section__inner mortgage-mid-cta__inner"
+        }
+      >
+        <div
+          className={
+            content.midCtaCutout
+              ? "mortgage-mid-cta__media mortgage-mid-cta__media--cutout"
+              : "mortgage-mid-cta__media"
+          }
+          aria-hidden="true"
+        >
           <Image
-            src="/persons/family_1.png"
+            src={content.midCtaImage}
             alt=""
             fill
             sizes="(min-width: 900px) 40vw, 100vw"

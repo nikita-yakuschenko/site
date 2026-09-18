@@ -7456,6 +7456,13 @@ textarea:focus-visible {
       minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
     align-items: stretch;
   }
+
+  /* Ряд без разделителей: колонок ровно три, и промежуток обычный
+     плиточный — расширенный нужен был только под слово между плашками. */
+  .mortgage-who--plain {
+    gap: var(--gap-tile);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
 }
 
 .mortgage-who__or {
@@ -7469,9 +7476,93 @@ textarea:focus-visible {
   text-transform: uppercase;
 }
 
+/* Ячейка ряда: сама плашка внутри неё может быть и кнопкой, и просто
+   блоком — растягивается по ячейке в обоих случаях. */
+.mortgage-who__cell {
+  display: flex;
+  min-width: 0;
+}
+
 /* Кадр уходит за нижнюю кромку — обрезает сама плашка, как у программ. */
 .mortgage-who__card {
+  flex: 1 1 auto;
   overflow: hidden;
+  text-align: left;
+}
+
+/* Нажимаемая плашка — кнопка: клавиатура и читалки получают её даром, а
+   вид остаётся плашкой программы. Отклик тот же, что у карточек объектов:
+   грань темнеет, а под нажатием плашка едва проседает. */
+.mortgage-who__card--action {
+  font: inherit;
+  cursor: pointer;
+  transition:
+    border-color 0.2s var(--ease-out),
+    transform 0.16s var(--ease-out);
+}
+
+.mortgage-who__card--action:hover {
+  border-color: rgb(var(--avgst-ink-rgb) / 0.22);
+}
+
+.mortgage-who__card--action:active {
+  transform: scale(0.99);
+}
+
+.mortgage-who__card--action:focus-visible {
+  outline: 2px solid var(--brand-yellow);
+  outline-offset: 2px;
+}
+
+/* Знак в углу — единственное, чем нажимаемая плашка отличается от
+   соседних. Стоит поверх кадра: в правом верхнем углу лежит он. */
+.mortgage-who__info {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  color: rgb(var(--avgst-ink-rgb) / 0.3);
+  transition: color 0.2s var(--ease-out);
+}
+
+.mortgage-who__card--action:hover .mortgage-who__info {
+  color: var(--avgst-ink);
+}
+
+/* Мазок маркера по формулировке, к которой привела плашка.
+   Заливка растёт слева направо, как ведут маркером, и гаснет сама:
+   постоянная подсветка через минуту читалась бы оформлением текста, а не
+   ответом на нажатие. box-decoration-break склеивает строки — иначе на
+   каждой мазок начинался бы заново. */
+.rule-mark {
+  background-color: transparent;
+  background-image: linear-gradient(
+    var(--brand-yellow),
+    var(--brand-yellow)
+  );
+  background-repeat: no-repeat;
+  background-size: 0% 100%;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+  padding: 1px 2px;
+  margin: 0 -2px;
+  border-radius: 2px;
+  color: inherit;
+  transition:
+    background-size 0.55s var(--ease-out),
+    color 0.3s var(--ease-out);
+}
+
+.rule-mark.is-lit {
+  background-size: 100% 100%;
+  color: var(--avgst-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mortgage-who__card--action,
+  .rule-mark {
+    transition: none;
+  }
 }
 
 /* Отклик на наведение тот же, что у плашек программ: грань темнеет,
@@ -8084,6 +8175,55 @@ textarea:focus-visible {
   object-position: center 30%;
 }
 
+/* Приглашение со знаком вместо фотографии.
+   Фотография заполняет свою половину и растворяется в заливке — у неё
+   есть кромка, которую нужно спрятать. Знак вписывается в кадр целиком:
+   растворять у него нечего, а вуаль поверх прозрачного фона легла бы
+   пятном на пустоте. */
+.mortgage-mid-cta__media--cutout {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.mortgage-mid-cta__media--cutout img {
+  object-fit: contain;
+  object-position: center;
+  padding: var(--gap-stack);
+}
+
+/* Косой край заливки тоже снимается: он растушёвывал кромку фотографии,
+   а знаку только притемнял бы бок. */
+.mortgage-mid-cta__inner--cutout::before {
+  content: none;
+}
+
+/* Приглашение со знаком — светлое, как первый экран той же программы.
+   Тёмная заливка нужна фотографии: она держит белый текст поверх кадра.
+   Знак лежит на прозрачном фоне, и на чернилах серый ноутбук почти
+   пропадал, а страница получала тёмный блок посреди светлых.
+
+   Фон не белый, а страничный серый: белым панель слилась бы с полем
+   вокруг и перестала быть блоком — у первого экрана такой задачи нет,
+   он сам начало страницы. */
+.mortgage-mid-cta__inner--cutout {
+  background: var(--page);
+  color: var(--avgst-ink);
+}
+
+.mortgage-mid-cta__inner--cutout .mortgage-mid-cta__body h2 {
+  color: var(--avgst-ink);
+}
+
+.mortgage-mid-cta__inner--cutout .mortgage-mid-cta__body p {
+  color: rgb(var(--avgst-ink-rgb) / 0.68);
+}
+
+/* Форма проявляется на месте текста — её набор тоже темнеет. */
+.mortgage-mid-cta__inner--cutout .lead-reveal__card {
+  --lead-ink: var(--avgst-ink-rgb);
+  color: var(--avgst-ink);
+}
+
 .mortgage-mid-cta__body {
   display: grid;
   /* Содержимое по своей ширине, а не во всю колонку: у заголовка и абзаца
@@ -8139,6 +8279,8 @@ textarea:focus-visible {
 }
 
 .lead-reveal__card {
+  /* По умолчанию баннер тёмный, и набор формы белый. */
+  --lead-ink: 255 255 255;
   position: relative;
   width: 100%;
   /* Формы-плашки здесь нет: баннер сам себе коробка, а белый
@@ -8209,13 +8351,28 @@ textarea:focus-visible {
   gap: normal;
 }
 
+/* Цвет набора формы задан переменной: баннер бывает и тёмным, и светлым,
+   а подписи, согласие и крестик должны читаться на обоих. Прежде здесь
+   стоял белый тремя константами, и на светлой панели подписи полей
+   становились невидимыми. */
 .lead-reveal__card .lead-card label,
 .lead-reveal__card .lead-form label {
-  color: rgb(255 255 255 / 0.82);
+  color: rgb(var(--lead-ink) / 0.82);
 }
 
 .lead-reveal__card .lead-form__consent {
-  color: rgb(255 255 255 / 0.72);
+  color: rgb(var(--lead-ink) / 0.72);
+}
+
+/* Ссылка согласия жёлтая на тёмном — там она единственный акцент. На
+   светлом жёлтый по серому не читается, и ссылка становится обычной
+   подчёркнутой. */
+.mortgage-mid-cta__inner--cutout .lead-form__consent-link {
+  color: var(--avgst-ink);
+}
+
+.mortgage-mid-cta__inner--cutout .lead-form__consent-link:hover {
+  color: rgb(var(--avgst-ink-rgb) / 0.7);
 }
 
 /* Крестик стоит в строке подписи первого поля, у правого края: выше он
@@ -8233,12 +8390,12 @@ textarea:focus-visible {
   padding: 0;
   border: 0;
   background: transparent;
-  color: rgb(255 255 255 / 0.55);
+  color: rgb(var(--lead-ink) / 0.55);
   cursor: pointer;
 }
 
 .lead-reveal__close:hover {
-  color: #fff;
+  color: rgb(var(--lead-ink));
 }
 
 .mortgage-mid-cta__body h2 {

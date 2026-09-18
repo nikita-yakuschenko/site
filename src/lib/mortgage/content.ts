@@ -28,9 +28,23 @@ type ProgramBlocks = {
     imageW: number;
     imageH: number;
     sizes: string;
+    /* Имя правила, в котором лежат подробности этого условия. Плашка с ним
+       становится нажимаемой: раскрывает правило и зажигает в нём нужную
+       формулировку. */
+    opensRule?: string;
   }[];
   rulesHeading: string;
-  rules: readonly { title: string; text: string }[];
+  rules: readonly {
+    /* Имя правила: по нему на него ссылается условие. Без имени правило
+       живёт по порядковому номеру, и ссылаться на него нельзя. */
+    id?: string;
+    title: string;
+    text: string;
+    /* Отрезок текста, который загорается при переходе из условия. Задан
+       дословно, а не границами: правка текста сдвинула бы номера символов
+       и мазок лёг бы по середине слова. */
+    highlight?: string;
+  }[];
   conditionsEyebrow: string;
   conditionsHeading: string;
   /* Строка спецификации: значение слева, раскрытие справа. Значение может
@@ -78,6 +92,12 @@ export type MortgageContent = {
      фотография заполняет его — отсюда признак cutout. */
   heroImage: string;
   heroCutout?: boolean;
+  /* Кадр приглашения внизу страницы. Он перекликается с первым экраном:
+     у семейной там фотография семьи, у остальных — тот же предметный знак,
+     которым программа обозначена наверху. Прежде кадр был зашит в
+     компонент, и на всех четырёх страницах стояла семья. */
+  midCtaImage: string;
+  midCtaCutout?: boolean;
 } & Partial<ProgramBlocks>;
 
 export type WithWho = MortgageContent &
