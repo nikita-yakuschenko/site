@@ -11022,6 +11022,7 @@ textarea:focus-visible {
 
 .project-config__tier-list {
   display: grid;
+  align-content: start;
   gap: 6px;
   margin-top: 8px;
   padding-top: 14px;
@@ -11039,6 +11040,28 @@ textarea:focus-visible {
 .project-config__tier-list svg {
   flex: 0 0 auto;
   color: var(--avgst-green);
+}
+
+/* Название, описание, цена и состав встают на общие линии: иначе цена в
+   карточке с коротким описанием уезжает вверх, и три уровня перестают
+   сравниваться взглядом. Строки задаёт список, карточки наследуют их
+   через subgrid; правило идёт после раскладки карточки, чтобы не быть
+   перебитым её собственными display. */
+@media (min-width: 720px) {
+  @supports (grid-template-rows: subgrid) {
+    .project-config__tiers {
+      grid-template-rows: auto auto auto auto;
+      row-gap: 8px;
+    }
+
+    .project-config__tiers li,
+    .project-config__tiers .project-config__tier {
+      display: grid;
+      grid-row: span 4;
+      grid-template-rows: subgrid;
+      gap: 8px;
+    }
+  }
 }
 
 .project-config__details-title {
