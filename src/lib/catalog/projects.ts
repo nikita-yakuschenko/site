@@ -29,6 +29,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barhhouse-73",
     description: "Дом в стиле барнхаус площадью 73 м².",
+    about: [],
     exteriors: [
       "/catalog/barhhouse-73/01.jpg",
       "/catalog/barhhouse-73/02.webp",
@@ -73,6 +74,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhouse-76",
     description: "Дом в стиле барнхаус площадью 76 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhouse-76/01.jpg",
       "/catalog/barnhouse-76/02.jpg",
@@ -123,6 +125,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhuose-82",
     description: "Дом в стиле барнхаус площадью 82 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhuose-82/01.jpg",
       "/catalog/barnhuose-82/02.jpg",
@@ -165,6 +168,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhouse-86",
     description: "Дом в стиле барнхаус площадью 86 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhouse-86/01.jpg",
       "/catalog/barnhouse-86/02.jpg",
@@ -196,6 +200,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhouse-90",
     description: "Дом в стиле барнхаус площадью 90 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhouse-90/01.jpg",
       "/catalog/barnhouse-90/02.jpg",
@@ -250,6 +255,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhouse-96",
     description: "Дом в стиле барнхаус площадью 96 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhouse-96/01.jpg",
       "/catalog/barnhouse-96/02.jpg",
@@ -280,6 +286,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhouse-98",
     description: "Дом в стиле барнхаус площадью 98 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhouse-98/01.jpg",
       "/catalog/barnhouse-98/02.jpg",
@@ -311,6 +318,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhouse-115",
     description: "Дом в стиле барнхаус площадью 115 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhouse-115/01.jpg",
       "/catalog/barnhouse-115/02.jpg",
@@ -356,6 +364,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnouse-122",
     description: "Дом в стиле барнхаус площадью 122 м².",
+    about: [],
     exteriors: [
       "/catalog/barnouse-122/01.jpg",
       "/catalog/barnouse-122/02.jpg",
@@ -396,6 +405,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhouse-129",
     description: "Дом в стиле барнхаус площадью 129 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhouse-129/01.png",
       "/catalog/barnhouse-129/02.jpg",
@@ -428,6 +438,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhouse-134",
     description: "Дом в стиле барнхаус площадью 134 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhouse-134/01.jpg",
       "/catalog/barnhouse-134/02.jpg",
@@ -461,6 +472,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/barnhouse-138",
     description: "Дом в стиле барнхаус площадью 138 м².",
+    about: [],
     exteriors: [
       "/catalog/barnhouse-138/01.jpg",
       "/catalog/barnhouse-138/02.jpeg",
@@ -492,6 +504,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "modular",
     href: "/catalog/duplex-173",
     description: "Модульный дом площадью 173 м².",
+    about: [],
     exteriors: [
       "/catalog/duplex-173/01.jpg",
       "/catalog/duplex-173/02.jpg",
@@ -524,6 +537,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/kamelot-101",
     description: "Дом классической архитектуры площадью 101 м².",
+    about: [],
     exteriors: [
       "/catalog/kamelot-101/01.jpg",
       "/catalog/kamelot-101/02.jpg",
@@ -555,6 +569,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/kamelot-124",
     description: "Дом классической архитектуры площадью 124 м².",
+    about: [],
     exteriors: [
       "/catalog/kamelot-124/01.jpg",
       "/catalog/kamelot-124/02.jpg",
@@ -587,6 +602,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "modular",
     href: "/catalog/cube-100",
     description: "Модульный дом площадью 100 м².",
+    about: [],
     exteriors: [
       "/catalog/cube-100/01.jpg",
       "/catalog/cube-100/02.jpg",
@@ -631,6 +647,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/norvegiya-92",
     description: "Панельно-каркасный дом площадью 92 м².",
+    about: [],
     exteriors: [
       "/catalog/norvegiya-92/01.jpg",
       "/catalog/norvegiya-92/02.jpg",
@@ -673,6 +690,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/norvegiya-115",
     description: "Панельно-каркасный дом площадью 115 м².",
+    about: [],
     exteriors: [
       "/catalog/norvegiya-115/01.jpg",
       "/catalog/norvegiya-115/02.jpg",
@@ -728,6 +746,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/norvegiya-132",
     description: "Панельно-каркасный дом площадью 132 м².",
+    about: [],
     exteriors: [
       "/catalog/norvegiya-132/01.jpg",
       "/catalog/norvegiya-132/02.jpg",
@@ -773,6 +792,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/scandi-90",
     description: "Дом классической архитектуры площадью 90 м².",
+    about: [],
     exteriors: [
       "/catalog/scandi-90/01.jpg",
       "/catalog/scandi-90/02.jpg",
@@ -806,6 +826,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/uzorye-115",
     description: "Дом классической архитектуры площадью 115 м².",
+    about: [],
     exteriors: [
       "/catalog/uzorye-115/01.jpg",
       "/catalog/uzorye-115/02.jpg",
@@ -836,6 +857,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/uzorye-122",
     description: "Дом классической архитектуры площадью 122 м².",
+    about: [],
     exteriors: [
       "/catalog/uzorye-122/01.jpg",
       "/catalog/uzorye-122/02.jpg",
@@ -867,6 +889,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/uzorye-132",
     description: "Дом классической архитектуры площадью 132 м².",
+    about: [],
     exteriors: [
       "/catalog/uzorye-132/01.jpg",
       "/catalog/uzorye-132/02.jpg",
@@ -897,6 +920,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/finlyandiya-149",
     description: "Дом классической архитектуры площадью 149 м².",
+    about: [],
     exteriors: [
       "/catalog/finlyandiya-149/01.png",
       "/catalog/finlyandiya-149/02.jpg",
@@ -926,6 +950,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "modular",
     href: "/catalog/frame-59",
     description: "Модульный дом площадью 59 м².",
+    about: [],
     exteriors: [
       "/catalog/frame-59/01.jpg",
       "/catalog/frame-59/02.jpg",
@@ -957,6 +982,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "modular",
     href: "/catalog/frame-60",
     description: "Модульный дом площадью 60 м².",
+    about: [],
     exteriors: [
       "/catalog/frame-60/01.jpg",
       "/catalog/frame-60/02.jpg",
@@ -1005,6 +1031,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/shvedskii-121",
     description: "Панельно-каркасный дом площадью 121 м².",
+    about: [],
     exteriors: [
       "/catalog/shvedskii-121/01.jpg",
       "/catalog/shvedskii-121/02.jpg",
@@ -1035,6 +1062,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/shvedskii-124",
     description: "Панельно-каркасный дом площадью 124 м².",
+    about: [],
     exteriors: [
       "/catalog/shvedskii-124/01.jpg",
       "/catalog/shvedskii-124/02.jpg",
@@ -1067,6 +1095,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/shvedskii-130",
     description: "Панельно-каркасный дом площадью 130 м².",
+    about: [],
     exteriors: [
       "/catalog/shvedskii-130/01.jpg",
       "/catalog/shvedskii-130/02.jpg",
@@ -1099,6 +1128,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/shvedskii-135",
     description: "Панельно-каркасный дом площадью 135 м².",
+    about: [],
     exteriors: [
       "/catalog/shvedskii-135/01.jpg",
       "/catalog/shvedskii-135/02.png",
@@ -1133,6 +1163,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/shvedskii-142",
     description: "Панельно-каркасный дом площадью 142 м².",
+    about: [],
     exteriors: [
       "/catalog/shvedskii-142/01.jpg",
       "/catalog/shvedskii-142/02.jpg",
@@ -1166,6 +1197,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/shvedskii-150",
     description: "Панельно-каркасный дом площадью 150 м².",
+    about: [],
     exteriors: [
       "/catalog/shvedskii-150/01.jpg",
       "/catalog/shvedskii-150/02.jpeg",
@@ -1226,6 +1258,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/shvedskii-161",
     description: "Панельно-каркасный дом площадью 161 м².",
+    about: [],
     exteriors: [
       "/catalog/shvedskii-161/01.jpg",
       "/catalog/shvedskii-161/02.jpg",
@@ -1296,6 +1329,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/ekohouse-120",
     description: "Панельно-каркасный дом площадью 120 м².",
+    about: [],
     exteriors: [
       "/catalog/ekohouse-120/01.jpg",
       "/catalog/ekohouse-120/02.jpg",
@@ -1329,6 +1363,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/ekohouse-128",
     description: "Панельно-каркасный дом площадью 128 м².",
+    about: [],
     exteriors: [
       "/catalog/ekohouse-128/01.jpg",
       "/catalog/ekohouse-128/02.jpg",
@@ -1378,6 +1413,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/ekohouse-132",
     description: "Панельно-каркасный дом площадью 132 м².",
+    about: [],
     exteriors: [
       "/catalog/ekohouse-132/01.jpg",
       "/catalog/ekohouse-132/02.jpg",
@@ -1446,6 +1482,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     technology: "panel",
     href: "/catalog/ekohouse-184",
     description: "Панельно-каркасный дом площадью 184 м².",
+    about: [],
     exteriors: [
       "/catalog/ekohouse-184/01.jpg",
       "/catalog/ekohouse-184/02.jpg",

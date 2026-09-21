@@ -4636,6 +4636,64 @@ a {
   padding: 0 14px;
 }
 
+/* Раздел «О проекте».
+   Шахматка из четырёх прямоугольников: текст и кадр, ниже кадр и текст.
+   Диагональ из текстовых карточек ведёт взгляд слева направо и вниз.
+
+   Высоту рядов задаёт пропорция кадра, а карточка растягивается под неё:
+   так оба прямоугольника ряда одинаковы, и шахматка читается сеткой, а не
+   случайным набором плиток. */
+.project-about__grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+}
+
+@media (min-width: 720px) {
+  .project-about__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.project-about__card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: 28px 32px;
+  border-radius: 14px;
+  background: var(--page);
+}
+
+.project-about__card h2 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: none;
+}
+
+.project-about__card p {
+  margin: 14px 0 0;
+  max-width: 42ch;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+.project-about__photo {
+  border-radius: 14px;
+  overflow: hidden;
+  aspect-ratio: 16 / 10;
+}
+
+.project-about__photo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* Фасады в карточке проекта: ряд с прокруткой на узком экране, сетка на
    широком — кадры разного размера смотрелись бы случайным коллажем. */
 .project-gallery {
@@ -6912,8 +6970,15 @@ textarea:focus-visible {
 @media (min-width: 960px) {
   .project-hero__bar {
     grid-template-columns: 1fr auto;
-    align-items: center;
+    /* Последняя базовая линия, а не центр: слева у каждой характеристики
+       над значением стоит подпись, справа её нет, и по центру числа
+       расходились по вертикали. По last baseline выравниваются именно
+       значения, независимо от кегля и от того, есть подпись или нет. */
+    align-items: last baseline;
     padding: 18px 22px 18px 24px;
+    /* Высота та же, что была с кнопкой расчёта. Без неё плашка просела бы
+       на шесть пикселей, и первый экран поехал бы следом. */
+    min-height: 86px;
   }
 }
 
@@ -6963,14 +7028,18 @@ textarea:focus-visible {
   letter-spacing: -0.02em;
 }
 
+/* В правой части плашки только платёж по ипотеке.
+   Кнопка расчёта убрана, полная цена тоже: рядом с платежом она шла мелкой
+   строкой, и обе цены проигрывали друг другу.
+
+   Устроено так же, как характеристика слева: подпись сверху, значение под
+   ней. Одинаковое устройство само ставит их на одну линию и избавляет от
+   подгонки отступами. */
 .project-hero__aside {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 12px;
+  display: block;
 }
 
-.project-hero__price p {
+.project-hero__pay-label {
   margin: 0;
   font-size: 11px;
   font-weight: 600;
@@ -6979,18 +7048,16 @@ textarea:focus-visible {
   color: rgb(255 255 255 / 0.58);
 }
 
-.project-hero__price strong {
+.project-hero__pay {
   display: block;
   margin-top: 2px;
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   font-weight: 700;
+  letter-spacing: -0.02em;
   white-space: nowrap;
-}
-
-.project-hero__cta {
-  height: var(--btn-h-lg);
-  padding: 0 var(--btn-pad-lg);
-  white-space: nowrap;
+  /* Фирменный жёлтый, как у числа в заголовке и значков характеристик:
+     единственная величина в плашке, ради которой сюда пришли. */
+  color: var(--brand-yellow);
 }
 
 .project-hero__icon {

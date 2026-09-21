@@ -71,6 +71,12 @@ export type CatalogProject = {
   technology: CatalogTechnology
   href: string
   description: string
+  /**
+   * Редакционные абзацы раздела «О проекте». Каждый со своей фотографией.
+   * Пусто значит, что текста ещё нет: раздел тогда показывает только то,
+   * что собирается из данных, и не выдумывает остального.
+   */
+  about: { title: string; text: string; image?: string }[]
   exteriors: string[]
   interiors: string[]
   floorPlans: string[]

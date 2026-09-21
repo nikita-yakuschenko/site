@@ -2,17 +2,20 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import {
-  IconArrowUpRight,
   IconBath,
   IconBed,
   IconChevronRight,
   IconRulerMeasure,
   IconStairs,
 } from '@tabler/icons-react'
+import { ProjectAbout } from '../../../components/project-about'
 import { ProjectActions } from '../../../components/project-actions'
 import { SiteChrome } from '../../../components/site-chrome'
 import { FixtureCatalogProvider } from '../../../lib/catalog/fixture-provider'
 import { copy, footerAboutFor } from '../../../lib/copy'
+import { monthlyPaymentForProject } from '../../../lib/mortgage'
+import { formatRub } from '../../../lib/locale'
+import { readServerRegionCode } from '../../../lib/regions'
 import { splitProjectName } from '../../../lib/project-name'
 import { SITE } from '../../../lib/site'
 
@@ -51,6 +54,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   // Маркировка в заголовке идёт фирменным жёлтым: правило .project-hero h1 span
   // уже есть в стилях, нужно лишь отделить число от слова.
   const { head, mark } = splitProjectName(project.name)
+
+  /* Платёж считается на сервере от цены проекта: расчёт и цена уже есть,
+     не хватало только вызова. Регион берётся серверный, на самой странице
+     ипотеки его можно сменить. */
+  const payment = project.priceAmount
+    ? monthlyPaymentForProject({
+        propertyPrice: project.priceAmount,
+        region: readServerRegionCode(),
+      })
+    : null
 
   const specs = [
     { icon: IconRulerMeasure, label: copy.area, value: `${project.area} ${copy.specArea}` },
@@ -114,26 +127,23 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                   )
                 })}
               </ul>
+              {/* Здесь только платёж. Кнопка расчёта убрана, полная цена
+                  тоже: рядом с платежом она шла мелкой строкой и обе цены
+                  проигрывали друг другу. Полной стоимости место ниже по
+                  странице, где под неё можно дать состав комплектации. */}
               <div className="project-hero__aside">
-                <div className="project-hero__price">
-                  <p>{copy.cost}</p>
-                  <strong>{project.priceLabel}</strong>
-                </div>
-                <Link className="btn btn-yellow project-hero__cta" href="/#contacts">
-                  {copy.getQuote}
-                  <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
-                </Link>
+                {/* Подпись над суммой, как у характеристик слева: без неё
+                    число висело само по себе и выбивалось из ряда. */}
+                <p className="project-hero__pay-label">{copy.paymentFrom}</p>
+                <strong className="project-hero__pay">
+                  {payment ? `${formatRub(payment)}${copy.perMonth}` : project.priceLabel}
+                </strong>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="section">
-          <div className="section__inner">
-            <h2>{project.name}</h2>
-            <p className="info-page__lead">{project.description}</p>
-          </div>
-        </section>
+        <ProjectAbout project={project} />
 
         {project.exteriors.length ? (
           <section className="section">
