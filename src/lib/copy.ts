@@ -143,6 +143,8 @@ export const copy = {
   noticeLinkLabel: "avgst.ru",
   noticeLinkHref: "https://avgst.ru",
   askQuestion: "Задать вопрос",
+  askDialogBody:
+    "Оставьте контакты — перезвоним и ответим на вопросы по проектам, срокам и ипотеке.",
   askQuestionShort: "Вопрос",
   name: "Имя",
   namePlaceholder: "",

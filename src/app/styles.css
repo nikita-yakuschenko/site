@@ -6775,6 +6775,88 @@ textarea:focus-visible {
   cursor: pointer;
 }
 
+/* Окно вопроса из шапки. Форма приходит к человеку, а не человек к ней:
+   прежде кнопка уводила якорем на главную и прокручивала в подвал. */
+.ask-dialog {
+  position: fixed;
+  inset: 0;
+  /* Во всю ширину окна, включая поле, оставшееся от спрятанной полосы
+     прокрутки: без этого справа светилась незатемнённая полоска. */
+  margin-right: calc(-1 * var(--scrollbar-gap, 0px));
+  z-index: 70;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 4vw, 40px);
+  background: rgb(var(--avgst-ink-rgb) / 0.72);
+  backdrop-filter: blur(3px);
+  animation: ask-dialog-in 0.24s var(--ease-out);
+}
+
+@keyframes ask-dialog-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.ask-dialog__card {
+  position: relative;
+  /* Поля в три-четыре слова: широкая колонка им ни к чему, а окно
+     поперёк экрана выглядит тяжелее самого вопроса. */
+  width: min(380px, 100%);
+  max-height: 90svh;
+  overflow-y: auto;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 30px 80px -40px rgb(0 0 0 / 0.6);
+  animation: ask-dialog-card 0.28s var(--ease-out);
+}
+
+@keyframes ask-dialog-card {
+  from {
+    opacity: 0;
+    transform: translateY(8px) scale(0.98);
+  }
+}
+
+.ask-dialog__card .lead-card {
+  border: 0;
+  background: none;
+}
+
+/* Поле в фокусе отмечается своей гранью: зелёная рамка общего правила
+   ложилась поверх скруглённого поля вторым контуром. */
+.ask-dialog__card :is(input, textarea):focus-visible {
+  outline: none;
+  border-color: rgb(var(--avgst-ink-rgb) / 0.55);
+  box-shadow: 0 0 0 3px rgb(var(--avgst-ink-rgb) / 0.08);
+}
+
+.ask-dialog__close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(var(--avgst-ink-rgb) / 0.06);
+  color: var(--avgst-ink);
+  cursor: pointer;
+  transition: background 0.2s var(--ease-out), transform 0.16s var(--ease-out);
+}
+
+.ask-dialog__close:hover {
+  background: rgb(var(--avgst-ink-rgb) / 0.14);
+}
+
+.ask-dialog__close:active {
+  transform: scale(0.94);
+}
+
+
 .configurator {
   display: grid;
   gap: 24px;

@@ -19,6 +19,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { AskDialog } from "./ask-dialog";
 import { copy } from "../lib/copy";
 import { copyrightYears, FOOTER_SOCIALS, footerSocialHref } from "../lib/site";
 import { mediaUrl } from "../lib/media";
@@ -162,6 +163,8 @@ export function SiteChrome({
   subrow?: ReactNode;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  /* Форма из шапки: открывается поверх страницы, а не уводит якорем. */
+  const [askOpen, setAskOpen] = useState(false);
 
   const noticeClosed = useSyncExternalStore(
     subscribeNotice,
@@ -286,12 +289,13 @@ export function SiteChrome({
                   {phone}
                 </a>
               ) : null}
-              <Link
+              <button
+                type="button"
                 className="btn btn-yellow site-header__cta"
-                href="/#contacts"
+                onClick={() => setAskOpen(true)}
               >
                 {copy.askQuestion}
-              </Link>
+              </button>
               <button
                 type="button"
                 className="site-header__burger"
@@ -389,13 +393,16 @@ export function SiteChrome({
                 {phone}
               </a>
             ) : null}
-            <Link
+            <button
+              type="button"
               className="btn btn-yellow"
-              href="/#contacts"
-              onClick={() => setMenuOpen(false)}
+              onClick={() => {
+                setMenuOpen(false);
+                setAskOpen(true);
+              }}
             >
               {copy.askQuestion}
-            </Link>
+            </button>
             {/* Тема полосы: в ряду на узком экране давала горизонтальный скролл. */}
             <button
               type="button"
@@ -571,6 +578,8 @@ export function SiteChrome({
           </div>
         </div>
       </footer>
+
+      {askOpen ? <AskDialog onClose={() => setAskOpen(false)} /> : null}
     </div>
   );
 }
