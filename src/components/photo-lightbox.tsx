@@ -18,6 +18,180 @@ import { copy } from "../lib/copy";
  * обычно не один снимок, а подряд, и возвращаться к сетке ради каждого
  * следующего — лишний шаг.
  */
+
+/** Предельное увеличение. Дальше видно зерно, а не отделку. */
+const MAX_SCALE = 4;
+
+/** Увеличение по двойному касанию: заметно, но не теряешь, где находишься. */
+const TAP_SCALE = 2.5;
+
+/**
+ * Щипок увеличивает кадр, а не страницу.
+ *
+ * Пока жест не перехвачен, им распоряжается браузер: на телефоне щипок
+ * масштабировал весь интерфейс вместе с кнопками, а сам снимок оставался
+ * прежнего размера. Поэтому касания забираются себе — touch-action: none в
+ * стилях, — и превращаются в перемещение и масштаб самого кадра.
+ *
+ * Модель простая: точка кадра p на экране лежит в s * p + t. При щипке
+ * серединa между пальцами должна остаться над той же точкой снимка, отсюда
+ * t = m - s₁ * (m - t₀) / s₀.
+ */
+const FLAT = { scale: 1, x: 0, y: 0 };
+
+function useZoom(
+  resetKey: unknown,
+  box: React.RefObject<HTMLDivElement | null>,
+) {
+  const [view, setView] = useState(FLAT);
+  const points = useRef(new Map<number, { x: number; y: number }>());
+  const start = useRef({ dist: 0, mx: 0, my: 0, scale: 1, x: 0, y: 0 });
+  const lastTap = useRef(0);
+
+  /* Новый кадр открывают целиком: увеличение прошлого к нему не относится.
+     Сброс идёт прямо в отрисовке, а не эффектом: эффект сработал бы после
+     того, как новый кадр уже показан в чужом масштабе, и это было бы видно
+     как рывок. React для смены состояния вслед за свойством предлагает
+     ровно этот приём. */
+  const [shownKey, setShownKey] = useState(resetKey);
+  if (shownKey !== resetKey) {
+    setShownKey(resetKey);
+    setView(FLAT);
+  }
+
+  /* Кадр не отпускает края: при увеличении его можно таскать ровно
+     настолько, насколько он вышел за рамку, а в масштабе 1 он всегда по
+     центру. Иначе снимок уезжает в пустоту и приходится искать его. */
+  const clamp = (scale: number, x: number, y: number) => {
+    const rect = box.current?.getBoundingClientRect();
+    if (!rect) return { scale, x, y };
+    const limitX = Math.max(0, rect.width * (scale - 1));
+    const limitY = Math.max(0, rect.height * (scale - 1));
+    return {
+      scale,
+      x: Math.min(0, Math.max(-limitX, x)),
+      y: Math.min(0, Math.max(-limitY, y)),
+    };
+  };
+
+  const local = (event: React.PointerEvent) => {
+    const rect = box.current?.getBoundingClientRect();
+    return {
+      x: event.clientX - (rect?.left ?? 0),
+      y: event.clientY - (rect?.top ?? 0),
+    };
+  };
+
+  const onPointerDown = (event: React.PointerEvent) => {
+    try {
+      box.current?.setPointerCapture?.(event.pointerId);
+    } catch {
+      /* Захват не удался — жест всё равно отследим по событиям элемента. */
+    }
+    points.current.set(event.pointerId, local(event));
+
+    if (points.current.size === 2) {
+      const [a, b] = [...points.current.values()];
+      if (!a || !b) return;
+      start.current = {
+        dist: Math.hypot(a.x - b.x, a.y - b.y) || 1,
+        mx: (a.x + b.x) / 2,
+        my: (a.y + b.y) / 2,
+        scale: view.scale,
+        x: view.x,
+        y: view.y,
+      };
+      return;
+    }
+
+    // Двойное касание: увеличить в точку касания или вернуть кадр целиком.
+    const now = Date.now();
+    if (event.pointerType !== "mouse" && now - lastTap.current < 300) {
+      lastTap.current = 0;
+      const point = local(event);
+      if (view.scale > 1) {
+        setView({ scale: 1, x: 0, y: 0 });
+      } else {
+        const next = TAP_SCALE;
+        setView(
+          clamp(next, point.x - next * point.x, point.y - next * point.y),
+        );
+      }
+      return;
+    }
+    lastTap.current = now;
+    start.current = {
+      ...start.current,
+      scale: view.scale,
+      x: view.x,
+      y: view.y,
+    };
+  };
+
+  const onPointerMove = (event: React.PointerEvent) => {
+    if (!points.current.has(event.pointerId)) return;
+    const prev = points.current.get(event.pointerId)!;
+    const point = local(event);
+    points.current.set(event.pointerId, point);
+
+    if (points.current.size >= 2) {
+      const [a, b] = [...points.current.values()];
+      if (!a || !b) return;
+      const dist = Math.hypot(a.x - b.x, a.y - b.y) || 1;
+      const scale = Math.min(
+        MAX_SCALE,
+        Math.max(1, (start.current.scale * dist) / start.current.dist),
+      );
+      const ratio = scale / start.current.scale;
+      setView(
+        clamp(
+          scale,
+          start.current.mx - ratio * (start.current.mx - start.current.x),
+          start.current.my - ratio * (start.current.my - start.current.y),
+        ),
+      );
+      return;
+    }
+
+    // Один палец тянет кадр — но только когда его увеличили.
+    if (view.scale <= 1) return;
+    setView((current) =>
+      clamp(
+        current.scale,
+        current.x + (point.x - prev.x),
+        current.y + (point.y - prev.y),
+      ),
+    );
+  };
+
+  const onPointerEnd = (event: React.PointerEvent) => {
+    points.current.delete(event.pointerId);
+    if (points.current.size === 1) {
+      // Один палец остался: дальше он тянет кадр, и отсчёт начинается заново.
+      const rest = [...points.current.values()][0];
+      if (rest)
+        start.current = {
+          ...start.current,
+          scale: view.scale,
+          x: view.x,
+          y: view.y,
+        };
+    }
+  };
+
+  return {
+    zoomed: view.scale > 1,
+    style: {
+      transform: `translate3d(${view.x}px, ${view.y}px, 0) scale(${view.scale})`,
+    } as React.CSSProperties,
+    handlers: {
+      onPointerDown,
+      onPointerMove,
+      onPointerUp: onPointerEnd,
+      onPointerCancel: onPointerEnd,
+    },
+  };
+}
 export function PhotoLightbox({
   images,
   labels,
@@ -39,6 +213,8 @@ export function PhotoLightbox({
 }) {
   const total = images.length;
   const strip = useRef<HTMLDivElement>(null);
+  const shot = useRef<HTMLDivElement>(null);
+  const zoom = useZoom(index, shot);
   const [legendOn, setLegendOn] = useState(false);
   const legend = legends?.[index];
   const go = useCallback(
@@ -110,7 +286,23 @@ export function PhotoLightbox({
             {labels[index]}
           </figcaption>
         ) : null}
-        <div className="photo-lightbox__shot">
+        <div
+          className={
+            zoom.zoomed
+              ? "photo-lightbox__shot is-zoomed"
+              : "photo-lightbox__shot"
+          }
+          ref={shot}
+          onPointerDown={zoom.handlers.onPointerDown}
+          onPointerMove={zoom.handlers.onPointerMove}
+          onPointerUp={zoom.handlers.onPointerUp}
+          onPointerCancel={zoom.handlers.onPointerCancel}
+        >
+          {/* Масштаб применяется к самому изображению, а не к обёртке вокруг
+              него: обёртка разрывала цепочку размеров — кадр вписан по
+              max-width от родителя, и внутри лишнего слоя он сжимался до
+              десятков пикселей. Кнопка экспликации и её панель лежат рядом с
+              кадром, поэтому с ним не масштабируются. */}
           <Image
             key={src}
             src={src}
@@ -119,6 +311,7 @@ export function PhotoLightbox({
             height={1400}
             sizes="100vw"
             priority
+            style={zoom.style}
           />
 
           {legend?.length ? (

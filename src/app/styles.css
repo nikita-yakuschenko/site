@@ -11977,6 +11977,24 @@ html.is-dialog-open {
   position: relative;
   display: inline-block;
   line-height: 0;
+  /* Касания забираем себе: иначе щипок отдаёт браузеру, и тот масштабирует
+     страницу вместе с кнопками, а сам кадр остаётся прежним. */
+  touch-action: none;
+  /* Увеличенный кадр не выходит за пределы своей рамки. */
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+/* Масштаб применяется к самому кадру. Начало координат в левом верхнем
+   углу: расчёт сдвига в компоненте исходит из него. */
+.photo-lightbox__shot img {
+  transform-origin: 0 0;
+  will-change: transform;
+}
+
+/* Пока кадр увеличен, палец его тянет, и курсор об этом говорит. */
+.photo-lightbox__shot.is-zoomed {
+  cursor: grab;
 }
 
 .photo-lightbox__frame img {
