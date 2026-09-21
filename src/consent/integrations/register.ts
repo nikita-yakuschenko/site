@@ -30,37 +30,11 @@ registerIntegration({
 registerIntegration({
   id: "yandex-metrica",
   category: "analytics",
-  init: async () => {
-    // Placeholder: счётчик подключается после ENV NEXT_PUBLIC_YM_ID.
-    const id = process.env.NEXT_PUBLIC_YM_ID;
-    if (!id || typeof window === "undefined") return;
-    // Не загружаем скрипт, пока нет явного ID и consent — init вызовут только при analytics=true.
-    const w = window as Window & { ym?: (...args: unknown[]) => void };
-    if (w.ym) return;
-    await new Promise<void>((resolve, reject) => {
-      const script = document.createElement("script");
-      script.src = "https://mc.yandex.ru/metrika/tag.js";
-      script.async = true;
-      script.onload = () => resolve();
-      script.onerror = () => reject(new Error("ym load failed"));
-      document.head.appendChild(script);
-    });
-    type YmQueue = { a?: unknown[][] } & ((...args: unknown[]) => void);
-    const ym = function (...args: unknown[]) {
-      (ym.a = ym.a || []).push(args);
-    } as YmQueue;
-    w.ym = ym;
-    w.ym(Number(id), "init", {
-      clickmap: true,
-      trackLinks: true,
-      accurateTrackBounce: true,
-      webvisor: true,
-      ecommerce: false,
-    });
-  },
-  revoke: async () => {
-    // First-party cleanup делает cleanupCategory('analytics').
-  },
+  /* Счётчик здесь больше не подключается: он грузится сразу, до баннера,
+     компонентом YandexMetrica в layout. Иначе в статистику не попадают
+     ровно те, ради кого её и смотрят, — ушедшие, не приняв куки.
+     Запись оставлена, чтобы очистка при отзыве согласия по-прежнему знала
+     про категорию: ключи _ym_* перечислены в cleanup.ts. */
 });
 
 registerIntegration({
