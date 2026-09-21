@@ -141,7 +141,7 @@ export function calculateMortgage(
   );
   const termMonths = termYears * 12;
 
-  let propertyPrice = Math.max(0, input.propertyPrice);
+  const propertyPrice = Math.max(0, input.propertyPrice);
   let downPayment = Math.max(0, input.downPayment);
 
   if (propertyPrice <= 0) errors.push("propertyPrice");

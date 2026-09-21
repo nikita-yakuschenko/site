@@ -6,6 +6,7 @@ import { ConsentShell } from '../consent/ConsentShell'
 import { parseConsent } from '../consent/storage'
 import {
   CONSENT_COOKIE,
+  CONSENT_VERSION,
   isConsentDecided,
 } from '../consent/types'
 import { copy } from '../lib/copy'
@@ -36,8 +37,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const jar = await cookies()
   const raw = jar.get(CONSENT_COOKIE)?.value
   const parsed = parseConsent(raw)
-  const initialState =
-    parsed && isConsentDecided(parsed) ? parsed : null
+  /* Версия проверяется здесь, а не на клиенте. Устаревшее согласие
+     считается неданным, и баннер спросит заново. Раньше это делал эффект
+     провайдера, и ему приходилось переписывать состояние уже после
+     отрисовки, хотя кука прочитана прямо тут. */
+  const fresh = parsed && parsed.version === CONSENT_VERSION ? parsed : null
+  const initialState = fresh && isConsentDecided(fresh) ? fresh : null
 
   return (
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>

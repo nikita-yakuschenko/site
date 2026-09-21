@@ -15,14 +15,12 @@ import {
   acceptAllState,
   necessaryOnlyState,
   buildConsentState,
-  readConsentCookie,
   writeConsentCookie,
   DEFAULT_CONSENT,
 } from "./storage";
 import {
   isConsentDecided,
   hasConsent as hasConsentState,
-  CONSENT_VERSION,
   type ConsentAction,
   type ConsentCategory,
   type CookieConsentState,
@@ -99,18 +97,14 @@ export function ConsentProvider({
   );
   const [settingsOpen, setSettingsOpen] = useState(false);
 
+  /* Состояние приходит с сервера: ту же куку читает layout, он же отсеивает
+     устаревшую версию. Перечитывать её здесь и переписывать состояние после
+     отрисовки незачем, на клиенте остаётся только применить последствия
+     уже принятого согласия. */
   useEffect(() => {
-    const fromCookie = readConsentCookie();
-    if (fromCookie && fromCookie.version === CONSENT_VERSION) {
-      setState(fromCookie);
-      void applySideEffects(null, fromCookie);
-      return;
-    }
-    if (fromCookie && fromCookie.version !== CONSENT_VERSION) {
-      // Версия устарела — спрашиваем снова.
-      setState(DEFAULT_CONSENT);
-    }
-  }, []);
+    if (!initialState) return;
+    void applySideEffects(null, initialState);
+  }, [initialState]);
 
   const persist = useCallback(
     (next: CookieConsentState, action: ConsentAction, prev: CookieConsentState | null) => {

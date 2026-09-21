@@ -141,9 +141,14 @@ export function MortgageCalculator({
     formatRateValue(program.rate),
   );
 
-  useEffect(() => {
+  /* Программа сменилась — поле ставки берёт её значение. Сверка идёт в
+     рендере, а не эффектом: setState внутри эффекта тянет лишний проход
+     отрисовки, и React об этом предупреждает. */
+  const [seenRate, setSeenRate] = useState(program.rate);
+  if (seenRate !== program.rate) {
+    setSeenRate(program.rate);
     setRateInput(formatRateValue(program.rate));
-  }, [program.rate]);
+  }
 
   const editableRate = programId === "market";
   const rateOverride = editableRate ? parseRate(rateInput) : undefined;
@@ -161,17 +166,18 @@ export function MortgageCalculator({
     onOpen();
   }, [onOpen]);
 
-  // Минимальный ПВ при смене программы / цены.
-  useEffect(() => {
-    const min = Math.round(propertyPrice * program.minDownPaymentPercent);
-    setDownPayment((prev) => (prev < min ? min : prev));
-  }, [program.minDownPaymentPercent, propertyPrice, program]);
+  /* Взнос и срок подтягиваются к границам программы прямо в рендере.
+     Эффектом это давало лишний проход отрисовки: сначала показывалось
+     значение вне границ, и только потом исправленное. Проверка сходится с
+     первого раза, потому что после поправки условие уже ложно. */
+  const minDownPayment = Math.round(propertyPrice * program.minDownPaymentPercent);
+  if (downPayment < minDownPayment) setDownPayment(minDownPayment);
 
-  useEffect(() => {
-    setTermYears((y) =>
-      Math.min(program.maxTermYears, Math.max(program.minTermYears, y)),
-    );
-  }, [program]);
+  const boundedTerm = Math.min(
+    program.maxTermYears,
+    Math.max(program.minTermYears, termYears),
+  );
+  if (boundedTerm !== termYears) setTermYears(boundedTerm);
 
   const paymentResult = useMemo(
     () =>
@@ -230,7 +236,12 @@ export function MortgageCalculator({
     [projects, budgetPrice],
   );
 
-  const trackParamsChanged = useEffectEvent(() => {
+  /* Обычные функции, а не useEffectEvent: зовут их из обработчика события
+     через отложенный таймер, а не из эффекта, и правило хуков такой вызов
+     запрещает. Поведение при этом то же: таймер сбрасывается на каждое
+     изменение, и срабатывает замыкание последней отрисовки, то есть с
+     самыми свежими значениями. */
+  const trackParamsChanged = () => {
     trackEvent({
       type: "mortgage_parameters_changed",
       program: programId,
@@ -247,9 +258,9 @@ export function MortgageCalculator({
       available_budget: Math.round(budgetPack.maxPropertyPrice),
       mode,
     });
-  });
+  };
 
-  const trackCompleted = useEffectEvent(() => {
+  const trackCompleted = () => {
     trackEvent({
       type: "mortgage_calculation_completed",
       program: programId,
@@ -262,7 +273,7 @@ export function MortgageCalculator({
       available_budget: Math.round(budgetPack.maxPropertyPrice),
       mode,
     });
-  });
+  };
 
   function scheduleAnalytics() {
     if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -700,9 +711,14 @@ function CalcField({
      ширину при движении соседнего ползунка. */
   const widthInChars = fieldWidthInChars(widthFrom ?? max);
   const [text, setText] = useState(displayMoney(value));
-  useEffect(() => {
+  /* Значение пришло снаружи (ползунок, сброс, смена программы) — поле
+     подтягивается за ним. Сверка в рендере, а не эффектом: иначе один
+     кадр поле показывает прежнее число. */
+  const [seenValue, setSeenValue] = useState(value);
+  if (seenValue !== value) {
+    setSeenValue(value);
     setText(displayMoney(value));
-  }, [value]);
+  }
 
   const commit = (raw: string, soft: boolean) => {
     const digits = raw.replace(/[^\d]/g, "").slice(0, maxDigits(max));

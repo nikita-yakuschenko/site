@@ -2,6 +2,7 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import { useConsent } from "./ConsentProvider";
+import type { CookieConsentState } from "./types";
 
 function Toggle({
   id,
@@ -56,12 +57,22 @@ export function CookieSettingsDialog() {
   const [analytics, setAnalytics] = useState(state.analytics);
   const [marketing, setMarketing] = useState(state.marketing);
 
-  useEffect(() => {
-    if (!settingsOpen) return;
-    setFunctional(state.functional);
-    setAnalytics(state.analytics);
-    setMarketing(state.marketing);
-  }, [settingsOpen, state]);
+  /* Окно открылось (или согласие поменялось снаружи, пока оно открыто) —
+     переключатели берут текущее состояние. Сверка идёт в рендере, а не
+     эффектом: setState внутри эффекта даёт лишний проход отрисовки, и один
+     кадр окно показывает прежние положения переключателей. */
+  const [seen, setSeen] = useState<{ open: boolean; state: CookieConsentState }>({
+    open: settingsOpen,
+    state,
+  });
+  if (seen.open !== settingsOpen || seen.state !== state) {
+    setSeen({ open: settingsOpen, state });
+    if (settingsOpen) {
+      setFunctional(state.functional);
+      setAnalytics(state.analytics);
+      setMarketing(state.marketing);
+    }
+  }
 
   useEffect(() => {
     if (!settingsOpen) return;
