@@ -1,7 +1,7 @@
 "use client";
 
 import { IconArrowUpRight, IconCheck } from "@tabler/icons-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { copy } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
 import { tiersForProject } from "../lib/catalog/tiers";
@@ -26,18 +26,52 @@ import {
  *
  * Платёж считается здесь же, на клиенте: он меняется вместе с выбором, а
  * серверное значение в шапке относится к базовой цене проекта.
+ *
+ * Выбранный уровень переживает перезагрузку и переходит между проектами:
+ * это решение про бюджет, а не про конкретный дом, и переспрашивать его
+ * на каждой странице незачем.
  */
+
+/** Ключ хранилища. Выбор общий для каталога, поэтому без слага проекта. */
+const TIER_KEY = "avgst:project-tier";
 export function ProjectConfig({
   project,
-  /** Платёж по базовой цене — из него берётся ставка: считать её второй
-   *  раз в компоненте значило бы завести вторую правду о программе. */
+  /** Платёж, посчитанный на сервере, и цена, для которой он посчитан:
+   *  из этой пары берётся ставка. Считать её второй раз в компоненте
+   *  значило бы завести вторую правду о программе. */
   basePayment,
+  basePrice,
 }: {
   project: CatalogProject;
   basePayment: number | null;
+  basePrice: number | null;
 }) {
   const tiers = tiersForProject(project);
   const [tierId, setTierId] = useState("standard");
+
+  /* Читаем после гидрации: на сервере localStorage нет, а разметка должна
+     совпасть. Хранилище может быть недоступно — тогда остаётся значение
+     по умолчанию. */
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem(TIER_KEY);
+      if (saved) setTierId(saved);
+    } catch {
+      /* приватный режим или запрет на хранилище */
+    }
+  }, []);
+
+  /* Пишем на выборе, а не эффектом от tierId: эффект записи срабатывал бы
+     в одном коммите с восстановлением и успевал затереть прочитанное
+     значение ещё не обновлённым состоянием. */
+  const pickTier = (id: string) => {
+    setTierId(id);
+    try {
+      window.localStorage.setItem(TIER_KEY, id);
+    } catch {
+      /* записать некуда — выбор живёт до перезагрузки */
+    }
+  };
 
   if (!tiers) return null;
   const tier = tiers.find((item) => item.id === tierId) ?? tiers[1]!;
@@ -45,8 +79,8 @@ export function ProjectConfig({
   /* Платёж пропорционален цене: при одной ставке, взносе и сроке аннуитет
      линеен по сумме кредита. */
   const monthly =
-    basePayment && project.priceAmount
-      ? Math.round((basePayment * tier.price) / project.priceAmount)
+    basePayment && basePrice
+      ? Math.round((basePayment * tier.price) / basePrice)
       : null;
 
   return (
@@ -71,7 +105,7 @@ export function ProjectConfig({
                         : "project-config__tier"
                     }
                     aria-pressed={item.id === tier.id}
-                    onClick={() => setTierId(item.id)}
+                    onClick={() => pickTier(item.id)}
                   >
                     <span className="project-config__tier-name">
                       {item.name}
@@ -95,10 +129,14 @@ export function ProjectConfig({
               ))}
             </ul>
 
+            {/* Заголовок называет уровень: иначе список материалов
+                читается как общий для дома, а он у каждой комплектации
+                свой. Ключ по уровню — чтобы при переключении список
+                собрался заново и первый пункт снова был раскрыт. */}
             <h3 className="project-config__details-title">
-              {copy.configDetails}
+              {copy.configDetails} {tier.nameAcc} {copy.configTierWordAcc}
             </h3>
-            <Accordion type="multiple" className="ui-accordion">
+            <Accordion key={tier.id} type="multiple" className="ui-accordion">
               {tier.details.map((detail) => (
                 <AccordionItem
                   key={detail.title}

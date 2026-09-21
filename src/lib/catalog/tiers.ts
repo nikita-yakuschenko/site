@@ -18,6 +18,8 @@ export type TierDetail = { title: string; text: string };
 export type ProjectTier = {
   id: string;
   name: string;
+  /** Название в винительном падеже: «что входит в стандартную». */
+  nameAcc: string;
   lead: string;
   /** Множитель к базовой цене проекта. */
   factor: number;
@@ -29,6 +31,7 @@ export const PROJECT_TIERS: readonly ProjectTier[] = [
   {
     id: "start",
     name: "Стартовая",
+    nameAcc: "стартовую",
     lead: "Основа дома. Силовой каркас с утеплением из сухой строганой доски. Изготавливаем на своём производстве.",
     factor: 0.663,
     includes: ["Силовой каркас", "Доставка и сборка"],
@@ -46,6 +49,7 @@ export const PROJECT_TIERS: readonly ProjectTier[] = [
   {
     id: "standard",
     name: "Стандартная",
+    nameAcc: "стандартную",
     lead: "Завершённый образ дома. Силовой каркас, кровля, окна и входные двери, наружная отделка.",
     factor: 1,
     includes: [
@@ -73,6 +77,7 @@ export const PROJECT_TIERS: readonly ProjectTier[] = [
   {
     id: "project",
     name: "Проектная",
+    nameAcc: "проектную",
     lead: "Архитектура дома выполнена согласно проекту: большие окна, терраса и внутренняя отделка стен.",
     factor: 1.416,
     includes: [
