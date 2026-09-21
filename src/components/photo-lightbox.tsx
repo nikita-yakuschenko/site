@@ -272,11 +272,54 @@ export function PhotoLightbox({
   const shot = useRef<HTMLDivElement>(null);
   const [legendOn, setLegendOn] = useState(false);
   const legend = legends?.[index];
+  /* Направление перелистывания запоминается в тот момент, когда его
+     попросили, а не выводится из номеров: с последнего кадра на первый
+     номер уменьшается, хотя листали вперёд, и кадр уезжал бы в обратную
+     сторону.
+
+     Хранится состоянием, а не ссылкой: его читает отрисовка, а ссылки в
+     отрисовке читать нельзя — там не видно, что значение поменялось.
+     Обновляется в том же наборе, что и номер кадра, поэтому к следующей
+     отрисовке оба уже согласованы. */
+  const [dir, setDir] = useState(1);
   const go = useCallback(
-    (step: number) => onIndex((index + step + total) % total),
+    (step: number) => {
+      setDir(step < 0 ? -1 : 1);
+      onIndex((index + step + total) % total);
+    },
     [index, total, onIndex],
   );
+  const pick = useCallback(
+    (next: number) => {
+      setDir(next < index ? -1 : 1);
+      onIndex(next);
+    },
+    [index, onIndex],
+  );
   const zoom = useZoom(index, shot, go);
+
+  /* Уходящий кадр держим в разметке, пока идёт его анимация: карусель — это
+     два кадра одновременно, приходящий и уходящий. Считаем смену прямо в
+     отрисовке, чтобы новый кадр сразу поехал с нужной стороны, а не мигнул
+     на месте и только потом поехал. */
+  const [shown, setShown] = useState(index);
+  const [leaving, setLeaving] = useState<{ src: string; dir: number } | null>(
+    null,
+  );
+  if (shown !== index) {
+    const from = images[shown];
+    if (from) setLeaving({ src: from, dir });
+    setShown(index);
+  }
+
+  /* Страховка на случай, когда событие окончания анимации не приходит: в
+     свёрнутой вкладке анимации не идут вовсе, и уходящий кадр остался бы
+     висеть поверх нового. Срок чуть больше самой анимации. */
+  useEffect(() => {
+    if (!leaving) return;
+    const id = window.setTimeout(() => setLeaving(null), 500);
+    return () => window.clearTimeout(id);
+  }, [leaving]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -354,21 +397,49 @@ export function PhotoLightbox({
           onPointerUp={zoom.handlers.onPointerUp}
           onPointerCancel={zoom.handlers.onPointerCancel}
         >
-          {/* Масштаб применяется к самому изображению, а не к обёртке вокруг
-              него: обёртка разрывала цепочку размеров — кадр вписан по
-              max-width от родителя, и внутри лишнего слоя он сжимался до
-              десятков пикселей. Кнопка экспликации и её панель лежат рядом с
-              кадром, поэтому с ним не масштабируются. */}
-          <Image
+          {/* Уходящий кадр: живёт ровно до конца своей анимации, дальше
+              снимается. Сторона зависит от направления листания. */}
+          {leaving ? (
+            <div
+              key={`leaving-${leaving.src}`}
+              className={
+                leaving.dir > 0
+                  ? "photo-lightbox__slide is-leaving-next"
+                  : "photo-lightbox__slide is-leaving-prev"
+              }
+              onAnimationEnd={() => setLeaving(null)}
+            >
+              <Image
+                src={leaving.src}
+                alt=""
+                width={2000}
+                height={1400}
+                sizes="100vw"
+              />
+            </div>
+          ) : null}
+
+          {/* Приходящий кадр. Масштаб применяется к самому изображению, а не
+              к слою слайда: слой занят перелистыванием, и два преобразования
+              на одном узле спорили бы друг с другом. */}
+          <div
             key={src}
-            src={src}
-            alt=""
-            width={2000}
-            height={1400}
-            sizes="100vw"
-            priority
-            style={zoom.style}
-          />
+            className={
+              dir > 0
+                ? "photo-lightbox__slide is-coming-next"
+                : "photo-lightbox__slide is-coming-prev"
+            }
+          >
+            <Image
+              src={src}
+              alt=""
+              width={2000}
+              height={1400}
+              sizes="100vw"
+              priority
+              style={zoom.style}
+            />
+          </div>
 
           {legend?.length ? (
             <>
@@ -444,7 +515,7 @@ export function PhotoLightbox({
                 }
                 aria-label={`${copy.galleryOpen} ${i + 1}`}
                 aria-current={i === index}
-                onClick={() => onIndex(i)}
+                onClick={() => pick(i)}
               >
                 <Image
                   src={thumb}
