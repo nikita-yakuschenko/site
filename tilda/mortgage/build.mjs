@@ -7,7 +7,10 @@ import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 
 const __dir = dirname(fileURLToPath(import.meta.url));
-const ASSET = "https://new.avgst.ru";
+/* Картинки лежат рядом: tilda/mortgage/assets/… */
+const ASSET = "assets";
+/* Ссылки на живой сайт (каталог и т.п.) — не картинки. */
+const SITE_ORIGIN = "https://new.avgst.ru";
 const SITE = {
   phone: "+7 (831) 266-66-45",
   phoneHref: "tel:+78312666645",
@@ -91,9 +94,9 @@ const PAGES = [
 ];
 
 const HREF_MAP = {
-  "/catalog": `${ASSET}/catalog`,
-  "/for-sale": `${ASSET}/for-sale`,
-  "/manufacture": `${ASSET}/manufacture`,
+  "/catalog": `${SITE_ORIGIN}/catalog`,
+  "/for-sale": `${SITE_ORIGIN}/for-sale`,
+  "/manufacture": `${SITE_ORIGIN}/manufacture`,
   "/#contacts": "#zm-contacts",
 };
 
@@ -384,7 +387,7 @@ function renderHero(c, meta) {
         <p class="zm-hero__lead">${esc(c.lead)}</p>
         <div class="zm-hero__actions">
           <a class="zm-btn" href="#zm-mid-form">Оставить заявку</a>
-          <a class="zm-hero__more" href="${ASSET}/catalog">Выбрать проект</a>
+          <a class="zm-hero__more" href="${SITE_ORIGIN}/catalog">Выбрать проект</a>
         </div>
       </div>
     </div>
