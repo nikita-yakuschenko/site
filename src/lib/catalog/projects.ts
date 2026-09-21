@@ -343,9 +343,9 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
       "/catalog/barnhouse-115/03.jpg",
       "/catalog/barnhouse-115/04.jpg",
       "/catalog/barnhouse-115/05.jpg",
+      "/catalog/barnhouse-115/06.jpg",
     ],
     interiors: [
-      "/catalog/barnhouse-115/06.jpg",
       "/catalog/barnhouse-115/07.jpg",
       "/catalog/barnhouse-115/08.jpg",
       "/catalog/barnhouse-115/09.jpg",
