@@ -25,6 +25,11 @@ const MAX_SCALE = 4;
 /** Увеличение по двойному касанию: заметно, но не теряешь, где находишься. */
 const TAP_SCALE = 2.5;
 
+/* Порог смаха: короче — это касание по кадру, а не листание. Проверяется
+   вместе с направлением, иначе кадр листался бы при попытке потянуть его
+   вверх. */
+const SWIPE_MIN = 56;
+
 /**
  * Щипок увеличивает кадр, а не страницу.
  *
@@ -42,11 +47,14 @@ const FLAT = { scale: 1, x: 0, y: 0 };
 function useZoom(
   resetKey: unknown,
   box: React.RefObject<HTMLDivElement | null>,
+  /** Смах листает кадры: на телефоне это основной способ, кнопок там нет. */
+  onSwipe: (step: number) => void,
 ) {
   const [view, setView] = useState(FLAT);
   const points = useRef(new Map<number, { x: number; y: number }>());
   const start = useRef({ dist: 0, mx: 0, my: 0, scale: 1, x: 0, y: 0 });
   const lastTap = useRef(0);
+  const swipe = useRef<{ x: number; y: number } | null>(null);
 
   /* Новый кадр открывают целиком: увеличение прошлого к нему не относится.
      Сброс идёт прямо в отрисовке, а не эффектом: эффект сработал бы после
@@ -59,18 +67,38 @@ function useZoom(
     setView(FLAT);
   }
 
-  /* Кадр не отпускает края: при увеличении его можно таскать ровно
-     настолько, насколько он вышел за рамку, а в масштабе 1 он всегда по
-     центру. Иначе снимок уезжает в пустоту и приходится искать его. */
+  /* Кадр не отпускает края экрана: пока он больше площадки, его можно
+     таскать ровно настолько, насколько он за неё вышел, а как только он в
+     неё помещается — встаёт по центру.
+
+     Считаем от самого снимка, а не от площадки: снимок вписан в неё и почти
+     всегда меньше, поэтому запас хода у них разный. Снимок стоит по центру,
+     его левый край отстоит от края площадки на (площадка − снимок) / 2, и
+     видимое положение точки p равно этому отступу плюс сдвиг плюс масштаб
+     на p. Отсюда и пределы ниже. */
   const clamp = (scale: number, x: number, y: number) => {
-    const rect = box.current?.getBoundingClientRect();
-    if (!rect) return { scale, x, y };
-    const limitX = Math.max(0, rect.width * (scale - 1));
-    const limitY = Math.max(0, rect.height * (scale - 1));
+    const stage = box.current?.getBoundingClientRect();
+    const shot = box.current?.querySelector("img");
+    if (!stage || !shot) return { scale, x, y };
+
+    const axis = (value: number, size: number, room: number) => {
+      const offset = (room - size) / 2;
+      const scaled = scale * size;
+
+      /* По этой оси увеличенный кадр всё ещё умещается в площадку — значит
+         таскать его некуда, он просто встаёт по её середине. Ноль тут не
+         подходит: снимок вписан по своей исходной высоте, и при масштабе
+         больше единицы он свисал бы вниз. */
+      if (scaled <= room) return (room - scaled) / 2 - offset;
+
+      // Кадр больше площадки: края не отпускаем, между ними он свободен.
+      return Math.min(-offset, Math.max(room - offset - scaled, value));
+    };
+
     return {
       scale,
-      x: Math.min(0, Math.max(-limitX, x)),
-      y: Math.min(0, Math.max(-limitY, y)),
+      x: axis(x, shot.offsetWidth, stage.width),
+      y: axis(y, shot.offsetHeight, stage.height),
     };
   };
 
@@ -93,6 +121,11 @@ function useZoom(
     if (points.current.size === 2) {
       const [a, b] = [...points.current.values()];
       if (!a || !b) return;
+      /* Пальцев стало двое — это щипок, и первое касание перестаёт быть
+         началом двойного: иначе следующее касание после щипка считалось бы
+         вторым и сбрасывало масштаб. */
+      lastTap.current = 0;
+      swipe.current = null;
       start.current = {
         dist: Math.hypot(a.x - b.x, a.y - b.y) || 1,
         mx: (a.x + b.x) / 2,
@@ -119,13 +152,14 @@ function useZoom(
       }
       return;
     }
-    lastTap.current = now;
     start.current = {
       ...start.current,
       scale: view.scale,
       x: view.x,
       y: view.y,
     };
+    // Смах считаем только от невязкого кадра: увеличенный тянут, а не листают.
+    swipe.current = view.scale > 1 ? null : local(event);
   };
 
   const onPointerMove = (event: React.PointerEvent) => {
@@ -165,6 +199,28 @@ function useZoom(
   };
 
   const onPointerEnd = (event: React.PointerEvent) => {
+    const from = swipe.current;
+    swipe.current = null;
+    if (from && points.current.size === 1 && view.scale <= 1) {
+      const to = local(event);
+      const dx = to.x - from.x;
+      const dy = to.y - from.y;
+      if (Math.abs(dx) > SWIPE_MIN && Math.abs(dx) > Math.abs(dy)) {
+        points.current.delete(event.pointerId);
+        onSwipe(dx < 0 ? 1 : -1);
+        return;
+      }
+    }
+
+    /* Касание засчитывается как одиночное здесь, а не при нажатии: отсчёт
+       двойного должен идти от отпущенного пальца, иначе в него попадает
+       второй палец щипка. */
+    if (from && points.current.size === 1 && event.pointerType !== "mouse") {
+      const to = local(event);
+      const moved = Math.hypot(to.x - from.x, to.y - from.y);
+      lastTap.current = moved < 12 ? Date.now() : 0;
+    }
+
     points.current.delete(event.pointerId);
     if (points.current.size === 1) {
       // Один палец остался: дальше он тянет кадр, и отсчёт начинается заново.
@@ -214,13 +270,13 @@ export function PhotoLightbox({
   const total = images.length;
   const strip = useRef<HTMLDivElement>(null);
   const shot = useRef<HTMLDivElement>(null);
-  const zoom = useZoom(index, shot);
   const [legendOn, setLegendOn] = useState(false);
   const legend = legends?.[index];
   const go = useCallback(
     (step: number) => onIndex((index + step + total) % total),
     [index, total, onIndex],
   );
+  const zoom = useZoom(index, shot, go);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {

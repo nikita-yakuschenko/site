@@ -11941,15 +11941,25 @@ html.is-dialog-open {
 }
 
 /* Просмотр кадра целиком: на плитке он обрезан и уменьшен. */
+/* Колонка, а не сетка по центру: кадру нужно отдать всю оставшуюся высоту,
+   чтобы увеличение шло по экрану. Лента миниатюр и подпись занимают
+   столько, сколько им нужно, остальное достаётся кадру. */
 .photo-lightbox {
   position: fixed;
   inset: 0;
   z-index: 60;
-  display: grid;
-  place-items: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
   padding: clamp(12px, 2vw, 24px);
   background: rgb(0 0 0 / 0.9);
   animation: photo-lightbox-in 0.2s var(--ease-out);
+}
+
+.photo-lightbox__frame {
+  flex: 1 1 auto;
 }
 
 @keyframes photo-lightbox-in {
@@ -11962,7 +11972,11 @@ html.is-dialog-open {
   margin: 0;
   /* Кадру отдаётся всё, что остаётся от ленты миниатюр и подписи:
      смотреть его приходят как раз ради подробностей. */
-  max-width: min(1760px, 100%);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  width: min(1760px, 100%);
+  height: 100%;
   animation: photo-lightbox-frame 0.24s var(--ease-out);
 }
 
@@ -11973,16 +11987,22 @@ html.is-dialog-open {
   }
 }
 
+/* Площадка кадра занимает всё отведённое место, а не облегает снимок.
+   Снимок вписан в неё и растёт по ней: увеличение идёт по экрану, а не
+   внутри коробки размером с уменьшенный кадр. Площадка не меняется в
+   размерах во время жеста — иначе кадр дёргался бы прямо под пальцами. */
 .photo-lightbox__shot {
   position: relative;
-  display: inline-block;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  overflow: hidden;
   line-height: 0;
   /* Касания забираем себе: иначе щипок отдаёт браузеру, и тот масштабирует
      страницу вместе с кнопками, а сам кадр остаётся прежним. */
   touch-action: none;
-  /* Увеличенный кадр не выходит за пределы своей рамки. */
-  overflow: hidden;
-  border-radius: 10px;
 }
 
 /* Масштаб применяется к самому кадру. Начало координат в левом верхнем
@@ -11990,6 +12010,11 @@ html.is-dialog-open {
 .photo-lightbox__shot img {
   transform-origin: 0 0;
   will-change: transform;
+}
+
+/* Пока кадр увеличен, палец его тянет. */
+.photo-lightbox__shot.is-zoomed {
+  cursor: grab;
 }
 
 /* Пока кадр увеличен, палец его тянет, и курсор об этом говорит. */
@@ -12001,8 +12026,9 @@ html.is-dialog-open {
   display: block;
   width: auto;
   height: auto;
+  /* Вписан в площадку: дальше его увеличивает жест, а не вёрстка. */
   max-width: 100%;
-  max-height: calc(100svh - 190px);
+  max-height: 100%;
   border-radius: 10px;
   object-fit: contain;
 }
@@ -12125,8 +12151,12 @@ html.is-dialog-open {
 }
 
 .photo-lightbox__close,
+/* Кнопки лежат поверх кадра. Без слоя левая из них оказывалась под
+   изображением — кадр идёт в разметке позже и перекрывал её, нажать было
+   нечем. */
 .photo-lightbox__nav {
   position: absolute;
+  z-index: 2;
   display: grid;
   place-items: center;
   width: 44px;
@@ -12154,6 +12184,7 @@ html.is-dialog-open {
 .photo-lightbox__close {
   top: clamp(12px, 3vw, 24px);
   right: clamp(12px, 3vw, 24px);
+  z-index: 2;
 }
 
 .photo-lightbox__nav--prev {
@@ -12162,6 +12193,14 @@ html.is-dialog-open {
 
 .photo-lightbox__nav--next {
   right: clamp(8px, 2vw, 24px);
+}
+
+/* На сенсорном экране кадры листают смахом, и стрелки там лишние: они
+   занимают края самого кадра и мешают тянуть увеличенный снимок. */
+@media (pointer: coarse) {
+  .photo-lightbox__nav {
+    display: none;
+  }
 }
 
 /* Лента миниатюр внизу: видно, сколько кадров всего и что будет
