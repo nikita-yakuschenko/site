@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { IconPlayerPlayFilled } from "@tabler/icons-react";
 import { useState } from "react";
 import { copy } from "../lib/copy";
 import { PhotoLightbox } from "./photo-lightbox";
@@ -59,8 +58,17 @@ export function ProjectBuilt({ project }: { project: CatalogProject }) {
               height={824}
               sizes="100vw"
             />
+            {/* Треугольник нарисован здесь, а не взят из набора: у значка
+                из набора он уже смещён вправо, и вместе с полем у круга
+                компенсация шла дважды — знак выглядел сбитым.
+
+                Основание на 9, вершина на 18.5: центр тяжести треугольника
+                лежит в трети от основания, то есть ровно в центре круга.
+                Именно он, а не рамка знака, должен совпадать с центром. */}
             <span className="project-built__play">
-              <IconPlayerPlayFilled size={22} aria-hidden="true" />
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M9 6.5 18.5 12 9 17.5z" fill="currentColor" />
+              </svg>
             </span>
             <span className="project-built__tour-label">
               {tour.title ?? copy.builtTour}

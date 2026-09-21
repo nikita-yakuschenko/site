@@ -11565,20 +11565,41 @@ html.is-dialog-open {
   filter: brightness(0.74);
 }
 
+/* Кружок воспроизведения. Поля у него нет: треугольник уже нарисован со
+   смещением, и второе смещение полем сбивало знак набок.
+
+   На телефоне круг меньше: 64px занимали шестую часть ширины экрана и
+   закрывали собой сам кадр, ради которого на него и смотрят. */
 .project-built__play {
   position: absolute;
   top: 50%;
   left: 50%;
   display: grid;
   place-items: center;
-  width: 64px;
-  height: 64px;
+  width: 48px;
+  height: 48px;
   transform: translate(-50%, -50%);
   border-radius: 999px;
   background: var(--brand-yellow);
   color: var(--avgst-ink);
-  padding-left: 3px;
   transition: transform 0.2s var(--ease-out);
+}
+
+.project-built__play svg {
+  width: 20px;
+  height: 20px;
+}
+
+@media (min-width: 900px) {
+  .project-built__play {
+    width: 60px;
+    height: 60px;
+  }
+
+  .project-built__play svg {
+    width: 24px;
+    height: 24px;
+  }
 }
 
 .project-built__tour:hover .project-built__play {
