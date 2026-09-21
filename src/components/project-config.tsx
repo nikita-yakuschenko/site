@@ -5,7 +5,7 @@ import {
   IconCheck,
   IconGiftFilled,
 } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { copy } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
 import { tiersForProject } from "../lib/catalog/tiers";
@@ -40,6 +40,51 @@ import {
 
 /** Ключ хранилища. Выбор общий для каталога, поэтому без слага проекта. */
 const TIER_KEY = "avgst:project-tier";
+
+/* Выбранный уровень живёт в хранилище, а не в состоянии компонента: он
+   общий для всех проектов, и хранилище здесь и есть источник правды.
+   Читаем его через useSyncExternalStore — эффект, который сразу после
+   монтирования дёргает setState, вызывает лишний каскад перерисовок.
+   Серверный снимок всегда «standard»: на сервере хранилища нет, и ответь
+   мы иначе, разметка сервера и браузера разошлись бы. */
+const DEFAULT_TIER = "standard";
+
+const tierListeners = new Set<() => void>();
+
+/* Запасная память на случай, когда хранилище недоступно: в приватном режиме
+   запись молча не проходит, и без этого выбор не держался бы даже до
+   перехода на соседнюю страницу. */
+let tierFallback: string | null = null;
+
+function subscribeTier(listener: () => void) {
+  tierListeners.add(listener);
+  // Соседняя вкладка сменила уровень — эта должна узнать.
+  window.addEventListener("storage", listener);
+  return () => {
+    tierListeners.delete(listener);
+    window.removeEventListener("storage", listener);
+  };
+}
+
+function readTier() {
+  try {
+    return (
+      window.localStorage.getItem(TIER_KEY) ?? tierFallback ?? DEFAULT_TIER
+    );
+  } catch {
+    return tierFallback ?? DEFAULT_TIER;
+  }
+}
+
+function writeTier(id: string) {
+  tierFallback = id;
+  try {
+    window.localStorage.setItem(TIER_KEY, id);
+  } catch {
+    /* записать некуда — выбор живёт до перезагрузки */
+  }
+  tierListeners.forEach((listener) => listener());
+}
 export function ProjectConfig({
   project,
   /** Платёж, посчитанный на сервере, и цена, для которой он посчитан:
@@ -53,32 +98,12 @@ export function ProjectConfig({
   basePrice: number | null;
 }) {
   const tiers = tiersForProject(project);
-  const [tierId, setTierId] = useState("standard");
+  const tierId = useSyncExternalStore(
+    subscribeTier,
+    readTier,
+    () => DEFAULT_TIER,
+  );
   const [formOpen, setFormOpen] = useState(false);
-
-  /* Читаем после гидрации: на сервере localStorage нет, а разметка должна
-     совпасть. Хранилище может быть недоступно — тогда остаётся значение
-     по умолчанию. */
-  useEffect(() => {
-    try {
-      const saved = window.localStorage.getItem(TIER_KEY);
-      if (saved) setTierId(saved);
-    } catch {
-      /* приватный режим или запрет на хранилище */
-    }
-  }, []);
-
-  /* Пишем на выборе, а не эффектом от tierId: эффект записи срабатывал бы
-     в одном коммите с восстановлением и успевал затереть прочитанное
-     значение ещё не обновлённым состоянием. */
-  const pickTier = (id: string) => {
-    setTierId(id);
-    try {
-      window.localStorage.setItem(TIER_KEY, id);
-    } catch {
-      /* записать некуда — выбор живёт до перезагрузки */
-    }
-  };
 
   if (!tiers) return null;
   const tier = tiers.find((item) => item.id === tierId) ?? tiers[1]!;
@@ -102,53 +127,49 @@ export function ProjectConfig({
 
         <div className="project-config">
           <ul className="project-config__tiers">
-              {tiers.map((item) => (
-                <li key={item.id}>
-                  <button
-                    type="button"
-                    className={
-                      item.id === tier.id
-                        ? "project-config__tier project-config__tier--on"
-                        : "project-config__tier"
-                    }
-                    aria-pressed={item.id === tier.id}
-                    onClick={() => pickTier(item.id)}
-                  >
-                    <span className="project-config__tier-name">
-                      {item.name}
-                    </span>
-                    <span className="project-config__tier-lead">
-                      {item.lead}
-                    </span>
-                    <span className="project-config__tier-price">
-                      {formatFromRub(item.price)}
-                    </span>
-                    <span className="project-config__tier-list">
-                      {item.includes.map((line) => (
-                        <span key={line}>
-                          <IconCheck size={14} stroke={2.4} aria-hidden="true" />
-                          {line}
-                        </span>
-                      ))}
-                      {/* Подарки отделены сегментом — подписью между двумя
+            {tiers.map((item) => (
+              <li key={item.id}>
+                <button
+                  type="button"
+                  className={
+                    item.id === tier.id
+                      ? "project-config__tier project-config__tier--on"
+                      : "project-config__tier"
+                  }
+                  aria-pressed={item.id === tier.id}
+                  onClick={() => writeTier(item.id)}
+                >
+                  <span className="project-config__tier-name">{item.name}</span>
+                  <span className="project-config__tier-lead">{item.lead}</span>
+                  <span className="project-config__tier-price">
+                    {formatFromRub(item.price)}
+                  </span>
+                  <span className="project-config__tier-list">
+                    {item.includes.map((line) => (
+                      <span key={line}>
+                        <IconCheck size={14} stroke={2.4} aria-hidden="true" />
+                        {line}
+                      </span>
+                    ))}
+                    {/* Подарки отделены сегментом — подписью между двумя
                           линиями, как хвост каталога: это не продолжение
                           состава, а другая его часть. Плашки у каждой
                           строки не нужны, подпись сказана один раз. */}
-                      {item.gifts?.length ? (
-                        <span className="project-config__tier-band">
-                          <span>{copy.configGift}</span>
-                        </span>
-                      ) : null}
-                      {item.gifts?.map((line) => (
-                        <span key={line} className="project-config__tier-gift">
-                          <IconGiftFilled size={14} aria-hidden="true" />
-                          {line}
-                        </span>
-                      ))}
-                    </span>
-                  </button>
-                </li>
-              ))}
+                    {item.gifts?.length ? (
+                      <span className="project-config__tier-band">
+                        <span>{copy.configGift}</span>
+                      </span>
+                    ) : null}
+                    {item.gifts?.map((line) => (
+                      <span key={line} className="project-config__tier-gift">
+                        <IconGiftFilled size={14} aria-hidden="true" />
+                        {line}
+                      </span>
+                    ))}
+                  </span>
+                </button>
+              </li>
+            ))}
           </ul>
 
           {/* Открытая форма переворачивает панель в тёмную: пока в ней
@@ -196,86 +217,84 @@ export function ProjectConfig({
                 </button>
               )}
 
-            <div
-              className="project-config__form"
-              data-open={formOpen ? "true" : "false"}
-            >
-              <div>
-                <LeadForm
-                  siteId={SITE.id}
-                  projectExternalId={project.id}
-                  variant="card"
-                  compact
-                  heading={copy.getQuote}
-                  submitLabel={copy.getQuote}
-                  /* Заявка уходит с выбранным уровнем и его ценой: иначе
+              <div
+                className="project-config__form"
+                data-open={formOpen ? "true" : "false"}
+              >
+                <div>
+                  <LeadForm
+                    siteId={SITE.id}
+                    projectExternalId={project.id}
+                    variant="card"
+                    compact
+                    heading={copy.getQuote}
+                    submitLabel={copy.getQuote}
+                    /* Заявка уходит с выбранным уровнем и его ценой: иначе
                      разговор начинается с «а что вы смотрели?». */
-                  meta={{
-                    project: project.name,
-                    tier: tier.name,
-                    price: tier.price,
-                  }}
-                />
+                    meta={{
+                      project: project.name,
+                      tier: tier.name,
+                      price: tier.price,
+                    }}
+                  />
                 </div>
               </div>
             </div>
           </aside>
         </div>
 
-          {/* Заголовок называет уровень: иначе список материалов
+        {/* Заголовок называет уровень: иначе список материалов
               читается как общий для дома, а он у каждой комплектации
               свой. Ключ по уровню — чтобы при переключении список
               собрался заново и первый пункт снова был раскрыт. */}
-          <h3 className="project-config__details-title">
-            {copy.configDetails}{" "}
-            <span className="project-config__details-mark">
-              {tier.nameAcc} {copy.configTierWordAcc}
-            </span>
-          </h3>
-          {/* Здесь список начинается свёрнутым, хотя обычно первый
+        <h3 className="project-config__details-title">
+          {copy.configDetails}{" "}
+          <span className="project-config__details-mark">
+            {tier.nameAcc} {copy.configTierWordAcc}
+          </span>
+        </h3>
+        {/* Здесь список начинается свёрнутым, хотя обычно первый
               пункт раскрыт: состав материалов открывают по нужде, а не
               читают подряд. */}
-          <Accordion
-            key={tier.id}
-            type="multiple"
-            defaultValue={[]}
-            className="ui-accordion"
-          >
-            {tier.details.map((detail) => (
-              <AccordionItem
-                key={detail.title}
-                value={`${tier.id}-${detail.title}`}
-              >
-                <AccordionTrigger>{detail.title}</AccordionTrigger>
-                <AccordionContent>
-                  {detail.lead ? (
-                    <p className="project-config__spec-lead">{detail.lead}</p>
-                  ) : null}
+        <Accordion
+          key={tier.id}
+          type="multiple"
+          defaultValue={[]}
+          className="ui-accordion"
+        >
+          {tier.details.map((detail) => (
+            <AccordionItem
+              key={detail.title}
+              value={`${tier.id}-${detail.title}`}
+            >
+              <AccordionTrigger>{detail.title}</AccordionTrigger>
+              <AccordionContent>
+                {detail.lead ? (
+                  <p className="project-config__spec-lead">{detail.lead}</p>
+                ) : null}
 
-                  {detail.items ? (
+                {detail.items ? (
+                  <ul className="project-config__spec-list">
+                    {detail.items.map((item) => (
+                      <li key={item}>{item}</li>
+                    ))}
+                  </ul>
+                ) : null}
+
+                {detail.groups?.map((group) => (
+                  <div key={group.title} className="project-config__spec">
+                    <p className="project-config__spec-title">{group.title}</p>
                     <ul className="project-config__spec-list">
-                      {detail.items.map((item) => (
+                      {group.items.map((item) => (
                         <li key={item}>{item}</li>
                       ))}
                     </ul>
-                  ) : null}
-
-                  {detail.groups?.map((group) => (
-                    <div key={group.title} className="project-config__spec">
-                      <p className="project-config__spec-title">
-                        {group.title}
-                      </p>
-                      <ul className="project-config__spec-list">
-                        {group.items.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  ))}
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+                  </div>
+                ))}
+              </AccordionContent>
+            </AccordionItem>
+          ))}
+        </Accordion>
       </div>
     </section>
   );

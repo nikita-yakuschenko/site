@@ -20,27 +20,24 @@ export function AskDialog({ onClose }: { onClose: () => void }) {
       if (event.key === "Escape") onClose();
     };
 
-    /* Прокрутку прячем у корня, а не у body: полосу рисует именно он, и
-       при overflow на body её светлый трек оставался справа поверх
-       затемнения. Ширину полосы возвращаем отступом, иначе страница под
-       окном дёргается вбок. */
+    /* Прокрутку прячем у корня, а не у body: полосу рисует именно он.
+       Ширину полосы ничем не компенсируем — у корня стоит
+       scrollbar-gutter: stable, место под полосу зарезервировано всегда, и
+       добавочный отступ сдвигал бы страницу вбок, возмещая то, чего не
+       происходит.
+
+       Класс нужен, чтобы закрасить сам зазор: полоса спрятана, зазор
+       остался, и в нём светился фон страницы белым краем вдоль затемнения.
+       Фон корня уходит на холст, то есть и на зазор тоже. */
     const root = document.documentElement;
-    const gap = window.innerWidth - root.clientWidth;
     const prevOverflow = root.style.overflow;
-    const prevPadding = root.style.paddingRight;
     root.style.overflow = "hidden";
-    if (gap > 0) {
-      root.style.paddingRight = `${gap}px`;
-      /* Ширину отдаём стилям: затемнение должно перекрыть и это поле,
-         иначе справа остаётся светлая полоса. */
-      root.style.setProperty("--scrollbar-gap", `${gap}px`);
-    }
+    root.classList.add("is-dialog-open");
 
     window.addEventListener("keydown", onKey);
     return () => {
       root.style.overflow = prevOverflow;
-      root.style.paddingRight = prevPadding;
-      root.style.removeProperty("--scrollbar-gap");
+      root.classList.remove("is-dialog-open");
       window.removeEventListener("keydown", onKey);
     };
   }, [onClose]);
