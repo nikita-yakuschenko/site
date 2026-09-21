@@ -53,6 +53,17 @@ export type CatalogOption = {
   defaultSelected: boolean
 }
 
+/** Видеообзор построенного дома. */
+export type ProjectTour = {
+  video: { provider: 'kinescope'; id: string } | { provider: 'vk'; oid: number; id: string }
+  cover: string
+  title?: string
+}
+
+/** Снимок построенного дома. Подпись необязательна: если известно, где
+ *  и когда снят, это стоит сказать, но чаще известен только кадр. */
+export type BuiltPhoto = { image: string; caption?: string }
+
 export type PlanRoom = { name: string; area: string }
 
 export type PlanVariant = {
@@ -93,6 +104,14 @@ export type CatalogProject = {
      Поле необязательное: без него раздел показывает планы картинками, как
      и показывал, потому что экспликацию из чертежа не достать. */
   plans?: PlanVariant[]
+  /* Фотографии домов, уже построенных по этому проекту. Не рендеры:
+     раздел существует именно затем, чтобы показать дом снятым на
+     участке. Поля нет, пока нет снимков, — раздел тогда не выводится. */
+  built?: BuiltPhoto[]
+  /* Видеообзор дома: провайдер и идентификатор ролика плюс кадр-обложка.
+     Живёт в том же разделе, что и фотографии построенных домов, — это
+     ответ на тот же вопрос, только подробнее. */
+  builtTour?: ProjectTour
   options: CatalogOption[]
 }
 

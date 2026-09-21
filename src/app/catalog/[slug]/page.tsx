@@ -14,6 +14,7 @@ import {
   ProjectInteriors,
 } from '../../../components/project-media'
 import { ProjectPlans } from '../../../components/project-plans'
+import { ProjectBuilt } from '../../../components/project-built'
 import { ProjectConfig } from '../../../components/project-config'
 import { tiersForProject } from '../../../lib/catalog/tiers'
 import { ProjectActions } from '../../../components/project-actions'
@@ -62,12 +63,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   // уже есть в стилях, нужно лишь отделить число от слова.
   const { head, mark } = splitProjectName(project.name)
 
-  /* Платёж считается на сервере, от самой дешёвой комплектации: в шапке
-     он подписан «от», а базовая цена проекта — это средний уровень.
-     Регион берётся серверный, на самой странице ипотеки его можно
-     сменить. */
+  /* Платёж считается на сервере, от самой дешёвой комплектации, доступной
+     в ипотеку: стартовая — это каркас, а банк кредитует дом. Регион
+     берётся серверный, на самой странице ипотеки его можно сменить. */
   const tiers = tiersForProject(project)
-  const basePrice = tiers ? Math.min(...tiers.map((tier) => tier.price)) : null
+  const mortgagePrices = tiers?.filter((tier) => tier.mortgage).map((tier) => tier.price)
+  const basePrice = mortgagePrices?.length ? Math.min(...mortgagePrices) : null
   const payment = basePrice
     ? monthlyPaymentForProject({
         propertyPrice: basePrice,
@@ -158,6 +159,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <ProjectExteriors project={project} />
         <ProjectPlans project={project} />
         <ProjectInteriors project={project} />
+        <ProjectBuilt project={project} />
         <ProjectConfig
           project={project}
           basePayment={payment}

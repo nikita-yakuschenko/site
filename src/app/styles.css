@@ -3696,6 +3696,23 @@ a {
   background: var(--page);
 }
 
+/* Тёмный разворот. Подряд идущие разделы с кадрами читались одним
+   полотном: одинаковое бенто на одинаковом белом. Смена тона делит
+   страницу на части сильнее любой рамки, а интерьерам тёмный фон ещё и
+   к лицу — кадры сняты при тёплом свете. */
+.section--ink {
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+.section--ink h2 {
+  color: #fff;
+}
+
+.section--ink .eyebrow {
+  color: rgb(255 255 255 / 0.55);
+}
+
 .section__inner {
   max-width: var(--page-width);
   margin: 0 auto;
@@ -11042,11 +11059,244 @@ textarea:focus-visible {
   color: var(--avgst-green);
 }
 
+/* Подарки отделены сегментом: подпись между двумя линиями — тем же
+   приёмом, что делит каталог на избранное и остальное. */
+.project-config__tier-list .project-config__tier-band {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 6px 0 2px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.45);
+}
+
+/* Пунктир, а не сплошная: отбивка внутри списка легче сплошных линий
+   карточки и не спорит с ними. */
+.project-config__tier-band::before,
+.project-config__tier-band::after {
+  content: "";
+  flex: 1;
+  height: 0;
+  border-top: 1px dashed rgb(var(--avgst-ink-rgb) / 0.22);
+}
+
+.project-config__tier-band > span {
+  flex: none;
+}
+
+.project-config__tier-gift {
+  color: var(--avgst-ink);
+}
+
+/* Чистый брендовый жёлтый, а не притемнённый: затемнение уводило его
+   в горчичный, и строка выглядела грязной. */
+.project-config__tier-list .project-config__tier-gift svg {
+  color: var(--brand-yellow);
+}
+
+/* Интерьеры: ровная сетка одинаковых кадров. Бенто с крупной плиткой
+   занято фасадами; здесь ни один кадр не главный — это варианты отделки,
+   и равные прямоугольники честнее. */
+.project-rows {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 900px) {
+  .project-rows {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.project-rows > * {
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  aspect-ratio: 16 / 10;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.08);
+  cursor: pointer;
+  transition: transform 0.16s var(--ease-out);
+}
+
+.project-rows img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.project-rows > *:hover img,
+.project-rows > *:focus-visible img {
+  transform: scale(1.03);
+}
+
+.project-rows > *:focus-visible {
+  outline: none;
+}
+
+.project-rows > *:active {
+  transform: scale(0.985);
+}
+
+.project-rows__rest {
+  position: relative;
+}
+
+.project-rows__rest img {
+  filter: brightness(0.5);
+}
+
+.project-rows__rest span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 2px;
+  color: #fff;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  pointer-events: none;
+}
+
+.project-rows__rest small {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
+}
+
+/* Построенные дома: широкий видеообзор и лента снимков под ним. Третье
+   бенто подряд слилось бы с фасадами и интерьерами, а кадры здесь
+   разнородные — сняты в разных посёлках, и листать их уместнее, чем
+   раскладывать сеткой. */
+.project-built__stage {
+  position: relative;
+  display: block;
+  width: 100%;
+  overflow: hidden;
+  margin: var(--gap-stack) 0 0;
+  padding: 0;
+  border: 0;
+  aspect-ratio: 21 / 9;
+  border-radius: var(--surface-radius, 18px);
+  background: #e8edf3;
+  cursor: pointer;
+}
+
+.project-built__stage img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-strip {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: minmax(220px, 32%);
+  gap: var(--gap-tile);
+  margin-top: var(--gap-tile);
+  padding-bottom: 6px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+}
+
+@media (min-width: 900px) {
+  .project-strip {
+    grid-auto-columns: minmax(240px, 1fr);
+  }
+}
+
+.project-strip > * {
+  position: relative;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  background: #e8edf3;
+  scroll-snap-align: start;
+  cursor: pointer;
+  transition: transform 0.16s var(--ease-out);
+}
+
+.project-strip img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.project-strip > *:hover img {
+  transform: scale(1.03);
+}
+
+.project-strip > *:active {
+  transform: scale(0.985);
+}
+
+/* Видеообзор в разделе построенных домов: крупная плитка с затемнением,
+   значком и подписью — иначе от фотографии её не отличить. */
+.project-built__tour {
+  position: relative;
+}
+
+.project-built__tour img {
+  filter: brightness(0.82);
+  transition: filter 0.3s var(--ease-out), transform 0.45s var(--ease-out);
+}
+
+.project-built__tour:hover img {
+  filter: brightness(0.74);
+}
+
+.project-built__play {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  display: grid;
+  place-items: center;
+  width: 64px;
+  height: 64px;
+  transform: translate(-50%, -50%);
+  border-radius: 999px;
+  background: var(--brand-yellow);
+  color: var(--avgst-ink);
+  padding-left: 3px;
+  transition: transform 0.2s var(--ease-out);
+}
+
+.project-built__tour:hover .project-built__play {
+  transform: translate(-50%, -50%) scale(1.06);
+}
+
+.project-built__tour-label {
+  position: absolute;
+  left: 18px;
+  bottom: 16px;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: #fff;
+  text-shadow: 0 1px 12px rgb(0 0 0 / 0.4);
+}
+
 /* Название, описание, цена и состав встают на общие линии: иначе цена в
    карточке с коротким описанием уезжает вверх, и три уровня перестают
    сравниваться взглядом. Строки задаёт список, карточки наследуют их
    через subgrid; правило идёт после раскладки карточки, чтобы не быть
-   перебитым её собственными display. */
+   перебитым её собственным display. */
 @media (min-width: 720px) {
   @supports (grid-template-rows: subgrid) {
     .project-config__tiers {
@@ -11064,9 +11314,59 @@ textarea:focus-visible {
   }
 }
 
+/* Состав пункта: короткая мысль абзацем, узлы подзаголовками, материалы
+   списком. Сплошным текстом перечисление слоёв не читается. */
+.project-config__spec-lead {
+  margin: 0 0 10px;
+}
+
+.project-config__spec {
+  margin-top: 14px;
+}
+
+.project-config__spec-title {
+  margin: 0 0 6px;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+}
+
+.project-config__spec-list {
+  display: grid;
+  gap: 2px;
+  line-height: 1.5;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.project-config__spec-list li {
+  position: relative;
+  padding-left: 16px;
+}
+
+/* Точка вместо маркера списка: у неё нет отступа браузера, и строка
+   выравнивается по тексту, а не по невидимому полю. */
+.project-config__spec-list li::before {
+  content: "";
+  position: absolute;
+  top: 0.62em;
+  left: 2px;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: var(--avgst-green);
+}
+
 .project-config__details-title {
   margin: var(--gap-stack) 0 12px;
   font-size: 18px;
+}
+
+/* Уровень в заголовке отмечен цветом: он меняется при переключении, и
+   именно на него смотрят, чтобы понять, чей это состав. */
+.project-config__details-mark {
+  color: var(--avgst-green);
 }
 
 /* Итог липнет к верху: состав длиннее панели, и цена должна оставаться
@@ -11109,6 +11409,13 @@ textarea:focus-visible {
   font-size: 16px;
   font-weight: 600;
   color: var(--avgst-green);
+}
+
+/* Без платежа строка остаётся той же по месту и высоте, но не зелёная:
+   зелёным на странице отмечены деньги. */
+.project-config__total-pay--plain {
+  color: var(--avgst-ink);
+  font-size: 15px;
 }
 
 .project-config__total-pay span {
@@ -11444,8 +11751,16 @@ textarea:focus-visible {
   transition: transform 0.45s var(--ease-out);
 }
 
-.project-bento > *:hover img {
+.project-bento > *:hover img,
+.project-bento > *:focus-visible img {
   transform: scale(1.03);
+}
+
+/* Зелёная рамка фокуса ложилась прямо на кадр — она возвращается на
+   плитку после закрытия просмотра с клавиатуры. Плитка показывает фокус
+   тем же приближением кадра, что и наводку. */
+.project-bento > *:focus-visible {
+  outline: none;
 }
 
 /* Варианты планировки переключаются, а не лежат рядом: сравнивать их

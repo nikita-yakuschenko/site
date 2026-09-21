@@ -18,9 +18,13 @@ import type { CatalogProject } from "../lib/catalog/types";
  * по нему не разглядеть — ради этого он и открывается целиком.
  *
  * Интерьеров бывает полтора десятка, и целиком сеткой они читаются как
- * простыня. Поэтому раздел раскладывает их так же, как фасады: то же
- * бенто из шести плиток. Если снимков больше, последняя плитка говорит,
- * сколько их ещё, и открывает просмотр — дальше листают там.
+ * простыня. Поэтому раздел показывает шесть кадров, а последняя плитка
+ * говорит, сколько их ещё, и открывает просмотр.
+ *
+ * Форма у него своя: ровная сетка на тёмном фоне. Фасады, интерьеры и
+ * построенные дома шли тремя одинаковыми бенто подряд и читались одним
+ * полотном; к тому же крупный кадр здесь не нужен — это варианты
+ * отделки, среди них нет главного.
  *
  * Интерьеры есть не у всех проектов, и раздел просто не выводится: пустой
  * заголовок хуже отсутствия.
@@ -83,19 +87,17 @@ export function ProjectInteriors({ project }: { project: CatalogProject }) {
   const rest = shots.length - tiles.length;
 
   return (
-    <section className="section" aria-labelledby="project-interiors-title">
+    <section
+      className="section section--ink"
+      aria-labelledby="project-interiors-title"
+    >
       <div className="section__inner">
         <p className="eyebrow">{copy.interiorsEyebrow}</p>
         <h2 id="project-interiors-title">{copy.interiorsHeading}</h2>
-        <div className="project-bento">
+        <div className="project-rows">
           {tiles.map((src, index) => {
             const last = rest > 0 && index === tiles.length - 1;
-            const cls = [
-              index === 0 ? "project-bento__lead" : "",
-              last ? "project-bento__rest" : "",
-            ]
-              .filter(Boolean)
-              .join(" ");
+            const cls = last ? "project-rows__rest" : "";
             return (
               <button
                 key={src}
@@ -107,9 +109,9 @@ export function ProjectInteriors({ project }: { project: CatalogProject }) {
                 <Image
                   src={src}
                   alt=""
-                  width={1600}
-                  height={1000}
-                  sizes={index === 0 ? "(min-width: 900px) 66vw, 100vw" : "33vw"}
+                  width={1400}
+                  height={900}
+                  sizes="(min-width: 900px) 33vw, 50vw"
                 />
                 {last ? (
                   <span>
