@@ -12026,69 +12026,36 @@ html.is-dialog-open {
   touch-action: none;
 }
 
-/* Слой одного кадра карусели. Оба кадра — приходящий и уходящий — лежат
-   друг на друге во всю площадку, поэтому вписывание снимка считается от
-   площадки, а не от слоя: иначе слой сжался бы до содержимого, а снимок
-   вместе с ним. */
+/* Лента кадров. Три кадра стоят в ряд и едут вместе: так палец тянет за
+   собой и текущий кадр, и соседний, а не подменяет один другим. Сдвиг
+   задаётся из компонента, переход включается только на доводке — иначе он
+   съедал бы слежение за пальцем. */
+.photo-lightbox__track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  will-change: transform;
+}
+
+.photo-lightbox__track.is-settling {
+  transition: transform 0.28s var(--ease-out);
+}
+
+/* Кадр занимает ровно ширину площадки, поэтому соседи ждут точно за её
+   краями. Ужиматься под содержимое ему нельзя: снимок вписывается в кадр,
+   а не наоборот. */
 .photo-lightbox__slide {
-  position: absolute;
-  inset: 0;
+  flex: 0 0 100%;
   display: grid;
   place-items: center;
+  min-width: 0;
+  height: 100%;
 }
 
-/* Перелистывание. Кадр уезжает в ту сторону, куда листают, и приходит с
-   противоположной; путь короче полной ширины и с растворением — полная
-   ширина на таком размере читается медлительной, а не отзывчивой. */
-@keyframes photo-slide-in-next {
-  from {
-    transform: translate3d(42%, 0, 0);
-    opacity: 0;
-  }
-}
-
-@keyframes photo-slide-in-prev {
-  from {
-    transform: translate3d(-42%, 0, 0);
-    opacity: 0;
-  }
-}
-
-@keyframes photo-slide-out-next {
-  to {
-    transform: translate3d(-42%, 0, 0);
-    opacity: 0;
-  }
-}
-
-@keyframes photo-slide-out-prev {
-  to {
-    transform: translate3d(42%, 0, 0);
-    opacity: 0;
-  }
-}
-
-.photo-lightbox__slide.is-coming-next {
-  animation: photo-slide-in-next 0.32s var(--ease-out) both;
-}
-
-.photo-lightbox__slide.is-coming-prev {
-  animation: photo-slide-in-prev 0.32s var(--ease-out) both;
-}
-
-.photo-lightbox__slide.is-leaving-next {
-  animation: photo-slide-out-next 0.32s var(--ease-out) both;
-}
-
-.photo-lightbox__slide.is-leaving-prev {
-  animation: photo-slide-out-prev 0.32s var(--ease-out) both;
-}
-
-/* Без анимации кадр просто меняется: уходящий слой снимается сразу, как
-   только его анимация закончится, а закончится она мгновенно. */
 @media (prefers-reduced-motion: reduce) {
-  .photo-lightbox__slide {
-    animation-duration: 0.01ms;
+  .photo-lightbox__track.is-settling {
+    transition-duration: 0.01ms;
   }
 }
 
@@ -12097,11 +12064,6 @@ html.is-dialog-open {
 .photo-lightbox__shot img {
   transform-origin: 0 0;
   will-change: transform;
-}
-
-/* Пока кадр увеличен, палец его тянет. */
-.photo-lightbox__shot.is-zoomed {
-  cursor: grab;
 }
 
 /* Пока кадр увеличен, палец его тянет, и курсор об этом говорит. */

@@ -25,10 +25,13 @@ const MAX_SCALE = 4;
 /** Увеличение по двойному касанию: заметно, но не теряешь, где находишься. */
 const TAP_SCALE = 2.5;
 
-/* Порог смаха: короче — это касание по кадру, а не листание. Проверяется
-   вместе с направлением, иначе кадр листался бы при попытке потянуть его
-   вверх. */
-const SWIPE_MIN = 56;
+/* Доля ширины, после которой кадр долистывается сам. Меньше — палец
+   отпустили, не доведя, и лента возвращается на место. */
+const SWIPE_RATIO = 0.22;
+
+/* Длительность доводки. Столько же стоит в стилях у самой ленты: если
+   значения разойдутся, кадр сменится раньше или позже, чем доедет. */
+const SETTLE_MS = 280;
 
 /**
  * Щипок увеличивает кадр, а не страницу.
@@ -47,8 +50,11 @@ const FLAT = { scale: 1, x: 0, y: 0 };
 function useZoom(
   resetKey: unknown,
   box: React.RefObject<HTMLDivElement | null>,
-  /** Смах листает кадры: на телефоне это основной способ, кнопок там нет. */
-  onSwipe: (step: number) => void,
+  /** Кадр едет за пальцем: сюда уходит текущий сдвиг, а по отпускании —
+      итоговый. Решение, листать или вернуть на место, принимает сам
+      просмотрщик: он знает ширину площадки. */
+  onDrag: (px: number) => void,
+  onDragEnd: (px: number) => void,
 ) {
   const [view, setView] = useState(FLAT);
   const points = useRef(new Map<number, { x: number; y: number }>());
@@ -168,6 +174,12 @@ function useZoom(
     const point = local(event);
     points.current.set(event.pointerId, point);
 
+    // Кадр не увеличен — ведём его за пальцем.
+    if (points.current.size === 1 && view.scale <= 1 && swipe.current) {
+      onDrag(point.x - swipe.current.x);
+      return;
+    }
+
     if (points.current.size >= 2) {
       const [a, b] = [...points.current.values()];
       if (!a || !b) return;
@@ -203,13 +215,7 @@ function useZoom(
     swipe.current = null;
     if (from && points.current.size === 1 && view.scale <= 1) {
       const to = local(event);
-      const dx = to.x - from.x;
-      const dy = to.y - from.y;
-      if (Math.abs(dx) > SWIPE_MIN && Math.abs(dx) > Math.abs(dy)) {
-        points.current.delete(event.pointerId);
-        onSwipe(dx < 0 ? 1 : -1);
-        return;
-      }
+      onDragEnd(to.x - from.x);
     }
 
     /* Касание засчитывается как одиночное здесь, а не при нажатии: отсчёт
@@ -272,60 +278,67 @@ export function PhotoLightbox({
   const shot = useRef<HTMLDivElement>(null);
   const [legendOn, setLegendOn] = useState(false);
   const legend = legends?.[index];
-  /* Направление перелистывания запоминается в тот момент, когда его
-     попросили, а не выводится из номеров: с последнего кадра на первый
-     номер уменьшается, хотя листали вперёд, и кадр уезжал бы в обратную
-     сторону.
-
-     Хранится состоянием, а не ссылкой: его читает отрисовка, а ссылки в
-     отрисовке читать нельзя — там не видно, что значение поменялось.
-     Обновляется в том же наборе, что и номер кадра, поэтому к следующей
-     отрисовке оба уже согласованы. */
-  const [dir, setDir] = useState(1);
   const go = useCallback(
     (step: number) => {
-      setDir(step < 0 ? -1 : 1);
       onIndex((index + step + total) % total);
     },
     [index, total, onIndex],
   );
-  const pick = useCallback(
-    (next: number) => {
-      setDir(next < index ? -1 : 1);
-      onIndex(next);
+  const pick = onIndex;
+
+  /* Лента из трёх кадров: предыдущий, текущий, следующий. Она стоит
+     сдвинутой на один кадр влево, поэтому в площадке виден средний, а
+     соседи ждут за её краями.
+
+     dx — сдвиг под пальцем в пикселях. Пока палец ведёт, перехода нет и
+     лента идёт след в след; по отпускании включается доводка, и лента
+     доезжает до соседа либо возвращается на место. */
+  const [dx, setDx] = useState(0);
+  const [settling, setSettling] = useState(false);
+  const track = useRef<HTMLDivElement>(null);
+  const settleTimer = useRef(0);
+
+  const slideTo = useCallback(
+    (step: number) => {
+      const width = track.current?.offsetWidth ?? 0;
+      window.clearTimeout(settleTimer.current);
+      setSettling(true);
+      setDx(step === 0 || !width ? 0 : step > 0 ? -width : width);
+      settleTimer.current = window.setTimeout(() => {
+        /* Кадр меняется, когда лента доехала: одновременно снимаем сдвиг и
+           переход, иначе лента поедет обратно у всех на глазах. */
+        setSettling(false);
+        setDx(0);
+        if (step !== 0) go(step);
+      }, SETTLE_MS);
     },
-    [index, onIndex],
+    [go],
   );
-  const zoom = useZoom(index, shot, go);
 
-  /* Уходящий кадр держим в разметке, пока идёт его анимация: карусель — это
-     два кадра одновременно, приходящий и уходящий. Считаем смену прямо в
-     отрисовке, чтобы новый кадр сразу поехал с нужной стороны, а не мигнул
-     на месте и только потом поехал. */
-  const [shown, setShown] = useState(index);
-  const [leaving, setLeaving] = useState<{ src: string; dir: number } | null>(
-    null,
+  useEffect(() => () => window.clearTimeout(settleTimer.current), []);
+
+  const onDrag = useCallback((px: number) => {
+    window.clearTimeout(settleTimer.current);
+    setSettling(false);
+    setDx(px);
+  }, []);
+
+  const onDragEnd = useCallback(
+    (px: number) => {
+      const width = track.current?.offsetWidth ?? 0;
+      const enough = width > 0 && Math.abs(px) > width * SWIPE_RATIO;
+      slideTo(enough ? (px < 0 ? 1 : -1) : 0);
+    },
+    [slideTo],
   );
-  if (shown !== index) {
-    const from = images[shown];
-    if (from) setLeaving({ src: from, dir });
-    setShown(index);
-  }
 
-  /* Страховка на случай, когда событие окончания анимации не приходит: в
-     свёрнутой вкладке анимации не идут вовсе, и уходящий кадр остался бы
-     висеть поверх нового. Срок чуть больше самой анимации. */
-  useEffect(() => {
-    if (!leaving) return;
-    const id = window.setTimeout(() => setLeaving(null), 500);
-    return () => window.clearTimeout(id);
-  }, [leaving]);
+  const zoom = useZoom(index, shot, onDrag, onDragEnd);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
-      if (event.key === "ArrowRight") go(1);
-      if (event.key === "ArrowLeft") go(-1);
+      if (event.key === "ArrowRight") slideTo(1);
+      if (event.key === "ArrowLeft") slideTo(-1);
     };
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -334,7 +347,7 @@ export function PhotoLightbox({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [go, onClose]);
+  }, [slideTo, onClose]);
 
   /* Активная миниатюра уезжает за край ленты, если кадры листают
      стрелками: подтягиваем её обратно. */
@@ -344,6 +357,10 @@ export function PhotoLightbox({
   }, [index]);
 
   const src = images[index];
+  /* Соседи по ленте. По кругу: с последнего кадра следующий — первый, и
+     наоборот, — иначе у краёв лента упиралась бы в пустоту. */
+  const before = total > 1 ? images[(index - 1 + total) % total] : undefined;
+  const after = total > 1 ? images[(index + 1) % total] : undefined;
   if (!src) return null;
 
   return (
@@ -369,7 +386,7 @@ export function PhotoLightbox({
           aria-label={copy.galleryPrev}
           onClick={(event) => {
             event.stopPropagation();
-            go(-1);
+            slideTo(-1);
           }}
         >
           <IconChevronLeft size={24} stroke={2.2} />
@@ -397,48 +414,60 @@ export function PhotoLightbox({
           onPointerUp={zoom.handlers.onPointerUp}
           onPointerCancel={zoom.handlers.onPointerCancel}
         >
-          {/* Уходящий кадр: живёт ровно до конца своей анимации, дальше
-              снимается. Сторона зависит от направления листания. */}
-          {leaving ? (
-            <div
-              key={`leaving-${leaving.src}`}
-              className={
-                leaving.dir > 0
-                  ? "photo-lightbox__slide is-leaving-next"
-                  : "photo-lightbox__slide is-leaving-prev"
-              }
-              onAnimationEnd={() => setLeaving(null)}
-            >
+          {/* Лента из трёх кадров. Стоит сдвинутой на один кадр влево,
+              поэтому в площадке виден средний, а соседи ждут за её краями и
+              выезжают следом за пальцем.
+
+              Масштаб применяется к самому изображению, а не к ленте: лента
+              занята перелистыванием, и два преобразования на одном узле
+              спорили бы друг с другом. */}
+          <div
+            ref={track}
+            className={
+              settling
+                ? "photo-lightbox__track is-settling"
+                : "photo-lightbox__track"
+            }
+            style={{
+              transform: `translate3d(calc(-100% + ${dx}px), 0, 0)`,
+            }}
+          >
+            <div className="photo-lightbox__slide">
+              {before ? (
+                <Image
+                  src={before}
+                  alt=""
+                  width={2000}
+                  height={1400}
+                  sizes="100vw"
+                />
+              ) : null}
+            </div>
+
+            <div className="photo-lightbox__slide">
               <Image
-                src={leaving.src}
+                key={src}
+                src={src}
                 alt=""
                 width={2000}
                 height={1400}
                 sizes="100vw"
+                priority
+                style={zoom.style}
               />
             </div>
-          ) : null}
 
-          {/* Приходящий кадр. Масштаб применяется к самому изображению, а не
-              к слою слайда: слой занят перелистыванием, и два преобразования
-              на одном узле спорили бы друг с другом. */}
-          <div
-            key={src}
-            className={
-              dir > 0
-                ? "photo-lightbox__slide is-coming-next"
-                : "photo-lightbox__slide is-coming-prev"
-            }
-          >
-            <Image
-              src={src}
-              alt=""
-              width={2000}
-              height={1400}
-              sizes="100vw"
-              priority
-              style={zoom.style}
-            />
+            <div className="photo-lightbox__slide">
+              {after ? (
+                <Image
+                  src={after}
+                  alt=""
+                  width={2000}
+                  height={1400}
+                  sizes="100vw"
+                />
+              ) : null}
+            </div>
           </div>
 
           {legend?.length ? (
@@ -491,7 +520,7 @@ export function PhotoLightbox({
             aria-label={copy.galleryNext}
             onClick={(event) => {
               event.stopPropagation();
-              go(1);
+              slideTo(1);
             }}
           >
             <IconChevronRight size={24} stroke={2.2} />
