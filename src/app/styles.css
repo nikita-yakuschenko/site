@@ -10962,7 +10962,10 @@ textarea:focus-visible {
   .project-config {
     grid-template-columns: minmax(0, 1fr) 340px;
     gap: 32px;
-    align-items: start;
+    /* Карточки тянутся до высоты ряда, панель — по содержимому: пока
+       форма закрыта, она маленькая, а когда вырастает под форму, ряд
+       задаёт уже она, и карточки догоняют. */
+    align-items: stretch;
   }
 }
 
@@ -11300,8 +11303,12 @@ textarea:focus-visible {
 @media (min-width: 720px) {
   @supports (grid-template-rows: subgrid) {
     .project-config__tiers {
-      grid-template-rows: auto auto auto auto;
+      /* Последняя строка забирает остаток высоты: колонка растёт, когда
+         в панели раскрывается форма, и карточки должны расти с ней, а не
+         висеть коротышками в высоком ряду. */
+      grid-template-rows: auto auto auto 1fr;
       row-gap: 8px;
+      height: 100%;
     }
 
     .project-config__tiers li,
@@ -11372,19 +11379,69 @@ textarea:focus-visible {
 /* Итог липнет к верху: состав длиннее панели, и цена должна оставаться
    на экране, пока по нему идут. */
 .project-config__total {
+  display: flex;
+  flex-direction: column;
+  align-self: start;
+  min-width: 0;
   padding: 22px;
   border: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
   border-radius: 16px;
   background: #fff;
   box-shadow: 0 8px 28px -18px rgb(var(--avgst-ink-rgb) / 0.4);
+  transition: background 0.42s var(--ease-out), color 0.42s var(--ease-out),
+    border-color 0.42s var(--ease-out);
 }
 
-@media (min-width: 900px) {
-  .project-config__total {
-    position: sticky;
-    top: 96px;
-  }
+/* Инверсия на время заполнения формы. Цвет — фирменный иссиня-чёрный:
+   отдельного синего в палитре нет, а этот и есть её синий.
+
+   Тогда же панель дотягивается до низа ряда: закрытой ей это ни к чему —
+   она маленькая плашка, — а с формой обрыв на двадцать пикселей выше
+   карточек читается браком. */
+.project-config__total[data-form="true"] {
+  align-self: stretch;
+  background: var(--avgst-ink);
+  border-color: transparent;
+  color: #fff;
 }
+
+.project-config__total[data-form="true"] .project-config__total-label,
+.project-config__total[data-form="true"] .project-config__total-pay span {
+  color: rgb(255 255 255 / 0.6);
+}
+
+.project-config__total[data-form="true"] .project-config__total-pay {
+  border-top-color: rgb(255 255 255 / 0.16);
+}
+
+.project-config__total[data-form="true"] .project-config__total-pay--plain {
+  color: #fff;
+}
+
+.project-config__total[data-form="true"] .lead-card {
+  --lead-ink: 255 255 255;
+}
+
+.project-config__total[data-form="true"] .lead-card input {
+  border-color: rgb(255 255 255 / 0.28);
+  background: rgb(255 255 255 / 0.06);
+  color: #fff;
+}
+
+.project-config__total[data-form="true"] .lead-card input::placeholder {
+  color: rgb(255 255 255 / 0.45);
+}
+
+.project-config__total[data-form="true"] .lead-card input:focus-visible {
+  border-color: rgb(255 255 255 / 0.7);
+  box-shadow: 0 0 0 3px rgb(255 255 255 / 0.12);
+}
+
+.project-config__total[data-form="true"] .lead-form__consent {
+  color: rgb(255 255 255 / 0.72);
+}
+
+
 
 .project-config__total-label {
   margin: 0;
@@ -11427,6 +11484,108 @@ textarea:focus-visible {
 .project-config__total .btn {
   width: 100%;
   gap: 6px;
+}
+
+/* Кнопка и форма — одна группа, прижатая к низу: пока панель тянется до
+   низа ряда, лишний воздух должен оставаться над ней, а не под. */
+.project-config__action {
+  display: grid;
+  margin-top: auto;
+}
+
+/* Форма в панели итога: закрытая строка высоты 0fr раскатывается до
+   1fr. Анимировать height нечем — она auto; grid-строка это умеет, и
+   переход прерывается на полпути, если закрыть не дожидаясь конца. */
+.project-config__form {
+  display: grid;
+  min-width: 0;
+  /* Панель — флекс-колонка, а её элементы по умолчанию не сжимаются
+     ниже содержимого: без этого закрытая форма всё равно держала свою
+     полную высоту, и панель стояла пустой на 300 лишних пикселей. */
+  min-height: 0;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  /* Кривая мягче общей --ease-out: та начинается рывком, и рост панели
+     на полсотни пикселей читался как щелчок. */
+  transition: grid-template-rows 0.55s cubic-bezier(0.22, 0.61, 0.36, 1),
+    opacity 0.3s var(--ease-out);
+}
+
+.project-config__form[data-open="true"] {
+  grid-template-rows: 1fr;
+  opacity: 1;
+}
+
+.project-config__form > div {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* Форма — часть панели, а не карточка в карточке: своя рамка и фон здесь
+   рисовали вторую коробку внутри первой. */
+.project-config__form .lead-card {
+  /* Боковой запас: у чекбокса согласия при ошибке обводка 2px с отступом
+     1px, и край обрезающего блока срезал её. Шесть пикселей поля
+     незаметны, срезанная рамка — нет. */
+  padding: 16px 6px 0;
+  border: 0;
+  border-radius: 0;
+  background: none;
+  /* Содержимое подъезжает вместе с ростом, а не возникает в конце: без
+     этого форма выглядела выпрыгнувшей снизу. */
+  opacity: 0;
+  transform: translateY(-6px);
+  transition: opacity 0.4s 0.08s var(--ease-out),
+    transform 0.5s 0.08s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+.project-config__form[data-open="true"] .lead-card {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-config__form .lead-card {
+    transition: none;
+  }
+}
+
+/* Поле в фокусе отмечается своей гранью, а не зелёной рамкой общего
+   правила: та рисовалась поверх скруглённого поля вторым контуром. */
+.project-config__form .lead-card input:focus-visible {
+  outline: none;
+  border-color: rgb(var(--avgst-ink-rgb) / 0.55);
+  box-shadow: 0 0 0 3px rgb(var(--avgst-ink-rgb) / 0.08);
+}
+
+/* Согласие в узкой колонке переносится по словам: неразрывная строка из
+   общего правила вылезала за грань панели, а раскрытая форма обрезала её
+   по краю. Колонке с текстом нужен min-width: 0, иначе она держит ширину
+   самой длинной ссылки. */
+.project-config__form .lead-card .lead-form__consent {
+  white-space: normal;
+}
+
+.project-config__form .lead-card .lead-form__consent > * {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+/* Форма живёт в узкой колонке: без этого её поля держат свою ширину и
+   вылезают за грань панели. */
+.project-config__form .lead-card,
+.project-config__form .lead-card label,
+.project-config__form .lead-card input,
+.project-config__form .lead-card .btn {
+  min-width: 0;
+  max-width: 100%;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-config__form {
+    transition: none;
+  }
 }
 
 .project-config__total-note {

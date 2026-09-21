@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import { copy } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
 import { tiersForProject } from "../lib/catalog/tiers";
+import { LeadForm } from "./lead-form";
+import { SITE } from "../lib/site";
 import type { CatalogProject } from "../lib/catalog/types";
 import {
   Accordion,
@@ -52,6 +54,7 @@ export function ProjectConfig({
 }) {
   const tiers = tiersForProject(project);
   const [tierId, setTierId] = useState("standard");
+  const [formOpen, setFormOpen] = useState(false);
 
   /* Читаем после гидрации: на сервере localStorage нет, а разметка должна
      совпасть. Хранилище может быть недоступно — тогда остаётся значение
@@ -98,8 +101,7 @@ export function ProjectConfig({
         <h2 id="project-config-title">{copy.configHeading}</h2>
 
         <div className="project-config">
-          <div>
-            <ul className="project-config__tiers">
+          <ul className="project-config__tiers">
               {tiers.map((item) => (
                 <li key={item.id}>
                   <button
@@ -147,65 +149,15 @@ export function ProjectConfig({
                   </button>
                 </li>
               ))}
-            </ul>
+          </ul>
 
-            {/* Заголовок называет уровень: иначе список материалов
-                читается как общий для дома, а он у каждой комплектации
-                свой. Ключ по уровню — чтобы при переключении список
-                собрался заново и первый пункт снова был раскрыт. */}
-            <h3 className="project-config__details-title">
-              {copy.configDetails}{" "}
-              <span className="project-config__details-mark">
-                {tier.nameAcc} {copy.configTierWordAcc}
-              </span>
-            </h3>
-            {/* Здесь список начинается свёрнутым, хотя обычно первый
-                пункт раскрыт: состав материалов открывают по нужде, а не
-                читают подряд. */}
-            <Accordion
-              key={tier.id}
-              type="multiple"
-              defaultValue={[]}
-              className="ui-accordion"
-            >
-              {tier.details.map((detail) => (
-                <AccordionItem
-                  key={detail.title}
-                  value={`${tier.id}-${detail.title}`}
-                >
-                  <AccordionTrigger>{detail.title}</AccordionTrigger>
-                  <AccordionContent>
-                    {detail.lead ? (
-                      <p className="project-config__spec-lead">{detail.lead}</p>
-                    ) : null}
-
-                    {detail.items ? (
-                      <ul className="project-config__spec-list">
-                        {detail.items.map((item) => (
-                          <li key={item}>{item}</li>
-                        ))}
-                      </ul>
-                    ) : null}
-
-                    {detail.groups?.map((group) => (
-                      <div key={group.title} className="project-config__spec">
-                        <p className="project-config__spec-title">
-                          {group.title}
-                        </p>
-                        <ul className="project-config__spec-list">
-                          {group.items.map((item) => (
-                            <li key={item}>{item}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))}
-                  </AccordionContent>
-                </AccordionItem>
-              ))}
-            </Accordion>
-          </div>
-
-          <aside className="project-config__total">
+          {/* Открытая форма переворачивает панель в тёмную: пока в ней
+              заполняют поля, она главная на экране, и инверсия говорит
+              это без единого слова. */}
+          <aside
+            className="project-config__total"
+            data-form={formOpen ? "true" : "false"}
+          >
             <p className="project-config__total-label">
               {tier.name} {copy.configTierWord}
             </p>
@@ -225,12 +177,105 @@ export function ProjectConfig({
                 <span>{copy.configDeliveryNote}</span>
               </p>
             )}
-            <a className="btn btn-yellow" href="#contacts">
-              {copy.getQuote}
-              <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
-            </a>
+            {/* Форма открывается здесь же, а не уводит якорем в подвал:
+                человек нажал на расчёт, глядя на выбранную комплектацию,
+                и терять её из виду ему незачем. Панель раскатывается,
+                потому что форма выше кнопки — подстановка на месте
+                рванула бы высоту рывком. */}
+            {/* Кнопка и форма — одна группа, прижатая к низу панели:
+                между ними ничего не должно распахиваться. */}
+            <div className="project-config__action">
+              {formOpen ? null : (
+                <button
+                  type="button"
+                  className="btn btn-yellow"
+                  onClick={() => setFormOpen(true)}
+                >
+                  {copy.getQuote}
+                  <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
+                </button>
+              )}
+
+            <div
+              className="project-config__form"
+              data-open={formOpen ? "true" : "false"}
+            >
+              <div>
+                <LeadForm
+                  siteId={SITE.id}
+                  projectExternalId={project.id}
+                  variant="card"
+                  compact
+                  heading={copy.getQuote}
+                  submitLabel={copy.getQuote}
+                  /* Заявка уходит с выбранным уровнем и его ценой: иначе
+                     разговор начинается с «а что вы смотрели?». */
+                  meta={{
+                    project: project.name,
+                    tier: tier.name,
+                    price: tier.price,
+                  }}
+                />
+                </div>
+              </div>
+            </div>
           </aside>
         </div>
+
+          {/* Заголовок называет уровень: иначе список материалов
+              читается как общий для дома, а он у каждой комплектации
+              свой. Ключ по уровню — чтобы при переключении список
+              собрался заново и первый пункт снова был раскрыт. */}
+          <h3 className="project-config__details-title">
+            {copy.configDetails}{" "}
+            <span className="project-config__details-mark">
+              {tier.nameAcc} {copy.configTierWordAcc}
+            </span>
+          </h3>
+          {/* Здесь список начинается свёрнутым, хотя обычно первый
+              пункт раскрыт: состав материалов открывают по нужде, а не
+              читают подряд. */}
+          <Accordion
+            key={tier.id}
+            type="multiple"
+            defaultValue={[]}
+            className="ui-accordion"
+          >
+            {tier.details.map((detail) => (
+              <AccordionItem
+                key={detail.title}
+                value={`${tier.id}-${detail.title}`}
+              >
+                <AccordionTrigger>{detail.title}</AccordionTrigger>
+                <AccordionContent>
+                  {detail.lead ? (
+                    <p className="project-config__spec-lead">{detail.lead}</p>
+                  ) : null}
+
+                  {detail.items ? (
+                    <ul className="project-config__spec-list">
+                      {detail.items.map((item) => (
+                        <li key={item}>{item}</li>
+                      ))}
+                    </ul>
+                  ) : null}
+
+                  {detail.groups?.map((group) => (
+                    <div key={group.title} className="project-config__spec">
+                      <p className="project-config__spec-title">
+                        {group.title}
+                      </p>
+                      <ul className="project-config__spec-list">
+                        {group.items.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
       </div>
     </section>
   );
