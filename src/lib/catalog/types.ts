@@ -53,6 +53,14 @@ export type CatalogOption = {
   defaultSelected: boolean
 }
 
+export type PlanRoom = { name: string; area: string }
+
+export type PlanVariant = {
+  image: string
+  label: string
+  rooms: PlanRoom[]
+}
+
 export type CatalogProject = {
   id: string
   slug: string
@@ -80,6 +88,11 @@ export type CatalogProject = {
   exteriors: string[]
   interiors: string[]
   floorPlans: string[]
+  /* Варианты планировки с экспликацией. Планы одного дома — это чаще не
+     этажи, а разные расстановки: та же коробка, другой состав комнат.
+     Поле необязательное: без него раздел показывает планы картинками, как
+     и показывал, потому что экспликацию из чертежа не достать. */
+  plans?: PlanVariant[]
   options: CatalogOption[]
 }
 
