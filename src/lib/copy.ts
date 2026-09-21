@@ -173,6 +173,13 @@ export const copy = {
   floorPlans: "Планировки",
   quote: "Расчёт комплектации",
   configurator: "Комплектация",
+  configHeading: "Варианты комплектаций",
+  configDetails: "Подробнее о составе и материалах",
+  configTierWord: "комплектация",
+  configPerMonth: "в месяц",
+  configPayNote: "семейная ипотека, взнос 20%, 30 лет",
+  configPriceNote:
+    "Цена предварительная: точную стоимость считает инженер после выезда на участок.",
   included: "Включено",
   breadcrumbsHome: "Главная",
   breadcrumbsCatalog: "Каталог",

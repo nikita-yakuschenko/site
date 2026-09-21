@@ -14,6 +14,7 @@ import {
   ProjectInteriors,
 } from '../../../components/project-media'
 import { ProjectPlans } from '../../../components/project-plans'
+import { ProjectConfig } from '../../../components/project-config'
 import { ProjectActions } from '../../../components/project-actions'
 import { SiteChrome } from '../../../components/site-chrome'
 import { FixtureCatalogProvider } from '../../../lib/catalog/fixture-provider'
@@ -153,6 +154,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <ProjectExteriors project={project} />
         <ProjectPlans project={project} />
         <ProjectInteriors project={project} />
+        <ProjectConfig project={project} basePayment={payment} />
       </main>
     </SiteChrome>
   )
