@@ -9,6 +9,11 @@ import {
   IconStairs,
 } from '@tabler/icons-react'
 import { ProjectAbout } from '../../../components/project-about'
+import {
+  ProjectExteriors,
+  ProjectInteriors,
+} from '../../../components/project-media'
+import { ProjectPlans } from '../../../components/project-plans'
 import { ProjectActions } from '../../../components/project-actions'
 import { SiteChrome } from '../../../components/site-chrome'
 import { FixtureCatalogProvider } from '../../../lib/catalog/fixture-provider'
@@ -145,18 +150,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
         <ProjectAbout project={project} />
 
-        {project.exteriors.length ? (
-          <section className="section">
-            <div className="section__inner">
-              <p className="eyebrow">{copy.exteriors}</p>
-              <div className="project-gallery">
-                {project.exteriors.map((src) => (
-                  <img key={src} src={src} alt="" loading="lazy" decoding="async" />
-                ))}
-              </div>
-            </div>
-          </section>
-        ) : null}
+        <ProjectExteriors project={project} />
+        <ProjectPlans project={project} />
+        <ProjectInteriors project={project} />
       </main>
     </SiteChrome>
   )

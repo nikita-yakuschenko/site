@@ -4643,56 +4643,66 @@ a {
    Высоту рядов задаёт пропорция кадра, а карточка растягивается под неё:
    так оба прямоугольника ряда одинаковы, и шахматка читается сеткой, а не
    случайным набором плиток. */
+/* Слева портрет, справа слово архитектора. */
 .project-about__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
+  gap: var(--gap-stack);
+  margin-top: 0;
 }
 
-@media (min-width: 720px) {
+@media (min-width: 900px) {
   .project-about__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 48px;
+    align-items: start;
   }
 }
 
-.project-about__card {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  padding: 28px 32px;
-  border-radius: 14px;
-  background: var(--page);
-}
-
-.project-about__card h2 {
+/* Заглушка портрета: серое поле с подписью. Пропорция задана, чтобы
+   раскладка не переехала, когда вместо неё встанет фотография. */
+.project-about__portrait {
+  display: grid;
+  place-items: center;
   margin: 0;
-  font-size: 1.35rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  text-transform: none;
+  aspect-ratio: 4 / 5;
+  border-radius: 16px;
+  background: rgb(var(--avgst-ink-rgb) / 0.06);
+  color: rgb(var(--avgst-ink-rgb) / 0.4);
+  font-size: 13px;
 }
 
-.project-about__card p {
-  margin: 14px 0 0;
-  max-width: 42ch;
-  font-size: 15px;
+.project-about__text p {
+  max-width: 62ch;
+  margin: 0 0 16px;
+  font-size: 17px;
   line-height: 1.6;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: rgb(var(--avgst-ink-rgb) / 0.78);
 }
 
-.project-about__photo {
-  border-radius: 14px;
-  overflow: hidden;
-  aspect-ratio: 16 / 10;
+.project-about__text p:last-child {
+  margin-bottom: 0;
 }
 
-.project-about__photo img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* Подпись отделена чертой: это уже не текст, а тот, кто его сказал. */
+.project-about__sign {
+  display: grid;
+  gap: 2px;
+  margin: 24px 0 0;
+  padding-top: 16px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  max-width: 62ch;
 }
+
+.project-about__sign strong {
+  font-size: 15px;
+}
+
+.project-about__sign span {
+  font-size: 13px;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+
 
 /* Фасады в карточке проекта: ряд с прокруткой на узком экране, сетка на
    широком — кадры разного размера смотрелись бы случайным коллажем. */
@@ -10448,5 +10458,679 @@ textarea:focus-visible {
 @media (max-width: 1023px) {
   .cfilter__reset {
     display: none;
+  }
+}
+
+/* ───────── Макет страницы проекта (/preview/project) ─────────
+   Отдельный префикс pp-: макет не должен задевать боевые страницы, пока
+   решение по нему не принято. */
+
+.pp__note {
+  width: min(var(--page-width), calc(100% - var(--page-gutter) * 2));
+  margin: 24px auto 0;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: rgb(var(--avgst-ink-rgb) / 0.05);
+  font-size: 13px;
+  color: rgb(var(--avgst-ink-rgb) / 0.6);
+}
+
+/* Полоса разделов липнет к верху окна. */
+.pp__nav {
+  position: sticky;
+  top: 0;
+  z-index: 5;
+  margin-top: 24px;
+  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  background: rgb(255 255 255 / 0.92);
+  backdrop-filter: blur(10px);
+}
+
+.pp__nav-inner {
+  display: flex;
+  gap: 24px;
+  overflow-x: auto;
+  padding-block: 14px;
+  scrollbar-width: none;
+}
+
+.pp__nav-inner::-webkit-scrollbar {
+  display: none;
+}
+
+.pp__nav a {
+  flex: 0 0 auto;
+  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+.pp__nav a:hover {
+  color: var(--avgst-ink);
+}
+
+.pp__section {
+  scroll-margin-top: 64px;
+}
+
+/* ── О проекте ── */
+.pp__about {
+  display: grid;
+  gap: var(--gap-stack);
+  margin-top: var(--gap-stack);
+}
+
+@media (min-width: 900px) {
+  .pp__about {
+    grid-template-columns: 300px minmax(0, 1fr);
+    gap: 64px;
+  }
+}
+
+.pp__specs {
+  display: grid;
+  gap: 18px;
+  margin: 0;
+}
+
+.pp__specs dt {
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1;
+}
+
+.pp__specs dd {
+  margin: 4px 0 0;
+  font-size: 13px;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.pp__about-text p {
+  max-width: 62ch;
+  margin: 0 0 16px;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgb(var(--avgst-ink-rgb) / 0.75);
+}
+
+/* ── Планировка ── */
+.pp__plan {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+}
+
+@media (min-width: 900px) {
+  .pp__plan {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 32px;
+    align-items: start;
+  }
+}
+
+.pp__plan-media {
+  overflow: hidden;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.pp__plan-media img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.pp__rooms {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* Комната — кнопка: ведёт в свои интерьеры. */
+.pp__room {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 2px 12px;
+  width: 100%;
+  padding: 14px 16px;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-radius: 12px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s var(--ease-out),
+    transform 0.16s var(--ease-out);
+}
+
+.pp__room:hover {
+  border-color: rgb(var(--avgst-ink-rgb) / 0.28);
+}
+
+.pp__room:active {
+  transform: scale(0.99);
+}
+
+.pp__room--on {
+  border-color: var(--avgst-ink);
+}
+
+.pp__room-name {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.pp__room-area {
+  font-size: 15px;
+  font-weight: 600;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.pp__room-go {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  grid-column: 1 / -1;
+  font-size: 12px;
+  color: rgb(var(--avgst-ink-rgb) / 0.45);
+}
+
+/* ── Фасады: бенто ── */
+.pp__bento {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 900px) {
+  .pp__bento {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .pp__bento-lead {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+}
+
+/* Кадр заполняет ячейку целиком. Пропорцию держит сама ячейка, а не
+   картинка: крупная плитка занимает две колонки и два ряда, и высота у
+   неё складывается из рядов с промежутком — задай ей 16:9 отдельно, и
+   она разошлась бы с сеткой. Прежде пропорция стояла на картинке, и под
+   мелкими плитками оставался серый хвост. */
+.pp__bento figure {
+  overflow: hidden;
+  margin: 0;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  background: #e8edf3;
+}
+
+@media (min-width: 900px) {
+  /* Селектор с именем блока — иначе правило проигрывает по весу
+     .pp__bento figure, и крупная плитка берёт ту же пропорцию вместо
+     того, чтобы занять свои два ряда. */
+  .pp__bento figure.pp__bento-lead {
+    aspect-ratio: auto;
+  }
+}
+
+.pp__bento img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.pp__bento figure:hover img {
+  transform: scale(1.03);
+}
+
+/* ── Интерьеры ── */
+.pp__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--gap-stack);
+}
+
+.pp__chip {
+  padding: 8px 14px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(var(--avgst-ink-rgb) / 0.06);
+  color: rgb(var(--avgst-ink-rgb) / 0.75);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s var(--ease-out),
+    color 0.2s var(--ease-out);
+}
+
+.pp__chip:hover {
+  background: rgb(var(--avgst-ink-rgb) / 0.1);
+}
+
+.pp__chip--on {
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+.pp__shots {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-tile);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 900px) {
+  .pp__shots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pp__shots figure {
+  overflow: hidden;
+  margin: 0;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  background: #e8edf3;
+}
+
+.pp__shots img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Комплектация ── */
+.pp__config {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+}
+
+@media (min-width: 900px) {
+  .pp__config {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    gap: 32px;
+    align-items: start;
+  }
+}
+
+/* Комплектации: три уровня в ряд. Карточка — кнопка, потому что выбор
+   меняет цену и платёж в панели справа. Состав перечислен прямо в ней:
+   разница между уровнями видна списком, а не описанием. */
+.pp__tiers {
+  display: grid;
+  gap: var(--gap-tile);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+@media (min-width: 720px) {
+  .pp__tiers {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+.pp__tiers li {
+  display: flex;
+  min-width: 0;
+}
+
+.pp__tier {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  flex: 1 1 auto;
+  padding: 20px;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-radius: 16px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s var(--ease-out),
+    box-shadow 0.2s var(--ease-out),
+    transform 0.16s var(--ease-out);
+}
+
+.pp__tier:hover {
+  border-color: rgb(var(--avgst-ink-rgb) / 0.28);
+}
+
+.pp__tier:active {
+  transform: scale(0.995);
+}
+
+/* Выбранная отмечена гранью и тенью, а не заливкой: заливка перекрасила
+   бы весь состав, который в ней и читают. */
+.pp__tier--on {
+  border-color: var(--avgst-ink);
+  box-shadow: 0 10px 30px -20px rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.pp__tier-name {
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.pp__tier-lead {
+  font-size: 14px;
+  line-height: 1.45;
+  color: rgb(var(--avgst-ink-rgb) / 0.62);
+}
+
+.pp__tier-price {
+  margin-top: 4px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: var(--avgst-green);
+}
+
+.pp__tier-list {
+  display: grid;
+  gap: 6px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  font-size: 14px;
+  color: rgb(var(--avgst-ink-rgb) / 0.75);
+}
+
+.pp__tier-list > span {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pp__tier-list svg {
+  flex: 0 0 auto;
+  color: var(--avgst-green);
+}
+
+.pp__details-title {
+  margin: var(--gap-stack) 0 12px;
+  font-size: 18px;
+}
+
+/* Итог липнет к верху: список опций длиннее панели, и цена должна
+   оставаться на экране, пока по нему идут. */
+.pp__total {
+  position: sticky;
+  top: 76px;
+  padding: 22px;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 28px -18px rgb(var(--avgst-ink-rgb) / 0.4);
+}
+
+.pp__total-label {
+  margin: 0;
+  font-size: 13px;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.pp__total-sum {
+  margin: 4px 0 0;
+  font-size: 30px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.05;
+}
+
+.pp__total-pay {
+  display: grid;
+  gap: 2px;
+  margin: 14px 0 18px;
+  padding-top: 14px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--avgst-green);
+}
+
+.pp__total-pay span {
+  font-size: 12px;
+  font-weight: 400;
+  color: rgb(var(--avgst-ink-rgb) / 0.5);
+}
+
+.pp__total .btn {
+  width: 100%;
+  gap: 6px;
+}
+
+.pp__total-note {
+  margin: 12px 0 0;
+  font-size: 12px;
+  line-height: 1.45;
+  color: rgb(var(--avgst-ink-rgb) / 0.5);
+}
+
+
+/* ───────── Кадры проекта: фасады, планировки, интерьеры ─────────
+   Пропорцию держит ячейка, а не картинка: у <img> есть атрибут height, и
+   без высоты в правиле он выигрывает — кадры выходили в натуральный рост,
+   а под ними оставался фон. */
+
+.project-bento {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 900px) {
+  .project-bento {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  /* Крупная плитка занимает две колонки и два ряда, поэтому своей
+     пропорции у неё нет — высоту дают ряды. */
+  .project-bento figure.project-bento__lead {
+    grid-column: span 2;
+    grid-row: span 2;
+    aspect-ratio: auto;
+  }
+}
+
+.project-bento figure,
+.project-shots figure {
+  overflow: hidden;
+  margin: 0;
+  aspect-ratio: 16 / 9;
+  border-radius: 14px;
+  background: #e8edf3;
+}
+
+.project-bento img,
+.project-shots img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.project-bento img {
+  transition: transform 0.45s var(--ease-out);
+}
+
+.project-bento figure:hover img {
+  transform: scale(1.03);
+}
+
+/* Варианты планировки переключаются, а не лежат рядом: сравнивать их
+   имеет смысл на одном месте, глядя на ту же коробку. */
+.project-plans__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: var(--gap-stack);
+}
+
+.project-plans__tab {
+  padding: 8px 16px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(var(--avgst-ink-rgb) / 0.06);
+  color: rgb(var(--avgst-ink-rgb) / 0.75);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition:
+    background-color 0.2s var(--ease-out),
+    color 0.2s var(--ease-out);
+}
+
+.project-plans__tab:hover {
+  background: rgb(var(--avgst-ink-rgb) / 0.1);
+}
+
+.project-plans__tab--on {
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+.project-plans__body {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-tile);
+}
+
+@media (min-width: 900px) {
+  .project-plans__body {
+    grid-template-columns: minmax(0, 1fr) 300px;
+    gap: 32px;
+    align-items: start;
+  }
+}
+
+/* Чертёж показывается целиком: обрезать план нельзя. */
+.project-plans__sheet {
+  margin: 0;
+  padding: 16px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.project-plans__sheet img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* Экспликация: слева комната, справа площадь, между ними отточие из
+   границы — так читается строка таблицы, а не два столбца порознь. */
+.project-plans__legend {
+  padding: 20px 22px;
+  border-radius: 16px;
+  background: #fff;
+}
+
+.project-plans__legend-title {
+  margin: 0 0 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.5);
+}
+
+.project-plans__legend dl {
+  display: grid;
+  gap: 0;
+  margin: 0;
+}
+
+.project-plans__legend dl > div {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+}
+
+.project-plans__legend dl > div:last-child {
+  border-bottom: 0;
+}
+
+.project-plans__legend dt {
+  font-size: 14px;
+  color: rgb(var(--avgst-ink-rgb) / 0.75);
+}
+
+.project-plans__legend dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Планы без экспликации — просто листами. */
+.project-plans {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+}
+
+@media (min-width: 900px) {
+  .project-plans {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.project-plans figure {
+  overflow: hidden;
+  margin: 0;
+  padding: 12px;
+  border-radius: 14px;
+  background: #fff;
+}
+
+.project-plans img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.project-shots {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 900px) {
+  .project-shots {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .project-bento figure:hover img {
+    transform: none;
   }
 }

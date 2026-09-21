@@ -27,6 +27,12 @@ export const copy = {
   perMonth: "/мес",
   baseConfig: "базовая комплектация",
   aboutProject: "О проекте",
+  /* Подпись под словом архитектора — заглушка: настоящее имя и должность
+     подставим, когда будет текст от человека. */
+  architectHeading: "Слово архитектора",
+  architectName: "Имя Фамилия",
+  architectRole: "главный архитектор",
+  architectPhotoHint: "Фото архитектора",
   aboutBuild: "Как его строят",
 
   /* Боковая колонка отбора. Единицы вынесены отдельными строками: они
@@ -153,6 +159,12 @@ export const copy = {
   leadError: "Не удалось отправить. Попробуйте ещё раз.",
   sending: "Отправка…",
   exteriors: "Фасады",
+  exteriorsHeading: "Как дом выглядит снаружи",
+  plansEyebrow: "Планировка",
+  plansHeading: "Как он устроен внутри",
+  plansLegend: "Экспликация",
+  interiorsEyebrow: "Интерьеры",
+  interiorsHeading: "Возможные варианты отделки",
   interiors: "Интерьеры",
   floorPlans: "Планировки",
   quote: "Расчёт комплектации",
