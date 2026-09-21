@@ -1,0 +1,1321 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Семейная ипотека — Авангард Строй</title>
+  <style>
+/* Zero Block — ипотечные лендинги Авангард Строй.
+   Префикс .zm- чтобы не конфликтовать со стилями Тильды. */
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+
+.zm-page {
+  --zm-page: #f5f6f8;
+  --zm-ink: #0b1020;
+  --zm-ink-rgb: 11 16 32;
+  --zm-yellow: #fcc90c;
+  --zm-green: #48b062;
+  --zm-white: #ffffff;
+  --zm-width: 1152px;
+  --zm-gutter: 24px;
+  --zm-gap: 16px;
+  --zm-stack: 32px;
+  --zm-section: 56px;
+  --zm-radius: 10px;
+  --zm-ease: cubic-bezier(0.23, 1, 0.32, 1);
+  --zm-font: "Geist", "Geist Sans", Inter, Arial, sans-serif;
+
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  color: var(--zm-ink);
+  background: var(--zm-page);
+  font-family: var(--zm-font);
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+.zm-page *,
+.zm-page *::before,
+.zm-page *::after {
+  box-sizing: border-box;
+}
+
+.zm-page img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.zm-page a {
+  color: inherit;
+}
+
+.zm-inner {
+  width: min(var(--zm-width), calc(100% - var(--zm-gutter) * 2));
+  margin-inline: auto;
+}
+
+.zm-section {
+  padding: var(--zm-section) 0;
+}
+
+.zm-section--tight {
+  padding-top: calc(var(--zm-section) * 0.6);
+}
+
+.zm-eyebrow {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--zm-ink-rgb) / 0.55);
+}
+
+.zm-h2 {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 3.2vw, 40px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+}
+
+.zm-lead {
+  margin: 0;
+  max-width: 42rem;
+  font-size: 17px;
+  line-height: 1.55;
+  color: rgb(var(--zm-ink-rgb) / 0.72);
+}
+
+.zm-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 0 22px;
+  border: none;
+  border-radius: 8px;
+  background: var(--zm-yellow);
+  color: var(--zm-ink);
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.2s var(--zm-ease), filter 0.2s var(--zm-ease);
+}
+
+.zm-btn:hover {
+  filter: brightness(0.97);
+  transform: translateY(-1px);
+}
+
+.zm-btn--ghost {
+  background: transparent;
+  border: 1px solid rgb(var(--zm-ink-rgb) / 0.18);
+}
+
+.zm-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgb(var(--zm-ink-rgb) / 0.25);
+  padding-bottom: 2px;
+  transition: border-color 0.2s var(--zm-ease);
+}
+
+.zm-link:hover {
+  border-color: var(--zm-ink);
+}
+
+/* —— Hero: на всю ширину экрана, без «карточки» с полями —— */
+.zm-hero {
+  padding: 0;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+}
+
+.zm-hero > .zm-inner {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.zm-hero__frame {
+  position: relative;
+  overflow: hidden;
+  min-height: min(78vh, 680px);
+  border-radius: 0;
+  background: var(--zm-ink);
+  color: #fff;
+}
+
+.zm-hero__frame--cutout {
+  background: linear-gradient(135deg, #eef1f4 0%, #f7f8fa 55%, #e8ecef 100%);
+  color: var(--zm-ink);
+}
+
+.zm-hero__media {
+  position: absolute;
+  inset: 0 0 0 38%;
+  z-index: 0;
+  -webkit-mask-image: linear-gradient(106deg, transparent 14%, #000 30%);
+  mask-image: linear-gradient(106deg, transparent 14%, #000 30%);
+}
+
+.zm-hero__media img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 24%;
+}
+
+.zm-hero__frame--cutout .zm-hero__media {
+  inset: auto 0 0 auto;
+  width: min(52%, 560px);
+  height: 100%;
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.zm-hero__frame--cutout .zm-hero__media img {
+  object-fit: contain;
+  object-position: bottom right;
+  mix-blend-mode: multiply;
+}
+
+/* Косая заливка слева, как на сайте — не полупрозрачная вуаль поверх фото */
+.zm-hero__veil {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: rgb(var(--zm-ink-rgb));
+  -webkit-mask-image: linear-gradient(106deg, #000 40%, transparent 58%);
+  mask-image: linear-gradient(106deg, #000 40%, transparent 58%);
+}
+
+.zm-hero__frame--cutout .zm-hero__veil {
+  display: none;
+}
+
+.zm-hero__body {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  gap: 18px;
+  max-width: 560px;
+  min-height: min(78vh, 680px);
+  padding: 48px max(24px, calc((100vw - var(--zm-width)) / 2)) 48px;
+  width: min(var(--zm-width), calc(100% - 48px));
+  margin-inline: auto;
+  box-sizing: content-box;
+}
+
+.zm-hero__title {
+  margin: 0;
+  font-size: clamp(32px, 4.5vw, 52px);
+  font-weight: 700;
+  line-height: 1.08;
+  letter-spacing: -0.03em;
+}
+
+.zm-hero__title em {
+  font-style: normal;
+  font-size: 1.32em;
+  line-height: 1;
+  color: var(--zm-yellow);
+}
+
+.zm-hero__frame--cutout .zm-hero__title em {
+  color: var(--zm-green);
+}
+
+.zm-hero__lead {
+  margin: 0;
+  max-width: 44ch;
+  font-size: 16px;
+  line-height: 1.6;
+  color: rgb(255 255 255 / 0.82);
+}
+
+.zm-hero__frame--cutout .zm-hero__lead {
+  color: rgb(var(--zm-ink-rgb) / 0.7);
+}
+
+.zm-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px 24px;
+  margin-top: 8px;
+}
+
+.zm-hero__more {
+  color: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid rgb(255 255 255 / 0.35);
+  padding-bottom: 2px;
+}
+
+.zm-hero__frame--cutout .zm-hero__more {
+  border-bottom-color: rgb(var(--zm-ink-rgb) / 0.25);
+}
+
+/* —— Who —— плашки как на сайте: текст сверху в одном ритме, кадр справа —— */
+.zm-who__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--zm-gap);
+  margin-top: var(--zm-stack);
+  align-items: stretch;
+  list-style: none;
+  padding: 0;
+}
+
+.zm-who__grid--quad {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.zm-who__grid--joined {
+  grid-template-columns:
+    minmax(0, 1fr) auto minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 20px;
+}
+
+.zm-who__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 144px;
+  min-width: 0;
+  padding: 24px;
+  overflow: hidden;
+  border: 1px solid rgb(var(--zm-ink-rgb) / 0.12);
+  border-radius: var(--zm-radius);
+  background: var(--zm-white);
+}
+
+.zm-who__label {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  max-width: 54%;
+  padding-right: 12px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.25;
+  text-transform: uppercase;
+  color: rgb(var(--zm-ink-rgb) / 0.55);
+}
+
+.zm-who__title {
+  position: relative;
+  z-index: 1;
+  margin: 16px 0 0;
+  max-width: 54%;
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+}
+
+.zm-who__note {
+  position: relative;
+  z-index: 1;
+  margin: 16px 0 0;
+  max-width: 46%;
+  font-size: 13px;
+  line-height: 1.35;
+  color: rgb(var(--zm-ink-rgb) / 0.65);
+}
+
+.zm-who__img {
+  position: absolute;
+  top: 12px;
+  right: 0;
+  width: 50%;
+  height: calc(100% + 12px);
+  object-fit: contain;
+  object-position: center top;
+  pointer-events: none;
+}
+
+.zm-who__joiner {
+  display: grid;
+  place-items: center;
+  margin: 0;
+  color: rgb(var(--zm-ink-rgb) / 0.42);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  line-height: 1;
+  text-transform: uppercase;
+}
+
+/* —— Accordion (rules / faq) —— */
+.zm-acc {
+  margin-top: var(--zm-stack);
+  border-top: 1px solid rgb(var(--zm-ink-rgb) / 0.1);
+}
+
+.zm-acc__item {
+  border-bottom: 1px solid rgb(var(--zm-ink-rgb) / 0.1);
+}
+
+.zm-acc__item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 4px;
+  list-style: none;
+  cursor: pointer;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.zm-acc__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.zm-acc__item summary::after {
+  content: "";
+  flex: none;
+  width: 10px;
+  height: 10px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+  opacity: 0.45;
+  transition: transform 0.2s var(--zm-ease);
+}
+
+.zm-acc__item[open] summary::after {
+  transform: rotate(-135deg);
+  margin-top: 6px;
+}
+
+.zm-acc__body {
+  padding: 0 4px 20px;
+  max-width: 52rem;
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgb(var(--zm-ink-rgb) / 0.72);
+}
+
+.zm-acc__body p {
+  margin: 0;
+}
+
+/* —— Steps —— */
+.zm-steps__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--zm-gap);
+  margin: var(--zm-stack) 0 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: zm-step;
+}
+
+.zm-steps__item {
+  position: relative;
+  padding: 24px 20px 20px;
+  border-radius: var(--zm-radius);
+  background: var(--zm-white);
+  border: 1px solid rgb(var(--zm-ink-rgb) / 0.08);
+  counter-increment: zm-step;
+}
+
+.zm-steps__item::before {
+  content: counter(zm-step);
+  display: block;
+  margin-bottom: 14px;
+  font-size: 42px;
+  font-weight: 700;
+  line-height: 1;
+  letter-spacing: -0.04em;
+  color: rgb(var(--zm-ink-rgb) / 0.1);
+}
+
+.zm-steps__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.zm-steps__text {
+  margin: 0;
+  font-size: 15px;
+  color: rgb(var(--zm-ink-rgb) / 0.68);
+}
+
+/* —— Finance —— */
+.zm-finance__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--zm-gap);
+  margin-top: var(--zm-stack);
+}
+
+.zm-finance__card {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  border-radius: var(--zm-radius);
+  background: var(--zm-white);
+  border: 1px solid rgb(var(--zm-ink-rgb) / 0.08);
+  text-decoration: none;
+  color: inherit;
+  transition: border-color 0.2s var(--zm-ease), transform 0.2s var(--zm-ease);
+}
+
+.zm-finance__card:hover {
+  border-color: rgb(var(--zm-ink-rgb) / 0.22);
+  transform: translateY(-2px);
+}
+
+.zm-finance__img {
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  width: 100%;
+  background: #e8eaee;
+}
+
+.zm-finance__body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 10px;
+  padding: 18px 18px 20px;
+}
+
+.zm-finance__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.zm-finance__text {
+  margin: 0;
+  flex: 1;
+  font-size: 15px;
+  color: rgb(var(--zm-ink-rgb) / 0.68);
+}
+
+.zm-finance__cta {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--zm-ink);
+}
+
+/* —— Conditions —— */
+.zm-cond {
+  margin-top: var(--zm-stack);
+  border-top: 1px solid rgb(var(--zm-ink-rgb) / 0.1);
+}
+
+.zm-cond__row {
+  display: grid;
+  grid-template-columns: minmax(120px, 180px) 1fr;
+  gap: 16px 28px;
+  padding: 22px 0;
+  border-bottom: 1px solid rgb(var(--zm-ink-rgb) / 0.1);
+}
+
+.zm-cond__value {
+  margin: 0;
+  font-size: clamp(22px, 2.4vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+  color: var(--zm-green);
+}
+
+.zm-cond__value--mark {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: var(--zm-yellow);
+  color: transparent;
+  font-size: 0;
+}
+
+.zm-cond__value--mark::after {
+  content: "";
+  display: block;
+  width: 10px;
+  height: 6px;
+  margin: 9px 0 0 8px;
+  border-left: 2px solid var(--zm-ink);
+  border-bottom: 2px solid var(--zm-ink);
+  transform: rotate(-45deg);
+}
+
+.zm-cond__title {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.zm-cond__text {
+  margin: 0;
+  font-size: 15px;
+  color: rgb(var(--zm-ink-rgb) / 0.7);
+}
+
+.zm-cond__points {
+  margin: 10px 0 0;
+  padding-left: 1.15em;
+  font-size: 15px;
+  color: rgb(var(--zm-ink-rgb) / 0.68);
+}
+
+.zm-cond__points li + li {
+  margin-top: 4px;
+}
+
+.zm-cond__note {
+  margin-top: 20px;
+  display: grid;
+  gap: 8px;
+}
+
+.zm-cond__note p {
+  margin: 0;
+  font-size: 14px;
+  color: rgb(var(--zm-ink-rgb) / 0.55);
+}
+
+/* —— Mid CTA ——
+   Как на сайте: фото слева растворяется в заливку, текст справа.
+   Секция на всю ширину экрана — не «карточка» посреди белого. */
+.zm-cta {
+  padding: 0;
+  width: 100vw;
+  max-width: 100vw;
+  margin-left: calc(50% - 50vw);
+  margin-right: calc(50% - 50vw);
+  background: transparent;
+}
+
+.zm-cta > .zm-inner {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+}
+
+.zm-cta__panel {
+  position: relative;
+  display: grid;
+  overflow: hidden;
+  min-height: 320px;
+  background: var(--zm-ink);
+  color: #fff;
+}
+
+.zm-cta__media {
+  position: relative;
+  min-height: 220px;
+}
+
+.zm-cta__media img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 30%;
+}
+
+.zm-cta__body {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+  align-content: center;
+  padding: 48px max(24px, calc((100vw - var(--zm-width)) / 2));
+  max-width: calc(var(--zm-width) / 2 + max(24px, calc((100vw - var(--zm-width)) / 2)));
+  margin-left: auto;
+  box-sizing: border-box;
+}
+
+.zm-cta__body .zm-h2 {
+  margin: 0;
+  color: #fff;
+  max-width: 22ch;
+}
+
+.zm-cta__body .zm-lead {
+  margin: 0;
+  max-width: 36ch;
+  color: rgb(255 255 255 / 0.78);
+}
+
+@media (min-width: 900px) {
+  .zm-cta__panel {
+    grid-template-columns: 1fr 1fr;
+    min-height: 360px;
+  }
+
+  .zm-cta__media {
+    position: absolute;
+    inset: 0 50% 0 0;
+    z-index: 0;
+    min-height: 0;
+    -webkit-mask-image: linear-gradient(270deg, transparent 0%, #000 34%);
+    mask-image: linear-gradient(270deg, transparent 0%, #000 34%);
+  }
+
+  .zm-cta__panel::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    background: rgb(var(--zm-ink-rgb));
+    -webkit-mask-image: linear-gradient(254deg, #000 46%, transparent 68%);
+    mask-image: linear-gradient(254deg, #000 46%, transparent 68%);
+  }
+
+  .zm-cta__body {
+    grid-column: 2;
+    padding: 48px 40px 48px 32px;
+    max-width: none;
+    margin-left: 0;
+    width: min(520px, 100%);
+  }
+}
+
+/* Cutout-программы: светлая панель, знак contain справа */
+.zm-cta--light .zm-cta__panel {
+  background: var(--zm-page);
+  color: var(--zm-ink);
+}
+
+.zm-cta--light .zm-cta__panel::before {
+  content: none;
+}
+
+.zm-cta--light .zm-cta__media {
+  -webkit-mask-image: none;
+  mask-image: none;
+}
+
+.zm-cta--light .zm-cta__media img {
+  object-fit: contain;
+  object-position: center;
+  padding: 32px;
+}
+
+.zm-cta--light .zm-cta__body .zm-h2 {
+  color: var(--zm-ink);
+}
+
+.zm-cta--light .zm-cta__body .zm-lead {
+  color: rgb(var(--zm-ink-rgb) / 0.68);
+}
+
+@media (min-width: 900px) {
+  .zm-cta--light .zm-cta__media {
+    position: absolute;
+    inset: 0 50% 0 0;
+  }
+
+  .zm-cta--light .zm-cta__body {
+    grid-column: 2;
+  }
+}
+
+.zm-form-slot {
+  margin-top: 8px;
+  width: min(100%, 360px);
+  min-height: 148px;
+  padding: 20px;
+  border: 1px solid rgb(255 255 255 / 0.18);
+  border-radius: var(--zm-radius);
+  background: rgb(255 255 255 / 0.06);
+}
+
+.zm-cta--light .zm-form-slot,
+.zm-contacts .zm-form-slot {
+  border-color: rgb(var(--zm-ink-rgb) / 0.14);
+  background: var(--zm-white);
+}
+
+.zm-form-slot__hint {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: rgb(255 255 255 / 0.45);
+}
+
+.zm-cta--light .zm-form-slot__hint,
+.zm-contacts .zm-form-slot__hint {
+  color: rgb(var(--zm-ink-rgb) / 0.45);
+}
+
+/* —— Banks ——
+   Как на сайте: brightness(0) — белые SVG (ВТБ) становятся чёрными.
+   Ряд на всю ширину колонки (.zm-inner = 1152px), не кучкой слева. */
+.zm-banks {
+  padding-top: 8px;
+}
+
+.zm-banks__row {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 20px;
+  padding: 20px 0;
+}
+
+.zm-banks__row img {
+  flex: 1 1 0;
+  min-width: 0;
+  max-width: 168px;
+  height: 40px;
+  width: auto;
+  object-fit: contain;
+  object-position: center;
+  opacity: 0.82;
+  filter: brightness(0) saturate(100%);
+}
+
+/* —— Other programs —— */
+.zm-programs__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--zm-gap);
+  margin-top: var(--zm-stack);
+}
+
+.zm-program {
+  position: relative;
+  display: flex;
+  min-height: 144px;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 22px;
+  border: 1px solid rgb(var(--zm-ink-rgb) / 0.12);
+  border-radius: var(--zm-radius);
+  background: #fff;
+  color: var(--zm-ink);
+  text-decoration: none;
+  overflow: hidden;
+  transition: border-color 0.2s var(--zm-ease), transform 0.2s var(--zm-ease);
+}
+
+.zm-program:hover {
+  border-color: rgb(var(--zm-ink-rgb) / 0.28);
+  transform: translateY(-2px);
+}
+
+.zm-program__rate {
+  margin: 0 0 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--zm-green);
+}
+
+.zm-program__title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.zm-program__note {
+  margin: 8px 0 0;
+  max-width: 11rem;
+  font-size: 14px;
+  color: rgb(var(--zm-ink-rgb) / 0.62);
+}
+
+.zm-program__img {
+  position: absolute;
+  right: 8px;
+  bottom: 0;
+  width: 110px;
+  height: 110px;
+  object-fit: contain;
+  object-position: bottom right;
+  pointer-events: none;
+}
+
+/* —— Contacts —— */
+.zm-contacts__grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 40px;
+  align-items: start;
+}
+
+.zm-contacts__list {
+  display: grid;
+  gap: 18px;
+  margin-top: 24px;
+}
+
+.zm-contacts__item {
+  margin: 0;
+}
+
+.zm-contacts__label {
+  display: block;
+  margin-bottom: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--zm-ink-rgb) / 0.5);
+}
+
+.zm-contacts__value {
+  font-size: 20px;
+  font-weight: 600;
+  text-decoration: none;
+  color: var(--zm-ink);
+}
+
+.zm-contacts__value:hover {
+  color: var(--zm-green);
+}
+
+.zm-contacts__addr {
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+/* —— Responsive —— */
+@media (max-width: 900px) {
+  .zm-finance__grid,
+  .zm-programs__grid,
+  .zm-contacts__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .zm-cta__panel {
+    grid-template-columns: 1fr;
+  }
+
+  .zm-cta__media:not(.zm-cta__media--cutout) {
+    min-height: 240px;
+    -webkit-mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 62%, transparent 100%);
+  }
+
+  .zm-cta__media--cutout {
+    min-height: 200px;
+  }
+
+  .zm-cta__body {
+    padding: 32px var(--zm-gutter) 40px;
+    max-width: none;
+    margin-left: 0;
+    width: auto;
+  }
+
+  .zm-cond__row {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .zm-who__grid,
+  .zm-who__grid--joined,
+  .zm-who__grid--quad {
+    grid-template-columns: 1fr;
+  }
+
+  .zm-who__joiner {
+    display: none;
+  }
+
+  .zm-who__label,
+  .zm-who__title,
+  .zm-who__note {
+    max-width: 60%;
+  }
+
+  .zm-who__img {
+    width: 36%;
+    object-position: center;
+  }
+
+  .zm-hero__frame--cutout .zm-hero__media {
+    width: min(70%, 320px);
+    height: 55%;
+    opacity: 0.9;
+  }
+
+  .zm-hero__media {
+    inset: 42% 0 0 0;
+    -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 28%);
+    mask-image: linear-gradient(to bottom, transparent 0%, #000 28%);
+  }
+
+  .zm-hero__veil {
+    -webkit-mask-image: linear-gradient(to bottom, #000 42%, transparent 72%);
+    mask-image: linear-gradient(to bottom, #000 42%, transparent 72%);
+  }
+
+  .zm-hero__body {
+    min-height: auto;
+    padding: 28px 22px 32px;
+    max-width: none;
+    width: auto;
+    box-sizing: border-box;
+  }
+
+  .zm-hero__frame {
+    min-height: 0;
+  }
+
+  .zm-hero__frame:not(.zm-hero__frame--cutout) {
+    min-height: min(85vh, 720px);
+  }
+
+  .zm-hero__frame:not(.zm-hero__frame--cutout) .zm-hero__body {
+    min-height: min(42vh, 360px);
+  }
+}
+
+@media (max-width: 640px) {
+  .zm-section {
+    padding: 40px 0;
+  }
+
+  .zm-hero__title {
+    font-size: 30px;
+  }
+
+  .zm-banks__row {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    gap: 20px 28px;
+  }
+
+  .zm-banks__row img {
+    flex: 0 0 auto;
+    width: 120px;
+    height: 28px;
+  }
+}
+
+  </style>
+</head>
+<body>
+<!--
+  Zero Block: вставьте содержимое <div class="zm-page">…</div> в HTML-элемент блока.
+  Стили уже внутри — либо оставьте <style>, либо вынесите shared.css в Settings → HTML/CSS.
+  Формы: замените .zm-form-slot на виджет формы Тильды.
+-->
+<div class="zm-page" data-program="family">
+<section class="zm-hero" id="zm-hero">
+  <div class="zm-inner">
+    <div class="zm-hero__frame">
+      <div class="zm-hero__media">
+        <img src="https://new.avgst.ru/persons/family_1.png" alt="" />
+      </div>
+      <div class="zm-hero__veil" aria-hidden="true"></div>
+      <div class="zm-hero__body">
+        <h1 class="zm-hero__title">Успейте купить дом<br />по семейной ипотеке под <em>6%</em></h1>
+        <p class="zm-hero__lead">Кредитный специалист подберёт банк и рассчитает платёж, объяснит условия, поможет собрать документы и отправит заявку.</p>
+        <div class="zm-hero__actions">
+          <a class="zm-btn" href="#zm-mid-form">Оставить заявку</a>
+          <a class="zm-hero__more" href="https://new.avgst.ru/catalog">Выбрать проект</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="zm-section" id="zm-who">
+  <div class="zm-inner">
+    <p class="zm-eyebrow">Участники</p>
+<h2 class="zm-h2">Кому подходит программа</h2>
+<p class="zm-lead">Семейную ипотеку могут оформить граждане России, если семья подходит хотя бы под одно из условий программы.</p>
+    <div class="zm-who__grid zm-who__grid--joined"><article class="zm-who__card">
+  <p class="zm-who__label">Ребёнок в семье</p>
+  <h3 class="zm-who__title">Дошкольник</h3>
+  <p class="zm-who__note">Младше 7 лет</p>
+  <img class="zm-who__img" src="https://new.avgst.ru/img/cards/bear.png" alt="" loading="lazy" />
+</article>
+<p class="zm-who__joiner" aria-hidden="true">или</p>
+<article class="zm-who__card">
+  <p class="zm-who__label">Дети в семье</p>
+  <h3 class="zm-who__title">Двое и более</h3>
+  <p class="zm-who__note">Младше 18 лет</p>
+  <img class="zm-who__img" src="https://new.avgst.ru/img/cards/school.png" alt="" loading="lazy" />
+</article>
+<p class="zm-who__joiner" aria-hidden="true">или</p>
+<article class="zm-who__card">
+  <p class="zm-who__label">Ребёнок в семье</p>
+  <h3 class="zm-who__title">Особенный</h3>
+  <p class="zm-who__note">С установленной инвалидностью</p>
+  <img class="zm-who__img" src="https://new.avgst.ru/img/cards/invalid.png" alt="" loading="lazy" />
+</article></div>
+  </div>
+</section>
+
+<section class="zm-section zm-section--tight">
+  <div class="zm-inner">
+    
+<h2 class="zm-h2">Правила, которые действуют в любом случае</h2>
+
+    <div class="zm-acc"><details class="zm-acc__item">
+  <summary>Регистрация родителя и ребёнка</summary>
+  <div class="zm-acc__body"><p>С 1 февраля 2026 года родитель, который оформляет Семейную ипотеку, должен быть зарегистрирован по одному адресу с ребёнком, дающим право на программу. Для родителей в официальном браке в отдельных случаях проверка совпадения регистрации может не требоваться.</p></div>
+</details>
+<details class="zm-acc__item">
+  <summary>Участие супруга в ипотеке</summary>
+  <div class="zm-acc__body"><p>Если заёмщик состоит в браке, супруг или супруга с российским гражданством, как правило, обязательно включается в кредит как созаёмщик. Если доходов семьи недостаточно, банк может привлечь дополнительных созаёмщиков — им не обязательно иметь собственных детей или самостоятельно соответствовать условиям программы.</p></div>
+</details>
+<details class="zm-acc__item">
+  <summary>Одна льготная ипотека на семью</summary>
+  <div class="zm-acc__body"><p>В общем случае семья может воспользоваться федеральной льготной ипотекой один раз. Учитываются льготные кредиты, оформленные после 23 декабря 2023 года, в которых человек участвовал как заёмщик, созаёмщик или в некоторых случаях поручитель. Повторное использование возможно при специальных условиях — например, если предыдущая льготная ипотека полностью погашена и после её оформления в семье родился ещё один ребёнок.</p></div>
+</details></div>
+  </div>
+</section>
+
+<section class="zm-section" id="zm-steps">
+  <div class="zm-inner">
+    <p class="zm-eyebrow">Процесс</p>
+<h2 class="zm-h2">Как это работает</h2>
+
+    <ol class="zm-steps__list"><li class="zm-steps__item">
+  <h3 class="zm-steps__title">Выбор проекта</h3>
+  <p class="zm-steps__text">Выбираете дом и считаете стоимость строительства.</p>
+</li>
+<li class="zm-steps__item">
+  <h3 class="zm-steps__title">Расчёт ипотеки</h3>
+  <p class="zm-steps__text">Готовим предварительный расчёт и подаём заявки в банки-партнёры.</p>
+</li>
+<li class="zm-steps__item">
+  <h3 class="zm-steps__title">Одобрение и договоры</h3>
+  <p class="zm-steps__text">Получаете одобрение, подписываете кредитный договор и договор строительного подряда.</p>
+</li>
+<li class="zm-steps__item">
+  <h3 class="zm-steps__title">Строительство дома</h3>
+  <p class="zm-steps__text">Производим и строим дом согласно графику с расчётами через эскроу-счёт.</p>
+</li></ol>
+  </div>
+</section>
+
+<section class="zm-section" id="zm-finance">
+  <div class="zm-inner">
+    <p class="zm-eyebrow">Объект</p>
+<h2 class="zm-h2">Что можно оформить</h2>
+
+    <div class="zm-finance__grid"><a class="zm-finance__card" href="https://new.avgst.ru/catalog">
+  <img class="zm-finance__img" src="https://new.avgst.ru/series/panel.jpg" alt="" loading="lazy" />
+  <div class="zm-finance__body">
+    <h3 class="zm-finance__title">Строительство дома</h3>
+    <p class="zm-finance__text">Панельно-каркасные, каркасные и модульные проекты из каталога.</p>
+    <span class="zm-finance__cta">Смотреть проекты →</span>
+  </div>
+</a>
+<a class="zm-finance__card" href="https://new.avgst.ru/for-sale">
+  <img class="zm-finance__img" src="https://new.avgst.ru/series/modular.jpg" alt="" loading="lazy" />
+  <div class="zm-finance__body">
+    <h3 class="zm-finance__title">Купить готовый дом</h3>
+    <p class="zm-finance__text">Дома, которые уже построены и готовы к сделке.</p>
+    <span class="zm-finance__cta">Выбрать дом →</span>
+  </div>
+</a>
+<a class="zm-finance__card" href="#zm-mid-form">
+  <img class="zm-finance__img" src="https://new.avgst.ru/img/cards/uchastok.jpg" alt="" loading="lazy" />
+  <div class="zm-finance__body">
+    <h3 class="zm-finance__title">Земельный участок</h3>
+    <p class="zm-finance__text">Участок под строительство дома.</p>
+    <span class="zm-finance__cta">Узнать подробнее →</span>
+  </div>
+</a></div>
+  </div>
+</section>
+
+<section class="zm-section" id="zm-conditions">
+  <div class="zm-inner">
+    <p class="zm-eyebrow">Условия</p>
+<h2 class="zm-h2">Общие правила программы</h2>
+
+    <div class="zm-cond"><div class="zm-cond__row">
+  <p class="zm-cond__value">6%</p>
+  <div>
+    <h3 class="zm-cond__title">Ставка</h3>
+    <p class="zm-cond__text">По льготной части кредита.</p>
+    <ul class="zm-cond__points"><li>Банк может повысить ставку при отказе от страхования по договору.</li><li>В установленных программой случаях такое увеличение ограничено.</li></ul>
+  </div>
+</div>
+<div class="zm-cond__row">
+  <p class="zm-cond__value">12 / 6 млн</p>
+  <div>
+    <h3 class="zm-cond__title">Лимит по льготной ставке</h3>
+    
+    <ul class="zm-cond__points"><li>до 12 млн руб. — Москва, Московская область, Санкт-Петербург и Ленинградская область</li><li>до 6 млн руб. — остальные регионы</li></ul>
+  </div>
+</div>
+<div class="zm-cond__row">
+  <p class="zm-cond__value">30 / 15 млн</p>
+  <div>
+    <h3 class="zm-cond__title">Комбинированная ипотека</h3>
+    <p class="zm-cond__text">Если объект дороже льготного лимита.</p>
+    <ul class="zm-cond__points"><li>до 30 млн руб. — Москва, Московская область, Санкт-Петербург и Ленинградская область</li><li>до 15 млн руб. — остальные регионы</li><li>ставка 6% — только на льготную часть</li><li>сверх лимита — рыночная ставка банка</li></ul>
+  </div>
+</div>
+<div class="zm-cond__row">
+  <p class="zm-cond__value">от 20%</p>
+  <div>
+    <h3 class="zm-cond__title">Первоначальный взнос</h3>
+    <p class="zm-cond__text">От стоимости недвижимости или договора строительства. Подойдут:</p>
+    <ul class="zm-cond__points"><li>собственные средства</li><li>материнский капитал</li><li>региональные и муниципальные выплаты</li><li>отдельные виды помощи работодателя</li></ul>
+  </div>
+</div>
+<div class="zm-cond__row">
+  <p class="zm-cond__value zm-cond__value--mark"></p>
+  <div>
+    <h3 class="zm-cond__title">Расчёты через эскроу</h3>
+    <p class="zm-cond__text">Строительство и расчёты проводим через эскроу-счёт — это требование программы и защита средств семьи.</p>
+    
+  </div>
+</div></div>
+    <div class="zm-cond__note"><p>Банки вправе устанавливать дополнительные требования — к возрасту и стажу заёмщика, доходу и долговой нагрузке, первоначальному взносу, участку, подрядчику, объекту, страхованию и перечню документов.</p>
+<p>Соответствие требованиям государственной программы не гарантирует выдачу кредита: окончательное решение принимает банк.</p></div>
+  </div>
+</section>
+
+<section class="zm-section zm-cta" id="zm-mid-form">
+  <div class="zm-inner">
+    <div class="zm-cta__panel">
+      <div class="zm-cta__media" aria-hidden="true">
+        <img src="https://new.avgst.ru/persons/family_1.png" alt="" loading="lazy" />
+      </div>
+      <div class="zm-cta__body">
+        <h2 class="zm-h2">Узнайте, подходит ли вам семейная ипотека</h2>
+        <p class="zm-lead">Оставьте контакты, свяжемся с вами, проконсультируем и ответим на все вопросы, поможем принять взвешенное решение.</p>
+        <div class="zm-form-slot" data-zm-form="mid">
+  <!-- Вставьте сюда виджет формы Тильды (Zero Block → Form / T123) -->
+  <p class="zm-form-slot__hint">Слот формы Тильды (середина страницы)<br />Поля: имя, телефон. После вставки удалите эту подсказку.</p>
+</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="zm-section zm-section--tight">
+  <div class="zm-inner">
+    <p class="zm-eyebrow">Вопросы</p>
+<h2 class="zm-h2">Частые вопросы</h2>
+
+    <div class="zm-acc"><details class="zm-acc__item">
+  <summary>Можно ли использовать материнский капитал как первый взнос?</summary>
+  <div class="zm-acc__body"><p>Да. Первоначальный взнос можно сформировать из собственных средств, материнского капитала, региональных и муниципальных выплат, а также отдельных видов помощи работодателя.</p></div>
+</details>
+<details class="zm-acc__item">
+  <summary>Какие банки участвуют?</summary>
+  <div class="zm-acc__body"><p>Работаем с ведущими банками-партнёрами. Подберём программу под ваш случай и подадим заявки.</p></div>
+</details>
+<details class="zm-acc__item">
+  <summary>Что если дом стоит дороже льготного лимита?</summary>
+  <div class="zm-acc__body"><p>Можно оформить комбинированную ипотеку. Льготная ставка 6% действует на часть в пределах лимита: 12 млн руб. в Москве, Московской области, Санкт-Петербурге и Ленинградской области или 6 млн руб. в остальных регионах. На сумму сверх лимита банк применяет рыночную ставку. Общий кредит — до 30 млн руб. в Москве, Московской области, Санкт-Петербурге и Ленинградской области или до 15 млн руб. в остальных регионах.</p></div>
+</details>
+<details class="zm-acc__item">
+  <summary>Можно ли взять семейную ипотеку повторно?</summary>
+  <div class="zm-acc__body"><p>В общем случае программа доступна семье один раз. Повтор возможен при специальных условиях — например, если предыдущая льготная ипотека полностью погашена и после её оформления в семье родился ещё один ребёнок.</p></div>
+</details>
+<details class="zm-acc__item">
+  <summary>Нужна ли одинаковая регистрация с ребёнком?</summary>
+  <div class="zm-acc__body"><p>С 1 февраля 2026 года родитель, оформляющий Семейную ипотеку, должен быть зарегистрирован по одному адресу с ребёнком, дающим право на программу. Для родителей в официальном браке в отдельных случаях проверка может не требоваться.</p></div>
+</details></div>
+  </div>
+</section>
+<section class="zm-section zm-section--tight zm-banks">
+  <div class="zm-inner">
+    <p class="zm-eyebrow">Партнёры</p>
+    <h2 class="zm-h2">Работаем с ведущими банками</h2>
+    <div class="zm-banks__row"><img src="https://new.avgst.ru/logos/banks/sber.svg" alt="СберБанк" title="СберБанк" loading="lazy" />
+<img src="https://new.avgst.ru/logos/banks/vtb.svg" alt="ВТБ" title="ВТБ" loading="lazy" />
+<img src="https://new.avgst.ru/logos/banks/domrf.svg" alt="ДОМ.РФ" title="ДОМ.РФ" loading="lazy" />
+<img src="https://new.avgst.ru/logos/banks/rshb.svg" alt="Россельхозбанк" title="Россельхозбанк" loading="lazy" />
+<img src="https://new.avgst.ru/logos/banks/primsoc.svg" alt="Примсоцбанк" title="Примсоцбанк" loading="lazy" />
+<img src="https://new.avgst.ru/logos/banks/centr-invest.svg" alt="Центр-инвест" title="Центр-инвест" loading="lazy" /></div>
+  </div>
+</section>
+
+<section class="zm-section" id="zm-other">
+  <div class="zm-inner">
+    <p class="zm-eyebrow">Ещё программы</p>
+<h2 class="zm-h2">Другие ипотечные программы</h2>
+<p class="zm-lead">Помимо этой — IT, сельская, семейная и базовые программы банков. Ссылки на страницы появятся позже.</p>
+    <div class="zm-programs__grid"><a class="zm-program" href="#">
+  <p class="zm-program__rate">от 6%</p>
+  <h3 class="zm-program__title">IT-ипотека</h3>
+  <p class="zm-program__note">Для специалистов IT-компаний</p>
+  <img class="zm-program__img" src="https://new.avgst.ru/persons/it.png" alt="" loading="lazy" />
+</a>
+<a class="zm-program" href="#">
+  <p class="zm-program__rate">от 3%</p>
+  <h3 class="zm-program__title">Сельская ипотека</h3>
+  <p class="zm-program__note">Для работников АПК и соц. сферы на селе</p>
+  <img class="zm-program__img" src="https://new.avgst.ru/img/cards/wheat.png" alt="" loading="lazy" />
+</a>
+<a class="zm-program" href="#">
+  <p class="zm-program__rate">от 16%</p>
+  <h3 class="zm-program__title">Базовые программы</h3>
+  <p class="zm-program__note">Лучшие условия от ведущих банков</p>
+  <img class="zm-program__img" src="https://new.avgst.ru/persons/bank.png" alt="" loading="lazy" />
+</a></div>
+  </div>
+</section>
+
+<section class="zm-section" id="zm-contacts">
+  <div class="zm-inner zm-contacts__grid">
+    <div>
+      <p class="zm-eyebrow">Контакты</p>
+      <h2 class="zm-h2">Свяжитесь с нами</h2>
+      <div class="zm-contacts__list">
+        <p class="zm-contacts__item">
+          <span class="zm-contacts__label">Телефон</span>
+          <a class="zm-contacts__value" href="tel:+78312666645">+7 (831) 266-66-45</a>
+        </p>
+        <p class="zm-contacts__item">
+          <span class="zm-contacts__label">Почта</span>
+          <a class="zm-contacts__value" href="mailto:avgst@avgst.ru">avgst@avgst.ru</a>
+        </p>
+        <p class="zm-contacts__item">
+          <span class="zm-contacts__label">Офис</span>
+          <span class="zm-contacts__value zm-contacts__addr">Деловой центр «Ока», проспект Гагарина 27А к1</span>
+        </p>
+      </div>
+    </div>
+    <div>
+      <h2 class="zm-h2">Получить консультацию</h2>
+      <p class="zm-lead">Оставьте телефон — рассчитаем платёж и подскажем, подходит ли семейная ипотека.</p>
+      <div class="zm-form-slot" data-zm-form="contacts">
+  <!-- Вставьте сюда виджет формы Тильды (Zero Block → Form / T123) -->
+  <p class="zm-form-slot__hint">Слот формы Тильды (контакты)<br />Поля: имя, телефон. После вставки удалите эту подсказку.</p>
+</div>
+    </div>
+  </div>
+</section>
+</div>
+</body>
+</html>
