@@ -10947,24 +10947,291 @@ textarea:focus-visible {
 
   /* Крупная плитка занимает две колонки и два ряда, поэтому своей
      пропорции у неё нет — высоту дают ряды. */
-  .project-bento figure.project-bento__lead {
+  .project-bento > .project-bento__lead {
     grid-column: span 2;
     grid-row: span 2;
     aspect-ratio: auto;
   }
 }
 
-.project-bento figure,
-.project-shots figure {
+.project-bento > * {
   overflow: hidden;
   margin: 0;
+  padding: 0;
+  border: 0;
   aspect-ratio: 16 / 9;
   border-radius: 14px;
   background: #e8edf3;
+  cursor: pointer;
+  transition: transform 0.16s var(--ease-out);
 }
 
-.project-bento img,
-.project-shots img {
+.project-bento > *:active {
+  transform: scale(0.985);
+}
+
+/* Просмотр кадра целиком: на плитке он обрезан и уменьшен. */
+.photo-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: grid;
+  place-items: center;
+  padding: clamp(12px, 2vw, 24px);
+  background: rgb(0 0 0 / 0.9);
+  animation: photo-lightbox-in 0.2s var(--ease-out);
+}
+
+@keyframes photo-lightbox-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.photo-lightbox__frame {
+  margin: 0;
+  /* Кадру отдаётся всё, что остаётся от ленты миниатюр и подписи:
+     смотреть его приходят как раз ради подробностей. */
+  max-width: min(1760px, 100%);
+  animation: photo-lightbox-frame 0.24s var(--ease-out);
+}
+
+@keyframes photo-lightbox-frame {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+}
+
+.photo-lightbox__shot {
+  position: relative;
+  display: inline-block;
+  line-height: 0;
+}
+
+.photo-lightbox__frame img {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: calc(100svh - 190px);
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+/* Экспликация поверх чертежа: список площадей нужен там же, где план,
+   но закрывать им чертёж по умолчанию незачем. */
+.photo-lightbox__legend-toggle {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border: 0;
+  border-radius: 10px;
+  background: rgb(var(--avgst-ink-rgb) / 0.82);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s var(--ease-out), transform 0.16s var(--ease-out);
+}
+
+.photo-lightbox__legend-toggle:hover {
+  background: var(--avgst-ink);
+}
+
+.photo-lightbox__legend-toggle:active {
+  transform: scale(0.94);
+}
+
+/* Панель встаёт на место кнопки и закрывает её: пока экспликация
+   открыта, эта кнопка не нужна — закрывает крестик внутри панели. */
+.photo-lightbox__legend {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: min(280px, calc(100% - 24px));
+  max-height: calc(100% - 24px);
+  overflow-y: auto;
+  padding: 16px 18px;
+  border-radius: 14px;
+  background: rgb(255 255 255 / 0.96);
+  box-shadow: 0 18px 40px rgb(0 0 0 / 0.28);
+  line-height: 1.4;
+  text-align: left;
+}
+
+.photo-lightbox__legend p {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 0 0 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.5);
+}
+
+/* Крестик того же вида, что и у самого просмотра — круг с чернильной
+   подложкой; меньше по размеру, потому что сидит в строке заголовка. */
+.photo-lightbox__legend p button {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  margin: -4px -6px -4px 0;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(var(--avgst-ink-rgb) / 0.08);
+  color: var(--avgst-ink);
+  cursor: pointer;
+  transition: background 0.2s var(--ease-out), transform 0.16s var(--ease-out);
+}
+
+.photo-lightbox__legend p button:hover {
+  background: rgb(var(--avgst-ink-rgb) / 0.16);
+}
+
+.photo-lightbox__legend p button:active {
+  transform: scale(0.94);
+}
+
+.photo-lightbox__legend dl {
+  display: grid;
+  gap: 6px;
+  margin: 0;
+}
+
+.photo-lightbox__legend dl > div {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+}
+
+.photo-lightbox__legend dt {
+  color: rgb(var(--avgst-ink-rgb) / 0.75);
+}
+
+.photo-lightbox__legend dd {
+  margin: 0;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+/* Подпись кадра: у планировок она говорит, какой это вариант. */
+.photo-lightbox__caption {
+  margin: 0 0 10px;
+  color: rgb(255 255 255 / 0.85);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-align: center;
+}
+
+.photo-lightbox__close,
+.photo-lightbox__nav {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 0;
+  border-radius: 999px;
+  background: rgb(255 255 255 / 0.14);
+  color: #fff;
+  cursor: pointer;
+  transition: background 0.2s var(--ease-out), transform 0.16s var(--ease-out);
+}
+
+.photo-lightbox__close:hover,
+.photo-lightbox__nav:hover {
+  background: rgb(255 255 255 / 0.26);
+}
+
+.photo-lightbox__close:active,
+.photo-lightbox__nav:active {
+  transform: scale(0.94);
+}
+
+.photo-lightbox__close {
+  top: clamp(12px, 3vw, 24px);
+  right: clamp(12px, 3vw, 24px);
+}
+
+.photo-lightbox__nav--prev {
+  left: clamp(8px, 2vw, 24px);
+}
+
+.photo-lightbox__nav--next {
+  right: clamp(8px, 2vw, 24px);
+}
+
+/* Лента миниатюр внизу: видно, сколько кадров всего и что будет
+   дальше. Она скроллится сама, а не растягивает модалку. */
+.photo-lightbox__strip {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: clamp(10px, 2vw, 20px);
+  display: flex;
+  gap: 8px;
+  padding: 0 clamp(12px, 4vw, 40px);
+  overflow-x: auto;
+  scrollbar-width: none;
+  scroll-behavior: smooth;
+  justify-content: safe center;
+}
+
+.photo-lightbox__strip::-webkit-scrollbar {
+  display: none;
+}
+
+.photo-lightbox__thumb {
+  position: relative;
+  flex: 0 0 auto;
+  width: clamp(72px, 9vw, 108px);
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: rgb(255 255 255 / 0.1);
+  opacity: 0.5;
+  cursor: pointer;
+  /* Рамку рисуем внутрь: outline с отступом обрезался бы краями ленты —
+     она прокручивается, а значит подрезает всё, что вылезло наружу. */
+  box-shadow: inset 0 0 0 0 transparent;
+  transition: opacity 0.2s var(--ease-out), box-shadow 0.2s var(--ease-out);
+}
+
+.photo-lightbox__thumb:hover {
+  opacity: 0.85;
+}
+
+.photo-lightbox__thumb--on {
+  opacity: 1;
+  box-shadow: inset 0 0 0 3px var(--brand-yellow);
+}
+
+.photo-lightbox__thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .photo-lightbox__strip {
+    scroll-behavior: auto;
+  }
+}
+
+.project-bento img {
   display: block;
   width: 100%;
   height: 100%;
@@ -10975,7 +11242,7 @@ textarea:focus-visible {
   transition: transform 0.45s var(--ease-out);
 }
 
-.project-bento figure:hover img {
+.project-bento > *:hover img {
   transform: scale(1.03);
 }
 
@@ -11026,12 +11293,34 @@ textarea:focus-visible {
   }
 }
 
-/* Чертёж показывается целиком: обрезать план нельзя. */
+/* Чертёж показывается целиком: обрезать план нельзя. Кликом он
+   открывается во весь экран — подписи на нём мелкие. */
 .project-plans__sheet {
+  display: block;
+  width: 100%;
   margin: 0;
   padding: 16px;
+  border: 0;
   border-radius: 16px;
   background: #fff;
+  cursor: pointer;
+  transition: transform 0.16s var(--ease-out);
+}
+
+.project-plans__sheet:active,
+.project-plans > button:active {
+  transform: scale(0.99);
+}
+
+.project-plans > button {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 0.16s var(--ease-out);
 }
 
 .project-plans__sheet img {
@@ -11116,21 +11405,40 @@ textarea:focus-visible {
   height: auto;
 }
 
-.project-shots {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+/* Интерьеры раскладываются тем же бенто, что и фасады: сетка из полутора
+   десятков кадров читалась как простыня. Если снимков больше шести,
+   последняя плитка говорит, сколько их ещё, и открывает просмотр. */
+.project-bento__rest {
+  position: relative;
 }
 
-@media (min-width: 900px) {
-  .project-shots {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+.project-bento__rest img {
+  filter: brightness(0.55);
+}
+
+.project-bento__rest span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-content: center;
+  gap: 2px;
+  color: #fff;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  pointer-events: none;
+}
+
+.project-bento__rest small {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.8;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .project-bento figure:hover img {
+  .project-bento > *:hover img {
     transform: none;
   }
 }

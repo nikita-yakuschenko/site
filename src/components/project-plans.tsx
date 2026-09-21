@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useState } from "react";
+import { PhotoLightbox } from "./photo-lightbox";
 import { copy } from "../lib/copy";
 import type { CatalogProject } from "../lib/catalog/types";
 
@@ -17,6 +18,9 @@ import type { CatalogProject } from "../lib/catalog/types";
  * устроено», список — «сколько чего»; на самом чертеже подписи мелкие, и
  * читать по ним площади неудобно.
  *
+ * Чертёж открывается во весь экран: подписи на нём мелкие, и на ширине
+ * колонки их не прочитать.
+ *
  * Экспликация есть не у всех проектов: её приходится снимать с чертежа
  * руками. Где её нет, раздел показывает планы картинками — без списка, но
  * и без выдуманных цифр.
@@ -24,6 +28,7 @@ import type { CatalogProject } from "../lib/catalog/types";
 export function ProjectPlans({ project }: { project: CatalogProject }) {
   const variants = project.plans ?? [];
   const [active, setActive] = useState(0);
+  const [open, setOpen] = useState<number | null>(null);
 
   if (!variants.length) {
     if (!project.floorPlans.length) return null;
@@ -36,8 +41,13 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
           <p className="eyebrow">{copy.plansEyebrow}</p>
           <h2 id="project-plans-title">{copy.plansHeading}</h2>
           <div className="project-plans">
-            {project.floorPlans.map((src) => (
-              <figure key={src}>
+            {project.floorPlans.map((src, index) => (
+              <button
+                key={src}
+                type="button"
+                aria-label={copy.galleryOpen}
+                onClick={() => setOpen(index)}
+              >
                 <Image
                   src={src}
                   alt={copy.plansHeading}
@@ -45,10 +55,19 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
                   height={1200}
                   sizes="(min-width: 900px) 50vw, 100vw"
                 />
-              </figure>
+              </button>
             ))}
           </div>
         </div>
+
+        {open !== null ? (
+          <PhotoLightbox
+            images={project.floorPlans}
+            index={open}
+            onIndex={setOpen}
+            onClose={() => setOpen(null)}
+          />
+        ) : null}
       </section>
     );
   }
@@ -86,7 +105,12 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
         ) : null}
 
         <div className="project-plans__body">
-          <figure className="project-plans__sheet">
+          <button
+            type="button"
+            className="project-plans__sheet"
+            aria-label={copy.galleryOpen}
+            onClick={() => setOpen(active)}
+          >
             <Image
               key={current.image}
               src={current.image}
@@ -95,7 +119,7 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
               height={1188}
               sizes="(min-width: 900px) 62vw, 100vw"
             />
-          </figure>
+          </button>
 
           <div className="project-plans__legend">
             <p className="project-plans__legend-title">{copy.plansLegend}</p>
@@ -110,6 +134,21 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
           </div>
         </div>
       </div>
+
+      {/* Листаем варианты того же дома: их и показывает просмотр. */}
+      {open !== null ? (
+        <PhotoLightbox
+          images={variants.map((variant) => variant.image)}
+          labels={variants.map((variant) => variant.label)}
+          legends={variants.map((variant) => variant.rooms)}
+          index={open}
+          onIndex={(next) => {
+            setOpen(next);
+            setActive(next);
+          }}
+          onClose={() => setOpen(null)}
+        />
+      ) : null}
     </section>
   );
 }

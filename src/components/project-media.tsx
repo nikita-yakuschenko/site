@@ -1,5 +1,9 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
 import { copy } from "../lib/copy";
+import { PhotoLightbox } from "./photo-lightbox";
 import type { CatalogProject } from "../lib/catalog/types";
 
 /**
@@ -10,6 +14,14 @@ import type { CatalogProject } from "../lib/catalog/types";
  * нечем — в каталоге все снимки лежали одним полем. Теперь раскладка есть,
  * и каждый раздел показывает своё.
  *
+ * Кадры кликабельны: на плитке снимок обрезан по 16:9 и уменьшен, отделку
+ * по нему не разглядеть — ради этого он и открывается целиком.
+ *
+ * Интерьеров бывает полтора десятка, и целиком сеткой они читаются как
+ * простыня. Поэтому раздел раскладывает их так же, как фасады: то же
+ * бенто из шести плиток. Если снимков больше, последняя плитка говорит,
+ * сколько их ещё, и открывает просмотр — дальше листают там.
+ *
  * Интерьеры есть не у всех проектов, и раздел просто не выводится: пустой
  * заголовок хуже отсутствия.
  */
@@ -17,15 +29,24 @@ import type { CatalogProject } from "../lib/catalog/types";
 /** Фасады. Первый кадр крупный: ряд одинаковых прямоугольников не
  *  говорит, какой из них главный. */
 export function ProjectExteriors({ project }: { project: CatalogProject }) {
-  if (!project.exteriors.length) return null;
+  const shots = project.exteriors;
+  const [open, setOpen] = useState<number | null>(null);
+  if (!shots.length) return null;
+
   return (
     <section className="section" aria-labelledby="project-exteriors-title">
       <div className="section__inner">
         <p className="eyebrow">{copy.exteriors}</p>
         <h2 id="project-exteriors-title">{copy.exteriorsHeading}</h2>
         <div className="project-bento">
-          {project.exteriors.map((src, index) => (
-            <figure key={src} className={index === 0 ? "project-bento__lead" : ""}>
+          {shots.map((src, index) => (
+            <button
+              key={src}
+              type="button"
+              className={index === 0 ? "project-bento__lead" : undefined}
+              aria-label={copy.galleryOpen}
+              onClick={() => setOpen(index)}
+            >
               <Image
                 src={src}
                 alt=""
@@ -33,36 +54,83 @@ export function ProjectExteriors({ project }: { project: CatalogProject }) {
                 height={1000}
                 sizes={index === 0 ? "(min-width: 900px) 66vw, 100vw" : "33vw"}
               />
-            </figure>
+            </button>
           ))}
         </div>
       </div>
+
+      {open !== null ? (
+        <PhotoLightbox
+          images={shots}
+          index={open}
+          onIndex={setOpen}
+          onClose={() => setOpen(null)}
+        />
+      ) : null}
     </section>
   );
 }
 
-/** Интерьеры. */
+/** Интерьеры. Шесть плиток; остальные кадры — за последней. */
+const INTERIOR_TILES = 6;
+
 export function ProjectInteriors({ project }: { project: CatalogProject }) {
-  if (!project.interiors.length) return null;
+  const shots = project.interiors;
+  const [open, setOpen] = useState<number | null>(null);
+  if (!shots.length) return null;
+
+  const tiles = shots.slice(0, INTERIOR_TILES);
+  const rest = shots.length - tiles.length;
+
   return (
     <section className="section" aria-labelledby="project-interiors-title">
       <div className="section__inner">
         <p className="eyebrow">{copy.interiorsEyebrow}</p>
         <h2 id="project-interiors-title">{copy.interiorsHeading}</h2>
-        <div className="project-shots">
-          {project.interiors.map((src) => (
-            <figure key={src}>
-              <Image
-                src={src}
-                alt=""
-                width={1400}
-                height={1000}
-                sizes="(min-width: 900px) 33vw, 50vw"
-              />
-            </figure>
-          ))}
+        <div className="project-bento">
+          {tiles.map((src, index) => {
+            const last = rest > 0 && index === tiles.length - 1;
+            const cls = [
+              index === 0 ? "project-bento__lead" : "",
+              last ? "project-bento__rest" : "",
+            ]
+              .filter(Boolean)
+              .join(" ");
+            return (
+              <button
+                key={src}
+                type="button"
+                className={cls || undefined}
+                aria-label={last ? `${copy.galleryRest} ${rest}` : copy.galleryOpen}
+                onClick={() => setOpen(index)}
+              >
+                <Image
+                  src={src}
+                  alt=""
+                  width={1600}
+                  height={1000}
+                  sizes={index === 0 ? "(min-width: 900px) 66vw, 100vw" : "33vw"}
+                />
+                {last ? (
+                  <span>
+                    +{rest}
+                    <small>{copy.galleryRest}</small>
+                  </span>
+                ) : null}
+              </button>
+            );
+          })}
         </div>
       </div>
+
+      {open !== null ? (
+        <PhotoLightbox
+          images={shots}
+          index={open}
+          onIndex={setOpen}
+          onClose={() => setOpen(null)}
+        />
+      ) : null}
     </section>
   );
 }
