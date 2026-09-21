@@ -413,6 +413,22 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
         ],
       },
     ],
+    /* Демонстрационные данные раздела «Построенные дома»: снимков с
+       участков пока нет, здесь лежат кадры из фикстур. Нужны, чтобы
+       раздел было что показать; заменить, как только придут настоящие
+       фотографии и ссылка на обзор. */
+    builtTour: {
+      video: { provider: "kinescope", id: "demo" },
+      cover: "/fixtures/house-2.jpg",
+      title: "Обзор построенного дома",
+    },
+    built: [
+      { image: "/fixtures/house-1.jpg", caption: "Посёлок Зелёный Город, 2025" },
+      { image: "/fixtures/house-3.jpg" },
+      { image: "/fixtures/house-4.jpg" },
+      { image: "/fixtures/house-5.jpg" },
+      { image: "/fixtures/house-6.jpg" },
+    ],
     floorPlans: [
       "/catalog/barnhouse-115/01.jpg",
       "/catalog/barnhouse-115/20.jpg",
