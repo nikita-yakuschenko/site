@@ -4,7 +4,6 @@ import Image from "next/image";
 import {
   IconChevronLeft,
   IconChevronRight,
-  IconTableColumn,
   IconX,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -257,7 +256,7 @@ function useZoom(
 export function PhotoLightbox({
   images,
   labels,
-  legends,
+  variantLabels,
   index,
   onIndex,
   onClose,
@@ -266,9 +265,9 @@ export function PhotoLightbox({
   /** Подписи к кадрам: у планировок это вариант, и без подписи, открыв
    *  чертёж, уже не понять, какой из них смотришь. */
   labels?: readonly string[];
-  /** Экспликация к кадру: на чертеже подписи мелкие, и список площадей
-   *  нужен там же, где сам план. Открывается поверх кадра по кнопке. */
-  legends?: readonly (readonly { name: string; area: string }[] | undefined)[];
+  /** Варианты планировки остаются доступными и в просмотре: сравнение
+   *  начинается именно здесь, когда чертёж можно разглядеть целиком. */
+  variantLabels?: readonly string[];
   index: number;
   onIndex: (next: number) => void;
   onClose: () => void;
@@ -276,8 +275,6 @@ export function PhotoLightbox({
   const total = images.length;
   const strip = useRef<HTMLDivElement>(null);
   const shot = useRef<HTMLDivElement>(null);
-  const [legendOn, setLegendOn] = useState(false);
-  const legend = legends?.[index];
   const go = useCallback(
     (step: number) => {
       onIndex((index + step + total) % total);
@@ -397,7 +394,26 @@ export function PhotoLightbox({
         className="photo-lightbox__frame"
         onClick={(event) => event.stopPropagation()}
       >
-        {labels?.[index] ? (
+        {variantLabels && variantLabels.length > 1 ? (
+          <div className="photo-lightbox__variants" role="tablist" aria-label="Варианты планировки">
+            {variantLabels.map((label, variantIndex) => (
+              <button
+                key={label}
+                type="button"
+                role="tab"
+                aria-selected={variantIndex === index}
+                className={variantIndex === index ? "is-active" : undefined}
+                onPointerDown={(event) => event.stopPropagation()}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  pick(variantIndex);
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        ) : labels?.[index] ? (
           <figcaption className="photo-lightbox__caption">
             {labels[index]}
           </figcaption>
@@ -470,45 +486,6 @@ export function PhotoLightbox({
             </div>
           </div>
 
-          {legend?.length ? (
-            <>
-              {/* Пока экспликация открыта, кнопки нет вовсе: панель встаёт
-                  на её место, а закрывает крестик внутри. */}
-              {legendOn ? null : (
-                <button
-                  type="button"
-                  className="photo-lightbox__legend-toggle"
-                  aria-label={copy.plansLegend}
-                  onClick={() => setLegendOn(true)}
-                >
-                  <IconTableColumn size={20} stroke={1.9} />
-                </button>
-              )}
-
-              {legendOn ? (
-                <div className="photo-lightbox__legend">
-                  <p>
-                    {copy.plansLegend}
-                    <button
-                      type="button"
-                      aria-label={copy.close}
-                      onClick={() => setLegendOn(false)}
-                    >
-                      <IconX size={15} stroke={2.2} />
-                    </button>
-                  </p>
-                  <dl>
-                    {legend.map((room, i) => (
-                      <div key={`${room.name}-${i}`}>
-                        <dt>{room.name}</dt>
-                        <dd>{room.area}</dd>
-                      </div>
-                    ))}
-                  </dl>
-                </div>
-              ) : null}
-            </>
-          ) : null}
         </div>
       </figure>
 

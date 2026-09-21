@@ -84,7 +84,7 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
         <h2 id="project-plans-title">{copy.plansHeading}</h2>
 
         {variants.length > 1 ? (
-          <div className="project-plans__tabs" role="tablist">
+          <div className="project-plans__tabs" role="tablist" aria-label="Варианты планировки">
             {variants.map((variant, index) => (
               <button
                 key={variant.label}
@@ -140,7 +140,7 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
         <PhotoLightbox
           images={variants.map((variant) => variant.image)}
           labels={variants.map((variant) => variant.label)}
-          legends={variants.map((variant) => variant.rooms)}
+          variantLabels={variants.map((variant) => variant.label)}
           index={open}
           onIndex={(next) => {
             setOpen(next);
