@@ -1,6 +1,10 @@
 "use client";
 
-import { IconArrowUpRight, IconCheck } from "@tabler/icons-react";
+import {
+  IconArrowUpRight,
+  IconCheck,
+  IconGiftFilled,
+} from "@tabler/icons-react";
 import { useEffect, useState } from "react";
 import { copy } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
@@ -77,9 +81,10 @@ export function ProjectConfig({
   const tier = tiers.find((item) => item.id === tierId) ?? tiers[1]!;
 
   /* Платёж пропорционален цене: при одной ставке, взносе и сроке аннуитет
-     линеен по сумме кредита. */
+     линеен по сумме кредита. У комплектации без ипотеки платежа нет — и
+     речи о ней на экране тоже. */
   const monthly =
-    basePayment && basePrice
+    tier.mortgage && basePayment && basePrice
       ? Math.round((basePayment * tier.price) / basePrice)
       : null;
 
@@ -123,6 +128,21 @@ export function ProjectConfig({
                           {line}
                         </span>
                       ))}
+                      {/* Подарки отделены сегментом — подписью между двумя
+                          линиями, как хвост каталога: это не продолжение
+                          состава, а другая его часть. Плашки у каждой
+                          строки не нужны, подпись сказана один раз. */}
+                      {item.gifts?.length ? (
+                        <span className="project-config__tier-band">
+                          <span>{copy.configGift}</span>
+                        </span>
+                      ) : null}
+                      {item.gifts?.map((line) => (
+                        <span key={line} className="project-config__tier-gift">
+                          <IconGiftFilled size={14} aria-hidden="true" />
+                          {line}
+                        </span>
+                      ))}
                     </span>
                   </button>
                 </li>
@@ -134,16 +154,52 @@ export function ProjectConfig({
                 свой. Ключ по уровню — чтобы при переключении список
                 собрался заново и первый пункт снова был раскрыт. */}
             <h3 className="project-config__details-title">
-              {copy.configDetails} {tier.nameAcc} {copy.configTierWordAcc}
+              {copy.configDetails}{" "}
+              <span className="project-config__details-mark">
+                {tier.nameAcc} {copy.configTierWordAcc}
+              </span>
             </h3>
-            <Accordion key={tier.id} type="multiple" className="ui-accordion">
+            {/* Здесь список начинается свёрнутым, хотя обычно первый
+                пункт раскрыт: состав материалов открывают по нужде, а не
+                читают подряд. */}
+            <Accordion
+              key={tier.id}
+              type="multiple"
+              defaultValue={[]}
+              className="ui-accordion"
+            >
               {tier.details.map((detail) => (
                 <AccordionItem
                   key={detail.title}
                   value={`${tier.id}-${detail.title}`}
                 >
                   <AccordionTrigger>{detail.title}</AccordionTrigger>
-                  <AccordionContent>{detail.text}</AccordionContent>
+                  <AccordionContent>
+                    {detail.lead ? (
+                      <p className="project-config__spec-lead">{detail.lead}</p>
+                    ) : null}
+
+                    {detail.items ? (
+                      <ul className="project-config__spec-list">
+                        {detail.items.map((item) => (
+                          <li key={item}>{item}</li>
+                        ))}
+                      </ul>
+                    ) : null}
+
+                    {detail.groups?.map((group) => (
+                      <div key={group.title} className="project-config__spec">
+                        <p className="project-config__spec-title">
+                          {group.title}
+                        </p>
+                        <ul className="project-config__spec-list">
+                          {group.items.map((item) => (
+                            <li key={item}>{item}</li>
+                          ))}
+                        </ul>
+                      </div>
+                    ))}
+                  </AccordionContent>
                 </AccordionItem>
               ))}
             </Accordion>
@@ -154,17 +210,25 @@ export function ProjectConfig({
               {tier.name} {copy.configTierWord}
             </p>
             <p className="project-config__total-sum">{formatRub(tier.price)}</p>
+            {/* Строка под суммой есть всегда: без неё панель у стартовой
+                схлопывается и выглядит обрезанной. Там, где ипотеки нет,
+                её место занимает факт о доставке — он верен для всех
+                уровней и ни на что не намекает. */}
             {monthly ? (
               <p className="project-config__total-pay">
                 {formatRub(monthly)} {copy.configPerMonth}
                 <span>{copy.configPayNote}</span>
               </p>
-            ) : null}
+            ) : (
+              <p className="project-config__total-pay project-config__total-pay--plain">
+                {copy.configDelivery}
+                <span>{copy.configDeliveryNote}</span>
+              </p>
+            )}
             <a className="btn btn-yellow" href="#contacts">
               {copy.getQuote}
               <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
             </a>
-            <p className="project-config__total-note">{copy.configPriceNote}</p>
           </aside>
         </div>
       </div>
