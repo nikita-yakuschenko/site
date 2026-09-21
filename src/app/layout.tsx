@@ -42,6 +42,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
      считается неданным, и баннер спросит заново. Раньше это делал эффект
      провайдера, и ему приходилось переписывать состояние уже после
      отрисовки, хотя кука прочитана прямо тут. */
+  /* Номер счётчика читается на сервере: так он берётся из окружения в
+     рантайме и не зависит от того, был ли задан на сборке. */
+  const counter = Number(process.env.NEXT_PUBLIC_YM_ID) || 0
+
   const fresh = parsed && parsed.version === CONSENT_VERSION ? parsed : null
   const initialState = fresh && isConsentDecided(fresh) ? fresh : null
 
@@ -49,21 +53,27 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ConsentShell initialState={initialState}>{children}</ConsentShell>
-        {/* Счётчик вне ConsentShell намеренно: он грузится сразу, а не после
-            согласия. Suspense нужен из-за useSearchParams внутри: без него
-            Next переводит весь маршрут в динамическую отрисовку. */}
-        <Suspense fallback={null}>
-          <YandexMetrica />
-        </Suspense>
+        {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в
+            клиентский код на сборке, и если переменную задать только в
+            окружении контейнера, в бандле окажется undefined. Здесь она
+            читается на сервере в рантайме, как и должно быть.
+
+            Suspense нужен из-за useSearchParams внутри: без него Next
+            переводит весь маршрут в динамическую отрисовку. */}
+        {counter ? (
+          <Suspense fallback={null}>
+            <YandexMetrica counter={counter} />
+          </Suspense>
+        ) : null}
         {/* Пиксель для тех, у кого отключён JavaScript: счётчик из скрипта
             до них не доберётся. Картинка спрятана за край экрана, как в
             сниппете из кабинета. */}
-        {process.env.NEXT_PUBLIC_YM_ID ? (
+        {counter ? (
           <noscript>
             <div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src={`https://mc.yandex.ru/watch/${process.env.NEXT_PUBLIC_YM_ID}`}
+                src={`https://mc.yandex.ru/watch/${counter}`}
                 style={{ position: 'absolute', left: '-9999px' }}
                 alt=""
               />

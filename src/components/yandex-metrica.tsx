@@ -10,6 +10,12 @@ import { usePathname, useSearchParams } from "next/navigation";
  * трафик, включая тех, кто ушёл, не дойдя до выбора в баннере: иначе эта
  * часть посетителей в отчёты не попадает вовсе.
  *
+ * Номер счётчика приходит пропсом с сервера, а не читается здесь из
+ * NEXT_PUBLIC_YM_ID. Эта переменная подставляется в клиентский код на
+ * сборке: если её задать только в окружении контейнера, серверная часть
+ * номер увидит, а в бандле окажется undefined, и счётчик молча не
+ * подключится. Так и было на проде.
+ *
  * Параметры init и адрес скрипта — один в один как в сниппете из кабинета.
  * Отличий от него ровно два, и оба вынужденные:
  *
@@ -30,14 +36,12 @@ type YandexMetrica = ((...args: unknown[]) => void) & {
 
 type MetricaWindow = Window & { ym?: YandexMetrica };
 
-const COUNTER = Number(process.env.NEXT_PUBLIC_YM_ID);
-const TAG_SRC = `https://mc.yandex.ru/metrika/tag.js?id=${COUNTER}`;
-
-function loadOnce(): void {
+function loadOnce(counter: number): void {
   const w = window as MetricaWindow;
   if (w.ym) return;
+  const src = `https://mc.yandex.ru/metrika/tag.js?id=${counter}`;
   for (const script of document.scripts) {
-    if (script.src === TAG_SRC) return;
+    if (script.src === src) return;
   }
 
   /* Очередь объявляется до загрузки скрипта: tag.js, запустившись,
@@ -52,10 +56,10 @@ function loadOnce(): void {
 
   const script = document.createElement("script");
   script.async = true;
-  script.src = TAG_SRC;
+  script.src = src;
   document.head.appendChild(script);
 
-  w.ym(COUNTER, "init", {
+  w.ym(counter, "init", {
     ssr: true,
     webvisor: true,
     clickmap: true,
@@ -67,14 +71,14 @@ function loadOnce(): void {
   });
 }
 
-export function YandexMetrica() {
+export function YandexMetrica({ counter }: { counter: number }) {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    if (!COUNTER) return;
-    loadOnce();
-  }, []);
+    if (!counter) return;
+    loadOnce(counter);
+  }, [counter]);
 
   /* Первый заход Метрика засчитывает сама при init, поэтому первый вызов
      эффекта пропускается: иначе вход считался бы дважды. Адрес прошлой
@@ -83,15 +87,15 @@ export function YandexMetrica() {
   const previous = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!COUNTER) return;
+    if (!counter) return;
     const query = searchParams.toString();
     const next = pathname + (query ? `?${query}` : "");
     const from = previous.current;
     previous.current = next;
     if (from === null) return;
     const w = window as MetricaWindow;
-    w.ym?.(COUNTER, "hit", next, { referer: from });
-  }, [pathname, searchParams]);
+    w.ym?.(counter, "hit", next, { referer: from });
+  }, [counter, pathname, searchParams]);
 
   return null;
 }
