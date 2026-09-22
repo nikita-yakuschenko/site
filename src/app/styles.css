@@ -12298,6 +12298,14 @@ html.is-dialog-open {
   border-radius: var(--photo-lightbox-radius) !important;
 }
 
+/* На телефоне кадр не должен выглядеть как прилипший к верхнему краю
+   баннер: площадка занимает весь viewport, а сам снимок стоит по центру. */
+@media (max-width: 719px) {
+  .photo-lightbox__slide {
+    align-items: center;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .photo-lightbox__track.is-settling {
     transition-duration: 0.01ms;
