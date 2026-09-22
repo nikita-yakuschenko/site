@@ -16,6 +16,7 @@ import { ProjectPlans } from '../../../components/project-plans'
 import { ProjectBuilt } from '../../../components/project-built'
 import { ProjectConfig } from '../../../components/project-config'
 import { ProjectNextSteps } from '../../../components/project-next-steps'
+import { ContactsSection } from '../../../components/block-renderer'
 import { MortgageCalculator } from '../../../components/mortgage-calculator'
 import { tiersForProject } from '../../../lib/catalog/tiers'
 import { ProjectActions } from '../../../components/project-actions'
@@ -177,6 +178,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           basePrice={basePrice}
         />
         <ProjectNextSteps project={project} />
+        <ContactsSection
+          block={{ blockType: 'contactsSection' }}
+          contacts={SITE.contacts}
+          siteId={SITE.id}
+          pageId={project.id}
+        />
       </main>
     </SiteChrome>
   )

@@ -48,7 +48,7 @@ export function ProjectNextSteps({ project }: { project: CatalogProject }) {
             <IconArrowUpRight size={18} stroke={2} />
           </span>
           <span className="project-next-steps__copy">
-            <span className="project-next-steps__title">Консультация с архитектором</span>
+            <span className="project-next-steps__title">Консультация с архитектором</span>
             <span className="project-next-steps__lead">
               Эксперт разместит дом на участке, рассчитает траекторию движения
               солнца, поможет принять решение.

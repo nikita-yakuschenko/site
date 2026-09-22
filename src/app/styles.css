@@ -12131,10 +12131,23 @@ html.is-dialog-open {
     aspect-ratio: 4 / 3;
   }
 
+  .project-next-steps__tile--consult {
+    aspect-ratio: 9 / 8;
+  }
+
+  .project-next-steps__copy {
+    right: 16px;
+  }
+
+  .project-next-steps__tile--consult .project-next-steps__title {
+    max-width: calc(100% - 40px);
+    white-space: normal;
+  }
+
   .project-next-steps__architects {
     right: 16px;
     bottom: 16px;
-    width: 90%;
+    width: 80%;
   }
 
 }

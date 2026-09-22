@@ -420,7 +420,7 @@ function Production({ block }: { block: LayoutBlock }) {
   );
 }
 
-function Contacts({
+export function ContactsSection({
   block,
   contacts,
   siteId,
@@ -583,7 +583,7 @@ export function BlockRenderer({
           return <Production key={index} block={block} />;
         if (block.blockType === "contactsSection") {
           return (
-            <Contacts
+            <ContactsSection
               key={index}
               block={block}
               contacts={contacts}
