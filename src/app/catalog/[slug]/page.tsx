@@ -11,6 +11,7 @@ import { ProjectBuilt } from '../../../components/project-built'
 import { ProjectConfig } from '../../../components/project-config'
 import { ProjectNextSteps } from '../../../components/project-next-steps'
 import { ProjectSimilar } from '../../../components/project-similar'
+import { ReadyHomeOffer } from '../../../components/ready-home-offer'
 import { ContactsSection } from '../../../components/block-renderer'
 import { MortgageCalculator } from '../../../components/mortgage-calculator'
 import { tiersForProject } from '../../../lib/catalog/tiers'
@@ -63,14 +64,18 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     .sort((a, b) => similarityScore(project, a) - similarityScore(project, b))
     .slice(0, 6)
 
+  const readyHome = project.readyHome
+  const locationDivider = readyHome ? project.name.toLocaleLowerCase('ru').lastIndexOf(' в ') : -1
+  const heroName = locationDivider > 0 ? project.name.slice(0, locationDivider) : project.name
+
   // Маркировка в заголовке идёт фирменным жёлтым: правило .project-hero h1 span
   // уже есть в стилях, нужно лишь отделить число от слова.
-  const { head, mark } = splitProjectName(project.name)
+  const { head, mark, tail } = splitProjectName(heroName)
 
   /* Платёж считается на сервере, от самой дешёвой комплектации, доступной
      в ипотеку: стартовая — это каркас, а банк кредитует дом. Регион
      берётся серверный, на самой странице ипотеки его можно сменить. */
-  const tiers = tiersForProject(project)
+  const tiers = readyHome ? null : tiersForProject(project)
   const mortgagePrices = tiers?.filter((tier) => tier.mortgage).map((tier) => tier.price)
   const basePrice = mortgagePrices?.length ? Math.min(...mortgagePrices) : null
   const standardPrice = tiers?.find((tier) => tier.id === 'standard')?.price ?? null
@@ -130,11 +135,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           <div className="project-hero__veil" />
           <div className="project-hero__stage">
             <div className="project-hero__intro">
-              <p className="project-hero__badge">{project.technologyBadge}</p>
-              <h1>
-                {head}
-                {mark ? <span>{mark}</span> : null}
-              </h1>
+              <div className="project-hero__heading">
+                <div className="project-hero__labels">
+                  <p className="project-hero__badge">{project.technologyBadge}</p>
+                  {readyHome ? (
+                    <p className="project-hero__location">
+                      В {readyHome.locationPrepositional ?? readyHome.location}
+                    </p>
+                  ) : null}
+                </div>
+                <h1>
+                  {head}
+                  {mark ? <span>{mark}</span> : null}
+                  {tail}
+                </h1>
+              </div>
             </div>
 
             <div className="project-hero__bar">
@@ -153,9 +168,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
               <div className="project-hero__aside">
                 {/* Подпись над суммой, как у характеристик слева: без неё
                     число висело само по себе и выбивалось из ряда. */}
-                <p className="project-hero__pay-label">{copy.paymentFrom}</p>
+                <p className="project-hero__pay-label">
+                  {readyHome ? 'Цена' : copy.paymentFrom}
+                </p>
                 <strong className="project-hero__pay">
-                  {payment ? `${formatRub(payment)}${copy.perMonth}` : project.priceLabel}
+                  {readyHome
+                    ? formatRub(readyHome.salePrice)
+                    : payment
+                      ? `${formatRub(payment)}${copy.perMonth}`
+                      : project.priceLabel}
                 </strong>
               </div>
             </div>
@@ -167,19 +188,25 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <ProjectPlans project={project} />
         <ProjectInteriors project={project} />
         <ProjectBuilt project={project} />
-        {standardPrice ? (
-          <MortgageCalculator
-            key={project.id}
-            projects={[]}
-            initialPropertyPrice={standardPrice}
-            initialProgramId="family"
-            showMatches={false}
-            projectTiers={tiers ?? undefined}
-            showEyebrow={false}
-          />
-        ) : null}
-        <ProjectConfig project={project} />
-        <ProjectNextSteps />
+        {readyHome ? (
+          <ReadyHomeOffer project={project} />
+        ) : (
+          <>
+            {standardPrice ? (
+              <MortgageCalculator
+                key={project.id}
+                projects={[]}
+                initialPropertyPrice={standardPrice}
+                initialProgramId="family"
+                showMatches={false}
+                projectTiers={tiers ?? undefined}
+                showEyebrow={false}
+              />
+            ) : null}
+            <ProjectConfig project={project} />
+          </>
+        )}
+        <ProjectNextSteps readyHome={Boolean(readyHome)} reviewImage={project.imageUrl} />
         <ProjectSimilar projects={similarProjects} />
         <ContactsSection
           block={{

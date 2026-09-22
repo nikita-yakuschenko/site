@@ -40,7 +40,9 @@ export function ProjectExteriors({ project }: { project: CatalogProject }) {
   return (
     <section className="section" aria-labelledby="project-exteriors-title">
       <div className="section__inner">
-        <h2 id="project-exteriors-title">{copy.exteriorsHeading}</h2>
+        <h2 id="project-exteriors-title">
+          {project.readyHome ? "Дом снаружи" : copy.exteriorsHeading}
+        </h2>
         <div className="project-bento">
           {shots.map((src, index) => (
             <button
@@ -91,7 +93,9 @@ export function ProjectInteriors({ project }: { project: CatalogProject }) {
       aria-labelledby="project-interiors-title"
     >
       <div className="section__inner">
-        <h2 id="project-interiors-title">{copy.interiorsHeading}</h2>
+        <h2 id="project-interiors-title">
+          {project.readyHome ? "Интерьер готового дома" : copy.interiorsHeading}
+        </h2>
         <div className="project-rows">
           {tiles.map((src, index) => {
             const last = rest > 0 && index === tiles.length - 1;

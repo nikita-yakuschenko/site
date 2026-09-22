@@ -33,7 +33,7 @@ import {
  */
 
 /** Порядок параметров в адресе. Правило 6. */
-const ORDER = ['q', 'series', 'tech', 'area', 'price', 'bedrooms', 'bathrooms', 'floors'] as const
+const ORDER = ['q', 'status', 'series', 'tech', 'area', 'price', 'bedrooms', 'bathrooms', 'floors'] as const
 
 export type RawParams = Record<string, string | string[] | undefined>
 
@@ -106,6 +106,7 @@ export function parseFilters(params: RawParams): CatalogFilters {
   const query = q ? normalizeQuery(q) : ''
   return {
     q: query || undefined,
+    status: first(params.status) === 'ready' ? 'ready' : undefined,
     series: series && isCatalogSeries(series) ? series : undefined,
     tech,
     area: parseRange(first(params.area)),
@@ -127,6 +128,7 @@ function encodeValue(value: string): string {
 export function filtersToHref(filters: CatalogFilters, pathname = '/catalog'): string {
   const value: Record<(typeof ORDER)[number], string | undefined> = {
     q: filters.q,
+    status: filters.status,
     series: filters.series,
     tech: filters.tech?.join(','),
     area: formatRange(filters.area),
@@ -208,6 +210,7 @@ export function facetsOf(
 export function countActive(filters: CatalogFilters): number {
   let n = 0
   if (filters.q) n += 1
+  if (filters.status) n += 1
   if (filters.series) n += 1
   if (filters.tech?.length) n += 1
   if (filters.area) n += 1

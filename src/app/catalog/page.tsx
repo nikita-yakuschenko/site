@@ -25,7 +25,11 @@ export async function generateMetadata({
   searchParams: Search
 }): Promise<Metadata> {
   const filters = parseFilters(await searchParams)
-  const title = filters.series ? seriesTitle(filters.series) : copy.catalogTitle
+  const title = filters.status === 'ready'
+    ? copy.readyHousesTitle
+    : filters.series
+      ? seriesTitle(filters.series)
+      : copy.catalogTitle
   return {
     title,
     description: copy.catalogLead,
@@ -57,6 +61,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
   if (canonical) permanentRedirect(canonical)
 
   const { items, rest } = await catalog.list({ siteCode: SITE.code, filters })
+  const heading = filters.status === 'ready' ? copy.readyHousesTitle : copy.catalogTitle
   const toBoard = (list: typeof items): BoardItem[] =>
     list.map((project) => ({ id: project.id, card: <ProjectCard project={project} /> }))
 
@@ -76,13 +81,13 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
           <div className="section__inner">
             {/* Заголовок без картинки: человеку и так видно, куда он попал,
                 а поиску и скринридеру страница без h1 не годится. */}
-            <h1 className="visually-hidden">{copy.catalogTitle}</h1>
+            <h1 className="visually-hidden">{heading}</h1>
 
             <CatalogBoard
               filters={filters}
               facets={facets}
               matched={toBoard(items)}
-              rest={toBoard(rest)}
+              rest={filters.status === 'ready' ? [] : toBoard(rest)}
               picked={!isEmpty(filters)}
             />
           </div>

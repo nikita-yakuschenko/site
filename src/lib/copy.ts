@@ -66,9 +66,11 @@ export const copy = {
   searchNothing: "По этому названию ничего не нашлось",
   filtersLabel: "Фильтры",
   favoritesOnly: "Только избранное",
+  readyOnly: "Готовый дом",
   favoritesEmpty:
     "В избранном пока пусто. Нажмите на сердце в карточке проекта, чтобы он сюда попал.",
   viewProject: "Посмотреть проект",
+  viewReadyHome: "Посмотреть дом",
   share: "Поделиться",
   favoriteAdd: "В избранное",
   favoriteRemove: "Убрать из избранного",
@@ -357,7 +359,7 @@ export const copy = {
         title: "Готовый дом",
         text:
           "Дом от застройщика — юридического лица или ИП, первого собственника. Вторичка у физлица программой не предусмотрена.",
-        href: "/for-sale",
+        href: "/catalog?status=ready",
         cta: "Выбрать дом",
         image: "/series/modular.jpg",
       },
@@ -613,7 +615,7 @@ export const copy = {
         title: "Готовый дом",
         text:
           "С участком или без него. Дом не старше пяти лет при покупке у физлица и не старше трёх — у юридического лица или ИП.",
-        href: "/for-sale",
+        href: "/catalog?status=ready",
         cta: "Выбрать дом",
         image: "/series/modular.jpg",
       },
@@ -1074,7 +1076,7 @@ export const copy = {
         title: "Готовый дом",
         text:
           "Как правило, вместе с участком. Банк проверяет юридическую чистоту, характеристики и рыночную стоимость объекта.",
-        href: "/for-sale",
+        href: "/catalog?status=ready",
         cta: "Выбрать дом",
         image: "/series/modular.jpg",
       },
@@ -1286,7 +1288,7 @@ export const copy = {
       {
         title: "Купить готовый дом",
         text: "Дома, которые уже построены и готовы к сделке.",
-        href: "/for-sale",
+        href: "/catalog?status=ready",
         cta: "Выбрать дом",
         form: false,
         formLead: "",

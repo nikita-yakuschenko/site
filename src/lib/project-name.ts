@@ -8,8 +8,16 @@
  * Если хвостового числа нет, маркировка пустая и заголовок выводится целиком
  * одним куском — никаких пустых span в разметке.
  */
-export function splitProjectName(name: string): { head: string; mark: string | null } {
-  const match = name.match(/^(.*?\s)(\d[\d\s./-]*)$/)
-  if (!match) return { head: name, mark: null }
-  return { head: match[1] ?? name, mark: match[2] ?? null }
+export function splitProjectName(name: string): {
+  head: string
+  mark: string | null
+  tail: string
+} {
+  const match = name.match(/^(.*?\s)(\d[\d\s./-]*?)(\s+[^\d].*)?$/)
+  if (!match) return { head: name, mark: null, tail: '' }
+  return {
+    head: match[1] ?? name,
+    mark: match[2] ?? null,
+    tail: match[3] ?? '',
+  }
 }

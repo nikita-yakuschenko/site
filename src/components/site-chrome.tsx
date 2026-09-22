@@ -489,7 +489,7 @@ export function SiteChrome({
               <h3>{copy.footerClients}</h3>
               <nav className="footer-nav" aria-label={copy.footerClients}>
                 <Link href="/exposition">{copy.exposition}</Link>
-                <Link href="/for-sale">{copy.readyHouses}</Link>
+                <Link href="/catalog?status=ready">{copy.readyHouses}</Link>
                 <Link href="/family-mortgage">{copy.mortgage}</Link>
               </nav>
             </div>

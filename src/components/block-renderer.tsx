@@ -145,11 +145,8 @@ function PopularProjects({
             ) : null}
             <h2>{String(block.heading || copy.popularHeading)}</h2>
           </div>
-          {/* Строковая ссылка со стрелкой, а не кнопка: это переход в
-              соседний раздел, а не действие. Кнопки на сайте оставлены за
-              действиями, и пилюль среди них нет. */}
           <a
-            className="section__link"
+            className="btn btn-yellow section__catalog-cta section__catalog-cta--desktop"
             href={String(block.catalogHref || "/catalog")}
           >
             {String(block.catalogLabel || copy.allProjects)}
@@ -161,6 +158,13 @@ function PopularProjects({
             <ProjectCard key={project.id} project={project} />
           ))}
         </div>
+        <a
+          className="btn btn-yellow section__catalog-cta section__catalog-cta--mobile"
+          href={String(block.catalogHref || "/catalog")}
+        >
+          {String(block.catalogLabel || copy.allProjects)}
+          <IconArrowUpRight size={18} stroke={2} />
+        </a>
       </div>
     </section>
   );
@@ -190,7 +194,7 @@ function SeriesBento({ block }: { block: LayoutBlock }) {
             <h2>{String(block.heading || copy.seriesHeading)}</h2>
           </div>
           <a
-            className="section__link"
+            className="btn btn-yellow section__catalog-cta section__catalog-cta--desktop"
             href={String(block.catalogHref || "/catalog")}
           >
             {String(block.catalogLabel || copy.seriesAll)}
@@ -219,6 +223,13 @@ function SeriesBento({ block }: { block: LayoutBlock }) {
             </a>
           ))}
         </div>
+        <a
+          className="btn btn-yellow section__catalog-cta section__catalog-cta--mobile"
+          href={String(block.catalogHref || "/catalog")}
+        >
+          {String(block.catalogLabel || copy.seriesAll)}
+          <IconArrowUpRight size={18} stroke={2} />
+        </a>
       </div>
     </section>
   );

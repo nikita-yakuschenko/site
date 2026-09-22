@@ -1,4 +1,4 @@
-import { formatFromRub } from "../locale"
+import { formatFromRub, formatRub } from "../locale"
 import type { CatalogProject, CatalogSeries } from "./types"
 
 /**
@@ -901,6 +901,70 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
       "/catalog/norvegiya-132/04.jpeg",
       "/catalog/norvegiya-132/05.jpg",
       "/catalog/norvegiya-132/06.jpg",
+    ],
+    interiors: [
+      "/catalog/norvegiya-132/07.jpg",
+      "/catalog/norvegiya-132/08.jpg",
+      "/catalog/norvegiya-132/09.jpg",
+      "/catalog/norvegiya-132/10.jpg",
+      "/catalog/norvegiya-132/11.jpg",
+      "/catalog/norvegiya-132/12.jpg",
+      "/catalog/norvegiya-132/13.jpg",
+      "/catalog/norvegiya-132/14.jpg",
+      "/catalog/norvegiya-132/15.jpg",
+      "/catalog/norvegiya-132/16.jpg",
+      "/catalog/norvegiya-132/17.jpg",
+      "/catalog/norvegiya-132/18.jpeg",
+      "/catalog/norvegiya-132/19.jpeg",
+      "/catalog/norvegiya-132/20.jpeg",
+    ],
+    floorPlans: [
+      "/catalog/norvegiya-132/01.jpg",
+      "/catalog/norvegiya-132/21.jpg",
+    ],
+    options: [],
+  },
+  {
+    id: "ready-norvegiya-132-gremyachki",
+    slug: "norvegiya-132-gremyachki",
+    name: "Норвегия 132 в Гремячках",
+    area: "132",
+    areaValue: 132,
+    floors: "1",
+    floorsValue: 1,
+    bedrooms: "3",
+    bathrooms: "2",
+    priceLabel: formatRub(10000000),
+    priceAmount: 10000000,
+    imageUrl: "/catalog/norvegiya-132-gremyachki/preview.png",
+    technologyBadge: "Готовый дом",
+    series: "panel",
+    technology: "panel",
+    href: "/catalog/norvegiya-132-gremyachki",
+    description: "Готовый дом Норвегия 132 в Гремячках площадью 132 м².",
+    readyHome: {
+      location: "Гремячки",
+      locationPrepositional: "Гремяках",
+      salePrice: 10000000,
+      configurationLead:
+        "Дом построен и готов к продаже. Комплектация и итоговая стоимость зафиксированы.",
+      configuration: [
+        "Силовой каркас и утепление",
+        "Кровля и наружная отделка",
+        "Окна и входные двери",
+        "Внутренняя отделка",
+        "Инженерные коммуникации",
+        "Терраса и крыльцо",
+      ],
+    },
+    about: [],
+    exteriors: [
+      "/catalog/norvegiya-132-gremyachki/exterior-5.png",
+      "/catalog/norvegiya-132-gremyachki/exterior-1.png",
+      "/catalog/norvegiya-132-gremyachki/exterior-2.png",
+      "/catalog/norvegiya-132-gremyachki/exterior-3.png",
+      "/catalog/norvegiya-132-gremyachki/exterior-4.png",
+      "/catalog/norvegiya-132-gremyachki/exterior-6.png",
     ],
     interiors: [
       "/catalog/norvegiya-132/07.jpg",

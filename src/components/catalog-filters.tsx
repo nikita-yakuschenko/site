@@ -166,6 +166,12 @@ export function CatalogFilters({
     value === "modular" ? copy.techModularShort : copy.techPanelShort;
 
   const chips: { label: string; clear: CatalogFilters }[] = [];
+  if (filters.status === "ready") {
+    chips.push({
+      label: copy.readyOnly,
+      clear: { ...filters, status: undefined },
+    });
+  }
   if (filters.series) {
     chips.push({ label: seriesTitle(filters.series), clear: { ...filters, series: undefined } });
   }
@@ -212,6 +218,25 @@ export function CatalogFilters({
         {/* Прокручивается только эта часть: кнопка возврата к выдаче лежит
             подвалом за её пределами и потому ничего не перекрывает. */}
         <div className="cfilter__scroll">
+
+        <fieldset className="cfilter__group">
+          <legend className="cfilter__legend">Статус</legend>
+          <div className="cfilter__checks">
+            <label className="cfilter__check">
+              <input
+                type="checkbox"
+                checked={filters.status === "ready"}
+                onChange={() =>
+                  go({
+                    ...filters,
+                    status: filters.status === "ready" ? undefined : "ready",
+                  })
+                }
+              />
+              {copy.readyOnly}
+            </label>
+          </div>
+        </fieldset>
 
         <fieldset className="cfilter__group">
           <legend className="cfilter__legend">

@@ -48,7 +48,9 @@ export function ProjectCard({ project }: { project: CatalogProject }) {
           ) : (
             <span className="card__empty">{copy.noPhoto}</span>
           )}
-          <span className="badge">{project.technologyBadge}</span>
+          <span className="badge">
+            {project.readyHome ? copy.readyOnly : project.technologyBadge}
+          </span>
         </a>
         <div className="card__actions">
           <button type="button" className="icon-btn" aria-label={copy.share} onClick={() => void shareProject(project)}>
@@ -82,7 +84,7 @@ export function ProjectCard({ project }: { project: CatalogProject }) {
         </ul>
         <p className="price">{project.priceLabel}</p>
         <a className="btn btn-yellow card__cta" href={project.href}>
-          {copy.viewProject}
+          {project.readyHome ? copy.viewReadyHome : copy.viewProject}
         </a>
       </div>
     </article>

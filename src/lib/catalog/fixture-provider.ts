@@ -76,6 +76,7 @@ function countMisses(item: CatalogProject, filters: CatalogFilters | undefined):
   if (!filters) return 0
   let misses = 0
   if (filters.q && !matchesName(item.name, filters.q)) misses += 1
+  if (filters.status === 'ready' && !item.readyHome) misses += 1
   if (filters.series && item.series !== filters.series) misses += 1
   if (filters.tech?.length && !filters.tech.includes(item.technology)) misses += 1
   if (!inRange(item.areaValue, filters.area)) misses += 1

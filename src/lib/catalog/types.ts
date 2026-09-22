@@ -30,6 +30,8 @@ export type Range = { min?: number; max?: number }
 export type CatalogFilters = {
   /** Поиск по названию проекта. */
   q?: string
+  /** Конкретные дома, которые уже построены и выставлены на продажу. */
+  status?: 'ready'
   series?: CatalogSeries
   tech?: CatalogTechnology[]
   area?: Range
@@ -100,6 +102,14 @@ export type CatalogProject = {
   technology: CatalogTechnology
   href: string
   description: string
+  /** Данные конкретного готового дома. Без поля запись является проектом. */
+  readyHome?: {
+    location: string
+    locationPrepositional?: string
+    salePrice: number
+    configurationLead: string
+    configuration: string[]
+  }
   /**
    * Редакционные абзацы раздела «О проекте». Каждый со своей фотографией.
    * Пусто значит, что текста ещё нет: раздел тогда показывает только то,

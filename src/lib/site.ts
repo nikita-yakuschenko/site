@@ -22,7 +22,7 @@ export const SITE = {
      плашке и блоком в подвале. */
   navigation: [
     { label: copy.projects, href: '/catalog' },
-    { label: copy.readyHouses, href: '/for-sale' },
+    { label: copy.readyHouses, href: '/catalog?status=ready' },
     { label: copy.mortgage, href: '/family-mortgage' },
     { label: copy.production, href: '/manufacture' },
     { label: copy.exposition, href: '/exposition' },

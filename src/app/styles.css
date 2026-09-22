@@ -3955,6 +3955,27 @@ a {
   transform: translate(2px, -2px);
 }
 
+.section__catalog-cta {
+  gap: 6px;
+  text-decoration: none;
+}
+
+.section__catalog-cta--mobile {
+  display: none;
+}
+
+@media (max-width: 719px) {
+  .section__catalog-cta--desktop {
+    display: none;
+  }
+
+  .section__catalog-cta--mobile {
+    display: flex;
+    width: fit-content;
+    margin: 24px auto 0;
+  }
+}
+
 /* Телефон: переход встаёт в строку надзаголовка, а не отдельной строкой под
    заголовком. Под заголовком он читался обрывком следующего блока —
    висел слева сам по себе, без связи с тем, что над ним.
@@ -7274,7 +7295,7 @@ html.is-dialog-open {
    технологии не должен менять очертания между списком и карточкой. */
 .project-hero__badge {
   width: fit-content;
-  margin: 0 0 16px;
+  margin: 0;
   padding: 4px 8px;
   border-radius: 6px;
   background: rgb(255 255 255 / 0.95);
@@ -7283,6 +7304,30 @@ html.is-dialog-open {
   font-weight: 500;
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
   backdrop-filter: blur(8px);
+}
+
+.project-hero__labels {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  width: 100%;
+  margin: 0 0 16px;
+}
+
+.project-hero__heading {
+  width: fit-content;
+  max-width: 100%;
+}
+
+.project-hero__location {
+  margin: 0;
+  color: #fff;
+  font-size: clamp(15px, 1.4vw, 20px);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  line-height: 1.2;
+  text-transform: uppercase;
 }
 
 .project-hero h1 {
@@ -12238,6 +12283,132 @@ html.is-dialog-open {
   color: rgb(var(--avgst-ink-rgb) / 0.5);
 }
 
+.ready-home-offer {
+  display: grid;
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+}
+
+@media (min-width: 820px) {
+  .ready-home-offer {
+    grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
+    align-items: stretch;
+  }
+}
+
+.ready-home-offer__details,
+.ready-home-offer__total {
+  min-width: 0;
+  padding: 24px;
+  border-radius: 16px;
+}
+
+.ready-home-offer__details {
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  background: #fff;
+}
+
+.ready-home-offer__details > p {
+  max-width: 62ch;
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+  color: rgb(var(--avgst-ink-rgb) / 0.65);
+}
+
+.ready-home-offer__details ul {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 24px;
+  margin: 22px 0 0;
+  padding: 20px 0 0;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  list-style: none;
+}
+
+.ready-home-offer__details li {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  line-height: 1.35;
+}
+
+.ready-home-offer__details li svg {
+  flex: none;
+  margin-top: 2px;
+  color: var(--avgst-green);
+}
+
+.ready-home-offer__total {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+.ready-home-offer__summary {
+  display: grid;
+  gap: 4px;
+}
+
+.ready-home-offer__summary p,
+.ready-home-offer__summary span {
+  margin: 0;
+  color: rgb(255 255 255 / 0.58);
+}
+
+.ready-home-offer__summary p {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+.ready-home-offer__summary strong {
+  font-size: clamp(1.8rem, 4vw, 2.4rem);
+  line-height: 1.05;
+  letter-spacing: -0.035em;
+}
+
+.ready-home-offer__summary span {
+  font-size: 13px;
+}
+
+.ready-home-offer__total > .btn {
+  width: 100%;
+  margin-top: auto;
+  gap: 6px;
+}
+
+.ready-home-offer__total .lead-card {
+  --lead-ink: 255 255 255;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+
+.ready-home-offer__total .lead-card input {
+  border-color: rgb(255 255 255 / 0.28);
+  background: rgb(255 255 255 / 0.06);
+  color: #fff;
+}
+
+.ready-home-offer__total .lead-form__consent {
+  color: rgb(255 255 255 / 0.72);
+  white-space: normal;
+}
+
+@media (max-width: 599px) {
+  .ready-home-offer__details,
+  .ready-home-offer__total {
+    padding: 20px;
+  }
+
+  .ready-home-offer__details ul {
+    grid-template-columns: 1fr;
+  }
+}
+
 .project-next-steps__grid {
   display: grid;
   gap: var(--gap-tile);
@@ -12275,6 +12446,21 @@ html.is-dialog-open {
      обрывается на фоне карточки. */
   background: rgb(214 207 201);
   color: var(--avgst-ink);
+}
+
+.project-next-steps__tile--review {
+  border-radius: 16px;
+  background: var(--avgst-ink);
+  color: #fff;
+  text-decoration: none;
+}
+
+.project-next-steps__tile--review::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(180deg, rgb(8 12 28 / 0.72), transparent 62%);
 }
 
 .project-next-steps__copy {
@@ -12328,6 +12514,16 @@ html.is-dialog-open {
   transform: scale(1.04);
 }
 
+.project-next-steps__review {
+  z-index: 0;
+  object-fit: cover;
+  transition: transform 0.45s var(--ease-out);
+}
+
+.project-next-steps__tile--review:hover .project-next-steps__review {
+  transform: scale(1.04);
+}
+
 .project-next-steps__lead {
   display: grid;
   max-width: 43ch;
@@ -12338,6 +12534,10 @@ html.is-dialog-open {
 
 .project-next-steps__tile--consult .project-next-steps__lead {
   color: rgb(var(--avgst-ink-rgb) / 0.62);
+}
+
+.project-next-steps__tile--review .project-next-steps__lead {
+  color: rgb(255 255 255 / 0.76);
 }
 
 .project-next-steps__tile:hover .series-bento__go {
@@ -12373,9 +12573,9 @@ html.is-dialog-open {
 }
 
 /* ───────── Кадры проекта: фасады, планировки, интерьеры ─────────
-   Пропорцию держит ячейка, а не картинка: у <img> есть атрибут height, и
-   без высоты в правиле он выигрывает — кадры выходили в натуральный рост,
-   а под ними оставался фон. */
+   Пропорцию держит ячейка, а не картинка: у <img> есть атрибут height и
+   свой aspect (часто 4:3), и без абсолютного кадра lead с aspect:auto
+   раздувал ряды — правый столбец и нижний ряд ломались. */
 
 .project-bento {
   display: grid;
@@ -12387,18 +12587,21 @@ html.is-dialog-open {
 @media (min-width: 900px) {
   .project-bento {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    grid-auto-flow: dense;
   }
 
-  /* Крупная плитка занимает две колонки и два ряда, поэтому своей
-     пропорции у неё нет — высоту дают ряды. */
+  /* Lead тянется на два ряда, высоту рядов задают мелкие 16:9 — не кадр. */
   .project-bento > .project-bento__lead {
     grid-column: span 2;
     grid-row: span 2;
     aspect-ratio: auto;
+    align-self: stretch;
+    min-height: 0;
   }
 }
 
 .project-bento > * {
+  position: relative;
   overflow: hidden;
   margin: 0;
   padding: 0;
@@ -12408,6 +12611,7 @@ html.is-dialog-open {
   background: #e8edf3;
   cursor: pointer;
   transition: transform 0.16s var(--ease-out);
+  min-width: 0;
 }
 
 .project-bento > *:active {
@@ -12699,14 +12903,15 @@ html.is-dialog-open {
   }
 }
 
+/* Кадр не участвует в расчёте высоты ячейки — только покрывает её. */
 .project-bento img {
+  position: absolute;
+  inset: 0;
   display: block;
   width: 100%;
   height: 100%;
+  max-width: none;
   object-fit: cover;
-}
-
-.project-bento img {
   transition: transform 0.45s var(--ease-out);
 }
 
