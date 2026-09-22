@@ -7131,9 +7131,13 @@ html.is-dialog-open {
   color: white;
 }
 
-.project-hero > img {
+.project-hero__media {
   position: absolute;
   inset: 0;
+}
+
+.project-hero__media img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -7339,15 +7343,7 @@ html.is-dialog-open {
 }
 
 .project-hero__specs li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   min-width: 108px;
-}
-
-.project-hero__specs svg {
-  color: var(--brand-yellow);
-  flex-shrink: 0;
 }
 
 .project-hero__specs p {
@@ -7362,9 +7358,44 @@ html.is-dialog-open {
 .project-hero__specs strong {
   display: block;
   margin-top: 2px;
+  color: var(--brand-yellow);
   font-size: 1.35rem;
   font-weight: 700;
   letter-spacing: -0.02em;
+}
+
+@media (max-width: 719px) {
+  .project-hero__intro {
+    padding-bottom: 10px;
+  }
+
+  .project-hero__badge {
+    margin-bottom: 8px;
+  }
+
+  .project-hero__bar {
+    gap: 12px;
+    padding: 14px 16px;
+  }
+
+  .project-hero__specs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .project-hero__specs li {
+    min-width: 0;
+  }
+
+  .project-hero__specs p {
+    font-size: 9px;
+    letter-spacing: 0.08em;
+  }
+
+  .project-hero__specs strong {
+    font-size: 1.15rem;
+  }
+
 }
 
 /* В правой части плашки только платёж по ипотеке.
@@ -7400,6 +7431,13 @@ html.is-dialog-open {
   /* Фирменный жёлтый, как у числа в заголовке и значков характеристик:
      единственная величина в плашке, ради которой сюда пришли. */
   color: var(--brand-yellow);
+}
+
+@media (max-width: 719px) {
+  .project-hero__pay {
+    font-size: 1.35rem;
+    line-height: 1.1;
+  }
 }
 
 .project-hero__icon {

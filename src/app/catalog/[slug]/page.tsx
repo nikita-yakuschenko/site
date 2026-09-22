@@ -1,13 +1,7 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import {
-  IconBath,
-  IconBed,
-  IconChevronRight,
-  IconRulerMeasure,
-  IconStairs,
-} from '@tabler/icons-react'
+import { IconChevronRight } from '@tabler/icons-react'
 import {
   ProjectExteriors,
   ProjectInteriors,
@@ -88,10 +82,10 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     : null
 
   const specs = [
-    { icon: IconRulerMeasure, label: copy.area, value: `${project.area} ${copy.specArea}` },
-    { icon: IconStairs, label: copy.floorsLabel, value: project.floors },
-    { icon: IconBed, label: copy.bedrooms, value: project.bedrooms },
-    { icon: IconBath, label: copy.bathrooms, value: project.bathrooms },
+    { label: copy.area, value: `${project.area} ${copy.specArea}` },
+    { label: copy.floorsLabel, value: project.floors },
+    { label: copy.bedrooms, value: project.bedrooms },
+    { label: copy.bathrooms, value: project.bathrooms },
   ]
 
   return (
@@ -123,7 +117,15 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     >
       <main>
         <section className="project-hero">
-          <img src={project.imageUrl} alt="" />
+          <picture className="project-hero__media">
+            {project.slug === 'barnhouse-115' ? (
+              <source
+                media="(max-width: 430px)"
+                srcSet="/catalog/barnhouse-115/hero-mobile.png"
+              />
+            ) : null}
+            <img src={project.imageUrl} alt="" />
+          </picture>
           <div className="project-hero__veil" />
           <div className="project-hero__stage">
             <div className="project-hero__intro">
@@ -136,18 +138,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
 
             <div className="project-hero__bar">
               <ul className="project-hero__specs">
-                {specs.map((spec) => {
-                  const Icon = spec.icon
-                  return (
-                    <li key={spec.label}>
-                      <Icon size={22} stroke={1.6} aria-hidden="true" />
-                      <div>
-                        <p>{spec.label}</p>
-                        <strong>{spec.value}</strong>
-                      </div>
-                    </li>
-                  )
-                })}
+                {specs.map((spec) => (
+                  <li key={spec.label}>
+                    <p>{spec.label}</p>
+                    <strong>{spec.value}</strong>
+                  </li>
+                ))}
               </ul>
               {/* Здесь только платёж. Кнопка расчёта убрана, полная цена
                   тоже: рядом с платежом она шла мелкой строкой и обе цены
