@@ -66,10 +66,20 @@ export type BuiltPhoto = { image: string; caption?: string }
 
 export type PlanRoom = { name: string; area: string }
 
-export type PlanVariant = {
+/** Отдельный этаж дома: чертёж и относящаяся только к нему экспликация. */
+export type PlanFloor = {
   image: string
   label: string
   rooms: PlanRoom[]
+}
+
+export type PlanVariant = {
+  label: string
+  /** Одноэтажные фикстуры старого формата. */
+  image?: string
+  rooms?: PlanRoom[]
+  /** Вариант двухэтажного дома содержит собственный набор этажей. */
+  floors?: PlanFloor[]
 }
 
 export type CatalogProject = {

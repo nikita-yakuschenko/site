@@ -177,7 +177,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           basePayment={payment}
           basePrice={basePrice}
         />
-        <ProjectNextSteps project={project} />
+        <ProjectNextSteps />
         <ContactsSection
           block={{ blockType: 'contactsSection' }}
           contacts={SITE.contacts}

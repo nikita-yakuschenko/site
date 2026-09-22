@@ -27,7 +27,8 @@ import type { CatalogProject } from "../lib/catalog/types";
  */
 export function ProjectPlans({ project }: { project: CatalogProject }) {
   const variants = project.plans ?? [];
-  const [active, setActive] = useState(0);
+  const [activeVariant, setActiveVariant] = useState(0);
+  const [activeFloor, setActiveFloor] = useState(0);
   const [open, setOpen] = useState<number | null>(null);
 
   if (!variants.length) {
@@ -72,7 +73,26 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
     );
   }
 
-  const current = variants[active] ?? variants[0]!;
+  const currentVariant = variants[activeVariant] ?? variants[0]!;
+  const currentFloors = currentVariant.floors?.length
+    ? currentVariant.floors
+    : currentVariant.image && currentVariant.rooms
+      ? [{ label: "1 этаж", image: currentVariant.image, rooms: currentVariant.rooms }]
+      : [];
+  const current = currentFloors[activeFloor] ?? currentFloors[0]!;
+
+  if (!current) return null;
+
+  const lightboxShowsFloors = currentFloors.length > 1;
+  const lightboxItems = lightboxShowsFloors
+    ? currentFloors
+    : variants.flatMap((variant) => {
+        if (variant.image && variant.rooms) {
+          return [{ label: variant.label, image: variant.image, rooms: variant.rooms }];
+        }
+        const firstFloor = variant.floors?.[0];
+        return firstFloor ? [firstFloor] : [];
+      });
 
   return (
     <section
@@ -90,13 +110,17 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
                 key={variant.label}
                 type="button"
                 role="tab"
-                aria-selected={index === active}
+                aria-selected={index === activeVariant}
                 className={
-                  index === active
+                  index === activeVariant
                     ? "project-plans__tab project-plans__tab--on"
                     : "project-plans__tab"
                 }
-                onClick={() => setActive(index)}
+                onClick={() => {
+                  setActiveVariant(index);
+                  setActiveFloor(0);
+                  setOpen(null);
+                }}
               >
                 {variant.label}
               </button>
@@ -109,12 +133,12 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
             type="button"
             className="project-plans__sheet"
             aria-label={copy.galleryOpen}
-            onClick={() => setOpen(active)}
+            onClick={() => setOpen(lightboxShowsFloors ? activeFloor : activeVariant)}
           >
             <Image
               key={current.image}
               src={current.image}
-              alt={`${copy.plansHeading}: ${current.label}`}
+              alt={`${copy.plansHeading}: ${currentVariant.label}, ${current.label}`}
               width={1680}
               height={1188}
               sizes="(min-width: 900px) 62vw, 100vw"
@@ -122,7 +146,28 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
           </button>
 
           <div className="project-plans__legend">
-            <p className="project-plans__legend-title">{copy.plansLegend}</p>
+            <div className="project-plans__legend-head">
+              <p className="project-plans__legend-title">{copy.plansLegend}</p>
+            </div>
+            {currentFloors.length > 1 ? (
+              <div className="project-plans__floor-tabs" role="tablist" aria-label="Этаж дома">
+                {currentFloors.map((floor, index) => (
+                  <button
+                    key={floor.label}
+                    type="button"
+                    role="tab"
+                    aria-selected={index === activeFloor}
+                    className={index === activeFloor ? "is-active" : undefined}
+                    onClick={() => {
+                      setActiveFloor(index);
+                      setOpen(null);
+                    }}
+                  >
+                    {floor.label}
+                  </button>
+                ))}
+              </div>
+            ) : null}
             <dl>
               {current.rooms.map((room, index) => (
                 <div key={`${room.name}-${index}`}>
@@ -138,13 +183,17 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
       {/* Листаем варианты того же дома: их и показывает просмотр. */}
       {open !== null ? (
         <PhotoLightbox
-          images={variants.map((variant) => variant.image)}
-          labels={variants.map((variant) => variant.label)}
-          variantLabels={variants.map((variant) => variant.label)}
+          images={lightboxItems.map((item) => item.image!)}
+          labels={lightboxItems.map((item) => item.label)}
+          variantLabels={lightboxItems.map((item) => item.label)}
           index={open}
           onIndex={(next) => {
             setOpen(next);
-            setActive(next);
+            if (lightboxShowsFloors) setActiveFloor(next);
+            else {
+              setActiveVariant(next);
+              setActiveFloor(0);
+            }
           }}
           onClose={() => setOpen(null)}
         />

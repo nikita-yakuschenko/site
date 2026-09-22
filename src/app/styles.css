@@ -9642,6 +9642,12 @@ html.is-dialog-open {
   line-height: 1.15;
 }
 
+@media (max-width: 599px) {
+  .mortgage-calc--project .mortgage-calc__head h2 {
+    margin-top: 6px;
+  }
+}
+
 .mortgage-calc__lead {
   margin: 6px 0 0;
   max-width: 64ch;
@@ -9874,6 +9880,61 @@ html.is-dialog-open {
   font-weight: 500;
   line-height: 1.25;
   color: rgb(var(--avgst-ink-rgb) / 0.68);
+}
+
+@media (max-width: 599px) {
+  .mortgage-calc--project .mortgage-calc__panel {
+    padding: 12px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__modes--tiers {
+    grid-template-columns: auto minmax(0, 1fr) minmax(0, 1fr);
+    width: 100%;
+    min-width: 0;
+  }
+
+  .mortgage-calc--project .mortgage-calc__modes--tiers .mortgage-calc__mode {
+    min-width: 0;
+    padding-inline: 5px;
+    font-size: 11px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tier-label {
+    min-width: 0;
+    padding-inline: 5px;
+    font-size: 11px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding-inline: 10px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-head {
+    gap: 8px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-label {
+    flex-shrink: 0;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-value {
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-value input {
+    width: 100%;
+    max-width: none;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-suffix.is-currency {
+    display: none;
+  }
 }
 
 .mortgage-calc__tile-value {
@@ -12601,13 +12662,19 @@ html.is-dialog-open {
 /* Экспликация: слева комната, справа площадь, между ними отточие из
    границы — так читается строка таблицы, а не два столбца порознь. */
 .project-plans__legend {
-  padding: 20px 22px;
+  overflow: hidden;
+  padding: 0;
   border-radius: 16px;
   background: #fff;
 }
 
+.project-plans__legend-head {
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+}
+
 .project-plans__legend-title {
-  margin: 0 0 12px;
+  margin: 0;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -12615,10 +12682,47 @@ html.is-dialog-open {
   color: rgb(var(--avgst-ink-rgb) / 0.5);
 }
 
+.project-plans__floor-tabs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 3px;
+  margin: 10px 20px 2px;
+  padding: 3px;
+  border-radius: 9px;
+  background: var(--page);
+}
+
+.project-plans__floor-tabs button {
+  min-height: 30px;
+  padding: 0 10px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+  transition:
+    background-color 0.16s var(--ease-out),
+    color 0.16s var(--ease-out);
+}
+
+.project-plans__floor-tabs button:hover,
+.project-plans__floor-tabs button:focus-visible {
+  color: var(--avgst-ink);
+}
+
+.project-plans__floor-tabs button.is-active {
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
 .project-plans__legend dl {
   display: grid;
   gap: 0;
   margin: 0;
+  padding: 6px 20px 10px;
 }
 
 .project-plans__legend dl > div {
@@ -12626,7 +12730,7 @@ html.is-dialog-open {
   align-items: baseline;
   justify-content: space-between;
   gap: 12px;
-  padding: 9px 0;
+  padding: 10px 0;
   border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
 }
 
@@ -12635,6 +12739,7 @@ html.is-dialog-open {
 }
 
 .project-plans__legend dt {
+  text-align: left;
   font-size: 14px;
   color: rgb(var(--avgst-ink-rgb) / 0.75);
 }

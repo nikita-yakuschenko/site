@@ -583,6 +583,39 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
       "/catalog/barnhouse-138/06.jpg",
       "/catalog/barnhouse-138/07.jpg",
     ],
+    plans: [
+      {
+        label: "Вариант А",
+        floors: [
+          {
+        image: "/catalog/barnhouse-138/06.jpg",
+        label: "1 этаж",
+        rooms: [
+          { name: "Кухня-гостиная", area: "24,27 м²" },
+          { name: "Холл", area: "12,96 м²" },
+          { name: "Спальня", area: "8,18 м²" },
+          { name: "Котельная", area: "6,00 м²" },
+          { name: "Санузел", area: "4,79 м²" },
+          { name: "Терраса", area: "17,36 м²" },
+          { name: "Крыльцо", area: "6,40 м²" },
+        ],
+          },
+          {
+        image: "/catalog/barnhouse-138/07.jpg",
+        label: "2 этаж",
+        rooms: [
+          { name: "Спальня", area: "12,03 м²" },
+          { name: "Кабинет", area: "11,6 м²" },
+          { name: "Спальня", area: "9,64 м²" },
+          { name: "Спальня", area: "9,6 м²" },
+          { name: "Холл", area: "5,0 м²" },
+          { name: "Санузел", area: "3,5 м²" },
+          { name: "Балкон", area: "6,6 м²" },
+        ],
+          },
+        ],
+      },
+    ],
     options: [],
   },
   {
@@ -1319,6 +1352,37 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
       "/catalog/shvedskii-142/08.png",
       "/catalog/shvedskii-142/09.png",
     ],
+    plans: [
+      {
+        label: "Вариант А",
+        floors: [
+          {
+        image: "/catalog/shvedskii-142/01-landscape.jpg",
+        label: "1 этаж",
+        rooms: [
+          { name: "Кухня-гостиная", area: "28,66 м²" },
+          { name: "Прихожая", area: "15,54 м²" },
+          { name: "Санузел", area: "6,11 м²" },
+          { name: "Котельная", area: "5,90 м²" },
+          { name: "Холл", area: "3,09 м²" },
+          { name: "Терраса", area: "24,00 м²" },
+          { name: "Крыльцо", area: "5,6 м²" },
+        ],
+          },
+          {
+        image: "/catalog/shvedskii-142/02-landscape.jpg",
+        label: "2 этаж",
+        rooms: [
+          { name: "Спальня", area: "14,04 м²" },
+          { name: "Спальня", area: "13,72 м²" },
+          { name: "Спальня", area: "10,56 м²" },
+          { name: "Санузел", area: "7,41 м²" },
+          { name: "Холл", area: "6,41 м²" },
+        ],
+          },
+        ],
+      },
+    ],
     options: [],
   },
   {
@@ -1651,6 +1715,42 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
       "/catalog/ekohouse-184/01.jpg",
       "/catalog/ekohouse-184/06.jpg",
     ],
+    plans: [
+      {
+        label: "Вариант А",
+        floors: [
+          {
+        image: "/catalog/ekohouse-184/floor-1-landscape.jpg",
+        label: "1 этаж",
+        rooms: [
+          { name: "Кухня-гостиная", area: "32,2 м²" },
+          { name: "Прихожая", area: "10,0 м²" },
+          { name: "Спальня", area: "13,5 м²" },
+          { name: "Холл", area: "12,8 м²" },
+          { name: "Котельная", area: "5,9 м²" },
+          { name: "Санузел", area: "5,6 м²" },
+          { name: "Терраса", area: "17,74 м²" },
+          { name: "Крыльцо", area: "14,38 м²" },
+          { name: "Навес", area: "24,3 м²" },
+        ],
+          },
+          {
+        image: "/catalog/ekohouse-184/floor-2-landscape.jpg",
+        label: "2 этаж",
+        rooms: [
+          { name: "Спальня", area: "14,6 м²" },
+          { name: "Спальня", area: "13,6 м²" },
+          { name: "Спальня", area: "11,0 м²" },
+          { name: "Спальня", area: "9,8 м²" },
+          { name: "Холл", area: "8,6 м²" },
+          { name: "Кладовая", area: "5,9 м²" },
+          { name: "Санузел", area: "5,6 м²" },
+          { name: "Гардеробная", area: "2,7 м²" },
+        ],
+          },
+        ],
+      },
+    ],
     options: [],
   },
 ]
@@ -1658,4 +1758,3 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
 export function countBySeries(series: CatalogSeries): number {
   return CATALOG_PROJECTS.filter((item) => item.series === series).length
 }
-

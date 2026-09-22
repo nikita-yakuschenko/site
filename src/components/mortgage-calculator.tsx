@@ -183,6 +183,13 @@ export function MortgageCalculator({
 
   const editableRate = programId === "market";
   const rateOverride = editableRate ? parseRate(rateInput) : undefined;
+  const isProjectCalculator = Boolean(projectTiers);
+  /* В карточке проекта рыночная часть комбо считается по ставке, которая
+     показана в переключателе «Рыночная». Основной калькулятор сохраняет
+     собственные банковские параметры программы. */
+  const projectCombinedMarketRate = isProjectCalculator
+    ? getMortgageProgram("market").rate
+    : undefined;
 
   const opened = useRef(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -219,8 +226,17 @@ export function MortgageCalculator({
         downPayment,
         termYears,
         rateOverride,
+        combinedMarketRateOverride: projectCombinedMarketRate,
       }),
-    [programId, region, propertyPrice, downPayment, termYears, rateOverride],
+    [
+      programId,
+      region,
+      propertyPrice,
+      downPayment,
+      termYears,
+      rateOverride,
+      projectCombinedMarketRate,
+    ],
   );
 
   const budgetPack = useMemo(
@@ -232,8 +248,17 @@ export function MortgageCalculator({
         monthlyPayment: comfortPayment,
         downPayment,
         termYears,
+        combinedMarketRateOverride: projectCombinedMarketRate,
       }),
-    [programId, region, comfortPayment, downPayment, termYears, rateOverride],
+    [
+      programId,
+      region,
+      comfortPayment,
+      downPayment,
+      termYears,
+      rateOverride,
+      projectCombinedMarketRate,
+    ],
   );
 
   const activeResult =
@@ -347,8 +372,6 @@ export function MortgageCalculator({
       ? program.rate
       : (activeResult.parts[0]?.annualRate ?? program.rate),
   );
-  const isProjectCalculator = Boolean(projectTiers);
-
   return (
     <section
       className={
@@ -565,15 +588,27 @@ export function MortgageCalculator({
                     <span aria-hidden="true" />
                     <dd>{formatRub(Math.round(downPayment))}</dd>
                   </div>
-                  <div>
-                    <dt>Сумма кредита</dt>
-                    <span aria-hidden="true" />
-                    <dd>{formatRub(Math.round(paymentResult.loanAmount))}</dd>
-                  </div>
+                  {paymentResult.isCombined ? (
+                    paymentResult.parts.map((part) => (
+                      <div key={part.kind}>
+                        <dt>
+                          Сумма кредита под {formatRate(part.annualRate)}
+                        </dt>
+                        <span aria-hidden="true" />
+                        <dd>{formatRub(Math.round(part.principal))}</dd>
+                      </div>
+                    ))
+                  ) : (
+                    <div>
+                      <dt>Сумма кредита</dt>
+                      <span aria-hidden="true" />
+                      <dd>{formatRub(Math.round(paymentResult.loanAmount))}</dd>
+                    </div>
+                  )}
                   <div>
                     <dt>Ставка</dt>
                     <span aria-hidden="true" />
-                    <dd>{displayRate}</dd>
+                    <dd>{paymentResult.isCombined ? "Комбо" : displayRate}</dd>
                   </div>
                 </dl>
               </>
@@ -872,7 +907,17 @@ function CalcField({
             onChange={(e) => commit(e.target.value, true)}
             onBlur={() => commit(text, false)}
           />
-          {trailing ?? <span>{suffix}</span>}
+          {trailing ?? (
+            <span
+              className={
+                suffix === "руб."
+                  ? "mortgage-calc__tile-suffix is-currency"
+                  : "mortgage-calc__tile-suffix"
+              }
+            >
+              {suffix}
+            </span>
+          )}
         </div>
       </div>
       {/* Тот же ползунок, что в отборе каталога. Раньше здесь стоял нативный

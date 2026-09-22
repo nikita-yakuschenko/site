@@ -66,6 +66,7 @@ function buildParts(
      руках и хочет посчитать по нему, а не по средней цифре с витрины.
      У программ с льготной частью не применяется — там ставка не его. */
   rateOverride?: number,
+  combinedMarketRateOverride?: number,
 ): { parts: LoanPart[]; isCombined: boolean } {
   const limit = subsidizedLimit(program, region);
   const useSplit =
@@ -90,6 +91,7 @@ function buildParts(
 
   const subsidizedPrincipal = limit!;
   const marketPrincipal = loanAmount - subsidizedPrincipal;
+  const marketRate = combinedMarketRateOverride ?? program.marketRate;
   const subPay = annuityPayment(
     subsidizedPrincipal,
     program.rate,
@@ -97,7 +99,7 @@ function buildParts(
   );
   const mktPay = annuityPayment(
     marketPrincipal,
-    program.marketRate,
+    marketRate,
     termMonths,
   );
   return {
@@ -112,7 +114,7 @@ function buildParts(
       {
         kind: "market",
         principal: marketPrincipal,
-        annualRate: program.marketRate,
+        annualRate: marketRate,
         monthlyPayment: mktPay,
       },
     ],
@@ -127,6 +129,9 @@ export type CalculateMortgageInput = {
   termYears: number;
   /** Годовая ставка долей (0.163 = 16,3%), если её задал человек. */
   rateOverride?: number;
+  /** Ставка рыночной части комбо. Нужна для контекстов, где показанная
+   *  пользователю рыночная ставка фиксирована отдельно от программы. */
+  combinedMarketRateOverride?: number;
 };
 
 export function calculateMortgage(
@@ -167,6 +172,7 @@ export function calculateMortgage(
     input.region,
     termMonths,
     input.rateOverride,
+    input.combinedMarketRateOverride,
   );
   const monthlyPayment = parts.reduce((s, p) => s + p.monthlyPayment, 0);
   const totalPayment = monthlyPayment * termMonths;
@@ -201,6 +207,7 @@ export function calculateMaxPropertyPrice(input: {
   downPayment: number;
   termYears: number;
   rateOverride?: number;
+  combinedMarketRateOverride?: number;
 }): {
   maxLoan: number;
   maxPropertyPrice: number;
@@ -227,6 +234,7 @@ export function calculateMaxPropertyPrice(input: {
       input.region,
       termMonths,
       input.rateOverride,
+      input.combinedMarketRateOverride,
     );
     if (pay <= payment) lo = mid;
     else hi = mid;
@@ -259,6 +267,7 @@ export function calculateMaxPropertyPrice(input: {
       maxPropertyPrice * (1 - 1e-9),
     ),
     termYears,
+    combinedMarketRateOverride: input.combinedMarketRateOverride,
   });
 
   return { maxLoan, maxPropertyPrice, result };
@@ -270,6 +279,7 @@ function paymentForLoan(
   region: RegionCode,
   termMonths: number,
   rateOverride?: number,
+  combinedMarketRateOverride?: number,
 ): number {
   const { parts } = buildParts(
     loanAmount,
@@ -277,6 +287,7 @@ function paymentForLoan(
     region,
     termMonths,
     rateOverride,
+    combinedMarketRateOverride,
   );
   return parts.reduce((s, p) => s + p.monthlyPayment, 0);
 }

@@ -4,12 +4,11 @@ import { IconArrowUpRight } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import type { CatalogProject } from "../lib/catalog/types";
 import { AskDialog } from "./ask-dialog";
 
 /** Два следующих шага после выбора комплектации: увидеть дом и обсудить
  * проект. Они не повторяют форму расчёта выше, а ведут к разным задачам. */
-export function ProjectNextSteps({ project }: { project: CatalogProject }) {
+export function ProjectNextSteps() {
   const [consultOpen, setConsultOpen] = useState(false);
 
   return (
