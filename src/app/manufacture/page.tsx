@@ -71,6 +71,42 @@ export default function ManufacturePage() {
             </figure>
           </div>
         </section>
+        <section className="section manufacture-beam" aria-labelledby="manufacture-beam-title">
+          <div className="section__inner manufacture-beam__inner">
+            <figure className="manufacture-beam__visual">
+              <Image
+                src="/production/wbz150-perspective.webp"
+                alt="Балочный центр WEINMANN WBZ 150 с подающими рольгангами"
+                width={1600}
+                height={1200}
+                sizes="(max-width: 719px) 100vw, 58vw"
+              />
+            </figure>
+            <h2 id="manufacture-beam-title">{copy.productionBeamTitle}</h2>
+            <div className="manufacture-beam__copy">
+              <p>{copy.productionBeamLead}</p>
+              <p>{copy.productionBeamDetail}</p>
+            </div>
+          </div>
+        </section>
+        <section className="section manufacture-cutting" aria-labelledby="manufacture-cutting-title">
+          <div className="section__inner manufacture-cutting__inner">
+            <h2 id="manufacture-cutting-title">{copy.productionCuttingTitle}</h2>
+            <div className="manufacture-cutting__copy">
+              <p>{copy.productionCuttingLead}</p>
+              <p>{copy.productionCuttingDetail}</p>
+            </div>
+            <figure className="manufacture-cutting__visual">
+              <Image
+                src="/production/svp950-overall.webp"
+                alt="Вертикальный форматно-раскроечный станок SVP 950 ECO"
+                width={1800}
+                height={1200}
+                sizes="(max-width: 719px) 100vw, 58vw"
+              />
+            </figure>
+          </div>
+        </section>
       </main>
     </SiteChrome>
   );
