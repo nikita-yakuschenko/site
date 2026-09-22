@@ -16,6 +16,13 @@ import {
 } from "react";
 import { trackEvent } from "../consent/analytics";
 import type { CatalogProject } from "../lib/catalog/types";
+import type { PricedTier } from "../lib/catalog/tiers";
+import {
+  DEFAULT_TIER,
+  readTier,
+  subscribeTier,
+  writeTier,
+} from "../lib/catalog/tier-selection";
 import { LeadForm } from "./lead-form";
 import { RangeSlider } from "./range-slider";
 import { formatRub } from "../lib/locale";
@@ -104,16 +111,34 @@ export function MortgageCalculator({
   projects,
   initialPropertyPrice,
   initialProgramId = "family",
+  showMatches = true,
+  projectTiers,
 }: {
   projects: CatalogProject[];
   initialPropertyPrice?: number;
   initialProgramId?: MortgageProgramId;
+  /** На карточке конкретного дома бюджет уже задан его ценой: подбор
+   *  других проектов там не нужен, остаётся только сам расчёт. */
+  showMatches?: boolean;
+  /** На странице проекта калькулятор привязан к ипотечным комплектациям. */
+  projectTiers?: readonly PricedTier[];
 }) {
   const region = useSyncExternalStore(
     subscribeRegion,
     readRegionCode,
     readServerRegionCode,
   );
+  const lead = showMatches
+    ? t.lead
+    : "Настройте условия и узнайте ежемесячный платёж.";
+  const selectedTierId = useSyncExternalStore(
+    subscribeTier,
+    readTier,
+    () => DEFAULT_TIER,
+  );
+  const mortgageTiers = projectTiers?.filter((tier) => tier.mortgage);
+  const selectedTier = mortgageTiers?.find((tier) => tier.id === selectedTierId)
+    ?? mortgageTiers?.[0];
   /* Форма заявки проявляется на месте карточки результата. */
   const [leadOpen, setLeadOpen] = useState(false);
   const fm = copy.familyMortgage;
@@ -131,6 +156,12 @@ export function MortgageCalculator({
     return Math.round(price * program.minDownPaymentPercent);
   });
   const [termYears, setTermYears] = useState(program.maxTermYears);
+  const [seenTierId, setSeenTierId] = useState(selectedTier?.id);
+  if (selectedTier && seenTierId !== selectedTier.id) {
+    setSeenTierId(selectedTier.id);
+    setPropertyPrice(selectedTier.price);
+    setDownPayment(Math.round(selectedTier.price * 0.2));
+  }
   /* Своя ставка — только у рыночной: государственной ставки там нет, её
      называет банк, и человек приходит с конкретным предложением на руках.
      У льготных программ ставка задана программой, и менять её нельзя.
@@ -316,10 +347,15 @@ export function MortgageCalculator({
       ? program.rate
       : (activeResult.parts[0]?.annualRate ?? program.rate),
   );
+  const isProjectCalculator = Boolean(projectTiers);
 
   return (
     <section
-      className="section section--muted mortgage-calc"
+      className={
+        isProjectCalculator
+          ? "section section--muted mortgage-calc mortgage-calc--project"
+          : "section section--muted mortgage-calc"
+      }
       id="mortgage-calc"
       aria-labelledby="mortgage-calc-title"
     >
@@ -328,17 +364,47 @@ export function MortgageCalculator({
             треть ширины у полей и результата, а сам стоял почти пустым. */}
         <header className="mortgage-calc__head">
           <p className="eyebrow">{t.eyebrow}</p>
-          <h2 id="mortgage-calc-title">{t.heading}</h2>
-          <p className="mortgage-calc__lead">{t.lead}</p>
+          <h2 id="mortgage-calc-title">
+            {projectTiers ? "Расчёт ипотеки" : t.heading}
+          </h2>
+          <p className="mortgage-calc__lead">{lead}</p>
         </header>
 
         <div className="mortgage-calc__panel">
           <div className="mortgage-calc__controls">
-            <div
-              className="mortgage-calc__modes"
-              role="tablist"
-              aria-label={t.heading}
-            >
+            {mortgageTiers ? (
+              <div
+                className="mortgage-calc__modes mortgage-calc__modes--tiers"
+                role="tablist"
+                aria-label="Комплектация"
+              >
+                <span className="mortgage-calc__tier-label">Комплектация:</span>
+                {mortgageTiers.map((tier) => (
+                  <button
+                    key={tier.id}
+                    type="button"
+                    role="tab"
+                    aria-selected={tier.id === selectedTier?.id}
+                    className={
+                      tier.id === selectedTier?.id
+                        ? "mortgage-calc__mode is-active"
+                        : "mortgage-calc__mode"
+                    }
+                    onClick={() => {
+                      writeTier(tier.id);
+                      scheduleAnalytics();
+                    }}
+                  >
+                    {tier.name}
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div
+                className="mortgage-calc__modes"
+                role="tablist"
+                aria-label={t.heading}
+              >
               <button
                 type="button"
                 role="tab"
@@ -371,7 +437,8 @@ export function MortgageCalculator({
               >
                 {t.modeBudget}
               </button>
-            </div>
+              </div>
+            )}
 
             <fieldset className="mortgage-calc__programs" aria-label={t.programLabel}>
               <div className="mortgage-calc__program-list">
@@ -472,7 +539,46 @@ export function MortgageCalculator({
             />
           </div>
 
-          <aside className="mortgage-calc__result">
+          <aside
+            className={
+              isProjectCalculator
+                ? "mortgage-calc__result mortgage-calc__result--project"
+                : "mortgage-calc__result"
+            }
+          >
+            {isProjectCalculator ? (
+              <>
+                <div className="mortgage-calc__project-payment">
+                  <p className="mortgage-calc__hero-num">
+                    {formatRub(Math.round(paymentResult.monthlyPayment))}
+                  </p>
+                  <p className="mortgage-calc__hero-label">{t.paymentSub}</p>
+                </div>
+                <dl className="mortgage-calc__receipt">
+                  <div>
+                    <dt>Стоимость дома</dt>
+                    <span aria-hidden="true" />
+                    <dd>{formatRub(Math.round(propertyPrice))}</dd>
+                  </div>
+                  <div>
+                    <dt>Первый взнос</dt>
+                    <span aria-hidden="true" />
+                    <dd>{formatRub(Math.round(downPayment))}</dd>
+                  </div>
+                  <div>
+                    <dt>Сумма кредита</dt>
+                    <span aria-hidden="true" />
+                    <dd>{formatRub(Math.round(paymentResult.loanAmount))}</dd>
+                  </div>
+                  <div>
+                    <dt>Ставка</dt>
+                    <span aria-hidden="true" />
+                    <dd>{displayRate}</dd>
+                  </div>
+                </dl>
+              </>
+            ) : (
+              <>
             {/* Содержимое карточки и форма лежат в одной клетке и
                 перекрещиваются прозрачностью: по нажатию расчёт гаснет,
                 форма проявляется ровно в его габаритах. Ни карточка, ни
@@ -620,59 +726,62 @@ export function MortgageCalculator({
             {/* Подпись общая для обоих состояний: не гаснет и держит
                 кнопку на одном месте — до раскрытия и после. */}
             <p className="mortgage-calc__result-note">{t.resultNote}</p>
+              </>
+            )}
           </aside>
 
-          {/* Проекты — часть калькулятора, а не отдельный блок под ним: ради
-              них расчёт и затевается. Число выводится здесь один раз; в
-              карточке результата и на кнопке его больше нет. */}
-          <section
-            className="mortgage-calc__matches"
-            id="mortgage-calc-projects"
-            aria-live="polite"
-          >
-            <div className="mortgage-calc__matches-head">
-              <h3>
-                {t.suitable} <strong>{projectsInSeries(eligible.total)}</strong>
-              </h3>
-              {eligible.total > 0 ? (
-                <Link
-                  className="mortgage-calc__matches-all"
-                  href={catalogHrefWithMaxPrice(budgetPrice)}
-                  onClick={() =>
-                    trackEvent({
-                      type: "mortgage_catalog_clicked",
-                      program: programId,
-                      available_budget: Math.round(budgetPrice),
-                    })
-                  }
-                >
-                  {t.viewAll}
-                  <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
-                </Link>
-              ) : null}
-            </div>
-
-            {eligible.items.length ? (
-              <div className="mortgage-calc__matches-grid">
-                {eligible.items.map((project) => (
-                  <div
-                    key={project.id}
-                    onClickCapture={() =>
+          {/* На ипотечной странице подбор проектов — часть калькулятора. На
+              карточке конкретного дома он выключен: цену уже задал проект. */}
+          {showMatches ? (
+            <section
+              className="mortgage-calc__matches"
+              id="mortgage-calc-projects"
+              aria-live="polite"
+            >
+              <div className="mortgage-calc__matches-head">
+                <h3>
+                  {t.suitable} <strong>{projectsInSeries(eligible.total)}</strong>
+                </h3>
+                {eligible.total > 0 ? (
+                  <Link
+                    className="mortgage-calc__matches-all"
+                    href={catalogHrefWithMaxPrice(budgetPrice)}
+                    onClick={() =>
                       trackEvent({
-                        type: "mortgage_project_clicked",
+                        type: "mortgage_catalog_clicked",
                         program: programId,
-                        projectId: project.id,
+                        available_budget: Math.round(budgetPrice),
                       })
                     }
                   >
-                    <ProjectCard project={project} />
-                  </div>
-                ))}
+                    {t.viewAll}
+                    <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
+                  </Link>
+                ) : null}
               </div>
-            ) : (
-              <p className="mortgage-calc__matches-empty">{t.projectsEmpty}</p>
-            )}
-          </section>
+
+              {eligible.items.length ? (
+                <div className="mortgage-calc__matches-grid">
+                  {eligible.items.map((project) => (
+                    <div
+                      key={project.id}
+                      onClickCapture={() =>
+                        trackEvent({
+                          type: "mortgage_project_clicked",
+                          program: programId,
+                          projectId: project.id,
+                        })
+                      }
+                    >
+                      <ProjectCard project={project} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="mortgage-calc__matches-empty">{t.projectsEmpty}</p>
+              )}
+            </section>
+          ) : null}
         </div>
       </div>
     </section>

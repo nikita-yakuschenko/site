@@ -44,7 +44,9 @@ export function ProjectBuilt({ project }: { project: CatalogProject }) {
     <section className="section" aria-labelledby="project-built-title">
       <div className="section__inner">
         <p className="eyebrow">{copy.builtEyebrow}</p>
-        <h2 id="project-built-title">{copy.builtHeading}</h2>
+        <h2 id="project-built-title">
+          Как {project.name} выглядит в жизни
+        </h2>
         {tour ? (
           <button
             type="button"

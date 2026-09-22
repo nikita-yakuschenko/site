@@ -16,6 +16,7 @@ import {
 import { ProjectPlans } from '../../../components/project-plans'
 import { ProjectBuilt } from '../../../components/project-built'
 import { ProjectConfig } from '../../../components/project-config'
+import { MortgageCalculator } from '../../../components/mortgage-calculator'
 import { tiersForProject } from '../../../lib/catalog/tiers'
 import { ProjectActions } from '../../../components/project-actions'
 import { SiteChrome } from '../../../components/site-chrome'
@@ -69,6 +70,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const tiers = tiersForProject(project)
   const mortgagePrices = tiers?.filter((tier) => tier.mortgage).map((tier) => tier.price)
   const basePrice = mortgagePrices?.length ? Math.min(...mortgagePrices) : null
+  const standardPrice = tiers?.find((tier) => tier.id === 'standard')?.price ?? null
   const payment = basePrice
     ? monthlyPaymentForProject({
         propertyPrice: basePrice,
@@ -160,6 +162,16 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         <ProjectPlans project={project} />
         <ProjectInteriors project={project} />
         <ProjectBuilt project={project} />
+        {standardPrice ? (
+          <MortgageCalculator
+            key={project.id}
+            projects={[]}
+            initialPropertyPrice={standardPrice}
+            initialProgramId="family"
+            showMatches={false}
+            projectTiers={tiers ?? undefined}
+          />
+        ) : null}
         <ProjectConfig
           project={project}
           basePayment={payment}

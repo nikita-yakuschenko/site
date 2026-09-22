@@ -9,6 +9,12 @@ import { useState, useSyncExternalStore } from "react";
 import { copy } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
 import { tiersForProject } from "../lib/catalog/tiers";
+import {
+  DEFAULT_TIER,
+  readTier,
+  subscribeTier,
+  writeTier,
+} from "../lib/catalog/tier-selection";
 import { LeadForm } from "./lead-form";
 import { SITE } from "../lib/site";
 import type { CatalogProject } from "../lib/catalog/types";
@@ -38,53 +44,6 @@ import {
  * на каждой странице незачем.
  */
 
-/** Ключ хранилища. Выбор общий для каталога, поэтому без слага проекта. */
-const TIER_KEY = "avgst:project-tier";
-
-/* Выбранный уровень живёт в хранилище, а не в состоянии компонента: он
-   общий для всех проектов, и хранилище здесь и есть источник правды.
-   Читаем его через useSyncExternalStore — эффект, который сразу после
-   монтирования дёргает setState, вызывает лишний каскад перерисовок.
-   Серверный снимок всегда «standard»: на сервере хранилища нет, и ответь
-   мы иначе, разметка сервера и браузера разошлись бы. */
-const DEFAULT_TIER = "standard";
-
-const tierListeners = new Set<() => void>();
-
-/* Запасная память на случай, когда хранилище недоступно: в приватном режиме
-   запись молча не проходит, и без этого выбор не держался бы даже до
-   перехода на соседнюю страницу. */
-let tierFallback: string | null = null;
-
-function subscribeTier(listener: () => void) {
-  tierListeners.add(listener);
-  // Соседняя вкладка сменила уровень — эта должна узнать.
-  window.addEventListener("storage", listener);
-  return () => {
-    tierListeners.delete(listener);
-    window.removeEventListener("storage", listener);
-  };
-}
-
-function readTier() {
-  try {
-    return (
-      window.localStorage.getItem(TIER_KEY) ?? tierFallback ?? DEFAULT_TIER
-    );
-  } catch {
-    return tierFallback ?? DEFAULT_TIER;
-  }
-}
-
-function writeTier(id: string) {
-  tierFallback = id;
-  try {
-    window.localStorage.setItem(TIER_KEY, id);
-  } catch {
-    /* записать некуда — выбор живёт до перезагрузки */
-  }
-  tierListeners.forEach((listener) => listener());
-}
 export function ProjectConfig({
   project,
   /** Платёж, посчитанный на сервере, и цена, для которой он посчитан:

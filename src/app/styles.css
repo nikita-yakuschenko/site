@@ -9707,6 +9707,20 @@ html.is-dialog-open {
   }
 }
 
+/* Результат на карточке проекта — часть общей панели, а не ещё одна
+   карточка внутри неё. Правое поле панели остаётся таким же, как у других
+   её элементов: акцент не должен прижиматься к наружной границе. */
+.mortgage-calc--project .mortgage-calc__panel {
+  padding-right: 16px;
+}
+
+@media (min-width: 960px) {
+  .mortgage-calc--project .mortgage-calc__panel {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    column-gap: 32px;
+  }
+}
+
 /* Компактный сегмент: по содержимому, не на всю колонку. */
 .mortgage-calc__modes {
   display: inline-grid;
@@ -9746,6 +9760,24 @@ html.is-dialog-open {
   white-space: nowrap;
   text-align: center;
   cursor: pointer;
+}
+
+/* На странице проекта переключатель режима заменён выбором комплектации.
+   Подпись остаётся частью одного компактного сегмента, а не отдельной
+   строкой, чтобы связь «цена дома — выбранный уровень» читалась сразу. */
+.mortgage-calc__modes--tiers {
+  grid-template-columns: auto auto auto;
+  width: fit-content;
+}
+
+.mortgage-calc__tier-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  white-space: nowrap;
 }
 
 .mortgage-calc__mode.is-active {
@@ -10132,6 +10164,73 @@ html.is-dialog-open {
   line-height: 1.3;
   color: rgb(var(--avgst-ink-rgb) / 0.55);
   text-align: center;
+}
+
+/* Резюме в карточке проекта собрано как чек: последовательность строк,
+   а не таблица. Лидер удерживает взгляд между названием и цифрой, а
+   фиксированная высота карточки не даёт странице сдвигаться при смене
+   комплектации или программы. */
+.mortgage-calc__result--project {
+  grid-template-rows: auto auto 1fr;
+  min-height: 280px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mortgage-calc__project-payment {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--avgst-ink);
+  background: transparent;
+}
+
+.mortgage-calc__project-payment .mortgage-calc__hero-num {
+  font-size: clamp(24px, 2.4vw, 30px);
+  color: var(--avgst-green);
+}
+
+.mortgage-calc__project-payment .mortgage-calc__hero-label {
+  min-height: 0;
+  margin-top: 2px;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.mortgage-calc__receipt {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  min-height: 0;
+  margin: 0;
+  padding: 16px 0 0 2px;
+}
+
+.mortgage-calc__receipt > div {
+  display: grid;
+  grid-template-columns: auto minmax(12px, 1fr) auto;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.mortgage-calc__receipt dt {
+  font-size: 12px;
+  color: rgb(var(--avgst-ink-rgb) / 0.62);
+}
+
+.mortgage-calc__receipt > div > span {
+  border-bottom: 1px dotted rgb(var(--avgst-ink-rgb) / 0.2);
+}
+
+.mortgage-calc__receipt dd {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
 }
 
 /* Подбор проектов внутри панели.
