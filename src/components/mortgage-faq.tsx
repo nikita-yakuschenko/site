@@ -32,7 +32,6 @@ export function MortgageFaq({ content }: { content: WithFaq }) {
       aria-labelledby="mortgage-faq-title"
     >
       <div className="section__inner">
-        <p className="eyebrow">{content.faqEyebrow}</p>
         <h2 id="mortgage-faq-title">{content.faqHeading}</h2>
         {/* Несколько ответов открытыми сразу: вопросы читают вразнобой и
             сверяют между собой, а не идут по одному. */}

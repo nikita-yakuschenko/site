@@ -16,12 +16,14 @@ import { ProjectPlans } from '../../../components/project-plans'
 import { ProjectBuilt } from '../../../components/project-built'
 import { ProjectConfig } from '../../../components/project-config'
 import { ProjectNextSteps } from '../../../components/project-next-steps'
+import { ProjectSimilar } from '../../../components/project-similar'
 import { ContactsSection } from '../../../components/block-renderer'
 import { MortgageCalculator } from '../../../components/mortgage-calculator'
 import { tiersForProject } from '../../../lib/catalog/tiers'
 import { ProjectActions } from '../../../components/project-actions'
 import { SiteChrome } from '../../../components/site-chrome'
 import { FixtureCatalogProvider } from '../../../lib/catalog/fixture-provider'
+import type { CatalogProject } from '../../../lib/catalog/types'
 import { copy, footerAboutFor } from '../../../lib/copy'
 import { monthlyPaymentForProject } from '../../../lib/mortgage'
 import { formatRub } from '../../../lib/locale'
@@ -60,6 +62,12 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params
   const project = await catalog.getBySlug(slug, { siteCode: SITE.code })
   if (!project) notFound()
+
+  const { items: catalogProjects } = await catalog.list({ siteCode: SITE.code })
+  const similarProjects = catalogProjects
+    .filter((item) => item.id !== project.id)
+    .sort((a, b) => similarityScore(project, a) - similarityScore(project, b))
+    .slice(0, 6)
 
   // Маркировка в заголовке идёт фирменным жёлтым: правило .project-hero h1 span
   // уже есть в стилях, нужно лишь отделить число от слова.
@@ -170,6 +178,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             initialProgramId="family"
             showMatches={false}
             projectTiers={tiers ?? undefined}
+            showEyebrow={false}
           />
         ) : null}
         <ProjectConfig
@@ -178,13 +187,28 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           basePrice={basePrice}
         />
         <ProjectNextSteps />
+        <ProjectSimilar projects={similarProjects} />
         <ContactsSection
-          block={{ blockType: 'contactsSection' }}
+          block={{
+            blockType: 'contactsSection',
+            showEyebrow: false,
+            muted: false,
+          }}
           contacts={SITE.contacts}
           siteId={SITE.id}
           pageId={project.id}
         />
       </main>
     </SiteChrome>
+  )
+}
+
+function similarityScore(project: CatalogProject, candidate: CatalogProject) {
+  return (
+    (candidate.series === project.series ? 0 : 1_000) +
+    (candidate.technology === project.technology ? 0 : 250) +
+    Math.abs(candidate.areaValue - project.areaValue) * 2 +
+    Math.abs(candidate.floorsValue - project.floorsValue) * 80 +
+    Math.abs(Number(candidate.bedrooms) - Number(project.bedrooms)) * 40
   )
 }

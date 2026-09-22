@@ -8,8 +8,15 @@ import { VideoLightbox, reviewEmbedSrc } from "./video-lightbox";
 type ReviewVideo = (typeof copy.independentReview.videos)[number];
 
 /** Независимый обзор: слева рассказ, справа кадр, снизу плейлист. */
-export function IndependentReview() {
+export function IndependentReview({
+  showEyebrow = true,
+  headingLines,
+}: {
+  showEyebrow?: boolean;
+  headingLines?: string[];
+}) {
   const data = copy.independentReview;
+  const titleLines = headingLines ?? data.headingLines;
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
   const current: ReviewVideo = data.videos[active] ?? data.videos[0];
@@ -24,9 +31,9 @@ export function IndependentReview() {
       <div className="section__inner independent-review__inner">
         <div className="independent-review__stage">
           <div className="independent-review__copy">
-            <p className="eyebrow">{data.eyebrow}</p>
+            {showEyebrow ? <p className="eyebrow">{data.eyebrow}</p> : null}
             <h2 id="independent-review-title">
-              {data.headingLines.map((line, index) => (
+              {titleLines.map((line, index) => (
                 <Fragment key={line}>
                   {index > 0 ? " " : null}
                   <span className="heading-line">{nbspText(line)}</span>

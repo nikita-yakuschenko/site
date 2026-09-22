@@ -138,9 +138,11 @@ function PopularProjects({
       <div className="section__inner">
         <div className="section__head">
           <div>
-            <p className="eyebrow">
-              {String(block.eyebrow || copy.popularEyebrow)}
-            </p>
+            {block.showEyebrow !== false ? (
+              <p className="eyebrow">
+                {String(block.eyebrow || copy.popularEyebrow)}
+              </p>
+            ) : null}
             <h2>{String(block.heading || copy.popularHeading)}</h2>
           </div>
           {/* Строковая ссылка со стрелкой, а не кнопка: это переход в
@@ -180,9 +182,11 @@ function SeriesBento({ block }: { block: LayoutBlock }) {
       <div className="section__inner">
         <div className="section__head">
           <div>
-            <p className="eyebrow">
-              {String(block.eyebrow || copy.seriesEyebrow)}
-            </p>
+            {block.showEyebrow !== false ? (
+              <p className="eyebrow">
+                {String(block.eyebrow || copy.seriesEyebrow)}
+              </p>
+            ) : null}
             <h2>{String(block.heading || copy.seriesHeading)}</h2>
           </div>
           <a
@@ -231,7 +235,7 @@ function TextSection({ block }: { block: LayoutBlock }) {
   );
 }
 
-function MortgageShowcase() {
+function MortgageShowcase({ block }: { block: LayoutBlock }) {
   const partners = [
     { name: "СберБанк", src: "/logos/banks/sber.svg" },
     { name: "ВТБ", src: "/logos/banks/vtb.svg" },
@@ -251,8 +255,16 @@ function MortgageShowcase() {
             <Image className="mortgage-family__image" src="/persons/family_1.png" alt="" fill sizes="(min-width: 961px) 60vw, 100vw" />
           </div>
           <div className="mortgage-family__body">
-            <p className="eyebrow">Семейная ипотека</p>
-            <h2 id="mortgage-showcase-title">{nbspText("Дом в ипотеку под ")}<em>6%</em></h2>
+            {block.showEyebrow !== false ? (
+              <p className="eyebrow">Семейная ипотека</p>
+            ) : null}
+            <h2 id="mortgage-showcase-title">
+              {nbspText(String(block.heading || "Дом в ипотеку"))}
+              <span className="mortgage-family__heading-tail">
+                {nbspText(String(block.headingTail || "под"))} {" "}
+                <em>{String(block.headingRate || "6%")}</em>
+              </span>
+            </h2>
             <p>
               {/* Тире приклеено к предыдущему слову: иначе оно уходит в начало строки. */}
               {nbspText("Семейная ипотека\u00a0- государственная программа для семей с детьми, которая позволяет построить дом ")}
@@ -346,8 +358,18 @@ function Production({ block }: { block: LayoutBlock }) {
             кадр мог остаться 4×3 и не рвать абзацы по разным строкам сетки. */}
         <div className="production__text">
           <div className="production__head">
-            <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
-            <h2>{nbspText(String(block.heading))}</h2>
+            {block.showEyebrow !== false ? (
+              <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
+            ) : null}
+            <h2>
+              {Array.isArray(block.headingLines)
+                ? block.headingLines.map((line) => (
+                    <span className="heading-line" key={String(line)}>
+                      {nbspText(String(line))}
+                    </span>
+                  ))
+                : nbspText(String(block.heading))}
+            </h2>
             {lead ? <p>{nbspText(String(lead))}</p> : null}
           </div>
           <div className="production__copy">
@@ -437,11 +459,18 @@ export function ContactsSection({
   const phone = useSite ? contacts?.phone : (block.phone as string | undefined);
   const email = useSite ? contacts?.email : (block.email as string | undefined);
   return (
-    <section className="section section--muted" id="contacts">
+    <section
+      className={
+        block.muted === false ? "section" : "section section--muted"
+      }
+      id="contacts"
+    >
       <div className="section__inner contacts">
         <div className="contacts__col">
           <div className="contacts__intro">
-            <p className="eyebrow">{copy.contactsEyebrow}</p>
+            {block.showEyebrow !== false ? (
+              <p className="eyebrow">{copy.contactsEyebrow}</p>
+            ) : null}
             <h2>{String(block.heading || copy.contacts)}</h2>
             <p className="contacts__lead">
               {block.body ? String(block.body) : copy.contactsBody}
@@ -567,11 +596,26 @@ export function BlockRenderer({
         if (block.blockType === "seriesBento") {
           return <SeriesBento key={index} block={block} />;
         }
-        if (block.blockType === "mortgageShowcase") return <MortgageShowcase key={index} />;
+        if (block.blockType === "mortgageShowcase") return <MortgageShowcase key={index} block={block} />;
         if (block.blockType === "independentReview")
-          return <IndependentReview key={index} />;
+          return (
+            <IndependentReview
+              key={index}
+              showEyebrow={block.showEyebrow !== false}
+              headingLines={
+                Array.isArray(block.headingLines)
+                  ? block.headingLines.map(String)
+                  : undefined
+              }
+            />
+          );
         if (block.blockType === "videoTestimonials")
-          return <VideoTestimonials key={index} />;
+          return (
+            <VideoTestimonials
+              key={index}
+              showEyebrow={block.showEyebrow !== false}
+            />
+          );
         if (block.blockType === "referralProgram")
           return (
             <ReferralProgram key={index} siteId={siteId} pageId={pageId} />

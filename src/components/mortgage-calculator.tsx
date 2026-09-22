@@ -113,6 +113,7 @@ export function MortgageCalculator({
   initialProgramId = "family",
   showMatches = true,
   projectTiers,
+  showEyebrow = true,
 }: {
   projects: CatalogProject[];
   initialPropertyPrice?: number;
@@ -122,6 +123,8 @@ export function MortgageCalculator({
   showMatches?: boolean;
   /** На странице проекта калькулятор привязан к ипотечным комплектациям. */
   projectTiers?: readonly PricedTier[];
+  /** На страницах ипотечных программ заголовок уже сам называет блок. */
+  showEyebrow?: boolean;
 }) {
   const region = useSyncExternalStore(
     subscribeRegion,
@@ -386,7 +389,7 @@ export function MortgageCalculator({
         {/* Заголовок вынесен из панели в шапку секции. Колонкой он забирал
             треть ширины у полей и результата, а сам стоял почти пустым. */}
         <header className="mortgage-calc__head">
-          <p className="eyebrow">{t.eyebrow}</p>
+          {showEyebrow ? <p className="eyebrow">{t.eyebrow}</p> : null}
           <h2 id="mortgage-calc-title">
             {projectTiers ? "Расчёт ипотеки" : t.heading}
           </h2>

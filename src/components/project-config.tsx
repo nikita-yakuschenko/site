@@ -81,7 +81,6 @@ export function ProjectConfig({
       aria-labelledby="project-config-title"
     >
       <div className="section__inner">
-        <p className="eyebrow">{copy.configurator}</p>
         <h2 id="project-config-title">{copy.configHeading}</h2>
 
         <div className="project-config">

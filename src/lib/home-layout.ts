@@ -25,7 +25,7 @@ export const HOME_LAYOUT: LayoutBlock[] = [
   },
   {
     blockType: "popularProjects",
-    eyebrow: copy.popularEyebrow,
+    showEyebrow: false,
     heading: copy.popularHeading,
     catalogHref: "/catalog",
     catalogLabel: copy.allProjects,
@@ -33,10 +33,10 @@ export const HOME_LAYOUT: LayoutBlock[] = [
   /* Числа считаются из public/catalog, пока нет CMS. */
   {
     blockType: "seriesBento",
-    heading: copy.seriesHeading,
-    eyebrow: copy.seriesEyebrow,
+    showEyebrow: false,
+    heading: "Подборки проектов",
     catalogHref: "/catalog",
-    catalogLabel: copy.seriesAll,
+    catalogLabel: "Все подборки",
     items: [
       {
         id: "panel",
@@ -74,8 +74,8 @@ export const HOME_LAYOUT: LayoutBlock[] = [
        domaizi.ru — фотография наша, они используют её по соглашению. */
     media: { url: "/production/factory.jpg" },
     mediaMobile: { url: "/production/factory-portrait.jpg" },
-    eyebrow: copy.production,
-    heading: copy.productionHeading,
+    showEyebrow: false,
+    headingLines: ["Производство", "Авангард Строй"],
     body: copy.productionBody,
     steps: copy.productionSteps,
     /* Главный выход — запись на экскурсию: это действие, а не чтение.
@@ -90,14 +90,21 @@ export const HOME_LAYOUT: LayoutBlock[] = [
   },
   {
     blockType: "mortgageShowcase",
+    showEyebrow: false,
+    heading: "Семейная ипотека",
+    headingTail: "под",
+    headingRate: "6%",
   },
   /* Редизайн блоков со старого avgst.ru: независимый обзор канала
      и видеоотзывы семей — сразу после ипотеки, до контактов. */
   {
     blockType: "independentReview",
+    showEyebrow: false,
+    headingLines: ["Независимый обзор", "наших домов"],
   },
   {
     blockType: "videoTestimonials",
+    showEyebrow: false,
   },
   /* Реферальная программа сразу после историй — чересполосица: отзывы muted, реферал белый. */
   {
@@ -105,6 +112,7 @@ export const HOME_LAYOUT: LayoutBlock[] = [
   },
   {
     blockType: "contactsSection",
+    showEyebrow: false,
     heading: copy.contacts,
     body: copy.contactsBody,
     useSiteContacts: true,

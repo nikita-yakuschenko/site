@@ -40,7 +40,6 @@ export function ProjectExteriors({ project }: { project: CatalogProject }) {
   return (
     <section className="section" aria-labelledby="project-exteriors-title">
       <div className="section__inner">
-        <p className="eyebrow">{copy.exteriors}</p>
         <h2 id="project-exteriors-title">{copy.exteriorsHeading}</h2>
         <div className="project-bento">
           {shots.map((src, index) => (
@@ -92,7 +91,6 @@ export function ProjectInteriors({ project }: { project: CatalogProject }) {
       aria-labelledby="project-interiors-title"
     >
       <div className="section__inner">
-        <p className="eyebrow">{copy.interiorsEyebrow}</p>
         <h2 id="project-interiors-title">{copy.interiorsHeading}</h2>
         <div className="project-rows">
           {tiles.map((src, index) => {

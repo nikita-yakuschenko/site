@@ -39,7 +39,6 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
         aria-labelledby="project-plans-title"
       >
         <div className="section__inner">
-          <p className="eyebrow">{copy.plansEyebrow}</p>
           <h2 id="project-plans-title">{copy.plansHeading}</h2>
           <div className="project-plans">
             {project.floorPlans.map((src, index) => (
@@ -100,7 +99,6 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
       aria-labelledby="project-plans-title"
     >
       <div className="section__inner">
-        <p className="eyebrow">{copy.plansEyebrow}</p>
         <h2 id="project-plans-title">{copy.plansHeading}</h2>
 
         {variants.length > 1 ? (

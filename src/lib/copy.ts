@@ -166,7 +166,7 @@ export const copy = {
   plansHeading: "Как он устроен внутри",
   plansLegend: "Экспликация",
   interiorsEyebrow: "Интерьеры",
-  interiorsHeading: "Возможные варианты отделки",
+  interiorsHeading: "Возможные варианты интерьера",
   builtEyebrow: "Построенные дома",
   builtHeading: "Как этот проект выглядит в жизни",
   builtTour: "Видеообзор дома",
@@ -1408,7 +1408,7 @@ export const copy = {
   },
   mortgageCalc: {
     eyebrow: "Калькулятор",
-    heading: "Калькулятор поможет рассчитать ипотеку",
+    heading: "Ипотечный калькулятор",
     lead: "Покажем условия по выбранной программе и проекты, которые впишутся в бюджет.",
     modePayment: "Платёж",
     modeBudget: "Дом по платежу",

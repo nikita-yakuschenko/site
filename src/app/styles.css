@@ -2268,6 +2268,11 @@ a {
   color: #fff;
 }
 
+.mortgage-family__heading-tail,
+.production__head h2 .heading-line {
+  display: block;
+}
+
 /* Ставка — то, за чем читают заголовок: крупнее остального набора и в
    цвете кнопки. Наклон em здесь не нужен. */
 .mortgage-family__body h1 em,
@@ -3006,7 +3011,7 @@ a {
     "stage stage";
   column-gap: var(--gap-tile);
   row-gap: var(--gap-stack);
-  align-items: end;
+  align-items: start;
 }
 
 .video-stories__intro {
@@ -3041,7 +3046,8 @@ a {
   flex-wrap: wrap;
   align-items: center;
   gap: 16px 20px;
-  align-self: end;
+  align-self: start;
+  justify-self: end;
 }
 
 .video-stories__stage {
@@ -11706,6 +11712,121 @@ html.is-dialog-open {
 
 .project-strip > *:active {
   transform: scale(0.985);
+}
+
+/* Похожие проекты продолжают карточку дома, но не повторяют каталог
+   сеткой: лента сохраняет место и оставляет видимым следующий выбор. */
+.project-similar__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap-tile);
+}
+
+.project-similar__head h2 {
+  margin: 0;
+}
+
+.project-similar__controls {
+  display: flex;
+  gap: 6px;
+}
+
+.project-similar__controls button {
+  display: grid;
+  width: 30px;
+  height: 30px;
+  place-items: center;
+  padding: 0;
+  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.14);
+  border-radius: 8px;
+  background: #fff;
+  color: var(--avgst-ink);
+  cursor: pointer;
+  transition:
+    border-color 0.16s var(--ease-out),
+    background-color 0.16s var(--ease-out),
+    color 0.16s var(--ease-out);
+}
+
+.project-similar__controls button:hover:not(:disabled),
+.project-similar__controls button:focus-visible:not(:disabled) {
+  border-color: var(--avgst-ink);
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+.project-similar__controls button:disabled {
+  color: rgb(var(--avgst-ink-rgb) / 0.28);
+  cursor: default;
+}
+
+.project-similar__track {
+  display: grid;
+  grid-auto-flow: column;
+  grid-auto-columns: calc((100% - var(--gap-tile) * 3) / 4);
+  gap: var(--gap-tile);
+  margin-top: var(--gap-stack);
+  padding: 1px 1px 8px;
+  overflow-x: auto;
+  overscroll-behavior-inline: contain;
+  scroll-behavior: smooth;
+  scroll-snap-type: inline mandatory;
+  scrollbar-width: none;
+}
+
+.project-similar__track::-webkit-scrollbar {
+  display: none;
+}
+
+.project-similar__track > .card {
+  height: 100%;
+  scroll-snap-align: start;
+}
+
+.project-similar .card__body {
+  gap: 5px;
+  padding: 12px;
+}
+
+.project-similar .card__body h3 {
+  font-size: 1rem;
+}
+
+.project-similar .specs {
+  gap: 3px 8px;
+  margin-top: 2px;
+  font-size: 12px;
+}
+
+.project-similar .price {
+  margin-top: 5px;
+  font-size: 0.9375rem;
+}
+
+.project-similar .card__cta {
+  min-height: 36px;
+  margin-top: 5px;
+  padding: 8px 12px;
+  font-size: 13px;
+}
+
+@media (max-width: 899px) {
+  .project-similar__track {
+    grid-auto-columns: calc((100% - var(--gap-tile) * 2) / 3);
+  }
+}
+
+@media (max-width: 719px) {
+  .project-similar__track {
+    grid-auto-columns: calc((100% - var(--gap-tile)) / 2);
+  }
+}
+
+@media (max-width: 599px) {
+  .project-similar__track {
+    grid-auto-columns: minmax(260px, 88%);
+  }
 }
 
 /* Видеообзор в разделе построенных домов: крупная плитка с затемнением,

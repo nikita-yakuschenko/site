@@ -44,7 +44,11 @@ export function MortgagePageContent({
   return (
     <>
       <MortgageHero content={content} />
-      <MortgageCalculator projects={projects} initialProgramId={programId} />
+      <MortgageCalculator
+        projects={projects}
+        initialProgramId={programId}
+        showEyebrow={false}
+      />
       {hasWho(content) ? <MortgageWhoFits content={content} /> : null}
       <MortgageSteps content={content} />
       <MortgageFinance content={content} projectCount={projects.length} />
@@ -121,7 +125,6 @@ function MortgageSteps({ content }: { content: MortgageContent }) {
   return (
     <section className="section section--muted" aria-labelledby="mortgage-steps-title">
       <div className="section__inner">
-        <p className="eyebrow">{fm.stepsEyebrow}</p>
         <h2 id="mortgage-steps-title">
           {content.stepsHeading ?? fm.stepsHeading}
         </h2>
@@ -186,7 +189,6 @@ function MortgageFinance({
   return (
     <section className="section" aria-labelledby="mortgage-finance-title">
       <div className="section__inner">
-        <p className="eyebrow">{fm.financeEyebrow}</p>
         <h2 id="mortgage-finance-title">
           {content.financeHeading ?? fm.financeHeading}
         </h2>
@@ -273,7 +275,6 @@ function MortgageConditions({ content }: { content: WithConditions }) {
       aria-labelledby="mortgage-conditions-title"
     >
       <div className="section__inner">
-        <p className="eyebrow">{content.conditionsEyebrow}</p>
         {/* Астериск в заголовке и сноска под списком — одна пара: правила
             выше общие для программы, а банк поверх них ставит свои. */}
         <h2 id="mortgage-conditions-title">
@@ -401,7 +402,6 @@ function MortgageContacts() {
       <div className="section__inner contacts">
         <div className="contacts__col">
           <div className="contacts__intro">
-            <p className="eyebrow">{copy.contactsEyebrow}</p>
             <h2>{fm.formHeading}</h2>
             <p className="contacts__lead">{nbspText(fm.formBody)}</p>
             <div className="contact-list">

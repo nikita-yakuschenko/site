@@ -85,7 +85,11 @@ function StoryCard({
 }
 
 /** Видеоотзывы: крупная история слева, две компактные справа. */
-export function VideoTestimonials() {
+export function VideoTestimonials({
+  showEyebrow = true,
+}: {
+  showEyebrow?: boolean;
+}) {
   const data = copy.videoTestimonials;
   const featured = data.stories[0];
   const side = data.stories.slice(1);
@@ -100,7 +104,7 @@ export function VideoTestimonials() {
     >
       <div className="section__inner video-stories__inner">
         <div className="video-stories__intro">
-          <p className="eyebrow">{data.eyebrow}</p>
+          {showEyebrow ? <p className="eyebrow">{data.eyebrow}</p> : null}
           <h2 id="video-stories-title">
             {data.headingLines.map((line, index) => (
               <Fragment key={line}>

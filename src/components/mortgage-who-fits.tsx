@@ -89,7 +89,6 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
   return (
     <section className="section" aria-labelledby="mortgage-who-title">
       <div className="section__inner">
-        <p className="eyebrow">{content.whoEyebrow}</p>
         <h2 id="mortgage-who-title">{content.whoHeading}</h2>
         <p className="mortgage-page__lead">{nbspText(content.whoLead)}</p>
 

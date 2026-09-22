@@ -107,7 +107,6 @@ export function MortgageOtherPrograms({
       aria-labelledby="mortgage-other-programs-title"
     >
       <div className="section__inner">
-        <p className="eyebrow">{copy.mortgageOtherPrograms.eyebrow}</p>
         <h2 id="mortgage-other-programs-title">
           {copy.mortgageOtherPrograms.heading}
         </h2>
