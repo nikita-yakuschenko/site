@@ -982,10 +982,28 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
       "/catalog/norvegiya-132/19.jpeg",
       "/catalog/norvegiya-132/20.jpeg",
     ],
-    floorPlans: [
-      "/catalog/norvegiya-132/01.jpg",
-      "/catalog/norvegiya-132/21.jpg",
+    /* Один построенный дом — одна планировка: чертёж + экспликация, как
+       на типовой карточке. Без plans раздел рисовал два кадра сеткой. */
+    plans: [
+      {
+        label: "Планировка",
+        image: "/catalog/norvegiya-132/01.jpg",
+        rooms: [
+          { name: "Кухня-гостиная", area: "29,9 м²" },
+          { name: "Мастер-спальня", area: "10,6 м²" },
+          { name: "Спальня", area: "11,8 м²" },
+          { name: "Спальня", area: "9,7 м²" },
+          { name: "Холл", area: "10,5 м²" },
+          { name: "Прихожая", area: "6,1 м²" },
+          { name: "Санузел", area: "5,0 м²" },
+          { name: "Санузел", area: "4,6 м²" },
+          { name: "Котельная", area: "6,2 м²" },
+          { name: "Терраса", area: "26,7 м²" },
+          { name: "Крыльцо", area: "10,7 м²" },
+        ],
+      },
     ],
+    floorPlans: ["/catalog/norvegiya-132/01.jpg"],
     options: [],
   },
   {
