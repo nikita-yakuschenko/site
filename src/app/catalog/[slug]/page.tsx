@@ -19,7 +19,7 @@ import { SiteChrome } from '../../../components/site-chrome'
 import { FixtureCatalogProvider } from '../../../lib/catalog/fixture-provider'
 import type { CatalogProject } from '../../../lib/catalog/types'
 import { copy, footerAboutFor } from '../../../lib/copy'
-import { monthlyPaymentForProject } from '../../../lib/mortgage'
+import { getMortgageProgram, monthlyPaymentForProject } from '../../../lib/mortgage'
 import { formatRub } from '../../../lib/locale'
 import { readServerRegionCode } from '../../../lib/regions'
 import { splitProjectName } from '../../../lib/project-name'
@@ -78,6 +78,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     ? monthlyPaymentForProject({
         propertyPrice: basePrice,
         region: readServerRegionCode(),
+        combinedMarketRateOverride: getMortgageProgram('market').rate,
       })
     : null
 
@@ -177,11 +178,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             showEyebrow={false}
           />
         ) : null}
-        <ProjectConfig
-          project={project}
-          basePayment={payment}
-          basePrice={basePrice}
-        />
+        <ProjectConfig project={project} />
         <ProjectNextSteps />
         <ProjectSimilar projects={similarProjects} />
         <ContactsSection

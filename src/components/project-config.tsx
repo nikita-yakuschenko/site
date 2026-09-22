@@ -8,6 +8,12 @@ import {
 import { useState, useSyncExternalStore } from "react";
 import { copy } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
+import { getMortgageProgram, monthlyPaymentForProject } from "../lib/mortgage";
+import {
+  readRegionCode,
+  readServerRegionCode,
+  subscribeRegion,
+} from "../lib/regions";
 import { tiersForProject } from "../lib/catalog/tiers";
 import {
   DEFAULT_TIER,
@@ -44,35 +50,33 @@ import {
  * на каждой странице незачем.
  */
 
-export function ProjectConfig({
-  project,
-  /** Платёж, посчитанный на сервере, и цена, для которой он посчитан:
-   *  из этой пары берётся ставка. Считать её второй раз в компоненте
-   *  значило бы завести вторую правду о программе. */
-  basePayment,
-  basePrice,
-}: {
-  project: CatalogProject;
-  basePayment: number | null;
-  basePrice: number | null;
-}) {
+export function ProjectConfig({ project }: { project: CatalogProject }) {
   const tiers = tiersForProject(project);
   const tierId = useSyncExternalStore(
     subscribeTier,
     readTier,
     () => DEFAULT_TIER,
   );
+  const region = useSyncExternalStore(
+    subscribeRegion,
+    readRegionCode,
+    readServerRegionCode,
+  );
   const [formOpen, setFormOpen] = useState(false);
 
   if (!tiers) return null;
   const tier = tiers.find((item) => item.id === tierId) ?? tiers[1]!;
 
-  /* Платёж пропорционален цене: при одной ставке, взносе и сроке аннуитет
-     линеен по сумме кредита. У комплектации без ипотеки платежа нет — и
-     речи о ней на экране тоже. */
+  /* Та же модель, что и в калькуляторе карточки: льготная часть ограничена
+     лимитом региона, а остаток комбо-кредита считается по ставке из
+     переключателя «Рыночная». Масштабировать платёж по цене здесь нельзя. */
   const monthly =
-    tier.mortgage && basePayment && basePrice
-      ? Math.round((basePayment * tier.price) / basePrice)
+    tier.mortgage
+      ? monthlyPaymentForProject({
+          propertyPrice: tier.price,
+          region,
+          combinedMarketRateOverride: getMortgageProgram("market").rate,
+        })
       : null;
 
   return (

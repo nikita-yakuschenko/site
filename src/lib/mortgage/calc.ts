@@ -302,6 +302,7 @@ export function monthlyPaymentForProject(input: {
   region: RegionCode;
   downPaymentPercent?: number;
   termYears?: number;
+  combinedMarketRateOverride?: number;
 }): number | null {
   if (!(input.propertyPrice > 0)) return null;
   const programId = input.programId ?? "family";
@@ -315,6 +316,7 @@ export function monthlyPaymentForProject(input: {
     propertyPrice: input.propertyPrice,
     downPayment,
     termYears,
+    combinedMarketRateOverride: input.combinedMarketRateOverride,
   });
   if (!Number.isFinite(result.monthlyPayment) || result.monthlyPayment <= 0) {
     return null;
