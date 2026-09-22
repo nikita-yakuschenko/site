@@ -8,14 +8,19 @@ import { AskDialog } from "./ask-dialog";
 
 /** Два следующих шага после выбора комплектации: увидеть дом и обсудить
  * проект. Они не повторяют форму расчёта выше, а ведут к разным задачам. */
+const DEFAULT_VISIT_IMAGE = "/media/project-next-steps/visit-house.png";
+
 export function ProjectNextSteps({
   readyHome = false,
   reviewImage,
+  visitImage = DEFAULT_VISIT_IMAGE,
 }: {
   readyHome?: boolean;
   reviewImage?: string;
+  visitImage?: string;
 }) {
   const [consultOpen, setConsultOpen] = useState(false);
+  const visitIsDefault = visitImage === DEFAULT_VISIT_IMAGE;
 
   return (
     <section className="section project-next-steps" aria-label="Следующие шаги">
@@ -36,11 +41,12 @@ export function ProjectNextSteps({
           </span>
           <Image
             className="project-next-steps__house"
-            src="/media/project-next-steps/visit-house.png"
+            src={visitImage}
             alt=""
-            width={1974}
-            height={750}
+            width={visitIsDefault ? 1974 : 1024}
+            height={visitIsDefault ? 750 : 576}
             sizes="(min-width: 720px) 50vw, 100vw"
+            quality={visitIsDefault ? 75 : 95}
           />
         </Link>
 

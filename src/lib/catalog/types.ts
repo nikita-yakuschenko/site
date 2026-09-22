@@ -84,6 +84,19 @@ export type PlanVariant = {
   floors?: PlanFloor[]
 }
 
+/** Пункт в описании готового дома: заголовок и необязательные уточнения. */
+export type ReadyHomePoint = {
+  title: string
+  items?: string[]
+}
+
+/** Секция оффера: конструкция или территория. */
+export type ReadyHomeSection = {
+  title: string
+  tone: "quality" | "place"
+  points: ReadyHomePoint[]
+}
+
 export type CatalogProject = {
   id: string
   slug: string
@@ -108,7 +121,12 @@ export type CatalogProject = {
     locationPrepositional?: string
     salePrice: number
     configurationLead: string
-    configuration: string[]
+    /** Плоский список — запасной формат. */
+    configuration?: string[]
+    /** Секции с вложенными пунктами: конструкция, территория. */
+    sections?: ReadyHomeSection[]
+    /** Картинка дома в плитке «Посмотрите дом вживую». */
+    visitImage?: string
   }
   /**
    * Редакционные абзацы раздела «О проекте». Каждый со своей фотографией.

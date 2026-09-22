@@ -12292,7 +12292,7 @@ html.is-dialog-open {
 @media (min-width: 820px) {
   .ready-home-offer {
     grid-template-columns: minmax(0, 1.35fr) minmax(280px, 0.65fr);
-    align-items: stretch;
+    align-items: start;
   }
 }
 
@@ -12316,7 +12316,83 @@ html.is-dialog-open {
   color: rgb(var(--avgst-ink-rgb) / 0.65);
 }
 
-.ready-home-offer__details ul {
+.ready-home-offer__sections {
+  display: grid;
+  gap: 28px;
+  margin-top: 24px;
+  padding-top: 22px;
+  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+}
+
+.ready-home-offer__section h3 {
+  margin: 0 0 14px;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: rgb(var(--avgst-ink-rgb) / 0.55);
+}
+
+.ready-home-offer__points {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ready-home-offer__points > li {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+}
+
+.ready-home-offer__points > li > svg {
+  margin-top: 2px;
+  color: var(--avgst-green);
+}
+
+.ready-home-offer__section--place .ready-home-offer__points > li > svg {
+  color: #2f6b4f;
+}
+
+.ready-home-offer__points > li > div {
+  min-width: 0;
+}
+
+.ready-home-offer__points > li > div > p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.ready-home-offer__points > li > div > ul {
+  display: grid;
+  gap: 6px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ready-home-offer__points > li > div > ul > li {
+  position: relative;
+  padding-left: 1.1em;
+  font-size: 15px;
+  line-height: 1.45;
+  color: rgb(var(--avgst-ink-rgb) / 0.72);
+}
+
+.ready-home-offer__points > li > div > ul > li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: rgb(var(--avgst-ink-rgb) / 0.4);
+}
+
+/* Старый плоский список — если секций ещё нет. */
+.ready-home-offer__flat {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px 24px;
@@ -12326,14 +12402,14 @@ html.is-dialog-open {
   list-style: none;
 }
 
-.ready-home-offer__details li {
+.ready-home-offer__flat li {
   display: flex;
   align-items: flex-start;
   gap: 8px;
   line-height: 1.35;
 }
 
-.ready-home-offer__details li svg {
+.ready-home-offer__flat li svg {
   flex: none;
   margin-top: 2px;
   color: var(--avgst-green);
@@ -12404,7 +12480,7 @@ html.is-dialog-open {
     padding: 20px;
   }
 
-  .ready-home-offer__details ul {
+  .ready-home-offer__flat {
     grid-template-columns: 1fr;
   }
 }
@@ -12618,13 +12694,18 @@ html.is-dialog-open {
   transform: scale(0.985);
 }
 
-/* Просмотр кадра целиком: на плитке он обрезан и уменьшен. */
-/* Колонка, а не сетка по центру: кадру нужно отдать всю оставшуюся высоту,
-   чтобы увеличение шло по экрану. Лента миниатюр и подпись занимают
-   столько, сколько им нужно, остальное достаётся кадру. */
+/* Просмотр кадра целиком: на плитке он обрезан и уменьшен.
+ *
+ * Слот кадра (--photo-lightbox stage) = оставшаяся высота колонки после
+ * паддинга и ленты миниатюр. Размер слота — единственный параметр единства.
+ *
+ * Десктоп: снимок всегда на высоту слота; если при этом ширина не влезает —
+ * max-width слота и прижим кверху.
+ * Мобилка: то же, но главная ось — ширина (обратная схема). */
 .photo-lightbox {
   --photo-lightbox-padding: clamp(12px, 2vw, 24px);
   --photo-lightbox-radius: 16px;
+  --photo-lightbox-stage-max-w: 1760px;
   position: fixed;
   inset: 0;
   box-sizing: border-box;
@@ -12632,14 +12713,11 @@ html.is-dialog-open {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start;
+  gap: var(--photo-lightbox-padding);
   padding: var(--photo-lightbox-padding);
-  background: rgb(0 0 0 / 0.9);
+  background: #0a0a0a;
   animation: photo-lightbox-in 0.2s var(--ease-out);
-}
-
-.photo-lightbox__frame {
-  flex: 0 1 auto;
 }
 
 @keyframes photo-lightbox-in {
@@ -12650,15 +12728,11 @@ html.is-dialog-open {
 
 .photo-lightbox__frame {
   margin: 0;
-  /* Единственная неизменная площадка для любых разделов. Управление
-     накладывается поверх неё и никогда не меняет её габариты. */
   position: relative;
+  flex: 1 1 auto;
   min-height: 0;
-  width: min(
-    1760px,
-    calc(100vw - (var(--photo-lightbox-padding) * 2))
-  );
-  height: calc(100dvh - (var(--photo-lightbox-padding) * 2));
+  width: min(var(--photo-lightbox-stage-max-w), 100%);
+  height: auto;
   overflow: hidden;
   border-radius: var(--photo-lightbox-radius) !important;
   clip-path: inset(0 round var(--photo-lightbox-radius)) !important;
@@ -12709,8 +12783,8 @@ html.is-dialog-open {
 }
 
 /* Кадр занимает ровно ширину площадки, поэтому соседи ждут точно за её
-   краями. Ужиматься под содержимое ему нельзя: снимок вписывается в кадр,
-   а не наоборот. */
+   краями. Прижим кверху: когда снимок ужался по ширине (десктоп) или по
+   высоте (мобилка), пустота остаётся снизу, а не «плавает» по центру. */
 .photo-lightbox__slide {
   flex: 0 0 100%;
   display: flex;
@@ -12720,14 +12794,6 @@ html.is-dialog-open {
   height: 100%;
   overflow: hidden;
   border-radius: var(--photo-lightbox-radius) !important;
-}
-
-/* На телефоне кадр не должен выглядеть как прилипший к верхнему краю
-   баннер: площадка занимает весь viewport, а сам снимок стоит по центру. */
-@media (max-width: 719px) {
-  .photo-lightbox__slide {
-    align-items: center;
-  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -12748,14 +12814,30 @@ html.is-dialog-open {
   cursor: grab;
 }
 
+/* Десктоп: высота слота — главный параметр единства. max-width сжимает
+   высоту обратно по пропорции (CSS replaced-element), если не влезло. */
 .photo-lightbox__slide img {
   display: block;
+  height: 100%;
   width: auto;
-  height: auto;
   max-width: 100%;
-  max-height: 100%;
   border-radius: var(--photo-lightbox-radius) !important;
-  object-fit: contain;
+}
+
+/* Мобилка: та же схема, ось обращена — единство по ширине слота.
+   По вертикали центрируем: узкий экран и так тесный, прижим кверху
+   оставляет пустоту снизу и выглядит как сдвиг. */
+@media (max-width: 719px) {
+  .photo-lightbox__slide {
+    align-items: center;
+  }
+
+  .photo-lightbox__slide img {
+    width: 100%;
+    height: auto;
+    max-width: none;
+    max-height: 100%;
+  }
 }
 
 /* Подпись — слой над кадром, поэтому высоту области просмотра не меняет. */
@@ -12813,8 +12895,7 @@ html.is-dialog-open {
   background: rgb(255 255 255 / 0.26);
 }
 
-.photo-lightbox__close:active,
-.photo-lightbox__nav:active {
+.photo-lightbox__close:active {
   transform: scale(0.94);
 }
 
@@ -12822,6 +12903,12 @@ html.is-dialog-open {
   top: clamp(12px, 3vw, 24px);
   right: clamp(12px, 3vw, 24px);
   z-index: 2;
+}
+
+.photo-lightbox__nav--prev,
+.photo-lightbox__nav--next {
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .photo-lightbox__nav--prev {
@@ -12832,6 +12919,11 @@ html.is-dialog-open {
   right: clamp(8px, 2vw, 24px);
 }
 
+.photo-lightbox__nav--prev:active,
+.photo-lightbox__nav--next:active {
+  transform: translateY(-50%) scale(0.94);
+}
+
 /* На сенсорном экране кадры листают смахом, и стрелки там лишние: они
    занимают края самого кадра и мешают тянуть увеличенный снимок. */
 @media (pointer: coarse) {
@@ -12840,16 +12932,16 @@ html.is-dialog-open {
   }
 }
 
-/* Лента миниатюр внизу: видно, сколько кадров всего и что будет
-   дальше. Она скроллится сама, а не растягивает модалку. */
+/* Лента миниатюр внизу: в потоке колонки, а не absolute поверх кадра —
+   иначе отступ снизу не равен боковым и на Retina лента выглядит обрезанной. */
 .photo-lightbox__strip {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: var(--photo-lightbox-padding);
+  position: relative;
+  flex: 0 0 auto;
   display: flex;
   gap: 8px;
-  padding: 0 clamp(12px, 4vw, 40px);
+  width: min(var(--photo-lightbox-stage-max-w), 100%);
+  max-width: 100%;
+  padding: 0;
   overflow-x: auto;
   scrollbar-width: none;
   scroll-behavior: smooth;

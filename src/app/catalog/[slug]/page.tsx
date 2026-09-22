@@ -206,7 +206,11 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <ProjectConfig project={project} />
           </>
         )}
-        <ProjectNextSteps readyHome={Boolean(readyHome)} reviewImage={project.imageUrl} />
+        <ProjectNextSteps
+          readyHome={Boolean(readyHome)}
+          reviewImage={project.imageUrl}
+          visitImage={readyHome?.visitImage}
+        />
         <ProjectSimilar projects={similarProjects} />
         <ContactsSection
           block={{
