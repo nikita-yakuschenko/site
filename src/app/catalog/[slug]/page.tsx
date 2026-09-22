@@ -8,7 +8,6 @@ import {
   IconRulerMeasure,
   IconStairs,
 } from '@tabler/icons-react'
-import { ProjectAbout } from '../../../components/project-about'
 import {
   ProjectExteriors,
   ProjectInteriors,
@@ -16,6 +15,7 @@ import {
 import { ProjectPlans } from '../../../components/project-plans'
 import { ProjectBuilt } from '../../../components/project-built'
 import { ProjectConfig } from '../../../components/project-config'
+import { ProjectNextSteps } from '../../../components/project-next-steps'
 import { MortgageCalculator } from '../../../components/mortgage-calculator'
 import { tiersForProject } from '../../../lib/catalog/tiers'
 import { ProjectActions } from '../../../components/project-actions'
@@ -156,7 +156,6 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           </div>
         </section>
 
-        <ProjectAbout project={project} />
 
         <ProjectExteriors project={project} />
         <ProjectPlans project={project} />
@@ -177,6 +176,7 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
           basePayment={payment}
           basePrice={basePrice}
         />
+        <ProjectNextSteps project={project} />
       </main>
     </SiteChrome>
   )
