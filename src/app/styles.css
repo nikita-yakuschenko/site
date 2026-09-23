@@ -1091,7 +1091,7 @@ a {
 .manufacture-prep__caption span { display: block; white-space: nowrap; }
 .manufacture-prep__card-image {
   position: absolute;
-  top: 0;
+  top: 5px;
   right: 0;
   width: auto;
   height: 100%;
@@ -1106,6 +1106,7 @@ a {
 }
 @media (prefers-reduced-motion: reduce) {
   .manufacture-prep__card-image { transition: none; }
+  .manufacture-prep__cards li:hover .manufacture-prep__card-image { transform: none; }
 }
 .manufacture-prep__questions { margin-top: var(--gap-section); }
 @media (min-width: 900px) {
@@ -1327,9 +1328,16 @@ a {
   line-height: 1.15;
   letter-spacing: -0.04em;
 }
+.manufacture-assembly__caption {
+  width: calc(100% - 120px);
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.4;
+  color: #475569;
+}
 .manufacture-assembly__card-image {
   position: absolute;
-  top: 0;
+  top: 5px;
   right: 0;
   width: auto;
   height: 100%;
@@ -1342,6 +1350,7 @@ a {
 }
 @media (prefers-reduced-motion: reduce) {
   .manufacture-assembly__card-image { transition: none; }
+  .manufacture-assembly__cards li:hover .manufacture-assembly__card-image { transform: none; }
 }
 @media (min-width: 900px) {
   .manufacture-assembly .manufacture-assembly__cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }

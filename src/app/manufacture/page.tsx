@@ -106,16 +106,23 @@ export default function ManufacturePage() {
             <ol className="mortgage-steps manufacture-assembly__cards">
               {["Сборка каркаса", "Утепление", "Пароизоляция"].map((title, index) => (
                 <li key={title}>
-                  {index === 0 ? (
-                    <Image className="manufacture-assembly__card-image" src="/img/cards/frame_panel.png" alt="" width={320} height={180} sizes="(max-width: 719px) 60vw, 320px" unoptimized />
-                  ) : (
-                    <span
-                      className="mortgage-steps__num"
-                      style={{ WebkitMaskImage: `url('/img/digits/${index + 1}.png')`, maskImage: `url('/img/digits/${index + 1}.png')` }}
-                      aria-hidden="true"
-                    />
-                  )}
+                  <Image
+                    className="manufacture-assembly__card-image"
+                    src={index === 0 ? "/img/cards/frame_panel+gts_explosive.png" : index === 1 ? "/img/cards/frame_panel+gts+insulation_explosive.png" : "/img/cards/panel.png"}
+                    alt=""
+                    width={320}
+                    height={180}
+                    sizes="(max-width: 719px) 60vw, 320px"
+                    unoptimized
+                  />
                   <strong>{title}</strong>
+                  <p className="manufacture-assembly__caption">
+                    {index === 0
+                      ? "Детали каркаса и плитных обшивок собираются в\u00a0единую панель"
+                      : index === 1
+                        ? "В\u00a0готовую панель плотно укладывается утеплитель"
+                        : "Внутренняя поверхность панели покрывается ПВХ-плёнкой 200\u00a0мкрн"}
+                  </p>
                 </li>
               ))}
             </ol>
