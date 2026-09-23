@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { SiteChrome } from "../../components/site-chrome";
 import { ContactsSection } from "../../components/block-renderer";
+import { ManufactureVideoReview } from "../../components/manufacture-video-review";
 import { ManufactureFaq, ManufacturePreparationQuestions, ManufactureProjectQuestions } from "../../components/manufacture-faq";
 import { copy, footerAboutFor } from "../../lib/copy";
 import { SITE } from "../../lib/site";
@@ -79,7 +80,7 @@ export default function ManufacturePage() {
           <div className="section__inner">
             <div className="manufacture-section-head">
               <h2 id="manufacture-machines-title">Подготовка деталей</h2>
-              <p>По конструкторской документации раскраиваем элементы каркаса и обшивки, затем маркируем детали для сборки.</p>
+              <p>По конструкторской документации раскраиваем элементы каркаса и плитные материалы, окрашиваем фасадную и внутреннюю деревянную отделку, затем маркируем детали для сборки.</p>
             </div>
             <ol className="mortgage-steps manufacture-prep__cards">
               {["Несущий каркас", "Плитные материалы", "Покраска"].map((title, index) => (
@@ -95,16 +96,25 @@ export default function ManufacturePage() {
             <ManufacturePreparationQuestions />
           </div>
         </section>
+        <ManufactureVideoReview />
         <section className="section manufacture-assembly" aria-labelledby="manufacture-assembly-title">
-          <div className="section__inner manufacture-assembly__inner">
-            <figure className="manufacture-assembly__visual">
-              <Image src="/production/factory.jpg" alt="Сборка панелей в производственном цехе Авангард Строй" fill sizes="(max-width: 719px) 100vw, 48vw" />
-            </figure>
-            <div className="manufacture-assembly__copy">
+          <div className="section__inner">
+            <div className="manufacture-section-head">
               <h2 id="manufacture-assembly-title">Сборка панелей</h2>
-              <p>Детали каркаса и плитной обшивки перемещают на сборочные столы. Здесь из них собирают несущие конструкции панелей.</p>
-              <p>Каркас утепляют, затем укладывают пароизоляционную плёнку.</p>
+              <p>На сборочных столах из подготовленных деталей собираем каркас панелей, утепляем его и укладываем пароизоляционную плёнку.</p>
             </div>
+            <ol className="mortgage-steps manufacture-assembly__cards">
+              {["Сборка каркаса", "Утепление", "Пароизоляция"].map((title, index) => (
+                <li key={title}>
+                  <span
+                    className="mortgage-steps__num"
+                    style={{ WebkitMaskImage: `url('/img/digits/${index + 1}.png')`, maskImage: `url('/img/digits/${index + 1}.png')` }}
+                    aria-hidden="true"
+                  />
+                  <strong>{title}</strong>
+                </li>
+              ))}
+            </ol>
           </div>
         </section>
         <section className="section manufacture-routes" aria-labelledby="manufacture-routes-title">
