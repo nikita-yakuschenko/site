@@ -106,11 +106,15 @@ export default function ManufacturePage() {
             <ol className="mortgage-steps manufacture-assembly__cards">
               {["Сборка каркаса", "Утепление", "Пароизоляция"].map((title, index) => (
                 <li key={title}>
-                  <span
-                    className="mortgage-steps__num"
-                    style={{ WebkitMaskImage: `url('/img/digits/${index + 1}.png')`, maskImage: `url('/img/digits/${index + 1}.png')` }}
-                    aria-hidden="true"
-                  />
+                  {index === 0 ? (
+                    <Image className="manufacture-assembly__card-image" src="/img/cards/frame_panel.png" alt="" width={320} height={180} sizes="(max-width: 719px) 60vw, 320px" unoptimized />
+                  ) : (
+                    <span
+                      className="mortgage-steps__num"
+                      style={{ WebkitMaskImage: `url('/img/digits/${index + 1}.png')`, maskImage: `url('/img/digits/${index + 1}.png')` }}
+                      aria-hidden="true"
+                    />
+                  )}
                   <strong>{title}</strong>
                 </li>
               ))}

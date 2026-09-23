@@ -1327,6 +1327,22 @@ a {
   line-height: 1.15;
   letter-spacing: -0.04em;
 }
+.manufacture-assembly__card-image {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: auto;
+  height: 100%;
+  object-fit: contain;
+  pointer-events: none;
+  transition: transform 0.25s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .manufacture-assembly__cards li:hover .manufacture-assembly__card-image { transform: translateY(-5px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .manufacture-assembly__card-image { transition: none; }
+}
 @media (min-width: 900px) {
   .manufacture-assembly .manufacture-assembly__cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
