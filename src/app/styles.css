@@ -1082,6 +1082,13 @@ a {
   line-height: 1.15;
   letter-spacing: -0.04em;
 }
+.manufacture-machines .manufacture-prep__cards .manufacture-prep__caption {
+  position: absolute;
+  top: 84px;
+  left: var(--page-gutter);
+  margin: 0;
+}
+.manufacture-prep__caption span { display: block; white-space: nowrap; }
 .manufacture-prep__card-image {
   position: absolute;
   top: 0;

@@ -84,16 +84,11 @@ export default function ManufacturePage() {
             <ol className="mortgage-steps manufacture-prep__cards">
               {["Несущий каркас", "Плитные материалы", "Покраска"].map((title, index) => (
                 <li key={title}>
-                  {index < 2 ? (
-                    <Image className="manufacture-prep__card-image" src={index === 0 ? "/img/cards/wbz.png" : "/img/cards/format.png"} alt="" width={320} height={180} sizes="(max-width: 719px) 60vw, 320px" unoptimized />
-                  ) : (
-                    <span
-                      className="mortgage-steps__num"
-                      style={{ WebkitMaskImage: `url('/img/digits/${index + 1}.png')`, maskImage: `url('/img/digits/${index + 1}.png')` }}
-                      aria-hidden="true"
-                    />
-                  )}
+                  <Image className="manufacture-prep__card-image" src={index === 0 ? "/img/cards/wbz.png" : index === 1 ? "/img/cards/format.png" : "/img/cards/imitation2.png"} alt="" width={320} height={180} sizes="(max-width: 719px) 60vw, 320px" unoptimized />
                   <strong>{index === 0 ? <>Несущий<br />каркас</> : index === 1 ? <>Плитные<br />материалы</> : title}</strong>
+                  <p className="manufacture-prep__caption">
+                    {index === 0 ? <><span>Детали каркаса</span><span>вырезаются на станке с ЧПУ</span></> : index === 1 ? <><span>Листы OSB и GTS разрезаются</span><span>на станке точно в размер</span></> : <><span>Отделочные материалы</span><span>окрашиваются</span><span>на специальной линии</span></>}
+                  </p>
                 </li>
               ))}
             </ol>
