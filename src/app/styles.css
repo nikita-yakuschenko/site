@@ -1383,7 +1383,34 @@ a {
 
 .section.manufacture-finish { background: #fff; }
 .section.manufacture-assembly { background: var(--page); }
+.section.manufacture-dispatch { padding-bottom: 0; background: #fff; }
 .section.manufacture-routes { background: var(--page); }
+
+.manufacture-dispatch__stage {
+  position: relative;
+  height: clamp(100px, 11vw, 150px);
+  overflow-x: clip;
+  overflow-y: visible;
+}
+.manufacture-dispatch__truck {
+  position: absolute;
+  bottom: clamp(-17px, -1.15vw, -10px);
+  left: 0;
+  width: clamp(300px, 34vw, 500px);
+  will-change: transform;
+}
+.manufacture-dispatch__truck img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+@media (prefers-reduced-motion: reduce) {
+  .manufacture-dispatch__truck {
+    left: 50%;
+    transform: translateX(-50%) !important;
+    will-change: auto;
+  }
+}
 
 .manufacture-assembly .manufacture-assembly__cards li { min-height: 160px; }
 .manufacture-assembly .manufacture-assembly__cards strong {

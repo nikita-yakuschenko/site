@@ -6,6 +6,7 @@ import { SiteChrome } from "../../components/site-chrome";
 import { ContactsSection } from "../../components/block-renderer";
 import { LeadDialogButton } from "../../components/lead-dialog";
 import { ManufactureVideoReview } from "../../components/manufacture-video-review";
+import { ManufactureTruckTransition } from "../../components/manufacture-truck-transition";
 import { ManufactureFaq, ManufacturePreparationQuestions, ManufactureProjectQuestions } from "../../components/manufacture-faq";
 import { copy, footerAboutFor } from "../../lib/copy";
 import { SITE } from "../../lib/site";
@@ -133,27 +134,11 @@ export default function ManufacturePage() {
             </ol>
           </div>
         </section>
+        <ManufactureTruckTransition />
         <section className="section manufacture-routes" aria-labelledby="manufacture-routes-title">
           <div className="section__inner">
             <div className="manufacture-section-head">
-              <h2 id="manufacture-routes-title">Два пути после сборки панелей</h2>
-              <p>Дальнейший процесс зависит от того, какой дом мы производим.</p>
-            </div>
-            <div className="manufacture-routes__grid">
-              <article className="manufacture-route">
-                <h3>Панельно-каркасный дом</h3>
-                <p>На этом производство домокомплекта завершено. Готовые панели перемещают на склад, где они ожидают отгрузки к началу строительства.</p>
-              </article>
-              <article className="manufacture-route">
-                <h3>Модульный дом</h3>
-                <p>Панели отправляют на участок сборки. Из них собирают модули и продолжают работы внутри:</p>
-                <ul>
-                  <li>Прокладывают коммуникации и электрику</li>
-                  <li>Укладывают напольное покрытие и выполняют отделку</li>
-                  <li>В мокрых зонах делают гидроизоляцию, укладывают керамогранит и устанавливают сантехнику</li>
-                </ul>
-                <p>Модули доукомплектовывают, упаковывают и отправляют на склад готовой продукции.</p>
-              </article>
+              <h2 id="manufacture-routes-title">А&nbsp;для модульного дома<br />всё только начинается</h2>
             </div>
           </div>
         </section>
