@@ -1345,6 +1345,7 @@ a {
   pointer-events: none;
   transition: transform 0.25s var(--ease-out);
 }
+.manufacture-assembly__cards li:nth-child(3) .manufacture-assembly__card-image { right: 16px; }
 @media (hover: hover) and (pointer: fine) {
   .manufacture-assembly__cards li:hover .manufacture-assembly__card-image { transform: translateY(-5px); }
 }
