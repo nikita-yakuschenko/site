@@ -1154,7 +1154,7 @@ a {
 .manufacture-prep__caption span { display: block; white-space: nowrap; }
 .manufacture-prep__card-image {
   position: absolute;
-  top: 5px;
+  top: 0;
   right: 0;
   width: auto;
   height: 100%;
