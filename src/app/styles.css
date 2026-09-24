@@ -10807,12 +10807,19 @@ html.is-dialog-open {
 
 .mortgage-calc__reveal-copy {
   display: grid;
+  /* Базовый блок рассчитан на баннер: там содержимое стоит по своей
+     ширине (justify-items: start) и по центру клетки. В панели расчёта
+     строки должны тянуться во всю ширину, иначе цифры прижимаются
+     влево, а справа остаётся пустое поле. */
+  justify-items: stretch;
   /* Не start: содержимое на несколько пикселей короче клетки, и кнопка
      расчёта не доставала до низа — форма, прижатая к низу, садилась
      мимо неё. space-between дотягивает кнопку до края, разница уходит
      в просветы между строками расчёта. */
   align-content: space-between;
-  gap: inherit;
+  /* Свой просвет, а не inherit: раньше он наследовался от обёртки, где
+     gap не задан вовсе, и строки расчёта слипались с кнопкой. */
+  gap: 12px;
   transition: opacity 0.3s var(--ease-out);
 }
 
@@ -10825,10 +10832,10 @@ html.is-dialog-open {
   position: relative;
   z-index: 1;
   display: grid;
-  /* Форма прижата к низу: её кнопка встаёт ровно туда, где стояла
-     кнопка расчёта. Иначе при раскрытии кнопка уезжает, и подмена
-     читается как прыжок. */
-  align-content: end;
+  /* Форма тянется во всю клетку: её кнопка встаёт ровно туда, где
+     стояла кнопка расчёта. Иначе при раскрытии кнопка уезжает, и
+     подмена читается как прыжок. */
+  align-content: stretch;
   pointer-events: none;
 }
 
@@ -10841,7 +10848,12 @@ html.is-dialog-open {
   color: var(--avgst-ink);
 }
 
+/* Светлый вариант общей карточки. Базовая рассчитана на тёмный баннер:
+   там весь текст белый. Здесь она лежит на белой панели расчёта, и
+   подписи полей нужно вернуть в чернила. */
 .mortgage-calc__reveal-card {
+  --lead-ink: var(--avgst-ink-rgb);
+  color: var(--avgst-ink);
   position: relative;
   width: 100%;
   opacity: 0;
@@ -10860,12 +10872,39 @@ html.is-dialog-open {
 
 /* Внутри карточки результата форма без своей рамки и фона: коробкой
    служит сама карточка. */
+/* Форма занимает всю высоту панели и распределяет по ней поля: панель
+   не должна менять размер между расчётом и формой — иначе соседние
+   блоки дёргаются при каждом нажатии. Прижать форму к низу мало:
+   сверху оставалось пустое поле в треть карточки. */
 .mortgage-calc__reveal-card .lead-card,
 .mortgage-calc__reveal-card .lead-form {
+  height: 100%;
+  justify-content: space-between;
   gap: 12px;
   padding: 0;
   border: 0;
   background: transparent;
+}
+
+/* В панели расчёта форма занимает её целиком: базовое ограничение в
+   340px — это вид для баннера, где поля не должны растягиваться на всю
+   колонку. Здесь из-за него форма была у́же кнопки расчёта, и правое
+   поле выходило вдвое шире левого. */
+.mortgage-calc__reveal-card {
+  max-width: none;
+  /* Подъём первой подписи на свою высоту — приём баннера: там она
+     встаёт в строку заголовка, который остаётся видимым. Здесь над
+     формой ничего нет, и подпись с крестиком вылезали за верх панели. */
+  --lead-caption: 0px;
+}
+
+/* Кнопка формы встаёт на место кнопки расчёта, значит и ширина у неё
+   та же. Базовое правило сужает её по надписи — это вид для баннера,
+   где рядом нет кнопки, которую надо повторить. */
+.mortgage-calc__reveal-card .lead-card button[type="submit"],
+.mortgage-calc__reveal-card .lead-form button[type="submit"] {
+  align-self: stretch;
+  width: 100%;
 }
 
 .mortgage-calc__result-cta {
@@ -12743,7 +12782,7 @@ html.is-dialog-open {
 
 /* Кнопка и форма — одна группа, прижатая к низу: пока панель тянется до
    низа ряда, лишний воздух должен оставаться над ней, а не под. */
-.project-config__action {
+.panel-lead {
   display: grid;
   margin-top: auto;
 }
@@ -12751,7 +12790,7 @@ html.is-dialog-open {
 /* Форма в панели итога: закрытая строка высоты 0fr раскатывается до
    1fr. Анимировать height нечем — она auto; grid-строка это умеет, и
    переход прерывается на полпути, если закрыть не дожидаясь конца. */
-.project-config__form {
+.panel-lead__form {
   display: grid;
   min-width: 0;
   /* Панель — флекс-колонка, а её элементы по умолчанию не сжимаются
@@ -12767,12 +12806,12 @@ html.is-dialog-open {
     opacity 0.3s var(--ease-out);
 }
 
-.project-config__form[data-open="true"] {
+.panel-lead__form[data-open="true"] {
   grid-template-rows: 1fr;
   opacity: 1;
 }
 
-.project-config__form > div {
+.panel-lead__form > div {
   position: relative;
   min-height: 0;
   overflow: hidden;
@@ -12780,7 +12819,7 @@ html.is-dialog-open {
 
 /* Форма — часть панели, а не карточка в карточке: своя рамка и фон здесь
    рисовали вторую коробку внутри первой. */
-.project-config__form .lead-card {
+.panel-lead__form .lead-card {
   /* Боковой запас: у чекбокса согласия при ошибке обводка 2px с отступом
      1px, и край обрезающего блока срезал её. Шесть пикселей поля
      незаметны, срезанная рамка — нет. */
@@ -12797,20 +12836,20 @@ html.is-dialog-open {
     transform 0.5s 0.08s cubic-bezier(0.22, 0.61, 0.36, 1);
 }
 
-.project-config__form[data-open="true"] .lead-card {
+.panel-lead__form[data-open="true"] .lead-card {
   opacity: 1;
   transform: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .project-config__form .lead-card {
+  .panel-lead__form .lead-card {
     transition: none;
   }
 }
 
 /* Поле в фокусе отмечается своей гранью, а не зелёной рамкой общего
    правила: та рисовалась поверх скруглённого поля вторым контуром. */
-.project-config__form .lead-card input:focus-visible {
+.panel-lead__form .lead-card input:focus-visible {
   outline: none;
   border-color: var(--ink-2);
   box-shadow: 0 0 0 3px var(--tint);
@@ -12820,27 +12859,27 @@ html.is-dialog-open {
    общего правила вылезала за грань панели, а раскрытая форма обрезала её
    по краю. Колонке с текстом нужен min-width: 0, иначе она держит ширину
    самой длинной ссылки. */
-.project-config__form .lead-card .lead-form__consent {
+.panel-lead__form .lead-card .lead-form__consent {
   white-space: normal;
 }
 
-.project-config__form .lead-card .lead-form__consent > * {
+.panel-lead__form .lead-card .lead-form__consent > * {
   min-width: 0;
   overflow-wrap: anywhere;
 }
 
 /* Форма живёт в узкой колонке: без этого её поля держат свою ширину и
    вылезают за грань панели. */
-.project-config__form .lead-card,
-.project-config__form .lead-card label,
-.project-config__form .lead-card input,
-.project-config__form .lead-card .btn {
+.panel-lead__form .lead-card,
+.panel-lead__form .lead-card label,
+.panel-lead__form .lead-card input,
+.panel-lead__form .lead-card .btn {
   min-width: 0;
   max-width: 100%;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .project-config__form {
+  .panel-lead__form {
     transition: none;
   }
 }

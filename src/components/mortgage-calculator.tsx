@@ -1,10 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  IconPencil,
-  IconX,
-} from "@tabler/icons-react";
+import { IconPencil } from "@tabler/icons-react";
 import {
   useEffect,
   useEffectEvent,
@@ -23,7 +20,6 @@ import {
   subscribeTier,
   writeTier,
 } from "../lib/catalog/tier-selection";
-import { LeadForm } from "./lead-form";
 import { RangeSlider } from "./range-slider";
 import { formatRub } from "../lib/locale";
 import { SITE } from "../lib/site";
@@ -43,6 +39,7 @@ import {
   subscribeRegion,
 } from "../lib/regions";
 import { IconArrowUpRight } from "@tabler/icons-react";
+import { LeadReveal } from "./lead-reveal";
 import { ProjectCard } from "./project-card";
 
 const t = copy.mortgageCalc;
@@ -143,7 +140,6 @@ export function MortgageCalculator({
   const selectedTier = mortgageTiers?.find((tier) => tier.id === selectedTierId)
     ?? mortgageTiers?.[0];
   /* Форма заявки проявляется на месте карточки результата. */
-  const [leadOpen, setLeadOpen] = useState(false);
   const fm = copy.familyMortgage;
   const [mode, setMode] = useState<Mode>("payment");
   const [programId, setProgramId] =
@@ -617,18 +613,24 @@ export function MortgageCalculator({
               </>
             ) : (
               <>
-            {/* Содержимое карточки и форма лежат в одной клетке и
-                перекрещиваются прозрачностью: по нажатию расчёт гаснет,
-                форма проявляется ровно в его габаритах. Ни карточка, ни
-                соседние блоки при этом не двигаются. */}
-            <div
-              className={
-                leadOpen
-                  ? "mortgage-calc__reveal is-open"
-                  : "mortgage-calc__reveal"
-              }
+            {/* Тот же приём, что и в баннерах: содержимое и форма лежат
+                в одной клетке и перекрещиваются прозрачностью. Раньше он
+                был здесь переписан заново — теперь это общий LeadReveal,
+                которому переданы местные классы раскладки. */}
+            <LeadReveal
+              siteId={SITE.id}
+              label={t.resultCta}
+              heading={fm.formHeading}
+              submitLabel={t.resultCta}
+              meta={leadMeta}
+              buttonClassName="btn btn-yellow mortgage-calc__result-cta"
+              classes={{
+                root: "mortgage-calc__reveal",
+                copy: "mortgage-calc__reveal-copy",
+                slot: "mortgage-calc__reveal-slot",
+                card: "mortgage-calc__reveal-card",
+              }}
             >
-              <div className="mortgage-calc__reveal-copy">
             <p className="mortgage-calc__hero-num">
               {mode === "payment"
                 ? formatRub(Math.round(activeResult.monthlyPayment))
@@ -730,40 +732,7 @@ export function MortgageCalculator({
               )}
             </div>
 
-            <button
-              type="button"
-              className="btn btn-yellow mortgage-calc__result-cta"
-              onClick={() => setLeadOpen(true)}
-            >
-              {t.resultCta}
-            </button>
-              </div>
-
-              <div className="mortgage-calc__reveal-slot" aria-hidden={!leadOpen}>
-                <div className="mortgage-calc__reveal-card">
-                  {/* Крестик в строке подписи первого поля, у правого края. */}
-                  <button
-                    type="button"
-                    className="lead-reveal__close"
-                    aria-label={copy.close}
-                    onClick={() => setLeadOpen(false)}
-                  >
-                    <IconX size={14} stroke={2.4} />
-                  </button>
-                  <LeadForm
-                    siteId={SITE.id}
-                    variant="card"
-                    compact
-                    heading={fm.formHeading}
-                    submitLabel={t.resultCta}
-                    meta={leadMeta}
-                  />
-                </div>
-              </div>
-            </div>
-            {/* Подпись общая для обоих состояний: не гаснет и держит
-                кнопку на одном месте — до раскрытия и после. */}
-            <p className="mortgage-calc__result-note">{t.resultNote}</p>
+            </LeadReveal>
               </>
             )}
           </aside>

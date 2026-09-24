@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  IconArrowUpRight,
-  IconCheck,
-  IconGiftFilled,
-} from "@tabler/icons-react";
+import { IconCheck, IconGiftFilled } from "@tabler/icons-react";
 import { useState, useSyncExternalStore } from "react";
 import { copy } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
@@ -21,8 +17,7 @@ import {
   subscribeTier,
   writeTier,
 } from "../lib/catalog/tier-selection";
-import { LeadForm } from "./lead-form";
-import { SITE } from "../lib/site";
+import { PanelLeadForm } from "./panel-lead-form";
 import type { CatalogProject } from "../lib/catalog/types";
 import {
   Accordion,
@@ -160,48 +155,23 @@ export function ProjectConfig({ project }: { project: CatalogProject }) {
                 <span>{copy.configDeliveryNote}</span>
               </p>
             )}
-            {/* Форма открывается здесь же, а не уводит якорем в подвал:
-                человек нажал на расчёт, глядя на выбранную комплектацию,
-                и терять её из виду ему незачем. Панель раскатывается,
-                потому что форма выше кнопки — подстановка на месте
-                рванула бы высоту рывком. */}
-            {/* Кнопка и форма — одна группа, прижатая к низу панели:
-                между ними ничего не должно распахиваться. */}
-            <div className="project-config__action">
-              {formOpen ? null : (
-                <button
-                  type="button"
-                  className="btn btn-yellow"
-                  onClick={() => setFormOpen(true)}
-                >
-                  {copy.getQuote}
-                  <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
-                </button>
-              )}
-
-              <div
-                className="project-config__form"
-                data-open={formOpen ? "true" : "false"}
-              >
-                <div>
-                  <LeadForm
-                    siteId={SITE.id}
-                    projectExternalId={project.id}
-                    variant="card"
-                    compact
-                    heading={copy.getQuote}
-                    submitLabel={copy.getQuote}
-                    /* Заявка уходит с выбранным уровнем и его ценой: иначе
-                     разговор начинается с «а что вы смотрели?». */
-                    meta={{
-                      project: project.name,
-                      tier: tier.name,
-                      price: tier.price,
-                    }}
-                  />
-                </div>
-              </div>
-            </div>
+            {/* Тот же блок, что и в предложении готового дома: кнопка,
+                на месте которой вырастает форма. Панель при этом
+                переворачивается в тёмную — про открытие ей сообщает сам
+                блок. */}
+            <PanelLeadForm
+              label={copy.getQuote}
+              heading={copy.getQuote}
+              projectExternalId={project.id}
+              onOpenChange={setFormOpen}
+              /* Заявка уходит с выбранным уровнем и его ценой: иначе
+                 разговор начинается с «а что вы смотрели?». */
+              meta={{
+                project: project.name,
+                tier: tier.name,
+                price: tier.price,
+              }}
+            />
           </aside>
         </div>
 

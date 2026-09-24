@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { LeadDialogButton } from './lead-dialog'
 import { SiteChrome } from './site-chrome'
 import { copy, footerAboutFor } from '../lib/copy'
 import { SITE } from '../lib/site'
@@ -49,9 +49,15 @@ export function InfoPage({
                 ))}
               </ul>
             ) : null}
-            <Link className="btn btn-yellow info-page__cta" href="/#contacts">
-              {cta}
-            </Link>
+            {/* Форма открывается здесь же. Прежде кнопка вела якорем на
+                «/#contacts» — то есть уносила человека с этой страницы на
+                главную, в подвал, ради трёх полей. */}
+            <LeadDialogButton
+              className="btn btn-yellow info-page__cta"
+              label={cta}
+              heading={cta}
+              pageId={eyebrow}
+            />
           </div>
         </section>
       </main>

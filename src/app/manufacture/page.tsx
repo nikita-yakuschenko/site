@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
-import { IconArrowUpRight, IconChevronRight } from "@tabler/icons-react";
+import { IconChevronRight } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
 import { SiteChrome } from "../../components/site-chrome";
 import { ContactsSection } from "../../components/block-renderer";
+import { LeadDialogButton } from "../../components/lead-dialog";
 import { ManufactureVideoReview } from "../../components/manufacture-video-review";
 import { ManufactureFaq, ManufacturePreparationQuestions, ManufactureProjectQuestions } from "../../components/manufacture-faq";
 import { copy, footerAboutFor } from "../../lib/copy";
@@ -46,10 +47,14 @@ export default function ManufacturePage() {
                 <span>ваш дом</span>
               </h1>
               <p>{copy.productionLead}</p>
-              <Link className="btn btn-yellow" href="#contacts">
-                {copy.factoryTour}
-                <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
-              </Link>
+              {/* Та же форма, что и в остальных местах, — на месте, а не
+                  якорем к блоку контактов в конце страницы. */}
+              <LeadDialogButton
+                label={copy.factoryTour}
+                heading={copy.factoryTour}
+                submitLabel={copy.factoryTour}
+                pageId="manufacture"
+              />
               </div>
             </div>
           </div>

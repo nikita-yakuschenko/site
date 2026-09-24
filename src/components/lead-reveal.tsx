@@ -22,6 +22,9 @@ export function LeadReveal({
   heading,
   body,
   submitLabel,
+  meta,
+  classes,
+  buttonClassName = 'btn btn-yellow',
   children,
 }: {
   siteId: number | string
@@ -29,18 +32,33 @@ export function LeadReveal({
   heading: string
   body?: string | null
   submitLabel?: string | null
+  /** Данные расчёта, уходящие вместе с заявкой. */
+  meta?: Record<string, unknown>
+  /** Местные классы поверх базовых: блок остаётся общим, а раскладка
+   *  у каждого своя — в калькуляторе форма садится на место кнопки
+   *  расчёта, в баннере просто занимает клетку. */
+  classes?: { root?: string; copy?: string; slot?: string; card?: string }
+  buttonClassName?: string
   /** Содержимое блока, которое гаснет на время показа формы. */
   children?: React.ReactNode
 }) {
   const [open, setOpen] = useState(false)
 
   return (
-    <div className={open ? 'lead-reveal is-open' : 'lead-reveal'}>
-      <div className="lead-reveal__copy">
+    <div
+      className={[
+        'lead-reveal',
+        classes?.root,
+        open ? 'is-open' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
+      <div className={['lead-reveal__copy', classes?.copy].filter(Boolean).join(' ')}>
         {children}
         <button
           type="button"
-          className="btn btn-yellow"
+          className={buttonClassName}
           onClick={() => setOpen(true)}
         >
           {label}
@@ -48,8 +66,11 @@ export function LeadReveal({
         </button>
       </div>
 
-      <div className="lead-reveal__slot" aria-hidden={!open}>
-        <div className="lead-reveal__card">
+      <div
+        className={['lead-reveal__slot', classes?.slot].filter(Boolean).join(' ')}
+        aria-hidden={!open}
+      >
+        <div className={['lead-reveal__card', classes?.card].filter(Boolean).join(' ')}>
           {/* Крестик в строке подписи первого поля, у правого края. */}
           <button
             type="button"
@@ -66,6 +87,7 @@ export function LeadReveal({
             heading={heading}
             body={body}
             submitLabel={submitLabel}
+            meta={meta}
           />
         </div>
       </div>

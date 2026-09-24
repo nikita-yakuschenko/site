@@ -19,7 +19,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import Link from "next/link";
-import { AskDialog } from "./ask-dialog";
+import { LeadDialog } from "./lead-dialog";
 import { copy } from "../lib/copy";
 import { copyrightYears, FOOTER_SOCIALS, footerSocialHref } from "../lib/site";
 import { mediaUrl } from "../lib/media";
@@ -579,7 +579,7 @@ export function SiteChrome({
         </div>
       </footer>
 
-      {askOpen ? <AskDialog onClose={() => setAskOpen(false)} /> : null}
+      {askOpen ? <LeadDialog onClose={() => setAskOpen(false)} /> : null}
     </div>
   );
 }

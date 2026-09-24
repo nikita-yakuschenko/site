@@ -4,7 +4,7 @@ import { IconArrowUpRight } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
-import { AskDialog } from "./ask-dialog";
+import { LeadDialog } from "./lead-dialog";
 
 /** Два следующих шага после выбора комплектации: увидеть дом и обсудить
  * проект. Они не повторяют форму расчёта выше, а ведут к разным задачам. */
@@ -101,7 +101,7 @@ export function ProjectNextSteps({
         )}
       </div>
 
-      {!readyHome && consultOpen ? <AskDialog onClose={() => setConsultOpen(false)} /> : null}
+      {!readyHome && consultOpen ? <LeadDialog onClose={() => setConsultOpen(false)} /> : null}
     </section>
   );
 }

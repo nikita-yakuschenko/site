@@ -1,11 +1,10 @@
 "use client";
 
-import { IconArrowUpRight, IconCheck, IconTrees } from "@tabler/icons-react";
+import { IconCheck, IconTrees } from "@tabler/icons-react";
 import { useState } from "react";
 import type { CatalogProject, ReadyHomeSection } from "../lib/catalog/types";
 import { formatRub } from "../lib/locale";
-import { SITE } from "../lib/site";
-import { LeadForm } from "./lead-form";
+import { PanelLeadForm } from "./panel-lead-form";
 
 export function ReadyHomeOffer({ project }: { project: CatalogProject }) {
   const ready = project.readyHome;
@@ -49,31 +48,20 @@ export function ReadyHomeOffer({ project }: { project: CatalogProject }) {
               <span>{project.name}</span>
             </div>
 
-            {formOpen ? (
-              <LeadForm
-                siteId={SITE.id}
-                projectExternalId={project.id}
-                variant="card"
-                compact
-                heading="Получить предложение"
-                submitLabel="Получить предложение"
-                meta={{
-                  project: project.name,
-                  location: ready.location,
-                  price: ready.salePrice,
-                  kind: "ready-home",
-                }}
-              />
-            ) : (
-              <button
-                type="button"
-                className="btn btn-yellow"
-                onClick={() => setFormOpen(true)}
-              >
-                Получить предложение
-                <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
-              </button>
-            )}
+            {/* Тот же блок, что и в комплектации: форма не подменяет
+                кнопку рывком, а вырастает на её месте. */}
+            <PanelLeadForm
+              label="Получить предложение"
+              heading="Получить предложение"
+              projectExternalId={project.id}
+              onOpenChange={setFormOpen}
+              meta={{
+                project: project.name,
+                location: ready.location,
+                price: ready.salePrice,
+                kind: "ready-home",
+              }}
+            />
           </aside>
         </div>
       </div>
