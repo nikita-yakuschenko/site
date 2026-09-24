@@ -10,6 +10,7 @@
   --brand-yellow: #fcc90c;
   --brand-yellow-foreground: var(--avgst-ink);
   --avgst-green: #48b062;
+  --avgst-green-rgb: 72 176 98;
   /* Глубокий иссиня-чёрный вместо прежнего почти нейтрального var(--avgst-ink).
      Меняется здесь одной строкой: остальной файл обращается к токену.
      Компоненты продублированы числами — они нужны для полупрозрачных
@@ -23,6 +24,68 @@
      снимок, а не перекрасить. Чуть тёплее чистого чёрного, чтобы зелень
      и дерево не уходили в серость. */
   --veil-rgb: 18 17 16;
+
+  /* ───────── Шкала чернил ─────────
+     Прежде прозрачность ink писали числом на глаз: в файле набралось 39
+     разных ступеней от 0.02 до 0.94, и между 0.68 и 0.72 не было никакой
+     мысли — только разные руки в разное время.
+
+     У каждой ступени одна работа. Разница между соседними
+     заметна глазом, поэтому выбор ступени — это выбор роли, а не подбор
+     числа. Значения сняты с пиков прежнего разнобоя, чтобы перевод на
+     токены не перекрасил половину сайта.
+
+     Текст:      ink-0 почти основной · ink-1 приглушённый ·
+                 ink-2 вторичный · ink-3 подпись
+     Знаки:      ink-4 иконки и декоративные метки
+     Линии:      line сетки и разделители · line-2 заметная грань
+     Подложки:   tint плашка на светлом · tint-2 нажатая или наведённая */
+  --ink-0: rgb(var(--avgst-ink-rgb) / 0.88);
+  --ink-1: rgb(var(--avgst-ink-rgb) / 0.72);
+  --ink-2: rgb(var(--avgst-ink-rgb) / 0.58);
+  --ink-3: rgb(var(--avgst-ink-rgb) / 0.45);
+  --ink-4: rgb(var(--avgst-ink-rgb) / 0.3);
+  --line: rgb(var(--avgst-ink-rgb) / 0.12);
+  --line-2: rgb(var(--avgst-ink-rgb) / 0.2);
+  --tint: rgb(var(--avgst-ink-rgb) / 0.06);
+  --tint-2: rgb(var(--avgst-ink-rgb) / 0.12);
+
+  /* Та же шкала для тёмных секций и фотографий: там текст белый, и
+     полупрозрачный белый играет роль чернил. Ступени те же по смыслу,
+     но выше по числам — белое на тёмном тускнеет быстрее. */
+  --on-dark-0: rgb(255 255 255 / 0.95);
+  --on-dark-1: rgb(255 255 255 / 0.82);
+  --on-dark-2: rgb(255 255 255 / 0.72);
+  --on-dark-3: rgb(255 255 255 / 0.55);
+  --on-dark-4: rgb(255 255 255 / 0.4);
+  --line-on-dark: rgb(255 255 255 / 0.16);
+  --tint-on-dark: rgb(255 255 255 / 0.1);
+
+  /* Поверхности: на чём лежит содержимое.
+     surface — карточка и страница, muted — серая полоса секции,
+     sunken — место кадра, пока он не загрузился. */
+  --surface: #fff;
+  --surface-muted: var(--page);
+  --surface-sunken: #e8edf3;
+
+  /* Состояния. Прежде цвет ошибки существовал только как #e85d4a,
+     повторённый в восьми местах, а рядом жили ещё два оттенка красного. */
+  --danger: #e85d4a;
+  --danger-on-dark: #ffb4a8;
+  --success: var(--avgst-green);
+  /* На тёмном фоне фирменные зелёный и жёлтый тускнеют: там берутся те
+     же цвета, поднятые по светлоте. Раньше это были четыре случайных
+     оттенка, написанных цифрами в четырёх местах. */
+  --success-on-dark: #5fc478;
+  --success-on-dark-rgb: 95 196 120;
+  /* Тёмный зелёный для текста и знаков на светлой зелёной плашке:
+     фирменный на белом не держит контраст. */
+  --success-strong: #2f7a43;
+  --warning: #f0b429;
+  --warning-rgb: 240 180 41;
+  --brand-yellow-strong: #e0b400;
+  --brand-yellow-on-dark: #ffe066;
+
   --radius: 0.625rem;
   --font-sans: var(--font-geist-sans), Inter, Arial, sans-serif;
   --page-width: 1152px;
@@ -43,7 +106,7 @@
      на оба: знаки стоят на соседних экранах, и расхождение в пару сотых
      читалось как разный серый. */
   --ghost-mark: 0.08;
-  --header-solid-shadow: 0 2px 6px rgb(var(--avgst-ink-rgb) / 0.1);
+  --header-solid-shadow: 0 2px 6px var(--line);
 
   /* Три размера кнопок, и только три. Раньше высоты стояли числами по
      месту, и какой размер где — решалось на глаз.
@@ -75,16 +138,16 @@
      3.37:1 при норме 4.5 — недобор был и у плашки шапки, просто на тёмных
      фотографиях не всплывал. Замер ведётся по размытому фону, как его и
      видит backdrop-filter, а не по отдельному яркому пикселю. */
-  --glass-bg: rgb(var(--avgst-ink-rgb) / 0.52);
-  --glass-border: 1px solid rgb(255 255 255 / 0.14);
+  --glass-bg: var(--ink-2);
+  --glass-border: 1px solid var(--line-on-dark);
   --glass-blur: blur(16px) saturate(120%);
-  --glass-shadow: 0 8px 30px rgb(var(--avgst-ink-rgb) / 0.18);
+  --glass-shadow: 0 8px 30px var(--line-2);
 
   /* Выпадающие панели служебной полосы. Сплошной цвет без прозрачности и
      размытия: они продолжают техническую полосу, а не лежат поверх кадра,
      и просвечивать им нечем и незачем. */
   --panel-bg: var(--avgst-ink);
-  --panel-shadow: 0 8px 24px rgb(var(--avgst-ink-rgb) / 0.28);
+  --panel-shadow: 0 8px 24px var(--ink-4);
 
   /* Одно скругление на обе поверхности: разные радиусы у соседних плашек
      читались как разные компоненты. */
@@ -180,13 +243,13 @@ a {
   /* Токены технической полосы. Темная — база; светлая переопределяет ниже. */
   --tech-bar-bg: var(--avgst-ink);
   --tech-bar-fg: #fff;
-  --tech-bar-underline: rgb(255 255 255 / 0.45);
-  --tech-bar-underline-soft: rgb(255 255 255 / 0.25);
+  --tech-bar-underline: var(--on-dark-4);
+  --tech-bar-underline-soft: var(--line-on-dark);
   --tech-panel-bg: var(--avgst-ink);
   --tech-panel-fg: #fff;
-  --tech-panel-line: rgb(255 255 255 / 0.12);
-  --tech-panel-soft: rgb(255 255 255 / 0.08);
-  --tech-panel-shadow: 0 8px 24px rgb(var(--avgst-ink-rgb) / 0.28);
+  --tech-panel-line: var(--tint-on-dark);
+  --tech-panel-soft: var(--tint-on-dark);
+  --tech-panel-shadow: 0 8px 24px var(--ink-4);
 
   pointer-events: auto;
   background: var(--tech-bar-bg);
@@ -198,15 +261,15 @@ a {
 .site-header__bar[data-tech-theme="light"] {
   --tech-bar-bg: #fff;
   --tech-bar-fg: var(--avgst-ink);
-  --tech-bar-underline: rgb(var(--avgst-ink-rgb) / 0.35);
-  --tech-bar-underline-soft: rgb(var(--avgst-ink-rgb) / 0.22);
+  --tech-bar-underline: var(--ink-4);
+  --tech-bar-underline-soft: var(--line-2);
   --tech-panel-bg: #fff;
   --tech-panel-fg: var(--avgst-ink);
-  --tech-panel-line: rgb(var(--avgst-ink-rgb) / 0.1);
-  --tech-panel-soft: rgb(var(--avgst-ink-rgb) / 0.06);
-  --tech-panel-shadow: 0 8px 24px rgb(var(--avgst-ink-rgb) / 0.12);
+  --tech-panel-line: var(--line);
+  --tech-panel-soft: var(--tint);
+  --tech-panel-shadow: 0 8px 24px var(--line);
   /* Нижняя грань, иначе белая полоса сливается со светлым кадром/страницей. */
-  box-shadow: inset 0 -1px 0 rgb(var(--avgst-ink-rgb) / 0.1);
+  box-shadow: inset 0 -1px 0 var(--line);
 }
 
 /* На внутренних страницах нижней грани у полосы нет.
@@ -290,7 +353,7 @@ a {
 
 .site-notice__close:hover {
   opacity: 1;
-  background: rgb(var(--avgst-ink-rgb) / 0.1);
+  background: var(--line);
 }
 
 .site-notice a {
@@ -358,11 +421,11 @@ a {
 
 .site-tech-theme:hover {
   opacity: 1;
-  background: rgb(255 255 255 / 0.1);
+  background: var(--tint-on-dark);
 }
 
 .site-header__bar[data-tech-theme="light"] .site-tech-theme:hover {
-  background: rgb(var(--avgst-ink-rgb) / 0.08);
+  background: var(--tint);
 }
 
 /* Пока живёт временный переключатель — правый inset у офиса снимаем. */
@@ -654,8 +717,8 @@ a {
 
 .site-header--solid .site-header__subrow > * {
   min-height: 36px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
-  background: rgb(var(--avgst-ink-rgb) / 0.04);
+  border: 1px solid var(--tint);
+  background: var(--tint);
   box-shadow: none;
   backdrop-filter: none;
 }
@@ -715,7 +778,7 @@ a {
 }
 
 .site-header__nav a:hover {
-  background: rgb(255 255 255 / 0.1);
+  background: var(--tint-on-dark);
 }
 
 /* Столбцы закреплены явно: при скрытой навигации правый блок уезжал в
@@ -875,7 +938,7 @@ a {
   display: block;
   padding: 12px 0;
   font-weight: 600;
-  color: rgb(255 255 255 / 0.85);
+  color: var(--on-dark-1);
 }
 .site-menu__phone {
   font-weight: 700;
@@ -891,7 +954,7 @@ a {
   padding: 12px 0;
   border: 0;
   background: transparent;
-  color: rgb(255 255 255 / 0.72);
+  color: var(--on-dark-2);
   font: inherit;
   font-size: 14px;
   font-weight: 500;
@@ -994,7 +1057,7 @@ a {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(90deg, var(--avgst-ink) 0%, rgb(var(--avgst-ink-rgb) / 0.94) 29%, rgb(var(--avgst-ink-rgb) / 0.5) 60%, transparent 100%);
+  background: linear-gradient(90deg, var(--avgst-ink) 0%, var(--ink-0) 29%, var(--ink-3) 60%, transparent 100%);
 }
 .manufacture-intro__copy {
   position: relative;
@@ -1017,7 +1080,7 @@ a {
 .manufacture-intro__copy p {
   max-width: 52ch;
   margin: var(--gap-stack) 0;
-  color: rgb(255 255 255 / 0.82);
+  color: var(--on-dark-1);
   line-height: 1.6;
 }
 .manufacture-intro__copy .btn { gap: 8px; margin-top: auto; }
@@ -1026,7 +1089,7 @@ a {
 .manufacture-docs__lead {
   max-width: 46rem;
   margin: 0;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
   font-size: 17px;
   line-height: 1.55;
 }
@@ -1119,7 +1182,7 @@ a {
   height: 80px;
   flex: 0 0 auto;
   border-radius: 50%;
-  color: rgb(var(--avgst-ink-rgb) / 0.4);
+  color: var(--ink-3);
   background: var(--page);
 }
 .manufacture-video-review .independent-review__item { grid-template-columns: auto minmax(0, 1fr); }
@@ -1133,14 +1196,14 @@ a {
   font-size: 20px;
   font-weight: 700;
   text-align: center;
-  background: rgb(var(--avgst-ink-rgb) / 0.55);
+  background: var(--ink-2);
 }
 .manufacture-video-review__pending img { filter: grayscale(1); }
 @media (max-width: 719px) {
   .manufacture-intro__banner { display: block; min-height: 0; padding-top: 56%; }
   .manufacture-intro__banner > img { object-position: 62% top; }
   .manufacture-intro__banner::after {
-    background: linear-gradient(180deg, transparent 0%, rgb(var(--avgst-ink-rgb) / 0.7) 40%, var(--avgst-ink) 64%);
+    background: linear-gradient(180deg, transparent 0%, var(--ink-1) 40%, var(--avgst-ink) 64%);
   }
   .manufacture-intro__copy { padding: var(--gap-stack) var(--page-gutter); }
   .manufacture-intro__copy h1 { font-size: clamp(1.8rem, 7vw, 2.3rem); }
@@ -1180,7 +1243,7 @@ a {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.6;
-  color: #475569;
+  color: var(--ink-2);
 }
 
 .manufacture-documentation__copy p + p {
@@ -1193,7 +1256,7 @@ a {
   margin: 0;
   aspect-ratio: 1.18;
   border-radius: var(--surface-radius);
-  background: #dfe5e9;
+  background: var(--surface-sunken);
 }
 
 .manufacture-documentation__visual img {
@@ -1235,7 +1298,7 @@ a {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.6;
-  color: #475569;
+  color: var(--ink-2);
 }
 
 .manufacture-beam__copy p + p {
@@ -1248,7 +1311,7 @@ a {
   margin: 0;
   aspect-ratio: 4 / 3;
   border-radius: var(--surface-radius);
-  background: #dfe5e9;
+  background: var(--surface-sunken);
 }
 
 .manufacture-beam__visual img {
@@ -1290,7 +1353,7 @@ a {
   font-size: 1rem;
   font-weight: 400;
   line-height: 1.6;
-  color: #475569;
+  color: var(--ink-2);
 }
 
 .manufacture-cutting__copy p + p {
@@ -1303,7 +1366,7 @@ a {
   margin: 0;
   aspect-ratio: 1.18;
   border-radius: var(--surface-radius);
-  background: #dfe5e9;
+  background: var(--surface-sunken);
 }
 
 .manufacture-cutting__visual img {
@@ -1333,7 +1396,7 @@ a {
   margin: 0;
   font-size: 14px;
   line-height: 1.4;
-  color: #475569;
+  color: var(--ink-2);
 }
 .manufacture-assembly__card-image {
   position: absolute;
@@ -1360,7 +1423,7 @@ a {
 .manufacture-route p,
 .manufacture-route li,
 .manufacture-finish__grid p {
-  color: #475569;
+  color: var(--ink-2);
   line-height: 1.6;
 }
 .manufacture-section-head { max-width: 760px; margin-bottom: var(--gap-stack); }
@@ -1372,7 +1435,7 @@ a {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-top: 1px solid var(--line);
 }
 
 .manufacture-route,
@@ -1382,7 +1445,7 @@ a {
 }
 .manufacture-route + .manufacture-route,
 .manufacture-finish__grid > div + div {
-  border-left: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-left: 1px solid var(--line);
   padding-left: clamp(24px, 3vw, 40px);
 }
 .manufacture-route h3,
@@ -1409,7 +1472,7 @@ a {
   .manufacture-route + .manufacture-route,
   .manufacture-finish__grid > div + div {
     border-left: 0;
-    border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+    border-top: 1px solid var(--line);
     padding-left: 0;
   }
 }
@@ -1461,8 +1524,8 @@ a {
 }
 
 .btn-outline {
-  border: 1px solid rgb(255 255 255 / 0.4);
-  background: rgb(255 255 255 / 0.05);
+  border: 1px solid var(--on-dark-4);
+  background: var(--tint-on-dark);
   color: white;
 }
 
@@ -1470,7 +1533,7 @@ a {
    общее со всеми кнопками сайта — пилюли здесь были единственными и
    выбивались из системы. */
 .btn-outline-dark {
-  border: 1px solid #d4d4d8;
+  border: 1px solid var(--line-2);
   background: white;
   color: var(--foreground);
 }
@@ -1687,7 +1750,7 @@ a {
 }
 
 .hero__promo:hover {
-  border-color: rgb(255 255 255 / 0.28);
+  border-color: var(--on-dark-4);
 }
 
 /* Медиа-слот, 16:9.
@@ -1797,7 +1860,7 @@ a {
 }
 
 .hero__promo-nav-row button:hover {
-  background: rgb(255 255 255 / 0.26);
+  background: var(--line-on-dark);
   color: white;
 }
 
@@ -1837,12 +1900,12 @@ a {
   height: 3px;
   overflow: hidden;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.38);
+  background: var(--on-dark-4);
   transition: background-color 0.2s var(--ease-out);
 }
 
 .hero__promo-progress button:hover .hero__promo-progress-track {
-  background: rgb(255 255 255 / 0.6);
+  background: var(--on-dark-3);
 }
 
 /* Пройденные сегменты залиты целиком, текущий заполняется по времени
@@ -1918,7 +1981,7 @@ a {
 .hero__promo-body > span:not([class]) {
   font-size: 13px;
   line-height: 1.45;
-  color: rgb(255 255 255 / 0.76);
+  color: var(--on-dark-2);
 }
 
 /* Действие выглядит кнопкой, а не ссылкой: прежняя строчка-ссылка читалась
@@ -2000,7 +2063,7 @@ a {
   /* Светлая грань по верхнему краю: без неё стекло читается плоской
      заливкой, с ней у карточки появляется толщина. */
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 1px 0 var(--tint-on-dark),
     0 10px 30px rgb(6 9 16 / 0.28);
   transition:
     transform 0.24s var(--ease-out),
@@ -2013,10 +2076,10 @@ a {
    поднимается, набирает плотность и отрывается тенью от фотографии. */
 .is-rail .hero__promo:hover {
   transform: translateY(-4px);
-  border-color: rgb(255 255 255 / 0.32);
-  background: rgb(var(--avgst-ink-rgb) / 0.68);
+  border-color: var(--on-dark-4);
+  background: var(--ink-1);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.16),
+    inset 0 1px 0 var(--line-on-dark),
     0 20px 44px rgb(6 9 16 / 0.42);
 }
 
@@ -2049,7 +2112,7 @@ a {
   right: 12px;
   font-size: 15px;
   line-height: 1;
-  color: rgb(255 255 255 / 0.45);
+  color: var(--on-dark-4);
   transition:
     color 0.2s var(--ease-out),
     transform 0.2s var(--ease-out);
@@ -2509,7 +2572,7 @@ a {
   margin: 16px 0 0;
   font-size: 1.05rem;
   line-height: 1.55;
-  color: rgb(255 255 255 / 0.86);
+  color: var(--on-dark-1);
 }
 
 .hero__cta {
@@ -2626,7 +2689,7 @@ a {
   letter-spacing: 0.06em;
   line-height: 1.3;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 0.58);
+  color: var(--on-dark-3);
 }
 
 .advantages__list strong {
@@ -2672,7 +2735,7 @@ a {
   }
 
   .advantages__list li:not(:last-child) {
-    border-right: 1px solid rgb(255 255 255 / 0.16);
+    border-right: 1px solid var(--line-on-dark);
   }
 
   .advantages__list svg {
@@ -2796,7 +2859,7 @@ a {
   margin: var(--gap-stack) 0 0;
   font-size: 16px;
   line-height: 1.6;
-  color: rgb(255 255 255 / 0.82);
+  color: var(--on-dark-1);
 }
 
 .mortgage-family__body > p:not(.eyebrow) strong {
@@ -2861,7 +2924,7 @@ a {
   flex-direction: column;
   align-items: flex-start;
   padding: var(--page-gutter);
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border: 1px solid var(--line);
   border-radius: var(--surface-radius);
   background: #fff;
   color: var(--avgst-ink);
@@ -2871,8 +2934,8 @@ a {
     border-color 0.2s var(--ease-out);
 }
 .mortgage-program:hover {
-  border-color: rgb(var(--avgst-ink-rgb) / 0.22);
-  background: #f8fafc;
+  border-color: var(--line-2);
+  background: var(--tint);
 }
 .mortgage-program > span:not(.series-bento__go) {
   position: relative;
@@ -2960,7 +3023,7 @@ a {
   grid-column: 1 / -1;
   min-width: 0;
   padding-top: var(--gap-section);
-  border-top: 1px solid #dce1e8;
+  border-top: 1px solid var(--line);
 }
 .mortgage-showcase__partner-list {
   display: flex;
@@ -3219,7 +3282,7 @@ a {
   font-size: 16px;
   line-height: 1.55;
   text-wrap: pretty;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 .independent-review__channel {
@@ -3255,11 +3318,11 @@ a {
   margin-top: 4px;
   font-size: 14px;
   font-style: normal;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .independent-review__audience {
-  color: rgb(var(--avgst-ink-rgb) / 0.42) !important;
+  color: var(--ink-3) !important;
 }
 
 .independent-review__player {
@@ -3307,7 +3370,7 @@ a {
   background: rgb(12 14 18 / 0.5);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  box-shadow: inset 0 0 0 1px rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 0 0 1px var(--tint-on-dark);
   pointer-events: none;
 }
 
@@ -3353,7 +3416,7 @@ a {
 .independent-review__playlist {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-top: 1px solid var(--line);
 }
 
 .independent-review__item {
@@ -3364,7 +3427,7 @@ a {
   align-items: start;
   padding: 20px 16px 18px;
   border: 0;
-  border-right: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-right: 1px solid var(--line);
   background: transparent;
   text-align: left;
   cursor: pointer;
@@ -3392,13 +3455,13 @@ a {
 }
 
 .independent-review__item:hover {
-  background: rgb(var(--avgst-ink-rgb) / 0.02);
+  background: var(--tint);
 }
 
 .independent-review__num {
   font-size: 14px;
   font-weight: 700;
-  color: rgb(var(--avgst-ink-rgb) / 0.35);
+  color: var(--ink-4);
 }
 
 .independent-review__item.is-active .independent-review__num {
@@ -3425,13 +3488,13 @@ a {
   font-size: 13px;
   font-style: normal;
   line-height: 1.35;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .independent-review__time {
   font-size: 12px;
   font-weight: 600;
-  color: rgb(var(--avgst-ink-rgb) / 0.45);
+  color: var(--ink-3);
   white-space: nowrap;
 }
 
@@ -3467,8 +3530,8 @@ a {
   }
 
   .independent-review__item {
-    border-right: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
-    border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
   }
 
   .independent-review__item:nth-child(2n) {
@@ -3543,7 +3606,7 @@ a {
   font-size: 16px;
   line-height: 1.5;
   text-wrap: pretty;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 .video-stories__actions {
@@ -3726,7 +3789,7 @@ a {
   font-size: 12px;
   font-weight: 500;
   line-height: 1.35;
-  color: rgb(255 255 255 / 0.68);
+  color: var(--on-dark-2);
 }
 
 .video-story__quote {
@@ -3960,7 +4023,7 @@ a {
   border-radius: calc(var(--surface-radius) + 2px);
   color: #fff;
   background: rgb(16 16 16 / 0.88);
-  border: 1px solid rgb(255 255 255 / 0.18);
+  border: 1px solid var(--line-on-dark);
   backdrop-filter: blur(22px) saturate(140%);
   -webkit-backdrop-filter: blur(22px) saturate(140%);
   opacity: 0;
@@ -3988,7 +4051,7 @@ a {
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: rgb(255 255 255 / 0.7);
+  color: var(--on-dark-2);
   font:
     400 24px/1 Arial,
     sans-serif;
@@ -3999,7 +4062,7 @@ a {
   margin: 0 28px 16px 0;
   font-size: 14px;
   line-height: 1.55;
-  color: rgb(255 255 255 / 0.82);
+  color: var(--on-dark-1);
 }
 
 .referral__field {
@@ -4013,7 +4076,7 @@ a {
   font-size: 12px;
   line-height: 1.3;
   font-weight: 500;
-  color: rgb(255 255 255 / 0.62);
+  color: var(--on-dark-3);
 }
 
 .referral__field input {
@@ -4021,9 +4084,9 @@ a {
   width: 100%;
   height: 48px;
   padding: 0 14px;
-  border: 1px solid rgb(255 255 255 / 0.2);
+  border: 1px solid var(--line-on-dark);
   border-radius: 12px;
-  background: rgb(255 255 255 / 0.08);
+  background: var(--tint-on-dark);
   font: 400 16px/1 var(--font-sans);
   color: #fff;
 }
@@ -4034,7 +4097,7 @@ a {
 }
 
 .referral__field input.is-invalid {
-  border-color: #e85d4a;
+  border-color: var(--danger);
   box-shadow: 0 0 0 2px rgb(232 93 74 / 0.35);
 }
 
@@ -4045,7 +4108,7 @@ a {
   margin: 0 0 16px;
   font-size: 12px;
   line-height: 1.45;
-  color: rgb(255 255 255 / 0.82);
+  color: var(--on-dark-1);
   cursor: pointer;
 }
 
@@ -4053,7 +4116,7 @@ a {
   padding: 8px 10px;
   margin: -8px -10px 8px;
   border-radius: 10px;
-  border: 1px solid #e85d4a;
+  border: 1px solid var(--danger);
   box-shadow: 0 0 0 2px rgb(232 93 74 / 0.25);
 }
 
@@ -4072,7 +4135,7 @@ a {
 }
 
 .referral__link:hover {
-  color: #ffe066;
+  color: var(--brand-yellow-on-dark);
 }
 
 .referral__submit {
@@ -4083,7 +4146,7 @@ a {
 .referral__error {
   margin: 12px 0 0;
   font-size: 13px;
-  color: #ffb4a8;
+  color: var(--danger-on-dark);
 }
 
 .referral__foot {
@@ -4095,7 +4158,7 @@ a {
   margin: 0;
   font-size: 13px;
   line-height: 1.45;
-  color: rgb(255 255 255 / 0.92);
+  color: var(--on-dark-0);
   text-shadow:
     0 1px 2px rgb(0 0 0 / 0.9),
     0 2px 12px rgb(0 0 0 / 0.75);
@@ -4212,7 +4275,7 @@ a {
 }
 
 .referral__ok-check {
-  color: #4ade80;
+  color: var(--success-on-dark);
   opacity: 0;
   transform: scale(0.6);
   transition:
@@ -4263,7 +4326,7 @@ a {
   margin: 0;
   font-size: 15px;
   line-height: 1.55;
-  color: rgb(255 255 255 / 0.72);
+  color: var(--on-dark-2);
 }
 
 @media (min-width: 640px) {
@@ -4413,7 +4476,7 @@ a {
 }
 
 .section--ink .eyebrow {
-  color: rgb(255 255 255 / 0.55);
+  color: var(--on-dark-3);
 }
 
 .section__inner {
@@ -4548,7 +4611,7 @@ a {
   margin: 16px 0 0;
   font-size: 16px;
   line-height: 1.5;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 /* Юридический документ: читаемый длинный текст и широкая таблица целей. */
@@ -4569,8 +4632,8 @@ a {
   margin: 14px 0 0;
   padding: 6px 10px;
   border-radius: 999px;
-  background: rgb(72 176 98 / 0.12);
-  color: #2f7a43;
+  background: rgb(var(--avgst-green-rgb) / 0.12);
+  color: var(--success-strong);
   font-size: 12px;
   font-weight: 600;
   line-height: 1.3;
@@ -4580,7 +4643,7 @@ a {
 .legal-doc h2 {
   margin: 2.75rem 0 0.85rem;
   padding-top: 0.35rem;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
   font-size: 1.15rem;
   line-height: 1.3;
 }
@@ -4594,7 +4657,7 @@ a {
   margin: 1.75rem 0 0.55rem;
   font-size: 1rem;
   line-height: 1.4;
-  color: rgb(var(--avgst-ink-rgb) / 0.92);
+  color: var(--ink-0);
 }
 
 .legal-doc p {
@@ -4602,7 +4665,7 @@ a {
   max-width: 72ch;
   font-size: 15px;
   line-height: 1.65;
-  color: rgb(var(--avgst-ink-rgb) / 0.84);
+  color: var(--ink-0);
 }
 
 .legal-doc__list {
@@ -4611,7 +4674,7 @@ a {
   max-width: 72ch;
   font-size: 15px;
   line-height: 1.6;
-  color: rgb(var(--avgst-ink-rgb) / 0.84);
+  color: var(--ink-0);
 }
 
 .legal-doc__list li + li {
@@ -4624,13 +4687,13 @@ a {
   max-width: 72ch;
   font-size: 15px;
   line-height: 1.65;
-  color: rgb(var(--avgst-ink-rgb) / 0.84);
+  color: var(--ink-0);
 }
 
 .legal-doc__table-wrap {
   margin: 1.25rem 0 0;
   overflow-x: auto;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
 }
 
@@ -4645,13 +4708,13 @@ a {
 .legal-doc__table th,
 .legal-doc__table td {
   padding: 10px 12px;
-  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-bottom: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
 }
 
 .legal-doc__table th {
-  background: rgb(var(--avgst-ink-rgb) / 0.04);
+  background: var(--tint);
   font-weight: 700;
   white-space: nowrap;
 }
@@ -4667,13 +4730,13 @@ a {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
+  color: var(--ink-3);
 }
 
 .catalog__empty {
   margin: 32px 0 0;
   font-size: 16px;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 /* ======================================================================
@@ -4765,10 +4828,10 @@ a {
   height: 46px;
   padding: 0 14px;
   margin: 0;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  border: 1px solid var(--line);
   border-radius: 10px;
   background: #fff;
-  color: rgb(var(--avgst-ink-rgb) / 0.4);
+  color: var(--ink-3);
 }
 
 /* Фокус показывает сама рамка коробки, а не кольцо вокруг неё: зелёное
@@ -4804,7 +4867,7 @@ a {
 }
 
 .catalog-search input::placeholder {
-  color: rgb(var(--avgst-ink-rgb) / 0.38);
+  color: var(--ink-3);
 }
 
 /* Родная крестовина у type="search" в вебките своя и не по стилю. */
@@ -4817,7 +4880,7 @@ a {
   padding: 4px;
   border: 0;
   border-radius: 50%;
-  background: rgb(var(--avgst-ink-rgb) / 0.08);
+  background: var(--tint);
   color: var(--avgst-ink);
   cursor: pointer;
 }
@@ -4886,7 +4949,7 @@ a {
 /* Сброс: красный только у знака, заливать кнопку тревожным цветом незачем,
    действие не опасное. */
 .cfilter__toggle.is-reset {
-  color: #e85d4a;
+  color: var(--danger);
 }
 
 /* В самый узкий экран подпись рядом с полем поиска не встаёт: остаётся
@@ -5015,7 +5078,7 @@ a {
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
+  color: var(--ink-3);
 }
 
 .cfilter__group {
@@ -5030,7 +5093,7 @@ a {
    становился вдвое больше, чем у соседей. Поэтому воздух уходит в legend. */
 .cfilter__group--quiet {
   margin-top: 20px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-top: 1px solid var(--line);
 }
 
 .cfilter__group--quiet .cfilter__legend {
@@ -5053,7 +5116,7 @@ a {
   font-weight: 700;
   letter-spacing: 0.07em;
   text-transform: uppercase;
-  color: rgb(var(--avgst-ink-rgb) / 0.45);
+  color: var(--ink-3);
 }
 
 .cfilter__legend span {
@@ -5087,7 +5150,7 @@ a {
   flex-grow: 1;
   height: 4px;
   border-radius: 2px;
-  background: rgb(var(--avgst-ink-rgb) / 0.12);
+  background: var(--line);
 }
 
 .ui-slider__range {
@@ -5131,7 +5194,7 @@ a {
   min-width: 42px;
   height: 34px;
   padding: 0 13px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  border: 1px solid var(--line);
   /* Тот же радиус, что у поля поиска и кнопки избранного рядом: скругление
      в колонке одно на все элементы. Пилюля со скруглением в половину
      высоты выбивалась из этого ряда. */
@@ -5185,7 +5248,7 @@ a {
   width: 100%;
   height: 38px;
   padding: 0 12px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
   color: var(--avgst-ink);
@@ -5196,7 +5259,7 @@ a {
 .cfilter__fav span {
   margin-left: auto;
   font-size: 12px;
-  color: rgb(var(--avgst-ink-rgb) / 0.45);
+  color: var(--ink-3);
 }
 
 .cfilter__fav.is-on {
@@ -5206,7 +5269,7 @@ a {
 }
 
 .cfilter__fav.is-on span {
-  color: rgb(255 255 255 / 0.6);
+  color: var(--on-dark-3);
 }
 
 /* Снимаемые условия. Дублируют состояние панели нарочно: снять условие
@@ -5217,7 +5280,7 @@ a {
   gap: 6px;
   align-items: center;
   padding-top: 16px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-top: 1px solid var(--line);
 }
 
 .cfilter__chip {
@@ -5226,7 +5289,7 @@ a {
   gap: 5px;
   height: 27px;
   padding: 0 10px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  border: 1px solid var(--line);
   border-radius: 999px;
   background: #fff;
   color: var(--avgst-ink);
@@ -5346,7 +5409,7 @@ a {
   font-weight: 400;
   letter-spacing: 0;
   text-transform: none;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 /* Воздух одинаковый с обеих сторон: разделитель стоит между двумя частями
@@ -5361,7 +5424,7 @@ a {
   content: "";
   flex: 1;
   height: 1px;
-  background: rgb(var(--avgst-ink-rgb) / 0.14);
+  background: var(--line);
 }
 
 .catalog__band--rest span {
@@ -5410,8 +5473,8 @@ a {
   margin: 0;
   aspect-ratio: 4 / 5;
   border-radius: 16px;
-  background: rgb(var(--avgst-ink-rgb) / 0.06);
-  color: rgb(var(--avgst-ink-rgb) / 0.4);
+  background: var(--tint);
+  color: var(--ink-3);
   font-size: 13px;
 }
 
@@ -5420,7 +5483,7 @@ a {
   margin: 0 0 16px;
   font-size: 17px;
   line-height: 1.6;
-  color: rgb(var(--avgst-ink-rgb) / 0.78);
+  color: var(--ink-1);
 }
 
 .project-about__text p:last-child {
@@ -5433,7 +5496,7 @@ a {
   gap: 2px;
   margin: 24px 0 0;
   padding-top: 16px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-top: 1px solid var(--line);
   max-width: 62ch;
 }
 
@@ -5443,7 +5506,7 @@ a {
 
 .project-about__sign span {
   font-size: 13px;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 /* Фасады в карточке проекта: ряд с прокруткой на узком экране, сетка на
@@ -5549,14 +5612,14 @@ a {
   color: white;
   text-decoration: none;
   /* Светлая грань, как у стекла слотов: без неё плитка — плоский снимок. */
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.12);
+  box-shadow: inset 0 1px 0 var(--tint-on-dark);
   transition: box-shadow 0.24s var(--ease-out);
 }
 
 .series-bento__tile:hover {
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.2),
-    inset 0 0 0 1px rgb(255 255 255 / 0.16);
+    inset 0 1px 0 var(--line-on-dark),
+    inset 0 0 0 1px var(--line-on-dark);
 }
 
 .series-bento__tile--panel {
@@ -5643,7 +5706,7 @@ a {
   width: 32px;
   height: 32px;
   border-radius: 8px;
-  background: rgb(255 255 255 / 0.95);
+  background: var(--on-dark-0);
   color: var(--avgst-ink);
   box-shadow: 0 1px 3px rgb(0 0 0 / 0.18);
   backdrop-filter: blur(8px);
@@ -5742,7 +5805,7 @@ a {
   display: block;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  background: #e2e8f0;
+  background: var(--surface-sunken);
 }
 
 .card__media img {
@@ -5761,14 +5824,14 @@ a {
   height: 100%;
   align-items: center;
   justify-content: center;
-  color: #94a3b8;
+  color: var(--ink-3);
 }
 
 .badge {
   position: absolute;
   top: 12px;
   left: 12px;
-  background: rgb(255 255 255 / 0.95);
+  background: var(--on-dark-0);
   border-radius: 6px;
   padding: 4px 8px;
   font-size: 12px;
@@ -5804,8 +5867,8 @@ a {
   height: 32px;
   border: 0;
   border-radius: 8px;
-  background: rgb(255 255 255 / 0.95);
-  color: #64748b;
+  background: var(--on-dark-0);
+  color: var(--ink-2);
   box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
   cursor: pointer;
 }
@@ -5837,7 +5900,7 @@ a {
   margin: 4px 0 0;
   padding: 0;
   list-style: none;
-  color: #475569;
+  color: var(--ink-2);
   font-size: 14px;
 }
 .specs li {
@@ -5909,7 +5972,7 @@ a {
 .production__head p:not(.eyebrow),
 .production__copy > p {
   max-width: 36rem;
-  color: #475569;
+  color: var(--ink-2);
   line-height: 1.6;
 }
 
@@ -5939,7 +6002,7 @@ a {
 .production__shops-wrap {
   margin-top: var(--gap-stack);
   padding-top: var(--gap-stack);
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-top: 1px solid var(--line);
 }
 
 /* Подзаголовок ряда: связывает карточки с рассказом выше. Набран
@@ -5951,7 +6014,7 @@ a {
   font-weight: 700;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .production__shops {
@@ -5999,7 +6062,7 @@ a {
   transform: translateY(0);
   transform-origin: 100% 100%;
   /* В покое почти плоские: тень иначе держит цифру поверх текста. */
-  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.35));
+  filter: drop-shadow(0 1px 0 var(--on-dark-4));
 }
 
 .production__shops li:nth-child(1) .production__shops-digit {
@@ -6041,9 +6104,9 @@ a {
   .production__shops li:hover .production__shops-digit {
     background-color: color-mix(in srgb, var(--brand-yellow) 78%, white);
     transform: translateY(-8px);
-    filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.9))
+    filter: drop-shadow(0 1px 0 var(--on-dark-0))
       drop-shadow(1px 3px 0 rgb(196 150 8 / 0.35))
-      drop-shadow(0 16px 20px rgb(var(--avgst-ink-rgb) / 0.18));
+      drop-shadow(0 16px 20px var(--line-2));
   }
 }
 
@@ -6059,7 +6122,7 @@ a {
   --digit-top: var(--gap-tile);
   margin-top: var(--gap-tile);
   padding-top: var(--gap-tile);
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-top: 1px solid var(--line);
   min-height: calc(var(--digit-h) + var(--gap-tile));
 }
 
@@ -6079,7 +6142,7 @@ a {
   z-index: 1;
   margin: 8px 0 0;
   padding-right: calc(var(--digit-h) * 0.72);
-  color: #475569;
+  color: var(--ink-2);
   font-size: 14px;
   line-height: 1.55;
 }
@@ -6111,7 +6174,7 @@ a {
     --digit-top: var(--gap-tile);
     margin-top: var(--gap-tile);
     padding-top: var(--gap-tile);
-    border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+    border-top: 1px solid var(--line);
     min-height: calc(var(--digit-h) + var(--gap-tile));
   }
 
@@ -6154,7 +6217,7 @@ a {
     top: 0;
     bottom: 0;
     width: 1px;
-    background: rgb(var(--avgst-ink-rgb) / 0.12);
+    background: var(--line);
   }
 
   /* У всех кроме последней правый край — черта, не край текста. */
@@ -6332,7 +6395,7 @@ a {
   border: var(--glass-border);
   background: var(--glass-bg);
   box-shadow:
-    inset 0 1px 0 rgb(255 255 255 / 0.1),
+    inset 0 1px 0 var(--tint-on-dark),
     0 12px 32px rgb(6 9 16 / 0.32);
   backdrop-filter: var(--glass-blur);
   color: white;
@@ -6347,8 +6410,8 @@ a {
    иначе непонятно, что кадр это кнопка. */
 .factory-video:hover .factory-video__card {
   transform: translateY(-3px);
-  border-color: rgb(255 255 255 / 0.3);
-  background: rgb(var(--avgst-ink-rgb) / 0.68);
+  border-color: var(--on-dark-4);
+  background: var(--ink-1);
 }
 
 /* Кадр из ролика. Без белого паспарту: у фотографии свой фон, рамка вокруг
@@ -6382,7 +6445,7 @@ a {
   margin: -15px 0 0 -15px;
   padding: 6px;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.92);
+  background: var(--on-dark-0);
   color: var(--avgst-ink);
 }
 
@@ -6539,7 +6602,7 @@ a {
 
 .contacts__lead {
   max-width: 36rem;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
 }
 
 .contact-list {
@@ -6558,7 +6621,7 @@ a {
 .contact-list p {
   margin: 0;
   font-size: 13px;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
+  color: var(--ink-3);
 }
 
 .contact-list__value {
@@ -6638,7 +6701,7 @@ a {
   border-radius: var(--surface-radius);
   background: var(--panel-bg);
   /* Легче panel-shadow: на серой полосе тяжёлая тень выглядит грязным пятном. */
-  box-shadow: 0 6px 20px rgb(var(--avgst-ink-rgb) / 0.12);
+  box-shadow: 0 6px 20px var(--line);
   color: #fff;
 }
 
@@ -6670,7 +6733,7 @@ a {
   gap: 2px;
   padding: 2px;
   border-radius: 8px;
-  background: rgb(255 255 255 / 0.08);
+  background: var(--tint-on-dark);
 }
 
 .contacts__tab {
@@ -6679,7 +6742,7 @@ a {
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: rgb(255 255 255 / 0.62);
+  color: var(--on-dark-3);
   font: inherit;
   font-size: 12px;
   font-weight: 600;
@@ -6692,7 +6755,7 @@ a {
 }
 
 .contacts__tab.is-active {
-  background: rgb(255 255 255 / 0.14);
+  background: var(--line-on-dark);
   color: #fff;
 }
 
@@ -6759,7 +6822,7 @@ a {
   align-content: start;
   margin: 14px 0 0;
   padding: 14px 0 0;
-  border-top: 1px solid rgb(255 255 255 / 0.12);
+  border-top: 1px solid var(--tint-on-dark);
   list-style: none;
   font-size: 13px;
   line-height: 1.35;
@@ -6852,7 +6915,7 @@ a {
   display: none;
   border-radius: 10px;
   overflow: hidden;
-  background: rgb(255 255 255 / 0.06);
+  background: var(--tint-on-dark);
 }
 
 .contacts__map.is-loading,
@@ -6889,14 +6952,14 @@ a {
   background:
     radial-gradient(
       circle at 50% 46%,
-      rgb(255 255 255 / 0.14) 0 7px,
+      var(--line-on-dark) 0 7px,
       transparent 8px
     ),
     linear-gradient(
       110deg,
-      rgb(255 255 255 / 0.03) 0%,
-      rgb(255 255 255 / 0.1) 42%,
-      rgb(255 255 255 / 0.03) 84%
+      var(--tint-on-dark) 0%,
+      var(--tint-on-dark) 42%,
+      var(--tint-on-dark) 84%
     );
   background-size:
     auto,
@@ -6920,7 +6983,7 @@ a {
 @media (prefers-reduced-motion: reduce) {
   .office-map-skeleton {
     animation: none;
-    background: rgb(255 255 255 / 0.08);
+    background: var(--tint-on-dark);
   }
 }
 
@@ -6930,7 +6993,7 @@ a {
   gap: 16px;
   padding: 24px;
   border-radius: 16px;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--line);
   background: var(--page);
 }
 
@@ -6956,7 +7019,7 @@ a {
   margin: 8px 0 0;
   font-size: 14px;
   line-height: 1.55;
-  color: #475569;
+  color: var(--ink-2);
 }
 .lead-card label,
 .lead-form label {
@@ -6974,7 +7037,7 @@ a {
   font-size: 13px;
   font-weight: 400;
   line-height: 1.35;
-  color: #475569;
+  color: var(--ink-2);
 }
 
 @media (min-width: 1024px) {
@@ -7000,7 +7063,7 @@ a {
 }
 
 .lead-form__consent-link:hover {
-  color: #e0b400;
+  color: var(--brand-yellow-strong);
 }
 
 .lead-card input,
@@ -7009,7 +7072,7 @@ a {
 .lead-form textarea,
 .filters select {
   height: 40px;
-  border: 1px solid #cbd5e1;
+  border: 1px solid var(--line-2);
   border-radius: var(--radius);
   padding: 0 12px;
   background: white;
@@ -7033,7 +7096,7 @@ a {
 .lead-field__error {
   font-size: 12px;
   font-weight: 500;
-  color: #c2410c;
+  color: var(--danger);
 }
 
 /* Ошибка не меняет высоту формы — ни короткой, ни полной.
@@ -7059,7 +7122,7 @@ a {
 .lead-card label:has(.lead-field__error.is-quiet),
 .lead-form label:has(.lead-field__error.is-quiet) {
   position: relative;
-  color: #e85d4a;
+  color: var(--danger);
 }
 
 /* Знак стоит у правого края поля: поле — последняя строка подписи,
@@ -7077,7 +7140,7 @@ a {
   border-radius: 0 var(--radius) var(--radius) 0;
   font-size: 15px;
   font-weight: 700;
-  color: #e85d4a;
+  color: var(--danger);
   pointer-events: none;
 }
 
@@ -7096,12 +7159,12 @@ a {
   margin: 0;
   border: 0;
   box-shadow: none;
-  color: #e85d4a;
+  color: var(--danger);
 }
 
 .lead-card .lead-form__consent.is-invalid input[type="checkbox"],
 .lead-form .lead-form__consent.is-invalid input[type="checkbox"] {
-  outline: 2px solid #e85d4a;
+  outline: 2px solid var(--danger);
   outline-offset: 1px;
   border-radius: 3px;
 }
@@ -7119,7 +7182,7 @@ a {
 
 .site-footer {
   background: var(--avgst-ink);
-  color: rgb(255 255 255 / 0.92);
+  color: var(--on-dark-0);
   padding: var(--gap-section) 0 40px;
 }
 
@@ -7152,7 +7215,7 @@ a {
   margin: 0;
   font-size: 12px;
   line-height: 1.45;
-  color: rgb(255 255 255 / 0.55);
+  color: var(--on-dark-3);
 }
 
 /* Соцсети между логотипом и описанием: light → original на hover. */
@@ -7231,7 +7294,7 @@ a {
 }
 
 .footer-grid .footer-policy:hover {
-  color: #5fc478;
+  color: var(--success-on-dark);
 }
 
 .footer-offer {
@@ -7240,7 +7303,7 @@ a {
 }
 
 .footer-muted {
-  color: rgb(255 255 255 / 0.48);
+  color: var(--on-dark-3);
   font-size: 13px;
   line-height: 1.45;
 }
@@ -7313,7 +7376,7 @@ a {
     width: 100%;
     margin-top: 0.75rem;
     padding-top: 1.75rem;
-    border-top: 1px solid rgb(255 255 255 / 0.1);
+    border-top: 1px solid var(--tint-on-dark);
   }
 
   .footer-contacts-col h3 {
@@ -7340,7 +7403,7 @@ a {
   font-size: 12px;
   letter-spacing: 0.16em;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 0.55);
+  color: var(--on-dark-3);
 }
 
 .footer-grid a,
@@ -7408,7 +7471,7 @@ a {
 
 .footer-contacts__hint {
   display: block;
-  color: rgb(255 255 255 / 0.48);
+  color: var(--on-dark-3);
   font-size: 13px;
 }
 
@@ -7439,7 +7502,7 @@ textarea:focus-visible {
 }
 
 .specs--on-dark {
-  color: rgb(255 255 255 / 0.9);
+  color: var(--on-dark-0);
 }
 .price--on-dark {
   color: white;
@@ -7448,7 +7511,7 @@ textarea:focus-visible {
   position: static;
   display: inline-block;
   margin-bottom: 12px;
-  background: rgb(255 255 255 / 0.16);
+  background: var(--line-on-dark);
   color: white;
 }
 
@@ -7461,7 +7524,7 @@ textarea:focus-visible {
 }
 .faq dd {
   margin: 8px 0 0;
-  color: #475569;
+  color: var(--ink-2);
 }
 
 .filters fieldset {
@@ -7469,7 +7532,7 @@ textarea:focus-visible {
   flex-wrap: wrap;
   gap: 12px;
   align-items: end;
-  border: 1px solid #e2e8f0;
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   padding: 16px;
   margin: 24px 0 0;
@@ -7533,7 +7596,7 @@ textarea:focus-visible {
    спрятанной полосы прокрутки. Иначе вдоль правого края светилась белая
    полоса — незатемнённый кусок страницы шириной с полосу прокрутки. */
 html.is-dialog-open {
-  background: rgb(var(--avgst-ink-rgb) / 0.72);
+  background: var(--ink-1);
 }
 
 .ask-dialog {
@@ -7543,7 +7606,7 @@ html.is-dialog-open {
   display: grid;
   place-items: center;
   padding: clamp(16px, 4vw, 40px);
-  background: rgb(var(--avgst-ink-rgb) / 0.72);
+  background: var(--ink-1);
   backdrop-filter: blur(3px);
   animation: ask-dialog-in 0.24s var(--ease-out);
 }
@@ -7583,8 +7646,8 @@ html.is-dialog-open {
    ложилась поверх скруглённого поля вторым контуром. */
 .ask-dialog__card :is(input, textarea):focus-visible {
   outline: none;
-  border-color: rgb(var(--avgst-ink-rgb) / 0.55);
-  box-shadow: 0 0 0 3px rgb(var(--avgst-ink-rgb) / 0.08);
+  border-color: var(--ink-2);
+  box-shadow: 0 0 0 3px var(--tint);
 }
 
 .ask-dialog__close {
@@ -7598,7 +7661,7 @@ html.is-dialog-open {
   height: 34px;
   border: 0;
   border-radius: 999px;
-  background: rgb(var(--avgst-ink-rgb) / 0.06);
+  background: var(--tint);
   color: var(--avgst-ink);
   cursor: pointer;
   transition:
@@ -7607,7 +7670,7 @@ html.is-dialog-open {
 }
 
 .ask-dialog__close:hover {
-  background: rgb(var(--avgst-ink-rgb) / 0.14);
+  background: var(--line);
 }
 
 .ask-dialog__close:active {
@@ -7637,16 +7700,16 @@ html.is-dialog-open {
   align-items: center;
 }
 .glass-panel {
-  background: rgb(255 255 255 / 0.82);
+  background: var(--on-dark-1);
   backdrop-filter: blur(12px);
   border-radius: calc(var(--radius) * 1.4);
   padding: 24px;
-  outline: 1px solid rgb(255 255 255 / 0.4);
+  outline: 1px solid var(--on-dark-4);
 }
 .crumbs {
   display: flex;
   gap: 8px;
-  color: rgb(255 255 255 / 0.8);
+  color: var(--on-dark-1);
   margin-bottom: 16px;
 }
 
@@ -7679,14 +7742,14 @@ html.is-dialog-open {
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(15, 18, 22, 0.18) 0%,
-    rgba(15, 18, 22, 0.16) 6%,
-    rgba(15, 18, 22, 0.13) 12%,
-    rgba(15, 18, 22, 0.1) 18%,
-    rgba(15, 18, 22, 0.08) 25%,
-    rgba(15, 18, 22, 0.07) 33%,
-    rgba(15, 18, 22, 0.06) 52%,
-    rgba(15, 18, 22, 0.55) 100%
+    rgb(var(--veil-rgb) / 0.18) 0%,
+    rgb(var(--veil-rgb) / 0.16) 6%,
+    rgb(var(--veil-rgb) / 0.13) 12%,
+    rgb(var(--veil-rgb) / 0.1) 18%,
+    rgb(var(--veil-rgb) / 0.08) 25%,
+    rgb(var(--veil-rgb) / 0.07) 33%,
+    rgb(var(--veil-rgb) / 0.06) 52%,
+    rgb(var(--veil-rgb) / 0.55) 100%
   );
 }
 
@@ -7804,7 +7867,7 @@ html.is-dialog-open {
   margin: 0;
   padding: 4px 8px;
   border-radius: 6px;
-  background: rgb(255 255 255 / 0.95);
+  background: var(--on-dark-0);
   color: var(--avgst-ink);
   font-size: 12px;
   font-weight: 500;
@@ -7903,7 +7966,7 @@ html.is-dialog-open {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 0.58);
+  color: var(--on-dark-3);
 }
 
 .project-hero__specs strong {
@@ -7969,7 +8032,7 @@ html.is-dialog-open {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: rgb(255 255 255 / 0.58);
+  color: var(--on-dark-3);
 }
 
 .project-hero__pay {
@@ -7998,14 +8061,14 @@ html.is-dialog-open {
   width: 44px;
   height: 44px;
   border-radius: 10px;
-  border: 1px solid rgb(255 255 255 / 0.28);
-  background: rgb(var(--avgst-ink-rgb) / 0.28);
+  border: 1px solid var(--on-dark-4);
+  background: var(--ink-4);
   color: white;
   cursor: pointer;
 }
 
 .project-hero__icon:hover {
-  background: rgb(255 255 255 / 0.12);
+  background: var(--tint-on-dark);
 }
 
 .preview-banner {
@@ -8048,7 +8111,7 @@ html.is-dialog-open {
    ряд читался как одна система. */
 
 .site-office {
-  --office-dot: #94a3b8;
+  --office-dot: var(--ink-3);
   /* Оптическая компенсация, равная отступу региона слева: у плашки шапки
      поля по 16px, и с тем же значением индикатор встаёт по кнопке «Задать
      вопрос», а ряд получается симметричным. Без отступа он единственный
@@ -8094,16 +8157,16 @@ html.is-dialog-open {
 }
 
 .site-office__dot--open {
-  --office-dot: #34c759;
-  --office-halo: 52 199 89;
+  --office-dot: var(--success-on-dark);
+  --office-halo: var(--success-on-dark-rgb);
   /* Свечение вместо обводки: заметно, но не превращает статус в кнопку. */
-  box-shadow: 0 0 0 3px rgb(52 199 89 / 0.18);
+  box-shadow: 0 0 0 3px rgb(var(--success-on-dark-rgb) / 0.18);
 }
 .site-office__dot--soon-open,
 .site-office__dot--soon-close {
-  --office-dot: #f0b429;
-  --office-halo: 240 180 41;
-  box-shadow: 0 0 0 3px rgb(240 180 41 / 0.18);
+  --office-dot: var(--warning);
+  --office-halo: var(--warning-rgb);
+  box-shadow: 0 0 0 3px rgb(var(--warning-rgb) / 0.18);
 }
 
 /* Живой статус подаёт признак жизни: волна расходится от точки раз в три
@@ -8171,13 +8234,13 @@ html.is-dialog-open {
 /* Закрытый офис — тот же фирменный жёлтый, но вдвое медленнее: состояние
    живое, а не срочное, и не спорит с «скоро откроемся». */
 .site-office__dot--closed {
-  --office-dot: #f0b429;
-  --office-halo: 240 180 41;
+  --office-dot: var(--warning);
+  --office-halo: var(--warning-rgb);
   --office-pulse: 5.2s;
-  box-shadow: 0 0 0 3px rgb(240 180 41 / 0.18);
+  box-shadow: 0 0 0 3px rgb(var(--warning-rgb) / 0.18);
 }
 .site-office__dot--unknown {
-  --office-dot: #8a9099;
+  --office-dot: var(--on-dark-4);
   opacity: 0.6;
 }
 
@@ -8291,7 +8354,7 @@ html.is-dialog-open {
   aspect-ratio: 16 / 9;
   border-radius: 10px;
   overflow: hidden;
-  background: rgb(255 255 255 / 0.06);
+  background: var(--tint-on-dark);
 }
 
 .site-office__map-canvas {
@@ -8571,7 +8634,7 @@ html.is-dialog-open {
 .referral-rules__head {
   margin: 0 0 0.5rem;
   padding: 0 0 1.5rem;
-  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-bottom: 1px solid var(--tint);
 }
 
 .referral-rules h1 {
@@ -8586,12 +8649,12 @@ html.is-dialog-open {
   margin: 14px 0 0;
   font-size: 13px;
   line-height: 1.4;
-  color: rgb(var(--avgst-ink-rgb) / 0.48);
+  color: var(--ink-3);
 }
 
 .referral-rules__meta b {
   font-weight: 600;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 .referral-rules__intro {
@@ -8599,13 +8662,13 @@ html.is-dialog-open {
   max-width: 72ch;
   font-size: 15px;
   line-height: 1.65;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 .referral-rules__section {
   margin: 2.75rem 0 0;
   padding-top: 0.35rem;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
 }
 
 .referral-rules__section h2 {
@@ -8619,7 +8682,7 @@ html.is-dialog-open {
   max-width: 72ch;
   font-size: 13px;
   line-height: 1.55;
-  color: rgb(var(--avgst-ink-rgb) / 0.48);
+  color: var(--ink-3);
 }
 
 .referral-rules__glossary {
@@ -8631,7 +8694,7 @@ html.is-dialog-open {
   gap: 6px;
   margin: 0;
   padding: 1rem 0;
-  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-bottom: 1px solid var(--tint);
 }
 
 .referral-rules__term:last-child {
@@ -8650,24 +8713,24 @@ html.is-dialog-open {
   max-width: 72ch;
   font-size: 15px;
   line-height: 1.65;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 .referral-rules__note {
   margin: 1.25rem 0 0;
   padding-top: 1rem;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
   max-width: 72ch;
   font-size: 13px;
   line-height: 1.55;
-  color: rgb(var(--avgst-ink-rgb) / 0.48);
+  color: var(--ink-3);
 }
 
 .referral-rules__group {
   margin: 1.25rem 0 0;
   padding: 1rem 1rem 0.25rem;
   border-radius: var(--surface-radius, var(--radius));
-  background: rgb(var(--avgst-ink-rgb) / 0.035);
+  background: var(--tint);
 }
 
 .referral-rules .referral-rules__group-title {
@@ -8680,7 +8743,7 @@ html.is-dialog-open {
   font-size: 15px;
   font-weight: 700;
   line-height: 1.35;
-  color: rgb(var(--avgst-ink-rgb) / 0.92);
+  color: var(--ink-0);
 }
 
 .referral-rules__list {
@@ -8696,7 +8759,7 @@ html.is-dialog-open {
   align-items: start;
   margin: 0;
   padding: 0.9rem 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
 }
 
 .referral-rules__list > .referral-rules__item:first-child {
@@ -8717,7 +8780,7 @@ html.is-dialog-open {
   max-width: 72ch;
   font-size: 15px;
   line-height: 1.65;
-  color: rgb(var(--avgst-ink-rgb) / 0.84);
+  color: var(--ink-0);
 }
 
 .referral-rules p,
@@ -8725,7 +8788,7 @@ html.is-dialog-open {
   max-width: 72ch;
   font-size: 15px;
   line-height: 1.65;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 .referral-rules ul,
@@ -8748,14 +8811,14 @@ html.is-dialog-open {
   max-width: 72ch;
   font-size: 15px;
   line-height: 1.6;
-  color: rgb(var(--avgst-ink-rgb) / 0.84);
+  color: var(--ink-0);
 }
 
 .referral-rules__checks {
   list-style: none;
   margin: 0.75rem 0 0;
   padding: 0.75rem 0 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
 }
 
 .referral-rules__checks li {
@@ -8766,8 +8829,8 @@ html.is-dialog-open {
   padding: 0.65rem 0;
   font-size: 15px;
   line-height: 1.6;
-  color: rgb(var(--avgst-ink-rgb) / 0.84);
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.06);
+  color: var(--ink-0);
+  border-top: 1px solid var(--tint);
 }
 
 .referral-rules__checks li > * {
@@ -8801,7 +8864,7 @@ html.is-dialog-open {
   gap: 8px 16px;
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border: 1px solid var(--line);
   border-radius: var(--radius);
   background: #fff;
 }
@@ -8822,7 +8885,7 @@ html.is-dialog-open {
   margin: 4px 0 0;
   font-size: 13px;
   line-height: 1.4;
-  color: rgb(var(--avgst-ink-rgb) / 0.48);
+  color: var(--ink-3);
 }
 
 .referral-rules__rate-value {
@@ -8837,7 +8900,7 @@ html.is-dialog-open {
 .referral-rules__rate-value span {
   font-size: 1rem;
   font-weight: 600;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .referral-rules__requisites {
@@ -8845,7 +8908,7 @@ html.is-dialog-open {
   max-width: 72ch;
   font-size: 15px;
   line-height: 1.65;
-  color: rgb(var(--avgst-ink-rgb) / 0.84);
+  color: var(--ink-0);
 }
 
 .referral-rules table {
@@ -8858,7 +8921,7 @@ html.is-dialog-open {
 .referral-rules th,
 .referral-rules td {
   padding: 0.65rem 0.75rem;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border: 1px solid var(--line);
   text-align: left;
   vertical-align: top;
 }
@@ -8868,13 +8931,13 @@ html.is-dialog-open {
   font-size: 0.92em;
   padding: 0.1em 0.35em;
   border-radius: 4px;
-  background: rgb(var(--avgst-ink-rgb) / 0.06);
+  background: var(--tint);
 }
 
 .referral-rules__footer {
   margin-top: 2.75rem;
   padding-top: 1.75rem;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
   text-align: center;
 }
 
@@ -8887,7 +8950,7 @@ html.is-dialog-open {
 .legal-doc__consent-actions {
   margin: 2.5rem 0 0;
   padding-top: 1.5rem;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
@@ -8938,7 +9001,7 @@ html.is-dialog-open {
   gap: 10px;
   padding: 14px;
   border-radius: 12px;
-  background: #0b1020;
+  background: var(--avgst-ink);
   color: #fff;
   box-shadow: 0 12px 36px rgb(0 0 0 / 0.3);
 }
@@ -8954,7 +9017,7 @@ html.is-dialog-open {
   margin: 0;
   font-size: 13px;
   line-height: 1.35;
-  color: rgb(255 255 255 / 0.82);
+  color: var(--on-dark-1);
 }
 
 .cookie-banner__text a {
@@ -8978,9 +9041,9 @@ html.is-dialog-open {
   height: 2rem;
   margin: 0;
   padding: 0 10px;
-  border: 1px solid rgb(255 255 255 / 0.22);
+  border: 1px solid var(--line-on-dark);
   border-radius: var(--radius);
-  background: rgb(255 255 255 / 0.08);
+  background: var(--tint-on-dark);
   color: #fff;
   font: inherit;
   font-size: 13px;
@@ -8991,7 +9054,7 @@ html.is-dialog-open {
 }
 
 .cookie-banner__btn:hover {
-  background: rgb(255 255 255 / 0.14);
+  background: var(--line-on-dark);
 }
 
 .cookie-banner__btn--primary {
@@ -9016,13 +9079,13 @@ html.is-dialog-open {
   padding: 0;
   border: 0;
   background: transparent;
-  color: rgb(255 255 255 / 0.45);
+  color: var(--on-dark-4);
   line-height: 1;
   cursor: pointer;
 }
 
 .cookie-banner__tune:hover {
-  color: rgb(255 255 255 / 0.9);
+  color: var(--on-dark-0);
   background: transparent;
 }
 
@@ -9057,7 +9120,7 @@ html.is-dialog-open {
   margin: 8px 0 18px;
   font-size: 14px;
   line-height: 1.5;
-  color: rgb(var(--avgst-ink-rgb) / 0.68);
+  color: var(--ink-1);
 }
 
 .cookie-settings__row {
@@ -9066,7 +9129,7 @@ html.is-dialog-open {
   gap: 12px;
   align-items: start;
   padding: 12px 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
 }
 
 .cookie-settings__label {
@@ -9078,7 +9141,7 @@ html.is-dialog-open {
   margin: 4px 0 0;
   font-size: 13px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.58);
+  color: var(--ink-2);
 }
 
 .cookie-settings__switch {
@@ -9102,8 +9165,8 @@ html.is-dialog-open {
   min-height: 12rem;
   padding: 20px;
   text-align: center;
-  background: rgb(var(--avgst-ink-rgb) / 0.04);
-  border: 1px dashed rgb(var(--avgst-ink-rgb) / 0.18);
+  background: var(--tint);
+  border: 1px dashed var(--line-2);
   border-radius: 10px;
 }
 
@@ -9117,7 +9180,7 @@ html.is-dialog-open {
   margin: 0;
   font-size: 14px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
 }
 
 .footer-grid button.footer-policy--button {
@@ -9143,7 +9206,7 @@ html.is-dialog-open {
 }
 
 .footer-grid button.footer-policy--button:hover {
-  color: #5fc478;
+  color: var(--success-on-dark);
   background: transparent;
 }
 
@@ -9168,7 +9231,7 @@ html.is-dialog-open {
   margin: 0 0 var(--gap-stack);
   font-size: 17px;
   line-height: 1.55;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 /* Условия — слепок плашки программы.
@@ -9213,7 +9276,7 @@ html.is-dialog-open {
 .mortgage-who__or {
   display: grid;
   place-items: center;
-  color: rgb(var(--avgst-ink-rgb) / 0.42);
+  color: var(--ink-3);
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.06em;
@@ -9247,7 +9310,7 @@ html.is-dialog-open {
 }
 
 .mortgage-who__card--action:hover {
-  border-color: rgb(var(--avgst-ink-rgb) / 0.22);
+  border-color: var(--line-2);
 }
 
 .mortgage-who__card--action:active {
@@ -9266,7 +9329,7 @@ html.is-dialog-open {
   top: 14px;
   right: 14px;
   z-index: 2;
-  color: rgb(var(--avgst-ink-rgb) / 0.3);
+  color: var(--ink-4);
   transition: color 0.2s var(--ease-out);
 }
 
@@ -9375,7 +9438,7 @@ html.is-dialog-open {
   align-content: start;
   min-height: 100%;
   padding: var(--page-gutter);
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border: 1px solid var(--line);
   border-radius: var(--surface-radius);
   background: #fff;
 }
@@ -9404,7 +9467,7 @@ html.is-dialog-open {
   mask-position: calc(-1 * var(--digit-h) * var(--gx) / var(--gh))
     calc(-1 * var(--digit-h) * var(--gy) / var(--gh));
   transform: translateY(var(--digit-lift));
-  filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.35));
+  filter: drop-shadow(0 1px 0 var(--on-dark-4));
 }
 
 .mortgage-steps li:nth-child(1) .mortgage-steps__num {
@@ -9469,9 +9532,9 @@ html.is-dialog-open {
   .mortgage-steps li:hover .mortgage-steps__num {
     background-color: color-mix(in srgb, var(--brand-yellow) 78%, white);
     --digit-lift: -8px;
-    filter: drop-shadow(0 1px 0 rgb(255 255 255 / 0.9))
+    filter: drop-shadow(0 1px 0 var(--on-dark-0))
       drop-shadow(1px 3px 0 rgb(196 150 8 / 0.35))
-      drop-shadow(0 16px 20px rgb(var(--avgst-ink-rgb) / 0.18));
+      drop-shadow(0 16px 20px var(--line-2));
   }
 }
 
@@ -9491,7 +9554,7 @@ html.is-dialog-open {
   margin: 0;
   font-size: 14px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.7);
+  color: var(--ink-1);
 }
 
 .mortgage-finance {
@@ -9521,7 +9584,7 @@ html.is-dialog-open {
   flex-direction: column;
   min-width: 0;
   overflow: hidden;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border: 1px solid var(--line);
   border-radius: var(--surface-radius);
   background: #fff;
   color: var(--avgst-ink);
@@ -9530,7 +9593,7 @@ html.is-dialog-open {
 }
 
 .mortgage-finance__card:hover {
-  border-color: rgb(var(--avgst-ink-rgb) / 0.22);
+  border-color: var(--line-2);
 }
 
 .mortgage-finance__media {
@@ -9538,7 +9601,7 @@ html.is-dialog-open {
   display: block;
   overflow: hidden;
   aspect-ratio: 16 / 10;
-  background: #e8edf3;
+  background: var(--surface-sunken);
 }
 
 .mortgage-finance__media img {
@@ -9559,7 +9622,7 @@ html.is-dialog-open {
   z-index: 2;
   padding: 6px 10px;
   border-radius: 8px;
-  background: rgb(255 255 255 / 0.95);
+  background: var(--on-dark-0);
   color: var(--avgst-ink);
   font-size: 13px;
   font-weight: 600;
@@ -9584,7 +9647,7 @@ html.is-dialog-open {
 .mortgage-finance__text {
   font-size: 14px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.7);
+  color: var(--ink-1);
 }
 
 /* Кнопка прижата к низу: описания разной длины, и без этого кнопки
@@ -9744,7 +9807,7 @@ html.is-dialog-open {
 .mortgage-conditions dt,
 .mortgage-conditions dd {
   padding: 22px 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-top: 1px solid var(--line);
 }
 
 /* Первая строка без линии сверху: её роль играет заголовок раздела. */
@@ -9780,7 +9843,7 @@ html.is-dialog-open {
   margin: 18px 0 0;
   font-size: 13px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .mortgage-conditions__value {
@@ -9820,7 +9883,7 @@ html.is-dialog-open {
   margin: 0;
   font-size: 14px;
   line-height: 1.5;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 .mortgage-conditions__points {
@@ -9839,7 +9902,7 @@ html.is-dialog-open {
   padding: 0;
   font-size: 14px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.78);
+  color: var(--ink-1);
 }
 
 .mortgage-conditions__points li::before {
@@ -9985,7 +10048,7 @@ html.is-dialog-open {
 }
 
 .mortgage-mid-cta__inner--cutout .mortgage-mid-cta__body p {
-  color: rgb(var(--avgst-ink-rgb) / 0.68);
+  color: var(--ink-1);
 }
 
 /* Форма проявляется на месте текста — её набор тоже темнеет. */
@@ -10142,7 +10205,7 @@ html.is-dialog-open {
 }
 
 .mortgage-mid-cta__inner--cutout .lead-form__consent-link:hover {
-  color: rgb(var(--avgst-ink-rgb) / 0.7);
+  color: var(--ink-1);
 }
 
 /* Крестик стоит в строке подписи первого поля, у правого края: выше он
@@ -10179,7 +10242,7 @@ html.is-dialog-open {
   max-width: 40ch;
   font-size: 16px;
   line-height: 1.5;
-  color: rgb(255 255 255 / 0.78);
+  color: var(--on-dark-1);
 }
 
 .mortgage-faq {
@@ -10248,7 +10311,7 @@ html.is-dialog-open {
   max-width: 64ch;
   font-size: 13px;
   line-height: 1.4;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
 }
 
 /* Панель — одна карточка, а не серая заливка: у неё белый фон, тонкая
@@ -10258,10 +10321,10 @@ html.is-dialog-open {
   display: grid;
   gap: 16px;
   padding: 16px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border: 1px solid var(--tint);
   border-radius: var(--calc-radius-panel);
   background: #fff;
-  box-shadow: 0 1px 2px rgb(var(--avgst-ink-rgb) / 0.04);
+  box-shadow: 0 1px 2px var(--tint);
 }
 
 @media (min-width: 960px) {
@@ -10335,7 +10398,7 @@ html.is-dialog-open {
   padding: 2px;
   gap: 2px;
   border-radius: 8px;
-  background: rgb(var(--avgst-ink-rgb) / 0.08);
+  background: var(--tint);
 }
 
 .mortgage-calc__mode {
@@ -10352,7 +10415,7 @@ html.is-dialog-open {
   border-radius: 6px;
   padding: 0 10px;
   background: transparent;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
   font: inherit;
   font-size: 12px;
   font-weight: 600;
@@ -10377,7 +10440,7 @@ html.is-dialog-open {
   padding: 0 6px 0 8px;
   font-size: 12px;
   font-weight: 600;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
   white-space: nowrap;
 }
 
@@ -10474,7 +10537,7 @@ html.is-dialog-open {
   font-size: 14px;
   font-weight: 500;
   line-height: 1.25;
-  color: rgb(var(--avgst-ink-rgb) / 0.68);
+  color: var(--ink-1);
 }
 
 @media (max-width: 599px) {
@@ -10567,7 +10630,7 @@ html.is-dialog-open {
 }
 
 .mortgage-calc__tile-value input:focus-visible {
-  outline: 1px solid rgb(var(--avgst-ink-rgb) / 0.3);
+  outline: 1px solid var(--ink-4);
   outline-offset: 3px;
   border-radius: 4px;
 }
@@ -10577,7 +10640,7 @@ html.is-dialog-open {
   flex: 0 0 auto;
   font-size: 12px;
   font-weight: 600;
-  color: rgb(var(--avgst-ink-rgb) / 0.45);
+  color: var(--ink-3);
   font-variant-numeric: tabular-nums;
 }
 
@@ -10601,8 +10664,8 @@ html.is-dialog-open {
   border-radius: 999px;
   min-height: 28px;
   padding: 5px 12px;
-  background: rgb(var(--avgst-ink-rgb) / 0.06);
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  background: var(--tint);
+  color: var(--ink-1);
   font: inherit;
   font-size: 13px;
   font-weight: 600;
@@ -10629,7 +10692,7 @@ html.is-dialog-open {
   color: var(--avgst-ink);
   /* Тень мягче: карточка лежит внутри панели, а не парит над страницей.
      Прежние 32px размытия на 10% отрывали её от собственного контейнера. */
-  box-shadow: 0 4px 16px rgb(var(--avgst-ink-rgb) / 0.06);
+  box-shadow: 0 4px 16px var(--tint);
 }
 
 .mortgage-calc__hero-num {
@@ -10649,7 +10712,7 @@ html.is-dialog-open {
   min-height: 2.6em;
   font-size: 12px;
   line-height: 1.3;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .mortgage-calc__result-metrics {
@@ -10658,8 +10721,8 @@ html.is-dialog-open {
   gap: 8px;
   min-height: 48px;
   padding: 8px 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
-  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
+  border-bottom: 1px solid var(--tint);
 }
 
 .mortgage-calc__result-metrics strong {
@@ -10674,7 +10737,7 @@ html.is-dialog-open {
   display: block;
   margin-top: 1px;
   font-size: 11px;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
+  color: var(--ink-3);
 }
 
 /* Фиксированный слот — льготные части не двигают карточку. */
@@ -10691,7 +10754,7 @@ html.is-dialog-open {
   height: 100%;
   padding: 8px 10px;
   border-radius: 8px;
-  background: rgb(var(--avgst-ink-rgb) / 0.04);
+  background: var(--tint);
   align-content: center;
 }
 
@@ -10707,7 +10770,7 @@ html.is-dialog-open {
 
 .mortgage-calc__parts span {
   min-width: 0;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 /* Ставка при названии части: не курсив, чуть плотнее подписи, чтобы не
@@ -10717,7 +10780,7 @@ html.is-dialog-open {
   font-style: normal;
   font-weight: 600;
   font-variant-numeric: tabular-nums;
-  color: rgb(var(--avgst-ink-rgb) / 0.8);
+  color: var(--ink-0);
 }
 
 .mortgage-calc__parts strong {
@@ -10771,7 +10834,7 @@ html.is-dialog-open {
 
 /* Карточка расчёта светлая: базовый белый крестик на ней был невидим. */
 .mortgage-calc__reveal-card .lead-reveal__close {
-  color: rgb(var(--avgst-ink-rgb) / 0.45);
+  color: var(--ink-3);
 }
 
 .mortgage-calc__reveal-card .lead-reveal__close:hover {
@@ -10818,7 +10881,7 @@ html.is-dialog-open {
   padding: 8px 10px;
   font-size: 12px;
   line-height: 1.3;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
   text-align: center;
 }
 
@@ -10850,7 +10913,7 @@ html.is-dialog-open {
 .mortgage-calc__project-payment .mortgage-calc__hero-label {
   min-height: 0;
   margin-top: 2px;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .mortgage-calc__receipt {
@@ -10872,11 +10935,11 @@ html.is-dialog-open {
 
 .mortgage-calc__receipt dt {
   font-size: 12px;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
 }
 
 .mortgage-calc__receipt > div > span {
-  border-bottom: 1px dotted rgb(var(--avgst-ink-rgb) / 0.2);
+  border-bottom: 1px dotted var(--line-2);
 }
 
 .mortgage-calc__receipt dd {
@@ -10896,7 +10959,7 @@ html.is-dialog-open {
   display: grid;
   gap: 12px;
   padding-top: 16px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-top: 1px solid var(--tint);
 }
 
 .mortgage-calc__matches-head {
@@ -10912,7 +10975,7 @@ html.is-dialog-open {
   font-size: 16px;
   font-weight: 600;
   line-height: 1.3;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 /* Число — единственное место, где оно названо. Раньше то же значение стояло
@@ -10981,7 +11044,7 @@ html.is-dialog-open {
 .mortgage-calc__matches-empty {
   margin: 0;
   font-size: 14px;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 /* Предупреждение живёт внутри карточки результата, в боксе под разбивкой
@@ -10992,20 +11055,20 @@ html.is-dialog-open {
   /* Без балансировки строк: она подрезает их по длине и оставляет справа
      пустое поле, хотя ширина карточки позволяет набрать строку до края. */
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .catalog__budget-note {
   margin: 0 0 var(--gap-tile);
   font-size: 15px;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 /* Radix Accordion (shadcn-примитив) под AV4. */
 .ui-accordion {
   display: grid;
   gap: 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-top: 1px solid var(--line);
 }
 
 /* Строка держит свой рост, а знак крупнее её: выход за кромку срезается
@@ -11014,7 +11077,7 @@ html.is-dialog-open {
 .ui-accordion__item {
   position: relative;
   overflow: hidden;
-  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border-bottom: 1px solid var(--line);
 }
 
 /* Знак состояния — та же стрелка, что ведёт в карточках: свёрнутый пункт
@@ -11123,7 +11186,7 @@ html.is-dialog-open {
 }
 
 .ui-accordion__trigger:hover {
-  color: rgb(var(--avgst-ink-rgb) / 0.82);
+  color: var(--ink-0);
 }
 
 .ui-accordion__trigger:focus-visible {
@@ -11151,7 +11214,7 @@ html.is-dialog-open {
   padding: 0 var(--mark-lane) 18px 0;
   font-size: 15px;
   line-height: 1.55;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 @keyframes ui-accordion-down {
@@ -11320,7 +11383,7 @@ html.is-dialog-open {
 }
 
 .mortgage-family--light .mortgage-family__body > p:not(.eyebrow) {
-  color: rgb(var(--avgst-ink-rgb) / 0.68);
+  color: var(--ink-1);
 }
 
 /* Первый экран со знаком на узком экране.
@@ -11462,17 +11525,17 @@ html.is-dialog-open {
      одной линии с «сумма кредита». */
   padding: 1px 6px;
   margin: -2px -6px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.16);
+  border: 1px solid var(--line);
   border-radius: 7px;
-  background: rgb(var(--avgst-ink-rgb) / 0.03);
+  background: var(--tint);
   transition:
     border-color 0.2s var(--ease-out),
     background-color 0.2s var(--ease-out);
 }
 
 .mortgage-calc__result-metrics .mortgage-calc__rate-chip:hover {
-  border-color: rgb(var(--avgst-ink-rgb) / 0.3);
-  background: rgb(var(--avgst-ink-rgb) / 0.06);
+  border-color: var(--ink-4);
+  background: var(--tint);
 }
 
 /* Фокус той же волосяной гранью, что у денежных полей калькулятора, а не
@@ -11480,13 +11543,13 @@ html.is-dialog-open {
    чужой. Фон при этом белеет — плашка перестаёт быть кнопкой и становится
    полем, в котором стоит каретка. */
 .mortgage-calc__result-metrics .mortgage-calc__rate-chip:focus-within {
-  border-color: rgb(var(--avgst-ink-rgb) / 0.35);
+  border-color: var(--ink-4);
   background: #fff;
 }
 
 .mortgage-calc__rate-pen {
   flex: 0 0 auto;
-  color: rgb(var(--avgst-ink-rgb) / 0.4);
+  color: var(--ink-3);
 }
 
 .mortgage-calc__rate-edit input {
@@ -11543,9 +11606,9 @@ html.is-dialog-open {
   margin: 24px auto 0;
   padding: 10px 14px;
   border-radius: 10px;
-  background: rgb(var(--avgst-ink-rgb) / 0.05);
+  background: var(--tint);
   font-size: 13px;
-  color: rgb(var(--avgst-ink-rgb) / 0.6);
+  color: var(--ink-2);
 }
 
 /* Полоса разделов липнет к верху окна. */
@@ -11554,8 +11617,8 @@ html.is-dialog-open {
   top: 0;
   z-index: 5;
   margin-top: 24px;
-  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
-  background: rgb(255 255 255 / 0.92);
+  border-bottom: 1px solid var(--line);
+  background: var(--on-dark-0);
   backdrop-filter: blur(10px);
 }
 
@@ -11573,7 +11636,7 @@ html.is-dialog-open {
 
 .pp__nav a {
   flex: 0 0 auto;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
   font-size: 14px;
   font-weight: 600;
   text-decoration: none;
@@ -11618,7 +11681,7 @@ html.is-dialog-open {
 .pp__specs dd {
   margin: 4px 0 0;
   font-size: 13px;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .pp__about-text p {
@@ -11626,7 +11689,7 @@ html.is-dialog-open {
   margin: 0 0 16px;
   font-size: 16px;
   line-height: 1.6;
-  color: rgb(var(--avgst-ink-rgb) / 0.75);
+  color: var(--ink-1);
 }
 
 /* ── Планировка ── */
@@ -11671,7 +11734,7 @@ html.is-dialog-open {
   gap: 2px 12px;
   width: 100%;
   padding: 14px 16px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border: 1px solid var(--line);
   border-radius: 12px;
   background: #fff;
   color: inherit;
@@ -11684,7 +11747,7 @@ html.is-dialog-open {
 }
 
 .pp__room:hover {
-  border-color: rgb(var(--avgst-ink-rgb) / 0.28);
+  border-color: var(--ink-4);
 }
 
 .pp__room:active {
@@ -11703,7 +11766,7 @@ html.is-dialog-open {
 .pp__room-area {
   font-size: 15px;
   font-weight: 600;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .pp__room-go {
@@ -11712,7 +11775,7 @@ html.is-dialog-open {
   gap: 4px;
   grid-column: 1 / -1;
   font-size: 12px;
-  color: rgb(var(--avgst-ink-rgb) / 0.45);
+  color: var(--ink-3);
 }
 
 /* ── Фасады: бенто ── */
@@ -11744,7 +11807,7 @@ html.is-dialog-open {
   margin: 0;
   aspect-ratio: 16 / 9;
   border-radius: 14px;
-  background: #e8edf3;
+  background: var(--surface-sunken);
 }
 
 @media (min-width: 900px) {
@@ -11780,8 +11843,8 @@ html.is-dialog-open {
   padding: 8px 14px;
   border: 0;
   border-radius: 999px;
-  background: rgb(var(--avgst-ink-rgb) / 0.06);
-  color: rgb(var(--avgst-ink-rgb) / 0.75);
+  background: var(--tint);
+  color: var(--ink-1);
   font: inherit;
   font-size: 14px;
   font-weight: 600;
@@ -11792,7 +11855,7 @@ html.is-dialog-open {
 }
 
 .pp__chip:hover {
-  background: rgb(var(--avgst-ink-rgb) / 0.1);
+  background: var(--line);
 }
 
 .pp__chip--on {
@@ -11818,7 +11881,7 @@ html.is-dialog-open {
   margin: 0;
   aspect-ratio: 16 / 9;
   border-radius: 14px;
-  background: #e8edf3;
+  background: var(--surface-sunken);
 }
 
 .pp__shots img {
@@ -11871,7 +11934,7 @@ html.is-dialog-open {
   gap: 8px;
   flex: 1 1 auto;
   padding: 20px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border: 1px solid var(--line);
   border-radius: 16px;
   background: #fff;
   color: inherit;
@@ -11885,7 +11948,7 @@ html.is-dialog-open {
 }
 
 .pp__tier:hover {
-  border-color: rgb(var(--avgst-ink-rgb) / 0.28);
+  border-color: var(--ink-4);
 }
 
 .pp__tier:active {
@@ -11896,7 +11959,7 @@ html.is-dialog-open {
    бы весь состав, который в ней и читают. */
 .pp__tier--on {
   border-color: var(--avgst-ink);
-  box-shadow: 0 10px 30px -20px rgb(var(--avgst-ink-rgb) / 0.55);
+  box-shadow: 0 10px 30px -20px var(--ink-2);
 }
 
 .pp__tier-name {
@@ -11908,7 +11971,7 @@ html.is-dialog-open {
 .pp__tier-lead {
   font-size: 14px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
 }
 
 .pp__tier-price {
@@ -11924,9 +11987,9 @@ html.is-dialog-open {
   gap: 6px;
   margin-top: 8px;
   padding-top: 14px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-top: 1px solid var(--line);
   font-size: 14px;
-  color: rgb(var(--avgst-ink-rgb) / 0.75);
+  color: var(--ink-1);
 }
 
 .pp__tier-list > span {
@@ -11951,16 +12014,16 @@ html.is-dialog-open {
   position: sticky;
   top: 76px;
   padding: 22px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border: 1px solid var(--line);
   border-radius: 16px;
   background: #fff;
-  box-shadow: 0 8px 28px -18px rgb(var(--avgst-ink-rgb) / 0.4);
+  box-shadow: 0 8px 28px -18px var(--ink-3);
 }
 
 .pp__total-label {
   margin: 0;
   font-size: 13px;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .pp__total-sum {
@@ -11976,7 +12039,7 @@ html.is-dialog-open {
   gap: 2px;
   margin: 14px 0 18px;
   padding-top: 14px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-top: 1px solid var(--line);
   font-size: 16px;
   font-weight: 600;
   color: var(--avgst-green);
@@ -11985,7 +12048,7 @@ html.is-dialog-open {
 .pp__total-pay span {
   font-size: 12px;
   font-weight: 400;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
+  color: var(--ink-3);
 }
 
 .pp__total .btn {
@@ -11997,7 +12060,7 @@ html.is-dialog-open {
   margin: 12px 0 0;
   font-size: 12px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
+  color: var(--ink-3);
 }
 
 /* ───────── Комплектация ─────────
@@ -12046,7 +12109,7 @@ html.is-dialog-open {
   gap: 8px;
   flex: 1 1 auto;
   padding: 20px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.12);
+  border: 1px solid var(--line);
   border-radius: 16px;
   background: #fff;
   color: inherit;
@@ -12060,7 +12123,7 @@ html.is-dialog-open {
 }
 
 .project-config__tier:hover {
-  border-color: rgb(var(--avgst-ink-rgb) / 0.28);
+  border-color: var(--ink-4);
 }
 
 .project-config__tier:active {
@@ -12071,7 +12134,7 @@ html.is-dialog-open {
    бы весь состав, который в ней и читают. */
 .project-config__tier--on {
   border-color: var(--avgst-ink);
-  box-shadow: 0 10px 30px -20px rgb(var(--avgst-ink-rgb) / 0.55);
+  box-shadow: 0 10px 30px -20px var(--ink-2);
 }
 
 .project-config__tier-name {
@@ -12083,7 +12146,7 @@ html.is-dialog-open {
 .project-config__tier-lead {
   font-size: 14px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
 }
 
 .project-config__tier-price {
@@ -12100,9 +12163,9 @@ html.is-dialog-open {
   gap: 6px;
   margin-top: 8px;
   padding-top: 14px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-top: 1px solid var(--line);
   font-size: 14px;
-  color: rgb(var(--avgst-ink-rgb) / 0.75);
+  color: var(--ink-1);
 }
 
 .project-config__tier-list > span {
@@ -12126,7 +12189,7 @@ html.is-dialog-open {
   font-size: 11px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: rgb(var(--avgst-ink-rgb) / 0.45);
+  color: var(--ink-3);
 }
 
 /* Пунктир, а не сплошная: отбивка внутри списка легче сплошных линий
@@ -12136,7 +12199,7 @@ html.is-dialog-open {
   content: "";
   flex: 1;
   height: 0;
-  border-top: 1px dashed rgb(var(--avgst-ink-rgb) / 0.22);
+  border-top: 1px dashed var(--line-2);
 }
 
 .project-config__tier-band > span {
@@ -12176,7 +12239,7 @@ html.is-dialog-open {
   border: 0;
   aspect-ratio: 16 / 10;
   border-radius: 14px;
-  background: rgb(255 255 255 / 0.08);
+  background: var(--tint-on-dark);
   cursor: pointer;
   transition: transform 0.16s var(--ease-out);
 }
@@ -12245,7 +12308,7 @@ html.is-dialog-open {
   border: 0;
   aspect-ratio: 21 / 9;
   border-radius: var(--surface-radius, 18px);
-  background: #e8edf3;
+  background: var(--surface-sunken);
   cursor: pointer;
 }
 
@@ -12281,7 +12344,7 @@ html.is-dialog-open {
   border: 0;
   aspect-ratio: 16 / 9;
   border-radius: 14px;
-  background: #e8edf3;
+  background: var(--surface-sunken);
   scroll-snap-align: start;
   cursor: pointer;
   transition: transform 0.16s var(--ease-out);
@@ -12327,7 +12390,7 @@ html.is-dialog-open {
   height: 30px;
   place-items: center;
   padding: 0;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.14);
+  border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
   color: var(--avgst-ink);
@@ -12346,7 +12409,7 @@ html.is-dialog-open {
 }
 
 .project-similar__controls button:disabled {
-  color: rgb(var(--avgst-ink-rgb) / 0.28);
+  color: var(--ink-4);
   cursor: default;
 }
 
@@ -12576,10 +12639,10 @@ html.is-dialog-open {
   align-self: start;
   min-width: 0;
   padding: 22px;
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border: 1px solid var(--line);
   border-radius: 16px;
   background: #fff;
-  box-shadow: 0 8px 28px -18px rgb(var(--avgst-ink-rgb) / 0.4);
+  box-shadow: 0 8px 28px -18px var(--ink-3);
   transition:
     background 0.42s var(--ease-out),
     color 0.42s var(--ease-out),
@@ -12601,11 +12664,11 @@ html.is-dialog-open {
 
 .project-config__total[data-form="true"] .project-config__total-label,
 .project-config__total[data-form="true"] .project-config__total-pay span {
-  color: rgb(255 255 255 / 0.6);
+  color: var(--on-dark-3);
 }
 
 .project-config__total[data-form="true"] .project-config__total-pay {
-  border-top-color: rgb(255 255 255 / 0.16);
+  border-top-color: var(--line-on-dark);
 }
 
 .project-config__total[data-form="true"] .project-config__total-pay--plain {
@@ -12617,28 +12680,28 @@ html.is-dialog-open {
 }
 
 .project-config__total[data-form="true"] .lead-card input {
-  border-color: rgb(255 255 255 / 0.28);
-  background: rgb(255 255 255 / 0.06);
+  border-color: var(--on-dark-4);
+  background: var(--tint-on-dark);
   color: #fff;
 }
 
 .project-config__total[data-form="true"] .lead-card input::placeholder {
-  color: rgb(255 255 255 / 0.45);
+  color: var(--on-dark-4);
 }
 
 .project-config__total[data-form="true"] .lead-card input:focus-visible {
-  border-color: rgb(255 255 255 / 0.7);
-  box-shadow: 0 0 0 3px rgb(255 255 255 / 0.12);
+  border-color: var(--on-dark-2);
+  box-shadow: 0 0 0 3px var(--tint-on-dark);
 }
 
 .project-config__total[data-form="true"] .lead-form__consent {
-  color: rgb(255 255 255 / 0.72);
+  color: var(--on-dark-2);
 }
 
 .project-config__total-label {
   margin: 0;
   font-size: 13px;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .project-config__total-sum {
@@ -12654,7 +12717,7 @@ html.is-dialog-open {
   gap: 2px;
   margin: 14px 0 18px;
   padding-top: 14px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-top: 1px solid var(--line);
   font-size: 16px;
   font-weight: 600;
   color: var(--avgst-green);
@@ -12670,7 +12733,7 @@ html.is-dialog-open {
 .project-config__total-pay span {
   font-size: 12px;
   font-weight: 400;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
+  color: var(--ink-3);
 }
 
 .project-config__total .btn {
@@ -12749,8 +12812,8 @@ html.is-dialog-open {
    правила: та рисовалась поверх скруглённого поля вторым контуром. */
 .project-config__form .lead-card input:focus-visible {
   outline: none;
-  border-color: rgb(var(--avgst-ink-rgb) / 0.55);
-  box-shadow: 0 0 0 3px rgb(var(--avgst-ink-rgb) / 0.08);
+  border-color: var(--ink-2);
+  box-shadow: 0 0 0 3px var(--tint);
 }
 
 /* Согласие в узкой колонке переносится по словам: неразрывная строка из
@@ -12786,7 +12849,7 @@ html.is-dialog-open {
   margin: 12px 0 0;
   font-size: 12px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
+  color: var(--ink-3);
 }
 
 .ready-home-offer {
@@ -12810,7 +12873,7 @@ html.is-dialog-open {
 }
 
 .ready-home-offer__details {
-  border: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border: 1px solid var(--line);
   background: #fff;
 }
 
@@ -12819,7 +12882,7 @@ html.is-dialog-open {
   margin: 0;
   font-size: 16px;
   line-height: 1.5;
-  color: rgb(var(--avgst-ink-rgb) / 0.65);
+  color: var(--ink-1);
 }
 
 .ready-home-offer__sections {
@@ -12827,7 +12890,7 @@ html.is-dialog-open {
   gap: 28px;
   margin-top: 24px;
   padding-top: 22px;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-top: 1px solid var(--line);
 }
 
 .ready-home-offer__section h3 {
@@ -12836,7 +12899,7 @@ html.is-dialog-open {
   font-weight: 700;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: rgb(var(--avgst-ink-rgb) / 0.55);
+  color: var(--ink-2);
 }
 
 .ready-home-offer__points {
@@ -12860,7 +12923,7 @@ html.is-dialog-open {
 }
 
 .ready-home-offer__section--place .ready-home-offer__points > li > svg {
-  color: #2f6b4f;
+  color: var(--success-strong);
 }
 
 .ready-home-offer__points > li > div {
@@ -12887,14 +12950,14 @@ html.is-dialog-open {
   padding-left: 1.1em;
   font-size: 15px;
   line-height: 1.45;
-  color: rgb(var(--avgst-ink-rgb) / 0.72);
+  color: var(--ink-1);
 }
 
 .ready-home-offer__points > li > div > ul > li::before {
   content: "—";
   position: absolute;
   left: 0;
-  color: rgb(var(--avgst-ink-rgb) / 0.4);
+  color: var(--ink-3);
 }
 
 /* Старый плоский список — если секций ещё нет. */
@@ -12904,7 +12967,7 @@ html.is-dialog-open {
   gap: 10px 24px;
   margin: 22px 0 0;
   padding: 20px 0 0;
-  border-top: 1px solid rgb(var(--avgst-ink-rgb) / 0.1);
+  border-top: 1px solid var(--line);
   list-style: none;
 }
 
@@ -12937,7 +13000,7 @@ html.is-dialog-open {
 .ready-home-offer__summary p,
 .ready-home-offer__summary span {
   margin: 0;
-  color: rgb(255 255 255 / 0.58);
+  color: var(--on-dark-3);
 }
 
 .ready-home-offer__summary p {
@@ -12970,13 +13033,13 @@ html.is-dialog-open {
 }
 
 .ready-home-offer__total .lead-card input {
-  border-color: rgb(255 255 255 / 0.28);
-  background: rgb(255 255 255 / 0.06);
+  border-color: var(--on-dark-4);
+  background: var(--tint-on-dark);
   color: #fff;
 }
 
 .ready-home-offer__total .lead-form__consent {
-  color: rgb(255 255 255 / 0.72);
+  color: var(--on-dark-2);
   white-space: normal;
 }
 
@@ -13111,15 +13174,15 @@ html.is-dialog-open {
   max-width: 43ch;
   font-size: 15px;
   line-height: 1.35;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
 }
 
 .project-next-steps__tile--consult .project-next-steps__lead {
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
 }
 
 .project-next-steps__tile--review .project-next-steps__lead {
-  color: rgb(255 255 255 / 0.76);
+  color: var(--on-dark-2);
 }
 
 .project-next-steps__tile:hover .series-bento__go {
@@ -13190,7 +13253,7 @@ html.is-dialog-open {
   border: 0;
   aspect-ratio: 16 / 9;
   border-radius: 14px;
-  background: #e8edf3;
+  background: var(--surface-sunken);
   cursor: pointer;
   transition: transform 0.16s var(--ease-out);
   min-width: 0;
@@ -13354,7 +13417,7 @@ html.is-dialog-open {
   left: 72px;
   z-index: 2;
   margin: 0;
-  color: rgb(255 255 255 / 0.85);
+  color: var(--on-dark-1);
   font-size: 14px;
   font-weight: 600;
   letter-spacing: 0.02em;
@@ -13388,7 +13451,7 @@ html.is-dialog-open {
   height: 44px;
   border: 0;
   border-radius: 999px;
-  background: rgb(255 255 255 / 0.14);
+  background: var(--line-on-dark);
   color: #fff;
   cursor: pointer;
   transition:
@@ -13398,7 +13461,7 @@ html.is-dialog-open {
 
 .photo-lightbox__close:hover,
 .photo-lightbox__nav:hover {
-  background: rgb(255 255 255 / 0.26);
+  background: var(--line-on-dark);
 }
 
 .photo-lightbox__close:active {
@@ -13468,7 +13531,7 @@ html.is-dialog-open {
   padding: 0;
   border: 0;
   border-radius: 8px;
-  background: rgb(255 255 255 / 0.1);
+  background: var(--tint-on-dark);
   opacity: 0.5;
   cursor: pointer;
   /* Рамку рисуем внутрь: outline с отступом обрезался бы краями ленты —
@@ -13543,7 +13606,7 @@ html.is-dialog-open {
   border: 0;
   border-radius: 999px;
   background: rgb(0 0 0 / 0.56);
-  color: rgb(255 255 255 / 0.8);
+  color: var(--on-dark-1);
   font: inherit;
   font-size: 13px;
   font-weight: 650;
@@ -13632,7 +13695,7 @@ html.is-dialog-open {
 
 .project-plans__legend-head {
   padding: 18px 20px 14px;
-  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-bottom: 1px solid var(--tint);
 }
 
 .project-plans__legend-title {
@@ -13641,7 +13704,7 @@ html.is-dialog-open {
   font-weight: 700;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: rgb(var(--avgst-ink-rgb) / 0.5);
+  color: var(--ink-3);
 }
 
 .project-plans__floor-tabs {
@@ -13660,7 +13723,7 @@ html.is-dialog-open {
   border: 0;
   border-radius: 6px;
   background: transparent;
-  color: rgb(var(--avgst-ink-rgb) / 0.62);
+  color: var(--ink-2);
   font: inherit;
   font-size: 12px;
   font-weight: 650;
@@ -13693,7 +13756,7 @@ html.is-dialog-open {
   justify-content: space-between;
   gap: 12px;
   padding: 10px 0;
-  border-bottom: 1px solid rgb(var(--avgst-ink-rgb) / 0.08);
+  border-bottom: 1px solid var(--tint);
 }
 
 .project-plans__legend dl > div:last-child {
@@ -13703,7 +13766,7 @@ html.is-dialog-open {
 .project-plans__legend dt {
   text-align: left;
   font-size: 14px;
-  color: rgb(var(--avgst-ink-rgb) / 0.75);
+  color: var(--ink-1);
 }
 
 .project-plans__legend dd {
