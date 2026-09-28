@@ -1386,6 +1386,78 @@ a {
 .section.manufacture-dispatch { padding-bottom: 0; background: #fff; }
 .section.manufacture-routes { background: var(--page); }
 
+.section.manufacture-module { min-height: 400svh; }
+.manufacture-module__video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+  z-index: 8;
+  opacity: 0;
+  pointer-events: none;
+}
+.manufacture-module__sticky {
+  position: sticky;
+  top: 80px;
+  height: calc(100svh - 104px);
+  display: flex;
+  flex-direction: column;
+}
+.manufacture-module__sticky .manufacture-section-head { max-width: 100%; }
+.manufacture-module__intro h2 {
+  will-change: transform, opacity;
+}
+.manufacture-module__scene {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+}
+.manufacture-module__scene img {
+  object-fit: contain;
+  object-position: center bottom;
+}
+.manufacture-module__wall {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+.manufacture-module__note {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 1;
+  max-width: 860px;
+  margin-inline: auto;
+  text-align: center;
+  display: grid;
+}
+.manufacture-module__note p[data-visible="true"] { opacity: 1; transform: translateY(0); }
+.manufacture-module__note p {
+  grid-area: 1 / 1;
+  margin: 0;
+  color: var(--avgst-ink);
+  font-size: clamp(24px, 2.8vw, 40px);
+  font-weight: 600;
+  line-height: 1.2;
+  letter-spacing: -0.025em;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .manufacture-module__note p, .manufacture-module__intro h2 { transform: none; transition: none; }
+}
+@media (max-width: 719px) {
+  .manufacture-module__sticky { top: 72px; height: calc(100svh - 96px); }
+  .manufacture-module__note { max-width: 100%; }
+  .manufacture-module__text-break { display: none; }
+}
+
 .manufacture-dispatch__stage {
   position: relative;
   height: clamp(100px, 11vw, 150px);

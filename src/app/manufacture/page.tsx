@@ -7,6 +7,7 @@ import { ContactsSection } from "../../components/block-renderer";
 import { LeadDialogButton } from "../../components/lead-dialog";
 import { ManufactureVideoReview } from "../../components/manufacture-video-review";
 import { ManufactureTruckTransition } from "../../components/manufacture-truck-transition";
+import { ManufactureModuleScene } from "../../components/manufacture-module-scene";
 import { ManufactureFaq, ManufacturePreparationQuestions, ManufactureProjectQuestions } from "../../components/manufacture-faq";
 import { copy, footerAboutFor } from "../../lib/copy";
 import { SITE } from "../../lib/site";
@@ -135,11 +136,9 @@ export default function ManufacturePage() {
           </div>
         </section>
         <ManufactureTruckTransition />
-        <section className="section manufacture-routes" aria-labelledby="manufacture-routes-title">
-          <div className="section__inner">
-            <div className="manufacture-section-head">
-              <h2 id="manufacture-routes-title">А&nbsp;для модульного дома<br />всё только начинается</h2>
-            </div>
+        <section className="section manufacture-routes manufacture-module" aria-labelledby="manufacture-routes-title">
+          <div className="section__inner manufacture-module__sticky">
+            <ManufactureModuleScene />
           </div>
         </section>
         <section className="section manufacture-finish" aria-labelledby="manufacture-finish-title">
