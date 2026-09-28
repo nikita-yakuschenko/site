@@ -14,11 +14,37 @@ export function ManufactureTruckTransition() {
 
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
+    let currentX: number | null = null;
+    let targetX = 0;
+    let lastFrameTime = 0;
 
-    const update = () => {
+    const placeTruck = (x: number) => {
+      truck.style.transform = `translate3d(${x}px, 0, 0)`;
+    };
+
+    const animate = (time: number) => {
       frame = 0;
+      const elapsed = lastFrameTime ? Math.min(time - lastFrameTime, 64) : 16;
+      lastFrameTime = time;
+      const followTime = window.innerWidth < 720 ? 260 : 180;
+      currentX = (currentX ?? targetX) + (targetX - (currentX ?? targetX)) * (1 - Math.exp(-elapsed / followTime));
+
+      if (Math.abs(targetX - currentX) < 0.5) {
+        currentX = targetX;
+        lastFrameTime = 0;
+      } else {
+        frame = window.requestAnimationFrame(animate);
+      }
+      placeTruck(currentX);
+    };
+
+    const updateTarget = () => {
       if (reducedMotion.matches) {
-        truck.style.transform = "translate3d(0, 0, 0)";
+        window.cancelAnimationFrame(frame);
+        frame = 0;
+        currentX = null;
+        lastFrameTime = 0;
+        truck.style.removeProperty("transform");
         return;
       }
 
@@ -26,27 +52,29 @@ export function ManufactureTruckTransition() {
       const progress = Math.min(1, Math.max(0, (window.innerHeight - bounds.top) / (window.innerHeight + bounds.height)));
       const start = bounds.width;
       const end = -truck.offsetWidth;
-      truck.style.transform = `translate3d(${start + (end - start) * progress}px, 0, 0)`;
+      targetX = start + (end - start) * progress;
+      if (currentX === null) {
+        currentX = targetX;
+        placeTruck(currentX);
+      } else if (!frame) {
+        frame = window.requestAnimationFrame(animate);
+      }
     };
 
-    const scheduleUpdate = () => {
-      if (!frame) frame = window.requestAnimationFrame(update);
-    };
-
-    const resizeObserver = new ResizeObserver(scheduleUpdate);
+    const resizeObserver = new ResizeObserver(updateTarget);
     resizeObserver.observe(stage);
     resizeObserver.observe(truck);
-    window.addEventListener("scroll", scheduleUpdate, { passive: true });
-    window.addEventListener("resize", scheduleUpdate);
-    reducedMotion.addEventListener("change", scheduleUpdate);
-    scheduleUpdate();
+    window.addEventListener("scroll", updateTarget, { passive: true });
+    window.addEventListener("resize", updateTarget);
+    reducedMotion.addEventListener("change", updateTarget);
+    updateTarget();
 
     return () => {
       window.cancelAnimationFrame(frame);
       resizeObserver.disconnect();
-      window.removeEventListener("scroll", scheduleUpdate);
-      window.removeEventListener("resize", scheduleUpdate);
-      reducedMotion.removeEventListener("change", scheduleUpdate);
+      window.removeEventListener("scroll", updateTarget);
+      window.removeEventListener("resize", updateTarget);
+      reducedMotion.removeEventListener("change", updateTarget);
     };
   }, []);
 
