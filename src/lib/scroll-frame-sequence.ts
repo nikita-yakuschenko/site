@@ -1,9 +1,9 @@
-type DecodedFrame = ImageBitmap | HTMLImageElement;
+type DecodedFrame = ImageBitmap | HTMLCanvasElement;
 
-async function decodeFrame(blob: Blob): Promise<DecodedFrame> {
+async function decodeFrame(blob: Blob, width: number, height: number): Promise<DecodedFrame> {
   if (typeof createImageBitmap === "function") {
     try {
-      return await createImageBitmap(blob);
+      return await createImageBitmap(blob, { resizeWidth: width, resizeHeight: height, resizeQuality: "high" });
     } catch {
       // Fall back to the browser's image decoder when bitmap decoding is unavailable.
     }
@@ -13,7 +13,11 @@ async function decodeFrame(blob: Blob): Promise<DecodedFrame> {
     const image = new Image();
     image.src = url;
     await image.decode();
-    return image;
+    const buffer = document.createElement("canvas");
+    buffer.width = width;
+    buffer.height = height;
+    buffer.getContext("2d")?.drawImage(image, 0, 0, width, height);
+    return buffer;
   } finally {
     URL.revokeObjectURL(url);
   }
@@ -21,9 +25,10 @@ async function decodeFrame(blob: Blob): Promise<DecodedFrame> {
 
 function releaseFrame(image: DecodedFrame) {
   if ("close" in image) image.close();
+  else { image.width = 0; image.height = 0; }
 }
 
-/** Fetch the sequence progressively, but only decode the current frame's neighborhood. */
+/** Prepare and retain every frame before playback reaches it; scrolling only draws ready images. */
 export function createScrollFrameSequence(canvas: HTMLCanvasElement, urls: readonly string[], onReady: () => void) {
   const context = canvas.getContext("2d");
   const controller = new AbortController();
@@ -35,32 +40,38 @@ export function createScrollFrameSequence(canvas: HTMLCanvasElement, urls: reado
   const attempts = new Map<number, number>();
   const retryAfter = new Map<number, number>();
   const retryTimers = new Set<ReturnType<typeof setTimeout>>();
+  const sourceWidth = canvas.width;
+  const sourceHeight = canvas.height;
+  const aspect = sourceWidth / sourceHeight;
+  const backgroundOrder = [...new Set([0, ...urls.map((_, index) => index).filter(index => index % 8 === 0), urls.length - 1, ...urls.map((_, index) => index)])];
   let wanted = 0;
+  let anticipated = 0;
   let direction = 1;
   let drawn = -1;
   let initialSettled = false;
   let disposed = false;
-  const radius = 3;
+  const radius = 8;
+  let renderWidth = sourceWidth;
+  let renderHeight = sourceHeight;
+
+  function measure() {
+    const bounds = canvas.getBoundingClientRect();
+    const displayWidth = Math.min(bounds.width, bounds.height * aspect);
+    // Keep all frames ready, at the canvas's display resolution, within a fixed memory budget.
+    // Master files and their dimensions stay unchanged.
+    const budget = (window.matchMedia("(max-width: 719px)").matches ? 128 : 256) * 1024 * 1024;
+    const budgetWidth = Math.floor(Math.sqrt(budget * aspect / (urls.length * 4)));
+    renderWidth = Math.max(1, Math.min(sourceWidth, budgetWidth, Math.ceil(displayWidth * Math.min(devicePixelRatio || 1, 2))));
+    renderHeight = Math.max(1, Math.round(renderWidth / aspect));
+  }
+  measure();
 
   function neighbors() {
-    const indices = [wanted];
+    const indices = [wanted, anticipated];
     for (let offset = 1; offset <= radius; offset++) {
-      indices.push(wanted + offset * direction, wanted - offset * direction);
+      indices.push(wanted + offset * direction, anticipated + offset * direction, wanted - offset * direction);
     }
     return indices.filter(index => index >= 0 && index < urls.length);
-  }
-
-  function shouldKeep(index: number) {
-    return index === 0 || Math.abs(index - wanted) <= radius;
-  }
-
-  function trimDecoded() {
-    for (const [index, image] of decoded) {
-      if (!shouldKeep(index)) {
-        releaseFrame(image);
-        decoded.delete(index);
-      }
-    }
   }
 
   function canFetch(index: number) {
@@ -104,12 +115,12 @@ export function createScrollFrameSequence(canvas: HTMLCanvasElement, urls: reado
       if (canFetch(0)) void fetchFrame(0);
       return;
     }
-    // Reserve a third slot for an urgent seek while two background downloads continue.
-    if (fetching.size < 3 && canFetch(wanted)) void fetchFrame(wanted);
-    while (fetching.size < 2) {
+    // Keep one slot available for a seek, alongside four background downloads.
+    if (fetching.size < 5 && canFetch(wanted)) void fetchFrame(wanted);
+    while (fetching.size < 4) {
       let next = neighbors().find(canFetch);
       if (next === undefined) {
-        for (let index = 0; index < urls.length; index++) {
+        for (const index of backgroundOrder) {
           if (canFetch(index)) { next = index; break; }
         }
       }
@@ -122,17 +133,24 @@ export function createScrollFrameSequence(canvas: HTMLCanvasElement, urls: reado
     const blob = blobs.get(index);
     if (!blob) return;
     decoding.add(index);
+    const width = renderWidth;
+    const height = renderHeight;
     try {
-      const image = await decodeFrame(blob);
-      if (disposed || !shouldKeep(index)) releaseFrame(image);
-      else decoded.set(index, image);
+      const image = await decodeFrame(blob, width, height);
+      if (disposed || width !== renderWidth || height !== renderHeight) releaseFrame(image);
+      else {
+        const previous = decoded.get(index);
+        if (previous) releaseFrame(previous);
+        decoded.set(index, image);
+        if (index === drawn) drawn = -1;
+        canvas.dataset.preparedFrames = String(decoded.size);
+      }
     } catch {
       decodeErrors.add(index);
     } finally {
       decoding.delete(index);
       if (!disposed) {
         if (index === 0) initialSettled = true;
-        trimDecoded();
         onReady();
         pumpDecode();
         pumpFetch();
@@ -142,9 +160,9 @@ export function createScrollFrameSequence(canvas: HTMLCanvasElement, urls: reado
 
   function pumpDecode() {
     if (disposed) return;
-    const candidates = initialSettled ? neighbors() : [0];
+    const candidates = initialSettled ? [...neighbors(), ...backgroundOrder] : [0];
     while (decoding.size < 2) {
-      const next = candidates.find(index => blobs.has(index) && !decoded.has(index)
+      const next = candidates.find(index => blobs.has(index) && (decoded.get(index)?.width !== renderWidth || decoded.get(index)?.height !== renderHeight)
         && !decoding.has(index) && !decodeErrors.has(index));
       if (next === undefined) break;
       void decode(next);
@@ -154,29 +172,41 @@ export function createScrollFrameSequence(canvas: HTMLCanvasElement, urls: reado
   pumpFetch();
   return {
     /** Called in requestAnimationFrame. A missing frame never clears the last good image. */
-    render(index: number) {
+    render(index: number, target = index) {
       if (disposed || !context) return false;
       const next = Math.min(urls.length - 1, Math.max(0, Math.round(index)));
+      const ahead = Math.min(urls.length - 1, Math.max(0, Math.round(target)));
+      if (ahead !== anticipated) direction = ahead > anticipated ? 1 : -1;
+      anticipated = ahead;
       if (next !== wanted) {
-        direction = next > wanted ? 1 : -1;
         wanted = next;
-        trimDecoded();
       }
       pumpDecode();
       pumpFetch();
-      const available = decoded.has(wanted) ? wanted : drawn < 0 ? neighbors().find(i => decoded.has(i)) : undefined;
+      let available = decoded.has(wanted) ? wanted : undefined;
+      if (available === undefined) {
+        // Use the nearest prepared frame on the approach side, rather than freezing far behind.
+        const candidates = [...decoded.keys()].filter(i => direction > 0 ? i <= wanted : i >= wanted);
+        available = candidates.sort((a, b) => Math.abs(a - wanted) - Math.abs(b - wanted))[0];
+      }
       if (available !== undefined && available !== drawn) {
         const image = decoded.get(available)!;
-        if (canvas.width !== image.width || canvas.height !== image.height) {
-          canvas.width = image.width;
-          canvas.height = image.height;
+        if (canvas.width !== renderWidth || canvas.height !== renderHeight) {
+          canvas.width = renderWidth;
+          canvas.height = renderHeight;
         }
         context.clearRect(0, 0, canvas.width, canvas.height);
-        context.drawImage(image, 0, 0);
+        context.drawImage(image, 0, 0, canvas.width, canvas.height);
         drawn = available;
         canvas.dataset.frame = String(drawn);
       }
       return drawn >= 0;
+    },
+    resize() {
+      measure();
+      drawn = -1;
+      decodeErrors.clear();
+      pumpDecode();
     },
     dispose() {
       disposed = true;
