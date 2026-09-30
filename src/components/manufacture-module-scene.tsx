@@ -2,6 +2,8 @@
 
 import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
+import frameSequence from "../data/manufacture-frames.json";
+import { createScrollFrameSequence } from "../lib/scroll-frame-sequence";
 
 const assemblyLayers = [
   { file: "PC_base.png", alt: "Основание будущего модуля", start: 0, range: 0, height: 40, depth: 1 },
@@ -11,8 +13,6 @@ const assemblyLayers = [
   { file: "Бл.png", alt: "Следующий этап сборки модуля", start: 0.44, range: 0.34, height: 110, depth: 6 },
   { file: "ПК-1-2.png", alt: "Завершение сборки панелей модуля", start: 0.54, range: 0.34, height: 85, depth: 4 },
 ] as const;
-const frameCount = 63;
-const frameUrl = (index: number) => `/video/framing/Кадр${String(index * 4 + 1).padStart(4, "0")}.png`;
 
 export function ManufactureModuleScene() {
   const sceneRef = useRef<HTMLDivElement>(null);
@@ -32,51 +32,14 @@ export function ManufactureModuleScene() {
     const layers = layerRefs.current;
     const sticky = scene?.closest<HTMLElement>(".manufacture-module__sticky");
     const section = sticky?.closest<HTMLElement>(".manufacture-module");
-    if (!scene || layers.length !== assemblyLayers.length || layers.some(layer => !layer) || !sticky || !section) return;
+    const canvas = frameCanvasRef.current;
+    if (!scene || !canvas || layers.length !== assemblyLayers.length || layers.some(layer => !layer) || !sticky || !section) return;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
     let lastTime = 0;
     let requestedNote = 0;
     let noteProgress = 0;
-    let frameProgress = 0;
-    let frameReady = false;
-    let wantedFrame = 0;
-    let drawnFrame = -1;
-    let disposed = false;
-    const canvas = frameCanvasRef.current;
-    const context = canvas?.getContext("2d");
-    const loadedFrames = new Map<number, HTMLImageElement>();
-    const pendingFrames = new Set<number>();
-    const drawFrame = (index: number) => {
-      const image = loadedFrames.get(index);
-      if (!image || !canvas || !context || drawnFrame === index) return;
-      if (canvas.width !== image.naturalWidth || canvas.height !== image.naturalHeight) {
-        canvas.width = image.naturalWidth;
-        canvas.height = image.naturalHeight;
-      }
-      context.clearRect(0, 0, canvas.width, canvas.height);
-      context.drawImage(image, 0, 0);
-      drawnFrame = index;
-      frameReady = true;
-      schedule();
-    };
-    const loadFrame = (index: number) => {
-      if (index < 0 || index >= frameCount || loadedFrames.has(index) || pendingFrames.has(index)) return;
-      pendingFrames.add(index);
-      const image = new window.Image();
-      image.onload = () => {
-        pendingFrames.delete(index);
-        if (disposed) return;
-        loadedFrames.set(index, image);
-        if (index === wantedFrame) drawFrame(index);
-        // Keep nearby frames decoded without retaining the full 139 MB sequence.
-        for (const cached of loadedFrames.keys()) {
-          if (Math.abs(cached - wantedFrame) > 5) loadedFrames.delete(cached);
-        }
-      };
-      image.onerror = () => { pendingFrames.delete(index); };
-      image.src = frameUrl(index);
-    };
+    const sequence = createScrollFrameSequence(canvas, frameSequence.frames, () => schedule());
 
     const showNote = (step: number) => {
       if (step === requestedNote) return;
@@ -152,17 +115,8 @@ export function ManufactureModuleScene() {
       });
       const frameStart = window.innerHeight * 1.34;
       const frameTarget = clamp((travelled - frameStart) / (window.innerHeight * 1.3));
-      frameProgress += (frameTarget - frameProgress) * (1 - Math.exp(-elapsed / 110));
-      if (Math.abs(frameTarget - frameProgress) < 0.0005) frameProgress = frameTarget;
-      if (frameProgress !== frameTarget) moving = true;
-      wantedFrame = Math.min(frameCount - 1, Math.round(frameProgress * (frameCount - 1)));
-      if (travelled >= frameStart - window.innerHeight * 0.2) {
-        drawFrame(wantedFrame);
-        loadFrame(wantedFrame);
-        loadFrame(wantedFrame + 1);
-        loadFrame(wantedFrame + 2);
-        loadFrame(wantedFrame - 1);
-      }
+      const wantedFrame = Math.round(frameTarget * (frameSequence.frames.length - 1));
+      const frameReady = sequence.render(wantedFrame);
       const frameBlend = frameReady && layerProgress.current.every(value => value === 1)
         ? smooth(clamp((travelled - frameStart) / (window.innerHeight * 0.1))) : 0;
       if (canvas) canvas.style.opacity = String(frameBlend);
@@ -180,7 +134,7 @@ export function ManufactureModuleScene() {
     reducedMotion.addEventListener("change", schedule);
     schedule();
     return () => {
-      disposed = true;
+      sequence.dispose();
       window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", schedule);
@@ -198,7 +152,7 @@ export function ManufactureModuleScene() {
         <p ref={secondNoteRef} data-visible={noteStep === 2}>На&nbsp;участке сборки из&nbsp;готовых панелей<br />собирается модуль.</p>
       </div>
       <div className="manufacture-module__scene" ref={sceneRef} style={{ isolation: "isolate" }}>
-        <canvas ref={frameCanvasRef} className="manufacture-module__video" role="img" aria-label="Приближение к собранному модулю при прокрутке" />
+        <canvas ref={frameCanvasRef} width={frameSequence.width} height={frameSequence.height} className="manufacture-module__video" role="img" aria-label="Приближение к собранному модулю при прокрутке" />
         {assemblyLayers.map((layer, index) => (
           <div className="manufacture-module__wall" key={layer.file} style={{ zIndex: layer.depth }} ref={element => { layerRefs.current[index] = element; }}>
             <Image src={`/img/manufacturing/${layer.file}`} alt={layer.alt} fill sizes="(max-width: 719px) 100vw, 1152px" unoptimized />
