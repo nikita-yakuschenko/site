@@ -1386,7 +1386,7 @@ a {
 .section.manufacture-dispatch { padding-bottom: 0; background: #fff; }
 .section.manufacture-routes { background: var(--page); }
 
-.section.manufacture-module { min-height: 400svh; }
+.section.manufacture-module { min-height: 740svh; }
 .manufacture-module__video {
   position: absolute;
   inset: 0;
@@ -1448,6 +1448,12 @@ a {
   opacity: 0;
   transform: translateY(14px);
   transition: none;
+}
+.manufacture-module__note:has(.manufacture-module__installation-note) { max-width: 100%; }
+.manufacture-module__installation-note span { display: block; }
+@media (min-width: 1000px) {
+  .manufacture-module__installation-note span { white-space: nowrap; }
+  .manufacture-module__note p.manufacture-module__installation-note { font-size: clamp(24px, 2.6vw, 40px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .manufacture-module__note p, .manufacture-module__intro h2 { transform: none; transition: none; }
