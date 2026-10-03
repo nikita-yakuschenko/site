@@ -19,6 +19,8 @@ next-env.d.ts
 .claude/
 public/media/factory-video.mp4
 data/
+!src/data/
+!src/data/manufacture-frames*.json
 test-results/
 playwright-report/
 playwright/.cache/

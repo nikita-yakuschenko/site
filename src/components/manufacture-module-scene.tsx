@@ -3,6 +3,8 @@
 import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
 import frameSequence from "../data/manufacture-frames.json";
+import secondFrameSequence from "../data/manufacture-frames2.json";
+import thirdFrameSequence from "../data/manufacture-frames3.json";
 import { createScrollFrameSequence } from "../lib/scroll-frame-sequence";
 
 const assemblyLayers = [
@@ -20,6 +22,23 @@ const finishingLayers = [
   { file: "ko-1-5.png", alt: "Внутренняя обрешётка второй стены" },
 ] as const;
 
+const floorLayers = [
+  { file: "heating_base.png", alt: "Основание тёплого пола" },
+  { file: "heating_tube.png", alt: "Укладка труб тёплого пола" },
+  { file: "csp.png", alt: "Черновое напольное покрытие из ЦСП" },
+] as const;
+
+const electricalLayers = [
+  { file: "ko-1-4+1-5.png", alt: "Обрешётка для скрытой прокладки электрики" },
+  { file: "electrical_line.png", alt: "Скрытая электропроводка в модуле" },
+] as const;
+
+const interiorFinishLayers = [
+  { file: "siding.png", alt: "Внутренняя отделка комнат" },
+  { file: "vinyl_base.png", alt: "Основание финишного напольного покрытия" },
+  { file: "quatzvinyl.png", alt: "Финишное напольное покрытие из кварцвинила" },
+] as const;
+
 export function ManufactureModuleScene() {
   const sceneRef = useRef<HTMLDivElement>(null);
   const introRef = useRef<HTMLHeadingElement>(null);
@@ -30,6 +49,12 @@ export function ManufactureModuleScene() {
   const fourthNoteRef = useRef<HTMLParagraphElement>(null);
   const fifthNoteRef = useRef<HTMLParagraphElement>(null);
   const sixthNoteRef = useRef<HTMLParagraphElement>(null);
+  const seventhNoteRef = useRef<HTMLParagraphElement>(null);
+  const eighthNoteRef = useRef<HTMLParagraphElement>(null);
+  const ninthNoteRef = useRef<HTMLParagraphElement>(null);
+  const floorRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const electricalRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const interiorFinishRefs = useRef<(HTMLDivElement | null)[]>([]);
   const ceramicLayerRef = useRef<HTMLDivElement>(null);
   const furnitureLayerRef = useRef<HTMLDivElement>(null);
   const servicesLayerRef = useRef<HTMLDivElement>(null);
@@ -38,6 +63,10 @@ export function ManufactureModuleScene() {
   const finishingRefs = useRef<(HTMLDivElement | null)[]>([]);
   const jointRef = useRef<HTMLDivElement>(null);
   const frameCanvasRef = useRef<HTMLCanvasElement>(null);
+  const secondFrameCanvasRef = useRef<HTMLCanvasElement>(null);
+  const thirdFrameCanvasRef = useRef<HTMLCanvasElement>(null);
+  const finishedRoomRef = useRef<HTMLDivElement>(null);
+  const interiorRef = useRef<HTMLDivElement>(null);
   const assemblyRef = useRef<HTMLDivElement>(null);
   const jointClipId = useId();
   const layerRefs = useRef<(HTMLDivElement | null)[]>([]);
@@ -50,7 +79,9 @@ export function ManufactureModuleScene() {
     const sticky = scene?.closest<HTMLElement>(".manufacture-module__sticky");
     const section = sticky?.closest<HTMLElement>(".manufacture-module");
     const canvas = frameCanvasRef.current;
-    if (!scene || !canvas || layers.length !== assemblyLayers.length || layers.some(layer => !layer) || !sticky || !section) return;
+    const secondCanvas = secondFrameCanvasRef.current;
+    const thirdCanvas = thirdFrameCanvasRef.current;
+    if (!scene || !canvas || !secondCanvas || !thirdCanvas || layers.length !== assemblyLayers.length || layers.some(layer => !layer) || !sticky || !section) return;
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
     let frame = 0;
     let lastTime = 0;
@@ -68,8 +99,19 @@ export function ManufactureModuleScene() {
     let furnitureProgress = 0;
     let ceramicNoteProgress = 0;
     let gyprocNoteProgress = 0;
+    let secondFrameProgress = 0;
+    let secondFrameBlend = 0;
+    const floorProgress = floorLayers.map(() => 0);
+    const electricalProgress = electricalLayers.map(() => 0);
+    let electricalNoteProgress = 0;
+    const interiorFinishProgress = interiorFinishLayers.map(() => 0);
+    let interiorFinishNoteProgress = 0;
+    let thirdFrameProgress = 0;
+    let thirdFrameBlend = 0;
     let metrics = { top: 0, padding: 0, viewport: 0, sceneHeight: 0, introOffset: 0 };
     const sequence = createScrollFrameSequence(canvas, frameSequence.frames, () => schedule());
+    const secondSequence = createScrollFrameSequence(secondCanvas, secondFrameSequence.frames, () => schedule());
+    const thirdSequence = createScrollFrameSequence(thirdCanvas, thirdFrameSequence.frames, () => schedule());
     const measure = () => {
       const top = Number.parseFloat(getComputedStyle(sticky).top);
       const viewport = sticky.clientHeight + (window.matchMedia("(max-width: 719px)").matches ? 96 : 104);
@@ -81,6 +123,8 @@ export function ManufactureModuleScene() {
         introOffset: (introRef.current?.offsetHeight ?? 0) + Math.min(72, viewport * 0.08),
       };
       sequence.resize();
+      secondSequence.resize();
+      thirdSequence.resize();
       schedule();
     };
 
@@ -171,6 +215,7 @@ export function ManufactureModuleScene() {
       frameBlend += (safeBlendTarget - frameBlend) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 100));
       if (Math.abs(safeBlendTarget - frameBlend) < 0.001) frameBlend = safeBlendTarget;
       if (frameBlend !== safeBlendTarget) moving = true;
+      if (frameBlend === 1 && frameProgress === 0 && desiredFrame > 0) moving = true;
       if (canvas) canvas.style.opacity = String(frameBlend);
       // Source-over compositing: fading both transparent scenes exposes the page
       // (at 50/50 their combined opacity is only 75%). Keep the backing scene opaque.
@@ -240,7 +285,7 @@ export function ManufactureModuleScene() {
       if (ceramicNoteProgress !== ceramicNoteTarget) moving = true;
       if (sixthNoteRef.current) {
         const visible = smooth(clamp((ceramicNoteProgress - 0.55) / 0.45));
-        sixthNoteRef.current.style.opacity = String(visible);
+        sixthNoteRef.current.style.opacity = String(visible * (1 - smooth(clamp(secondFrameBlend / 0.45))));
         sixthNoteRef.current.style.transform = reducedMotion.matches ? "none" : `translate3d(0, ${(1 - visible) * 12}px, 0)`;
       }
       const ceramicTarget = masticProgress === 1 ? clamp((travelled / viewport - 5.64) / 0.28) : 0;
@@ -253,7 +298,105 @@ export function ManufactureModuleScene() {
       if (Math.abs(furnitureTarget - furnitureProgress) < 0.001) furnitureProgress = furnitureTarget;
       if (furnitureProgress !== furnitureTarget) moving = true;
       if (furnitureLayerRef.current) furnitureLayerRef.current.style.opacity = String(smooth(furnitureProgress));
-      showNote(ceramicNoteProgress > 0.55 ? 6 : gyprocNoteProgress > 0.55 ? 5 : servicesNoteProgress > 0.55 ? 4 : finishingNoteProgress > 0.55 ? 3 : travelled >= wallStart ? 2 : reveal > 0 ? 1 : 0);
+      // Seat the matching first frame before continuing the camera movement.
+      const desiredSecondFrame = clamp((travelled / viewport - 6.58) / 1.3);
+      const floorActive = floorProgress.some(value => value > 0);
+      const secondFrameTarget = floorActive ? 1 : secondFrameBlend === 1 ? desiredSecondFrame : 0;
+      secondFrameProgress += (secondFrameTarget - secondFrameProgress) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 70));
+      if (Math.abs(secondFrameTarget - secondFrameProgress) < 0.0005) secondFrameProgress = secondFrameTarget;
+      if (secondFrameProgress !== secondFrameTarget) moving = true;
+      const secondFrameReady = secondSequence.render(
+        secondFrameProgress * (secondFrameSequence.frames.length - 1),
+        desiredSecondFrame * (secondFrameSequence.frames.length - 1),
+      );
+      const secondBlendTarget = secondFrameReady && furnitureProgress === 1
+        ? smooth(clamp((travelled / viewport - 6.42) / 0.12)) : 0;
+      // Reverse through the sequence before returning to the stationary interior.
+      const safeSecondBlendTarget = secondFrameProgress > 0 && secondBlendTarget < secondFrameBlend ? secondFrameBlend : secondBlendTarget;
+      secondFrameBlend += (safeSecondBlendTarget - secondFrameBlend) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 100));
+      if (Math.abs(safeSecondBlendTarget - secondFrameBlend) < 0.001) secondFrameBlend = safeSecondBlendTarget;
+      if (secondFrameBlend !== safeSecondBlendTarget) moving = true;
+      if (secondFrameBlend === 1 && secondFrameProgress !== (floorActive ? 1 : desiredSecondFrame)) moving = true;
+      secondCanvas.style.opacity = String(secondFrameBlend);
+      if (interiorRef.current) interiorRef.current.style.opacity = secondFrameBlend === 1 ? "0" : "1";
+      if (seventhNoteRef.current) {
+        const visible = smooth(clamp((secondFrameBlend - 0.55) / 0.45));
+        seventhNoteRef.current.style.opacity = String(visible * (1 - smooth(clamp(electricalNoteProgress / 0.45))));
+        seventhNoteRef.current.style.transform = reducedMotion.matches ? "none" : `translate3d(0, ${(1 - visible) * 12}px, 0)`;
+      }
+      const secondFinalFrameReady = secondFrameBlend === 1 && secondCanvas.dataset.frame === String(secondFrameSequence.frames.length - 1);
+      floorLayers.forEach((_, index) => {
+        const precedingReady = index === 0 || floorProgress[index - 1] === 1;
+        const target = secondFinalFrameReady && precedingReady
+          ? clamp((travelled / viewport - 8.04 - index * 0.4) / 0.28) : 0;
+        let progress = floorProgress[index] ?? 0;
+        progress += (target - progress) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 100));
+        if (Math.abs(target - progress) < 0.001) progress = target;
+        floorProgress[index] = progress;
+        if (progress !== target) moving = true;
+        const layer = floorRefs.current[index];
+        if (layer) layer.style.opacity = String(smooth(progress));
+      });
+      if (floorActive && floorProgress.every(value => value === 0) && secondFrameProgress !== desiredSecondFrame) moving = true;
+      const electricalNoteTarget = floorProgress[2] === 1 ? clamp((travelled / viewport - 9.24) / 0.18) : 0;
+      electricalNoteProgress += (electricalNoteTarget - electricalNoteProgress) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 100));
+      if (Math.abs(electricalNoteTarget - electricalNoteProgress) < 0.001) electricalNoteProgress = electricalNoteTarget;
+      if (electricalNoteProgress !== electricalNoteTarget) moving = true;
+      if (eighthNoteRef.current) {
+        const visible = smooth(clamp((electricalNoteProgress - 0.55) / 0.45));
+        eighthNoteRef.current.style.opacity = String(visible * (1 - smooth(clamp(interiorFinishNoteProgress / 0.45))));
+        eighthNoteRef.current.style.transform = reducedMotion.matches ? "none" : `translate3d(0, ${(1 - visible) * 12}px, 0)`;
+      }
+      electricalLayers.forEach((_, index) => {
+        const precedingReady = index === 0 ? floorProgress[2] === 1 : electricalProgress[index - 1] === 1;
+        const target = precedingReady ? clamp((travelled / viewport - 9.44 - index * 0.4) / 0.28) : 0;
+        let progress = electricalProgress[index] ?? 0;
+        progress += (target - progress) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 100));
+        if (Math.abs(target - progress) < 0.001) progress = target;
+        electricalProgress[index] = progress;
+        if (progress !== target) moving = true;
+        const layer = electricalRefs.current[index];
+        if (layer) layer.style.opacity = String(smooth(progress));
+      });
+      const interiorFinishNoteTarget = electricalProgress[1] === 1 ? clamp((travelled / viewport - 10.24) / 0.18) : 0;
+      interiorFinishNoteProgress += (interiorFinishNoteTarget - interiorFinishNoteProgress) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 100));
+      if (Math.abs(interiorFinishNoteTarget - interiorFinishNoteProgress) < 0.001) interiorFinishNoteProgress = interiorFinishNoteTarget;
+      if (interiorFinishNoteProgress !== interiorFinishNoteTarget) moving = true;
+      if (ninthNoteRef.current) {
+        const visible = smooth(clamp((interiorFinishNoteProgress - 0.55) / 0.45));
+        ninthNoteRef.current.style.opacity = String(visible);
+        ninthNoteRef.current.style.transform = reducedMotion.matches ? "none" : `translate3d(0, ${(1 - visible) * 12}px, 0)`;
+      }
+      interiorFinishLayers.forEach((_, index) => {
+        const precedingReady = index === 0 ? electricalProgress[1] === 1 : interiorFinishProgress[index - 1] === 1;
+        const target = precedingReady ? clamp((travelled / viewport - 10.44 - index * 0.4) / 0.28) : 0;
+        let progress = interiorFinishProgress[index] ?? 0;
+        progress += (target - progress) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 100));
+        if (Math.abs(target - progress) < 0.001) progress = target;
+        interiorFinishProgress[index] = progress;
+        if (progress !== target) moving = true;
+        const layer = interiorFinishRefs.current[index];
+        if (layer) layer.style.opacity = String(smooth(progress));
+      });
+      const desiredThirdFrame = clamp((travelled / viewport - 11.8) / 1.3);
+      const thirdFrameTarget = thirdFrameBlend === 1 ? desiredThirdFrame : 0;
+      thirdFrameProgress += (thirdFrameTarget - thirdFrameProgress) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 70));
+      if (Math.abs(thirdFrameTarget - thirdFrameProgress) < 0.0005) thirdFrameProgress = thirdFrameTarget;
+      if (thirdFrameProgress !== thirdFrameTarget) moving = true;
+      const thirdFrameReady = thirdSequence.render(
+        thirdFrameProgress * (thirdFrameSequence.frames.length - 1),
+        desiredThirdFrame * (thirdFrameSequence.frames.length - 1),
+      );
+      const thirdBlendTarget = thirdFrameReady && interiorFinishProgress[2] === 1
+        ? smooth(clamp((travelled / viewport - 11.64) / 0.12)) : 0;
+      const safeThirdBlendTarget = thirdFrameProgress > 0 && thirdBlendTarget < thirdFrameBlend ? thirdFrameBlend : thirdBlendTarget;
+      thirdFrameBlend += (safeThirdBlendTarget - thirdFrameBlend) * (reducedMotion.matches ? 1 : 1 - Math.exp(-elapsed / 100));
+      if (Math.abs(safeThirdBlendTarget - thirdFrameBlend) < 0.001) thirdFrameBlend = safeThirdBlendTarget;
+      if (thirdFrameBlend !== safeThirdBlendTarget) moving = true;
+      if (thirdFrameBlend === 1 && thirdFrameProgress !== desiredThirdFrame) moving = true;
+      thirdCanvas.style.opacity = String(thirdFrameBlend);
+      if (finishedRoomRef.current) finishedRoomRef.current.style.opacity = thirdFrameBlend === 1 ? "0" : "1";
+      showNote(interiorFinishNoteProgress > 0.55 ? 9 : electricalNoteProgress > 0.55 ? 8 : secondFrameBlend > 0.55 ? 7 : ceramicNoteProgress > 0.55 ? 6 : gyprocNoteProgress > 0.55 ? 5 : servicesNoteProgress > 0.55 ? 4 : finishingNoteProgress > 0.55 ? 3 : travelled >= wallStart ? 2 : reveal > 0 ? 1 : 0);
       if (moving) frame = window.requestAnimationFrame(animate);
       else lastTime = 0;
     };
@@ -266,6 +409,8 @@ export function ManufactureModuleScene() {
     measure();
     return () => {
       sequence.dispose();
+      secondSequence.dispose();
+      thirdSequence.dispose();
       window.cancelAnimationFrame(frame);
       window.removeEventListener("scroll", schedule);
       window.removeEventListener("resize", measure);
@@ -285,8 +430,13 @@ export function ManufactureModuleScene() {
         <p className="manufacture-module__installation-note" ref={fourthNoteRef} data-visible={noteStep === 4}><span>Прокладываются все инженерные коммуникации</span>{" "}<span>и&nbsp;делаются закладные</span></p>
         <p className="manufacture-module__installation-note" ref={fifthNoteRef} data-visible={noteStep === 5}><span>В&nbsp;санузлах монтируется влагостойкий гипсокартон</span>{" "}<span>и&nbsp;делается гидроизоляция</span></p>
         <p className="manufacture-module__installation-note" ref={sixthNoteRef} data-visible={noteStep === 6}><span>Укладывается керамогранит,</span>{" "}<span>устанавливается сантехника и&nbsp;мебель</span></p>
+        <p className="manufacture-module__installation-note" ref={seventhNoteRef} data-visible={noteStep === 7}><span>В&nbsp;комнатах укладывается тёплый пол</span>{" "}<span>и&nbsp;черновое напольное покрытие</span></p>
+        <p className="manufacture-module__installation-note" ref={eighthNoteRef} data-visible={noteStep === 8}>Скрытым способом прокладывается электрика</p>
+        <p className="manufacture-module__installation-note" ref={ninthNoteRef} data-visible={noteStep === 9}><span>Монтируется внутренняя отделка</span>{" "}<span>и&nbsp;финишное напольное покрытие</span></p>
       </div>
       <div className="manufacture-module__scene" ref={sceneRef} style={{ isolation: "isolate" }}>
+        <div ref={finishedRoomRef} style={{ position: "absolute", inset: 0, isolation: "isolate" }}>
+        <div ref={interiorRef} style={{ position: "absolute", inset: 0, isolation: "isolate" }}>
         <canvas ref={frameCanvasRef} width={frameSequence.width} height={frameSequence.height} className="manufacture-module__video" role="img" aria-label="Приближение к собранному модулю при прокрутке" />
         <div ref={assemblyRef} style={{ position: "absolute", inset: 0, isolation: "isolate" }}>
         {assemblyLayers.map((layer, index) => (
@@ -325,6 +475,25 @@ export function ManufactureModuleScene() {
         <div className="manufacture-module__wall" ref={furnitureLayerRef} style={{ zIndex: 16 }}>
           <Image src="/img/manufacturing/furniture.png" alt="Установленная сантехника и мебель в санузле" fill sizes="(max-width: 719px) 150vw, 1152px" unoptimized />
         </div>
+        </div>
+        <canvas ref={secondFrameCanvasRef} width={secondFrameSequence.width} height={secondFrameSequence.height} className="manufacture-module__video" style={{ zIndex: 17 }} role="img" aria-label="Продолжение обзора готового модуля при прокрутке" />
+        {floorLayers.map((layer, index) => (
+          <div className="manufacture-module__wall" key={layer.file} style={{ zIndex: 18 + index }} ref={element => { floorRefs.current[index] = element; }}>
+            <Image src={`/img/manufacturing/${layer.file}`} alt={layer.alt} fill sizes="(max-width: 719px) 150vw, 1152px" unoptimized />
+          </div>
+        ))}
+        {electricalLayers.map((layer, index) => (
+          <div className="manufacture-module__wall" key={layer.file} style={{ zIndex: 21 + index }} ref={element => { electricalRefs.current[index] = element; }}>
+            <Image src={`/img/manufacturing/${layer.file}`} alt={layer.alt} fill sizes="(max-width: 719px) 150vw, 1152px" unoptimized />
+          </div>
+        ))}
+        {interiorFinishLayers.map((layer, index) => (
+          <div className="manufacture-module__wall" key={layer.file} style={{ zIndex: 23 + index }} ref={element => { interiorFinishRefs.current[index] = element; }}>
+            <Image src={`/img/manufacturing/${layer.file}`} alt={layer.alt} fill sizes="(max-width: 719px) 150vw, 1152px" unoptimized />
+          </div>
+        ))}
+        </div>
+        <canvas ref={thirdFrameCanvasRef} width={thirdFrameSequence.width} height={thirdFrameSequence.height} className="manufacture-module__video" style={{ zIndex: 26 }} role="img" aria-label="Обзор модуля после внутренней отделки при прокрутке" />
       </div>
     </>
   );

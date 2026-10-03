@@ -1386,7 +1386,7 @@ a {
 .section.manufacture-dispatch { padding-bottom: 0; background: #fff; }
 .section.manufacture-routes { background: var(--page); }
 
-.section.manufacture-module { min-height: 740svh; }
+.section.manufacture-module { min-height: 1430svh; }
 .manufacture-module__video {
   position: absolute;
   inset: 0;
