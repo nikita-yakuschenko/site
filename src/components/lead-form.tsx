@@ -84,6 +84,7 @@ export function LeadForm({
         body: JSON.stringify({
           name,
           phone: phoneE164(phone),
+          message: String(data.get('message') || '').trim(),
           consent,
           siteId,
           pageId,

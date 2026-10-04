@@ -1,7 +1,7 @@
 "use client";
 
 import { IconArrowUpRight, IconX } from "@tabler/icons-react";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { copy } from "../lib/copy";
 import { LeadForm } from "./lead-form";
@@ -34,9 +34,28 @@ export function LeadDialog({
   pageId?: string;
   meta?: Record<string, unknown>;
 }) {
+  const dialogRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
+    const previousFocus = document.activeElement instanceof HTMLElement
+      ? document.activeElement : null;
+    const focusable = () => Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex="0"]'
+    ) ?? []).filter((element) => element.getClientRects().length > 0);
+    focusable()[0]?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
+      if (event.key !== "Tab") return;
+      const elements = focusable();
+      const first = elements[0];
+      const last = elements[elements.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && (document.activeElement === first || !dialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && (document.activeElement === last || !dialogRef.current?.contains(document.activeElement))) {
+        event.preventDefault();
+        first.focus();
+      }
     };
 
     /* Прокрутку прячем у корня, а не у body: полосу рисует именно он.
@@ -58,6 +77,7 @@ export function LeadDialog({
       root.style.overflow = prevOverflow;
       root.classList.remove("is-dialog-open");
       window.removeEventListener("keydown", onKey);
+      previousFocus?.focus();
     };
   }, [onClose]);
 
@@ -70,6 +90,7 @@ export function LeadDialog({
   return createPortal(
     <div
       className="ask-dialog"
+      ref={dialogRef}
       role="dialog"
       aria-modal="true"
       aria-label={heading}

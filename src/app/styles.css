@@ -14102,3 +14102,109 @@ html.is-dialog-open {
     transform: none;
   }
 }
+
+/* Выставочные площадки: существующие секции, форма и кнопки сайта. */
+.exposition-hero__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(340px, 1fr);
+  gap: var(--gap-split);
+  align-items: start;
+}
+.exposition-place__layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: center;
+  gap: var(--gap-split);
+}
+.exposition-place--reverse .exposition-photo-placeholder {
+  grid-column: 2;
+  grid-row: 1;
+}
+.exposition-place--reverse .exposition-place__copy {
+  grid-column: 1;
+  grid-row: 1;
+}
+.exposition-photo-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  aspect-ratio: 4 / 3;
+  border-radius: 16px;
+  background: var(--surface-sunken);
+  color: var(--avgst-ink);
+}
+.exposition-page .exposition-place h2 {
+  margin: 0 0 24px;
+}
+.exposition-page address {
+  font-style: normal;
+  color: var(--ink-1);
+  line-height: 1.6;
+  text-wrap: pretty;
+}
+@media (max-width: 899px) {
+  .exposition-hero__layout,
+  .exposition-place__layout {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+  }
+  .exposition-place--reverse .exposition-photo-placeholder,
+  .exposition-place--reverse .exposition-place__copy {
+    grid-column: auto;
+    grid-row: auto;
+  }
+}
+
+.exposition-detail-hero .project-hero__media .exposition-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  aspect-ratio: auto;
+  border-radius: 0;
+  background: var(--avgst-ink);
+  color: var(--on-dark-1);
+}
+.exposition-detail-hero .project-hero__stage {
+  width: calc(100% - 2 * var(--page-gutter));
+}
+.exposition-page .exposition-detail-hero address {
+  color: #fff;
+}
+.exposition-detail-hero__bar {
+  align-items: center;
+}
+.exposition-detail-hero__bar .btn {
+  gap: 8px;
+  width: fit-content;
+  max-width: 100%;
+}
+.exposition-detail-gallery > .exposition-photo-placeholder {
+  cursor: default;
+  padding: 16px;
+  text-align: center;
+}
+.exposition-detail-gallery.project-bento > .exposition-photo-placeholder {
+  aspect-ratio: auto;
+  min-height: 160px;
+  background: var(--surface-sunken);
+}
+.exposition-detail__description {
+  padding: 24px;
+}
+.exposition-detail__description h3 {
+  margin: 0 0 16px;
+}
+.exposition-detail__description p,
+.exposition-detail__visit p {
+  color: var(--ink-1);
+  line-height: 1.6;
+}
+.exposition-detail__visit address {
+  margin-top: 24px;
+}
+@media (max-width: 359px) {
+  .exposition-detail-hero h1 {
+    font-size: 2.25rem;
+  }
+}
