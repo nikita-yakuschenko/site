@@ -60,7 +60,7 @@ export function ManufactureProjectQuestions() {
   return (
     <div className="manufacture-docs__questions">
       <h3 className="mortgage-rules__title">Вопросы о проекте</h3>
-      <Accordion type="multiple" defaultValue={[]} className="ui-accordion mortgage-rules">
+      <Accordion type="multiple" defaultValue={[]} className="ui-accordion mortgage-rules manufacture-questions">
         {projectQuestions.map((item, index) => (
           <AccordionItem key={item.question} value={`manufacture-project-${index}`}>
             <AccordionTrigger>{item.question}</AccordionTrigger>
@@ -76,7 +76,7 @@ export function ManufacturePreparationQuestions() {
   return (
     <div className="manufacture-prep__questions">
       <h3 className="mortgage-rules__title">Вопросы о подготовке деталей</h3>
-      <Accordion type="multiple" defaultValue={[]} className="ui-accordion mortgage-rules">
+      <Accordion type="multiple" defaultValue={[]} className="ui-accordion mortgage-rules manufacture-questions">
         {preparationQuestions.map((item, index) => (
           <AccordionItem key={item.question} value={`manufacture-preparation-${index}`}>
             <AccordionTrigger>{item.question}</AccordionTrigger>
@@ -93,7 +93,7 @@ export function ManufactureFaq() {
     <section className="section manufacture-faq" aria-labelledby="manufacture-faq-title">
       <div className="section__inner">
         <h2 id="manufacture-faq-title">Частые вопросы</h2>
-        <Accordion type="multiple" className="ui-accordion mortgage-faq">
+        <Accordion type="multiple" defaultValue={[]} className="ui-accordion mortgage-faq manufacture-questions">
           {questions.map((item, index) => (
             <AccordionItem key={item.question} value={`manufacture-faq-${index}`}>
               <AccordionTrigger>{item.question}</AccordionTrigger>
