@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { IconChevronRight } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
-import mountingImage from "../../../public/img/pages/mounting.jpg";
+import mountingImage from "../../../public/img/pages/mounting.png";
 import { SiteChrome } from "../../components/site-chrome";
 import { ContactsSection } from "../../components/block-renderer";
 import { LeadDialogButton } from "../../components/lead-dialog";
