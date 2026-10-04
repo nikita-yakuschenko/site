@@ -459,12 +459,14 @@ export function ContactsSection({
   siteId,
   pageId,
   form,
+  defaultPlace,
 }: {
   block: LayoutBlock;
   contacts?: SiteContacts | null;
   siteId: number | string;
   pageId?: number | string;
   form?: LayoutBlock | null;
+  defaultPlace?: import('../lib/office').ContactPlaceId;
 }) {
   const useSite = block.useSiteContacts !== false;
   const phone = useSite ? contacts?.phone : (block.phone as string | undefined);
@@ -515,7 +517,7 @@ export function ContactsSection({
             </div>
           </div>
 
-          <ContactsPlace />
+          <ContactsPlace defaultPlace={defaultPlace} />
         </div>
         <LeadForm
           siteId={siteId}

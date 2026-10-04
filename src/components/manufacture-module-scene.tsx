@@ -8,6 +8,13 @@ import thirdFrameSequence from "../data/manufacture-frames3.json";
 import fourthFrameSequence from "../data/manufacture-frames4.json";
 import { createScrollFrameSequence } from "../lib/scroll-frame-sequence";
 
+function ResponsiveNoteText({ desktop, mobile }: { desktop: string[]; mobile: string[] }) {
+  return <>
+    <span className="manufacture-module__desktop-lines">{desktop.map(line => <span key={line}>{line}</span>)}</span>
+    <span className="manufacture-module__mobile-lines">{mobile.map(line => <span key={line}>{line.replace(/(^|\s)([Вв]|[Ии]|[Оо]|[Нн]а|[Ии]з|[Дд]ля) /g, "$1$2\u00a0")}</span>)}</span>
+  </>;
+}
+
 const assemblyLayers = [
   { file: "PC_base.png", alt: "Основание будущего модуля", start: 0, range: 0, height: 40, depth: 1 },
   { file: "1-3.png", alt: "Установка первой стены", start: 0.12, range: 0.36, height: 80, depth: 2 },
@@ -508,17 +515,17 @@ export function ManufactureModuleScene() {
       </div>
       <div className="manufacture-module__note" ref={noteRef} data-step={noteStep}>
         <p ref={firstNoteRef} data-visible={noteStep === 1}>Сначала панели будущего модуля<br className="manufacture-module__text-break" /> поступают на&nbsp;участок сборки.</p>
-        <p ref={secondNoteRef} data-visible={noteStep === 2}>На&nbsp;участке сборки из&nbsp;готовых панелей<br />собирается модуль.</p>
+        <p ref={secondNoteRef} data-visible={noteStep === 2}><ResponsiveNoteText desktop={["На\u00a0участке сборки из\u00a0готовых панелей", "собирается модуль."]} mobile={["На участке сборки из готовых", "панелей собирается модуль."]} /></p>
         <p className="manufacture-module__installation-note" ref={thirdNoteRef} data-visible={noteStep === 3}><span>В&nbsp;собранном модуле устанавливаются окна,</span>{" "}<span>монтируется внутренняя обрешетка</span></p>
         <p className="manufacture-module__installation-note" ref={fourthNoteRef} data-visible={noteStep === 4}><span>Прокладываются все инженерные коммуникации</span>{" "}<span>и&nbsp;делаются закладные</span></p>
         <p className="manufacture-module__installation-note" ref={fifthNoteRef} data-visible={noteStep === 5}><span>В&nbsp;санузлах монтируется влагостойкий гипсокартон</span>{" "}<span>и&nbsp;делается гидроизоляция</span></p>
         <p className="manufacture-module__installation-note" ref={sixthNoteRef} data-visible={noteStep === 6}><span>Укладывается керамогранит,</span>{" "}<span>устанавливается сантехника и&nbsp;мебель</span></p>
-        <p className="manufacture-module__installation-note" ref={seventhNoteRef} data-visible={noteStep === 7}><span>В&nbsp;комнатах укладывается тёплый пол</span>{" "}<span>и&nbsp;черновое напольное покрытие</span></p>
+        <p className="manufacture-module__installation-note" ref={seventhNoteRef} data-visible={noteStep === 7}><ResponsiveNoteText desktop={["В\u00a0комнатах укладывается тёплый пол", "и\u00a0черновое напольное покрытие"]} mobile={["В комнатах укладывается", "тёплый пол и черновое", "напольное покрытие"]} /></p>
         <p className="manufacture-module__installation-note" ref={eighthNoteRef} data-visible={noteStep === 8}>Скрытым способом прокладывается электрика</p>
-        <p className="manufacture-module__installation-note" ref={ninthNoteRef} data-visible={noteStep === 9}><span>Монтируется внутренняя отделка</span>{" "}<span>и&nbsp;финишное напольное покрытие</span></p>
+        <p className="manufacture-module__installation-note" ref={ninthNoteRef} data-visible={noteStep === 9}><ResponsiveNoteText desktop={["Монтируется внутренняя отделка", "и\u00a0финишное напольное покрытие"]} mobile={["Монтируется внутренняя", "отделка и финишное", "напольное покрытие"]} /></p>
         <p className="manufacture-module__installation-note" ref={tenthNoteRef} data-visible={noteStep === 10}><span>Снаружи модуль обшивается</span>{" "}<span>фасадной отделкой</span></p>
-        <p className="manufacture-module__installation-note" ref={eleventhNoteRef} data-visible={noteStep === 11}><span>Затем модуль комплектуется всем необходимым</span>{" "}<span>для монтажа и&nbsp;упаковывается</span></p>
-        <p className="manufacture-module__installation-note" ref={twelfthNoteRef} data-visible={noteStep === 12}><span>Производство завершено, готовый модуль</span>{" "}<span>ожидает отправки на&nbsp;участок</span></p>
+        <p className="manufacture-module__installation-note" ref={eleventhNoteRef} data-visible={noteStep === 11}><ResponsiveNoteText desktop={["Затем модуль комплектуется всем необходимым", "для монтажа и\u00a0упаковывается"]} mobile={["Затем модуль комплектуется", "всем необходимым для монтажа", "и упаковывается"]} /></p>
+        <p className="manufacture-module__installation-note" ref={twelfthNoteRef} data-visible={noteStep === 12}><ResponsiveNoteText desktop={["Производство завершено, готовый модуль", "ожидает отправки на\u00a0участок"]} mobile={["Производство завершено,", "готовый модуль ожидает", "отправки на\u00a0участок"]} /></p>
       </div>
       <div className="manufacture-module__scene" ref={sceneRef} style={{ isolation: "isolate" }}>
         <div ref={finishedExteriorRef} style={{ position: "absolute", inset: 0, isolation: "isolate" }}>

@@ -2,12 +2,15 @@ import type { Metadata } from "next";
 import { IconChevronRight } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
+import mountingImage from "../../../public/img/pages/mounting.jpg";
 import { SiteChrome } from "../../components/site-chrome";
 import { ContactsSection } from "../../components/block-renderer";
 import { LeadDialogButton } from "../../components/lead-dialog";
+import { LeadReveal } from "../../components/lead-reveal";
 import { ManufactureVideoReview } from "../../components/manufacture-video-review";
 import { ManufactureTruckTransition } from "../../components/manufacture-truck-transition";
 import { ManufactureModuleScene } from "../../components/manufacture-module-scene";
+import { ManufactureMountingVideos } from "../../components/manufacture-mounting-videos";
 import { ManufactureFaq, ManufacturePreparationQuestions, ManufactureProjectQuestions } from "../../components/manufacture-faq";
 import { copy, footerAboutFor } from "../../lib/copy";
 import { SITE } from "../../lib/site";
@@ -141,18 +144,44 @@ export default function ManufacturePage() {
             <ManufactureModuleScene />
           </div>
         </section>
+        <section className="section mortgage-mid-cta" aria-labelledby="manufacture-tour-title">
+          <div className="section__inner mortgage-mid-cta__inner mortgage-mid-cta__inner--reversed">
+            <div className="mortgage-mid-cta__media" aria-hidden="true">
+              <Image src="/fixtures/factory.jpg" alt="" fill sizes="(min-width: 900px) 40vw, 100vw" />
+            </div>
+            <div className="mortgage-mid-cta__body">
+              <LeadReveal
+                siteId={SITE.id}
+                label="Записаться на экскурсию"
+                heading="Записаться на экскурсию"
+                submitLabel="Записаться"
+                meta={{ pageId: "manufacture", requestType: "factory-tour", placement: "after-production-animation" }}
+              >
+                <h2 id="manufacture-tour-title">Посмотрите производство вживую</h2>
+                <p>Приходите на&nbsp;экскурсию: покажем, как изготавливаем домокомплекты, и&nbsp;ответим на&nbsp;вопросы о&nbsp;вашем будущем доме.</p>
+              </LeadReveal>
+            </div>
+          </div>
+        </section>
         <section className="section manufacture-finish" aria-labelledby="manufacture-finish-title">
           <div className="section__inner manufacture-finish__layout">
             <h2 id="manufacture-finish-title">Сборка дома на участке</h2>
             <div className="manufacture-finish__image">
-              <Image src="/img/pages/mounting.jpg" alt="Монтаж дома на участке с помощью крана" fill sizes="(max-width: 899px) 100vw, 552px" />
+              <Image src={mountingImage} alt="Монтаж дома на участке с помощью крана" fill sizes="(max-width: 899px) 100vw, 552px" />
             </div>
-            <p className="manufacture-finish__text">К&nbsp;началу строительства домокомплект доставляют заказчику. Панели перевозят фурой, а&nbsp;модули низкорамным тралом. На&nbsp;участке конструкции разгружают и&nbsp;с&nbsp;помощью крана за&nbsp;несколько дней собирают дом.</p>
+            <div className="manufacture-finish__body">
+              <div className="manufacture-finish__text">
+                <p>К&nbsp;началу строительства домокомплект доставляют заказчику.</p>
+                <p>Панели перевозят фурами, а&nbsp;модули низкорамными тралами. На&nbsp;участке конструкции разгружают и&nbsp;с&nbsp;помощью крана за&nbsp;несколько дней собирают дом.</p>
+              </div>
+              <ManufactureMountingVideos />
+            </div>
           </div>
         </section>
         <ManufactureFaq />
         <ContactsSection
-          block={{ blockType: "contactsSection", showEyebrow: false, heading: "Посмотрите производство вживую", body: "Покажем, как изготавливаем домокомплекты, и ответим на вопросы о вашем будущем доме.", useSiteContacts: true }}
+          defaultPlace="factory"
+          block={{ blockType: "contactsSection", showEyebrow: false, heading: "Остались вопросы?", body: "Приезжайте в\u00a0гости, мы покажем, как изготавливаем домокомплекты, и\u00a0ответим на\u00a0вопросы о\u00a0вашем будущем доме", useSiteContacts: true }}
           contacts={SITE.contacts}
           siteId={SITE.id}
           pageId="manufacture"

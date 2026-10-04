@@ -53,8 +53,8 @@ function PlaceCopyBody({ place }: { place: ContactPlace }) {
  * 2 остановки) короче производства (2 строки, 3 остановки) — карта и
  * кнопка прыгают. На десктопе прыжок маскировал 1fr у колонки.
  */
-export function ContactsPlace() {
-  const [placeId, setPlaceId] = useState<ContactPlaceId>('office')
+export function ContactsPlace({ defaultPlace = 'office' }: { defaultPlace?: ContactPlaceId }) {
+  const [placeId, setPlaceId] = useState<ContactPlaceId>(defaultPlace)
   const place =
     CONTACT_PLACES.find((item) => item.id === placeId) ?? CONTACT_PLACES[0]
   // CONTACT_PLACES не пустой: офис и производство заданы в office.ts.

@@ -1088,7 +1088,7 @@ a {
 .section.manufacture-docs { background: #fff; }
 .manufacture-docs__lead {
   max-width: 46rem;
-  margin: 0;
+  margin: var(--gap-tile) 0 0;
   color: var(--ink-1);
   font-size: 17px;
   line-height: 1.55;
@@ -1381,7 +1381,7 @@ a {
   padding-block: var(--gap-section);
 }
 
-.section.manufacture-finish { background: #fff; }
+.section.manufacture-finish { background: var(--page); }
 .section.manufacture-assembly { background: var(--page); }
 .section.manufacture-dispatch { padding-bottom: 0; background: #fff; }
 .section.manufacture-routes { background: var(--page); }
@@ -1451,6 +1451,8 @@ a {
 }
 .manufacture-module__note:has(.manufacture-module__installation-note) { max-width: 100%; }
 .manufacture-module__installation-note span { display: block; }
+.manufacture-module__desktop-lines > span { display: block; }
+.manufacture-module__note .manufacture-module__mobile-lines { display: none; }
 @media (min-width: 720px) {
   .manufacture-module__scene img,
   .manufacture-module__video { object-position: center; }
@@ -1479,8 +1481,23 @@ a {
     flex: none;
     transform: translate(-50%, -50%);
   }
-  .manufacture-module__note { max-width: 100%; }
+  .manufacture-module__note,
+  .manufacture-module__note:has(.manufacture-module__installation-note) {
+    left: calc((100% - 100vw + 8px) / 2);
+    right: auto;
+    width: calc(100vw - 8px);
+    max-width: none;
+  }
   .manufacture-module__text-break { display: none; }
+  .manufacture-module__note .manufacture-module__desktop-lines { display: none; }
+  .manufacture-module__note .manufacture-module__mobile-lines { display: block; }
+  .manufacture-module__note p {
+    min-width: 0;
+    font-size: 22px;
+    letter-spacing: -0.025em;
+    word-spacing: normal;
+  }
+  .manufacture-module__mobile-lines > span { display: block; }
 }
 
 .manufacture-dispatch__stage {
@@ -1552,13 +1569,13 @@ a {
 }
 .manufacture-section-head { max-width: 760px; margin-bottom: var(--gap-stack); }
 .manufacture-section-head h2 { margin: 0; text-wrap: balance; }
-.manufacture-section-head p { margin: var(--gap-stack) 0 0; }
+.manufacture-section-head p { margin: var(--gap-tile) 0 0; }
 
 .manufacture-finish__layout {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   grid-template-rows: auto 1fr;
-  grid-template-areas: "image heading" "image text";
+  grid-template-areas: "heading ." "image text";
   column-gap: var(--gap-split);
   row-gap: var(--gap-stack);
   align-items: start;
@@ -1566,8 +1583,27 @@ a {
 .manufacture-finish .manufacture-finish__layout h2 { grid-area: heading; margin: 0; text-wrap: balance; }
 .manufacture-finish__image { grid-area: image; position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
 .manufacture-finish__image img { object-fit: cover; }
-.manufacture-finish__text { grid-area: text; margin: 0; color: var(--ink-2); line-height: 1.6; }
+.manufacture-finish__body { grid-area: text; display: grid; gap: var(--gap-stack); }
+.manufacture-finish__text { margin: 0; color: var(--ink-2); line-height: 1.6; }
+.manufacture-finish__text p { margin: 0; }
+.manufacture-finish__text p + p { margin-top: var(--gap-tile); }
+.manufacture-mounting-videos { display: grid; gap: var(--gap-tile); }
+.manufacture-mounting-videos .mortgage-rules__title { margin: 0; }
+.manufacture-mounting-videos__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-tile); }
+.manufacture-mounting-videos .manufacture-mounting-videos__player { aspect-ratio: 16 / 9; border-radius: var(--surface-radius); }
+.manufacture-mounting-videos__player .independent-review__play { width: 48px; height: 48px; }
+.manufacture-mounting-videos__caption { margin: 0 0 8px; color: var(--ink-2); font-size: 14px; }
+@media (min-width: 900px) {
+  .manufacture-finish__body {
+    align-self: stretch;
+    grid-template-rows: auto 1fr;
+  }
+  .manufacture-finish__body .manufacture-mounting-videos {
+    align-self: end;
+  }
+}
 @media (max-width: 899px) {
+  .manufacture-mounting-videos__grid { grid-template-columns: minmax(0, 1fr); }
   .manufacture-finish__layout {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto;
@@ -10148,6 +10184,23 @@ html.is-dialog-open {
     position: relative;
     z-index: 2;
     grid-column: 2;
+  }
+}
+
+@media (min-width: 900px) {
+  .mortgage-mid-cta__inner--reversed .mortgage-mid-cta__media {
+    inset: 0 0 0 50%;
+    -webkit-mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+    mask-image: linear-gradient(90deg, transparent 0%, #000 34%);
+  }
+
+  .mortgage-mid-cta__inner--reversed::before {
+    -webkit-mask-image: linear-gradient(106deg, #000 46%, transparent 68%);
+    mask-image: linear-gradient(106deg, #000 46%, transparent 68%);
+  }
+
+  .mortgage-mid-cta__inner--reversed .mortgage-mid-cta__body {
+    grid-column: 1;
   }
 }
 

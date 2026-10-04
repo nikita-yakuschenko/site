@@ -26,9 +26,8 @@ export function ManufactureVideoReview() {
             <div className="independent-review__channel">
               <span className="manufacture-video-review__avatar" aria-hidden="true"><IconUser size={34} stroke={1.5} /></span>
               <span>
-                <strong>Имя Фамилия</strong>
-                <em>Должность в компании</em>
-                <em className="independent-review__audience">Короткая подпись о герое видео</em>
+                <strong>Денис Гришаткин</strong>
+                <em>Собственник компании</em>
               </span>
             </div>
           </div>
