@@ -1386,7 +1386,7 @@ a {
 .section.manufacture-dispatch { padding-bottom: 0; background: #fff; }
 .section.manufacture-routes { background: var(--page); }
 
-.section.manufacture-module { min-height: 1430svh; }
+.section.manufacture-module { min-height: 1740svh; }
 .manufacture-module__video {
   position: absolute;
   inset: 0;
@@ -1451,6 +1451,10 @@ a {
 }
 .manufacture-module__note:has(.manufacture-module__installation-note) { max-width: 100%; }
 .manufacture-module__installation-note span { display: block; }
+@media (min-width: 720px) {
+  .manufacture-module__scene img,
+  .manufacture-module__video { object-position: center; }
+}
 @media (min-width: 1000px) {
   .manufacture-module__installation-note span { white-space: nowrap; }
   .manufacture-module__note p.manufacture-module__installation-note { font-size: clamp(24px, 2.6vw, 40px); }
