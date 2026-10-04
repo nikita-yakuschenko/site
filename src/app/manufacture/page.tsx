@@ -142,15 +142,12 @@ export default function ManufacturePage() {
           </div>
         </section>
         <section className="section manufacture-finish" aria-labelledby="manufacture-finish-title">
-          <div className="section__inner">
-            <div className="manufacture-section-head">
-              <h2 id="manufacture-finish-title">Сборка дома на участке</h2>
-              <p>К началу строительства домокомплект доставляют заказчику. Панели перевозят фурой, а модули низкорамным тралом. На участке конструкции разгружают и с помощью крана за несколько дней собирают дом.</p>
+          <div className="section__inner manufacture-finish__layout">
+            <h2 id="manufacture-finish-title">Сборка дома на участке</h2>
+            <div className="manufacture-finish__image">
+              <Image src="/img/pages/mounting.jpg" alt="Монтаж дома на участке с помощью крана" fill sizes="(max-width: 899px) 100vw, 552px" />
             </div>
-            <div className="manufacture-finish__grid">
-              <div><h3>Модульный дом</h3><p>После сборки готов к проживанию.</p></div>
-              <div><h3>Панельно-каркасный дом</h3><p>Передаётся заказчику в готовности к прокладке коммуникаций, электрики, установке сантехники и отделочным работам.</p></div>
-            </div>
+            <p className="manufacture-finish__text">К&nbsp;началу строительства домокомплект доставляют заказчику. Панели перевозят фурой, а&nbsp;модули низкорамным тралом. На&nbsp;участке конструкции разгружают и&nbsp;с&nbsp;помощью крана за&nbsp;несколько дней собирают дом.</p>
           </div>
         </section>
         <ManufactureFaq />
