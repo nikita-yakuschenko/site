@@ -12,7 +12,7 @@ import {
 import { shareProject } from '../lib/share'
 import type { CatalogProject } from '../lib/catalog/types'
 
-export function ProjectCard({ project }: { project: CatalogProject }) {
+export function ProjectCard({ project, showPrice = true, locationLabel }: { project: CatalogProject; showPrice?: boolean; locationLabel?: string }) {
   // Подписка на внешнее хранилище вместо синхронизации через эффект.
   const favorites = useSyncExternalStore(subscribeFavorites, readFavorites, readServerFavorites)
   const favorite = favorites.includes(project.id)
@@ -68,9 +68,12 @@ export function ProjectCard({ project }: { project: CatalogProject }) {
         </div>
       </div>
       <div className="card__body">
-        <a href={project.href}>
+        {locationLabel ? <div className="card__heading">
+          <a href={project.href}><h3>{project.name}</h3></a>
+          <span className="card__location-badge" aria-label={`Выставочная площадка: ${locationLabel}`}>{locationLabel}</span>
+        </div> : <a href={project.href}>
           <h3>{project.name}</h3>
-        </a>
+        </a>}
         <ul className="specs">
           {specs.map((spec) => {
             const Icon = spec.icon
@@ -82,7 +85,7 @@ export function ProjectCard({ project }: { project: CatalogProject }) {
             )
           })}
         </ul>
-        <p className="price">{project.priceLabel}</p>
+        {showPrice && <p className="price">{project.priceLabel}</p>}
         <a className="btn btn-yellow card__cta" href={project.href}>
           {project.readyHome ? copy.viewReadyHome : copy.viewProject}
         </a>

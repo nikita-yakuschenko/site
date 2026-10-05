@@ -6,6 +6,7 @@ import { copy, footerAboutFor } from '../lib/copy'
 import { SITE } from '../lib/site'
 
 export function ExpositionShell({ children, placeName, overlay = false }: { children: ReactNode; placeName?: string; overlay?: boolean }) {
+  const placesLabel = <><span className="exposition-crumbs__full">Выставочные площадки</span><span className="exposition-crumbs__short">Площадки</span></>
   return (
     <SiteChrome name={SITE.name} phone={SITE.contacts.phone} email={SITE.contacts.email}
       address={SITE.contacts.address} navigation={[...SITE.navigation]} overlay={overlay}
@@ -15,10 +16,10 @@ export function ExpositionShell({ children, placeName, overlay = false }: { chil
           <Link href="/">{copy.breadcrumbsHome}</Link>
           <IconChevronRight size={14} stroke={2} aria-hidden="true" />
           {placeName ? <>
-            <Link href="/exposition">Выставочные площадки</Link>
+            <Link href="/exposition">{placesLabel}</Link>
             <IconChevronRight size={14} stroke={2} aria-hidden="true" />
             <span aria-current="page">{placeName}</span>
-          </> : <span aria-current="page">Выставочные площадки</span>}
+          </> : <span aria-current="page">{placesLabel}</span>}
         </nav>
       }>
       <main className="exposition-page">{children}</main>

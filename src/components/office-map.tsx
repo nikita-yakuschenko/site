@@ -6,9 +6,9 @@ import {
   OFFICE_CENTER,
   OFFICE_MAP_ZOOM,
   OFFICE_ROUTE_URL,
-  yandexMapsLoaderUrl,
 } from '../lib/office'
 import { SITE } from '../lib/site'
+import { loadYandexMaps, type YmapsMap } from '../lib/yandex-maps'
 
 /**
  * Карта офиса без интерфейса Яндекс.Карт.
@@ -22,75 +22,6 @@ import { SITE } from '../lib/site'
  * блок контактов не выполняет свою задачу. JS API грузится сразу.
  */
 
-type YmapsMap = {
-  destroy: () => void
-  behaviors: { disable: (list: string[]) => void }
-  geoObjects: { add: (obj: unknown) => void }
-  container: { fitToViewport: () => void }
-}
-
-type YmapsNs = {
-  ready: (cb: () => void) => void
-  Map: new (
-    el: HTMLElement,
-    state: { center: readonly [number, number]; zoom: number; controls: string[] },
-    options?: Record<string, unknown>,
-  ) => YmapsMap
-  Placemark: new (
-    coords: readonly [number, number],
-    properties?: Record<string, unknown>,
-    options?: Record<string, unknown>,
-  ) => unknown
-}
-
-declare global {
-  interface Window {
-    ymaps?: YmapsNs
-  }
-}
-
-let loader: Promise<YmapsNs> | null = null
-
-function readKey(): Promise<string | null> {
-  return fetch('/api/maps-key')
-    .then((r) => (r.ok ? r.json() : null))
-    .then((data: { key?: string } | null) => data?.key || null)
-    .catch(() => null)
-}
-
-function loadYmaps(apikey: string): Promise<YmapsNs> {
-  if (typeof window === 'undefined') {
-    return Promise.reject(new Error('ymaps: no window'))
-  }
-  if (window.ymaps) return Promise.resolve(window.ymaps)
-  if (loader) return loader
-  loader = new Promise<YmapsNs>((resolve, reject) => {
-    const existing = document.querySelector<HTMLScriptElement>('script[data-ymaps-loader]')
-    if (existing) {
-      existing.addEventListener('load', () => {
-        if (window.ymaps) resolve(window.ymaps)
-        else reject(new Error('ymaps missing after load'))
-      })
-      existing.addEventListener('error', () => reject(new Error('ymaps script error')))
-      return
-    }
-    const script = document.createElement('script')
-    script.src = yandexMapsLoaderUrl(apikey)
-    script.async = true
-    script.dataset.ymapsLoader = '1'
-    script.onload = () => {
-      if (window.ymaps) resolve(window.ymaps)
-      else reject(new Error('ymaps missing after load'))
-    }
-    script.onerror = () => reject(new Error('ymaps script error'))
-    document.head.appendChild(script)
-  }).catch((err) => {
-    loader = null
-    throw err
-  })
-  return loader
-}
-
 export function OfficeMap({
   onNavigate,
   className = 'site-office__map',
@@ -99,6 +30,7 @@ export function OfficeMap({
   zoom = OFFICE_MAP_ZOOM,
   routeUrl = OFFICE_ROUTE_URL,
   ariaLabel = copy.officeMapOpen,
+  markerLabel = SITE.name,
 }: {
   onNavigate?: () => void
   /** Класс обёртки: панель офиса и блок контактов делят один компонент. */
@@ -109,6 +41,7 @@ export function OfficeMap({
   zoom?: number
   routeUrl?: string
   ariaLabel?: string
+  markerLabel?: string
 }) {
   const host = useRef<HTMLDivElement>(null)
   const [status, setStatus] = useState<'pending' | 'ready' | 'failed'>('pending')
@@ -118,12 +51,7 @@ export function OfficeMap({
     let cancelled = false
     let resizeObserver: ResizeObserver | null = null
 
-    readKey()
-      .then((apikey) => {
-        // Ключа нет — карта просто не показывается, панель остаётся рабочей.
-        if (!apikey) throw new Error('ключ JS API не задан')
-        return loadYmaps(apikey)
-      })
+    loadYandexMaps()
       .then((ymaps) => {
         ymaps.ready(() => {
           if (cancelled || !host.current) return
@@ -139,7 +67,7 @@ export function OfficeMap({
           instance.geoObjects.add(
             new ymaps.Placemark(
               center,
-              { iconContent: SITE.name },
+              { iconContent: markerLabel },
               { preset: 'islands#redStretchyIcon' },
             ),
           )
@@ -162,7 +90,7 @@ export function OfficeMap({
       resizeObserver?.disconnect()
       map?.destroy()
     }
-  }, [center, zoom])
+  }, [center, zoom, markerLabel])
 
   const stateClass =
     status === 'ready'

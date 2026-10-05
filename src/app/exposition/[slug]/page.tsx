@@ -1,10 +1,14 @@
 import type { Metadata } from 'next'
+import Image from 'next/image'
 import { notFound } from 'next/navigation'
 import { ExpositionShell, ExpositionPhotoPlaceholder } from '../../../components/exposition-shell'
-import { LeadForm } from '../../../components/lead-form'
+import { ExpositionLocations } from '../../../components/exposition-locations'
+import { ExpositionVisit } from '../../../components/exposition-visit'
+import { ExpositionTourGallery } from '../../../components/exposition-tour-gallery'
 import { LeadDialogButton } from '../../../components/lead-dialog'
+import { ProjectCard } from '../../../components/project-card'
+import { CATALOG_PROJECTS } from '../../../lib/catalog/projects'
 import { EXPOSITION_PLACES } from '../../../lib/exposition'
-import { SITE } from '../../../lib/site'
 
 type Props = { params: Promise<{ slug: string }> }
 
@@ -23,11 +27,19 @@ export default async function ExpositionPlacePage({ params }: Props) {
   const { slug } = await params
   const place = EXPOSITION_PLACES.find((item) => item.slug === slug)
   if (!place) notFound()
+  const projects = place.projectSlugs.flatMap((projectSlug) => CATALOG_PROJECTS.filter((project) => project.slug === projectSlug))
   return (
     <ExpositionShell placeName={place.name} overlay>
       <section className="project-hero exposition-detail-hero" aria-labelledby="exposition-place-title">
         <div className="project-hero__media">
-          <ExpositionPhotoPlaceholder label="Главная фотография площадки" />
+          {place.slug === 'vysokiy-kvartal' ? (
+            <Image src="/img/pages/vysokiy-kvartal-aerial.webp" alt="Панорама КП Высокий Квартал с высоты"
+              fill preload sizes="(max-aspect-ratio: 16/9) 178svh, 100vw" quality={90} />
+          ) : (
+            <Image className="exposition-detail-hero__avangard-image" src="/img/pages/avangard-hero.webp"
+              alt="Дом с террасой на площадке Авангард среди берёз"
+              fill preload sizes="(max-aspect-ratio: 5/4) 125svh, 100vw" quality={90} />
+          )}
         </div>
         <div className="project-hero__veil" />
         <div className="project-hero__stage">
@@ -45,54 +57,37 @@ export default async function ExpositionPlacePage({ params }: Props) {
         </div>
       </section>
 
-      <section className="section" aria-labelledby="exposition-houses-title">
+      <section className="section exposition-detail-projects" aria-labelledby="exposition-projects-title">
         <div className="section__inner">
-          <h2 id="exposition-houses-title">Выставочные дома</h2>
-          <div className="project-bento exposition-detail-gallery">
+          <h2 id="exposition-projects-title">Проекты в экспозиции</h2>
+          {projects.length > 0 ? (
+            <div className="grid-2">{projects.map((project) => <ProjectCard key={project.id} project={project} showPrice={false} />)}</div>
+          ) : <div className="project-bento exposition-detail-gallery">
             {Array.from({ length: 6 }, (_, index) => (
               <ExpositionPhotoPlaceholder key={index} label="Фотография выставочного дома"
                 className={index === 0 ? 'project-bento__lead' : ''} />
             ))}
-          </div>
+          </div>}
         </div>
       </section>
 
-      <section className="section section--muted" aria-labelledby="exposition-plan-title">
-        <div className="section__inner">
-          <h2 id="exposition-plan-title">План площадки</h2>
-          <div className="project-plans__body">
-            <ExpositionPhotoPlaceholder label="План выставочной площадки" />
-            <div className="project-plans__legend exposition-detail__description">
-              <h3>Расположение домов</h3>
-              <p>План площадки и список выставочных домов будут добавлены.</p>
-            </div>
-          </div>
-        </div>
-      </section>
+      <ExpositionVisit />
 
-      <section className="section section--ink" aria-labelledby="exposition-interiors-title">
+      <section className="section section--ink" aria-labelledby="exposition-tour-title">
         <div className="section__inner">
-          <h2 id="exposition-interiors-title">Интерьеры выставочных домов</h2>
-          <div className="project-rows exposition-detail-gallery">
+          <h2 id="exposition-tour-title">Как проходит экскурсия</h2>
+          {place.tourPhotos.length > 0 ? <ExpositionTourGallery photos={place.tourPhotos} /> : <div className="project-bento exposition-detail-gallery exposition-tour-gallery">
             {Array.from({ length: 6 }, (_, index) => (
-              <ExpositionPhotoPlaceholder key={index} label="Фотография интерьера" />
+              <ExpositionPhotoPlaceholder key={index} label="Фото с дня открытых дверей"
+                className={index === 0 ? 'project-bento__lead' : ''} />
             ))}
-          </div>
+          </div>}
         </div>
       </section>
 
-      <section className="section" aria-labelledby="exposition-visit-title">
-        <div className="section__inner exposition-hero__layout">
-          <div className="exposition-detail__visit">
-            <h2 id="exposition-visit-title">Приезжайте на экскурсию</h2>
-            <address>{place.address}</address>
-            <p>Описание площадки и информация о посещении будут добавлены.</p>
-          </div>
-            <LeadForm siteId={SITE.id} pageId={`exposition/${place.slug}`} variant="card"
-              heading="Записаться на экскурсию"
-              body="Оставьте контакты, мы свяжемся с вами и согласуем удобное время."
-              submitLabel="Записаться на экскурсию"
-              meta={{ requestType: 'exposition-tour', exposition: place.slug }} />
+      <section className="section exposition-directions" aria-labelledby="directions-title">
+        <div className="section__inner">
+          <ExpositionLocations place={place} pageId={`exposition/${place.slug}`} />
         </div>
       </section>
     </ExpositionShell>

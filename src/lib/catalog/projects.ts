@@ -321,9 +321,9 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
   {
     id: "barnhouse-115",
     slug: "barnhouse-115",
-    name: "Барнхаус 115",
-    area: "115",
-    areaValue: 115,
+    name: "Барнхаус 113",
+    area: "113",
+    areaValue: 113,
     floors: "1",
     floorsValue: 1,
     bedrooms: "3",
@@ -335,7 +335,7 @@ export const CATALOG_PROJECTS: CatalogProject[] = [
     series: "barn",
     technology: "panel",
     href: "/catalog/barnhouse-115",
-    description: "Дом в стиле барнхаус площадью 115 м².",
+    description: "Дом в стиле барнхаус площадью 113 м².",
     about: [],
     exteriors: [
       "/catalog/barnhouse-115/00.jpg",

@@ -6078,6 +6078,28 @@ a {
   color: var(--avgst-green);
 }
 
+.card__heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.card__location-badge {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--foreground);
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
 .specs {
   display: flex;
   flex-wrap: wrap;
@@ -14157,13 +14179,8 @@ html.is-dialog-open {
   }
 }
 
-.exposition-detail-hero .project-hero__media .exposition-photo-placeholder {
-  width: 100%;
-  height: 100%;
-  aspect-ratio: auto;
-  border-radius: 0;
-  background: var(--avgst-ink);
-  color: var(--on-dark-1);
+.exposition-detail-hero .exposition-detail-hero__avangard-image {
+  object-position: center 65%;
 }
 .exposition-detail-hero .project-hero__stage {
   width: calc(100% - 2 * var(--page-gutter));
@@ -14189,19 +14206,8 @@ html.is-dialog-open {
   min-height: 160px;
   background: var(--surface-sunken);
 }
-.exposition-detail__description {
-  padding: 24px;
-}
-.exposition-detail__description h3 {
-  margin: 0 0 16px;
-}
-.exposition-detail__description p,
-.exposition-detail__visit p {
-  color: var(--ink-1);
-  line-height: 1.6;
-}
-.exposition-detail__visit address {
-  margin-top: 24px;
+@media (max-width: 899px) {
+  .exposition-tour-gallery > .project-bento__lead { grid-column: 1 / -1; }
 }
 @media (max-width: 359px) {
   .exposition-detail-hero h1 {
@@ -14210,68 +14216,89 @@ html.is-dialog-open {
 }
 
 /* Выставочные площадки: композиция экскурсии в фирменной сетке сайта. */
+.exposition-page > :is(.exposition-hero, .exposition-places, .exposition-visit, .exposition-projects, .exposition-directions) > .section__inner { width: min(var(--page-width), 100%); }
+.exposition-address__short { display: none; }
+.exposition-crumbs__short { display: none; }
 .exposition-page .exposition-hero { padding: 24px var(--page-gutter) 0; }
+.exposition-hero .mortgage-family__image { object-position: center 65%; }
 .exposition-page .exposition-hero h1 { margin: 0; }
 .exposition-hero__caption { display: block; font-size: 12px; color: var(--on-dark-2); margin-top: 28px; }
-.exposition-place > img, .exposition-visit__photo img, .exposition-project-card img, .exposition-cta__stage > img { object-fit: cover; }
+.exposition-place > img, .exposition-visit__photo img { object-fit: cover; }
 .exposition-page .exposition-places { padding: 24px var(--page-gutter) 56px; scroll-margin-top: 120px; }
-.exposition-places__grid { display: grid; width: 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-tile); grid-auto-rows: 300px; }
-.exposition-place { min-width: 0; height: 100%; aspect-ratio: auto; }
+.exposition-places__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-tile); }
+.exposition-place { min-width: 0; height: auto; aspect-ratio: 16 / 9; }
 .exposition-place .independent-review__place { display: inline-flex; max-width: calc(100% - 70px); }
 .exposition-video-tile { background: var(--avgst-ink); }
 .exposition-video-tile video { display: block; width: 100%; height: 100%; object-fit: cover; pointer-events: none; }
-.exposition-cta__stage::after { content: ''; position: absolute; inset: 0; background: rgb(var(--veil-rgb) / .55); pointer-events: none; }
 .exposition-page .exposition-visit { background: var(--surface-muted); padding: 48px var(--page-gutter); }
-.exposition-visit__top { display: grid; grid-template-columns: 1fr 1.2fr; gap: 48px; align-items: center; }
+.exposition-visit__top { display: grid; grid-template-areas: "photo heading"; grid-template-columns: 1.2fr 1fr; gap: 48px; align-items: center; }
+.exposition-visit__heading { grid-area: heading; }
 .exposition-page .exposition-visit h2 { margin-top: 0; }
-.exposition-visit__photo { position: relative; height: 260px; overflow: hidden; border-radius: 12px; }
-.exposition-benefits { list-style: none; padding: 32px; margin: -24px 32px 0 0; position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; background: var(--surface); border-radius: 12px; }
-.exposition-benefits li > span { color: var(--success-strong); font-size: 12px; }
-.exposition-benefits h3 { font-size: 15px; margin: 16px 0 8px; }
+.exposition-visit__photo { grid-area: photo; position: relative; height: 260px; overflow: hidden; border-radius: 12px; }
+.exposition-benefits { list-style: none; padding: 32px; margin: -24px 0 0 32px; position: relative; z-index: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 32px; background: var(--surface); border-radius: 12px; }
+.exposition-benefits h3 { font-size: 15px; margin: 0 0 8px; }
 .exposition-benefits p { font-size: 14px; line-height: 1.4; color: var(--ink-2); margin: 0; }
 .exposition-page .exposition-projects { padding: 56px var(--page-gutter); }
+.exposition-projects .section__head { align-items: flex-start; }
+.exposition-projects .section__catalog-cta--desktop { margin-top: 8px; }
 .exposition-projects__intro { font-size: 14px; color: var(--ink-2); margin: 16px 0 24px; max-width: 650px; }
-.exposition-projects__rail { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; }
-.exposition-project-card { min-width: 0; overflow: hidden; border-radius: 12px; text-decoration: none; color: var(--foreground); background: var(--surface-muted); }
-.exposition-project-card__photo { position: relative; height: 144px; overflow: hidden; }
-.exposition-project-card__copy { position: relative; padding: 16px; }
-.exposition-project-card h3 { font-size: 14px; margin: 0 20px 8px 0; }
-.exposition-project-card__copy > span { font-size: 11px; color: var(--ink-2); display: block; }
-.exposition-project-card__copy > svg { position: absolute; top: 16px; right: 12px; color: var(--success-strong); }
-.exposition-project-card:hover { background: var(--surface-sunken); }
 .exposition-page .exposition-directions { background: var(--surface-muted); padding: 48px var(--page-gutter); }
-.exposition-locations { display: grid; grid-template-columns: 1.3fr 1fr; gap: 48px; }
-.exposition-locations__map { border-radius: 16px; overflow: hidden; min-height: 380px; background: var(--surface-sunken); }
-.exposition-locations__map iframe { width: 100%; height: 100%; min-height: 380px; border: 0; display: block; }
-.exposition-locations__list { margin-top: 24px; display: grid; gap: 12px; }
-.exposition-location { border-radius: 12px; padding: 16px; border: 1px solid var(--line); }
-.exposition-location.is-selected { background: var(--surface); border-color: var(--avgst-green); }
-.exposition-location button { display: flex; width: 100%; text-align: left; gap: 12px; border: 0; background: transparent; padding: 0; cursor: pointer; color: var(--foreground); font: inherit; }
-.exposition-location button > svg { color: var(--success-strong); flex-shrink: 0; }
-.exposition-location strong { font-size: 15px; display: block; margin-bottom: 6px; }
-.exposition-location button span span { display: block; font-size: 12px; color: var(--ink-2); line-height: 1.4; }
-.exposition-location a { display: inline-flex; align-items: center; gap: 8px; font-size: 12px; color: var(--success-strong); margin: 12px 0 0 36px; text-decoration: none; font-weight: 600; }
-.exposition-locations__copy > p { font-size: 12px; line-height: 1.5; color: var(--ink-2); margin: 20px 0 0; }
-.exposition-page .exposition-cta { padding: 32px var(--page-gutter) 56px; }
-.exposition-cta__stage { position: relative; overflow: hidden; border-radius: 16px; min-height: 380px; color: white; }
-.exposition-cta__copy { position: relative; z-index: 1; padding: 48px; }
-.exposition-page .exposition-cta h2 { margin: 0 0 20px; }
-.exposition-cta__copy p { color: var(--on-dark-1); line-height: 1.5; margin-bottom: 24px; }
+.exposition-page .exposition-directions h2 { margin: 0 0 24px; }
+.exposition-locations.contacts__place { transform: none; }
+.exposition-locations--single { grid-template-areas: "copy" "map" "route"; }
+.exposition-locations--single .contacts__map:is(.is-loading, .is-ready) { min-width: 0; min-height: 0; }
+.exposition-locations--single .exposition-locations__actions .btn { max-width: 100%; height: auto; min-height: var(--btn-h-md); padding-block: 10px; line-height: 1.35; }
+.exposition-locations--single .exposition-locations__actions .btn svg { flex: 0 0 auto; }
+.exposition-locations .contacts__tab { padding-inline: 6px; white-space: nowrap; }
+.exposition-locations .contacts__map [class*="-gotoymaps__text-container"],
+.exposition-locations .contacts__map [class*="-gototaxi"],
+.exposition-locations .contacts__map [class*="-gototech"] { display: none; }
+.exposition-locations__full-address { max-width: 36ch; margin-top: 4px; color: var(--on-dark-1); opacity: 1; font-size: 13px; line-height: 1.5; }
+.exposition-locations__exposition { display: grid; gap: 12px; margin-top: 16px; padding-top: 16px; border-top: 1px solid var(--tint-on-dark); }
+.exposition-locations__exposition h3 { margin: 0; font-size: 14px; font-weight: 600; line-height: 1.35; }
+.exposition-locations__stats { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 0; }
+.exposition-locations__stat { display: grid; grid-template-areas: "label" "value"; align-content: start; gap: 12px; min-width: 0; margin-top: 20px; }
+.exposition-locations__stat:last-child { padding-left: 24px; border-left: 1px solid var(--tint-on-dark); }
+.exposition-locations__stat-value { grid-area: value; margin: 0; color: var(--on-dark-0); font-size: 36px; font-weight: 700; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums; }
+.exposition-locations__stat-label { grid-area: label; display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--on-dark-1); font-size: 13px; line-height: 1.4; }
+.exposition-locations__stat-label svg { flex: 0 0 auto; color: var(--on-dark-2); }
+.exposition-locations__stat--primary { grid-column: 1 / -1; grid-template-areas: "value label"; grid-template-columns: 116px minmax(0, 1fr); align-items: center; gap: 24px; margin-top: 0; padding: 4px 0 20px; border-bottom: 1px solid var(--tint-on-dark); }
+.exposition-locations__stat--primary .exposition-locations__stat-value { color: var(--brand-yellow); font-size: 64px; }
+.exposition-locations__stat--primary .exposition-locations__stat-label { font-size: 14px; font-weight: 600; }
+.exposition-locations__actions { grid-area: route; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
+.exposition-locations__route { color: var(--on-dark-0); font-size: 12px; font-weight: 600; text-underline-offset: 3px; }
+.exposition-locations__route:hover { color: var(--brand-yellow); }
+.exposition-locations__route:focus-visible { outline: 2px solid var(--brand-yellow); outline-offset: 4px; }
+@media (min-width: 1024px) {
+  .exposition-locations.contacts__place:has(.contacts__map:is(.is-loading, .is-ready)) { height: auto; min-height: 0; }
+  .exposition-locations.contacts__place:has(.contacts__map:is(.is-loading, .is-ready)) .contacts__map:is(.is-loading, .is-ready) { height: auto; aspect-ratio: 4 / 3; }
+  .exposition-locations--single.contacts__place:has(.contacts__map:is(.is-loading, .is-ready)) { grid-template-rows: 1fr auto; grid-template-areas: "copy map" "route map"; }
+}
 @media (max-width: 959px) {
-  .exposition-visit__top, .exposition-locations { gap: 24px; }
+  .exposition-visit__top { gap: 24px; }
   .exposition-benefits { padding: 24px; gap: 24px; grid-template-columns: repeat(2, 1fr); }
-  .exposition-projects__rail { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px; }
-  .exposition-project-card { flex: 0 0 220px; scroll-snap-align: start; }
 }
 @media (max-width: 767px) {
-  .exposition-places__grid, .exposition-visit__top, .exposition-locations { grid-template-columns: 1fr; }
+  .exposition-places__grid, .exposition-visit__top { grid-template-columns: 1fr; }
+  .exposition-visit__top { grid-template-areas: "heading" "photo"; }
+  .exposition-crumbs__full { display: none; }
+  .exposition-crumbs__short { display: inline; }
+  .exposition-detail-hero__bar .btn { width: 100%; }
+  .exposition-locations__actions { flex-direction: column; align-items: center; text-align: center; }
+  .exposition-locations__stat { gap: 10px; margin-top: 16px; }
+  .exposition-locations__stat:last-child { padding-left: 16px; }
+  .exposition-locations__stat-label { align-items: flex-start; }
+  .exposition-locations__stat:not(.exposition-locations__stat--primary) .exposition-locations__stat-label { min-height: 2.8em; }
+  .exposition-locations__stat-label svg { width: 18px; height: 18px; }
+  .exposition-locations__stat-value { font-size: 32px; }
+  .exposition-locations__stat--primary { grid-template-columns: 88px minmax(0, 1fr); gap: 16px; margin-top: 0; padding-bottom: 16px; }
+  .exposition-locations__stat--primary .exposition-locations__stat-value { font-size: 48px; }
+  .exposition-locations__stat--primary .exposition-locations__stat-label { flex-direction: column; gap: 6px; }
+  .exposition-address__full { display: none; }
+  .exposition-address__short { display: inline; }
   .exposition-page .exposition-places { padding-bottom: 32px; }
-  .exposition-places__grid { grid-auto-rows: 260px; }
   .exposition-page .exposition-visit, .exposition-page .exposition-projects, .exposition-page .exposition-directions { padding-top: 32px; padding-bottom: 32px; }
-  .exposition-visit__photo { height: 220px; }
-  .exposition-benefits { margin: -16px 12px 0; gap: 24px 16px; padding: 24px 16px; }
-  .exposition-benefits h3 { font-size: 14px; }
-  .exposition-benefits p { font-size: 12px; }
-  .exposition-locations__map, .exposition-locations__map iframe { min-height: 280px; }
-  .exposition-cta__copy { padding: 32px 16px; }
+  .exposition-visit__photo { height: auto; aspect-ratio: 16 / 9; }
+  .exposition-page .exposition-visit h2 { margin: 0; }
+  .exposition-benefits { grid-template-columns: 1fr; margin: 24px 0 0; gap: 24px; padding: 24px; }
 }

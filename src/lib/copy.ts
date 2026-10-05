@@ -1494,7 +1494,7 @@ export const copy = {
         provider: "vk" as const,
         oid: -71425780,
         id: "456240239",
-        title: "Барнхаус 115",
+        title: "Барнхаус 113",
         subtitle: "Обзор дома по проекту",
         duration: "07:42",
         poster: "/media/reviews/review-barn.jpg",
