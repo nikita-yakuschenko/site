@@ -25,6 +25,7 @@ import { LeadForm } from "./lead-form";
 import { ProjectCard } from "./project-card";
 import { ReferralProgram } from "./referral-program";
 import { VideoTestimonials } from "./video-testimonials";
+import { PhotoTile } from "./photo-tile";
 
 const ADVANTAGE_ICONS = [IconHourglass, IconUsers, IconMedal, IconStar];
 
@@ -203,24 +204,14 @@ function SeriesBento({ block }: { block: LayoutBlock }) {
         </div>
         <div className="series-bento">
           {items.map((item) => (
-            <a
+            <PhotoTile
               key={item.id}
-              className={`series-bento__tile series-bento__tile--${item.id}`}
+              className={`series-bento__tile--${item.id}`}
               href={item.href}
-            >
-              <img src={item.image} alt="" />
-              {item.count != null ? (
-                <span className="badge series-bento__count">
-                  {projectsInSeries(item.count)}
-                </span>
-              ) : null}
-              <span className="series-bento__go" aria-hidden="true">
-                <IconArrowUpRight size={18} stroke={2} />
-              </span>
-              <span className="series-bento__label">
-                <span className="series-bento__name">{item.title}</span>
-              </span>
-            </a>
+              image={item.image}
+              title={item.title}
+              count={item.count != null ? projectsInSeries(item.count) : undefined}
+            />
           ))}
         </div>
         <a

@@ -6,7 +6,7 @@ for (const width of [320, 375, 390, 768, 1440]) {
     await page.setViewportSize({ width, height: 900 })
     await page.goto('/exposition')
     await page.getByRole('button', { name: 'Необходимые', exact: true }).click()
-    await expect(page.locator('.manufacture-intro__banner h1')).toHaveText('Запишитесь на экскурсию на выставочные площадки')
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Выставочныеплощадки')
     await expect(page.locator('.exposition-hero form')).toHaveCount(0)
     await page.locator('.exposition-hero').getByRole('button', { name: 'Записаться на экскурсию' }).click()
     await expect(page.getByRole('dialog', { name: 'Записаться на экскурсию', exact: true })).toBeVisible()
@@ -15,30 +15,30 @@ for (const width of [320, 375, 390, 768, 1440]) {
     await expect(photo).toBeVisible()
     await expect.poll(() => photo.evaluate((img) => (img as HTMLImageElement).naturalWidth)).toBeGreaterThan(0)
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true)
-    await expect(page.locator('main a[href^="#"]')).toHaveCount(0)
+    expect(await page.getByRole('heading', { level: 1 }).evaluate((el) => el.scrollWidth <= el.clientWidth)).toBe(true)
+    await expect(page.locator('main a[href="#places"]')).toHaveCount(0)
 
     for (const place of EXPOSITION_PLACES) {
-      const section = page.locator('.exposition-place').filter({
-        has: page.getByRole('heading', { name: place.name, exact: true }),
-      })
-      await expect(section.locator('address')).toHaveText(place.address)
-      await expect(section.getByRole('link')).toHaveAttribute('href', `/exposition/${place.slug}`)
-      await expect(section.getByRole('link').locator('svg')).toHaveCount(0)
-      await expect(section.locator('.production__actions')).toBeVisible()
-      await section.getByRole('button', { name: 'Записаться на экскурсию' }).click()
-      const dialog = page.getByRole('dialog', { name: `Экскурсия в ${place.name}`, exact: true })
-      await expect(dialog).toBeVisible()
-      await expect(dialog.locator('.ask-dialog__close')).toBeFocused()
-      await page.keyboard.press('Shift+Tab')
-      await expect(dialog.locator('button[type="submit"]')).toBeFocused()
-      await page.keyboard.press('Tab')
-      await expect(dialog.locator('.ask-dialog__close')).toBeFocused()
-      await page.keyboard.press('Escape')
-      await expect(dialog).toHaveCount(0)
-      await expect(section.getByRole('button', { name: 'Записаться на экскурсию' })).toBeFocused()
+      const card = page.locator('.exposition-place').filter({ hasText: place.name })
+      await expect(card).toHaveAttribute('href', `/exposition/${place.slug}`)
+      await expect(card.locator('.independent-review__place')).toHaveText(place.address)
+      await expect(card.locator('.series-bento__go')).toBeVisible()
+      await expect(card.locator('.series-bento__name')).toHaveText(place.name)
     }
   })
 }
+
+test('location selection updates map and project links lead to the catalog', async ({ page }) => {
+  await page.goto('/exposition')
+  const location = page.getByRole('button', { name: /Высокий Квартал/ })
+  await location.click()
+  await expect(location).toHaveAttribute('aria-pressed', 'true')
+  await expect(page.locator('.exposition-locations iframe')).toHaveAttribute('title', 'Карта: Высокий Квартал')
+  await expect(page.locator('.exposition-locations iframe')).toHaveAttribute('src', /output=embed/)
+  await expect(page.locator('.exposition-project-card')).toHaveCount(5)
+  await page.locator('.exposition-project-card').first().click()
+  await expect(page).toHaveURL(/\/catalog\//)
+})
 
 for (const place of EXPOSITION_PLACES) {
   for (const width of [320, 375, 390, 768, 1440]) {

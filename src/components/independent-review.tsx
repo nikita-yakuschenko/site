@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, useState } from "react";
-import { IconBuildingFactory2, IconMapPin } from "@tabler/icons-react";
+import { PhotoLocationBadge } from "./photo-tile";
 import { copy, nbspText } from "../lib/copy";
 import { VideoLightbox, reviewEmbedSrc } from "./video-lightbox";
 
@@ -20,8 +20,6 @@ export function IndependentReview({
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
   const current: ReviewVideo = data.videos[active] ?? data.videos[0];
-  const PlaceIcon =
-    current.placeKind === "factory" ? IconBuildingFactory2 : IconMapPin;
 
   return (
     <section
@@ -75,10 +73,7 @@ export function IndependentReview({
                   : undefined
               }
             />
-            <span className="independent-review__place">
-              <PlaceIcon size={15} stroke={1.75} aria-hidden="true" />
-              <span>{current.place}</span>
-            </span>
+            <PhotoLocationBadge address={current.place} factory={current.placeKind === 'factory'} />
             <span className="independent-review__play" aria-hidden="true">
               <svg viewBox="0 0 24 24" width="28" height="28">
                 <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
