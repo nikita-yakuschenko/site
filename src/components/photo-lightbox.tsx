@@ -254,6 +254,7 @@ function useZoom(
   };
 }
 export function PhotoLightbox({
+  backdrop = 'dark',
   images,
   labels,
   variantLabels,
@@ -261,6 +262,7 @@ export function PhotoLightbox({
   onIndex,
   onClose,
 }: {
+  backdrop?: 'dark' | 'form';
   images: readonly string[];
   /** Подписи к кадрам: у планировок это вариант, и без подписи, открыв
    *  чертёж, уже не понять, какой из них смотришь. */
@@ -362,7 +364,7 @@ export function PhotoLightbox({
 
   return (
     <div
-      className="photo-lightbox"
+      className={`photo-lightbox${backdrop === 'form' ? ' photo-lightbox--form' : ''}`}
       role="dialog"
       aria-modal="true"
       onClick={onClose}

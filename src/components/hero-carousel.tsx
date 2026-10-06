@@ -7,6 +7,7 @@ import {
   IconChevronRight,
 } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
+import { CarouselProgress, CAROUSEL_SLIDE_MS } from "./carousel-progress";
 
 /**
  * Сообщение баннера. Постоянное: это то, что компания говорит о себе
@@ -49,7 +50,7 @@ export type HeroPromo = {
 // Длительность слота. Текста в карточке три-четыре строки, шести секунд
 // на прочтение не хватало. Значение отсюда же уходит в CSS-переменную, чтобы
 // полоска прогресса и смена слота не разъезжались.
-const SLIDE_MS = 11000;
+const SLIDE_MS = CAROUSEL_SLIDE_MS;
 
 // Порог жеста: доля ширины слота, после которой лента доводит до следующего,
 // а не возвращается. Четверть — достаточно, чтобы короткое касание при
@@ -285,15 +286,6 @@ export function HeroCarousel({
     if (width && Math.abs(dx) > width * SWIPE_RATIO) step(dx < 0 ? 1 : -1);
   }
 
-  useEffect(() => {
-    if (paused) return;
-    if (!rotating) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-    // Таймер на один шаг, а не интервал: эффект и так перезапускается на
-    // каждом слоте, и повторяющийся таймер только копил бы расхождение.
-    const id = window.setTimeout(() => step(1), SLIDE_MS);
-    return () => window.clearTimeout(id);
-  }, [pos, paused, rotating, step]);
 
   if (!count) return null;
 
@@ -490,49 +482,7 @@ export function HeroCarousel({
           {/* Полоса прогресса, она же переключатель, у нижней границы
               карточки. Слоем по той же причине, что шевроны. */}
           {rotating ? (
-            <div
-              className="hero__promo-progress"
-              role="tablist"
-              aria-label={copy.heroPromosAria}
-            >
-              {promos.map((item, itemIndex) => {
-                const active = itemIndex === index;
-                return (
-                  <button
-                    key={`seg-${item.heading}`}
-                    type="button"
-                    role="tab"
-                    aria-selected={active}
-                    aria-label={item.heading}
-                    className={
-                      active
-                        ? "is-active"
-                        : itemIndex < index
-                          ? "is-done"
-                          : undefined
-                    }
-                    onClick={() => goTo(itemIndex)}
-                  >
-                    <span className="hero__promo-progress-track">
-                      <span
-                        className="hero__promo-progress-fill"
-                        key={active ? `play-${playId}` : "idle"}
-                        style={
-                          active
-                            ? {
-                                animationDuration: `${SLIDE_MS}ms`,
-                                animationPlayState: paused
-                                  ? "paused"
-                                  : "running",
-                              }
-                            : undefined
-                        }
-                      />
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+            <CarouselProgress labels={promos.map(item => item.heading)} index={index} playId={playId} paused={paused} onSelect={goTo} onComplete={() => step(1)} />
           ) : null}
         </div>
       </div>

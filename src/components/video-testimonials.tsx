@@ -1,6 +1,8 @@
 "use client";
 
 import { Fragment, useState } from "react";
+import Link from "next/link";
+import { YandexRating } from "./yandex-rating";
 import { IconArrowUpRight, IconMapPin } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
 import { VideoLightbox, kinescopeEmbed } from "./video-lightbox";
@@ -87,8 +89,10 @@ function StoryCard({
 /** Видеоотзывы: крупная история слева, две компактные справа. */
 export function VideoTestimonials({
   showEyebrow = true,
+  showAllLink = true,
 }: {
   showEyebrow?: boolean;
+  showAllLink?: boolean;
 }) {
   const data = copy.videoTestimonials;
   const featured = data.stories[0];
@@ -113,18 +117,17 @@ export function VideoTestimonials({
               </Fragment>
             ))}
           </h2>
+          <div className="video-stories__rating">
+            <YandexRating />
+          </div>
           <p className="video-stories__lead">{nbspText(data.lead)}</p>
         </div>
 
         <div className="video-stories__actions">
-          <button
-            type="button"
-            className="btn btn-yellow"
-            onClick={() => setActive(featured)}
-          >
-            {data.watchAllLabel}
+          {showAllLink ? <Link href="/stories" className="btn btn-yellow">
+            Все дома и истории
             <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
-          </button>
+          </Link> : null}
         </div>
 
         <div className="video-stories__stage">
