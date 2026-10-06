@@ -27,7 +27,7 @@ export default async function HomePage() {
     >
       <main>
         <BlockRenderer
-          blocks={HOME_LAYOUT}
+          blocks={HOME_LAYOUT.filter((block) => block.blockType !== 'advantagesBar')}
           projects={items}
           contacts={SITE.contacts}
           siteId={SITE.id}

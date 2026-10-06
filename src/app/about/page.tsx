@@ -5,6 +5,7 @@ import { IconChevronRight } from '@tabler/icons-react'
 import { SiteChrome } from '../../components/site-chrome'
 import { VideoTestimonials } from '../../components/video-testimonials'
 import { AboutTimeline, type HistoryEntry } from '../../components/about-timeline'
+import { AboutCompanyBento } from '../../components/about-company-bento'
 import { BlockRenderer } from '../../components/block-renderer'
 import { HOME_LAYOUT } from '../../lib/home-layout'
 import { footerAboutFor } from '../../lib/copy'
@@ -49,9 +50,7 @@ export default function AboutPage() {
             </div>
           </div>
         </section>
-        <section className="section" aria-labelledby="about-intro"><div className="section__inner about-copy">
-          <h2 id="about-intro">Строим дома, в которые хочется возвращаться</h2><p>Мы — строительная компания из Нижнего Новгорода. С 2014 года строим деревянные дома, дачи и бани. Сегодня наши направления — каркасные, панельно-каркасные и модульные дома.</p><p>Помогаем пройти путь от выбора проекта до готового дома: с планировкой, строительством и инженерными системами.</p><div className="about-actions"><Link className="btn btn-yellow" href="/catalog">Выбрать проект дома</Link><Link className="btn btn-outline" href="/exposition">Посмотреть дома вживую</Link></div>
-        </div></section>
+        <AboutCompanyBento />
         <section className="section about-tinted" aria-labelledby="about-history"><div className="section__inner"><AboutTimeline entries={history} /></div></section>
         <BlockRenderer blocks={HOME_LAYOUT.filter(block => block.blockType === 'productionSection')} projects={[]} contacts={SITE.contacts} siteId={SITE.id} pageId="about" />
         <VideoTestimonials showEyebrow={false} />

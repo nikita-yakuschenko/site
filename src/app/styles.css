@@ -4799,6 +4799,46 @@ a {
 .about-photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 16px; }
 .about-photo img { object-fit: cover; }
 .about-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.section.about-company h2 { margin: 0; }
+.company-bento { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(3, minmax(152px, auto)); gap: var(--gap-tile); margin-top: var(--gap-stack); }
+.company-bento__tile { position: relative; min-width: 0; margin: 0; padding: 24px; border-radius: var(--surface-radius); overflow: hidden; background: var(--surface-muted); color: var(--foreground); }
+.company-bento__mission { grid-area: 1 / 1 / 3 / 3; display: flex; flex-direction: column; padding: var(--gap-stack); background: var(--avgst-ink); color: var(--on-dark-0); }
+.company-bento__logo { display: block; flex-shrink: 0; width: 144px; height: auto; max-width: 100%; margin-bottom: 24px; }
+.company-bento__mission blockquote { margin: 0; }
+.company-bento__mission blockquote p { margin: 0; font-size: 22px; line-height: 1.55; font-weight: 500; }
+.company-bento__mission figcaption { margin-top: auto; padding-top: 24px; font-size: 14px; font-weight: 600; color: var(--on-dark-1); }
+.company-bento__slot--right { grid-area: 2 / 3 / 3 / 4; }
+.company-bento__slot--bottom-left { grid-area: 3 / 1 / 4 / 2; }
+.company-bento__slot--bottom-middle { grid-area: 3 / 2 / 4 / 3; }
+.company-bento__slot--bottom-right { grid-area: 3 / 3 / 4 / 4; }
+.company-bento__factory { grid-area: 1 / 3 / 2 / 4; display: flex; flex-direction: column; padding: 0; text-decoration: none; }
+.company-bento__factory-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; padding: 16px; }
+.company-bento__factory-heading h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; }
+.company-bento__factory-heading p { margin: 6px 0 0; color: var(--ink-1); font-size: 14px; line-height: 1.5; }
+.company-bento__factory-heading > svg { flex-shrink: 0; margin-top: 4px; transition: transform .2s var(--ease-out); }
+.company-bento__factory-photo { position: relative; flex: 1; min-height: 64px; background: var(--surface-sunken); }
+.company-bento__factory-photo img { object-fit: cover; }
+.company-bento__factory:hover .company-bento__factory-heading > svg { transform: translate(2px, -2px); }
+.company-bento__factory:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
+.company-partners { grid-column: 1 / -1; min-width: 0; padding: 24px; border-radius: var(--surface-radius); background: var(--surface-muted); }
+.company-partners h3 { margin: 0 0 24px; font-size: 20px; line-height: 1.3; font-weight: 700; }
+.company-partners .mortgage-showcase__partners { padding-top: 0; border-top: 0; }
+@media (max-width: 900px) {
+  .company-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; }
+  .company-bento__tile { grid-area: auto; }
+  .company-bento__mission { grid-column: 1 / -1; grid-row: 1; }
+  .company-bento__slot { min-height: 176px; }
+  .company-bento__factory-photo { min-height: 100px; }
+}
+@media (max-width: 600px) {
+  .company-bento { grid-template-columns: 1fr; }
+  .company-bento__mission { padding: 24px; }
+  .company-bento__mission blockquote p { font-size: 18px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .company-bento__factory-heading > svg { transition: none; }
+  .company-bento__factory:hover .company-bento__factory-heading > svg { transform: none; }
+}
 .about-tinted { background: var(--surface-muted); }
 .about-page #contacts { background: var(--on-dark-0); }
 .about-principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
