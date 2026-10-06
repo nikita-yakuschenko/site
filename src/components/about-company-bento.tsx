@@ -42,7 +42,7 @@ export function AboutCompanyBento() {
           <div className="company-bento__tile company-bento__slot company-bento__slot--bottom-middle" aria-hidden="true" />
           <div className="company-bento__tile company-bento__slot company-bento__slot--bottom-right" aria-hidden="true" />
           <div className="company-partners" role="group" aria-labelledby="company-partners-title">
-            <h3 id="company-partners-title">Ведущие банки-партнёры</h3>
+            <h3 id="company-partners-title">Банки-партнёры</h3>
             <BankStrip partners={BANK_PARTNERS} />
           </div>
         </div>
