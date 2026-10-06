@@ -15,9 +15,8 @@ const BANK_PARTNERS: BankPartner[] = [
 
 export function AboutCompanyBento() {
   return (
-    <section className="section about-company" aria-labelledby="about-company-today">
+    <section className="section about-company" aria-label="О компании">
       <div className="section__inner">
-        <h2 id="about-company-today">Авангард Строй Сегодня</h2>
         <div className="company-bento">
           <figure className="company-bento__tile company-bento__mission">
             <Image className="company-bento__logo" src="/logo_lg.svg" alt="Авангард Строй" width={144} height={40} />
@@ -29,11 +28,11 @@ export function AboutCompanyBento() {
 
           <Link className="company-bento__tile company-bento__factory" href="/manufacture">
             <div className="company-bento__factory-heading">
-              <div><h3>AS Prefab</h3><p>Индустриальный подход</p></div>
+              <div><h3>Индустриальный<br />подход</h3></div>
               <IconArrowUpRight size={20} stroke={2} aria-hidden />
             </div>
             <div className="company-bento__factory-photo">
-              <Image src="/production/factory.jpg" alt="Изготовление стен и перекрытий на заводе Авангард Строй" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 900px) 50vw, 384px" />
+              <Image src="/img/pages/industrial.png" alt="Индустриальный подход к строительству домов" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 900px) 50vw, 384px" />
             </div>
           </Link>
           {/* Preserve the approved grid slots until their content is selected. */}
