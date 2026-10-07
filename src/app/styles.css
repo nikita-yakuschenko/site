@@ -4838,8 +4838,9 @@ a {
 }
 .company-bento__tile { position: relative; min-width: 0; margin: 0; padding: 24px; border-radius: var(--surface-radius); overflow: hidden; background: var(--surface-muted); color: var(--foreground); }
 .company-bento__hero { grid-area: hero; padding: var(--gap-stack); background: var(--avgst-ink); color: var(--on-dark-0); }
-.company-bento__hero-image { object-fit: cover; }
-.company-bento__hero-content { position: relative; z-index: 1; }
+.company-bento__hero-image { object-fit: cover; transform: translateX(8%); }
+.company-bento__hero::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(120deg, var(--avgst-ink) 0%, var(--avgst-ink) 30%, rgb(var(--avgst-ink-rgb) / 0.97) 36%, rgb(var(--avgst-ink-rgb) / 0.86) 43%, rgb(var(--avgst-ink-rgb) / 0.64) 50%, rgb(var(--avgst-ink-rgb) / 0.36) 57%, rgb(var(--avgst-ink-rgb) / 0.14) 64%, rgb(var(--avgst-ink-rgb) / 0.03) 71%, transparent 78%); pointer-events: none; }
+.company-bento__hero-content { position: relative; z-index: 2; }
 .company-bento__project-link { position: absolute; top: 16px; right: 16px; z-index: 2; display: flex; align-items: center; gap: 4px; padding: 1px 4px; border: 1px solid var(--on-dark-4); border-radius: 6px; background: rgb(var(--avgst-ink-rgb) / 0.3); color: var(--on-dark-1); text-decoration: none; }
 .company-bento__project-badge { font-size: 14px; line-height: 1.2; font-weight: 400; white-space: nowrap; }
 .company-bento__project-link > svg { flex-shrink: 0; transition: transform .2s var(--ease-out); }
@@ -4851,9 +4852,26 @@ a {
 .company-bento__hero h2 { max-width: 74%; margin: 0; font-weight: 600; line-height: 1.2; text-transform: none; }
 .company-bento__hero-description { max-width: 60%; margin: 24px 0 0; color: var(--on-dark-1); font-size: 16px; line-height: 1.6; }
 .company-bento__hero-description span { display: block; }
-.company-bento__catalog-cta { position: absolute; bottom: var(--gap-stack); left: var(--gap-stack); z-index: 1; gap: 6px; }
-.company-bento__slot--right { grid-area: side; }
-.company-bento__slot--card-left { grid-area: card-left; }
+.company-bento__catalog-cta { position: absolute; bottom: var(--gap-stack); left: var(--gap-stack); z-index: 2; gap: 6px; }
+.company-bento__technologies { grid-area: side; display: flex; flex-direction: column; gap: 8px; padding: 16px; text-decoration: none; }
+.company-bento__technologies-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.company-bento__technologies h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
+.company-bento__technologies-heading > svg { flex-shrink: 0; box-sizing: content-box; padding: 6px; border: 1px solid var(--line); border-radius: 10px; }
+.company-bento__technologies:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
+.company-bento__technology-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); flex: 1; min-height: 0; }
+.company-bento__technology-list figure { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; padding: 0 8px; }
+.company-bento__technology-list figure + figure { border-left: 1px solid var(--line); }
+.company-bento__technology-image { position: relative; flex: 1; min-height: 80px; }
+.company-bento__technology-image img { object-fit: contain; }
+.company-bento__technology-list figcaption { color: var(--ink-1); text-align: center; font-size: 12px; line-height: 1.4; }
+.company-bento__production { grid-area: card-left; }
+.company-bento__production-photo { position: absolute; top: 0; bottom: 0; left: 8%; width: 100%; }
+.company-bento__production-image { object-fit: contain; object-position: right center; }
+.company-bento__production::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(90deg, var(--surface-muted), color-mix(in srgb, var(--surface-muted) 80%, transparent) 35%, transparent 66%); }
+.company-bento__production::after { content: ''; position: absolute; z-index: 1; inset: -16px; background: conic-gradient(from 0deg at 77% 50%, transparent 0deg 247deg, var(--surface-muted) 247deg 315deg, transparent 315deg 360deg); filter: blur(22px); }
+.company-bento__production-copy { position: relative; z-index: 2; }
+.company-bento__production h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
+.company-bento__production p { margin: 12px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
 .company-bento__slot--card-middle { grid-area: card-middle; }
 .company-bento__slot--card-right { grid-area: card-right; }
 .company-bento__coverage { grid-area: bottom-left; }
@@ -4866,13 +4884,13 @@ a {
 .company-bento__coverage-graphic--compact { display: none; }
 .company-bento__coverage-cities { fill: var(--ink-2); font-size: 12px; font-family: inherit; }
 .company-bento__coverage-city-origin { fill: var(--ink); font-weight: 600; }
-.company-bento__factory { grid-area: factory; min-height: var(--company-bento-row); padding: 0; text-decoration: none; }
+.company-bento__factory { grid-area: factory; min-height: var(--company-bento-row); padding: 0; background: var(--avgst-ink); color: var(--on-dark-0); text-decoration: none; }
 .company-bento__factory-heading { position: relative; z-index: 1; display: flex; align-items: start; justify-content: space-between; gap: 12px; padding: 16px; }
-.company-bento__factory-heading h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 700; letter-spacing: -0.02em; }
+.company-bento__factory-heading h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; letter-spacing: -0.02em; }
 .company-bento__factory-heading p { margin: 6px 0 0; color: var(--ink-1); font-size: 14px; line-height: 1.5; }
-.company-bento__factory-heading > svg { flex-shrink: 0; box-sizing: content-box; padding: 6px; border: 1px solid var(--line); border-radius: 10px; background: var(--surface-muted); transition: transform .2s var(--ease-out); }
-.company-bento__factory-photo { position: absolute; right: -8px; bottom: 0; width: 55%; height: 90%; }
-.company-bento__factory-photo img { object-fit: contain; object-position: right bottom; }
+.company-bento__factory-heading > svg { flex-shrink: 0; box-sizing: content-box; padding: 6px; border: 1px solid var(--on-dark-4); border-radius: 10px; background: rgb(var(--avgst-ink-rgb) / 0.3); transition: transform .2s var(--ease-out); }
+.company-bento__factory-photo { position: absolute; inset: 0; }
+.company-bento__factory-photo img { object-fit: cover; object-position: center; }
 .company-bento__factory:hover .company-bento__factory-heading > svg { transform: translate(2px, -2px); }
 .company-bento__factory:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
 .company-partners { position: relative; grid-area: partners; display: flex; align-items: center; min-width: 0; min-height: var(--company-bento-row); box-sizing: border-box; padding: 24px; border-radius: var(--surface-radius); background: var(--surface-muted); }
@@ -4883,7 +4901,7 @@ a {
   .company-bento__tile, .company-partners { grid-area: auto; }
   .company-bento__hero { grid-column: 1 / -1; grid-row: 1; min-height: calc(var(--company-bento-row) * 2 + var(--company-bento-gap)); }
   .company-bento__slot { min-height: 176px; }
-  .company-bento__coverage { min-height: var(--company-bento-row); }
+  .company-bento__coverage, .company-bento__production, .company-bento__technologies { min-height: var(--company-bento-row); }
 }
 @media (max-width: 600px) {
   .company-bento { grid-template-columns: 1fr; }
@@ -4891,7 +4909,7 @@ a {
   .company-bento__catalog-cta { position: relative; bottom: auto; left: auto; margin-top: 24px; }
   .company-bento__project-link { position: relative; top: auto; right: auto; justify-content: flex-end; width: fit-content; margin: 0 0 24px auto; }
   .company-bento__hero::after { content: ''; position: absolute; inset: 0; background: rgb(var(--avgst-ink-rgb) / 0.56); }
-  .company-bento__hero-image { object-position: 70% center; }
+  .company-bento__hero-image { object-position: 70% center; transform: none; }
   .company-bento__hero h2, .company-bento__hero-description { max-width: 100%; }
   .company-bento__coverage-copy { width: 100%; }
   .company-bento__coverage { min-height: 300px; }

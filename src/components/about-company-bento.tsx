@@ -5,6 +5,10 @@ import { BankStrip, type BankPartner } from './bank-strip'
 import { CoverageMapGraphic } from './coverage-map-graphic'
 import { nbspText } from '../lib/copy'
 import aboutBentoProject from '../../public/img/pages/about-bento-project.png'
+import productionEquipment from '../../public/img/pages/wbz.png'
+import modularTechnology from '../../public/img/pages/modular_tech.png'
+import panelTechnology from '../../public/img/pages/panel_tech.png'
+import industrialApproach from '../../public/img/pages/industrial.png'
 
 const BANK_PARTNERS: BankPartner[] = [
   { name: 'СберБанк', src: '/logos/banks/sber.svg' },
@@ -47,12 +51,39 @@ export function AboutCompanyBento() {
               <IconArrowUpRight size={20} stroke={2} aria-hidden />
             </div>
             <div className="company-bento__factory-photo">
-              <Image src="/img/pages/industrial.png" alt="Индустриальный подход к строительству домов" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 900px) 50vw, 384px" />
+              <Image src={industrialApproach} alt="Индустриальный подход к строительству домов" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
             </div>
           </Link>
+          <Link className="company-bento__tile company-bento__technologies" href="/manufacture" aria-label="2 технологии домов — подробнее о производстве">
+            <div className="company-bento__technologies-heading">
+              <h3>2 технологии домов</h3>
+              <IconArrowUpRight size={20} stroke={2} aria-hidden />
+            </div>
+            <div className="company-bento__technology-list">
+              <figure>
+                <div className="company-bento__technology-image">
+                  <Image src={panelTechnology} alt="Панели для панельно-каркасной технологии" fill sizes="(max-width: 600px) 45vw, (max-width: 1024px) 25vw, 160px" />
+                </div>
+                <figcaption>Панельно-каркасная</figcaption>
+              </figure>
+              <figure>
+                <div className="company-bento__technology-image">
+                  <Image src={modularTechnology} alt="Дом по модульной технологии" fill sizes="(max-width: 600px) 45vw, (max-width: 1024px) 25vw, 160px" />
+                </div>
+                <figcaption>Модульная</figcaption>
+              </figure>
+            </div>
+          </Link>
+          <article className="company-bento__tile company-bento__production" aria-labelledby="company-bento-production-title">
+            <div className="company-bento__production-photo">
+              <Image className="company-bento__production-image" src={productionEquipment} alt="Оборудование собственного производства Авангард Строй" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 374px" />
+            </div>
+            <div className="company-bento__production-copy">
+              <h3 id="company-bento-production-title">Собственное<br />производство</h3>
+              <p>{nbspText('Современное оборудование')}<br />{nbspText('и контроль качества')}</p>
+            </div>
+          </article>
           {/* Preserve the approved grid slots until their content is selected. */}
-          <div className="company-bento__tile company-bento__slot company-bento__slot--right" aria-hidden="true" />
-          <div className="company-bento__tile company-bento__slot company-bento__slot--card-left" aria-hidden="true" />
           <div className="company-bento__tile company-bento__slot company-bento__slot--card-middle" aria-hidden="true" />
           <div className="company-bento__tile company-bento__slot company-bento__slot--card-right" aria-hidden="true" />
           <article className="company-bento__tile company-bento__coverage" aria-labelledby="company-bento-coverage-title">
