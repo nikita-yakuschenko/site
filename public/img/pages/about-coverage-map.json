@@ -1,0 +1,223 @@
+{
+  "city": "Нижний Новгород",
+  "coordinates": {
+    "longitude": 44.006516,
+    "latitude": 56.326797
+  },
+  "pixel": {
+    "x": 400,
+    "y": 96
+  },
+  "viewport": {
+    "width": 568,
+    "height": 186
+  },
+  "extent": {
+    "x": 0,
+    "y": -80,
+    "width": 568,
+    "height": 346
+  },
+  "contextRadiusKm": 1000,
+  "radiusKm": 500,
+  "innerRadiusKm": 250,
+  "pixelsPerKm": 0.17,
+  "projection": "+proj=aeqd +lat_0=56.326797 +lon_0=44.006516 +datum=WGS84 +units=m +no_defs",
+  "cities": [
+    {
+      "name": "Москва",
+      "coordinates": {
+        "longitude": 37.6173,
+        "latitude": 55.7558
+      },
+      "pixel": {
+        "x": 331.90048158595016,
+        "y": 103.65178491199224
+      },
+      "label": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      },
+      "compactLabel": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      }
+    },
+    {
+      "name": "Казань",
+      "coordinates": {
+        "longitude": 49.1064,
+        "latitude": 55.7961
+      },
+      "pixel": {
+        "x": 454.3291001076933,
+        "y": 104.03578617970331
+      },
+      "label": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      },
+      "compactLabel": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      }
+    },
+    {
+      "name": "Ярославль",
+      "coordinates": {
+        "longitude": 39.870011,
+        "latitude": 57.619983
+      },
+      "pixel": {
+        "x": 357.99992554393583,
+        "y": 70.24996905482314
+      },
+      "label": {
+        "x": -8,
+        "y": 4,
+        "align": "left"
+      },
+      "compactLabel": {
+        "x": -8,
+        "y": 4,
+        "align": "left"
+      }
+    },
+    {
+      "name": "Вологда",
+      "coordinates": {
+        "longitude": 39.919982,
+        "latitude": 59.209989
+      },
+      "pixel": {
+        "x": 360.32205577719265,
+        "y": 40.21988158603722
+      },
+      "label": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      },
+      "compactLabel": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      }
+    },
+    {
+      "name": "Киров",
+      "coordinates": {
+        "longitude": 49.669981,
+        "latitude": 58.590053
+      },
+      "pixel": {
+        "x": 455.94259985685255,
+        "y": 50.82773867079436
+      },
+      "label": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      },
+      "compactLabel": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      }
+    },
+    {
+      "name": "Калуга",
+      "coordinates": {
+        "longitude": 36.270024,
+        "latitude": 54.520379
+      },
+      "pixel": {
+        "x": 314.99520193409666,
+        "y": 125.43900533138353
+      },
+      "label": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      },
+      "compactLabel": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      }
+    },
+    {
+      "name": "Курск",
+      "coordinates": {
+        "longitude": 36.190028,
+        "latitude": 51.73998
+      },
+      "pixel": {
+        "x": 308.3018512337709,
+        "y": 177.6706479821038
+      },
+      "label": {
+        "x": 8,
+        "y": -6,
+        "align": "right"
+      },
+      "compactLabel": {
+        "x": 8,
+        "y": -6,
+        "align": "right"
+      }
+    },
+    {
+      "name": "Смоленск",
+      "coordinates": {
+        "longitude": 32.047336,
+        "latitude": 54.782688
+      },
+      "pixel": {
+        "x": 269.8245618261965,
+        "y": 113.94552587180002
+      },
+      "label": {
+        "x": -8,
+        "y": 4,
+        "align": "left"
+      },
+      "compactLabel": {
+        "x": -20,
+        "y": -6,
+        "align": "right"
+      }
+    },
+    {
+      "name": "Санкт-Петербург",
+      "coordinates": {
+        "longitude": 30.314074,
+        "latitude": 59.94096
+      },
+      "pixel": {
+        "x": 270.6910777597786,
+        "y": 14.46609328918926
+      },
+      "label": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      },
+      "compactLabel": {
+        "x": 8,
+        "y": 4,
+        "align": "right"
+      }
+    }
+  ],
+  "source": {
+    "name": "Natural Earth",
+    "url": "https://www.naturalearthdata.com/",
+    "revision": "ca96624a56bd078437bca8184e78163e5039ad19",
+    "license": "Public domain"
+  }
+}

@@ -34,11 +34,12 @@ const STILL = "(prefers-reduced-motion: reduce)";
  * Уехав за набор, позиция возвращается в середину — наборы одинаковые, и
  * подмены не видно.
  */
-export function BankStrip({ partners }: { partners: BankPartner[] }) {
+export function BankStrip({ partners, layout = "strip" }: { partners: BankPartner[]; layout?: "strip" | "grid" }) {
   const viewRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (layout === "grid") return;
     const view = viewRef.current;
     const track = trackRef.current;
     if (!view || !track) return;
@@ -151,7 +152,7 @@ export function BankStrip({ partners }: { partners: BankPartner[] }) {
       narrow.removeEventListener("change", sync);
       still.removeEventListener("change", sync);
     };
-  }, []);
+  }, [layout]);
 
   const logos = () =>
     partners.map(({ name, src, inkSrc }) =>
@@ -166,12 +167,14 @@ export function BankStrip({ partners }: { partners: BankPartner[] }) {
     );
 
   return (
-    <div className="mortgage-showcase__partners" aria-label="Банки-партнёры">
+    <div className={`mortgage-showcase__partners${layout === "grid" ? " mortgage-showcase__partners--grid" : ""}`} aria-label="Банки-партнёры">
       <div className="mortgage-showcase__partner-list" ref={viewRef}>
         <div className="mortgage-partner-track" ref={trackRef}>
           <div className="mortgage-partner-row">{logos()}</div>
-          <div className="mortgage-partner-row" aria-hidden="true">{logos()}</div>
-          <div className="mortgage-partner-row" aria-hidden="true">{logos()}</div>
+          {layout === "strip" && <>
+            <div className="mortgage-partner-row" aria-hidden="true">{logos()}</div>
+            <div className="mortgage-partner-row" aria-hidden="true">{logos()}</div>
+          </>}
         </div>
       </div>
     </div>
