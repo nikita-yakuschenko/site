@@ -9,6 +9,8 @@ import productionEquipment from '../../public/img/pages/wbz.png'
 import modularTechnology from '../../public/img/pages/modular_tech.png'
 import panelTechnology from '../../public/img/pages/panel_tech.png'
 import industrialApproach from '../../public/img/pages/industrial.png'
+import businessSolutions from '../../public/img/pages/B2B.png'
+import architecturalBureau from '../../public/img/pages/care.png'
 
 const BANK_PARTNERS: BankPartner[] = [
   { name: 'СберБанк', src: '/logos/banks/sber.svg' },
@@ -83,9 +85,23 @@ export function AboutCompanyBento() {
               <p>{nbspText('Современное оборудование')}<br />{nbspText('и контроль качества')}</p>
             </div>
           </article>
-          {/* Preserve the approved grid slots until their content is selected. */}
-          <div className="company-bento__tile company-bento__slot company-bento__slot--card-middle" aria-hidden="true" />
-          <div className="company-bento__tile company-bento__slot company-bento__slot--card-right" aria-hidden="true" />
+          <article className="company-bento__tile company-bento__architecture" aria-labelledby="company-bento-architecture-title">
+            <Image className="company-bento__architecture-image" src={architecturalBureau} alt="" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
+            <div className="company-bento__architecture-copy">
+              <h3 id="company-bento-architecture-title">Архитектурное бюро</h3>
+              <p>{nbspText('Внимание к деталям')}<br />{nbspText('и забота о вашем уюте')}</p>
+            </div>
+          </article>
+          <Link className="company-bento__tile company-bento__business" href="/business" aria-label="B2B решения — для партнёров и корпоративных клиентов">
+            <Image className="company-bento__business-image" src={businessSolutions} alt="" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
+            <div className="company-bento__business-copy">
+              <div className="company-bento__business-heading">
+                <h3>B2B решения</h3>
+                <IconArrowUpRight size={20} stroke={2} aria-hidden />
+              </div>
+              <p>{nbspText('Решения для партнёров')}<br />{nbspText('и корпоративных клиентов.')}</p>
+            </div>
+          </Link>
           <article className="company-bento__tile company-bento__coverage" aria-labelledby="company-bento-coverage-title">
             <div className="company-bento__coverage-copy">
               <h3 id="company-bento-coverage-title">

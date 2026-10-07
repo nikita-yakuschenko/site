@@ -4873,7 +4873,22 @@ a {
 .company-bento__production h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
 .company-bento__production p { margin: 12px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
 .company-bento__slot--card-middle { grid-area: card-middle; }
+.company-bento__architecture { grid-area: card-middle; background: var(--avgst-ink); color: var(--on-dark-0); }
+.company-bento__architecture-image { object-fit: cover; object-position: center; }
+.company-bento__architecture::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(180deg, rgb(var(--avgst-ink-rgb) / 0.55), rgb(var(--avgst-ink-rgb) / 0.35) 42%, transparent 68%); pointer-events: none; }
+.company-bento__architecture-copy { position: relative; z-index: 1; }
+.company-bento__architecture h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
+.company-bento__architecture p { margin: 12px 0 0; color: var(--on-dark-1); font-size: 14px; line-height: 1.4; }
 .company-bento__slot--card-right { grid-area: card-right; }
+.company-bento__business { grid-area: card-right; background: var(--avgst-ink); color: var(--on-dark-0); text-decoration: none; }
+.company-bento__business-image { object-fit: cover; object-position: center; }
+.company-bento__business::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(110deg, var(--avgst-ink) 0%, var(--avgst-ink) 40%, rgb(var(--avgst-ink-rgb) / 0.98) 47%, rgb(var(--avgst-ink-rgb) / 0.85) 53%, rgb(var(--avgst-ink-rgb) / 0.45) 61%, rgb(var(--avgst-ink-rgb) / 0.1) 69%, transparent 76%); pointer-events: none; }
+.company-bento__business-copy { position: relative; z-index: 1; }
+.company-bento__business-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
+.company-bento__business h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
+.company-bento__business p { margin: 8px 0 0; color: var(--on-dark-1); font-size: 14px; line-height: 1.4; }
+.company-bento__business-heading > svg { flex-shrink: 0; box-sizing: content-box; padding: 6px; border: 1px solid var(--on-dark-4); border-radius: 10px; background: rgb(var(--avgst-ink-rgb) / 0.3); }
+.company-bento__business:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
 .company-bento__coverage { grid-area: bottom-left; }
 .company-bento__coverage-copy { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; width: 60%; height: 100%; }
 .company-bento__coverage h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
@@ -4901,7 +4916,7 @@ a {
   .company-bento__tile, .company-partners { grid-area: auto; }
   .company-bento__hero { grid-column: 1 / -1; grid-row: 1; min-height: calc(var(--company-bento-row) * 2 + var(--company-bento-gap)); }
   .company-bento__slot { min-height: 176px; }
-  .company-bento__coverage, .company-bento__production, .company-bento__technologies { min-height: var(--company-bento-row); }
+  .company-bento__coverage, .company-bento__production, .company-bento__technologies, .company-bento__business, .company-bento__architecture { min-height: var(--company-bento-row); }
 }
 @media (max-width: 600px) {
   .company-bento { grid-template-columns: 1fr; }
