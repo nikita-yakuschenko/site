@@ -1,7 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { IconArrowUpRight } from '@tabler/icons-react'
-import { BankStrip, type BankPartner } from './bank-strip'
 import { CoverageMapGraphic } from './coverage-map-graphic'
 import { nbspText } from '../lib/copy'
 import aboutBentoProject from '../../public/img/pages/about-bento-project.png'
@@ -12,13 +11,11 @@ import industrialApproach from '../../public/img/pages/industrial.png'
 import businessSolutions from '../../public/img/pages/B2B.png'
 import architecturalBureau from '../../public/img/pages/care.png'
 
-const BANK_PARTNERS: BankPartner[] = [
-  { name: 'СберБанк', src: '/logos/banks/sber.svg' },
+const BANK_PARTNERS = [
+  { name: 'Сбер', src: '/logos/banks/sber-short.svg' },
   { name: 'ВТБ', src: '/logos/banks/vtb.svg' },
   { name: 'ДОМ.РФ', src: '/logos/banks/domrf.svg' },
   { name: 'Россельхозбанк', src: '/logos/banks/rshb.svg' },
-  { name: 'Примсоцбанк', src: '/logos/banks/primsoc.svg', inkSrc: '/logos/banks/primsoc-ink.svg' },
-  { name: 'Центр-инвест', src: '/logos/banks/centr-invest.svg' },
 ]
 
 export function AboutCompanyBento() {
@@ -50,54 +47,53 @@ export function AboutCompanyBento() {
           <Link className="company-bento__tile company-bento__factory" href="/manufacture">
             <div className="company-bento__factory-heading">
               <div><h3>Индустриальный<br />подход</h3></div>
-              <IconArrowUpRight size={20} stroke={2} aria-hidden />
             </div>
             <div className="company-bento__factory-photo">
-              <Image src={industrialApproach} alt="Индустриальный подход к строительству домов" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
+              <Image className="company-bento__animated-image" src={industrialApproach} alt="Индустриальный подход к строительству домов" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
             </div>
           </Link>
           <Link className="company-bento__tile company-bento__technologies" href="/manufacture" aria-label="2 технологии домов — подробнее о производстве">
             <div className="company-bento__technologies-heading">
               <h3>2 технологии домов</h3>
-              <IconArrowUpRight size={20} stroke={2} aria-hidden />
             </div>
             <div className="company-bento__technology-list">
               <figure>
                 <div className="company-bento__technology-image">
-                  <Image src={panelTechnology} alt="Панели для панельно-каркасной технологии" fill sizes="(max-width: 600px) 45vw, (max-width: 1024px) 25vw, 160px" />
+                  <Image className="company-bento__animated-image" src={panelTechnology} alt="Панели для панельно-каркасной технологии" fill sizes="(max-width: 600px) 45vw, (max-width: 1024px) 25vw, 160px" />
                 </div>
                 <figcaption>Панельно-каркасная</figcaption>
               </figure>
               <figure>
                 <div className="company-bento__technology-image">
-                  <Image src={modularTechnology} alt="Дом по модульной технологии" fill sizes="(max-width: 600px) 45vw, (max-width: 1024px) 25vw, 160px" />
+                  <Image className="company-bento__animated-image" src={modularTechnology} alt="Дом по модульной технологии" fill sizes="(max-width: 600px) 45vw, (max-width: 1024px) 25vw, 160px" />
                 </div>
                 <figcaption>Модульная</figcaption>
               </figure>
             </div>
           </Link>
-          <article className="company-bento__tile company-bento__production" aria-labelledby="company-bento-production-title">
+          <Link className="company-bento__tile company-bento__production" href="/manufacture" aria-labelledby="company-bento-production-title">
             <div className="company-bento__production-photo">
-              <Image className="company-bento__production-image" src={productionEquipment} alt="Оборудование собственного производства Авангард Строй" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 374px" />
+              <Image className="company-bento__production-image company-bento__animated-image" src={productionEquipment} alt="Оборудование собственного производства Авангард Строй" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 374px" />
             </div>
             <div className="company-bento__production-copy">
               <h3 id="company-bento-production-title">Собственное<br />производство</h3>
               <p>{nbspText('Современное оборудование')}<br />{nbspText('и контроль качества')}</p>
             </div>
-          </article>
+            <span className="series-bento__go company-bento__go" aria-hidden><IconArrowUpRight size={18} stroke={2} /></span>
+          </Link>
           <article className="company-bento__tile company-bento__architecture" aria-labelledby="company-bento-architecture-title">
-            <Image className="company-bento__architecture-image" src={architecturalBureau} alt="" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
+            <Image className="company-bento__architecture-image company-bento__animated-image" src={architecturalBureau} alt="" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
             <div className="company-bento__architecture-copy">
-              <h3 id="company-bento-architecture-title">Архитектурное бюро</h3>
+              <h3 id="company-bento-architecture-title">Архитектурное<br />бюро</h3>
               <p>{nbspText('Внимание к деталям')}<br />{nbspText('и забота о вашем уюте')}</p>
             </div>
           </article>
-          <Link className="company-bento__tile company-bento__business" href="/business" aria-label="B2B решения — для партнёров и корпоративных клиентов">
-            <Image className="company-bento__business-image" src={businessSolutions} alt="" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
+          <Link className="company-bento__tile company-bento__business" href="/business" aria-label="B2B и B2G решения — для партнёров и корпоративных клиентов">
+            <Image className="company-bento__business-image company-bento__animated-image" src={businessSolutions} alt="" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
             <div className="company-bento__business-copy">
               <div className="company-bento__business-heading">
-                <h3>B2B решения</h3>
-                <IconArrowUpRight size={20} stroke={2} aria-hidden />
+                <h3>B2B и B2G<br />решения</h3>
+                <span className="series-bento__go company-bento__go" aria-hidden><IconArrowUpRight size={18} stroke={2} /></span>
               </div>
               <p>{nbspText('Решения для партнёров')}<br />{nbspText('и корпоративных клиентов.')}</p>
             </div>
@@ -113,10 +109,22 @@ export function AboutCompanyBento() {
             <CoverageMapGraphic />
             <CoverageMapGraphic compact />
           </article>
-          <div className="company-partners" role="group" aria-labelledby="company-partners-title">
-            <h3 id="company-partners-title">Банки-партнёры</h3>
-            <BankStrip partners={BANK_PARTNERS} layout="grid" />
-          </div>
+          <Link className="company-partners" href="/family-mortgage" aria-labelledby="company-partners-title">
+            <div className="company-partners__copy">
+              <div className="company-partners__heading">
+                <h3 id="company-partners-title">Ипотека и кредитование</h3>
+                <span className="series-bento__go company-bento__go" aria-hidden><IconArrowUpRight size={18} stroke={2} /></span>
+              </div>
+              <p>Работаем с ведущими банками</p>
+            </div>
+            <div className="company-partners__logos">
+              {BANK_PARTNERS.map(({ name, src }) => (
+                <span className="company-partners__logo" key={name}>
+                  <Image src={src} alt={name} width={168} height={56} />
+                </span>
+              ))}
+            </div>
+          </Link>
         </div>
       </div>
     </section>
