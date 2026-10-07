@@ -52,9 +52,9 @@ export function AboutCompanyBento() {
               <Image className="company-bento__animated-image" src={industrialApproach} alt="Индустриальный подход к строительству домов" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
             </div>
           </Link>
-          <Link className="company-bento__tile company-bento__technologies" href="/manufacture" aria-label="2 технологии домов — подробнее о производстве">
+          <Link className="company-bento__tile company-bento__technologies" href="/manufacture" aria-label="Технологии — подробнее о производстве">
             <div className="company-bento__technologies-heading">
-              <h3>2 технологии домов</h3>
+              <h3>Технологии</h3>
             </div>
             <div className="company-bento__technology-list">
               <figure>
