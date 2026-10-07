@@ -1,6 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { IconArrowUpRight } from '@tabler/icons-react'
+import { BankStrip } from './bank-strip'
 import { CoverageMapGraphic } from './coverage-map-graphic'
 import { nbspText } from '../lib/copy'
 import aboutBentoProject from '../../public/img/pages/about-bento-project.png'
@@ -31,7 +32,7 @@ export function AboutCompanyBento() {
             </Link>
             <div className="company-bento__hero-content">
               <Image className="company-bento__logo" src="/logo_lg.svg" alt="Авангард Строй" width={144} height={40} />
-              <h2 id="company-bento-title">{nbspText('Делаем путь к своему дому')}<br />{nbspText('простым и предсказуемым')}</h2>
+              <h2 id="company-bento-title">{nbspText('Делаем путь к своему дому')}{' '}<br />{nbspText('простым и предсказуемым')}</h2>
               <p className="company-bento__hero-description">
                 <span>{nbspText('Проектируем, производим и строим')}</span>
                 <span>{nbspText('панельно-каркасные и модульные дома')}</span>
@@ -123,6 +124,9 @@ export function AboutCompanyBento() {
                   <Image src={src} alt={name} width={168} height={56} />
                 </span>
               ))}
+            </div>
+            <div className="company-partners__mobile-strip">
+              <BankStrip partners={BANK_PARTNERS} />
             </div>
           </Link>
         </div>

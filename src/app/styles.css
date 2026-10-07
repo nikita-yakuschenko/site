@@ -4915,6 +4915,8 @@ a {
 .company-partners__heading { min-height: 34px; padding-right: 44px; }
 .company-partners p { margin: 6px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
 .company-partners__logos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
+.company-partners__mobile-strip { display: none; min-width: 0; }
+.company-partners__mobile-strip .mortgage-showcase__partners { padding-top: 0; border-top: 0; }
 .company-partners__logo { display: flex; align-items: center; justify-content: center; min-width: 0; height: 64px; padding: 8px; }
 .company-partners__logo img { display: block; width: 100%; height: 40px; object-fit: contain; filter: brightness(0) saturate(100%); opacity: 0.82; transition: filter .2s var(--ease-out), opacity .2s var(--ease-out); }
 .company-partners__logo:nth-child(3) img { filter: grayscale(1); }
@@ -4943,16 +4945,21 @@ a {
   .company-bento { grid-template-columns: 1fr; }
   .company-bento__hero { padding: 24px; }
   .company-bento__catalog-cta { position: relative; bottom: auto; left: auto; margin-top: 24px; }
-  .company-bento__project-link { position: relative; top: auto; right: auto; justify-content: flex-end; width: fit-content; margin: 0 0 24px auto; }
+  .company-bento__project-link { top: 16px; right: 16px; }
+  .company-bento__logo { margin-top: 32px; margin-bottom: 24px; }
   .company-bento__hero::after { content: ''; position: absolute; inset: 0; background: rgb(var(--avgst-ink-rgb) / 0.56); }
   .company-bento__hero-image { object-position: 70% center; transform: none; }
   .company-bento__hero h2, .company-bento__hero-description { max-width: 100%; }
+  .company-bento__hero h2 { text-wrap: balance; }
+  .company-bento__hero h2 br { display: none; }
+  .company-bento__hero-description span { display: inline; }
+  .company-bento__hero-description span:not(:last-child)::after { content: ' '; }
   .company-bento__coverage-copy { width: 100%; }
-  .company-bento__coverage { min-height: 300px; }
+  .company-bento__coverage, .company-partners { height: var(--company-bento-row); min-height: var(--company-bento-row); }
   .company-bento__coverage-graphic--wide { display: none; }
   .company-bento__coverage-graphic--compact { display: block; }
-  .company-partners { min-height: 270px; }
-  .company-partners__logos { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .company-partners__logos { display: none; }
+  .company-partners__mobile-strip { display: block; }
 }
 @media (prefers-reduced-motion: reduce) {
   .company-bento__project-link > svg { transition: none; }
@@ -5060,9 +5067,12 @@ a {
 @media (max-width: 767px) {
   .about-split, .about-principles { grid-template-columns: 1fr; }
   .about-history__blocks, .about-history__layout--media { grid-template-columns: 1fr; }
-  .about-timeline__heading { align-items: flex-start; }
+  .about-timeline__heading { position: relative; align-items: flex-start; }
+  .about-timeline__heading h2 { margin: 0; }
+  .about-timeline__title { display: block; max-width: calc(100% - 92px); }
+  .about-timeline__controls { position: absolute; top: 0; right: 0; }
   .about-timeline__rail { margin-top: 32px; }
-  .about-timeline__year { margin-left: 0; }
+  .about-timeline__year { display: block; margin-left: 0; font-variant-numeric: tabular-nums; }
 }
 @media (prefers-reduced-motion: reduce) { .about-timeline__controls button { transition: none; } }
 

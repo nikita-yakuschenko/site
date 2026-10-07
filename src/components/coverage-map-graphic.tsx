@@ -2,12 +2,12 @@ import geometry from '../../public/img/pages/about-coverage-map.json'
 
 export function CoverageMapGraphic({ compact = false }: { compact?: boolean }) {
   const frame = compact
-    ? { x: 220, y: -80, width: 360, height: 300 }
+    ? { x: 120, y: -24, width: 360, height: 240 }
     : { x: 0, y: 0, ...geometry.viewport }
   const fadeId = `coverage-map-fade-${compact ? 'compact' : 'wide'}`
 
   return (
-    <svg className={`company-bento__coverage-graphic company-bento__coverage-graphic--${compact ? 'compact' : 'wide'}`} viewBox={`${frame.x} ${frame.y} ${frame.width} ${frame.height}`} preserveAspectRatio="xMidYMid slice" aria-hidden="true" focusable="false">
+    <svg className={`company-bento__coverage-graphic company-bento__coverage-graphic--${compact ? 'compact' : 'wide'}`} viewBox={`${frame.x} ${frame.y} ${frame.width} ${frame.height}`} preserveAspectRatio={compact ? 'xMaxYMid slice' : 'xMidYMid slice'} aria-hidden="true" focusable="false">
       <defs>
         <linearGradient id={fadeId}>
           <stop offset="0%" stopColor="var(--surface-muted)" />
@@ -26,7 +26,7 @@ export function CoverageMapGraphic({ compact = false }: { compact?: boolean }) {
         <circle r="2" fill="white" />
       </g>
       <g className="company-bento__coverage-cities">
-        {geometry.cities.map(city => {
+        {!compact && geometry.cities.map(city => {
           const label = compact ? city.compactLabel : city.label
           return (
             <g key={city.name} transform={`translate(${city.pixel.x} ${city.pixel.y})`}>
@@ -35,9 +35,9 @@ export function CoverageMapGraphic({ compact = false }: { compact?: boolean }) {
             </g>
           )
         })}
-        <text className="company-bento__coverage-city-origin" x={geometry.pixel.x + 12} y={geometry.pixel.y - 17}>
+        <text className="company-bento__coverage-city-origin" x={geometry.pixel.x + (compact ? 64 : 12)} y={geometry.pixel.y + (compact ? 24 : -17)} textAnchor={compact ? 'end' : 'start'}>
           <tspan>Нижний</tspan>
-          <tspan x={geometry.pixel.x + 12} dy="14">Новгород</tspan>
+          <tspan x={geometry.pixel.x + (compact ? 64 : 12)} dy="14">Новгород</tspan>
         </text>
       </g>
     </svg>

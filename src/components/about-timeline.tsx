@@ -13,11 +13,33 @@ export type HistoryEntry = { year: string; events: HistoryBlocks; eventLogos?: r
 
 export function AboutTimeline({ entries }: { entries: readonly HistoryEntry[] }) {
   const rail = useRef<HTMLDivElement>(null)
+  const scale = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
   const [gallery, setGallery] = useState<{ entry: number; index: number } | null>(null)
   const galleryImages = gallery ? entries[gallery.entry]?.images : undefined
 
   const [edges, setEdges] = useState({ start: true, end: false })
+
+  useEffect(() => {
+    const element = scale.current
+    if (!element) return
+    const revealActiveYear = () => {
+      const button = element.querySelector<HTMLButtonElement>('button[aria-current]')
+      if (!button || !element.clientWidth) return
+      const viewport = element.getBoundingClientRect()
+      const target = button.getBoundingClientRect()
+      const offset = target.left < viewport.left + 8
+        ? target.left - viewport.left - 8
+        : target.right > viewport.right - 8
+          ? target.right - viewport.right + 8
+          : 0
+      if (offset) element.scrollTo({ left: element.scrollLeft + offset, behavior: 'instant' })
+    }
+    revealActiveYear()
+    const observer = new ResizeObserver(revealActiveYear)
+    observer.observe(element)
+    return () => observer.disconnect()
+  }, [active])
 
   useEffect(() => {
     const element = rail.current
@@ -64,13 +86,13 @@ export function AboutTimeline({ entries }: { entries: readonly HistoryEntry[] })
   return (
     <>
       <div className="about-timeline__heading">
-        <h2 id="about-history">История компании <span className="about-timeline__year" aria-live="polite">{entries[active]?.year}</span></h2>
+        <h2 id="about-history"><span className="about-timeline__title">История компании</span> <span className="about-timeline__year" aria-live="polite">{entries[active]?.year}</span></h2>
         <div className="about-timeline__controls">
           <button type="button" aria-label="Предыдущие годы" aria-controls="about-history-rail" disabled={edges.start} onClick={() => move(-1)}><IconArrowLeft size={18} stroke={2} aria-hidden /></button>
           <button type="button" aria-label="Следующие годы" aria-controls="about-history-rail" disabled={edges.end} onClick={() => move(1)}><IconArrowRight size={18} stroke={2} aria-hidden /></button>
         </div>
       </div>
-      <nav className="about-timeline__scale" aria-label="Выбрать год истории компании">
+      <nav ref={scale} className="about-timeline__scale" aria-label="Выбрать год истории компании">
         {entries.map((entry, index) => <button key={entry.year} type="button" aria-current={index === active ? 'date' : undefined} aria-controls="about-history-rail" onClick={() => goTo(index)}><span className="about-timeline__tick" aria-hidden /><span>{entry.year}</span></button>)}
       </nav>
       <div ref={rail} id="about-history-rail" className="about-timeline__rail" tabIndex={0} role="region" aria-labelledby="about-history">
