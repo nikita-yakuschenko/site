@@ -52,7 +52,7 @@ export function AboutCompanyBento() {
               <Image className="company-bento__animated-image" src={industrialApproach} alt="Индустриальный подход к строительству домов" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
             </div>
           </Link>
-          <Link className="company-bento__tile company-bento__technologies" href="/manufacture" aria-label="Технологии — подробнее о производстве">
+          <article className="company-bento__tile company-bento__technologies" aria-label="Технологии">
             <div className="company-bento__technologies-heading">
               <h3>Технологии</h3>
             </div>
@@ -70,7 +70,7 @@ export function AboutCompanyBento() {
                 <figcaption>Модульная</figcaption>
               </figure>
             </div>
-          </Link>
+          </article>
           <Link className="company-bento__tile company-bento__production" href="/manufacture" aria-labelledby="company-bento-production-title">
             <div className="company-bento__production-photo">
               <Image className="company-bento__production-image company-bento__animated-image" src={productionEquipment} alt="Оборудование собственного производства Авангард Строй" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 374px" />
