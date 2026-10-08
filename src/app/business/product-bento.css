@@ -37,6 +37,7 @@
   transition: transform 0.45s var(--ease-out);
 }
 .business-product-bento__prefab {
+  --prefab-art-height: 160px;
   grid-column: 1 / 4;
   grid-row: 1;
   display: grid;
@@ -142,6 +143,17 @@
   width: calc(200px * 1672 / 941);
   height: 200px;
 }
+.business-product-bento__prefab .business-product-bento__image {
+  /* The source has 446px of transparent padding to the right of the panel.
+     Keep the panel itself 20px inside the card without altering the PNG. */
+  inset: auto calc(20px - var(--prefab-art-height) * 446 / 941) 16px auto;
+  width: calc(var(--prefab-art-height) * 1672 / 941);
+  height: var(--prefab-art-height);
+  min-height: 0;
+}
+.business-product-bento__prefab .business-product-bento__copy {
+  max-width: 52%;
+}
 .business-product-bento__modules .business-product-bento__image img {
   object-fit: contain;
   object-position: right bottom;
@@ -185,7 +197,7 @@
   margin-top: 12px;
 }
 @media (hover: hover) and (prefers-reduced-motion: no-preference) {
-  a.business-product-bento__tile:hover .business-product-bento__image img,
+  .business-product-bento__tile:is(.business-product-bento__prefab, .business-product-bento__modules):hover .business-product-bento__image img,
   .business-product-bento__tile:not(a) .business-product-bento__image:hover img,
   .business-product-bento__materials .business-product-bento__image:hover img {
     transform: scale(1.04);
@@ -269,7 +281,26 @@
     width: calc(160px * 1672 / 941);
     height: 160px;
   }
+  .business-product-bento__prefab .business-product-bento__image {
+    height: var(--prefab-art-height);
+    min-height: 0;
+  }
+  .business-product-bento__prefab .business-product-bento__copy {
+    max-width: 54%;
+  }
   .business-product-bento__copy h3 {
     font-size: 20px;
+  }
+}
+
+@media (max-width: 399px) {
+  .business-product-bento__prefab {
+    --prefab-art-height: 140px;
+  }
+}
+
+@media (max-width: 359px) {
+  .business-product-bento__prefab {
+    --prefab-art-height: 120px;
   }
 }

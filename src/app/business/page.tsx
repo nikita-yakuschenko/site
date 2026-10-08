@@ -151,7 +151,15 @@ export default function BusinessPage() {
           headingId="business-title"
           sectionClassName="b2b-intro"
           className="b2b-hero"
-          title={nbspText(BUSINESS.title)}
+          title={
+            <>
+              <span className="page-hero__accent">
+                {nbspText(BUSINESS.titleAccent)}
+              </span>
+              {nbspText(BUSINESS.title.slice(BUSINESS.titleAccent.length))}
+            </>
+          }
+          description={nbspText(BUSINESS.lead)}
           image={heroImage}
           imageAlt="Портфель, ноутбук с проектами и строительная каска"
           actions={<Inquiry label="Начать сотрудничество" />}
@@ -159,13 +167,7 @@ export default function BusinessPage() {
 
         <Section
           id="products"
-          title={
-            <>
-              Решения для бизнеса
-              <br />
-              от Авангард Строй
-            </>
-          }
+          title="Решения для бизнеса"
           muted
         >
           <BusinessProductBento

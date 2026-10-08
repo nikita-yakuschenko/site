@@ -36,12 +36,14 @@ export function PageHero({
       <div className="section__inner">
         <div className={`page-hero page-hero--${variant} ${bannerClass} ${className}`}>
           <div className="page-hero__copy">
-            <h1 id={headingId}>{title}</h1>
-            <div
-              className="page-hero__description"
-              aria-hidden={description ? undefined : true}
-            >
-              {description ? <p>{description}</p> : null}
+            <div className="page-hero__text">
+              <h1 id={headingId}>{title}</h1>
+              <div
+                className="page-hero__description"
+                aria-hidden={description ? undefined : true}
+              >
+                {description ? <p>{description}</p> : null}
+              </div>
             </div>
             <div className="page-hero__actions">{actions}</div>
           </div>

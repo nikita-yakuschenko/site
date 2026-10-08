@@ -29,6 +29,15 @@ for (const width of [320, 359, 360, 375, 390, 399, 400, 430, 599, 600, 768, 799,
         const range = document.createRange()
         range.selectNodeContents(heading)
         const textBounds = range.getBoundingClientRect()
+        const copy = el.querySelector('.page-hero__copy')!
+        const copyStyle = getComputedStyle(copy)
+        const heroStyle = getComputedStyle(el)
+        const descriptionBounds = description.getBoundingClientRect()
+        const expectedButtonY = copy.getBoundingClientRect().top
+          + parseFloat(copyStyle.paddingTop) + 8
+          + Number(heroStyle.getPropertyValue('--hero-title-lines')) * 1.32 * parseFloat(getComputedStyle(heading).fontSize)
+          + Number(heroStyle.getPropertyValue('--hero-description-lines')) * 25.6
+          + 2 * parseFloat(copyStyle.rowGap)
         return {
           geometry: {
             heroTop: bounds.top,
@@ -45,7 +54,10 @@ for (const width of [320, 359, 360, 375, 390, 399, 400, 430, 599, 600, 768, 799,
           transparentHero: getComputedStyle(el).backgroundColor === 'rgba(0, 0, 0, 0)',
           fontSize: parseFloat(getComputedStyle(heading).fontSize),
           headingFits: textBounds.bottom <= description.getBoundingClientRect().top,
-          descriptionFits: description.scrollHeight <= description.clientHeight,
+          descriptionFits: descriptionBounds.bottom <= actions.getBoundingClientRect().top - parseFloat(copyStyle.rowGap),
+          descriptionGap: descriptionBounds.top - headingBounds.bottom,
+          expectedDescriptionGap: parseFloat(copyStyle.rowGap),
+          buttonShift: Math.abs(buttonBounds.top - expectedButtonY),
           containsImage: getComputedStyle(image).objectFit === 'contain',
           clipping: [el, image.parentElement!].some((node) => ['hidden', 'clip'].includes(getComputedStyle(node).overflow)),
           overflow: document.documentElement.scrollWidth > innerWidth,
@@ -58,6 +70,8 @@ for (const width of [320, 359, 360, 375, 390, 399, 400, 430, 599, 600, 768, 799,
       expect(result.fontSize).toBeLessThanOrEqual(30)
       expect(result.headingFits, route).toBe(true)
       expect(result.descriptionFits, route).toBe(true)
+      expect(Math.abs(result.descriptionGap - result.expectedDescriptionGap), route).toBeLessThan(0.5)
+      expect(result.buttonShift, route).toBeLessThan(0.5)
       expect(result.containsImage, route).toBe(!banner)
       if (!banner) expect(result.clipping, route).toBe(false)
       expect(result.overflow, route).toBe(false)

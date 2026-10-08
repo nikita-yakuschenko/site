@@ -1,5 +1,5 @@
-/* Shared line budgets keep every intro and primary CTA aligned even when
-   a heading wraps differently or a description is absent. */
+/* Reserve one shared text area to keep intros and CTAs aligned. Within it,
+   the description follows the actual heading height, not its line budget. */
 .section.page-hero-section {
   background: transparent;
 }
@@ -44,8 +44,16 @@
   padding: var(--gap-split);
 }
 
-.page-hero .page-hero__copy > h1 {
-  height: calc(var(--hero-title-lines) * 1.32em);
+.page-hero__text {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap-stack);
+  font-size: var(--section-title-size);
+  height: calc(var(--hero-title-lines) * 1.32em + var(--hero-description-lines) * 25.6px + var(--gap-stack) + 8px);
+}
+
+.page-hero .page-hero__text > h1 {
+  flex-shrink: 0;
   margin: 8px 0 0;
   font-size: var(--section-title-size);
   line-height: normal;
@@ -55,15 +63,19 @@
   hyphens: manual;
 }
 
-.page-hero__copy > h1 em {
+.page-hero__text > h1 em {
   font-size: 1.32em;
   font-style: normal;
   line-height: 1;
   color: var(--brand-yellow);
 }
 
+.page-hero__accent {
+  color: var(--brand-yellow);
+}
+
 .page-hero__description {
-  height: calc(var(--hero-description-lines) * 1.6em);
+  flex-shrink: 0;
   font-size: 16px;
 }
 
@@ -132,7 +144,7 @@
   object-fit: cover;
 }
 
-.page-hero:is(.page-hero--family, .page-hero--manufacture) .page-hero__copy > h1,
+.page-hero:is(.page-hero--family, .page-hero--manufacture) .page-hero__text > h1,
 .page-hero:is(.page-hero--family, .page-hero--manufacture) .page-hero__more {
   color: #fff;
 }

@@ -1,8 +1,6 @@
 import type { ReactNode } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import {
-  IconArrowUpRight,
   IconBuildingWarehouse,
   IconHome,
 } from "@tabler/icons-react";
@@ -80,21 +78,9 @@ export function BusinessProductBento({
                 </div>
               )}
             </div>
-            {product.href ? (
-              <span
-                className="series-bento__go company-bento__go"
-                aria-hidden="true"
-              >
-                <IconArrowUpRight size={18} stroke={2} />
-              </span>
-            ) : null}
           </>
         );
-        return product.href ? (
-          <Link key={id} href={product.href} className={className}>
-            {content}
-          </Link>
-        ) : (
+        return (
           <article key={id} className={className}>
             {content}
           </article>
