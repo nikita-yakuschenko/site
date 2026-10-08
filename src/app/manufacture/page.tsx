@@ -4,6 +4,7 @@ import Link from "next/link";
 import Image from "next/image";
 import mountingImage from "../../../public/img/pages/mounting.png";
 import { SiteChrome } from "../../components/site-chrome";
+import { PageHero } from "../../components/page-hero";
 import { ContactsSection } from "../../components/block-renderer";
 import { LeadDialogButton } from "../../components/lead-dialog";
 import { LeadReveal } from "../../components/lead-reveal";
@@ -40,30 +41,27 @@ export default function ManufacturePage() {
       about={footerAboutFor(SITE.name)}
     >
       <main>
-        <section className="section manufacture-intro" aria-labelledby="manufacture-hero-title">
-          <div className="section__inner">
-            <div className="manufacture-intro__banner">
-              <Image src="/production/manufacture-hero-board.png" alt="" fill priority sizes="(max-width: 719px) 100vw, 1152px" />
-              <div className="manufacture-intro__copy">
-              <h1 id="manufacture-hero-title">
-                <span>Производство</span>
-                <span>Авангард Строй -</span>
-                <span>место где рождается</span>
-                <span>ваш дом</span>
-              </h1>
-              <p>{copy.productionLead}</p>
-              {/* Та же форма, что и в остальных местах, — на месте, а не
-                  якорем к блоку контактов в конце страницы. */}
+        <PageHero
+          headingId="manufacture-hero-title"
+          sectionClassName="manufacture-intro"
+          variant="manufacture"
+          image="/production/manufacture-hero-board.png"
+          title={<>
+            Производство<br />
+            Авангард Строй -<br />
+            место где рождается<br />
+            ваш дом
+          </>}
+          description={copy.productionLead}
+          actions={
               <LeadDialogButton
                 label={copy.factoryTour}
                 heading={copy.factoryTour}
                 submitLabel={copy.factoryTour}
                 pageId="manufacture"
               />
-              </div>
-            </div>
-          </div>
-        </section>
+          }
+        />
         <section className="section manufacture-docs" aria-labelledby="manufacture-documentation-title">
           <div className="section__inner">
             <h2 id="manufacture-documentation-title">Проект и документация</h2>

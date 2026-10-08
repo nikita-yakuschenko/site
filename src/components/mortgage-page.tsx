@@ -23,6 +23,7 @@ import { MortgageFaq } from "./mortgage-faq";
 import { MortgageWhoFits } from "./mortgage-who-fits";
 import { ScrollTo } from "./scroll-to";
 import { MortgageOtherPrograms } from "./mortgage-other-programs";
+import { PageHero } from "./page-hero";
 import type { CatalogProject } from "../lib/catalog/types";
 import type { MortgageProgramId } from "../lib/mortgage";
 
@@ -62,60 +63,34 @@ export function MortgagePageContent({
 }
 
 function MortgageHero({ content }: { content: MortgageContent }) {
-  return (
-    <section
-      className="section mortgage-page mortgage-page--hero"
-      aria-labelledby="mortgage-hero-title"
-    >
-      <div className="section__inner mortgage-showcase__grid">
-        <div
-          className={
-            content.heroCutout
-              ? "mortgage-family mortgage-family--light"
-              : "mortgage-family"
-          }
-        >
-          <div
-            className={
-              content.heroCutout
-                ? "mortgage-family__media mortgage-family__media--cutout"
-                : "mortgage-family__media"
-            }
-          >
-            <Image
-              className="mortgage-family__image"
-              src={content.heroImage}
-              alt=""
-              fill
-              priority
-              sizes="(min-width: 961px) 60vw, 100vw"
-            />
-          </div>
-          <div className="mortgage-family__body">
-            {/* Надстроки нет: она повторяла первые два слова заголовка —
-                «Семейная ипотека» над «Семейная ипотека на дом от 6%».
-                Раздел и так назван крошками строкой выше. */}
-            <h1 id="mortgage-hero-title">
-              {nbspText(content.headingLine)}
-              <br />
-              {nbspText(content.headingBefore)}
-              <em>{content.headingRate}</em>
-            </h1>
-            <p>{nbspText(content.lead)}</p>
-            <div className="mortgage-family__actions">
-              <ScrollTo className="btn btn-yellow" target="mortgage-calc">
-                {copy.mortgageCalcCta}
-                <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
-              </ScrollTo>
-              <Link className="mortgage-family__more" href="/catalog">
-                {copy.mortgageChooseProject}
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-  );
+    return (
+      <PageHero
+        headingId="mortgage-hero-title"
+        sectionClassName="mortgage-page mortgage-page--hero"
+        title={
+          <>
+            {nbspText(content.headingLine)}
+            <br />
+            {nbspText(content.headingBefore)}
+            <em>{content.headingRate}</em>
+          </>
+        }
+        description={nbspText(content.lead)}
+        image={content.heroImage}
+        variant={content.heroCutout ? "cutout" : "family"}
+        actions={
+          <>
+            <ScrollTo className="btn btn-yellow" target="mortgage-calc">
+              {copy.mortgageCalcCta}
+              <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
+            </ScrollTo>
+            <Link className="page-hero__more" href="/catalog">
+              {copy.mortgageChooseProject}
+            </Link>
+          </>
+        }
+      />
+    );
 }
 
 function MortgageSteps({ content }: { content: MortgageContent }) {

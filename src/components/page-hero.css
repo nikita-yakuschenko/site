@@ -1,0 +1,212 @@
+/* Shared line budgets keep every intro and primary CTA aligned even when
+   a heading wraps differently or a description is absent. */
+.section.page-hero-section {
+  background: transparent;
+}
+
+.page-hero-section + .section {
+  padding-top: var(--gap-section);
+}
+
+.page-hero-section + .section > .section__inner > h2,
+.page-hero-section + .section > .section__inner > header > h2 {
+  margin-top: 8px;
+  font-size: var(--section-title-size);
+  line-height: normal;
+}
+
+.page-hero {
+  --hero-title-lines: 4;
+  --hero-description-lines: 3;
+  --hero-actions-height: var(--btn-h-md);
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  min-height: 384px;
+  background: transparent;
+}
+
+.page-hero.mortgage-family,
+.page-hero.manufacture-intro__banner {
+  display: grid;
+  min-height: 384px;
+  padding: 0;
+  background: var(--avgst-ink);
+}
+
+.page-hero__copy {
+  position: relative;
+  z-index: 2;
+  min-width: 0;
+  display: grid;
+  align-content: start;
+  gap: var(--gap-stack);
+  padding: var(--gap-split);
+}
+
+.page-hero .page-hero__copy > h1 {
+  height: calc(var(--hero-title-lines) * 1.32em);
+  margin: 8px 0 0;
+  font-size: var(--section-title-size);
+  line-height: normal;
+  color: var(--avgst-ink);
+  text-wrap: balance;
+  overflow-wrap: normal;
+  hyphens: manual;
+}
+
+.page-hero__copy > h1 em {
+  font-size: 1.32em;
+  font-style: normal;
+  line-height: 1;
+  color: var(--brand-yellow);
+}
+
+.page-hero__description {
+  height: calc(var(--hero-description-lines) * 1.6em);
+  font-size: 16px;
+}
+
+.page-hero__description > p {
+  margin: 0;
+  max-width: 44ch;
+  font-size: inherit;
+  line-height: 1.6;
+  color: var(--ink-1);
+}
+
+.page-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-content: start;
+  align-items: flex-start;
+  gap: 20px;
+  min-height: var(--hero-actions-height);
+}
+
+.page-hero .page-hero__actions .btn {
+  gap: 8px;
+  margin: 0;
+  min-height: var(--btn-h-md);
+  height: auto;
+  white-space: normal;
+}
+
+.page-hero__more {
+  align-self: center;
+  color: var(--foreground);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.2;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.page-hero__image {
+  position: relative;
+  min-width: 0;
+}
+
+.page-hero__image img {
+  object-fit: contain;
+  object-position: center;
+}
+
+/* Keep the two established photo-banner compositions, not the cutout look. */
+.page-hero--family .page-hero__image {
+  position: absolute;
+  inset: 0 0 0 38%;
+}
+
+.page-hero--manufacture .page-hero__image {
+  position: absolute;
+  inset: 0;
+}
+
+.page-hero--family .page-hero__image img {
+  object-fit: cover;
+  object-position: center 24%;
+}
+
+.page-hero--manufacture .page-hero__image img {
+  object-fit: cover;
+}
+
+.page-hero:is(.page-hero--family, .page-hero--manufacture) .page-hero__copy > h1,
+.page-hero:is(.page-hero--family, .page-hero--manufacture) .page-hero__more {
+  color: #fff;
+}
+
+.page-hero:is(.page-hero--family, .page-hero--manufacture) .page-hero__description > p {
+  color: var(--on-dark-1);
+}
+
+@media (min-width: 961px) and (max-width: 1279px) {
+  .page-hero {
+    --hero-title-lines: 5;
+    --hero-description-lines: 4;
+  }
+}
+
+@media (max-width: 960px) {
+  .page-hero,
+  .page-hero.mortgage-family,
+  .page-hero.manufacture-intro__banner {
+    grid-template-columns: 1fr;
+    min-height: 0;
+  }
+  .page-hero__image,
+  .page-hero--family .page-hero__image,
+  .page-hero--manufacture .page-hero__image {
+    position: relative;
+    inset: auto;
+    grid-row: 1;
+    aspect-ratio: 16 / 10;
+  }
+  .page-hero__copy {
+    padding: var(--gap-stack) var(--page-gutter);
+  }
+  .page-hero--manufacture::after {
+    background: linear-gradient(180deg, transparent 0%, var(--ink-1) 40%, var(--avgst-ink) 64%);
+  }
+  .page-hero--manufacture .page-hero__image img {
+    object-position: 62% top;
+  }
+  .page-hero--manufacture .page-hero__image {
+    -webkit-mask-image: linear-gradient(180deg, #000 58%, transparent 100%);
+    mask-image: linear-gradient(180deg, #000 58%, transparent 100%);
+  }
+}
+
+@media (max-width: 899px) {
+  .page-hero {
+    --hero-actions-height: 96px;
+  }
+  .page-hero__actions {
+    flex-direction: column;
+  }
+  .page-hero__more {
+    align-self: flex-start;
+    margin-left: var(--btn-pad-md);
+  }
+}
+
+@media (max-width: 599px) {
+  .page-hero {
+    --hero-title-lines: 5;
+    --hero-description-lines: 5;
+  }
+}
+
+@media (max-width: 399px) {
+  .page-hero {
+    --hero-title-lines: 6;
+    --hero-description-lines: 6;
+  }
+}
+
+@media (max-width: 359px) {
+  .page-hero {
+    --hero-description-lines: 7;
+  }
+}

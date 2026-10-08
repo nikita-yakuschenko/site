@@ -20,16 +20,17 @@ import {
   IconHome as IconRoof,
   IconChevronRight,
 } from "@tabler/icons-react";
-import factoryImage from "../../../public/production/factory.jpg";
+import heroImage from "../../../public/img/pages/b2b_hero.png";
 import mountingImage from "../../../public/img/pages/mounting.png";
 import machineImage from "../../../public/production/manufacture-hero-board.png";
 import { BusinessProductBento } from "../../components/business-product-bento";
+import { PageHero } from "../../components/page-hero";
 import { SiteChrome } from "../../components/site-chrome";
 import { LeadDialogButton } from "../../components/lead-dialog";
 import { LeadForm } from "../../components/lead-form";
 import { BUSINESS } from "../../lib/business-content";
 import { SITE } from "../../lib/site";
-import { copy, footerAboutFor } from "../../lib/copy";
+import { copy, footerAboutFor, nbspText } from "../../lib/copy";
 import "./business.css";
 import "./product-bento.css";
 
@@ -146,50 +147,15 @@ export default function BusinessPage() {
       }
     >
       <main className="b2b-page">
-        <section className="section b2b-intro" aria-labelledby="business-title">
-          <div className="section__inner">
-            <div className="b2b-hero">
-              <div className="b2b-hero__copy">
-                <h1 id="business-title">
-                  {BUSINESS.title
-                    .replace("Производственные", "Производствен\u00adные")
-                    .replace("строительного", "строитель\u00adного")}
-                </h1>
-                <p>{BUSINESS.lead}</p>
-                <div className="b2b-actions">
-                  <Inquiry />
-                  <Link className="btn b2b-secondary" href="/manufacture">
-                    Продукция и производство
-                    <IconArrowUpRight size={18} aria-hidden="true" />
-                  </Link>
-                </div>
-                <ul className="b2b-hero__facts">
-                  <li>
-                    <IconBuildingFactory2 aria-hidden="true" />
-                    Собственное производство
-                  </li>
-                  <li>
-                    <IconSettings aria-hidden="true" />
-                    Современное оборудование
-                  </li>
-                  <li>
-                    <IconUsers aria-hidden="true" />
-                    Работа с B2B-заказчиками
-                  </li>
-                </ul>
-              </div>
-              <div className="b2b-hero__image">
-                <Image
-                  src={factoryImage}
-                  alt="Изготовление панелей и модулей на производстве Авангард Строй"
-                  fill
-                  preload
-                  sizes="(max-width: 719px) 100vw, 576px"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
+        <PageHero
+          headingId="business-title"
+          sectionClassName="b2b-intro"
+          className="b2b-hero"
+          title={nbspText(BUSINESS.title)}
+          image={heroImage}
+          imageAlt="Портфель, ноутбук с проектами и строительная каска"
+          actions={<Inquiry label="Начать сотрудничество" />}
+        />
 
         <Section
           id="products"
