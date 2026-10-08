@@ -33,6 +33,11 @@ import { copy, footerAboutFor } from "../../lib/copy";
 import "./business.css";
 import "./product-bento.css";
 
+// Временно скрыт по запросу; контент сохранён для последующего возврата.
+const SHOW_INDUSTRIES = false;
+const SHOW_CONTRACT = false;
+const SHOW_PROCESS = false;
+
 export const metadata: Metadata = {
   title: "Для бизнеса — производственные решения",
   description:
@@ -103,7 +108,7 @@ function Section({
   children,
 }: {
   id: string;
-  title: string;
+  title: ReactNode;
   muted?: boolean;
   children: ReactNode;
 }) {
@@ -187,6 +192,28 @@ export default function BusinessPage() {
         </section>
 
         <Section
+          id="products"
+          title={
+            <>
+              Решения для бизнеса
+              <br />
+              от Авангард Строй
+            </>
+          }
+          muted
+        >
+          <BusinessProductBento
+            materialsAction={
+              <Inquiry
+                label="Обсудить комплектацию"
+                topic="Строительные материалы"
+                secondary
+              />
+            }
+          />
+        </Section>
+
+        <Section
           id="benefits"
           title="Больше возможностей для бизнеса — меньше производственных ограничений"
           muted
@@ -207,63 +234,51 @@ export default function BusinessPage() {
           </div>
         </Section>
 
-        <Section id="industries" title="Решения для вашей отрасли">
-          <div className="b2b-industries">
-            {BUSINESS.industries.map((industry, index) => (
-              <article className="b2b-industry" key={industry.title}>
-                <div
-                  className={`b2b-industry__image${industry.image ? "" : " b2b-industry__image--placeholder"}`}
-                >
-                  {industry.image ? (
-                    <Image
-                      src={industry.image}
-                      alt=""
-                      fill
-                      sizes="(max-width: 599px) 100vw, (max-width: 959px) 50vw, 384px"
-                    />
-                  ) : index === 2 ? (
-                    <IconBuildingWarehouse
-                      size={52}
-                      stroke={1.2}
-                      aria-hidden="true"
-                    />
-                  ) : (
-                    <IconRoof size={52} stroke={1.2} aria-hidden="true" />
-                  )}
-                </div>
-                <div className="b2b-industry__copy">
-                  <h3>{industry.title}</h3>
-                  <p className="b2b-industry__audience">{industry.audience}</p>
-                  <p>{industry.task}</p>
+        {SHOW_INDUSTRIES && (
+          <Section id="industries" title="Решения для вашей отрасли">
+            <div className="b2b-industries">
+              {BUSINESS.industries.map((industry, index) => (
+                <article className="b2b-industry" key={industry.title}>
                   <div
-                    className="b2b-product-links"
-                    aria-label="Подходящие решения"
+                    className={`b2b-industry__image${industry.image ? "" : " b2b-industry__image--placeholder"}`}
                   >
-                    {industry.products.map((id) => (
-                      <IndustrySolution key={id} id={id} />
-                    ))}
+                    {industry.image ? (
+                      <Image
+                        src={industry.image}
+                        alt=""
+                        fill
+                        sizes="(max-width: 599px) 100vw, (max-width: 959px) 50vw, 384px"
+                      />
+                    ) : index === 2 ? (
+                      <IconBuildingWarehouse
+                        size={52}
+                        stroke={1.2}
+                        aria-hidden="true"
+                      />
+                    ) : (
+                      <IconRoof size={52} stroke={1.2} aria-hidden="true" />
+                    )}
                   </div>
-                </div>
-              </article>
-            ))}
-          </div>
-        </Section>
-
-        <Section
-          id="products"
-          title="От отдельных конструкций до готовых зданий"
-          muted
-        >
-          <BusinessProductBento
-            materialsAction={
-              <Inquiry
-                label="Обсудить комплектацию"
-                topic="Строительные материалы"
-                secondary
-              />
-            }
-          />
-        </Section>
+                  <div className="b2b-industry__copy">
+                    <h3>{industry.title}</h3>
+                    <p className="b2b-industry__audience">
+                      {industry.audience}
+                    </p>
+                    <p>{industry.task}</p>
+                    <div
+                      className="b2b-product-links"
+                      aria-label="Подходящие решения"
+                    >
+                      {industry.products.map((id) => (
+                        <IndustrySolution key={id} id={id} />
+                      ))}
+                    </div>
+                  </div>
+                </article>
+              ))}
+            </div>
+          </Section>
+        )}
 
         <Section
           id="readiness"
@@ -356,49 +371,51 @@ export default function BusinessPage() {
           </div>
         </Section>
 
-        <Section
-          id="contract"
-          title="Ваши заказы — наши производственные мощности"
-        >
-          <div className="b2b-contract">
-            <div className="b2b-contract__image">
-              <Image
-                src={machineImage}
-                alt="Промышленное оборудование для обработки деревянных деталей"
-                fill
-                sizes="(max-width: 719px) 100vw, 1152px"
-              />
+        {SHOW_CONTRACT && (
+          <Section
+            id="contract"
+            title="Ваши заказы — наши производственные мощности"
+          >
+            <div className="b2b-contract">
+              <div className="b2b-contract__image">
+                <Image
+                  src={machineImage}
+                  alt="Промышленное оборудование для обработки деревянных деталей"
+                  fill
+                  sizes="(max-width: 719px) 100vw, 1152px"
+                />
+              </div>
+              <div className="b2b-contract__copy">
+                <h3>Контрактное производство</h3>
+                <p>
+                  Изготовление конструкций, панелей и домокомплектов на
+                  действующем производстве. Используйте заводские мощности без
+                  инвестиций в создание или расширение собственного завода.
+                </p>
+                <Inquiry
+                  label="Обсудить контрактное производство"
+                  topic="Контрактное производство"
+                />
+                <Link className="section__link" href="/manufacture">
+                  Посмотреть производство
+                  <IconArrowUpRight size={16} aria-hidden="true" />
+                </Link>
+              </div>
+              <ul>
+                {BUSINESS.contract.map((text) => (
+                  <li key={text}>
+                    <IconBuildingFactory2
+                      size={26}
+                      stroke={1.5}
+                      aria-hidden="true"
+                    />
+                    {text}
+                  </li>
+                ))}
+              </ul>
             </div>
-            <div className="b2b-contract__copy">
-              <h3>Контрактное производство</h3>
-              <p>
-                Изготовление конструкций, панелей и домокомплектов на
-                действующем производстве. Используйте заводские мощности без
-                инвестиций в создание или расширение собственного завода.
-              </p>
-              <Inquiry
-                label="Обсудить контрактное производство"
-                topic="Контрактное производство"
-              />
-              <Link className="section__link" href="/manufacture">
-                Посмотреть производство
-                <IconArrowUpRight size={16} aria-hidden="true" />
-              </Link>
-            </div>
-            <ul>
-              {BUSINESS.contract.map((text) => (
-                <li key={text}>
-                  <IconBuildingFactory2
-                    size={26}
-                    stroke={1.5}
-                    aria-hidden="true"
-                  />
-                  {text}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </Section>
+          </Section>
+        )}
 
         <Section
           id="partnership"
@@ -421,19 +438,24 @@ export default function BusinessPage() {
           </div>
         </Section>
 
-        <Section id="process" title="От первого проекта до регулярных поставок">
-          <ol className="b2b-process">
-            {BUSINESS.process.map(([title, description], index) => (
-              <li key={title}>
-                <span className="b2b-process__number" aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
-                <h3>{title}</h3>
-                <p>{description}</p>
-              </li>
-            ))}
-          </ol>
-        </Section>
+        {SHOW_PROCESS && (
+          <Section
+            id="process"
+            title="От первого проекта до регулярных поставок"
+          >
+            <ol className="b2b-process">
+              {BUSINESS.process.map(([title, description], index) => (
+                <li key={title}>
+                  <span className="b2b-process__number" aria-hidden="true">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3>{title}</h3>
+                  <p>{description}</p>
+                </li>
+              ))}
+            </ol>
+          </Section>
+        )}
 
         <Section
           id="inquiry"

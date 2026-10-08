@@ -131,7 +131,7 @@ const META_LINK_GROUPS: readonly MetaGroup[] = [
     links: [
       { label: copy.about, href: "/about" },
       { label: copy.business, href: "/business" },
-      { label: copy.dealers, href: "/dealers" },
+      { label: copy.dealers, href: "https://b2b.avgst.ru/" },
     ],
   },
 ];
