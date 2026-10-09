@@ -3,7 +3,6 @@ import type { ReactNode } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
-  IconArrowRight,
   IconArrowUpRight,
   IconChartBar,
   IconClock,
@@ -21,8 +20,8 @@ import {
   IconChevronRight,
 } from "@tabler/icons-react";
 import heroImage from "../../../public/img/pages/b2b_hero.png";
-import mountingImage from "../../../public/img/pages/mounting.png";
 import machineImage from "../../../public/production/manufacture-hero-board.png";
+import { BusinessTechnologyComparison } from "../../components/business-technology-comparison";
 import { BusinessProductBento } from "../../components/business-product-bento";
 import { PageHero } from "../../components/page-hero";
 import { SiteChrome } from "../../components/site-chrome";
@@ -40,7 +39,7 @@ const SHOW_CONTRACT = false;
 const SHOW_PROCESS = false;
 
 export const metadata: Metadata = {
-  title: "Для бизнеса — производственные решения",
+  title: "Производственные решения для бизнеса",
   description:
     "Фермы на МЗП, кровельные панели, прекат, префаб и модульные здания. Контрактное производство и сотрудничество для строительных компаний и бизнеса.",
 };
@@ -181,27 +180,6 @@ export default function BusinessPage() {
           />
         </Section>
 
-        <Section
-          id="benefits"
-          title="Больше возможностей для бизнеса — меньше производственных ограничений"
-          muted
-        >
-          <div className="b2b-feature-grid">
-            {BUSINESS.benefits.map(([title, description], index) => {
-              const Icon = benefitIcons[index] ?? IconCube;
-              return (
-                <article className="b2b-feature" key={title}>
-                  <Icon size={30} stroke={1.5} aria-hidden="true" />
-                  <div>
-                    <h3>{title}</h3>
-                    <p>{description}</p>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </Section>
-
         {SHOW_INDUSTRIES && (
           <Section id="industries" title="Решения для вашей отрасли">
             <div className="b2b-industries">
@@ -249,94 +227,10 @@ export default function BusinessPage() {
         )}
 
         <Section
-          id="readiness"
-          title="Выбирайте, сколько строительных работ оставить за собой"
+          id="technology-comparison"
+          title="Меньше времени на объект. Больше возможностей для бизнеса."
         >
-          <ol className="b2b-readiness">
-            {BUSINESS.readiness.map((item) => (
-              <li key={item.title}>
-                <div className="b2b-readiness__image">
-                  <Image
-                    src={item.image}
-                    alt=""
-                    fill
-                    sizes="(max-width: 599px) 100vw, (max-width: 959px) 50vw, 288px"
-                  />
-                </div>
-                <h3>{item.title}</h3>
-                <dl>
-                  <dt>На производстве</dt>
-                  <dd>{item.factory}</dd>
-                  <dt>На площадке</dt>
-                  <dd>{item.site}</dd>
-                </dl>
-              </li>
-            ))}
-          </ol>
-          <div className="b2b-readiness__scale">
-            <span>Больше работ на площадке</span>
-            <IconArrowRight size={24} aria-hidden="true" />
-            <span>Больше работ на производстве</span>
-          </div>
-          <p className="b2b-note">
-            С ростом заводской готовности больше операций выполняется на
-            производстве и меньше остаётся на участке. Точное распределение
-            зависит от выбранной комплектации.
-          </p>
-        </Section>
-
-        <Section
-          id="economy"
-          title="Считайте эффективность строительства, а не только стоимость материалов"
-          muted
-        >
-          <div className="b2b-economy">
-            <div className="b2b-economy__main">
-              <p>
-                Сравнивайте полную стоимость строительного процесса: не только
-                закупку, но и монтаж, логистику, финансирование и управление
-                объектом.
-              </p>
-              <p>
-                Заводская технология не всегда дешевле по прямым затратам. Чтобы
-                оценить результат, рассчитываем конкретный проект с учётом ваших
-                бригад, сроков и процессов.
-              </p>
-              <Inquiry
-                label="Получить индивидуальный расчёт"
-                topic="Экономика проекта"
-              />
-              <div className="b2b-economy__image">
-                <Image
-                  src={mountingImage}
-                  alt="Монтаж заводского модуля с помощью автокрана"
-                  fill
-                  sizes="(max-width: 719px) 100vw, 640px"
-                />
-              </div>
-            </div>
-            <aside
-              className="b2b-economy__costs"
-              aria-label="Что учитывать в расчёте"
-            >
-              <h3>Из чего складывается результат</h3>
-              <ul>
-                {BUSINESS.costs.map((cost, index) => {
-                  const Icon = benefitIcons[index % 6] ?? IconCube;
-                  return (
-                    <li key={cost}>
-                      <Icon size={22} stroke={1.5} aria-hidden="true" />
-                      {cost}
-                    </li>
-                  );
-                })}
-              </ul>
-              <p>
-                Для коммерческих объектов также учитываем срок начала
-                эксплуатации и возможную выручку от более раннего запуска.
-              </p>
-            </aside>
-          </div>
+          <BusinessTechnologyComparison />
         </Section>
 
         {SHOW_CONTRACT && (
@@ -385,27 +279,6 @@ export default function BusinessPage() {
           </Section>
         )}
 
-        <Section
-          id="partnership"
-          title="Развивайте строительный бизнес вместе с нами"
-          muted
-        >
-          <div className="b2b-feature-grid">
-            {BUSINESS.partnership.map(([title, description], index) => {
-              const Icon = partnerIcons[index] ?? IconCube;
-              return (
-                <article className="b2b-feature" key={title}>
-                  <Icon size={30} stroke={1.5} aria-hidden="true" />
-                  <div>
-                    <h3>{title}</h3>
-                    <p>{description}</p>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        </Section>
-
         {SHOW_PROCESS && (
           <Section
             id="process"
@@ -424,6 +297,32 @@ export default function BusinessPage() {
             </ol>
           </Section>
         )}
+
+        <Section
+          id="partnership"
+          title="Развивайте строительный бизнес вместе с нами"
+          muted
+        >
+          <p className="b2b-partnership-lead">
+            Больше возможностей для бизнеса и меньше производственных ограничений.
+            Используйте наши мощности, готовые решения и поддержку, чтобы расширять
+            ассортимент, сокращать сроки и выполнять больше заказов.
+          </p>
+          <div className="b2b-feature-grid">
+            {[...BUSINESS.benefits, ...BUSINESS.partnership.filter(([title]) => !BUSINESS.benefits.some(([benefitTitle]) => benefitTitle === title))].map(([title, description], index) => {
+              const Icon = index < BUSINESS.benefits.length ? benefitIcons[index] ?? IconCube : partnerIcons[index - BUSINESS.benefits.length + 1] ?? IconCube;
+              return (
+                <article className="b2b-feature" key={title}>
+                  <Icon size={30} stroke={1.5} aria-hidden="true" />
+                  <div>
+                    <h3>{title}</h3>
+                    <p>{description}</p>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
+        </Section>
 
         <Section
           id="inquiry"

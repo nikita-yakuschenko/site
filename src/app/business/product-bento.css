@@ -1,7 +1,7 @@
 .business-product-bento {
   display: grid;
   grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-template-rows: 200px 180px auto;
+  grid-template-rows: 200px 180px;
   gap: var(--gap-tile);
 }
 .business-product-bento .company-bento__tile {
@@ -180,9 +180,9 @@
   font-size: 12px;
   text-align: center;
 }
-.business-product-bento__materials {
+.business-product-bento > .business-product-bento__materials {
   grid-column: 1 / -1;
-  display: grid;
+  display: none;
   grid-template-columns: 2fr 1fr;
   gap: 32px;
   align-items: start;
@@ -206,7 +206,7 @@
 @media (max-width: 1023px) {
   .business-product-bento {
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    grid-template-rows: auto auto auto;
+    grid-template-rows: auto auto;
   }
   .business-product-bento__prefab {
     grid-column: 1 / 4;
@@ -267,6 +267,11 @@
   .business-product-bento__precut .business-product-bento__copy {
     max-width: 58%;
   }
+  .business-product-bento__trusses .business-product-bento__image {
+    height: 100%;
+    min-height: 0;
+    margin: 0;
+  }
   .business-product-bento__prefab .business-product-bento__image,
   .business-product-bento__modules .business-product-bento__image,
   .business-product-bento__precut .business-product-bento__image {
@@ -300,6 +305,19 @@
 }
 
 @media (max-width: 359px) {
+  .business-product-bento__trusses .business-product-bento__copy {
+    max-width: none;
+  }
+  .business-product-bento__trusses .business-product-bento__image {
+    position: relative;
+    inset: auto;
+    height: 140px;
+    margin-top: 12px;
+    mask-image: none;
+  }
+  .business-product-bento__trusses .business-product-bento__image img {
+    object-fit: contain;
+  }
   .business-product-bento__prefab {
     --prefab-art-height: 120px;
   }

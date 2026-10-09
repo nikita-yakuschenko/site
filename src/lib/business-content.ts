@@ -148,7 +148,7 @@ export const BUSINESS = {
   ],
   readiness: [
     {
-      title: "Ручное строительство",
+      title: "Ручная стройка",
       factory: "Поставка материалов",
       site: "Раскрой, сборка каркаса и все последующие этапы",
       image: "/img/cards/frame.png",
@@ -157,13 +157,13 @@ export const BUSINESS = {
       title: "Прекат",
       factory: "Раскрой элементов по проекту",
       site: "Сборка каркаса и последующие этапы",
-      image: "/img/cards/logs.png",
+      image: "/img/cards/business-precut-marked.png",
     },
     {
       title: "Префаб",
       factory: "Изготовление панелей домокомплекта",
       site: "Монтаж панелей и последующие этапы",
-      image: "/img/pages/panel_tech.png",
+      image: "/img/cards/panel.png",
     },
     {
       title: "Модуль",
