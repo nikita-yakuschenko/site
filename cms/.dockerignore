@@ -8,6 +8,8 @@ media
 *.tsbuildinfo
 audit.local.json
 tests
+# Site import runs from the full repository, outside the standalone CMS image.
+scripts/import-site.ts
 README.md
 VALIDATION.md
 Dockerfile
