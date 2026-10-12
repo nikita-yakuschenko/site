@@ -5,7 +5,7 @@ import { activeStaff, authenticated, ownAccountOrSuper, privilegedField, superAd
 export const Users: CollectionConfig = {
   slug: 'users',
   labels: { singular: 'Пользователь', plural: 'Пользователи' },
-  admin: { useAsTitle: 'email', defaultColumns: ['email', 'firstName', 'lastName', 'role', 'isBlocked'] },
+  admin: { useAsTitle: 'email', defaultColumns: ['email', 'firstName', 'lastName', 'role', 'isBlocked'], components: { afterListTable: ['./components/admin/CollectionEmptyState#UsersEmptyState'] } },
   timestamps: true,
   auth: {
     tokenExpiration: 7200,
@@ -70,6 +70,6 @@ export const Users: CollectionConfig = {
         { label: 'Наблюдатель', value: 'viewer' },
       ],
     },
-    { name: 'isBlocked', type: 'checkbox', label: 'Заблокирован', defaultValue: false, access: { create: privilegedField, update: privilegedField } },
+    { name: 'isBlocked', type: 'checkbox', label: 'Статус', defaultValue: false, access: { create: privilegedField, update: privilegedField }, admin: { description: 'Включённый флажок означает, что пользователь заблокирован.', components: { Cell: './components/admin/BlockedCell#BlockedCell' } } },
   ],
 }

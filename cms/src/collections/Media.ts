@@ -5,7 +5,7 @@ export function createMedia({ directory, uploadsEnabled }: { directory: string; 
   return {
     slug: 'media',
     labels: { singular: 'Медиафайл', plural: 'Медиафайлы' },
-    admin: { useAsTitle: 'title' },
+    admin: { useAsTitle: 'title', components: { afterListTable: ['./components/admin/CollectionEmptyState#MediaEmptyState'] } },
     timestamps: true,
     access: {
       read: authenticated,

@@ -79,6 +79,9 @@ export interface User {
   firstName: string;
   lastName: string;
   role: 'super-admin' | 'admin' | 'editor' | 'viewer';
+  /**
+   * Включённый флажок означает, что пользователь заблокирован.
+   */
   isBlocked?: boolean | null;
   updatedAt: string;
   createdAt: string;

@@ -18,6 +18,7 @@ export default buildConfig({
   routes: { admin: '/', api: '/api' },
   admin: {
     user: 'users',
+    dateFormat: 'dd.MM.yyyy, HH:mm',
     meta: {
       title: 'Панель управления | avgst.ru',
       titleSuffix: '',
@@ -27,7 +28,15 @@ export default buildConfig({
       ],
     },
     importMap: { baseDir: root, importMapFile: path.resolve(root, 'app/(payload)/importMap.js') },
-    components: { graphics: { Logo: './components/Brand#Brand', Icon: './components/Brand#BrandIcon' } },
+    components: {
+      graphics: { Logo: './components/Brand#Brand', Icon: './components/Brand#BrandIcon' },
+      providers: ['./components/admin/AdminShell#AdminShell'],
+      Nav: './components/admin/AdminShell#EmptyNav',
+      views: {
+        dashboard: { Component: './components/admin/Dashboard#Dashboard' },
+        login: { Component: './components/admin/LoginView#LoginView', path: '/login', exact: true },
+      },
+    },
     timezones: { defaultTimezone: 'Europe/Moscow', supportedTimezones: [{ label: 'Москва', value: 'Europe/Moscow' }] },
   },
   i18n: { supportedLanguages: { ru }, fallbackLanguage: 'ru' },
