@@ -64,7 +64,7 @@ export const Users: CollectionConfig = {
       name: 'role', type: 'select', label: 'Роль', required: true, defaultValue: 'viewer',
       access: { create: privilegedField, update: privilegedField },
       options: [
-        { label: 'Супрадмин', value: 'super-admin' },
+        { label: 'Суперадмин', value: 'super-admin' },
         { label: 'Администратор', value: 'admin' },
         { label: 'Редактор', value: 'editor' },
         { label: 'Наблюдатель', value: 'viewer' },
