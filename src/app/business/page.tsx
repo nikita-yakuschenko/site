@@ -228,7 +228,7 @@ export default function BusinessPage() {
 
         <Section
           id="technology-comparison"
-          title="Меньше времени на объект. Больше возможностей для бизнеса."
+          title="Технологии и прибыль"
         >
           <BusinessTechnologyComparison />
         </Section>

@@ -1,0 +1,10 @@
+/* Default shadcn/ui Tabs proportions and states, mapped to existing tokens. */
+.ui-tabs { display: flex; flex-direction: column; gap: 8px; }
+.ui-tabs-list { display: inline-flex; width: fit-content; height: 36px; align-items: center; justify-content: center; padding: 3px; border-radius: 8px; background: var(--surface-sunken); color: var(--ink-1); }
+.ui-tabs-trigger { display: inline-flex; flex: 1; align-items: center; justify-content: center; gap: 6px; height: calc(100% - 1px); border: 1px solid transparent; border-radius: 6px; padding: 4px 8px; background: transparent; color: var(--ink-1); font: inherit; font-size: 14px; font-weight: 500; line-height: 20px; white-space: nowrap; cursor: pointer; }
+.ui-tabs-trigger:hover { color: var(--avgst-ink); }
+.ui-tabs-trigger[data-state="active"] { background: var(--surface); color: var(--avgst-ink); box-shadow: 0 1px 3px rgb(0 0 0 / 10%), 0 1px 2px rgb(0 0 0 / 6%); }
+.ui-tabs-trigger:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 2px; }
+.ui-tabs-trigger:disabled { pointer-events: none; opacity: .5; }
+.ui-tabs-content { flex: 1; outline: none; }
+.ui-tabs-content:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 3px; }

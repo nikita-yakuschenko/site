@@ -178,6 +178,12 @@
   .page-hero__copy {
     padding: var(--gap-stack) var(--page-gutter);
   }
+  .page-hero--cutout .page-hero__copy {
+    padding-inline: 0;
+  }
+  .page-hero__text {
+    height: auto;
+  }
   .page-hero--manufacture::after {
     background: linear-gradient(180deg, transparent 0%, var(--ink-1) 40%, var(--avgst-ink) 64%);
   }

@@ -18,8 +18,6 @@
 .technology-card__duration > strong .technology-card__duration-value { font-size: inherit; }
 .technology-card__duration > strong span { font-size: 18px; }
 .technology-card__duration > strong .technology-card__per-object { font-size: 14px; font-weight: 400; letter-spacing: 0; white-space: nowrap; }
-.technology-comparison__bar { height: 8px; border-radius: 4px; background: var(--surface-sunken); overflow: hidden; }
-.technology-comparison__bar > span { display: block; height: 100%; background: var(--brand-yellow); border-radius: inherit; }
 .technology-card__metrics { display: grid; grid-template-columns: 1fr 1fr; margin: 12px 0; padding-top: 10px; border-top: 1px solid var(--line-2); }
 .technology-card__metrics > div { padding-right: 8px; }
 .technology-card__metrics > div + div { padding: 0 0 0 10px; border-left: 1px solid var(--line-2); }
@@ -27,52 +25,78 @@
 .technology-card__metrics dd { margin: 4px 0 0; font-size: 25px; font-weight: 750; line-height: 1.15; }
 .technology-card__annual { display: grid; gap: 8px; background: color-mix(in srgb, var(--brand-yellow) 12%, var(--surface)); border-radius: 10px; padding: 12px; }
 .technology-card__annual-value { display: flex; align-items: center; gap: 8px; }
-.technology-card__annual-value > svg { color: var(--brand-yellow-strong); flex-shrink: 0; }
+.technology-card__annual-value > svg { color: var(--brand-yellow); flex-shrink: 0; }
 .b2b-page .technology-card__annual p { font-size: 11px; line-height: 1.4; min-height: 31px; text-wrap: pretty; }
 .technology-card__annual strong { display: block; font-size: 23px; line-height: 1.15; }
 .technology-comparison__subsection { margin-top: 28px; }
 .b2b-page .technology-comparison__summary h3 { font-size: 18px; line-height: 1.35; }
 .b2b-page .technology-comparison__summary p { margin-top: 6px; max-width: 920px; font-size: 13px; line-height: 1.5; }
-.technology-comparison__strip { padding: 16px; margin-top: 14px; border: 1px solid var(--line-2); border-radius: var(--surface-radius); background: var(--surface); }
-.technology-comparison__mobile { display: none; }
-.technology-comparison__crew-count { display: flex; align-items: center; gap: 10px; height: 42px; }
-.technology-comparison__crew-count > strong { font-size: 28px; line-height: 1; }
-.technology-comparison__crew-count b { font-size: 14px; }
-.b2b-page .technology-comparison__crew-count p { font-size: 11px; line-height: 1.4; }
-.technology-comparison__people { display: flex; margin-top: 10px; }
-.technology-comparison__people svg { width: calc(100% / 12); max-width: 18px; height: 22px; color: var(--line-2); }
+.technology-comparison__compact { margin-top: 16px; padding: 20px 24px; border: 1px solid var(--line-2); border-radius: var(--surface-radius); }
+.technology-comparison__panel-content { display: grid; grid-template-columns: 260px minmax(0, 1fr); gap: 32px; padding: 20px 0; border-bottom: 1px solid var(--line-2); }
+.technology-comparison__crew { min-width: 0; }
+.technology-comparison__crew h4 { margin: 0 0 12px; font-size: 16px; line-height: 1.3; font-weight: 750; }
+.b2b-page .technology-comparison__crew-count { display: flex; align-items: baseline; gap: 8px; margin: 0; color: var(--avgst-ink); font-size: 14px; }
+.technology-comparison__crew-count strong { font-size: 32px; line-height: 1; font-variant-numeric: tabular-nums; }
+.technology-comparison__people { display: grid; grid-template-columns: repeat(10, minmax(0, 16px)); gap: 2px; margin-top: 12px; }
+.technology-comparison__people svg { width: 100%; height: 20px; color: var(--line-2); }
 .technology-comparison__people .is-active { color: var(--brand-yellow); }
-.technology-comparison__table { width: 100%; table-layout: fixed; border-collapse: collapse; }
-.technology-comparison__table th, .technology-comparison__table td { padding: 8px 14px; border: 0; background: transparent; text-align: left; }
-.technology-comparison__table thead th span { display: flex; align-items: center; gap: 8px; min-height: 26px; }
-.technology-comparison__table tr > :nth-child(n+3) { border-left: 1px solid var(--line-2); }
-.technology-comparison__table thead th { font-size: 14px; font-weight: 750; line-height: 1.3; vertical-align: top; color: var(--avgst-ink); }
-.technology-comparison__table thead td { width: 144px; }
-.technology-comparison__table tbody th { padding-left: 0; font-size: 12px; color: var(--ink-2); font-weight: 400; }
-.technology-comparison__table tbody th span { display: flex; align-items: center; gap: 8px; }
-.technology-comparison__table .technology-comparison__bar { width: 100%; height: 8px; }
-.technology-comparison__team tr > * { padding-top: 16px; padding-bottom: 20px; }
-.technology-comparison__tasks { border-top: 1px solid var(--line-2); }
-.technology-comparison__tasks tr:first-child > * { padding-top: 20px; }
-.technology-comparison__crew-count > strong { font-variant-numeric: tabular-nums; }
-.b2b-page .technology-comparison__note { display: flex; align-items: flex-start; gap: 10px; font-size: 11px; line-height: 1.5; margin-top: 16px; color: var(--ink-2); }
-.technology-comparison__note > svg { flex-shrink: 0; width: 17px; height: 17px; margin-top: 1px; }
+.b2b-page .technology-comparison__foremen { margin: 12px 0 0; font-size: 14px; color: var(--ink-1); }
+.b2b-page .technology-comparison__figure-key { display: flex; align-items: center; gap: 8px; margin: 12px 0 0; font-size: 13px; color: var(--ink-1); }
+.technology-comparison__tabs-divider { padding-bottom: 16px; border-bottom: 1px solid var(--line-2); }
+.b2b-page .technology-comparison__baseline { margin: 0 0 12px; font-size: 13px; line-height: 1.5; color: var(--ink-1); }
+.technology-comparison__chart { --chart-label-width: 156px; --chart-value-width: 32px; min-width: 0; }
+.technology-comparison__axis { display: flex; justify-content: space-between; margin-left: calc(var(--chart-label-width) + 12px); margin-right: calc(var(--chart-value-width) + 8px); color: var(--ink-1); font-size: 12px; font-variant-numeric: tabular-nums; }
+.technology-comparison__chart-rows { display: grid; gap: 12px; margin: 8px 0 0; }
+.technology-comparison__chart-row { display: grid; grid-template-columns: var(--chart-label-width) minmax(0, 1fr); align-items: center; gap: 12px; }
+.technology-comparison__chart-row dt { display: flex; align-items: center; gap: 8px; font-size: 14px; line-height: 1.3; }
+.technology-comparison__chart-row dt svg { flex-shrink: 0; color: var(--ink-1); }
+.technology-comparison__chart-row dd { display: flex; align-items: center; gap: 8px; min-width: 0; margin: 0; }
+.technology-comparison__plot { position: relative; display: block; flex: 1; min-width: 0; height: 16px; border-left: 1px solid var(--line-2); border-right: 1px solid var(--line-2); }
+.technology-comparison__plot::before { content: ""; position: absolute; top: 0; bottom: 0; left: 50%; border-left: 1px solid var(--line-2); }
+.technology-comparison__plot > span { position: relative; display: block; height: 100%; background: var(--brand-yellow); border-radius: 0 3px 3px 0; }
+.technology-comparison__chart-row strong { width: var(--chart-value-width); flex-shrink: 0; font-size: 14px; line-height: 1; font-variant-numeric: tabular-nums; text-align: right; }
+.b2b-page .technology-comparison__legend { margin: 16px 0 0; font-size: 13px; line-height: 1.5; color: var(--ink-1); }
+.technology-comparison__payroll-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin: 0; padding: 12px 0 20px; border-bottom: 1px solid var(--line-2); }
+.technology-comparison__payroll-summary > div + div { padding-left: 24px; border-left: 1px solid var(--line-2); }
+.technology-comparison__payroll-summary > div:first-child dt { color: var(--avgst-ink); font-weight: 650; }
+.technology-comparison__payroll-summary dt { font-size: 14px; line-height: 1.4; color: var(--ink-1); }
+.technology-comparison__payroll-summary dd { margin: 6px 0; font-size: 24px; line-height: 1.2; font-weight: 750; font-variant-numeric: tabular-nums; }
+.technology-comparison__payroll-summary span { font-size: 12px; line-height: 1.5; color: var(--ink-1); }
+.technology-comparison__payroll-details { margin-top: 4px; font-size: 14px; }
+.technology-comparison__payroll-details summary { cursor: pointer; padding: 16px 0; font-weight: 600; }
+.technology-comparison__payroll-details summary:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 3px; }
+.technology-comparison__payroll-table { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+.technology-comparison__payroll-table th, .technology-comparison__payroll-table td { text-align: left; padding: 10px 12px; border: 0; border-bottom: 1px solid var(--line-2); background: transparent; }
+.technology-comparison__payroll-table th:first-child { padding-left: 0; }
+.technology-comparison__payroll-table thead th { font-size: 12px; color: var(--ink-1); font-weight: 500; }
+.technology-comparison__payroll-table tbody th { font-weight: 400; }
+.technology-comparison__payroll-table td:nth-child(2) { color: var(--ink-1); }
+.technology-comparison__payroll-table tr > :last-child { text-align: right; padding-right: 0; font-weight: 650; white-space: nowrap; }
+.technology-comparison__payroll-table tfoot th, .technology-comparison__payroll-table tfoot td { border-bottom: 0; font-weight: 750; }
+.technology-comparison__calculation-notes { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 32px; margin-top: 12px; }
+.b2b-page .technology-comparison__calculation-notes p { margin: 0; font-size: 13px; line-height: 1.5; color: var(--ink-1); }
+.b2b-page .technology-comparison__note { display: flex; align-items: flex-start; gap: 10px; font-size: 14px; line-height: 1.5; margin-top: 16px; color: var(--ink-1); }
+.technology-comparison__note > svg { flex-shrink: 0; width: 20px; height: 20px; margin-top: 1px; }
 @media (max-width: 1023px) {
   .technology-comparison__cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 719px) {
-  .technology-comparison__table { display: none; }
-  .technology-comparison__mobile { display: grid; gap: 20px; }
-  .technology-comparison__mobile-technology { min-width: 0; }
-  .technology-comparison__mobile-technology + .technology-comparison__mobile-technology { padding-top: 20px; border-top: 1px solid var(--line-2); }
-  .technology-comparison__mobile-technology h4 { margin: 0 0 16px; font-size: 18px; font-weight: 750; line-height: 1.3; color: var(--avgst-ink); }
-  .technology-comparison__mobile-team { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
-  .technology-comparison__mobile-team .technology-comparison__people { margin: 0; width: 144px; }
-  .technology-comparison__mobile-tasks { display: grid; gap: 12px; margin: 16px 0 0; }
-  .technology-comparison__mobile-tasks > div { display: grid; grid-template-columns: 116px minmax(0, 1fr); align-items: center; gap: 12px; }
-  .technology-comparison__mobile-tasks dt { display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 12px; line-height: 1.4; }
-  .technology-comparison__mobile-tasks dt svg { flex-shrink: 0; }
-  .technology-comparison__mobile-tasks dd { min-width: 0; margin: 0; }
+  .technology-comparison__compact { padding: 16px; }
+  .technology-comparison__panel-content { grid-template-columns: 1fr; gap: 24px; }
+  .technology-comparison__technology-tabs { display: grid; width: 100%; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .technology-comparison__technology-tabs .ui-tabs-trigger { min-width: 0; padding: 4px 2px; font-size: 12px; line-height: 16px; }
+  .technology-comparison__chart { --chart-label-width: 108px; --chart-value-width: 24px; }
+  .technology-comparison__chart-row dt svg { display: none; }
+  .technology-comparison__chart-row dt { font-size: 13px; }
+  .technology-comparison__payroll-summary { grid-template-columns: 1fr; gap: 16px; }
+  .technology-comparison__payroll-summary dd { font-size: 22px; }
+  .technology-comparison__payroll-summary > div + div { padding-left: 0; border-left: 0; }
+  .technology-comparison__payroll-table thead { display: none; }
+  .technology-comparison__payroll-table tr { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 8px; padding: 10px 0; border-bottom: 1px solid var(--line-2); }
+  .technology-comparison__payroll-table th, .technology-comparison__payroll-table td { padding: 0; border: 0; font-size: 13px; }
+  .technology-comparison__payroll-table th { grid-column: 1 / -1; }
+  .technology-comparison__payroll-table td:nth-child(2) { font-size: 12px; }
+  .technology-comparison__calculation-notes { grid-template-columns: 1fr; gap: 12px; }
 }
 @media (max-width: 599px) {
   .technology-comparison__cards { grid-template-columns: 1fr; }
