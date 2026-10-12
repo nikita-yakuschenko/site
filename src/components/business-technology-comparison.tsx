@@ -72,7 +72,7 @@ export function BusinessTechnologyComparison() {
               <div className="technology-comparison__crew">
                 <div className="technology-comparison__group-heading"><h4>Команда</h4><span>{technology.crews} {technology.crews === 10 || technology.crews === 7 ? "бригад" : "бригады"}</span></div>
                 <table className="technology-comparison__team-table" aria-label="Состав команды и ежемесячный ФОТ">
-                  <thead><tr><th scope="col">Сотрудники</th><th scope="col" aria-label="Количество сотрудников">Чел.</th><th scope="col">ФОТ / мес.</th></tr></thead>
+                  <thead><tr><th scope="col">Сотрудники</th><th scope="col" aria-label="Количество сотрудников">Чел.</th><th scope="col">ФОТ / мес.<sup>*</sup></th></tr></thead>
                   <tbody>
                     {payroll.roles.map(role => <tr key={role.title}><th scope="row">{role.title}</th><td>{role.count}</td><td>{formatAmount(role.total)}</td></tr>)}
                     {Array.from({ length: 5 - payroll.roles.length }, (_, index) => <tr className="technology-comparison__team-spacer" aria-hidden="true" key={`spacer-${index}`}><td colSpan={3} /></tr>)}
@@ -96,8 +96,8 @@ export function BusinessTechnologyComparison() {
             </div>
           </TabsContent>
         </Tabs>
-        <p className="technology-comparison__salary-source">Зарплаты: усреднённые значения из исследований HH.ru, SuperJob и Авито Работа.</p>
-        <p className="technology-comparison__scope">Расходы на бэкофис — бухгалтерию, маркетинг, юридическое сопровождение и HR — не включены. Пример служит для сравнения технологий и не заменяет финансовую модель конкретного бизнеса.</p>
+        <p className="technology-comparison__salary-source"><span className="technology-comparison__footnote-marker">*</span>Зарплаты: усреднённые значения из исследований HH.ru, SuperJob и Авито Работа.</p>
+        <p className="technology-comparison__scope"><IconInfoCircle size={20} aria-hidden="true" /><span>Расходы на бэкофис — бухгалтерию, маркетинг, юридическое сопровождение и HR — не включены. Пример служит для сравнения технологий и не заменяет финансовую модель конкретного бизнеса.</span></p>
       </div>
     </>
   );
