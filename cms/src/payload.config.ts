@@ -18,7 +18,14 @@ export default buildConfig({
   routes: { admin: '/', api: '/api' },
   admin: {
     user: 'users',
-    meta: { titleSuffix: ' | Авангард Строй 4.0' },
+    meta: {
+      title: 'Панель управления | avgst.ru',
+      titleSuffix: '',
+      icons: [
+        { rel: 'icon', type: 'image/svg+xml', url: '/favicon.svg' },
+        { rel: 'shortcut icon', url: '/favicon.svg' },
+      ],
+    },
     importMap: { baseDir: root, importMapFile: path.resolve(root, 'app/(payload)/importMap.js') },
     components: { graphics: { Logo: './components/Brand#Brand', Icon: './components/Brand#BrandIcon' } },
     timezones: { defaultTimezone: 'Europe/Moscow', supportedTimezones: [{ label: 'Москва', value: 'Europe/Moscow' }] },

@@ -28,6 +28,7 @@ FROM base AS runner
 ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
+COPY --from=builder --chown=node:node /app/public ./public
 RUN mkdir -p /app/media && chown node:node /app/media
 USER node
 EXPOSE 3000
