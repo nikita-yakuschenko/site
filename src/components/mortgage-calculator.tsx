@@ -21,6 +21,7 @@ import {
   writeTier,
 } from "../lib/catalog/tier-selection";
 import { RangeSlider } from "./range-slider";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { formatRub } from "../lib/locale";
 import { SITE } from "../lib/site";
 import { copy, projectsInSeries } from "../lib/copy";
@@ -31,16 +32,19 @@ import {
   getEligibleProjects,
   getMortgageProgram,
   MORTGAGE_PROGRAMS,
+  subsidizedLimit,
   type MortgageProgramId,
 } from "../lib/mortgage";
 import {
   readRegionCode,
   readServerRegionCode,
   subscribeRegion,
+  type RegionCode,
 } from "../lib/regions";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { LeadReveal } from "./lead-reveal";
 import { ProjectCard } from "./project-card";
+import "./mortgage-family.css";
 
 const t = copy.mortgageCalc;
 
@@ -94,6 +98,10 @@ function displayMoney(value: number): string {
   return Math.round(value).toLocaleString("ru-RU");
 }
 
+function sentenceMoney(value: number): string {
+  return formatRub(Math.round(value)).replace(/\.$/, "");
+}
+
 function maxDigits(max: number): number {
   return String(Math.floor(Math.max(0, max))).length;
 }
@@ -123,11 +131,14 @@ export function MortgageCalculator({
   /** На страницах ипотечных программ заголовок уже сам называет блок. */
   showEyebrow?: boolean;
 }) {
-  const region = useSyncExternalStore(
+  const siteRegion = useSyncExternalStore(
     subscribeRegion,
     readRegionCode,
     readServerRegionCode,
   );
+  const [constructionRegion, setConstructionRegion] = useState<RegionCode | null>(null);
+  const region = constructionRegion ?? siteRegion;
+  const [childrenCount, setChildrenCount] = useState(1);
   const lead = showMatches
     ? t.lead
     : "Настройте условия и узнайте ежемесячный платёж.";
@@ -145,6 +156,7 @@ export function MortgageCalculator({
   const [programId, setProgramId] =
     useState<MortgageProgramId>(initialProgramId);
   const program = getMortgageProgram(programId);
+  const showFamilyDetails = initialProgramId === "family";
 
   const [propertyPrice, setPropertyPrice] = useState(
     () => initialPropertyPrice ?? 8_000_000,
@@ -208,7 +220,7 @@ export function MortgageCalculator({
      значение вне границ, и только потом исправленное. Проверка сходится с
      первого раза, потому что после поправки условие уже ложно. */
   const minDownPayment = Math.round(propertyPrice * program.minDownPaymentPercent);
-  if (downPayment < minDownPayment) setDownPayment(minDownPayment);
+  if (downPayment < minDownPayment && (mode === "payment" || programId !== "family")) setDownPayment(minDownPayment);
 
   const boundedTerm = Math.min(
     program.maxTermYears,
@@ -226,6 +238,7 @@ export function MortgageCalculator({
         termYears,
         rateOverride,
         combinedMarketRateOverride: projectCombinedMarketRate,
+        childrenCount,
       }),
     [
       programId,
@@ -235,6 +248,7 @@ export function MortgageCalculator({
       termYears,
       rateOverride,
       projectCombinedMarketRate,
+      childrenCount,
     ],
   );
 
@@ -248,6 +262,7 @@ export function MortgageCalculator({
         downPayment,
         termYears,
         combinedMarketRateOverride: projectCombinedMarketRate,
+        childrenCount,
       }),
     [
       programId,
@@ -257,6 +272,7 @@ export function MortgageCalculator({
       termYears,
       rateOverride,
       projectCombinedMarketRate,
+      childrenCount,
     ],
   );
 
@@ -277,13 +293,17 @@ export function MortgageCalculator({
       monthly_payment: Math.round(activeResult.monthlyPayment),
       loan_amount: Math.round(activeResult.loanAmount),
       is_combined: activeResult.isCombined,
+      construction_region: region,
+      children_count: programId === "family" ? childrenCount : undefined,
+      subsidy_months: activeResult.subsidyMonths,
+      remaining_after_subsidy: activeResult.remainingAfterSubsidy,
       parts: activeResult.parts.map((part) => ({
         kind: part.kind,
         principal: Math.round(part.principal),
         rate: part.annualRate,
       })),
     }),
-    [mode, programId, budgetPrice, downPayment, termYears, activeResult],
+    [mode, programId, budgetPrice, downPayment, termYears, activeResult, region, childrenCount],
   );
 
   const eligible = useMemo(
@@ -394,6 +414,7 @@ export function MortgageCalculator({
 
         <div className="mortgage-calc__panel">
           <div className="mortgage-calc__controls">
+            <div className={`mortgage-calc__toolbar${showFamilyDetails ? " mortgage-calc__toolbar--family" : ""}`}>
             {mortgageTiers ? (
               <div
                 className="mortgage-calc__modes mortgage-calc__modes--tiers"
@@ -447,20 +468,37 @@ export function MortgageCalculator({
                 type="button"
                 role="tab"
                 aria-selected={mode === "budget"}
-                className={
-                  mode === "budget"
-                    ? "mortgage-calc__mode is-active"
-                    : "mortgage-calc__mode"
-                }
-                onClick={() => {
-                  setMode("budget");
-                  scheduleAnalytics();
-                }}
+                disabled
+                className="mortgage-calc__mode mortgage-calc__mode--soon"
               >
                 {t.modeBudget}
+                <span className="mortgage-calc__soon">Скоро</span>
               </button>
               </div>
             )}
+
+            {showFamilyDetails ? <div className="mortgage-calc__family-options">
+              <span className={`mortgage-calc__select-slot mortgage-calc__select-slot--children${programId !== "family" ? " is-hidden" : ""}`}>
+                <Select value={String(childrenCount)} disabled={programId !== "family"} onValueChange={(value) => { setChildrenCount(Number(value)); scheduleAnalytics(); }}>
+                  <SelectTrigger aria-label="Количество детей"><SelectValue /></SelectTrigger>
+                  <SelectContent className="mortgage-calc__select-content">
+                    <SelectItem value="1">1 ребёнок</SelectItem>
+                    <SelectItem value="2">2 ребёнка</SelectItem>
+                    <SelectItem value="3">3 и более детей</SelectItem>
+                  </SelectContent>
+                </Select>
+              </span>
+              <span className={`mortgage-calc__select-slot mortgage-calc__select-slot--region${programId === "market" || programId === "rural" ? " is-hidden" : ""}`}>
+                <Select value={region} disabled={programId === "market" || programId === "rural"} onValueChange={(value) => { setConstructionRegion(value as RegionCode); scheduleAnalytics(); }}>
+                  <SelectTrigger aria-label="Регион строительства"><SelectValue /></SelectTrigger>
+                  <SelectContent className="mortgage-calc__select-content">
+                    <SelectItem value="nn">Нижегородская обл.</SelectItem>
+                    <SelectItem value="msk">Московская обл.</SelectItem>
+                  </SelectContent>
+                </Select>
+              </span>
+            </div> : null}
+            </div>
 
             <fieldset className="mortgage-calc__programs" aria-label={t.programLabel}>
               <div className="mortgage-calc__program-list">
@@ -574,7 +612,7 @@ export function MortgageCalculator({
                   <p className="mortgage-calc__hero-num">
                     {formatRub(Math.round(paymentResult.monthlyPayment))}
                   </p>
-                  <p className="mortgage-calc__hero-label">{t.paymentSub}</p>
+                  <p className="mortgage-calc__hero-label">{programId === "family" && termYears > 15 ? "Платёж в первые 15 лет" : t.paymentSub}</p>
                 </div>
                 <dl className="mortgage-calc__receipt">
                   <div>
@@ -591,7 +629,7 @@ export function MortgageCalculator({
                     paymentResult.parts.map((part) => (
                       <div key={part.kind}>
                         <dt>
-                          Сумма кредита под {formatRate(part.annualRate)}
+                          Сумма кредита под {part.kind === "market" ? "ставку от " : ""}{formatRate(part.annualRate)}
                         </dt>
                         <span aria-hidden="true" />
                         <dd>{formatRub(Math.round(part.principal))}</dd>
@@ -638,7 +676,7 @@ export function MortgageCalculator({
             </p>
             <p className="mortgage-calc__hero-label">
               {mode === "payment"
-                ? t.paymentSub
+                ? programId === "family" && termYears > 15 ? "Платёж в первые 15 лет" : t.paymentSub
                 : `${t.about} · ${t.budgetSub}`}
             </p>
 
@@ -720,7 +758,7 @@ export function MortgageCalculator({
                           ? t.subsidizedPart
                           : t.marketPart}
                         <em className="mortgage-calc__part-rate">
-                          {formatRate(part.annualRate)}
+                          {part.kind === "market" ? "от " : ""}{formatRate(part.annualRate)}
                         </em>
                       </span>
                       <strong>{formatRub(Math.round(part.principal))}</strong>
@@ -736,6 +774,15 @@ export function MortgageCalculator({
               </>
             )}
           </aside>
+
+          {showFamilyDetails || programId === "family" ? <div className="mortgage-calc__program-note">
+            {programId === "family" ? (
+              <p>
+                Льготный лимит: {sentenceMoney(subsidizedLimit(program, region, childrenCount)!)}. Лимит зависит от количества детей в семье, ставка 6%.
+                {" Льготная ставка действует до 15 лет. После 15 лет ставка и платёж могут измениться. Сверх лимита применяется указанная в расчёте рыночная ставка; условия комбо определяет банк."}
+              </p>
+            ) : <p>{t.disclaimer}</p>}
+          </div> : null}
 
           {/* На ипотечной странице подбор проектов — часть калькулятора. На
               карточке конкретного дома он выключен: цену уже задал проект. */}

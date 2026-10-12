@@ -160,7 +160,7 @@ export const CONTACT_PLACES: readonly ContactPlace[] = [
 
 export function formatRange(row: ScheduleRow): string {
   if (row.from === null || row.to === null) return copy.officeByArrangement;
-  return `${hhmm(row.from)} – ${hhmm(row.to)}`;
+  return `${hhmm(row.from)} - ${hhmm(row.to)}`;
 }
 
 // Часовой пояс офиса берём через Intl, а не сдвигом на три часа: смещение

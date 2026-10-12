@@ -89,7 +89,7 @@ export function AboutCompanyBento() {
               <p>{nbspText('Внимание к деталям')}<br />{nbspText('и забота о вашем уюте')}</p>
             </div>
           </article>
-          <Link className="company-bento__tile company-bento__business" href="/business" aria-label="B2B и B2G решения — для партнёров и корпоративных клиентов">
+          <Link className="company-bento__tile company-bento__business" href="/business" aria-label="B2B и B2G решения - для партнёров и корпоративных клиентов">
             <Image className="company-bento__business-image company-bento__animated-image" src={businessSolutions} alt="" fill sizes="(max-width: 600px) calc(100vw - 48px), (max-width: 1024px) 50vw, 384px" />
             <div className="company-bento__business-copy">
               <div className="company-bento__business-heading">

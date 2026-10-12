@@ -314,6 +314,9 @@ function MortgageConditions({ content }: { content: WithConditions }) {
                 {nbspText(line)}
               </p>
             ))}
+            {content === fm ? <p>
+              Условия новых договоров с 1 октября 2026 года: <a href="https://minfin.gov.ru/ru/document?id_4=309881-reshenie_ot_22.09.2026__25-67381-01850-r_o_poryadke_predostavleniya_subsidii" target="_blank" rel="noopener noreferrer">решение Минфина № 25-67381-01850-Р, версия 11</a> и <a href="https://www.cbr.ru/press/event/?id=32901" target="_blank" rel="noopener noreferrer">разъяснение Банка России</a>.
+            </p> : null}
           </div>
         </div>
       </div>

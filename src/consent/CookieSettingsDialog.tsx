@@ -126,7 +126,7 @@ export function CookieSettingsDialog() {
       >
         <h2 id={titleId}>Настройки cookie</h2>
         <p className="cookie-settings__lead">
-          Выберите категории. Необходимые всегда включены — без них сайт не
+          Выберите категории. Необходимые всегда включены - без них сайт не
           работает.
         </p>
 

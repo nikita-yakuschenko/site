@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   const place = EXPOSITION_PLACES.find((item) => item.slug === slug)
   if (!place) notFound()
-  return { title: `${place.name} — выставочная площадка`, description: place.address }
+  return { title: `${place.name} - выставочная площадка`, description: place.address }
 }
 
 export default async function ExpositionPlacePage({ params }: Props) {

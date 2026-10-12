@@ -13,7 +13,7 @@ import { SITE } from '../../lib/site'
 import paintShop2020 from '../../../public/img/about/paint-shop-2020.png'
 
 export const metadata: Metadata = {
-  title: 'О компании — Авангард Строй',
+  title: 'О компании - Авангард Строй',
   description: 'Строим загородные дома с 2014 года. Собственное производство и история Авангард Строй.',
 }
 

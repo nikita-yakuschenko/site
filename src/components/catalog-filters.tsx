@@ -160,7 +160,7 @@ export function CatalogFilters({
   const mln = (rub: number) =>
     (rub / 1_000_000).toLocaleString("ru-RU", { maximumFractionDigits: 1 });
   const mlnRange = (lo: number, hi: number) =>
-    mln(lo) + "–" + mln(hi) + " " + copy.millionShort;
+    mln(lo) + "-" + mln(hi) + " " + copy.millionShort;
 
   const techLabel = (value: "modular" | "panel") =>
     value === "modular" ? copy.techModularShort : copy.techPanelShort;
@@ -185,7 +185,7 @@ export function CatalogFilters({
     const lo = filters.area.min ?? facets.area.min;
     const hi = filters.area.max ?? facets.area.max;
     chips.push({
-      label: lo + "–" + hi + " " + copy.areaUnit,
+      label: lo + "-" + hi + " " + copy.areaUnit,
       clear: { ...filters, area: undefined },
     });
   }
@@ -243,7 +243,7 @@ export function CatalogFilters({
             {copy.areaLegend}
             <span>
               {areaValue[0]}
-              {"–"}
+              {"-"}
               {areaValue[1]} {copy.areaUnit}
             </span>
           </legend>

@@ -36,7 +36,7 @@ export const MORTGAGE_PROGRAMS: readonly MortgageProgram[] = [
     maxTermYears: 30,
     subsidizedLimitByRegion: { nn: 6_000_000, msk: 12_000_000 },
     maxLoanByRegion: { nn: 15_000_000, msk: 30_000_000 },
-    marketRate: 0.185,
+    marketRate: 0.16,
     allowCombined: true,
   },
   {
@@ -51,7 +51,7 @@ export const MORTGAGE_PROGRAMS: readonly MortgageProgram[] = [
        в Подмосковье. Здесь стояли семейные цифры — 6 и 12 млн. */
     subsidizedLimitByRegion: { nn: 9_000_000, msk: 9_000_000 },
     maxLoanByRegion: { nn: 18_000_000, msk: 18_000_000 },
-    marketRate: 0.185,
+    marketRate: 0.16,
     allowCombined: true,
   },
   {
@@ -65,7 +65,7 @@ export const MORTGAGE_PROGRAMS: readonly MortgageProgram[] = [
     maxTermYears: 25,
     subsidizedLimitByRegion: { nn: 6_000_000, msk: 6_000_000 },
     maxLoanByRegion: { nn: 6_000_000, msk: 6_000_000 },
-    marketRate: 0.185,
+    marketRate: 0.16,
     allowCombined: false,
   },
   {
@@ -93,8 +93,13 @@ export function getMortgageProgram(
 export function subsidizedLimit(
   program: MortgageProgram,
   region: RegionCode,
+  childrenCount = 1,
 ): number | null {
   if (!program.subsidizedLimitByRegion) return null;
+  if (program.id === "family") {
+    const count = Math.min(3, Math.max(1, Math.floor(childrenCount)));
+    return (region === "msk" ? [12, 15, 18] : [6, 8, 10])[count - 1]! * 1_000_000;
+  }
   return program.subsidizedLimitByRegion[region];
 }
 

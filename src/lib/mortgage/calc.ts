@@ -20,8 +20,10 @@ export type MortgageCalcResult = {
   loanAmount: number;
   termMonths: number;
   monthlyPayment: number;
-  totalPayment: number;
-  overpayment: number;
+  totalPayment: number | null;
+  overpayment: number | null;
+  subsidyMonths: number | null;
+  remainingAfterSubsidy: number | null;
   /** Ориентировочный доход семьи (~40% платёж / доход). */
   indicativeIncome: number;
   isCombined: boolean;
@@ -56,6 +58,13 @@ export function maxPrincipalFromPayment(
   return (monthlyPayment * (factor - 1)) / (r * factor);
 }
 
+/** Остаток после платежей; расчёт без промежуточного округления. */
+export function remainingPrincipal(principal: number, rate: number, termMonths: number, paidMonths: number): number {
+  if (paidMonths >= termMonths || principal <= 0) return 0;
+  const remainingMonths = termMonths - Math.max(0, paidMonths);
+  return maxPrincipalFromPayment(annuityPayment(principal, rate, termMonths), rate, remainingMonths);
+}
+
 function buildParts(
   loanAmount: number,
   program: MortgageProgram,
@@ -67,15 +76,16 @@ function buildParts(
      У программ с льготной частью не применяется — там ставка не его. */
   rateOverride?: number,
   combinedMarketRateOverride?: number,
+  childrenCount = 1,
 ): { parts: LoanPart[]; isCombined: boolean } {
-  const limit = subsidizedLimit(program, region);
+  const limit = subsidizedLimit(program, region, childrenCount);
   const useSplit =
     program.allowCombined &&
     limit != null &&
     loanAmount > limit;
 
   if (!useSplit) {
-    const rate = rateOverride ?? program.rate;
+    const rate = program.id === "family" ? program.rate : rateOverride ?? program.rate;
     return {
       isCombined: false,
       parts: [
@@ -127,6 +137,7 @@ export type CalculateMortgageInput = {
   propertyPrice: number;
   downPayment: number;
   termYears: number;
+  childrenCount?: number;
   /** Годовая ставка долей (0.163 = 16,3%), если её задал человек. */
   rateOverride?: number;
   /** Ставка рыночной части комбо. Нужна для контекстов, где показанная
@@ -158,6 +169,7 @@ export function calculateMortgage(
   }
 
   let loanAmount = Math.max(0, propertyPrice - downPayment);
+  if (program.id === "family") loanAmount = Math.round(loanAmount * 100) / 100;
   const maxLoan = maxLoanAmount(program, input.region);
   let cappedByMaxLoan = false;
   if (loanAmount > maxLoan) {
@@ -173,10 +185,16 @@ export function calculateMortgage(
     termMonths,
     input.rateOverride,
     input.combinedMarketRateOverride,
+    input.childrenCount,
   );
   const monthlyPayment = parts.reduce((s, p) => s + p.monthlyPayment, 0);
-  const totalPayment = monthlyPayment * termMonths;
-  const overpayment = Math.max(0, totalPayment - loanAmount);
+  const subsidyMonths = program.id === "family" ? Math.min(180, termMonths) : null;
+  const remainingAfterSubsidy = subsidyMonths === null ? null : parts.reduce(
+    (sum, part) => sum + remainingPrincipal(part.principal, part.annualRate, termMonths, subsidyMonths), 0,
+  );
+  // После 15 лет ставка неизвестна: итоговую стоимость такого кредита не прогнозируем.
+  const totalPayment = program.id === "family" && termMonths > 180 ? null : monthlyPayment * termMonths;
+  const overpayment = totalPayment === null ? null : Math.max(0, totalPayment - loanAmount);
 
   return {
     propertyPrice,
@@ -188,6 +206,8 @@ export function calculateMortgage(
     monthlyPayment,
     totalPayment,
     overpayment,
+    subsidyMonths,
+    remainingAfterSubsidy,
     indicativeIncome: monthlyPayment > 0 ? monthlyPayment / 0.4 : 0,
     isCombined,
     parts,
@@ -206,6 +226,7 @@ export function calculateMaxPropertyPrice(input: {
   monthlyPayment: number;
   downPayment: number;
   termYears: number;
+  childrenCount?: number;
   rateOverride?: number;
   combinedMarketRateOverride?: number;
 }): {
@@ -235,6 +256,7 @@ export function calculateMaxPropertyPrice(input: {
       termMonths,
       input.rateOverride,
       input.combinedMarketRateOverride,
+      input.childrenCount,
     );
     if (pay <= payment) lo = mid;
     else hi = mid;
@@ -248,7 +270,7 @@ export function calculateMaxPropertyPrice(input: {
   const fromMinDownShare =
     program.minDownPaymentPercent > 0 &&
     program.minDownPaymentPercent < 1
-      ? maxLoan / (1 - program.minDownPaymentPercent)
+      ? (program.id === "family" ? downPayment / program.minDownPaymentPercent : maxLoan / (1 - program.minDownPaymentPercent))
       : fromLoanAndDown;
   // Если заданный ПВ больше минимального — цена = кредит + ПВ.
   // Если ПВ мал относительно кредита — цена ограничена долей ПВ.
@@ -268,9 +290,10 @@ export function calculateMaxPropertyPrice(input: {
     ),
     termYears,
     combinedMarketRateOverride: input.combinedMarketRateOverride,
+    childrenCount: input.childrenCount,
   });
 
-  return { maxLoan, maxPropertyPrice, result };
+  return { maxLoan: program.id === "family" ? result.loanAmount : maxLoan, maxPropertyPrice, result };
 }
 
 function paymentForLoan(
@@ -280,6 +303,7 @@ function paymentForLoan(
   termMonths: number,
   rateOverride?: number,
   combinedMarketRateOverride?: number,
+  childrenCount = 1,
 ): number {
   const { parts } = buildParts(
     loanAmount,
@@ -288,6 +312,7 @@ function paymentForLoan(
     termMonths,
     rateOverride,
     combinedMarketRateOverride,
+    childrenCount,
   );
   return parts.reduce((s, p) => s + p.monthlyPayment, 0);
 }

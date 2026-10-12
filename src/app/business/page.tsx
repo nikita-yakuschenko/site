@@ -213,7 +213,7 @@ export default function BusinessPage() {
         {SHOW_CONTRACT && (
           <Section
             id="contract"
-            title="Ваши заказы — наши производственные мощности"
+            title="Ваши заказы - наши производственные мощности"
           >
             <div className="b2b-contract">
               <div className="b2b-contract__image">

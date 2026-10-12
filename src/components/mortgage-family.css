@@ -1,0 +1,74 @@
+.mortgage-calc__toolbar {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.mortgage-calc__mode--soon {
+  position: relative;
+  color: var(--ink-3);
+  cursor: default;
+}
+.mortgage-calc__soon {
+  position: absolute;
+  top: -9px;
+  right: -5px;
+  padding: 3px 5px;
+  border-radius: 999px;
+  background: var(--brand-yellow);
+  color: var(--foreground);
+  font-size: 9px;
+  font-weight: 600;
+  line-height: 1;
+}
+.mortgage-calc__family-options {
+  display: flex;
+  gap: 6px;
+  min-width: 0;
+}
+.mortgage-calc__select-slot { display: block; min-width: 0; }
+.mortgage-calc__select-slot--children { width: 156px; flex-shrink: 0; }
+.mortgage-calc__select-slot--region { width: 176px; flex-shrink: 0; }
+.mortgage-calc__family-options .ui-select-trigger {
+  height: 28px;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 6px;
+  background: var(--tint);
+  color: var(--ink-1);
+  font: inherit;
+  font-size: 12px;
+  outline: none;
+  box-shadow: none;
+}
+.mortgage-calc__family-options .ui-select-trigger:focus,
+.mortgage-calc__family-options .ui-select-trigger:focus-visible {
+  outline: none;
+  border: 0;
+  box-shadow: none;
+}
+.mortgage-calc__family-options .ui-select-trigger:focus-visible { background: var(--tint); }
+.mortgage-calc__select-content .ui-select-item { font-size: 12px; white-space: nowrap; }
+.mortgage-calc__family-options .is-hidden { visibility: hidden; }
+.mortgage-calc__program-note {
+  grid-column: 1;
+  min-width: 0;
+  min-height: 90px;
+}
+.mortgage-calc__program-note p {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+@media (max-width: 719px) {
+  .mortgage-calc__toolbar--family { flex-wrap: wrap; gap: 8px; }
+  .mortgage-calc__toolbar--family .mortgage-calc__family-options { width: 100%; flex-wrap: wrap; }
+  .mortgage-calc__select-slot { flex: 1; min-width: 0; width: auto; }
+  .mortgage-calc__select-slot--children { min-width: 156px; }
+  .mortgage-calc__select-slot--region { min-width: 166px; }
+  .mortgage-calc__family-options .ui-select-trigger { gap: 4px; padding: 0 4px; }
+  .mortgage-calc__program-note { min-height: 180px; }
+}

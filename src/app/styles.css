@@ -176,6 +176,21 @@ html {
   scrollbar-gutter: stable;
 }
 
+/* Select блокирует прокрутку body; явный overflow на корне сохраняет
+   сам скроллбар, а не только пустое место под него. */
+html:has(.ui-select-content) {
+  overflow-y: scroll;
+}
+
+@supports (scrollbar-gutter: stable) {
+  /* Корень уже сохраняет место скроллбара. Компенсация Radix на body
+     иначе вычитает ту же ширину повторно и сдвигает страницу. */
+  html body[data-scroll-locked] {
+    margin-right: 0 !important;
+    --removed-body-scroll-bar-size: 0px;
+  }
+}
+
 html,
 body {
   margin: 0;
@@ -11778,13 +11793,13 @@ html.is-dialog-open {
 }
 
 @media (max-width: 899px) {
-  .manufacture-questions .ui-accordion__item {
+  :is(.manufacture-questions, .mortgage-rules, .mortgage-faq) .ui-accordion__item {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 56px;
   }
-  .manufacture-questions .ui-accordion__header { grid-area: 1 / 1 / 2 / -1; }
-  .manufacture-questions .ui-accordion__trigger { padding-right: var(--mark-lane); }
-  .manufacture-questions .ui-accordion__mark {
+  :is(.manufacture-questions, .mortgage-rules, .mortgage-faq) .ui-accordion__header { grid-area: 1 / 1 / 2 / -1; }
+  :is(.manufacture-questions, .mortgage-rules, .mortgage-faq) .ui-accordion__trigger { padding-right: var(--mark-lane); }
+  :is(.manufacture-questions, .mortgage-rules, .mortgage-faq) .ui-accordion__mark {
     position: relative;
     grid-area: 1 / 2;
     align-self: center;
@@ -11792,8 +11807,8 @@ html.is-dialog-open {
     right: auto;
     transform: translateY(var(--digit-lift)) rotate(var(--mark-turn));
   }
-  .manufacture-questions .ui-accordion__content { grid-column: 1 / -1; }
-  .manufacture-questions .ui-accordion__content-inner { max-width: none; padding-right: 0; }
+  :is(.manufacture-questions, .mortgage-rules, .mortgage-faq) .ui-accordion__content { grid-column: 1 / -1; }
+  :is(.manufacture-questions, .mortgage-rules, .mortgage-faq) .ui-accordion__content-inner { max-width: none; padding-right: 0; }
 }
 
 @keyframes ui-accordion-down {
@@ -13533,7 +13548,7 @@ html.is-dialog-open {
 }
 
 .ready-home-offer__points > li > div > ul > li::before {
-  content: "—";
+  content: "-";
   position: absolute;
   left: 0;
   color: var(--ink-3);

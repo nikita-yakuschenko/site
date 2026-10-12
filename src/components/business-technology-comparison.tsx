@@ -57,7 +57,7 @@ export function BusinessTechnologyComparison() {
           );
         })}
       </div>
-      <p className="technology-comparison__note"><IconInfoCircle size={20} aria-hidden="true" /><span>Все данные приведены в относительных величинах. N — условная единица маржинального дохода с одного объекта. Расчёты сделаны для примера и не являются публичной офертой или финансовым прогнозом. Фактические показатели зависят от конкретного проекта, региона, команды и организации процессов.</span></p>
+      <p className="technology-comparison__note"><IconInfoCircle size={20} aria-hidden="true" /><span>Все данные приведены в относительных величинах. N - условная единица маржинального дохода с одного объекта. Расчёты сделаны для примера и не являются публичной офертой или финансовым прогнозом. Фактические показатели зависят от конкретного проекта, региона, команды и организации процессов.</span></p>
       <div className="technology-comparison__subsection">
         <div className="technology-comparison__summary"><h3>Команда и операционная нагрузка</h3></div>
         <p className="technology-comparison__context"><IconInfoCircle size={20} aria-hidden="true" /><span>Сравнение рассчитано для строительства 20 домов в год. За 100% принята операционная нагрузка при ручной стройке; показатели остальных технологий приведены относительно этой базы.</span></p>
@@ -97,7 +97,7 @@ export function BusinessTechnologyComparison() {
           </TabsContent>
         </Tabs>
         <p className="technology-comparison__salary-source"><span className="technology-comparison__footnote-marker">*</span>Зарплаты: усреднённые значения из исследований HH.ru, SuperJob и Авито Работа.</p>
-        <p className="technology-comparison__scope"><IconInfoCircle size={20} aria-hidden="true" /><span>Расходы на бэкофис — бухгалтерию, маркетинг, юридическое сопровождение и HR — не включены. Пример служит для сравнения технологий и не заменяет финансовую модель конкретного бизнеса.</span></p>
+        <p className="technology-comparison__scope"><IconInfoCircle size={20} aria-hidden="true" /><span>Расходы на бэкофис - бухгалтерию, маркетинг, юридическое сопровождение и HR - не включены. Пример служит для сравнения технологий и не заменяет финансовую модель конкретного бизнеса.</span></p>
       </div>
     </>
   );
