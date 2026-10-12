@@ -25,6 +25,7 @@ import { formatRub } from '../../../lib/locale'
 import { readServerRegionCode } from '../../../lib/regions'
 import { splitProjectName } from '../../../lib/project-name'
 import { SITE } from '../../../lib/site'
+import { getProjectPageOrder } from '../../../lib/catalog/page-order'
 
 const catalog = new FixtureCatalogProvider()
 
@@ -57,6 +58,9 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
   const { slug } = await params
   const project = await catalog.getBySlug(slug, { siteCode: SITE.code })
   if (!project) notFound()
+
+  const pageOrder = await getProjectPageOrder(slug)
+  const blockStyle = (key: string) => ({ order: pageOrder.indexOf(key), width: '100%' })
 
   const { items: catalogProjects } = await catalog.list({ siteCode: SITE.code })
   const similarProjects = catalogProjects
@@ -121,8 +125,8 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </>
       }
     >
-      <main>
-        <section className="project-hero">
+      <main style={{ display: 'flex', flexDirection: 'column' }}>
+        <section className="project-hero" data-cms-block="projectHero" style={{ order: -1 }}>
           <picture className="project-hero__media">
             {project.slug === 'barnhouse-115' ? (
               <source
@@ -184,44 +188,21 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
         </section>
 
 
-        <ProjectExteriors project={project} />
-        <ProjectPlans project={project} />
-        <ProjectInteriors project={project} />
-        <ProjectBuilt project={project} />
-        {readyHome ? (
-          <ReadyHomeOffer project={project} />
-        ) : (
-          <>
-            {standardPrice ? (
-              <MortgageCalculator
-                key={project.id}
-                projects={[]}
-                initialPropertyPrice={standardPrice}
-                initialProgramId="family"
-                showMatches={false}
-                projectTiers={tiers ?? undefined}
-                showEyebrow={false}
-              />
-            ) : null}
-            <ProjectConfig project={project} />
-          </>
-        )}
-        <ProjectNextSteps
-          readyHome={Boolean(readyHome)}
-          reviewImage={project.imageUrl}
-          visitImage={readyHome?.visitImage}
-        />
-        <ProjectSimilar projects={similarProjects} />
-        <ContactsSection
-          block={{
-            blockType: 'contactsSection',
-            showEyebrow: false,
-            muted: false,
-          }}
-          contacts={SITE.contacts}
-          siteId={SITE.id}
-          pageId={project.id}
-        />
+        {pageOrder.map(key => {
+          const blocks: Record<string, React.ReactNode> = {
+            ProjectExteriors: <ProjectExteriors project={project} />,
+            ProjectPlans: <ProjectPlans project={project} />,
+            ProjectInteriors: <ProjectInteriors project={project} />,
+            ProjectBuilt: <ProjectBuilt project={project} />,
+            ReadyHomeOffer: readyHome ? <ReadyHomeOffer project={project} /> : null,
+            MortgageCalculator: !readyHome && standardPrice ? <MortgageCalculator projects={[]} initialPropertyPrice={standardPrice} initialProgramId="family" showMatches={false} projectTiers={tiers ?? undefined} showEyebrow={false} /> : null,
+            ProjectConfig: !readyHome ? <ProjectConfig project={project} /> : null,
+            ProjectNextSteps: <ProjectNextSteps readyHome={Boolean(readyHome)} reviewImage={project.imageUrl} visitImage={readyHome?.visitImage} />,
+            ProjectSimilar: <ProjectSimilar projects={similarProjects} />,
+            contactsSection: <ContactsSection block={{ blockType: 'contactsSection', showEyebrow: false, muted: false }} contacts={SITE.contacts} siteId={SITE.id} pageId={project.id} />,
+          }
+          return blocks[key] ? <div key={key} data-cms-block={key} style={blockStyle(key)}>{blocks[key]}</div> : null
+        })}
       </main>
     </SiteChrome>
   )

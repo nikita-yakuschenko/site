@@ -1,0 +1,2 @@
+export const projectBlockOrder = ['ProjectExteriors', 'ProjectPlans', 'ProjectInteriors', 'ProjectBuilt', 'MortgageCalculator', 'ProjectConfig', 'ReadyHomeOffer', 'ProjectNextSteps', 'ProjectSimilar', 'contactsSection']
+export const validProjectOrder = (value: unknown): value is string[] => Array.isArray(value) && value.length === projectBlockOrder.length && new Set(value).size === value.length && value.every(key => typeof key === 'string' && projectBlockOrder.includes(key))

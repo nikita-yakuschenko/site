@@ -6,18 +6,20 @@ import {
   IconLoader2 as Loader2Icon,
   IconCircleX as OctagonXIcon,
   IconAlertTriangle as TriangleAlertIcon,
+  IconX,
 } from "@tabler/icons-react"
-import { useTheme } from "next-themes"
+import { useTheme } from "@payloadcms/ui"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 
 const Toaster = ({ ...props }: ToasterProps) => {
-  const { theme = "system" } = useTheme()
+  const { theme } = useTheme()
 
   return (
     <Sonner
       theme={theme as ToasterProps["theme"]}
       className="toaster group"
       icons={{
+        close: <IconX className="size-3" />,
         success: <CircleCheckIcon className="size-4" />,
         info: <InfoIcon className="size-4" />,
         warning: <TriangleAlertIcon className="size-4" />,

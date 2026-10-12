@@ -23,11 +23,12 @@ export function ProjectNextSteps({
   const visitIsDefault = visitImage === DEFAULT_VISIT_IMAGE;
 
   return (
-    <section className="section project-next-steps" aria-label="Следующие шаги">
+    <section className="section project-next-steps" aria-label="Следующие шаги" data-cms-block="ProjectNextSteps">
       <div className="section__inner project-next-steps__grid">
         <Link
           className="project-next-steps__tile project-next-steps__tile--visit"
           href="/exposition"
+          data-cms-block="ProjectNextSteps.visit"
         >
           <span className="series-bento__go" aria-hidden="true">
             <IconArrowUpRight size={18} stroke={2} />
@@ -54,6 +55,7 @@ export function ProjectNextSteps({
           <Link
             className="project-next-steps__tile project-next-steps__tile--review"
             href="#project-exteriors-title"
+            data-cms-block="ProjectNextSteps.review"
           >
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
@@ -78,6 +80,7 @@ export function ProjectNextSteps({
             type="button"
             className="project-next-steps__tile project-next-steps__tile--consult"
             onClick={() => setConsultOpen(true)}
+            data-cms-block="ProjectNextSteps.consult"
           >
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />

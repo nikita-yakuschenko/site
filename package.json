@@ -8,6 +8,9 @@
     "node": ">=22.0.0"
   },
   "scripts": {
+    "index:site": "node scripts/index-site.mjs",
+    "predev": "npm run index:site",
+    "prebuild": "npm run index:site",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

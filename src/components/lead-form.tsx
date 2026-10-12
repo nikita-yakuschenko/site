@@ -106,6 +106,7 @@ export function LeadForm({
 
   return (
     <form
+      data-cms-block="LeadForm"
       className={`${variant === 'card' ? 'lead-card' : 'lead-form'} ym-disable-submit`}
       onSubmit={onSubmit}
       noValidate

@@ -21,6 +21,10 @@ export interface Config {
   blocks: {};
   collections: {
     users: User;
+    pages: Page;
+    blocks: Block;
+    forms: Form;
+    projects: Project;
     media: Media;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -30,6 +34,10 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     users: UsersSelect<false> | UsersSelect<true>;
+    pages: PagesSelect<false> | PagesSelect<true>;
+    blocks: BlocksSelect<false> | BlocksSelect<true>;
+    forms: FormsSelect<false> | FormsSelect<true>;
+    projects: ProjectsSelect<false> | ProjectsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -105,6 +113,296 @@ export interface User {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages".
+ */
+export interface Page {
+  id: number;
+  title: string;
+  route: string;
+  metaTitle: string;
+  kind: 'page' | 'template' | 'exposition' | 'redirect' | 'preview';
+  source?: string | null;
+  redirect?: string | null;
+  layout?:
+    | {
+        component:
+          | {
+              relationTo: 'blocks';
+              value: number | Block;
+            }
+          | {
+              relationTo: 'forms';
+              value: number | Form;
+            };
+        anchor?: string | null;
+        parameters?:
+          | {
+              [k: string]: unknown;
+            }
+          | unknown[]
+          | string
+          | number
+          | boolean
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  importKey?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blocks".
+ */
+export interface Block {
+  id: number;
+  title: string;
+  key: string;
+  source: string;
+  exportName?: string | null;
+  defaults?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  parts?:
+    | {
+        key: string;
+        title: string;
+        id?: string | null;
+      }[]
+    | null;
+  forms?: (number | Form)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms".
+ */
+export interface Form {
+  id: number;
+  title: string;
+  key: string;
+  source: string;
+  exportName?: string | null;
+  defaults?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  parts?:
+    | {
+        key: string;
+        title: string;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects".
+ */
+export interface Project {
+  id: number;
+  recordType: 'project' | 'ready-home';
+  slug: string;
+  blockOrder?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  name: string;
+  imageUrl?: string | null;
+  technologyBadge: 'Панельно-каркасный' | 'Модульный';
+  series?: ('panel' | 'barn' | 'classic' | 'modular') | null;
+  areaValue: number;
+  floorsValue: number;
+  bedrooms: number;
+  bathrooms: number;
+  exteriors?:
+    | {
+        image: string;
+        id?: string | null;
+      }[]
+    | null;
+  floorPlans?:
+    | {
+        image: string;
+        id?: string | null;
+      }[]
+    | null;
+  plans?:
+    | {
+        label: string;
+        image?: string | null;
+        rooms?:
+          | {
+              name: string;
+              area: string;
+              id?: string | null;
+            }[]
+          | null;
+        floors?:
+          | {
+              label: string;
+              image: string;
+              rooms?:
+                | {
+                    name: string;
+                    area: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  interiors?:
+    | {
+        image: string;
+        id?: string | null;
+      }[]
+    | null;
+  built?:
+    | {
+        image: string;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  builtTour?: {
+    title?: string | null;
+    cover?: string | null;
+    video?: {
+      provider?: ('kinescope' | 'vk') | null;
+      id?: string | null;
+      oid?: number | null;
+    };
+  };
+  configurations?:
+    | {
+        key: 'start' | 'standard' | 'project';
+        name: string;
+        price: number;
+        lead?: string | null;
+        mortgage?: boolean | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+        id?: string | null;
+      }[]
+    | null;
+  priceAmount?: number | null;
+  options?:
+    | {
+        key: string;
+        name: string;
+        price: number;
+        defaultSelected?: boolean | null;
+        id?: string | null;
+      }[]
+    | null;
+  readyHome?: {
+    location?: string | null;
+    locationPrepositional?: string | null;
+    salePrice?: number | null;
+    configurationLead?: string | null;
+    configuration?:
+      | {
+          text: string;
+          id?: string | null;
+        }[]
+      | null;
+    sections?:
+      | {
+          title: string;
+          tone: 'quality' | 'place';
+          points?:
+            | {
+                title: string;
+                items?:
+                  | {
+                      text: string;
+                      id?: string | null;
+                    }[]
+                  | null;
+                id?: string | null;
+              }[]
+            | null;
+          id?: string | null;
+        }[]
+      | null;
+    visitImage?: string | null;
+  };
+  description?: string | null;
+  about?:
+    | {
+        title: string;
+        text: string;
+        image?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  importKey?: string | null;
+  contentImported?: boolean | null;
+  configurationsImported?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
@@ -161,6 +459,22 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'users';
         value: number | User;
+      } | null)
+    | ({
+        relationTo: 'pages';
+        value: number | Page;
+      } | null)
+    | ({
+        relationTo: 'blocks';
+        value: number | Block;
+      } | null)
+    | ({
+        relationTo: 'forms';
+        value: number | Form;
+      } | null)
+    | ({
+        relationTo: 'projects';
+        value: number | Project;
       } | null)
     | ({
         relationTo: 'media';
@@ -234,6 +548,258 @@ export interface UsersSelect<T extends boolean = true> {
         createdAt?: T;
         expiresAt?: T;
       };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "pages_select".
+ */
+export interface PagesSelect<T extends boolean = true> {
+  title?: T;
+  route?: T;
+  metaTitle?: T;
+  kind?: T;
+  source?: T;
+  redirect?: T;
+  layout?:
+    | T
+    | {
+        component?: T;
+        anchor?: T;
+        parameters?: T;
+        id?: T;
+      };
+  importKey?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "blocks_select".
+ */
+export interface BlocksSelect<T extends boolean = true> {
+  title?: T;
+  key?: T;
+  source?: T;
+  exportName?: T;
+  defaults?: T;
+  parts?:
+    | T
+    | {
+        key?: T;
+        title?: T;
+        id?: T;
+      };
+  forms?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms_select".
+ */
+export interface FormsSelect<T extends boolean = true> {
+  title?: T;
+  key?: T;
+  source?: T;
+  exportName?: T;
+  defaults?: T;
+  parts?:
+    | T
+    | {
+        key?: T;
+        title?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "projects_select".
+ */
+export interface ProjectsSelect<T extends boolean = true> {
+  recordType?: T;
+  slug?: T;
+  blockOrder?: T;
+  name?: T;
+  imageUrl?: T;
+  technologyBadge?: T;
+  series?: T;
+  areaValue?: T;
+  floorsValue?: T;
+  bedrooms?: T;
+  bathrooms?: T;
+  exteriors?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  floorPlans?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  plans?:
+    | T
+    | {
+        label?: T;
+        image?: T;
+        rooms?:
+          | T
+          | {
+              name?: T;
+              area?: T;
+              id?: T;
+            };
+        floors?:
+          | T
+          | {
+              label?: T;
+              image?: T;
+              rooms?:
+                | T
+                | {
+                    name?: T;
+                    area?: T;
+                    id?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  interiors?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  built?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  builtTour?:
+    | T
+    | {
+        title?: T;
+        cover?: T;
+        video?:
+          | T
+          | {
+              provider?: T;
+              id?: T;
+              oid?: T;
+            };
+      };
+  configurations?:
+    | T
+    | {
+        key?: T;
+        name?: T;
+        price?: T;
+        lead?: T;
+        mortgage?: T;
+        includes?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        gifts?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        details?:
+          | T
+          | {
+              title?: T;
+              lead?: T;
+              items?:
+                | T
+                | {
+                    text?: T;
+                    id?: T;
+                  };
+              groups?:
+                | T
+                | {
+                    title?: T;
+                    items?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+            };
+        id?: T;
+      };
+  priceAmount?: T;
+  options?:
+    | T
+    | {
+        key?: T;
+        name?: T;
+        price?: T;
+        defaultSelected?: T;
+        id?: T;
+      };
+  readyHome?:
+    | T
+    | {
+        location?: T;
+        locationPrepositional?: T;
+        salePrice?: T;
+        configurationLead?: T;
+        configuration?:
+          | T
+          | {
+              text?: T;
+              id?: T;
+            };
+        sections?:
+          | T
+          | {
+              title?: T;
+              tone?: T;
+              points?:
+                | T
+                | {
+                    title?: T;
+                    items?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    id?: T;
+                  };
+              id?: T;
+            };
+        visitImage?: T;
+      };
+  description?: T;
+  about?:
+    | T
+    | {
+        title?: T;
+        text?: T;
+        image?: T;
+        id?: T;
+      };
+  importKey?: T;
+  contentImported?: T;
+  configurationsImported?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

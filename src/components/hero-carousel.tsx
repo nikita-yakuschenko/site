@@ -341,7 +341,7 @@ export function HeroCarousel({
 
       <div className="hero__stage">
         <div className="hero__copy">
-          <h1>
+          <h1 data-cms-block="hero.heading">
             {nbspText(message.heading)}
             {message.headingMore ? (
               <>
@@ -350,8 +350,8 @@ export function HeroCarousel({
               </>
             ) : null}
           </h1>
-          {message.text ? <p>{nbspText(message.text)}</p> : null}
-          <a className="btn btn-yellow hero__cta" href={message.href}>
+          {message.text ? <p data-cms-block="hero.subtitle">{nbspText(message.text)}</p> : null}
+          <a className="btn btn-yellow hero__cta" href={message.href} data-cms-block="hero.button">
             {message.cta}
             <IconArrowUpRight size={18} stroke={2} />
           </a>
@@ -368,6 +368,7 @@ export function HeroCarousel({
             .filter(Boolean)
             .join(" ")}
           aria-roledescription="carousel"
+          data-cms-block="hero.promos"
           aria-label={copy.heroPromosAria}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -397,6 +398,7 @@ export function HeroCarousel({
                     key={key}
                     type="button"
                     className="hero__promo"
+                    data-cms-block={`hero.promo.${promos.indexOf(promo)}`}
                     aria-hidden={!active}
                     tabIndex={active ? undefined : -1}
                     onClick={() => {

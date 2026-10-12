@@ -6,6 +6,8 @@ import { fileURLToPath } from 'node:url'
 import { buildConfig } from 'payload'
 import sharp from 'sharp'
 import { Users } from './collections/Users'
+import { Pages, Blocks, Forms } from './collections/Structure'
+import { Projects } from './collections/Projects'
 import { createMedia } from './collections/Media'
 import { readEnvironment } from './config/environment'
 
@@ -30,9 +32,16 @@ export default buildConfig({
     importMap: { baseDir: root, importMapFile: path.resolve(root, 'app/(payload)/importMap.js') },
     components: {
       graphics: { Logo: './components/Brand#Brand', Icon: './components/Brand#BrandIcon' },
-      providers: ['./components/admin/AdminShell#AdminShell'],
+      providers: ['./components/admin/AdminShell#AdminShell', './components/admin/AdminToasts#AdminToasts'],
       Nav: './components/admin/AdminShell#EmptyNav',
       views: {
+        site: { Component: './components/admin/StructureView#SiteView', path: '/structure/site', exact: true },
+        pages: { Component: './components/admin/StructureView#PagesView', path: '/structure/pages', exact: true },
+        catalog: { Component: './components/admin/StructureView#CatalogView', path: '/structure/catalog', exact: true },
+        blocks: { Component: './components/admin/StructureView#BlocksView', path: '/structure/blocks', exact: true },
+        forms: { Component: './components/admin/StructureView#FormsView', path: '/structure/forms', exact: true },
+        sections: { Component: './components/admin/StructureView#SectionsView', path: '/structure/sections', exact: true },
+        integrations: { Component: './components/admin/StructureView#IntegrationsView', path: '/structure/integrations', exact: true },
         dashboard: { Component: './components/admin/Dashboard#Dashboard' },
         login: { Component: './components/admin/LoginView#LoginView', path: '/login', exact: true },
       },
@@ -48,7 +57,7 @@ export default buildConfig({
   debug: false,
   defaultDepth: 0,
   maxDepth: 3,
-  collections: [Users, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
+  collections: [Users, Pages, Blocks, Forms, Projects, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
   editor: lexicalEditor(),
   sharp,
   upload: { limits: { fileSize: 10 * 1024 * 1024 } },

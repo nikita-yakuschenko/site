@@ -578,6 +578,7 @@ export function BlockRenderer({
   return (
     <>
       {list.map((block, index) => {
+        const render = () => {
         if (!isRegisteredBlock(block.blockType)) {
           return (
             <UnknownBlock
@@ -670,6 +671,8 @@ export function BlockRenderer({
         }
         if (block.blockType === "faq") return <Faq key={index} block={block} />;
         return <UnknownBlock key={index} type={block.blockType} />;
+        };
+        return <div key={`${block.blockType}-${index}`} data-cms-block={block.blockType} style={{ display: 'contents' }}>{render()}</div>;
       })}
     </>
   );

@@ -120,7 +120,7 @@
 
   /* dashboard-01 owns the shell; Payload still owns collection forms. */
   .avgst-shell .template-default { display: block; padding: 0; min-height: 0; width: 100%; }
-  .avgst-shell { --gutter-h: 24px; --app-header-height: 56px; }
+  .avgst-shell { --gutter-h: 24px; --app-header-height: 48px; }
   .avgst-shell .collection-list__wrap { padding-top: 24px; }
   .avgst-shell .list-header__title-and-actions { align-items: center; gap: 12px; }
   .avgst-shell .list-header__title-actions { margin-bottom: 0; }
@@ -289,5 +289,118 @@
     mask: url('/logo_wp.svg') center / contain no-repeat;
   }
   html[data-theme="dark"] .avgst-login__logo { background-color: #fff; }
+}
+
+/* Keep Payload's notification producers; the shared Sonner store is rendered
+   by AdminToasts with shadcn styling on authenticated and login screens. */
+.payload-toast-container { display: none !important; }
+.toaster [data-sonner-toast] { font-family: var(--font-sans); }
+
+/* Payload keeps an accessible label on its overlay toggle. The global
+   button color must not expose that label over the visible row header. */
+.avgst-shell .collapsible__toggle { color: transparent; }
+.avgst-shell .collapsible__toggle > span {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+.avgst-shell .collapsible__toggle:focus-visible { outline: 2px solid var(--ring); outline-offset: -2px; }
+.avgst-shell .collapsible__toggle-wrap { min-height: 48px; }
+.avgst-shell .collapsible__header-wrap { min-width: 0; }
+.page-preview { margin-bottom: 24px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); }
+.page-preview__stage { height: max(360px, calc(100dvh - 300px)); overflow: auto; padding: 16px; background: var(--muted); }
+.page-preview__screen { position: relative; margin-inline: auto; box-shadow: 0 2px 8px rgb(11 16 32 / 0.12); }
+.page-metadata-field { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 28px; padding-block: 4px; }
+.page-metadata-field__label { font-size: 12px; color: var(--muted-foreground); }
+.page-record-metadata { display: flex; align-items: center; gap: 10px; min-width: 0; margin-inline-end: auto; }
+.page-record-metadata > span[data-slot='badge'] { flex-shrink: 0; }
+:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__controls:has(.page-record-metadata) { flex: 1; min-width: 0; }
+:is(.collection-edit--pages, .collection-edit--projects) .doc-controls { padding-inline: 24px; }
+:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__wrapper { align-items: center; }
+:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__controls-wrapper:has(.page-record-metadata) { flex: 1; width: 100%; min-width: 0; padding-inline-start: 0; }
+:is(.collection-edit--pages, .collection-edit--projects) .doc-controls .page-record-metadata { display: flex; align-items: center; gap: 10px; margin-inline-start: 0; margin-inline-end: auto; }
+:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__content:not(:has(.doc-controls__meta > :not(.doc-controls__value-wrap))):not(:has(.doc-controls__meta-icons)) { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__value-wrap { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__meta:not(:has(> :not(.doc-controls__value-wrap))) { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects) .page-details-row .field-type,
+:is(.collection-edit--pages, .collection-edit--projects) .page-metadata-row .field-type { margin-bottom: 0; }
+:is(.collection-edit--pages, .collection-edit--projects) .document-fields__fields { --spacing-field: 12px; }
+:is(.collection-edit--pages, .collection-edit--projects) .document-fields__fields > .page-details-row { margin-bottom: 12px; }
+:is(.collection-edit--pages, .collection-edit--projects) .page-details-row > .row__fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+  gap: 12px;
+  margin: 0;
+}
+:is(.collection-edit--pages, .collection-edit--projects) .page-details-row > .row__fields > * {
+  width: 100% !important;
+  min-width: 0;
+  margin-inline: 0;
+}
+:is(.collection-edit--pages, .collection-edit--projects) .document-fields__main .field-label { margin-bottom: 6px; }
+@media (max-width: 639px) {
+  :is(.collection-edit--pages, .collection-edit--projects) .page-details-row > .row__fields { grid-template-columns: minmax(0, 1fr); }
+}
+.shadcn-surface [data-slot="checkbox"] { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; min-height: 16px; padding: 0; border: 1px solid var(--input); border-radius: 4px; background: var(--card); color: var(--foreground); }
+.shadcn-surface [data-slot="checkbox"][data-state="checked"] { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); }
+.shadcn-surface [data-slot="checkbox"]:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
+.project-image-preview { display: block; width: 100%; max-height: 180px; object-fit: contain; object-position: left center; margin: 8px 0 12px; border-radius: 6px; }
+.avgst-shell input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+.avgst-shell input[type="number"]::-webkit-inner-spin-button,
+.avgst-shell input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+.project-specs-row > .row__fields { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin: 0; }
+.project-specs-row > .row__fields > * { width: 100% !important; min-width: 0; margin-inline: 0; }
+.project-ordered-fields { display: flex; flex-direction: column; }
+.project-ordered-fields > * { order: 0; }
+.project-ordered-fields > .collapsible-field:not([class*="project-order-section-"]) { order: 100; }
+.collection-edit--projects .project-ordered-fields > .collapsible-field {
+  margin-block: 0 4px;
+}
+.collection-edit--projects .project-ordered-fields > .collapsible-field > .collapsible > .collapsible__toggle-wrap {
+  min-height: 40px;
+  padding: 4px 8px 4px 16px;
+}
+.project-order-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.project-order-actions { display: inline-flex; align-items: center; gap: 2px; position: relative; z-index: 2; }
+@media (max-width: 479px) { .project-specs-row > .row__fields { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+.collection-edit--projects .field-type.row .field-type { margin-bottom: 0; }
+.collection-edit--projects .collapsible__content { padding: 16px; }
+.collection-edit--projects .document-fields__main .render-fields { --spacing-field: 12px; }
+.page-preview:fullscreen { display: flex; flex-direction: column; width: 100%; height: 100%; margin: 0; border: 0; border-radius: 0; }
+.page-preview:fullscreen .page-preview__stage { flex: 1; min-height: 0; height: auto; }
+
+@media (min-width: 1024px) {
+  :is(.collection-edit--pages, .collection-edit--projects) .document-fields {
+    display: flex;
+    --main-width: var(--page-editor-width, 50%);
+    --doc-sidebar-width: 0px;
+    --sidebar-wrap-width: var(--page-preview-width, 50%);
+    --sidebar-gutter-h-left: 24px;
+    --sidebar-gutter-h-right: 24px;
+    --main-gutter-h-left: 24px;
+    --main-gutter-h-right: 24px;
+  }
+  :is(.collection-edit--pages, .collection-edit--projects) .document-fields__main { width: var(--page-editor-width, 50%); min-width: 0; flex: 0 0 var(--page-editor-width, 50%); }
+  :is(.collection-edit--pages, .collection-edit--projects) .document-fields__sidebar-wrap {
+    width: var(--page-preview-width, 50%); min-width: 0; flex: 0 0 var(--page-preview-width, 50%); position: sticky;
+    top: calc(var(--app-header-height, 48px) + var(--doc-controls-height));
+    height: calc(100dvh - var(--app-header-height, 48px) - var(--doc-controls-height));
+  }
+}
+@media (min-width: 1600px) {
+  :is(.collection-edit--pages, .collection-edit--projects) .document-fields {
+    --page-editor-width: 33.333333%;
+    --page-preview-width: 66.666667%;
+  }
+}
+@media (max-width: 1023px) {
+  :is(.collection-edit--pages, .collection-edit--projects) .document-fields { display: block; }
+  :is(.collection-edit--pages, .collection-edit--projects) .document-fields__main,
+  :is(.collection-edit--pages, .collection-edit--projects) .document-fields__sidebar-wrap { width: 100%; min-width: 0; height: auto; position: static; }
 }
 

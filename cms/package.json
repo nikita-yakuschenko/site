@@ -19,6 +19,8 @@
     "migrate:status": "payload migrate:status",
     "migrate:create": "payload migrate:create",
     "bootstrap": "tsx scripts/bootstrap.ts",
+    "import:site": "tsx scripts/import-site.ts",
+    "structure:complete": "tsx scripts/complete-page-structure.ts",
     "test": "tsx --test tests/*.test.ts",
     "test:integration": "tsx --test --test-force-exit tests/integration/*.test.ts"
   },
@@ -57,6 +59,7 @@
     "typescript": "5.7.3"
   },
   "overrides": {
-    "undici": "^7.29.1"
+    "undici": "^7.29.1",
+    "sonner": "$sonner"
   }
 }

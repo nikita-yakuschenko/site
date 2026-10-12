@@ -4,6 +4,7 @@ import { cookies } from 'next/headers'
 import { GeistSans } from 'geist/font/sans'
 import { ConsentShell } from '../consent/ConsentShell'
 import { YandexMetrica } from '../components/yandex-metrica'
+import { CMSPreviewBridge } from '../components/cms-preview-bridge'
 import { parseConsent } from '../consent/storage'
 import {
   CONSENT_COOKIE,
@@ -53,6 +54,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
       <body suppressHydrationWarning>
         <ConsentShell initialState={initialState}>{children}</ConsentShell>
+        <CMSPreviewBridge />
         {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в
             клиентский код на сборке, и если переменную задать только в
             окружении контейнера, в бандле окажется undefined. Здесь она

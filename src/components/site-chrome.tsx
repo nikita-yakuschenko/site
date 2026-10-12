@@ -215,12 +215,12 @@ export function SiteChrome({
         {/* Технический ряд — сплошная полоса во всю ширину вьюпорта, поэтому
             он лежит вне контейнера с ограниченной шириной: полоса тянется от
             края до края, а содержимое внутри держит ширину страницы. */}
-        <div className="site-header__bar" data-tech-theme={techBarTheme}>
+        <div className="site-header__bar" data-tech-theme={techBarTheme} data-cms-block="technicalHeader">
           <div className="site-header__meta">
-            <RegionSwitch />
+            <span data-cms-block="technicalHeader.region" style={{ display: 'contents' }}><RegionSwitch /></span>
             {/* Одна группа: всё покупательское уехало в плашку, служебным
                 остались рассказ о компании и работа с юрлицами. */}
-            <nav className="site-meta-nav" aria-label={copy.metaNavAria}>
+            <nav className="site-meta-nav" aria-label={copy.metaNavAria} data-cms-block="technicalHeader.navigation">
               {META_LINK_GROUPS.map((group) => (
                 <span
                   key={group.links[0]?.href}
@@ -242,7 +242,7 @@ export function SiteChrome({
                 </span>
               ))}
             </nav>
-            <OfficeStatusIndicator />
+            <span data-cms-block="technicalHeader.status" style={{ display: 'contents' }}><OfficeStatusIndicator /></span>
             {/* Временный переключатель: на мобилке прячется в бургер. */}
             <button
               type="button"
@@ -260,9 +260,9 @@ export function SiteChrome({
           </div>
         </div>
 
-        <div className="site-header__inner">
+        <div className="site-header__inner" data-cms-block="mainHeader">
           <div className="site-header__plaque">
-            <Link href="/" className="site-header__brand" aria-label={name}>
+            <Link href="/" className="site-header__brand" aria-label={name} data-cms-block="mainHeader.logo">
               <img
                 className="site-header__logo site-header__logo--lg"
                 src={src}
@@ -275,7 +275,7 @@ export function SiteChrome({
               />
             </Link>
 
-            <nav className="site-header__nav" aria-label={copy.navAria}>
+            <nav className="site-header__nav" aria-label={copy.navAria} data-cms-block="mainHeader.navigation">
               {items.map((item) => (
                 <Link key={`${item.href}-${item.label}`} href={item.href}>
                   {item.label}
@@ -283,7 +283,7 @@ export function SiteChrome({
               ))}
             </nav>
 
-            <div className="site-header__aside">
+            <div className="site-header__aside" data-cms-block="mainHeader.contacts">
               {phone ? (
                 <a className="site-header__phone" href={telHref(phone)}>
                   {phone}
@@ -428,7 +428,7 @@ export function SiteChrome({
 
       {children}
 
-      <footer className="site-footer" id="footer">
+      <footer className="site-footer" id="footer" data-cms-block="footer">
         <div className="footer-grid">
           <div className="footer-brand-col">
             <Link href="/" className="site-footer__brand">
@@ -477,14 +477,14 @@ export function SiteChrome({
             <p className="footer-muted footer-offer">
               {footer || copy.offerDisclaimer}
             </p>
-            <div className="footer-legal">
+            <div className="footer-legal" data-cms-block="footer.legal">
               <p className="footer-muted">
                 © {copy.footerCopyrightName} {years}
               </p>
               <p className="footer-muted footer-inn">ИНН&nbsp;5261106177</p>
             </div>
           </div>
-          <div className="footer-mid">
+          <div className="footer-mid" data-cms-block="footer.navigation">
             <div className="footer-section">
               <h3>{copy.footerClients}</h3>
               <nav className="footer-nav" aria-label={copy.footerClients}>
@@ -517,7 +517,7 @@ export function SiteChrome({
               </nav>
             </div>
           </div>
-          <div className="footer-contacts-col">
+          <div className="footer-contacts-col" data-cms-block="footer.contacts">
             <h3>{copy.contacts}</h3>
             <div className="footer-contacts">
               <div className="footer-contacts__place">
