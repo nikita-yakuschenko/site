@@ -2,9 +2,9 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { IconClock, IconCoins, IconInfoCircle, IconUserFilled, IconShoppingCart, IconTruck, IconShieldCheck, IconRuler2 } from "@tabler/icons-react";
+import { IconClock, IconCoins, IconInfoCircle, IconShoppingCart, IconTruck, IconShieldCheck, IconRuler2 } from "@tabler/icons-react";
 import { BUSINESS } from "../lib/business-content";
-import { calculateBusinessPayroll, PAYROLL_RATES } from "../lib/business-payroll";
+import { calculateBusinessPayroll } from "../lib/business-payroll";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import "./business-technology-comparison.css";
 
@@ -23,17 +23,13 @@ const operations = [
   { title: "Контроль", Icon: IconShieldCheck, original: [80, 35, 20, 12] },
 ] as const;
 
-function CrewFigures({ count }: { count: number }) {
-  return <span className="technology-comparison__people" aria-hidden="true">{Array.from({ length: 10 }, (_, index) => <IconUserFilled key={index} className={index < count ? "is-active" : undefined} />)}</span>;
-}
-
-const rubles = (value: number) => `${new Intl.NumberFormat("ru-RU").format(value)} ₽`;
+const formatAmount = (value: number) => new Intl.NumberFormat("ru-RU").format(value);
 
 export function BusinessTechnologyComparison() {
   const [selectedTechnology, setSelectedTechnology] = useState(0);
   const technology = technologies[selectedTechnology]!;
   const loads = operations.map(({original}) => Math.round(original[selectedTechnology]! / original[0] * 100));
-  const payroll = calculateBusinessPayroll(loads, technology.crews, technology.supervisors);
+  const payroll = calculateBusinessPayroll(loads, technology.supervisors);
   return (
     <>
       <p className="technology-comparison__lead">Чем выше заводская готовность, тем меньше работ остаётся на площадке. Это создаёт условия для снижения операционных расходов и фонда оплаты труда, а также роста маржинальной прибыли компании.</p>
@@ -63,7 +59,8 @@ export function BusinessTechnologyComparison() {
       </div>
       <p className="technology-comparison__note"><IconInfoCircle size={20} aria-hidden="true" /><span>Все данные приведены в относительных величинах. N — условная единица маржинального дохода с одного объекта. Расчёты сделаны для примера и не являются публичной офертой или финансовым прогнозом. Фактические показатели зависят от конкретного проекта, региона, команды и организации процессов.</span></p>
       <div className="technology-comparison__subsection">
-        <div className="technology-comparison__summary"><h3>Команда и операционная нагрузка</h3><p>Условный пример для строительства 20 домов в год.</p></div>
+        <div className="technology-comparison__summary"><h3>Команда и операционная нагрузка</h3></div>
+        <p className="technology-comparison__context"><IconInfoCircle size={20} aria-hidden="true" /><span>Сравнение рассчитано для строительства 20 домов в год. За 100% принята операционная нагрузка при ручной стройке; показатели остальных технологий приведены относительно этой базы.</span></p>
         <Tabs className="technology-comparison__compact" value={String(selectedTechnology)} onValueChange={value => setSelectedTechnology(Number(value))}>
           <div className="technology-comparison__tabs-divider">
             <TabsList className="technology-comparison__technology-tabs" aria-label="Технология строительства">
@@ -71,48 +68,36 @@ export function BusinessTechnologyComparison() {
             </TabsList>
           </div>
           <TabsContent className="technology-comparison__technology-panel" value={String(selectedTechnology)}>
-            <dl className="technology-comparison__payroll-summary">
-              <div><dt>Расчётный ФОТ / мес.</dt><dd>{rubles(payroll.payroll)}</dd><span>Выплаты сотрудникам на руки</span></div>
-              <div><dt>Подрядные бригады / мес.</dt><dd>{rubles(payroll.contractors)}</dd><span>{technology.crews} × {rubles(PAYROLL_RATES.contractorCrew)}</span></div>
-              <div><dt>Всего по модели / мес.</dt><dd>{rubles(payroll.total)}</dd><span>Сотрудники и подрядные бригады</span></div>
-            </dl>
             <div className="technology-comparison__panel-content">
               <div className="technology-comparison__crew">
-                <h4>Команда на площадке</h4>
-                <p className="technology-comparison__crew-count"><strong>{technology.crews}</strong><span>{technology.crews === 10 || technology.crews === 7 ? "бригад" : "бригады"}</span></p>
-                <CrewFigures count={technology.crews} />
-                <p className="technology-comparison__foremen">{technology.supervisors} {technology.supervisors === 1 ? "прораб" : "прораба"}</p>
-                <p className="technology-comparison__figure-key">Одна фигурка — одна бригада</p>
+                <div className="technology-comparison__group-heading"><h4>Команда</h4><span>{technology.crews} {technology.crews === 10 || technology.crews === 7 ? "бригад" : "бригады"}</span></div>
+                <table className="technology-comparison__team-table" aria-label="Состав команды и ежемесячный ФОТ">
+                  <thead><tr><th scope="col">Сотрудники</th><th scope="col" aria-label="Количество сотрудников">Чел.</th><th scope="col">ФОТ / мес.</th></tr></thead>
+                  <tbody>
+                    {payroll.roles.map(role => <tr key={role.title}><th scope="row">{role.title}</th><td>{role.count}</td><td>{formatAmount(role.total)}</td></tr>)}
+                    {Array.from({ length: 5 - payroll.roles.length }, (_, index) => <tr className="technology-comparison__team-spacer" aria-hidden="true" key={`spacer-${index}`}><td colSpan={3} /></tr>)}
+                  </tbody>
+                  <tfoot><tr><th scope="row" colSpan={2}>Итого ФОТ</th><td>{formatAmount(payroll.payroll)}</td></tr></tfoot>
+                </table>
               </div>
               <div className="technology-comparison__chart">
-              <p className="technology-comparison__baseline">Относительная нагрузка · ручная стройка = 100</p>
-              <div className="technology-comparison__axis" aria-hidden="true"><span>0</span><span>50</span><span>100</span></div>
+              <div className="technology-comparison__group-heading"><h4>Операционная нагрузка</h4></div>
+              <div className="technology-comparison__axis" aria-hidden="true"><span>0%</span><span>50%</span><span>100%</span></div>
               <dl className="technology-comparison__chart-rows">
                 {operations.map(({title, Icon, original}) => {
                   const value = Math.round(original[selectedTechnology]! / original[0] * 100);
                   return <div className="technology-comparison__chart-row" key={title}>
                     <dt><Icon size={17} stroke={1.5} aria-hidden="true" />{title}</dt>
-                    <dd><span className="technology-comparison__plot" aria-hidden="true"><span style={{ width: `${value}%` }} /></span><strong aria-label={`${value} условных единиц`}>{value}</strong></dd>
+                    <dd><span className="technology-comparison__plot" aria-hidden="true"><span style={{ width: `${value}%` }} /></span><strong>{value}%</strong></dd>
                   </div>;
                 })}
               </dl>
               </div>
             </div>
-            <details className="technology-comparison__payroll-details" key={selectedTechnology}>
-              <summary>Как рассчитан ФОТ</summary>
-              <table className="technology-comparison__payroll-table" aria-label="Расшифровка ежемесячного ФОТ">
-                <thead><tr><th scope="col">Позиция</th><th scope="col">Сотрудники × ставка</th><th scope="col">В месяц</th></tr></thead>
-                <tbody>{payroll.roles.map(role => <tr key={role.title}><th scope="row">{role.title}</th><td>{role.count} × {rubles(role.rate)}</td><td>{rubles(role.total)}</td></tr>)}</tbody>
-                <tfoot><tr><th scope="row">Итого ФОТ</th><td /><td>{rubles(payroll.payroll)}</td></tr></tfoot>
-              </table>
-              <div className="technology-comparison__calculation-notes">
-                <p>Один сотрудник на каждые 50 единиц нагрузки, с округлением вверх. При сумме закупок и логистики менее 50 — одна совмещённая позиция за {rubles(PAYROLL_RATES.combined)} в месяц.</p>
-                <p>Ставки включают оклад и целевую премию. ФОТ здесь — сумма выплат на руки, без расчёта НДФЛ и страховых взносов. Стоимость подрядных бригад показана отдельно и не включена в ФОТ.</p>
-              </div>
-            </details>
-        <p className="technology-comparison__legend">Условный пример, не смета: индексы показывают относительную нагрузку, а не измеренные расходы или процент экономии.</p>
           </TabsContent>
         </Tabs>
+        <p className="technology-comparison__salary-source">Зарплаты: усреднённые значения из исследований HH.ru, SuperJob и Авито Работа.</p>
+        <p className="technology-comparison__scope">Расходы на бэкофис — бухгалтерию, маркетинг, юридическое сопровождение и HR — не включены. Пример служит для сравнения технологий и не заменяет финансовую модель конкретного бизнеса.</p>
       </div>
     </>
   );
