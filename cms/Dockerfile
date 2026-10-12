@@ -4,21 +4,21 @@ ENV NEXT_TELEMETRY_DISABLED=1
 
 FROM base AS dependencies
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN --mount=type=cache,id=avgst-cms-npm,target=/root/.npm,sharing=locked \
+    npm ci --prefer-offline --no-audit --no-fund
 
-FROM base AS builder
-COPY --from=dependencies /app/node_modules ./node_modules
+FROM dependencies AS builder
 COPY . .
 # Disposable build-only values: dynamic routes never connect to this database.
 # Runtime secrets are required separately; none are persisted as image ENV.
-RUN PAYLOAD_SECRET="$(node -e 'process.stdout.write(require("crypto").randomBytes(48).toString("hex"))')" \
+RUN --mount=type=cache,id=avgst-cms-next,target=/app/.next/cache,sharing=locked \
+    PAYLOAD_SECRET="$(node -e 'process.stdout.write(require("crypto").randomBytes(48).toString("hex"))')" \
     DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build \
     CMS_PUBLIC_URL=https://cms.avgst.ru npm run build
 
 # Explicit maintenance image, built with --target operations. Never deployed.
 # Migrations and bootstrap are separate operator commands, not startup hooks.
-FROM base AS operations
-COPY --from=dependencies /app/node_modules ./node_modules
+FROM dependencies AS operations
 COPY . .
 ENV NODE_ENV=production
 USER node
