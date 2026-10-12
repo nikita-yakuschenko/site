@@ -289,7 +289,7 @@ export default function BusinessPage() {
 
         </div>
         <ContactsSection
-          block={HOME_LAYOUT.find((block) => block.blockType === "contactsSection")!}
+          block={{ ...HOME_LAYOUT.find((block) => block.blockType === "contactsSection")!, muted: false }}
           form={HOME_LAYOUT.find((block) => block.blockType === "leadForm")}
           contacts={SITE.contacts}
           siteId={SITE.id}
