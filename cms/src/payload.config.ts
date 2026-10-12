@@ -1,0 +1,47 @@
+import { postgresAdapter } from '@payloadcms/db-postgres'
+import { lexicalEditor } from '@payloadcms/richtext-lexical'
+import { ru } from '@payloadcms/translations/languages/ru'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
+import { buildConfig } from 'payload'
+import sharp from 'sharp'
+import { Users } from './collections/Users'
+import { createMedia } from './collections/Media'
+import { readEnvironment } from './config/environment'
+
+const root = path.dirname(fileURLToPath(import.meta.url))
+const environment = readEnvironment()
+
+export default buildConfig({
+  secret: environment.secret,
+  serverURL: environment.publicURL,
+  routes: { admin: '/', api: '/api' },
+  admin: {
+    user: 'users',
+    meta: { titleSuffix: ' | Авангард Строй 4.0' },
+    importMap: { baseDir: root, importMapFile: path.resolve(root, 'app/(payload)/importMap.js') },
+    components: { graphics: { Logo: './components/Brand#Brand', Icon: './components/Brand#BrandIcon' } },
+    timezones: { defaultTimezone: 'Europe/Moscow', supportedTimezones: [{ label: 'Москва', value: 'Europe/Moscow' }] },
+  },
+  i18n: { supportedLanguages: { ru }, fallbackLanguage: 'ru' },
+  cors: [environment.publicURL],
+  csrf: [environment.publicURL],
+  cookiePrefix: 'avgst-cms',
+  graphQL: { disable: true },
+  telemetry: false,
+  debug: false,
+  defaultDepth: 0,
+  maxDepth: 3,
+  collections: [Users, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
+  editor: lexicalEditor(),
+  sharp,
+  upload: { limits: { fileSize: 10 * 1024 * 1024 } },
+  db: postgresAdapter({
+    pool: { connectionString: environment.databaseURL, connectionTimeoutMillis: 5000, max: 10 },
+    push: false,
+    disableCreateDatabase: true,
+    migrationDir: path.resolve(root, 'migrations'),
+  }),
+  typescript: { outputFile: path.resolve(root, 'payload-types.ts') },
+  logger: { options: { level: 'warn', redact: ['password', 'token', 'secret', 'connectionString', 'req.headers.authorization', 'req.headers.cookie'] } },
+})

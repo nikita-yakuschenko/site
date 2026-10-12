@@ -2,6 +2,7 @@ node_modules
 .next
 .git
 .github
+cms
 *.md
 !README.md
 !docs/**/*.md

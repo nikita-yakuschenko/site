@@ -1,0 +1,14 @@
+node_modules
+.next
+.env
+.env.*
+!.env.example
+media
+*.log
+*.tsbuildinfo
+audit.local.json
+tests
+README.md
+VALIDATION.md
+Dockerfile
+.git
