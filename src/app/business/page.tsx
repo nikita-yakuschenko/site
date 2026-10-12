@@ -4,16 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import {
   IconArrowUpRight,
-  IconChartBar,
-  IconClock,
-  IconCoins,
-  IconUsers,
-  IconSettings,
-  IconCube,
-  IconPencil,
-  IconTool,
-  IconTag,
-  IconLayersIntersect,
   IconBuildingFactory2,
   IconBuildingWarehouse,
   IconHome as IconRoof,
@@ -23,10 +13,12 @@ import heroImage from "../../../public/img/pages/b2b_hero.png";
 import machineImage from "../../../public/production/manufacture-hero-board.png";
 import { BusinessTechnologyComparison } from "../../components/business-technology-comparison";
 import { BusinessProductBento } from "../../components/business-product-bento";
+import { BusinessBenefitsBento } from "../../components/business-benefits-bento";
 import { PageHero } from "../../components/page-hero";
 import { SiteChrome } from "../../components/site-chrome";
 import { LeadDialogButton } from "../../components/lead-dialog";
-import { LeadForm } from "../../components/lead-form";
+import { ContactsSection } from "../../components/block-renderer";
+import { HOME_LAYOUT } from "../../lib/home-layout";
 import { BUSINESS } from "../../lib/business-content";
 import { SITE } from "../../lib/site";
 import { copy, footerAboutFor, nbspText } from "../../lib/copy";
@@ -44,22 +36,6 @@ export const metadata: Metadata = {
     "Фермы на МЗП, кровельные панели, прекат, префаб и модульные здания. Контрактное производство и сотрудничество для строительных компаний и бизнеса.",
 };
 
-const benefitIcons: Record<number, typeof IconCube> = {
-  0: IconChartBar,
-  1: IconClock,
-  2: IconCoins,
-  3: IconUsers,
-  4: IconSettings,
-  5: IconCube,
-};
-const partnerIcons: Record<number, typeof IconCube> = {
-  0: IconCube,
-  1: IconPencil,
-  2: IconUsers,
-  3: IconTag,
-  4: IconTool,
-  5: IconLayersIntersect,
-};
 const specialProducts = {
   materials: "Материалы",
   contract: "Контрактное производство",
@@ -145,7 +121,8 @@ export default function BusinessPage() {
         </nav>
       }
     >
-      <main className="b2b-page">
+      <main>
+        <div className="b2b-page">
         <PageHero
           headingId="business-title"
           sectionClassName="b2b-intro"
@@ -300,82 +277,24 @@ export default function BusinessPage() {
 
         <Section
           id="partnership"
-          title="Развивайте строительный бизнес вместе с нами"
+          title="Преимущества для вашего бизнеса"
           muted
         >
           <p className="b2b-partnership-lead">
-            Больше возможностей для бизнеса и меньше производственных ограничений.
-            Используйте наши мощности, готовые решения и поддержку, чтобы расширять
-            ассортимент, сокращать сроки и выполнять больше заказов.
+            Готовые решения и поддержка, чтобы расширять ассортимент, сокращать
+            сроки и выполнять больше заказов.
           </p>
-          <div className="b2b-feature-grid">
-            {[...BUSINESS.benefits, ...BUSINESS.partnership.filter(([title]) => !BUSINESS.benefits.some(([benefitTitle]) => benefitTitle === title))].map(([title, description], index) => {
-              const Icon = index < BUSINESS.benefits.length ? benefitIcons[index] ?? IconCube : partnerIcons[index - BUSINESS.benefits.length + 1] ?? IconCube;
-              return (
-                <article className="b2b-feature" key={title}>
-                  <Icon size={30} stroke={1.5} aria-hidden="true" />
-                  <div>
-                    <h3>{title}</h3>
-                    <p>{description}</p>
-                  </div>
-                </article>
-              );
-            })}
-          </div>
+          <BusinessBenefitsBento />
         </Section>
 
-        <Section
-          id="inquiry"
-          title="Найдём производственное решение для вашей задачи"
-          muted
-        >
-          <div className="b2b-contact">
-            <div className="b2b-contact__copy">
-              <p>
-                Расскажите, что строите и какие задачи хотите передать
-                производству. Подберём продукт, обсудим комплектацию и
-                подготовку расчёта.
-              </p>
-              <div className="b2b-actions">
-                <Inquiry />
-                <a
-                  className="btn b2b-secondary"
-                  href={`mailto:${SITE.contacts.email}?subject=${encodeURIComponent("B2B: проект на расчёт")}`}
-                >
-                  Отправить проект на расчёт
-                  <IconArrowUpRight size={18} aria-hidden="true" />
-                </a>
-              </div>
-              <p className="b2b-contact__direct">
-                Чертежи и файлы проекта можно отправить на{" "}
-                <a
-                  href={`mailto:${SITE.contacts.email}?subject=${encodeURIComponent("B2B: проект на расчёт")}`}
-                >
-                  {SITE.contacts.email}
-                </a>
-                .<br />
-                Обсудить задачу по телефону:{" "}
-                <a href="tel:+78312666645">{SITE.contacts.phone}</a>.
-              </p>
-              <Image
-                src="/img/pages/B2B.png"
-                alt="Вариант размещения модульных зданий"
-                width={640}
-                height={360}
-                sizes="(max-width: 719px) 100vw, 576px"
-              />
-            </div>
-            <LeadForm
-              siteId={SITE.id}
-              pageId="business"
-              heading="Обсудим вашу задачу"
-              body="Укажите компанию, тип объекта и необходимые конструкции в сообщении."
-              submitLabel="Отправить заявку"
-              variant="card"
-              meta={{ direction: "b2b", topic: "Сотрудничество" }}
-            />
-          </div>
-        </Section>
+        </div>
+        <ContactsSection
+          block={HOME_LAYOUT.find((block) => block.blockType === "contactsSection")!}
+          form={HOME_LAYOUT.find((block) => block.blockType === "leadForm")}
+          contacts={SITE.contacts}
+          siteId={SITE.id}
+          pageId="business"
+        />
       </main>
     </SiteChrome>
   );

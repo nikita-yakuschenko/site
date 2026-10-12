@@ -1,0 +1,27 @@
+.business-benefits-bento { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 12px; }
+.business-benefit { position: relative; grid-column: span 4; display: flex; flex-direction: column; align-items: flex-start; min-width: 0; padding: 24px; border-radius: var(--surface-radius); background: var(--surface); color: var(--avgst-ink); }
+.business-benefit--time, .business-benefit--range { grid-column: span 3; }
+.business-benefit--factory { grid-column: span 6; }
+.business-benefit--dark { background: var(--avgst-ink); color: var(--on-dark-0, #fff); }
+.business-benefit__number { position: absolute; top: 24px; right: 24px; font-family: var(--font-geist-sans), Arial, sans-serif; font-size: 36px; font-weight: 700; line-height: 1; font-variant-numeric: tabular-nums; color: #c7cbd2; pointer-events: none; }
+.business-benefit--dark .business-benefit__number { color: #66707f; }
+.business-benefit:hover .business-benefit__number { color: var(--brand-yellow); }
+@media (prefers-reduced-motion: no-preference) {
+  .business-benefit__number { transition: color 150ms ease; }
+}
+.b2b-page .business-benefit h3 { max-width: min(340px, calc(100% - 64px)); font-size: 20px; line-height: 1.25; hyphens: none; overflow-wrap: normal; text-wrap: balance; color: inherit; }
+.b2b-page .business-benefit p { max-width: 350px; margin-top: 10px; font-size: 14px; line-height: 1.5; text-wrap: pretty; color: var(--ink-1); }
+.b2b-page .business-benefit--dark p { color: var(--on-dark-1, #d5d9e1); }
+@media (max-width: 1023px) {
+  .business-benefits-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .business-benefit, .business-benefit--time, .business-benefit--range { grid-column: span 1; }
+  .business-benefit--factory { grid-column: span 2; }
+  .business-benefit--branding { grid-column: span 2; }
+}
+@media (max-width: 599px) {
+  .business-benefits-bento { grid-template-columns: 1fr; }
+  .business-benefit, .business-benefit--factory, .business-benefit--branding { grid-column: span 1; min-height: 0; padding: 20px; }
+  .business-benefit__number { top: 20px; right: 20px; }
+  .b2b-page .business-benefit h3 { font-size: 18px; }
+  .b2b-page .business-benefit p { max-width: none; }
+}
