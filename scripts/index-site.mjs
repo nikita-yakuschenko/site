@@ -83,6 +83,7 @@ const appFiles = await files(path.join(root, 'src/app'))
 for (const file of appFiles.filter(file => /[/\\]page\.tsx$/.test(file)).sort()) {
   const source = await parse(file)
   const route = '/' + relative(file).replace(/^src\/app\//, '').replace(/\/?page\.tsx$/, '').split('/').filter(segment => segment && !segment.startsWith('(')).join('/')
+  if (route === '/cms-preview' || route.startsWith('/cms-preview/')) continue
   const components = new Set()
   const imports = new Map()
   for (const statement of source.statements) {
