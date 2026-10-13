@@ -1,5 +1,6 @@
 import type { CollectionConfig } from 'payload'
 import { authenticated, contentManager, contentWriter } from '../access/staff'
+import { configurationTemplateFields } from '../config/configuration-template-fields'
 
 const access = { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager }
 
@@ -9,15 +10,16 @@ function registry(slug: 'blocks' | 'forms', singular: string, plural: string): C
     admin: { useAsTitle: 'title', defaultColumns: ['title', 'key', 'updatedAt'] },
     fields: [
       { name: 'title', label: 'Название', type: 'text', required: true },
-      { name: 'key', label: 'Ключ компонента', type: 'text', required: true, unique: true },
-      { name: 'source', label: 'Исходный файл', type: 'text', required: true },
-      { name: 'exportName', label: 'Экспорт компонента', type: 'text' },
-      { name: 'defaults', label: 'Параметры по умолчанию', type: 'json' },
-      { name: 'parts', label: 'Состав компонента', type: 'array', fields: [
+      ...(slug === 'blocks' ? [configurationTemplateFields] : []),
+      { name: 'key', label: 'Ключ компонента', type: 'text', required: true, unique: true, admin: { condition: data => data.key !== 'ProjectConfig' } },
+      { name: 'source', label: 'Исходный файл', type: 'text', required: true, admin: { condition: data => data.key !== 'ProjectConfig' } },
+      { name: 'exportName', label: 'Экспорт компонента', type: 'text', admin: { condition: data => data.key !== 'ProjectConfig' } },
+      { name: 'defaults', label: 'Параметры по умолчанию', type: 'json', admin: { condition: data => data.key !== 'ProjectConfig' } },
+      { name: 'parts', label: 'Состав компонента', type: 'array', admin: { condition: data => data.key !== 'ProjectConfig' }, fields: [
         { name: 'key', label: 'Ключ элемента', type: 'text', required: true },
         { name: 'title', label: 'Название', type: 'text', required: true },
       ] },
-      ...(slug === 'blocks' ? [{ name: 'forms', label: 'Формы блока', type: 'relationship' as const, relationTo: 'forms' as const, hasMany: true, admin: { allowCreate: false } }] : []),
+      ...(slug === 'blocks' ? [{ name: 'forms', label: 'Формы блока', type: 'relationship' as const, relationTo: 'forms' as const, hasMany: true, admin: { allowCreate: false, condition: (data: { key?: string }) => data.key !== 'ProjectConfig' } }] : []),
     ],
   }
 }

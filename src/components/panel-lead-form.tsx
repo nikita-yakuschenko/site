@@ -55,7 +55,7 @@ export function PanelLeadForm({
 
       <div className="panel-lead__form" data-open={open ? "true" : "false"}>
         <div>
-          <LeadForm
+          <LeadForm formId="project-configuration"
             siteId={SITE.id}
             projectExternalId={projectExternalId}
             variant="card"

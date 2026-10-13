@@ -3,8 +3,7 @@ import { permanentRedirect } from 'next/navigation'
 import { CatalogBoard, type BoardItem } from '../../components/catalog-board'
 import { ProjectCard } from '../../components/project-card'
 import { SiteChrome } from '../../components/site-chrome'
-import { CATALOG_PROJECTS } from '../../lib/catalog/projects'
-import { FixtureCatalogProvider } from '../../lib/catalog/fixture-provider'
+import { CmsCatalogProvider } from '../../lib/catalog/cms-provider'
 import {
   canonicalRedirect,
   facetsOf,
@@ -14,8 +13,8 @@ import {
 import { copy, footerAboutFor, seriesTitle } from '../../lib/copy'
 import { SITE } from '../../lib/site'
 
-const catalog = new FixtureCatalogProvider()
-const facets = facetsOf(CATALOG_PROJECTS)
+const catalog = new CmsCatalogProvider()
+
 
 type Search = Promise<Record<string, string | string[] | undefined>>
 
@@ -54,6 +53,8 @@ export async function generateMetadata({
  * серверным.
  */
 export default async function CatalogPage({ searchParams }: { searchParams: Search }) {
+  const all = await catalog.list({ siteCode: SITE.code })
+  const facets = facetsOf(all.items)
   const params = await searchParams
   const filters = parseFilters(params)
 

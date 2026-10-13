@@ -1,10 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { PhotoLightbox } from "./photo-lightbox";
 import { copy } from "../lib/copy";
-import type { CatalogProject } from "../lib/catalog/types";
+import { isPlanVariants } from '../lib/catalog/project-plans-data';
+import type { CatalogProject, PlanVariant } from "../lib/catalog/types";
 
 /**
  * Планировка.
@@ -21,21 +22,34 @@ import type { CatalogProject } from "../lib/catalog/types";
  * Чертёж открывается во весь экран: подписи на нём мелкие, и на ширине
  * колонки их не прочитать.
  *
- * Экспликация есть не у всех проектов: её приходится снимать с чертежа
- * руками. Где её нет, раздел показывает планы картинками — без списка, но
- * и без выдуманных цифр.
+ * В подключённых к CMS вариантах изображение и экспликация обязательны
+ * для каждого этажа. Старый список картинок остаётся только запасным
+ * представлением для ещё не перенесённых проектов.
  */
-export function ProjectPlans({ project }: { project: CatalogProject }) {
-  const variants = project.plans ?? [];
+export function ProjectPlans({ project, variants: savedVariants, connected = false }: { project: CatalogProject; variants?: PlanVariant[]; connected?: boolean }) {
+  const [draft, setDraft] = useState<PlanVariant[] | null>(null);
+  const database = connected || draft !== null;
+  const variants = draft ?? savedVariants ?? project.plans ?? [];
+  useEffect(() => {
+    if (window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return;
+    const allowed = new Set(['http://localhost:3001', 'https://cms.avgst.ru']);
+    const receive = (event: MessageEvent) => {
+      if (event.source === window.parent && allowed.has(event.origin) && event.data?.type === 'avgst:preview-plans' && isPlanVariants(event.data.variants)) setDraft(event.data.variants);
+    };
+    window.addEventListener('message', receive);
+    return () => window.removeEventListener('message', receive);
+  }, []);
   const [activeVariant, setActiveVariant] = useState(0);
   const [activeFloor, setActiveFloor] = useState(0);
   const [open, setOpen] = useState<number | null>(null);
 
   if (!variants.length) {
-    if (!project.floorPlans.length) return null;
+    if (database || !project.floorPlans.length) return null;
     return (
       <section
         className="section section--muted"
+        data-cms-block="ProjectPlans"
+        data-content-source={database ? "database" : "mock"}
         aria-labelledby="project-plans-title"
       >
         <div className="section__inner">
@@ -74,13 +88,15 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
     );
   }
 
-  const currentVariant = variants[activeVariant] ?? variants[0]!;
+  const selectedVariant = Math.min(activeVariant, variants.length - 1);
+  const currentVariant = variants[selectedVariant]!;
   const currentFloors = currentVariant.floors?.length
     ? currentVariant.floors
     : currentVariant.image && currentVariant.rooms
       ? [{ label: "1 этаж", image: currentVariant.image, rooms: currentVariant.rooms }]
       : [];
-  const current = currentFloors[activeFloor] ?? currentFloors[0]!;
+  const selectedFloor = Math.min(activeFloor, currentFloors.length - 1);
+  const current = currentFloors[selectedFloor];
 
   if (!current) return null;
 
@@ -98,6 +114,8 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
   return (
     <section
       className="section section--muted"
+      data-cms-block="ProjectPlans"
+      data-content-source={database ? "database" : "mock"}
       aria-labelledby="project-plans-title"
     >
       <div className="section__inner">
@@ -109,12 +127,12 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
           <div className="project-plans__tabs" role="tablist" aria-label="Варианты планировки">
             {variants.map((variant, index) => (
               <button
-                key={variant.label}
+                key={`${variant.label}-${index}`}
                 type="button"
                 role="tab"
-                aria-selected={index === activeVariant}
+                aria-selected={index === selectedVariant}
                 className={
-                  index === activeVariant
+                  index === selectedVariant
                     ? "project-plans__tab project-plans__tab--on"
                     : "project-plans__tab"
                 }
@@ -135,11 +153,12 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
             type="button"
             className="project-plans__sheet"
             aria-label={copy.galleryOpen}
-            onClick={() => setOpen(lightboxShowsFloors ? activeFloor : activeVariant)}
+            onClick={() => setOpen(lightboxShowsFloors ? selectedFloor : selectedVariant)}
           >
             <Image
               key={current.image}
               src={current.image}
+              unoptimized={database}
               alt={`${copy.plansHeading}: ${currentVariant.label}, ${current.label}`}
               width={1680}
               height={1188}
@@ -155,11 +174,11 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
               <div className="project-plans__floor-tabs" role="tablist" aria-label="Этаж дома">
                 {currentFloors.map((floor, index) => (
                   <button
-                    key={floor.label}
+                    key={`${floor.label}-${index}`}
                     type="button"
                     role="tab"
-                    aria-selected={index === activeFloor}
-                    className={index === activeFloor ? "is-active" : undefined}
+                    aria-selected={index === selectedFloor}
+                    className={index === selectedFloor ? "is-active" : undefined}
                     onClick={() => {
                       setActiveFloor(index);
                       setOpen(null);
@@ -174,7 +193,7 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
               {current.rooms.map((room, index) => (
                 <div key={`${room.name}-${index}`}>
                   <dt>{room.name}</dt>
-                  <dd>{room.area}</dd>
+                  <dd>{/[мm][²2]/.test(room.area) ? room.area : `${room.area} м²`}</dd>
                 </div>
               ))}
             </dl>
@@ -188,7 +207,7 @@ export function ProjectPlans({ project }: { project: CatalogProject }) {
           images={lightboxItems.map((item) => item.image!)}
           labels={lightboxItems.map((item) => item.label)}
           variantLabels={lightboxItems.map((item) => item.label)}
-          index={open}
+          index={Math.min(open, lightboxItems.length - 1)}
           onIndex={(next) => {
             setOpen(next);
             if (lightboxShowsFloors) setActiveFloor(next);

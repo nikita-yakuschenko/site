@@ -8,6 +8,8 @@ import sharp from 'sharp'
 import { Users } from './collections/Users'
 import { Pages, Blocks, Forms } from './collections/Structure'
 import { Projects } from './collections/Projects'
+import { ProjectPrices } from './collections/ProjectPrices'
+import { LeadDelivery, LeadSubmissions } from './collections/LeadSubmissions'
 import { createMedia } from './collections/Media'
 import { readEnvironment } from './config/environment'
 
@@ -57,7 +59,8 @@ export default buildConfig({
   debug: false,
   defaultDepth: 0,
   maxDepth: 3,
-  collections: [Users, Pages, Blocks, Forms, Projects, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
+  collections: [Users, Pages, Blocks, Forms, Projects, ProjectPrices, LeadSubmissions, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
+  globals: [LeadDelivery],
   editor: lexicalEditor(),
   sharp,
   upload: { limits: { fileSize: 10 * 1024 * 1024 } },

@@ -99,6 +99,8 @@ export type ReadyHomeSection = {
 
 export type CatalogProject = {
   id: string
+  cmsId?: number
+  mobileImageUrl?: string | null
   slug: string
   name: string
   area: string
@@ -109,6 +111,7 @@ export type CatalogProject = {
   bathrooms: string
   priceLabel: string
   priceAmount: number | null
+  regionalPrices?: Partial<Record<'nn' | 'msk', number>>
   imageUrl: string
   technologyBadge: string
   series: CatalogSeries

@@ -1,0 +1,16 @@
+import 'server-only'
+import { configurationTiers, type ConfigurationData } from './project-configurations-data'
+import type { PricedTier } from './tiers'
+import type { SharedConfigurationContent } from './configuration-content'
+
+export async function resolveProjectConfigurations(slug: string): Promise<PricedTier[] | null> {
+  const key = process.env.CMS_SITE_API_KEY
+  if (!key) return null
+  try {
+    const origin = process.env.CMS_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://cms.avgst.ru' : 'http://localhost:3001')
+    const response = await fetch(`${origin}/api/projects/configurations?slug=${encodeURIComponent(slug)}`, { headers: { Authorization: `Bearer ${key}` }, cache: 'no-store', signal: AbortSignal.timeout(5000) })
+    if (!response.ok) return null
+    const data = await response.json() as { configurations: ConfigurationData[]; technologyBadge: string; sharedContent?: SharedConfigurationContent[] }
+    return configurationTiers(data.configurations, data.technologyBadge, data.sharedContent)
+  } catch { return null }
+}

@@ -10,6 +10,7 @@ export type RegionCode = (typeof REGIONS)[number]['code']
 export type RegionTone = (typeof REGIONS)[number]['tone']
 
 const STORAGE_KEY = 'avgst:region'
+let sessionRegion: RegionCode | null = null
 
 export function regionByCode(code: string | null): (typeof REGIONS)[number] {
   return REGIONS.find((region) => region.code === code) || REGIONS[0]
@@ -17,6 +18,7 @@ export function regionByCode(code: string | null): (typeof REGIONS)[number] {
 
 export function readRegionCode(): RegionCode {
   if (typeof window === 'undefined') return 'nn'
+  if (sessionRegion) return sessionRegion
   try {
     return regionByCode(window.localStorage.getItem(STORAGE_KEY)).code
   } catch {
@@ -25,11 +27,10 @@ export function readRegionCode(): RegionCode {
 }
 
 export function writeRegionCode(code: RegionCode): void {
-  if (!canPersistFunctional()) {
-    notifyRegion()
-    return
+  sessionRegion = code
+  if (canPersistFunctional()) {
+    try { window.localStorage.setItem(STORAGE_KEY, code) } catch { /* The current session still follows the selected region. */ }
   }
-  window.localStorage.setItem(STORAGE_KEY, code)
   notifyRegion()
 }
 
@@ -51,7 +52,7 @@ export function readServerRegionCode(): RegionCode {
 export function subscribeRegion(listener: () => void): () => void {
   regionListeners.add(listener)
   const onStorage = (event: StorageEvent) => {
-    if (event.key === null || event.key === STORAGE_KEY) notifyRegion()
+    if (event.key === null || event.key === STORAGE_KEY) { sessionRegion = null; notifyRegion() }
   }
   window.addEventListener('storage', onStorage)
   return () => {

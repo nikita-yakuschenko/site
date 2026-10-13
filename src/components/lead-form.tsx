@@ -2,6 +2,8 @@
 
 import { useRef, useState } from 'react'
 import Link from 'next/link'
+import { useProjectLeadContext } from './project-lead-context'
+import { readRegionCode } from '../lib/regions'
 import { IconArrowUpRight } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
@@ -20,6 +22,8 @@ export function LeadForm({
   siteId,
   pageId,
   projectExternalId,
+  projectId,
+  formId,
   heading,
   body,
   submitLabel,
@@ -31,6 +35,8 @@ export function LeadForm({
   siteId: number | string
   pageId?: number | string
   projectExternalId?: string
+  projectId?: number
+  formId?: string
   heading: string
   body?: string | null
   submitLabel?: string | null
@@ -54,6 +60,8 @@ export function LeadForm({
    */
   meta?: Record<string, unknown>
 }) {
+  const project = useProjectLeadContext()
+  const resolvedFormId = formId || 'lead-form'
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
   const [phone, setPhone] = useState('+7')
   const [invalid, setInvalid] = useState<{
@@ -87,10 +95,13 @@ export function LeadForm({
           message: String(data.get('message') || '').trim(),
           consent,
           siteId,
-          pageId,
-          projectExternalId,
+          pageId: pageId ?? project?.slug,
+          projectExternalId: projectExternalId ?? project?.id,
+          projectId: projectId ?? project?.cmsId,
+          formId: resolvedFormId,
+          sourceUrl: window.location.href,
           sourcePath: window.location.pathname,
-          ...(meta ? { meta } : {}),
+          meta: { region: readRegionCode(), ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
         }),
       })
       if (!response.ok) throw new Error('lead-failed')
@@ -107,6 +118,7 @@ export function LeadForm({
   return (
     <form
       data-cms-block="LeadForm"
+      data-form-id={resolvedFormId}
       className={`${variant === 'card' ? 'lead-card' : 'lead-form'} ym-disable-submit`}
       onSubmit={onSubmit}
       noValidate

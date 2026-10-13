@@ -20,7 +20,8 @@ export function CMSPreviewBridge() {
       if (event.source !== window.parent || !allowed.has(event.origin)) return
       if (event.data?.type === 'avgst:preview-order') {
         const keys = ['ProjectExteriors', 'ProjectPlans', 'ProjectInteriors', 'ProjectBuilt', 'MortgageCalculator', 'ProjectConfig', 'ReadyHomeOffer', 'ProjectNextSteps', 'ProjectSimilar', 'contactsSection']
-        const order = event.data.order
+        const requested = event.data.order
+        const order = Array.isArray(requested) ? [...requested.filter(key => key !== 'contactsSection'), 'contactsSection'] : requested
         if (!Array.isArray(order) || order.length !== keys.length || new Set(order).size !== order.length || !order.every(key => keys.includes(key))) return
         for (const element of document.querySelectorAll<HTMLElement>('[data-cms-block]')) {
           const index = order.indexOf(element.dataset.cmsBlock)

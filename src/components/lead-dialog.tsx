@@ -108,7 +108,7 @@ export function LeadDialog({
         >
           <IconX size={18} stroke={2.2} />
         </button>
-        <LeadForm
+        <LeadForm formId="consultation-dialog"
           siteId={SITE.id}
           pageId={pageId}
           variant="card"

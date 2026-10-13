@@ -2,12 +2,12 @@ import Link from "next/link";
 import { IconChevronRight } from "@tabler/icons-react";
 import { MortgagePageContent } from "./mortgage-page";
 import { SiteChrome } from "./site-chrome";
-import { FixtureCatalogProvider } from "../lib/catalog/fixture-provider";
+import { CmsCatalogProvider } from "../lib/catalog/cms-provider";
 import { copy, footerAboutFor } from "../lib/copy";
 import { mortgageTitle, type MortgageProgramId } from "../lib/mortgage";
 import { SITE } from "../lib/site";
 
-const catalog = new FixtureCatalogProvider();
+const catalog = new CmsCatalogProvider();
 
 /**
  * Страница одной ипотечной программы.

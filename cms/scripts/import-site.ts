@@ -1,8 +1,9 @@
+import { normalizePlans } from '../src/config/project-plans'
 import { existsSync } from 'node:fs'
 import { createLocalReq, getPayload } from 'payload'
 import index from '../src/data/site-index.json'
 import { CATALOG_PROJECTS } from '../../src/lib/catalog/projects'
-import { tiersForProject } from '../../src/lib/catalog/tiers'
+import { normalizeConfigurations } from '../src/config/project-configurations'
 import type { Project } from '../src/payload-types'
 
 if (existsSync('.env')) process.loadEnvFile('.env')
@@ -19,11 +20,7 @@ try {
     const existing = await payload.find({ collection: 'projects', where: { or: [{ importKey: { equals: importKey } }, { slug: { equals: project.slug } }] }, limit: 1, req, overrideAccess: false })
     const tierContent = {
       configurationsImported: true,
-      configurations: project.readyHome ? [] : (tiersForProject({ ...project, priceAmount: existing.docs[0]?.priceAmount ?? project.priceAmount }) ?? []).map(tier => ({
-        key: tier.id as 'start' | 'standard' | 'project', name: tier.name, price: tier.price, lead: tier.lead, mortgage: tier.mortgage,
-        includes: tier.includes.map(text => ({ text })), gifts: tier.gifts?.map(text => ({ text })),
-        details: tier.details.map(detail => ({ title: detail.title, lead: detail.lead, items: detail.items?.map(text => ({ text })), groups: detail.groups?.map(group => ({ title: group.title, items: group.items.map(text => ({ text })) })) })),
-      })),
+      configurations: project.readyHome ? [] : normalizeConfigurations([], project.technology === 'modular' ? 'Модульный' : 'Панельно-каркасный'),
     }
     const content: Partial<Project> & Pick<Project, 'recordType'> = {
       contentImported: true, recordType: project.readyHome ? 'ready-home' : 'project',
@@ -31,7 +28,13 @@ try {
       exteriors: project.exteriors.map(image => ({ image })),
       interiors: project.interiors.map(image => ({ image })),
       floorPlans: project.floorPlans.map(image => ({ image })),
-      plans: project.plans, built: project.built, builtTour: project.builtTour,
+      plans: normalizePlans(project.plans || []),
+      plansContentSource: project.plans?.length ? 'database' : 'mock',
+      built: [
+        ...(project.builtTour ? [{ type: 'video' as const, provider: project.builtTour.video.provider, videoUrl: project.builtTour.video.provider === 'vk' ? `https://vk.com/video${project.builtTour.video.oid}_${project.builtTour.video.id}` : `https://kinescope.io/${project.builtTour.video.id}`, image: project.builtTour.cover, caption: project.builtTour.title }] : []),
+        ...(project.built || []).map(photo => ({ ...photo, type: 'photo' as const })),
+      ],
+      builtTour: project.builtTour,
       about: project.about,
       options: project.options.map(({ id, ...option }) => ({ key: id, ...option })),
       readyHome: project.readyHome ? {

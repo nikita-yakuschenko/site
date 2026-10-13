@@ -1,6 +1,10 @@
+import { resolveProjectPlans } from '../../../lib/catalog/project-plans'
+import { resolveProjectConfigurations } from '../../../lib/catalog/project-configurations'
+import { ProjectHeroPayment } from '../../../components/project-hero-payment'
+import { ProjectSectionTones } from '../../../components/project-section-tones'
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { IconChevronRight } from '@tabler/icons-react'
 import {
   ProjectExteriors,
@@ -14,20 +18,22 @@ import { ProjectSimilar } from '../../../components/project-similar'
 import { ReadyHomeOffer } from '../../../components/ready-home-offer'
 import { ContactsSection } from '../../../components/block-renderer'
 import { MortgageCalculator } from '../../../components/mortgage-calculator'
-import { tiersForProject } from '../../../lib/catalog/tiers'
 import { ProjectActions } from '../../../components/project-actions'
 import { SiteChrome } from '../../../components/site-chrome'
-import { FixtureCatalogProvider } from '../../../lib/catalog/fixture-provider'
+import { ProjectLeadProvider } from '../../../components/project-lead-context'
+import { CmsCatalogProvider } from '../../../lib/catalog/cms-provider'
 import type { CatalogProject } from '../../../lib/catalog/types'
 import { copy, footerAboutFor } from '../../../lib/copy'
-import { getMortgageProgram, monthlyPaymentForProject } from '../../../lib/mortgage'
 import { formatRub } from '../../../lib/locale'
-import { readServerRegionCode } from '../../../lib/regions'
-import { splitProjectName } from '../../../lib/project-name'
+import { resolveProjectHero } from '../../../lib/catalog/project-hero'
+import { resolveProjectExteriors, resolveProjectInteriors } from '../../../lib/catalog/project-exteriors'
+import { resolveProjectBuilt } from '../../../lib/catalog/project-built'
+import { resolveProjectNextSteps } from '../../../lib/catalog/project-next-steps'
+import { ProjectHeroContent } from '../../../components/project-hero-content'
 import { SITE } from '../../../lib/site'
 import { getProjectPageOrder } from '../../../lib/catalog/page-order'
 
-const catalog = new FixtureCatalogProvider()
+const catalog = new CmsCatalogProvider()
 
 export async function generateStaticParams() {
   const { items } = await catalog.list({ siteCode: SITE.code })
@@ -40,24 +46,23 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
-  const project = await catalog.getBySlug(slug, { siteCode: SITE.code })
-  if (!project) return { title: copy.notFound }
-  return { title: project.name, description: project.description }
+  const result = await resolveProjectHero(slug)
+  if (!result) return { title: copy.notFound }
+  return { title: result.hero.name, description: result.project.description }
 }
 
-/**
- * Карточка проекта.
- *
- * Разметка опирается на готовые классы `.project-hero`: кадр на весь первый
- * экран, крошки, значок технологии, заголовок и стеклянная плашка с ТТХ и
- * ценой. Ниже — описание и фасады. Комплектации и планировки появятся
- * вместе с макетом карточки, когда по фото будет понятно, что есть план,
- * а что интерьер.
- */
-export default async function ProjectPage({ params }: { params: Promise<{ slug: string }> }) {
+/** Карточка проекта из CMS с общими и системными блоками. */
+export default async function ProjectPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ cmsPreview?: string }> }) {
   const { slug } = await params
-  const project = await catalog.getBySlug(slug, { siteCode: SITE.code })
-  if (!project) notFound()
+  const result = await resolveProjectHero(slug)
+  if (!result) notFound()
+  const { project, hero, source } = result
+  if (hero.slug !== slug) {
+    const query = await searchParams
+    redirect(`/catalog/${hero.slug}${query.cmsPreview === '1' ? '?cmsPreview=1' : ''}`)
+  }
+  const heroProject = { ...project, name: hero.name, slug: hero.slug }
+  const [exteriors, interiors, built, nextSteps, plans, configurations] = await Promise.all([resolveProjectExteriors(hero.slug), resolveProjectInteriors(hero.slug), resolveProjectBuilt(hero.slug), resolveProjectNextSteps(hero.slug), resolveProjectPlans(hero.slug), resolveProjectConfigurations(hero.slug)])
 
   const pageOrder = await getProjectPageOrder(slug)
   const blockStyle = (key: string) => ({ order: pageOrder.indexOf(key), width: '100%' })
@@ -69,36 +74,13 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
     .slice(0, 6)
 
   const readyHome = project.readyHome
-  const locationDivider = readyHome ? project.name.toLocaleLowerCase('ru').lastIndexOf(' в ') : -1
-  const heroName = locationDivider > 0 ? project.name.slice(0, locationDivider) : project.name
 
-  // Маркировка в заголовке идёт фирменным жёлтым: правило .project-hero h1 span
-  // уже есть в стилях, нужно лишь отделить число от слова.
-  const { head, mark, tail } = splitProjectName(heroName)
+  const tiers = readyHome ? null : configurations ?? []
+  const standardPrice = tiers?.find(tier => tier.id === 'standard')?.price ?? null
 
-  /* Платёж считается на сервере, от самой дешёвой комплектации, доступной
-     в ипотеку: стартовая — это каркас, а банк кредитует дом. Регион
-     берётся серверный, на самой странице ипотеки его можно сменить. */
-  const tiers = readyHome ? null : tiersForProject(project)
-  const mortgagePrices = tiers?.filter((tier) => tier.mortgage).map((tier) => tier.price)
-  const basePrice = mortgagePrices?.length ? Math.min(...mortgagePrices) : null
-  const standardPrice = tiers?.find((tier) => tier.id === 'standard')?.price ?? null
-  const payment = basePrice
-    ? monthlyPaymentForProject({
-        propertyPrice: basePrice,
-        region: readServerRegionCode(),
-        combinedMarketRateOverride: getMortgageProgram('market').rate,
-      })
-    : null
-
-  const specs = [
-    { label: copy.area, value: `${project.area} ${copy.specArea}` },
-    { label: copy.floorsLabel, value: project.floors },
-    { label: copy.bedrooms, value: project.bedrooms },
-    { label: copy.bathrooms, value: project.bathrooms },
-  ]
 
   return (
+    <ProjectLeadProvider project={project}>
     <SiteChrome
       name={SITE.name}
       phone={SITE.contacts.phone}
@@ -119,57 +101,17 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
             <IconChevronRight size={14} stroke={2} aria-hidden="true" />
             {/* Текущая страница — не ссылка: вести с неё на неё же
                 некуда, и aria-current сообщает это программам чтения. */}
-            <span aria-current="page">{project.name}</span>
+            <span aria-current="page">{hero.name}</span>
           </nav>
-          <ProjectActions project={project} stats={{ likes: 0, shares: 0 }} />
+          <ProjectActions project={heroProject} stats={{ likes: 0, shares: 0 }} />
         </>
       }
     >
-      <main style={{ display: 'flex', flexDirection: 'column' }}>
-        <section className="project-hero" data-cms-block="projectHero" style={{ order: -1 }}>
-          <picture className="project-hero__media">
-            {project.slug === 'barnhouse-115' ? (
-              <source
-                media="(max-width: 430px)"
-                srcSet="/catalog/barnhouse-115/hero-mobile.png"
-              />
-            ) : null}
-            <img src={project.imageUrl} alt="" />
-          </picture>
-          <div className="project-hero__veil" />
-          <div className="project-hero__stage">
-            <div className="project-hero__intro">
-              <div className="project-hero__heading">
-                <div className="project-hero__labels">
-                  <p className="project-hero__badge">{project.technologyBadge}</p>
-                  {readyHome ? (
-                    <p className="project-hero__location">
-                      В {readyHome.locationPrepositional ?? readyHome.location}
-                    </p>
-                  ) : null}
-                </div>
-                <h1>
-                  {head}
-                  {mark ? <span>{mark}</span> : null}
-                  {tail}
-                </h1>
-              </div>
-            </div>
-
-            <div className="project-hero__bar">
-              <ul className="project-hero__specs">
-                {specs.map((spec) => (
-                  <li key={spec.label}>
-                    <p>{spec.label}</p>
-                    <strong>{spec.value}</strong>
-                  </li>
-                ))}
-              </ul>
-              {/* Здесь только платёж. Кнопка расчёта убрана, полная цена
-                  тоже: рядом с платежом она шла мелкой строкой и обе цены
-                  проигрывали друг другу. Полной стоимости место ниже по
-                  странице, где под неё можно дать состав комплектации. */}
-              <div className="project-hero__aside">
+      <main data-project-sections style={{ display: 'flex', flexDirection: 'column' }}>
+        <ProjectSectionTones />
+        <section className="project-hero" data-cms-block="projectHero" data-content-source={source} style={{ order: -1 }}>
+          <ProjectHeroContent data={hero} connected={source === 'database'} location={readyHome?.locationPrepositional ?? readyHome?.location} payment={tiers ? <ProjectHeroPayment tiers={tiers} /> :
+              <div key="payment" className="project-hero__aside">
                 {/* Подпись над суммой, как у характеристик слева: без неё
                     число висело само по себе и выбивалось из ряда. */}
                 <p className="project-hero__pay-label">
@@ -178,33 +120,31 @@ export default async function ProjectPage({ params }: { params: Promise<{ slug: 
                 <strong className="project-hero__pay">
                   {readyHome
                     ? formatRub(readyHome.salePrice)
-                    : payment
-                      ? `${formatRub(payment)}${copy.perMonth}`
-                      : project.priceLabel}
+                    : 'Стоимость уточняется'}
                 </strong>
               </div>
-            </div>
-          </div>
+          } />
         </section>
 
 
         {pageOrder.map(key => {
           const blocks: Record<string, React.ReactNode> = {
-            ProjectExteriors: <ProjectExteriors project={project} />,
-            ProjectPlans: <ProjectPlans project={project} />,
-            ProjectInteriors: <ProjectInteriors project={project} />,
-            ProjectBuilt: <ProjectBuilt project={project} />,
+            ProjectExteriors: <ProjectExteriors project={project} images={exteriors ?? undefined} connected={exteriors !== null} />,
+            ProjectPlans: <ProjectPlans project={project} variants={plans ?? undefined} connected={plans !== null} />,
+            ProjectInteriors: <ProjectInteriors project={project} images={interiors ?? undefined} connected={interiors !== null} />,
+            ProjectBuilt: <ProjectBuilt project={project} items={built ?? undefined} />,
             ReadyHomeOffer: readyHome ? <ReadyHomeOffer project={project} /> : null,
-            MortgageCalculator: !readyHome && standardPrice ? <MortgageCalculator projects={[]} initialPropertyPrice={standardPrice} initialProgramId="family" showMatches={false} projectTiers={tiers ?? undefined} showEyebrow={false} /> : null,
-            ProjectConfig: !readyHome ? <ProjectConfig project={project} /> : null,
-            ProjectNextSteps: <ProjectNextSteps readyHome={Boolean(readyHome)} reviewImage={project.imageUrl} visitImage={readyHome?.visitImage} />,
+            MortgageCalculator: !readyHome && tiers ? <MortgageCalculator projects={[]} initialPropertyPrice={standardPrice || undefined} initialProgramId="family" showMatches={false} projectTiers={tiers} showEyebrow={false} /> : null,
+            ProjectConfig: !readyHome ? <ProjectConfig project={heroProject} configurations={configurations ?? []} /> : null,
+            ProjectNextSteps: <ProjectNextSteps readyHome={Boolean(readyHome)} reviewImage={project.imageUrl} visitImage={readyHome?.visitImage} settings={nextSteps} />,
             ProjectSimilar: <ProjectSimilar projects={similarProjects} />,
-            contactsSection: <ContactsSection block={{ blockType: 'contactsSection', showEyebrow: false, muted: false }} contacts={SITE.contacts} siteId={SITE.id} pageId={project.id} />,
+            contactsSection: <ContactsSection block={{ blockType: 'contactsSection', showEyebrow: false, muted: false }} contacts={SITE.contacts} siteId={SITE.id} pageId={project.id} project={{ id: project.id, cmsId: hero.projectId, slug: hero.slug, name: hero.name }} />,
           }
           return blocks[key] ? <div key={key} data-cms-block={key} style={blockStyle(key)}>{blocks[key]}</div> : null
         })}
       </main>
     </SiteChrome>
+    </ProjectLeadProvider>
   )
 }
 

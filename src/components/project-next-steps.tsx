@@ -3,8 +3,9 @@
 import { IconArrowUpRight } from "@tabler/icons-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LeadDialog } from "./lead-dialog";
+import { defaultNextStepsSettings, isNextStepsSettings, type NextStepsSettings } from '../lib/catalog/project-next-steps-data';
 
 /** Два следующих шага после выбора комплектации: увидеть дом и обсудить
  * проект. Они не повторяют форму расчёта выше, а ведут к разным задачам. */
@@ -14,17 +15,28 @@ export function ProjectNextSteps({
   readyHome = false,
   reviewImage,
   visitImage = DEFAULT_VISIT_IMAGE,
+  settings = defaultNextStepsSettings,
 }: {
   readyHome?: boolean;
   reviewImage?: string;
   visitImage?: string;
+  settings?: NextStepsSettings;
 }) {
   const [consultOpen, setConsultOpen] = useState(false);
+  const [draft, setDraft] = useState<NextStepsSettings | null>(null);
+  useEffect(() => {
+    if (window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return;
+    const receive = (event: MessageEvent) => {
+      if (event.source === window.parent && ['http://localhost:3001', 'https://cms.avgst.ru'].includes(event.origin) && event.data?.type === 'avgst:preview-next-steps' && isNextStepsSettings(event.data.settings)) setDraft(event.data.settings);
+    };
+    window.addEventListener('message', receive);
+    return () => window.removeEventListener('message', receive);
+  }, []);
+  const current = draft ?? settings;
   const visitIsDefault = visitImage === DEFAULT_VISIT_IMAGE;
+  if (!current.enabled || (!current.visitEnabled && !current.secondaryEnabled)) return null;
 
-  return (
-    <section className="section project-next-steps" aria-label="Следующие шаги" data-cms-block="ProjectNextSteps">
-      <div className="section__inner project-next-steps__grid">
+  const visitCard = current.visitEnabled ? (
         <Link
           className="project-next-steps__tile project-next-steps__tile--visit"
           href="/exposition"
@@ -50,8 +62,8 @@ export function ProjectNextSteps({
             quality={visitIsDefault ? 75 : 95}
           />
         </Link>
-
-        {readyHome && reviewImage ? (
+        ) : null;
+  const secondaryCard = current.secondaryEnabled ? readyHome && reviewImage ? (
           <Link
             className="project-next-steps__tile project-next-steps__tile--review"
             href="#project-exteriors-title"
@@ -101,10 +113,15 @@ export function ProjectNextSteps({
               sizes="(min-width: 720px) 50vw, 100vw"
             />
           </button>
-        )}
+        ) : null;
+
+  return (
+    <section className="section project-next-steps" aria-label="Следующие шаги" data-cms-block="ProjectNextSteps">
+      <div className="section__inner project-next-steps__grid" style={current.visitEnabled && current.secondaryEnabled ? undefined : { gridTemplateColumns: '1fr' }}>
+        {current.order === 'secondary-first' ? <>{secondaryCard}{visitCard}</> : <>{visitCard}{secondaryCard}</>}
       </div>
 
-      {!readyHome && consultOpen ? <LeadDialog onClose={() => setConsultOpen(false)} /> : null}
+      {!readyHome && current.secondaryEnabled && consultOpen ? <LeadDialog onClose={() => setConsultOpen(false)} /> : null}
     </section>
   );
 }

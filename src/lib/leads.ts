@@ -8,8 +8,13 @@ export const leadInputSchema = z.object({
     .min(10)
     .max(32)
     .regex(/^[+\d][\d\s()-]{8,}$/),
-  siteId: z.number().int().positive(),
-  pageId: z.number().int().positive().optional(),
+  siteId: z.union([z.number().int().positive(), z.string().trim().min(1).max(120)]),
+  pageId: z.union([z.number().int().positive(), z.string().trim().min(1).max(120)]).optional(),
+  projectId: z.number().int().positive().optional(),
+  formId: z.string().trim().min(1).max(120).optional(),
+  sourceUrl: z.string().url().max(2000).optional(),
+  message: z.string().trim().max(5000).optional(),
+  meta: z.record(z.string(), z.unknown()).optional(),
   projectExternalId: z.string().trim().max(120).optional(),
   sourcePath: z.string().trim().max(500).optional(),
   consent: z.literal(true),

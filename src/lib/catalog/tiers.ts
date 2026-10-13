@@ -1,4 +1,5 @@
 import type { CatalogProject } from "./types";
+import { configurationKeys } from './configuration-rules';
 
 /**
  * Комплектации: три уровня, а не набор галочек.
@@ -203,14 +204,27 @@ export const PROJECT_TIERS: readonly ProjectTier[] = [
   },
 ];
 
-export type PricedTier = ProjectTier & { price: number };
+export const TURNKEY_TIER: ProjectTier = {
+  id: 'turnkey', name: 'Под ключ', nameAcc: 'комплектацию под ключ', factor: 0, mortgage: true,
+  lead: 'Чистовая отделка стен, потолков и пола, в ванной — керамогранит, подключены инженерные коммуникации и электрика. Вам остаётся только выбрать мебель.',
+  includes: ['Силовой каркас', 'Кровля', 'Окна по проекту; входные двери', 'Наружная отделка', 'Чистовая отделка стен и потолков: имитация бруса из доски камерной сушки', 'Чистовой настил пола — ламинат', 'Отделка стен и пола ванной комнаты керамогранитом', 'Электрика, водоснабжение, канализация, вентиляция и отопление', 'Терраса', 'Доставка и сборка'],
+  details: [],
+};
+
+export const tierDefinitions = [...PROJECT_TIERS, TURNKEY_TIER];
+
+export type PricedTier = ProjectTier & { price: number; regionalPrices?: Partial<Record<'nn' | 'msk', number>> };
+
+export function tiersForRegion(tiers: readonly PricedTier[], region: 'nn' | 'msk'): PricedTier[] {
+  return tiers.map(tier => ({ ...tier, price: tier.regionalPrices ? tier.regionalPrices[region] ?? 0 : tier.price }));
+}
 
 /** Цена комплектации округляется до тысяч: до рубля её всё равно считает
  *  инженер после выезда, а «2 419 950 ₽» обещает несуществующую точность. */
 export function tiersForProject(project: CatalogProject): PricedTier[] | null {
   const base = project.priceAmount;
   if (!base) return null;
-  return PROJECT_TIERS.map((tier) => ({
+  return configurationKeys(project.technology === 'modular').map(key => tierDefinitions.find(tier => tier.id === key)!).map((tier) => ({
     ...tier,
     price: Math.round((base * tier.factor) / 1000) * 1000,
   }));

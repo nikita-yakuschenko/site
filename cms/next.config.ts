@@ -6,8 +6,8 @@ import { fileURLToPath } from 'node:url'
 const root = path.dirname(fileURLToPath(import.meta.url))
 const config: NextConfig = {
   output: 'standalone',
-  outputFileTracingRoot: root,
-  turbopack: { root },
+  outputFileTracingRoot: path.resolve(root, '..'),
+  turbopack: { root: path.resolve(root, '..') },
   poweredByHeader: false,
   reactStrictMode: true,
   async headers() {

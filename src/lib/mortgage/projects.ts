@@ -16,7 +16,7 @@ export function resolveProjectPrice(project: CatalogProject): number | null {
   if (project.priceAmount != null && project.priceAmount > 0) {
     return project.priceAmount;
   }
-  if (!(project.areaValue > 0)) return null;
+  if (project.cmsId || !(project.areaValue > 0)) return null;
   const perM2 = RUB_PER_M2[project.series] ?? 50_000;
   return Math.round((project.areaValue * perM2) / 50_000) * 50_000;
 }

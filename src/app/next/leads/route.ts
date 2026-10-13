@@ -1,22 +1,17 @@
 import { NextResponse } from 'next/server'
-
+import { allowLeadAttempt, leadInputSchema } from '../../../lib/leads'
 export const dynamic = 'force-dynamic'
-
-/**
- * Приём заявок.
- *
- * Хранить заявку пока негде: базы в контуре нет, коллекция Leads появится
- * вместе с Payload в AV4-10. Отвечаем честной 503 — форма покажет ошибку.
- * Это сознательный выбор: молча принять заявку и потерять её хуже, чем
- * показать, что приём ещё не работает. Контур закрыт от индексации и никуда
- * не ведёт, так что живых обращений здесь быть не должно.
- */
-export function POST() {
-  return NextResponse.json(
-    {
-      error: 'leads-not-ready',
-      message: 'Приём заявок подключается вместе с CMS (AV4-10).',
-    },
-    { status: 503, headers: { 'Cache-Control': 'no-store' } },
-  )
+export async function POST(request: Request) {
+  if (!allowLeadAttempt(request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local')) return NextResponse.json({ error: 'too-many-attempts' }, { status: 429 })
+  let input
+  try { input = leadInputSchema.safeParse(await request.json()) } catch { return NextResponse.json({ error: 'invalid-input' }, { status: 400 }) }
+  if (!input.success || !input.data.formId) return NextResponse.json({ error: 'invalid-input' }, { status: 400 })
+  const key = process.env.CMS_SITE_API_KEY
+  if (!key) return NextResponse.json({ error: 'integration-not-configured' }, { status: 503 })
+  try {
+    const origin = process.env.CMS_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://cms.avgst.ru' : 'http://localhost:3001')
+    const response = await fetch(origin + '/api/lead-submissions/submit', { method: 'POST', headers: { Authorization: 'Bearer ' + key, 'Content-Type': 'application/json' }, body: JSON.stringify(input.data), signal: AbortSignal.timeout(15000), cache: 'no-store' })
+    if (!response.ok) return NextResponse.json({ error: 'delivery-failed' }, { status: response.status === 503 ? 503 : 502 })
+    return NextResponse.json(await response.json(), { headers: { 'Cache-Control': 'no-store' } })
+  } catch { return NextResponse.json({ error: 'delivery-unavailable' }, { status: 502 }) }
 }

@@ -25,6 +25,8 @@ export interface Config {
     blocks: Block;
     forms: Form;
     projects: Project;
+    'project-prices': ProjectPrice;
+    'lead-submissions': LeadSubmission;
     media: Media;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -38,6 +40,8 @@ export interface Config {
     blocks: BlocksSelect<false> | BlocksSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    'project-prices': ProjectPricesSelect<false> | ProjectPricesSelect<true>;
+    'lead-submissions': LeadSubmissionsSelect<false> | LeadSubmissionsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -48,8 +52,12 @@ export interface Config {
     defaultIDType: number;
   };
   fallbackLocale: null;
-  globals: {};
-  globalsSelect: {};
+  globals: {
+    'lead-delivery': LeadDelivery;
+  };
+  globalsSelect: {
+    'lead-delivery': LeadDeliverySelect<false> | LeadDeliverySelect<true>;
+  };
   locale: null;
   widgets: {
     collections: CollectionsWidget;
@@ -158,8 +166,254 @@ export interface Page {
 export interface Block {
   id: number;
   title: string;
-  key: string;
-  source: string;
+  configurationTemplates?: {
+    panel?: {
+      start?: {
+        lead?: string | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      standard?: {
+        lead?: string | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      project?: {
+        lead?: string | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+      };
+    };
+    modular?: {
+      standard?: {
+        lead?: string | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      project?: {
+        lead?: string | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      turnkey?: {
+        lead?: string | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+      };
+    };
+  };
+  key?: string | null;
+  source?: string | null;
   exportName?: string | null;
   defaults?:
     | {
@@ -188,8 +442,8 @@ export interface Block {
 export interface Form {
   id: number;
   title: string;
-  key: string;
-  source: string;
+  key?: string | null;
+  source?: string | null;
   exportName?: string | null;
   defaults?:
     | {
@@ -228,7 +482,13 @@ export interface Project {
     | boolean
     | null;
   name: string;
+  desktopImage?: (number | null) | Media;
   imageUrl?: string | null;
+  /**
+   * До 430 px. Если не задано, используется десктопное изображение.
+   */
+  mobileImage?: (number | null) | Media;
+  mobileImageUrl?: string | null;
   technologyBadge: 'Панельно-каркасный' | 'Модульный';
   series?: ('panel' | 'barn' | 'classic' | 'modular') | null;
   areaValue: number;
@@ -237,7 +497,9 @@ export interface Project {
   bathrooms: number;
   exteriors?:
     | {
-        image: string;
+        photo?: (number | null) | Media;
+        image?: string | null;
+        isPrimary?: boolean | null;
         id?: string | null;
       }[]
     | null;
@@ -249,7 +511,7 @@ export interface Project {
     | null;
   plans?:
     | {
-        label: string;
+        label?: string | null;
         image?: string | null;
         rooms?:
           | {
@@ -258,32 +520,41 @@ export interface Project {
               id?: string | null;
             }[]
           | null;
-        floors?:
-          | {
-              label: string;
-              image: string;
-              rooms?:
-                | {
-                    name: string;
-                    area: string;
-                    id?: string | null;
-                  }[]
-                | null;
-              id?: string | null;
-            }[]
-          | null;
+        floors: {
+          label?: string | null;
+          photo?: (number | null) | Media;
+          image?: string | null;
+          rooms: {
+            name: string;
+            area: string;
+            id?: string | null;
+          }[];
+          id?: string | null;
+        }[];
         id?: string | null;
       }[]
     | null;
   interiors?:
     | {
-        image: string;
+        photo?: (number | null) | Media;
+        image?: string | null;
         id?: string | null;
       }[]
     | null;
   built?:
     | {
-        image: string;
+        type: 'photo' | 'video';
+        isPrimary?: boolean | null;
+        provider?: ('kinescope' | 'vk') | null;
+        /**
+         * Ссылка на ролик Kinescope или VK Видео. Идентификаторы определяются автоматически.
+         */
+        videoUrl?: string | null;
+        /**
+         * Для фото: фотография дома. Для видео: необязательная обложка.
+         */
+        photo?: (number | null) | Media;
+        image?: string | null;
         caption?: string | null;
         id?: string | null;
       }[]
@@ -299,8 +570,11 @@ export interface Project {
   };
   configurations?:
     | {
-        key: 'start' | 'standard' | 'project';
+        key: 'start' | 'standard' | 'project' | 'turnkey';
         name: string;
+        /**
+         * 0 — цена не задана. Региональные цены загружаются в разделе «Прайс» и имеют приоритет.
+         */
         price: number;
         lead?: string | null;
         mortgage?: boolean | null;
@@ -386,7 +660,14 @@ export interface Project {
       | null;
     visitImage?: string | null;
   };
+  nextStepsSettings?: {
+    enabled?: boolean | null;
+    visitEnabled?: boolean | null;
+    secondaryEnabled?: boolean | null;
+    order?: ('visit-first' | 'secondary-first') | null;
+  };
   description?: string | null;
+  searchDescription?: string | null;
   about?:
     | {
         title: string;
@@ -396,8 +677,22 @@ export interface Project {
       }[]
     | null;
   importKey?: string | null;
+  heroContentSource?: ('mock' | 'database') | null;
+  exteriorsContentSource?: ('mock' | 'database') | null;
+  interiorsContentSource?: ('mock' | 'database') | null;
+  plansContentSource?: ('mock' | 'database') | null;
+  builtContentSource?: ('mock' | 'database') | null;
   contentImported?: boolean | null;
   configurationsImported?: boolean | null;
+  legacyConfigurations?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -431,6 +726,41 @@ export interface Media {
       filename?: string | null;
     };
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-prices".
+ */
+export interface ProjectPrice {
+  id: number;
+  lookupKey: string;
+  project: number | Project;
+  configuration: 'start' | 'standard' | 'project' | 'turnkey';
+  region: 'nn' | 'msk';
+  price: number;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-submissions".
+ */
+export interface LeadSubmission {
+  id: number;
+  requestId: string;
+  formId: string;
+  status: 'pending' | 'test' | 'sent' | 'failed';
+  payload:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -475,6 +805,14 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'projects';
         value: number | Project;
+      } | null)
+    | ({
+        relationTo: 'project-prices';
+        value: number | ProjectPrice;
+      } | null)
+    | ({
+        relationTo: 'lead-submissions';
+        value: number | LeadSubmission;
       } | null)
     | ({
         relationTo: 'media';
@@ -578,6 +916,270 @@ export interface PagesSelect<T extends boolean = true> {
  */
 export interface BlocksSelect<T extends boolean = true> {
   title?: T;
+  configurationTemplates?:
+    | T
+    | {
+        panel?:
+          | T
+          | {
+              start?:
+                | T
+                | {
+                    lead?: T;
+                    includes?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    gifts?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    details?:
+                      | T
+                      | {
+                          title?: T;
+                          lead?: T;
+                          items?:
+                            | T
+                            | {
+                                text?: T;
+                                id?: T;
+                              };
+                          groups?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                        };
+                  };
+              standard?:
+                | T
+                | {
+                    lead?: T;
+                    includes?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    gifts?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    details?:
+                      | T
+                      | {
+                          title?: T;
+                          lead?: T;
+                          items?:
+                            | T
+                            | {
+                                text?: T;
+                                id?: T;
+                              };
+                          groups?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                        };
+                  };
+              project?:
+                | T
+                | {
+                    lead?: T;
+                    includes?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    gifts?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    details?:
+                      | T
+                      | {
+                          title?: T;
+                          lead?: T;
+                          items?:
+                            | T
+                            | {
+                                text?: T;
+                                id?: T;
+                              };
+                          groups?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                        };
+                  };
+            };
+        modular?:
+          | T
+          | {
+              standard?:
+                | T
+                | {
+                    lead?: T;
+                    includes?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    gifts?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    details?:
+                      | T
+                      | {
+                          title?: T;
+                          lead?: T;
+                          items?:
+                            | T
+                            | {
+                                text?: T;
+                                id?: T;
+                              };
+                          groups?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                        };
+                  };
+              project?:
+                | T
+                | {
+                    lead?: T;
+                    includes?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    gifts?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    details?:
+                      | T
+                      | {
+                          title?: T;
+                          lead?: T;
+                          items?:
+                            | T
+                            | {
+                                text?: T;
+                                id?: T;
+                              };
+                          groups?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                        };
+                  };
+              turnkey?:
+                | T
+                | {
+                    lead?: T;
+                    includes?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    gifts?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    details?:
+                      | T
+                      | {
+                          title?: T;
+                          lead?: T;
+                          items?:
+                            | T
+                            | {
+                                text?: T;
+                                id?: T;
+                              };
+                          groups?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                        };
+                  };
+            };
+      };
   key?: T;
   source?: T;
   exportName?: T;
@@ -622,7 +1224,10 @@ export interface ProjectsSelect<T extends boolean = true> {
   slug?: T;
   blockOrder?: T;
   name?: T;
+  desktopImage?: T;
   imageUrl?: T;
+  mobileImage?: T;
+  mobileImageUrl?: T;
   technologyBadge?: T;
   series?: T;
   areaValue?: T;
@@ -632,7 +1237,9 @@ export interface ProjectsSelect<T extends boolean = true> {
   exteriors?:
     | T
     | {
+        photo?: T;
         image?: T;
+        isPrimary?: T;
         id?: T;
       };
   floorPlans?:
@@ -657,6 +1264,7 @@ export interface ProjectsSelect<T extends boolean = true> {
           | T
           | {
               label?: T;
+              photo?: T;
               image?: T;
               rooms?:
                 | T
@@ -672,12 +1280,18 @@ export interface ProjectsSelect<T extends boolean = true> {
   interiors?:
     | T
     | {
+        photo?: T;
         image?: T;
         id?: T;
       };
   built?:
     | T
     | {
+        type?: T;
+        isPrimary?: T;
+        provider?: T;
+        videoUrl?: T;
+        photo?: T;
         image?: T;
         caption?: T;
         id?: T;
@@ -786,7 +1400,16 @@ export interface ProjectsSelect<T extends boolean = true> {
             };
         visitImage?: T;
       };
+  nextStepsSettings?:
+    | T
+    | {
+        enabled?: T;
+        visitEnabled?: T;
+        secondaryEnabled?: T;
+        order?: T;
+      };
   description?: T;
+  searchDescription?: T;
   about?:
     | T
     | {
@@ -796,8 +1419,39 @@ export interface ProjectsSelect<T extends boolean = true> {
         id?: T;
       };
   importKey?: T;
+  heroContentSource?: T;
+  exteriorsContentSource?: T;
+  interiorsContentSource?: T;
+  plansContentSource?: T;
+  builtContentSource?: T;
   contentImported?: T;
   configurationsImported?: T;
+  legacyConfigurations?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "project-prices_select".
+ */
+export interface ProjectPricesSelect<T extends boolean = true> {
+  lookupKey?: T;
+  project?: T;
+  configuration?: T;
+  region?: T;
+  price?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-submissions_select".
+ */
+export interface LeadSubmissionsSelect<T extends boolean = true> {
+  requestId?: T;
+  formId?: T;
+  status?: T;
+  payload?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -874,6 +1528,33 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
   batch?: T;
   updatedAt?: T;
   createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-delivery".
+ */
+export interface LeadDelivery {
+  id: number;
+  mode: 'disabled' | 'test' | 'webhook';
+  url?: string | null;
+  /**
+   * Необязательно. Например, CRM_AUTHORIZATION. Значение с токеном задаётся в окружении CMS.
+   */
+  authorizationEnv?: string | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "lead-delivery_select".
+ */
+export interface LeadDeliverySelect<T extends boolean = true> {
+  mode?: T;
+  url?: T;
+  authorizationEnv?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -454,6 +454,7 @@ export function PhotoLightbox({
               {before ? (
                 <Image
                   src={before}
+                  unoptimized={/^https?:\/\//.test(before)}
                   alt=""
                   width={2000}
                   height={1400}
@@ -466,6 +467,7 @@ export function PhotoLightbox({
               <Image
                 key={src}
                 src={src}
+                  unoptimized={/^https?:\/\//.test(src)}
                 alt=""
                 width={2000}
                 height={1400}
@@ -479,6 +481,7 @@ export function PhotoLightbox({
               {after ? (
                 <Image
                   src={after}
+                  unoptimized={/^https?:\/\//.test(after)}
                   alt=""
                   width={2000}
                   height={1400}
@@ -514,7 +517,7 @@ export function PhotoLightbox({
           >
             {images.map((thumb, i) => (
               <button
-                key={thumb}
+                key={`${thumb}-${i}`}
                 type="button"
                 className={
                   i === index
@@ -527,6 +530,7 @@ export function PhotoLightbox({
               >
                 <Image
                   src={thumb}
+                  unoptimized={/^https?:\/\//.test(thumb)}
                   alt=""
                   width={200}
                   height={130}

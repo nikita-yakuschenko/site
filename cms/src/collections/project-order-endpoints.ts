@@ -1,6 +1,6 @@
 import type { Endpoint } from 'payload'
 import { contentWriter } from '../access/staff'
-import { projectBlockOrder, validProjectOrder } from '../config/project-order'
+import { projectBlockOrder, validProjectOrder, completeProjectOrder, normalizeProjectOrder } from '../config/project-order'
 
 export const projectOrderEndpoints: Endpoint[] = [
   { path: '/page-order', method: 'get', handler: async req => {
@@ -10,16 +10,16 @@ export const projectOrderEndpoints: Endpoint[] = [
     const result = await req.payload.find({ collection: 'projects', where: { slug: { equals: slug } }, limit: 1, select: { blockOrder: true }, req, overrideAccess: true })
     const order = result.docs[0]?.blockOrder
     let fallback = projectBlockOrder
-    if (!validProjectOrder(order)) {
+    if (!completeProjectOrder(order)) {
       const templates = await req.payload.find({ collection: 'pages', where: { source: { equals: 'src/app/catalog/[slug]/page.tsx' } }, limit: 1, depth: 1, req, overrideAccess: true })
       const keys = (templates.docs[0]?.layout || []).flatMap(row => {
-        const key = typeof row.component.value === 'object' && 'key' in row.component.value ? row.component.value.key : ''
+        const key = typeof row.component.value === 'object' && 'key' in row.component.value ? row.component.value.key || '' : ''
         const canonical = key === 'ContactsSection' ? 'contactsSection' : key
         return projectBlockOrder.includes(canonical) ? [canonical] : []
       })
       fallback = [...new Set([...keys, ...projectBlockOrder])]
     }
-    return Response.json({ order: validProjectOrder(order) ? order : fallback }, { headers: { 'Cache-Control': 'no-store' } })
+    return Response.json({ order: normalizeProjectOrder(completeProjectOrder(order) ? order : fallback) }, { headers: { 'Cache-Control': 'no-store' } })
   } },
   { path: '/apply-order-to-all', method: 'post', handler: async req => {
     if (!await contentWriter({ req })) return Response.json({ error: 'Нет доступа' }, { status: 403 })

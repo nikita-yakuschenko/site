@@ -3,6 +3,8 @@ import type { AdminViewServerProps } from 'payload'
 import { structure } from '../../config/structure'
 import { PagesIndex } from './PagesIndex'
 import { CatalogIndex } from './CatalogIndex'
+import { PriceImport } from './PriceImport'
+import Link from 'next/link'
 
 async function StructureView({ view, initPageResult }: AdminViewServerProps & { view: typeof structure[number]['key'] }) {
   if (!initPageResult.req.user) redirect('/login')
@@ -13,6 +15,8 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
   const projects = view === 'catalog' ? await initPageResult.req.payload.find({ collection: 'projects', limit: 1000, sort: 'name', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
   return <div className="shadcn-surface flex flex-col gap-6 p-4 lg:p-6">
     <h1 className="text-2xl font-semibold tracking-tight">{item.title}</h1>
+    {view === 'catalog' && <PriceImport />}
+    {view === 'integrations' && <div className="rounded-xl border p-4 flex flex-col gap-3"><h2 className="text-lg font-semibold">Передача заявок</h2><p className="text-sm text-muted-foreground">Формы передают данные общему обработчику. Здесь выбирается тестовый режим или отправка через API / вебхук.</p><Link href="/globals/lead-delivery">Настроить отправку заявок</Link><Link href="/collections/lead-submissions">Посмотреть отправки форм</Link></div>}
     {view === 'pages' && pages && <PagesIndex siteUrl={siteUrl} pages={pages.docs} />}
     {view === 'catalog' && projects && <CatalogIndex siteUrl={siteUrl} projects={projects.docs} />}
   </div>

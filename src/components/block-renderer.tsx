@@ -451,6 +451,7 @@ export function ContactsSection({
   pageId,
   form,
   defaultPlace,
+  project,
 }: {
   block: LayoutBlock;
   contacts?: SiteContacts | null;
@@ -458,6 +459,7 @@ export function ContactsSection({
   pageId?: number | string;
   form?: LayoutBlock | null;
   defaultPlace?: import('../lib/office').ContactPlaceId;
+  project?: { id: string; cmsId?: number; slug: string; name: string };
 }) {
   const useSite = block.useSiteContacts !== false;
   const phone = useSite ? contacts?.phone : (block.phone as string | undefined);
@@ -513,6 +515,10 @@ export function ContactsSection({
         <LeadForm
           siteId={siteId}
           pageId={pageId}
+          formId="contacts-question"
+          projectId={project?.cmsId}
+          projectExternalId={project?.id}
+          meta={project ? { blockKey: 'contactsSection', projectSlug: project.slug, projectName: project.name } : { blockKey: 'contactsSection' }}
           variant="card"
           heading={form?.heading ? String(form.heading) : copy.haveQuestion}
           body={form?.body ? String(form.body) : copy.haveQuestionBody}

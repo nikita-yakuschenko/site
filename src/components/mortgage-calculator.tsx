@@ -13,7 +13,7 @@ import {
 } from "react";
 import { trackEvent } from "../consent/analytics";
 import type { CatalogProject } from "../lib/catalog/types";
-import type { PricedTier } from "../lib/catalog/tiers";
+import { tiersForRegion, type PricedTier } from "../lib/catalog/tiers";
 import {
   DEFAULT_TIER,
   readTier,
@@ -137,7 +137,7 @@ export function MortgageCalculator({
     readServerRegionCode,
   );
   const [constructionRegion, setConstructionRegion] = useState<RegionCode | null>(null);
-  const region = constructionRegion ?? siteRegion;
+  const region = projectTiers ? siteRegion : constructionRegion ?? siteRegion;
   const [childrenCount, setChildrenCount] = useState(1);
   const lead = showMatches
     ? t.lead
@@ -147,7 +147,7 @@ export function MortgageCalculator({
     readTier,
     () => DEFAULT_TIER,
   );
-  const mortgageTiers = projectTiers?.filter((tier) => tier.mortgage);
+  const mortgageTiers = projectTiers ? tiersForRegion(projectTiers, region).filter((tier) => tier.mortgage) : undefined;
   const selectedTier = mortgageTiers?.find((tier) => tier.id === selectedTierId)
     ?? mortgageTiers?.[0];
   /* Форма заявки проявляется на месте карточки результата. */
@@ -159,19 +159,22 @@ export function MortgageCalculator({
   const showFamilyDetails = initialProgramId === "family";
 
   const [propertyPrice, setPropertyPrice] = useState(
-    () => initialPropertyPrice ?? 8_000_000,
+    () => (selectedTier && selectedTier.price > 0 ? selectedTier.price : initialPropertyPrice) ?? 8_000_000,
   );
   const [comfortPayment, setComfortPayment] = useState(60_000);
   const [downPayment, setDownPayment] = useState(() => {
-    const price = initialPropertyPrice ?? 8_000_000;
+    const price = (selectedTier && selectedTier.price > 0 ? selectedTier.price : initialPropertyPrice) ?? 8_000_000;
     return Math.round(price * program.minDownPaymentPercent);
   });
   const [termYears, setTermYears] = useState(program.maxTermYears);
-  const [seenTierId, setSeenTierId] = useState(selectedTier?.id);
-  if (selectedTier && seenTierId !== selectedTier.id) {
-    setSeenTierId(selectedTier.id);
-    setPropertyPrice(selectedTier.price);
-    setDownPayment(Math.round(selectedTier.price * 0.2));
+  const tierSnapshot = selectedTier ? `${region}:${selectedTier.id}:${selectedTier.price}` : '';
+  const [seenTierId, setSeenTierId] = useState(tierSnapshot);
+  if (selectedTier && seenTierId !== tierSnapshot) {
+    setSeenTierId(tierSnapshot);
+    if (selectedTier.price > 0) {
+      setPropertyPrice(selectedTier.price);
+      setDownPayment(Math.round(selectedTier.price * 0.2));
+    }
   }
   /* Своя ставка — только у рыночной: государственной ставки там нет, её
      называет банк, и человек приходит с конкретным предложением на руках.
@@ -391,6 +394,30 @@ export function MortgageCalculator({
       ? program.rate
       : (activeResult.parts[0]?.annualRate ?? program.rate),
   );
+  const tierSelector = mortgageTiers ? (
+    <div className="mortgage-calc__modes mortgage-calc__modes--tiers" role="tablist" aria-label="Комплектация"
+      style={{ '--mortgage-tier-count': mortgageTiers.length } as React.CSSProperties}>
+      <span className="mortgage-calc__tier-label">Комплектация:</span>
+      {mortgageTiers.map(tier => (
+        <button key={tier.id} type="button" role="tab" aria-selected={tier.id === selectedTier?.id}
+          className={tier.id === selectedTier?.id ? 'mortgage-calc__mode is-active' : 'mortgage-calc__mode'}
+          onClick={() => { writeTier(tier.id); if (tier.price > 0) scheduleAnalytics(); }}>
+          {tier.name}
+        </button>
+      ))}
+    </div>
+  ) : null;
+  if (projectTiers && (!selectedTier || selectedTier.price <= 0)) return (
+    <section className="section section--muted mortgage-calc mortgage-calc--project" id="mortgage-calc" aria-labelledby="mortgage-calc-title">
+      <div className="section__inner">
+        <header className="mortgage-calc__head"><h2 id="mortgage-calc-title">Расчёт ипотеки</h2><p className="mortgage-calc__lead">{lead}</p></header>
+        <div className="mortgage-calc__panel"><div className="mortgage-calc__controls">
+          {tierSelector}
+          <p role="status">{selectedTier ? `Комплектация «${selectedTier.name}»: цена для выбранного региона уточняется.` : 'Для выбранного региона стоимость дома уточняется.'} Расчёт станет доступен после определения цены.</p>
+        </div></div>
+      </div>
+    </section>
+  );
   return (
     <section
       className={
@@ -416,32 +443,7 @@ export function MortgageCalculator({
           <div className="mortgage-calc__controls">
             <div className={`mortgage-calc__toolbar${showFamilyDetails ? " mortgage-calc__toolbar--family" : ""}`}>
             {mortgageTiers ? (
-              <div
-                className="mortgage-calc__modes mortgage-calc__modes--tiers"
-                role="tablist"
-                aria-label="Комплектация"
-              >
-                <span className="mortgage-calc__tier-label">Комплектация:</span>
-                {mortgageTiers.map((tier) => (
-                  <button
-                    key={tier.id}
-                    type="button"
-                    role="tab"
-                    aria-selected={tier.id === selectedTier?.id}
-                    className={
-                      tier.id === selectedTier?.id
-                        ? "mortgage-calc__mode is-active"
-                        : "mortgage-calc__mode"
-                    }
-                    onClick={() => {
-                      writeTier(tier.id);
-                      scheduleAnalytics();
-                    }}
-                  >
-                    {tier.name}
-                  </button>
-                ))}
-              </div>
+              tierSelector
             ) : (
               <div
                 className="mortgage-calc__modes"
@@ -489,7 +491,7 @@ export function MortgageCalculator({
                 </Select>
               </span>
               <span className={`mortgage-calc__select-slot mortgage-calc__select-slot--region${programId === "market" || programId === "rural" ? " is-hidden" : ""}`}>
-                <Select value={region} disabled={programId === "market" || programId === "rural"} onValueChange={(value) => { setConstructionRegion(value as RegionCode); scheduleAnalytics(); }}>
+                <Select value={region} disabled={Boolean(projectTiers) || programId === "market" || programId === "rural"} onValueChange={(value) => { setConstructionRegion(value as RegionCode); scheduleAnalytics(); }}>
                   <SelectTrigger aria-label="Регион строительства"><SelectValue /></SelectTrigger>
                   <SelectContent className="mortgage-calc__select-content">
                     <SelectItem value="nn">Нижегородская обл.</SelectItem>
@@ -656,6 +658,7 @@ export function MortgageCalculator({
                 был здесь переписан заново — теперь это общий LeadReveal,
                 которому переданы местные классы раскладки. */}
             <LeadReveal
+              formId="mortgage-calculator"
               siteId={SITE.id}
               label={t.resultCta}
               heading={fm.formHeading}

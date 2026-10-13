@@ -6,6 +6,5 @@ export function ProjectMortgageSummary() {
     const prefix = path.slice(0, -3)
     return { key: field.value, name: fields[`${prefix}name`]?.value as string, price: fields[`${prefix}price`]?.value as number, mortgage: fields[`${prefix}mortgage`]?.value }
   })
-  const price = tiers.find(tier => tier.key === 'standard')?.price
-  return <dl className="shadcn-surface grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm"><dt className="text-muted-foreground">Стоимость для расчёта</dt><dd>{typeof price === 'number' ? `${price.toLocaleString('ru-RU')} ₽` : 'Не задана цена стандартной комплектации'}</dd><dt className="text-muted-foreground">Доступны в ипотеку</dt><dd>{tiers.filter(tier => tier.mortgage).map(tier => tier.name).join(', ') || 'Нет доступных комплектаций'}</dd></dl>
+  return <dl className="shadcn-surface grid grid-cols-[auto_1fr] gap-x-4 gap-y-2 text-sm"><dt className="text-muted-foreground">Стоимость для расчёта</dt><dd>Региональный прайс — для региона, выбранного на сайте</dd><dt className="text-muted-foreground">Доступны в ипотеку</dt><dd>{tiers.filter(tier => tier.key !== 'start').map(tier => tier.name).join(', ') || 'Нет доступных комплектаций'}</dd></dl>
 }

@@ -17,6 +17,7 @@ import { LeadForm } from './lead-form'
  * поэтому высота блока не скачет.
  */
 export function LeadReveal({
+  formId = 'inline-request',
   siteId,
   label,
   heading,
@@ -27,6 +28,7 @@ export function LeadReveal({
   buttonClassName = 'btn btn-yellow',
   children,
 }: {
+  formId?: string
   siteId: number | string
   label: string
   heading: string
@@ -80,7 +82,7 @@ export function LeadReveal({
           >
             <IconX size={14} stroke={2.4} />
           </button>
-          <LeadForm
+          <LeadForm formId={formId}
             siteId={siteId}
             variant="card"
             compact

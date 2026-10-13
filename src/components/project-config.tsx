@@ -10,7 +10,7 @@ import {
   readServerRegionCode,
   subscribeRegion,
 } from "../lib/regions";
-import { tiersForProject } from "../lib/catalog/tiers";
+import { tiersForProject, tiersForRegion, type PricedTier } from "../lib/catalog/tiers";
 import {
   DEFAULT_TIER,
   readTier,
@@ -45,28 +45,29 @@ import {
  * на каждой странице незачем.
  */
 
-export function ProjectConfig({ project }: { project: CatalogProject }) {
-  const tiers = tiersForProject(project);
-  const tierId = useSyncExternalStore(
+export function ProjectConfig({ project, configurations, previewTier, onPreviewTierChange }: { project: CatalogProject; configurations?: PricedTier[]; previewTier?: string; onPreviewTierChange?: (tier: string) => void }) {
+  const persistedTierId = useSyncExternalStore(
     subscribeTier,
     readTier,
     () => DEFAULT_TIER,
   );
+  const tierId = previewTier ?? persistedTierId;
   const region = useSyncExternalStore(
     subscribeRegion,
     readRegionCode,
     readServerRegionCode,
   );
   const [formOpen, setFormOpen] = useState(false);
+  const tiers = configurations ? tiersForRegion(configurations, region) : tiersForProject(project);
 
-  if (!tiers) return null;
-  const tier = tiers.find((item) => item.id === tierId) ?? tiers[1]!;
+  if (!tiers?.length) return null;
+  const tier = tiers.find((item) => item.id === tierId) ?? tiers.find(item => item.id === 'standard') ?? tiers[0]!;
 
   /* Та же модель, что и в калькуляторе карточки: льготная часть ограничена
      лимитом региона, а остаток комбо-кредита считается по ставке из
      переключателя «Рыночная». Масштабировать платёж по цене здесь нельзя. */
   const monthly =
-    tier.mortgage
+    tier.mortgage && tier.price > 0
       ? monthlyPaymentForProject({
           propertyPrice: tier.price,
           region,
@@ -94,12 +95,12 @@ export function ProjectConfig({ project }: { project: CatalogProject }) {
                       : "project-config__tier"
                   }
                   aria-pressed={item.id === tier.id}
-                  onClick={() => writeTier(item.id)}
+                  onClick={() => onPreviewTierChange ? onPreviewTierChange(item.id) : writeTier(item.id)}
                 >
                   <span className="project-config__tier-name">{item.name}</span>
                   <span className="project-config__tier-lead">{item.lead}</span>
                   <span className="project-config__tier-price">
-                    {formatFromRub(item.price)}
+                    {item.price > 0 ? formatFromRub(item.price) : 'Цена уточняется'}
                   </span>
                   <span className="project-config__tier-list">
                     {item.includes.map((line) => (
@@ -139,7 +140,7 @@ export function ProjectConfig({ project }: { project: CatalogProject }) {
             <p className="project-config__total-label">
               {tier.name} {copy.configTierWord}
             </p>
-            <p className="project-config__total-sum">{formatRub(tier.price)}</p>
+            <p className="project-config__total-sum">{tier.price > 0 ? formatRub(tier.price) : 'Цена уточняется'}</p>
             {/* Строка под суммой есть всегда: без неё панель у стартовой
                 схлопывается и выглядит обрезанной. Там, где ипотеки нет,
                 её место занимает факт о доставке — он верен для всех
@@ -179,10 +180,10 @@ export function ProjectConfig({ project }: { project: CatalogProject }) {
               читается как общий для дома, а он у каждой комплектации
               свой. Ключ по уровню — чтобы при переключении список
               собрался заново и первый пункт снова был раскрыт. */}
-        <h3 className="project-config__details-title">
+        {tier.details.length > 0 && <><h3 className="project-config__details-title">
           {copy.configDetails}{" "}
           <span className="project-config__details-mark">
-            {tier.nameAcc} {copy.configTierWordAcc}
+            {tier.id === 'turnkey' ? 'комплектацию под ключ' : `${tier.nameAcc} ${copy.configTierWordAcc}`}
           </span>
         </h3>
         {/* Здесь список начинается свёрнутым, хотя обычно первый
@@ -226,7 +227,7 @@ export function ProjectConfig({ project }: { project: CatalogProject }) {
               </AccordionContent>
             </AccordionItem>
           ))}
-        </Accordion>
+        </Accordion></>}
       </div>
     </section>
   );

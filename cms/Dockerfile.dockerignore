@@ -1,0 +1,16 @@
+**
+!cms
+!cms/**
+!src
+!src/lib
+!src/lib/**
+**/node_modules
+**/.next
+**/.env
+**/.env.*
+**/media
+**/*.log
+**/*.tsbuildinfo
+cms/tests
+cms/audit.local.json
+cms/scripts/import-site.ts

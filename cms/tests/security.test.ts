@@ -94,3 +94,19 @@ test('health is a minimal DB-independent liveness response', async () => {
   assert.equal(response.headers.get('Cache-Control'), 'no-store')
   assert.deepEqual(await response.json(), { status: 'ok' })
 })
+
+test('anonymous media access is limited to images referenced by connected public blocks', async () => {
+  const media = createMedia({ directory: './media', uploadsEnabled: true })
+  const req = {
+    user: null,
+    payload: { find: async (query: { where: unknown; select: unknown; depth: number }) => {
+      assert.deepEqual(query.where, { or: [{ heroContentSource: { equals: 'database' } }, { exteriorsContentSource: { equals: 'database' } }, { interiorsContentSource: { equals: 'database' } }, { builtContentSource: { equals: 'database' } }, { plansContentSource: { equals: 'database' } }] })
+      assert.deepEqual(query.select, { heroContentSource: true, exteriorsContentSource: true, interiorsContentSource: true, builtContentSource: true, plansContentSource: true, plans: true, desktopImage: true, mobileImage: true, exteriors: true, interiors: true, built: true })
+      assert.equal(query.depth, 0)
+      return { docs: [{ heroContentSource: 'database', desktopImage: 5, mobileImage: 9 }, { heroContentSource: 'mock', desktopImage: 99, exteriorsContentSource: 'database', exteriors: [{ photo: 12 }] }, { interiorsContentSource: 'database', interiors: [{ photo: 14 }], exteriors: [{ photo: 98 }] }, { builtContentSource: 'database', built: [{ type: 'photo', photo: 16 }, { type: 'video', photo: 17 }] }, { builtContentSource: 'mock', built: [{ photo: 97 }] }, { plansContentSource: 'database', plans: [{ floors: [{ photo: 21 }, { photo: 22 }] }] }, { plansContentSource: 'mock', plans: [{ floors: [{ photo: 96 }] }] }]  }
+    } },
+  } as unknown as PayloadRequest
+  assert.deepEqual(await media.access!.read!({ req }), { id: { in: [5, 9, 12, 14, 16, 17, 21, 22] } })
+  req.payload.find = (async () => ({ docs: [] })) as unknown as typeof req.payload.find
+  assert.equal(await media.access!.read!({ req }), false)
+})

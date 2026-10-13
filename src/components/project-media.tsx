@@ -1,7 +1,8 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { isHeroImage } from "../lib/catalog/project-hero-data";
 import { copy } from "../lib/copy";
 import { PhotoLightbox } from "./photo-lightbox";
 import type { CatalogProject } from "../lib/catalog/types";
@@ -34,10 +35,24 @@ import type { CatalogProject } from "../lib/catalog/types";
  *  остальное прячется за подписью «+N ещё фото» на последней. */
 const GALLERY_TILES = 6;
 
+function useGalleryImages(gallery: 'exteriors' | 'interiors', connected: boolean, images: string[]) {
+  const [draft, setDraft] = useState<string[] | null>(null);
+  useEffect(() => {
+    if (!connected || window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return;
+    const allowed = new Set(['http://localhost:3001', 'https://cms.avgst.ru']);
+    const receive = (event: MessageEvent) => {
+      if (event.source === window.parent && allowed.has(event.origin) && event.data?.type === `avgst:preview-${gallery}` && Array.isArray(event.data.images) && event.data.images.every(isHeroImage)) setDraft(event.data.images);
+    };
+    window.addEventListener('message', receive);
+    return () => window.removeEventListener('message', receive);
+  }, [connected, gallery]);
+  return draft ?? images;
+}
+
 /** Фасады. Первый кадр крупный: ряд одинаковых прямоугольников не
  *  говорит, какой из них главный. */
-export function ProjectExteriors({ project }: { project: CatalogProject }) {
-  const shots = project.exteriors;
+export function ProjectExteriors({ project, images, connected = false }: { project: CatalogProject; images?: string[]; connected?: boolean }) {
+  const shots = useGalleryImages('exteriors', connected, images ?? project.exteriors);
   const [open, setOpen] = useState<number | null>(null);
   if (!shots.length) return null;
 
@@ -61,7 +76,7 @@ export function ProjectExteriors({ project }: { project: CatalogProject }) {
               .join(" ");
             return (
               <button
-                key={src}
+                key={`${src}-${index}`}
                 type="button"
                 className={classes || undefined}
                 aria-label={
@@ -71,6 +86,7 @@ export function ProjectExteriors({ project }: { project: CatalogProject }) {
               >
                 <Image
                   src={src}
+                  unoptimized={/^https?:\/\//.test(src)}
                   alt=""
                   width={1600}
                   height={1000}
@@ -90,7 +106,7 @@ export function ProjectExteriors({ project }: { project: CatalogProject }) {
         </div>
       </div>
 
-      {open !== null ? (
+      {open !== null && open < shots.length ? (
         <PhotoLightbox
           images={shots}
           index={open}
@@ -103,8 +119,8 @@ export function ProjectExteriors({ project }: { project: CatalogProject }) {
 }
 
 /** Интерьеры. Шесть плиток; остальные кадры — за последней. */
-export function ProjectInteriors({ project }: { project: CatalogProject }) {
-  const shots = project.interiors;
+export function ProjectInteriors({ project, images, connected = false }: { project: CatalogProject; images?: string[]; connected?: boolean }) {
+  const shots = useGalleryImages('interiors', connected, images ?? project.interiors);
   const [open, setOpen] = useState<number | null>(null);
   if (!shots.length) return null;
 
@@ -126,7 +142,7 @@ export function ProjectInteriors({ project }: { project: CatalogProject }) {
             const cls = last ? "project-rows__rest" : "";
             return (
               <button
-                key={src}
+                key={`${src}-${index}`}
                 type="button"
                 className={cls || undefined}
                 aria-label={last ? `${copy.galleryRest} ${rest}` : copy.galleryOpen}
@@ -136,6 +152,7 @@ export function ProjectInteriors({ project }: { project: CatalogProject }) {
                   src={src}
                   alt=""
                   width={1400}
+                  unoptimized={/^https?:\/\//.test(src)}
                   height={900}
                   sizes="(min-width: 900px) 33vw, 50vw"
                 />
@@ -151,7 +168,7 @@ export function ProjectInteriors({ project }: { project: CatalogProject }) {
         </div>
       </div>
 
-      {open !== null ? (
+      {open !== null && open < shots.length ? (
         <PhotoLightbox
           images={shots}
           index={open}
