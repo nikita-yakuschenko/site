@@ -387,6 +387,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   const data = { title: 'Комплектации', key: 'ProjectConfig', source: 'src/components/project-config.tsx', exportName: 'ProjectConfig', configurationTemplates: defaultConfigurationTemplates() }
   if (found.docs[0]) await payload.update({ collection: 'blocks', id: found.docs[0].id, data: { configurationTemplates: data.configurationTemplates }, req, overrideAccess: true })
   else await payload.create({ collection: 'blocks', data, req, overrideAccess: true })
+  const projects = await payload.find({ collection: 'projects', pagination: false, depth: 0, req, overrideAccess: true })
+  for (const project of projects.docs) {
+    if (project.recordType !== 'ready-home') await payload.update({ collection: 'projects', id: project.id, data: { configurations: project.configurations || [], technologyBadge: project.technologyBadge }, req, overrideAccess: true })
+  }
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {

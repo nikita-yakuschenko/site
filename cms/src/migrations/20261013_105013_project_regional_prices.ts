@@ -1,6 +1,6 @@
 import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
-export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
+export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
    CREATE TYPE "public"."enum_project_prices_configuration" AS ENUM('start', 'standard', 'project', 'turnkey');
   CREATE TYPE "public"."enum_project_prices_region" AS ENUM('nn', 'msk');
@@ -28,10 +28,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "project_prices_created_at_idx" ON "project_prices" USING btree ("created_at");
   ALTER TABLE "payload_locked_documents_rels" ADD CONSTRAINT "payload_locked_documents_rels_project_prices_fk" FOREIGN KEY ("project_prices_id") REFERENCES "public"."project_prices"("id") ON DELETE cascade ON UPDATE no action;
   CREATE INDEX "payload_locked_documents_rels_project_prices_id_idx" ON "payload_locked_documents_rels" USING btree ("project_prices_id");`)
-  const projects = await payload.find({ collection: 'projects', pagination: false, depth: 0, req, overrideAccess: true })
-  for (const project of projects.docs) {
-    if (project.recordType !== 'ready-home') await payload.update({ collection: 'projects', id: project.id, data: { configurations: project.configurations || [], technologyBadge: project.technologyBadge }, req, overrideAccess: true })
-  }
+  // Project normalization runs after all schema migrations: the current Payload
+  // model already includes columns introduced by later migrations.
 }
 
 export async function down({ db, payload, req }: MigrateDownArgs): Promise<void> {
