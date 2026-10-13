@@ -2,6 +2,7 @@ import type { Endpoint } from 'payload'
 import { authorizeSiteRequest } from './project-hero-endpoint'
 import { configurationTiers } from '../../../src/lib/catalog/project-configurations-data'
 import { sharedConfigurationContent } from '../../../src/lib/catalog/configuration-content'
+import { isPublicPriceKind } from '../config/price-kinds'
 
 export const projectConfigurationsEndpoint: Endpoint = {
   path: '/configurations', method: 'get', handler: async req => {
@@ -14,7 +15,7 @@ export const projectConfigurationsEndpoint: Endpoint = {
     const record = result.docs[0]
     if (!record || !configurationTiers(record.configurations || [], record.technologyBadge)) return Response.json({ error: 'Комплектации не настроены' }, { status: 404 })
     const prices = await req.payload.find({ collection: 'project-prices', where: { project: { equals: record.id } }, pagination: false, depth: 0, req, overrideAccess: true })
-    const configurations = (record.configurations || []).map(row => ({ key: row.key, price: row.price, regionalPrices: Object.fromEntries(prices.docs.filter(price => price.configuration === row.key).map(price => [price.region, price.price])) }))
+    const configurations = (record.configurations || []).map(row => ({ key: row.key, price: row.price, regionalPrices: Object.fromEntries(prices.docs.filter(price => price.configuration === row.key && isPublicPriceKind(price.region)).map(price => [price.region, price.price])) }))
     // Legacy project prices belong only to NN; never substitute them for another region.
     for (const row of configurations) if (!('nn' in row.regionalPrices) && row.price > 0) row.regionalPrices.nn = row.price
     const blocks = await req.payload.find({ collection: 'blocks', where: { key: { equals: 'ProjectConfig' } }, limit: 1, depth: 0, req, overrideAccess: true })

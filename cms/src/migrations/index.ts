@@ -18,6 +18,7 @@ import * as migration_20261013_084741_project_plans_media from './20261013_08474
 import * as migration_20261013_105013_project_regional_prices from './20261013_105013_project_regional_prices';
 import * as migration_20261013_115324_catalog_and_lead_delivery from './20261013_115324_catalog_and_lead_delivery';
 import * as migration_20261013_121931_shared_block_configurations from './20261013_121931_shared_block_configurations';
+import * as migration_20261013_204953_price_kinds from './20261013_204953_price_kinds';
 
 export const migrations = [
   {
@@ -118,6 +119,11 @@ export const migrations = [
   {
     up: migration_20261013_121931_shared_block_configurations.up,
     down: migration_20261013_121931_shared_block_configurations.down,
-    name: '20261013_121931_shared_block_configurations'
+    name: '20261013_121931_shared_block_configurations',
+  },
+  {
+    up: migration_20261013_204953_price_kinds.up,
+    down: migration_20261013_204953_price_kinds.down,
+    name: '20261013_204953_price_kinds'
   },
 ];

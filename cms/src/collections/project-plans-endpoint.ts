@@ -1,6 +1,6 @@
 import type { Endpoint } from 'payload'
 import { authorizeSiteRequest } from './project-hero-endpoint'
-import { floorName } from '../config/project-plans'
+import { floorName, variantName } from '../config/project-plans'
 export const projectPlansEndpoint: Endpoint = {
   path: '/plans', method: 'get', handler: async req => {
     const denied = authorizeSiteRequest(req)
@@ -11,7 +11,7 @@ export const projectPlansEndpoint: Endpoint = {
       where: { and: [{ plansContentSource: { equals: 'database' } }, { or: [{ slug: { equals: slug } }, { importKey: { equals: `catalog:${slug}` } }] }] }, select: { plans: true } })
     const record = result.docs[0]
     if (!record) return Response.json({ error: 'Планировки не подключены' }, { status: 404 })
-    const variants = (record.plans || []).map((variant, index) => ({ label: variant.label?.trim() || `Вариант ${index + 1}`,
+    const variants = (record.plans || []).map((variant, index) => ({ label: variantName(index),
       floors: (variant.floors || []).map((floor, floorIndex) => ({ label: floorName(floor.label, floorIndex),
         image: typeof floor.photo === 'object' && floor.photo?.url ? new URL(floor.photo.url, process.env.CMS_PUBLIC_URL).href : floor.image,
         rooms: (floor.rooms || []).map(room => ({ name: room.name, area: room.area })),

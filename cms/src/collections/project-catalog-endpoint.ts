@@ -2,6 +2,7 @@ import type { Endpoint } from 'payload'
 import { authorizeSiteRequest } from './project-hero-endpoint'
 import { isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
 import type { CatalogProject } from '../../../src/lib/catalog/types'
+import { isPublicPriceKind } from '../config/price-kinds'
 
 export const projectCatalogEndpoint: Endpoint = {
   path: '/catalog', method: 'get', handler: async req => {
@@ -19,7 +20,7 @@ export const projectCatalogEndpoint: Endpoint = {
       const modular = isModularTechnology(record.technologyBadge)
       const importedPrice = prices.docs.find(row => (typeof row.project === 'number' ? row.project : row.project.id) === record.id && row.configuration === 'standard' && row.region === 'nn')?.price
       const price = record.recordType === 'ready-home' ? record.readyHome?.salePrice : importedPrice ?? record.configurations?.find(row => row.key === 'standard')?.price ?? record.priceAmount
-      const regionalPrices = Object.fromEntries(prices.docs.filter(row => (typeof row.project === 'number' ? row.project : row.project.id) === record.id && row.configuration === 'standard').map(row => [row.region, row.price]))
+      const regionalPrices = Object.fromEntries(prices.docs.filter(row => (typeof row.project === 'number' ? row.project : row.project.id) === record.id && row.configuration === 'standard' && isPublicPriceKind(row.region)).map(row => [row.region, row.price]))
       if (!('nn' in regionalPrices) && price && price > 0) regionalPrices.nn = price
       return {
         id: record.importKey?.replace(/^catalog:/, '') || `cms:${record.id}`, cmsId: record.id, slug: record.slug, name: record.name, href: `/catalog/${record.slug}`,

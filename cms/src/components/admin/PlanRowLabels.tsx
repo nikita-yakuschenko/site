@@ -1,10 +1,11 @@
 'use client'
 import { useRowLabel } from '@payloadcms/ui'
+import { floorName, variantName } from '../../config/project-plans'
 export function PlanVariantRowLabel() {
-  const { data, rowNumber } = useRowLabel<{ label?: string }>()
-  return <span>{data?.label?.trim() || `Вариант ${(rowNumber ?? 0) + 1}`}</span>
+  const { rowNumber } = useRowLabel()
+  return <span>{variantName(rowNumber ?? 0)}</span>
 }
 export function PlanFloorRowLabel() {
-  const { data, rowNumber } = useRowLabel<{ label?: string }>()
-  return <span>{data?.label?.trim() || `${(rowNumber ?? 0) + 1} этаж`}</span>
+  const { rowNumber } = useRowLabel()
+  return <span>{floorName(null, rowNumber ?? 0)}</span>
 }

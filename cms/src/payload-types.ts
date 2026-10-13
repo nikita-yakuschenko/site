@@ -547,12 +547,9 @@ export interface Project {
         isPrimary?: boolean | null;
         provider?: ('kinescope' | 'vk') | null;
         /**
-         * Ссылка на ролик Kinescope или VK Видео. Идентификаторы определяются автоматически.
+         * Платформа определяется по ссылке автоматически.
          */
         videoUrl?: string | null;
-        /**
-         * Для фото: фотография дома. Для видео: необязательная обложка.
-         */
         photo?: (number | null) | Media;
         image?: string | null;
         caption?: string | null;
@@ -702,8 +699,14 @@ export interface Project {
  */
 export interface Media {
   id: number;
-  alt: string;
-  title: string;
+  /**
+   * Если пусто, подставится имя файла.
+   */
+  alt?: string | null;
+  /**
+   * Если пусто, подставится имя файла.
+   */
+  title?: string | null;
   description?: string | null;
   updatedAt: string;
   createdAt: string;
@@ -736,7 +739,7 @@ export interface ProjectPrice {
   lookupKey: string;
   project: number | Project;
   configuration: 'start' | 'standard' | 'project' | 'turnkey';
-  region: 'nn' | 'msk';
+  region: 'msk' | 'nn' | 'special' | 'dealer';
   price: number;
   updatedAt: string;
   createdAt: string;

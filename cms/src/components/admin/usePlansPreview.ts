@@ -1,11 +1,11 @@
 'use client'
 import { useFormFields } from '@payloadcms/ui'
 import { useEffect, useRef, type RefObject } from 'react'
-import { floorName } from '../../config/project-plans'
+import { floorName, variantName } from '../../config/project-plans'
 type Draft = { label: string; floors: { label: string; image: string; rooms: { name: string; area: string }[] }[] }
 export function usePlansPreview(project: boolean, frame: RefObject<HTMLIFrameElement | null>, origin: string) {
   const rows = useFormFields(([fields]) => project && (fields.plansContentSource?.value === 'database' || (fields.plans?.rows?.length ?? 0) > 0) ? (fields.plans?.rows || []).map((_, index) => ({
-    label: String(fields[`plans.${index}.label`]?.value || `Вариант ${index + 1}`),
+    label: variantName(index),
     floors: (fields[`plans.${index}.floors`]?.rows || []).map((_, floorIndex) => {
       const path = `plans.${index}.floors.${floorIndex}`
       return { label: floorName(fields[`${path}.label`]?.value as string, floorIndex), photo: fields[`${path}.photo`]?.value, image: fields[`${path}.image`]?.value,

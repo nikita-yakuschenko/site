@@ -7,7 +7,7 @@ import { projectHeroEndpoint } from './project-hero-endpoint'
 import { projectExteriorsEndpoint } from './project-exteriors-endpoint'
 import { projectInteriorsEndpoint } from './project-interiors-endpoint'
 import { projectBuiltEndpoint } from './project-built-endpoint'
-import { parseBuiltVideo } from '../config/built-media'
+import { detectBuiltVideo } from '../config/built-media'
 import { projectPlansEndpoint } from './project-plans-endpoint'
 import { normalizePlans, validRoomArea } from '../config/project-plans'
 import { projectNextStepsEndpoint } from './project-next-steps-endpoint'
@@ -20,11 +20,12 @@ const imageFields: Field[] = [
   { name: 'image', label: 'Изображение', type: 'text', required: true },
   { name: 'thumbnail', type: 'ui', admin: { components: { Field: './components/admin/ProjectImageField#ProjectImage' } } },
 ]
-const rooms: Field = { name: 'rooms', label: 'Экспликация', required: true, minRows: 1, labels: { singular: 'Помещение', plural: 'Помещения' }, type: 'array', admin: { initCollapsed: true }, fields: [
+const rooms: Field = { name: 'rooms', label: 'Экспликация', required: true, minRows: 1, labels: { singular: 'Помещение', plural: 'Помещения' }, type: 'array', admin: { initCollapsed: true, components: { Field: './components/admin/RoomsTable#RoomsTable' } }, fields: [
   { type: 'row', fields: [{ name: 'name', label: 'Название', type: 'text', required: true }, { name: 'area', label: 'Площадь, м²', type: 'text', required: true, validate: (value: unknown) => validRoomArea(value) ? true : 'Укажите площадь больше нуля' }] },
 ] }
 const integerCount = (minimum: number) => (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= minimum ? true : "Укажите целое число не меньше " + minimum
 const focus = (previewKey: string, previewTitle: string): Field => ({ name: `${previewKey}Preview`, type: 'ui', custom: { previewKey, previewTitle }, admin: { components: { Field: './components/admin/ProjectSectionPreview#ProjectSectionPreview' } } })
+const galleryBatch = (target: 'exteriors' | 'interiors' | 'built') => ({ path: './components/admin/ProjectImageUpload#GalleryBatchUpload', clientProps: { target } })
 
 export const Projects: CollectionConfig = {
   slug: 'projects',
@@ -38,7 +39,10 @@ export const Projects: CollectionConfig = {
     if (Array.isArray(data?.interiors)) data.interiors = data.interiors.map((row: { photo?: unknown; image?: string }) => ({ ...row, image: row.photo ? null : row.image }))
     if (Array.isArray(data?.built)) {
       const primary = Math.max(0, data.built.findIndex((row: { isPrimary?: boolean }) => row.isPrimary))
-      data.built = data.built.map((row: { photo?: unknown; image?: string }, index: number) => ({ ...row, image: row.photo ? null : row.image, isPrimary: index === primary }))
+      data.built = data.built.map((row: { photo?: unknown; image?: string; type?: string; videoUrl?: string }, index: number) => {
+        const video = row.type === 'video' ? detectBuiltVideo(row.videoUrl) : null
+        return { ...row, image: row.photo ? null : row.image, isPrimary: index === primary, ...(row.type === 'video' ? { provider: video?.provider ?? null } : { provider: null, videoUrl: null }) }
+      })
     }
     if (Array.isArray(data?.exteriors) && data.exteriors.length) {
       const primary = Math.max(0, data.exteriors.findIndex((row: { isPrimary?: boolean }) => row.isPrimary))
@@ -85,7 +89,7 @@ export const Projects: CollectionConfig = {
       { name: 'mobileImage', label: 'Изображение главного экрана: мобильное', type: 'upload', relationTo: 'media', admin: { description: 'До 430 px. Если не задано, используется десктопное изображение.', components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
       { name: 'mobileImageUrl', type: 'text', admin: { hidden: true } },
       { name: 'mobileHeroThumbnail', type: 'ui', admin: { components: { Field: './components/admin/ProjectImageField#ProjectMobileHeroImage' } } },
-      { type: 'row', fields: [
+      { type: 'row', admin: { className: 'project-choice-row' }, fields: [
         { name: 'technologyBadge', label: 'Технология', type: 'select', required: true, options: [{ label: 'Панельно-каркасная', value: 'Панельно-каркасный' }, { label: 'Модульная', value: 'Модульный' }] },
         { name: 'series', label: 'Серия', type: 'select', options: [{ label: 'Панельные', value: 'panel' }, { label: 'Барнхаусы', value: 'barn' }, { label: 'Классические', value: 'classic' }, { label: 'Модульные', value: 'modular' }] },
       ] },
@@ -96,9 +100,9 @@ export const Projects: CollectionConfig = {
         { name: 'bathrooms', label: 'Санузлы', type: 'number', required: true, min: 0, validate: integerCount(0), admin: { step: 1, width: '25%' } },
       ] },
     ] },
-    { type: 'collapsible', label: 'Фасады', admin: { initCollapsed: true }, fields: [focus('ProjectExteriors', 'Фасады'), {
-      name: 'exteriors', label: 'Фотографии фасадов', labels: { singular: 'Фотография', plural: 'Фотографии' }, type: 'array',
-      admin: { initCollapsed: true, components: { RowLabel: './components/admin/ExteriorRowLabel#ExteriorRowLabel' } },
+    { type: 'collapsible', label: 'Рендеры фасадов', admin: { initCollapsed: true }, fields: [focus('ProjectExteriors', 'Рендеры фасадов'), {
+      name: 'exteriors', label: 'Рендеры фасадов', labels: { singular: 'Рендер', plural: 'Рендеры' }, type: 'array',
+      admin: { className: 'gallery-attachments', initCollapsed: true, components: { beforeInput: [galleryBatch('exteriors')], RowLabel: './components/admin/ExteriorRowLabel#ExteriorRowLabel' } },
       fields: [
         { name: 'photo', label: 'Изображение', type: 'upload', relationTo: 'media', validate: (value: unknown, { siblingData }: { siblingData?: { image?: string } }) => value || siblingData?.image ? true : 'Загрузите или выберите изображение', admin: { components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
         { name: 'image', type: 'text', admin: { hidden: true } },
@@ -109,13 +113,13 @@ export const Projects: CollectionConfig = {
     { type: 'collapsible', label: 'Планировки', admin: { initCollapsed: true }, fields: [
       focus('ProjectPlans', 'Планировки'),
       { name: 'floorPlans', type: 'array', admin: { hidden: true }, fields: imageFields },
-      { name: 'plans', label: 'Варианты планировки', labels: { singular: 'Вариант', plural: 'Варианты' }, type: 'array', admin: { initCollapsed: true, components: { RowLabel: './components/admin/PlanRowLabels#PlanVariantRowLabel' } }, fields: [
-        { name: 'label', label: 'Название варианта (необязательно)', type: 'text', admin: { placeholder: 'По умолчанию — Вариант 1, Вариант 2…' } },
+      { name: 'plans', label: 'Варианты планировки', labels: { singular: 'вариант', plural: 'Варианты' }, type: 'array', admin: { initCollapsed: true, components: { RowLabel: './components/admin/PlanRowLabels#PlanVariantRowLabel' } }, fields: [
+        { name: 'label', type: 'text', admin: { hidden: true } },
         { name: 'image', type: 'text', admin: { hidden: true } },
         { ...rooms, required: false, minRows: undefined, admin: { hidden: true } },
-        { name: 'floors', label: 'Этажи', labels: { singular: 'Этаж', plural: 'Этажи' }, type: 'array', required: true, minRows: 1, defaultValue: [{ label: null, rooms: [] }],
+        { name: 'floors', label: 'Этажи', labels: { singular: 'этаж', plural: 'Этажи' }, type: 'array', required: true, minRows: 1, defaultValue: [{ label: null, rooms: [] }],
           admin: { initCollapsed: false, components: { RowLabel: './components/admin/PlanRowLabels#PlanFloorRowLabel' } }, fields: [
-            { name: 'label', label: 'Другое название этажа (необязательно)', type: 'text', admin: { placeholder: 'Например, мансарда' } },
+            { name: 'label', type: 'text', admin: { hidden: true } },
             { name: 'photo', label: 'Планировка этажа', type: 'upload', relationTo: 'media', validate: (value: unknown, { siblingData }: { siblingData?: { image?: string } }) => value || siblingData?.image ? true : 'Загрузите планировку этажа', admin: { components: { Field: { path: './components/admin/ProjectImageUpload#ProjectImageUpload', clientProps: { imageKind: 'plan' } } } } },
             { name: 'image', type: 'text', admin: { hidden: true } },
             { name: 'thumbnail', type: 'ui', admin: { components: { Field: './components/admin/ProjectImageField#ProjectExteriorImage' } } },
@@ -124,8 +128,8 @@ export const Projects: CollectionConfig = {
         },
       ] },
     ] },
-    { type: 'collapsible', label: 'Интерьеры', admin: { initCollapsed: true }, fields: [focus('ProjectInteriors', 'Интерьеры'), {
-      name: 'interiors', label: 'Фотографии интерьеров', labels: { singular: 'Фотография', plural: 'Фотографии' }, type: 'array', admin: { initCollapsed: true },
+    { type: 'collapsible', label: 'Рендеры интерьеров', admin: { initCollapsed: true }, fields: [focus('ProjectInteriors', 'Рендеры интерьеров'), {
+      name: 'interiors', label: 'Рендеры интерьеров', labels: { singular: 'Рендер', plural: 'Рендеры' }, type: 'array', admin: { className: 'gallery-attachments', initCollapsed: true, components: { beforeInput: [galleryBatch('interiors')] } },
       fields: [
         { name: 'photo', label: 'Изображение', type: 'upload', relationTo: 'media', validate: (value: unknown, { siblingData }: { siblingData?: { image?: string } }) => value || siblingData?.image ? true : 'Загрузите или выберите изображение', admin: { components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
         { name: 'image', type: 'text', admin: { hidden: true } },
@@ -134,12 +138,12 @@ export const Projects: CollectionConfig = {
     }] },
     { type: 'collapsible', label: 'Построенные дома', admin: { initCollapsed: true }, fields: [
       focus('ProjectBuilt', 'Построенные дома'),
-      { name: 'built', label: 'Фото и видео', labels: { singular: 'Запись', plural: 'Записи' }, type: 'array', admin: { initCollapsed: true, components: { RowLabel: './components/admin/BuiltRowLabel#BuiltRowLabel' } }, fields: [
-        { name: 'type', label: 'Тип записи', type: 'select', required: true, defaultValue: 'photo', options: [{ label: 'Фото', value: 'photo' }, { label: 'Видео', value: 'video' }] },
+      { name: 'built', label: 'Фото и видео', labels: { singular: 'запись', plural: 'Записи' }, type: 'array', admin: { className: 'gallery-attachments', initCollapsed: true, components: { beforeInput: [galleryBatch('built')], RowLabel: './components/admin/BuiltRowLabel#BuiltRowLabel' } }, fields: [
+        { name: 'type', label: 'Тип записи', type: 'select', required: true, defaultValue: 'photo', options: [{ label: 'Фото', value: 'photo' }, { label: 'Видео', value: 'video' }], admin: { hidden: true } },
         { name: 'isPrimary', type: 'checkbox', defaultValue: false, admin: { hidden: true } },
-        { name: 'provider', label: 'Платформа', type: 'select', options: [{ label: 'Kinescope', value: 'kinescope' }, { label: 'VK Видео', value: 'vk' }], validate: (value: unknown, { siblingData }: { siblingData?: { type?: string } }) => siblingData?.type !== 'video' || ['kinescope', 'vk'].includes(String(value)) ? true : 'Выберите платформу', admin: { condition: (_data, siblingData) => siblingData.type === 'video' } },
-        { name: 'videoUrl', label: 'Ссылка на видео', type: 'text', validate: (value: unknown, { siblingData }: { siblingData?: { type?: string; provider?: string } }) => siblingData?.type !== 'video' || parseBuiltVideo(siblingData.provider, value) ? true : 'Вставьте ссылку на видео выбранной платформы', admin: { condition: (_data, siblingData) => siblingData.type === 'video', description: 'Ссылка на ролик Kinescope или VK Видео. Идентификаторы определяются автоматически.' } },
-        { name: 'photo', label: 'Изображение', type: 'upload', relationTo: 'media', validate: (value: unknown, { siblingData }: { siblingData?: { type?: string; image?: string } }) => siblingData?.type === 'video' || value || siblingData?.image ? true : 'Загрузите или выберите фотографию', admin: { description: 'Для фото: фотография дома. Для видео: необязательная обложка.', components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
+        { name: 'provider', label: 'Платформа', type: 'select', options: [{ label: 'Kinescope', value: 'kinescope' }, { label: 'VK Видео', value: 'vk' }], admin: { hidden: true } },
+        { name: 'videoUrl', label: 'Ссылка на видео', type: 'text', validate: (value: unknown, { siblingData }: { siblingData?: { type?: string } }) => siblingData?.type !== 'video' || detectBuiltVideo(value) ? true : 'Вставьте ссылку на ролик Kinescope или VK Видео', admin: { condition: (_data, siblingData) => siblingData.type === 'video', description: 'Платформа определяется по ссылке автоматически.' } },
+        { name: 'photo', label: 'Изображение', type: 'upload', relationTo: 'media', validate: (value: unknown, { siblingData }: { siblingData?: { type?: string; image?: string } }) => siblingData?.type === 'video' || value || siblingData?.image ? true : 'Загрузите или выберите фотографию', admin: { components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
         { name: 'image', type: 'text', admin: { hidden: true } },
         { name: 'thumbnail', type: 'ui', admin: { components: { Field: './components/admin/ProjectImageField#ProjectExteriorImage' } } },
         { name: 'caption', label: 'Подпись', type: 'text' },
@@ -186,6 +190,9 @@ export const Projects: CollectionConfig = {
         { name: 'price', label: 'Цена, ₽', type: 'number', required: true, min: 0 },
         { name: 'defaultSelected', label: 'Выбрано по умолчанию', type: 'checkbox', admin: { components: { Field: './components/admin/CheckboxField#CheckboxField' } } },
       ] },
+    ] },
+    { type: 'collapsible', label: 'Цены', admin: { className: 'project-prices-section', initCollapsed: true, condition: data => data.recordType !== 'ready-home' }, fields: [
+      { name: 'pricesEditor', type: 'ui', admin: { components: { Field: './components/admin/ProjectPricesEditor#ProjectPricesEditor' } } },
     ] },
     { type: 'collapsible', label: 'Готовый дом — условия продажи', admin: { initCollapsed: true, condition: data => data.recordType === 'ready-home' }, fields: [
       focus('ReadyHomeOffer', 'Условия продажи готового дома'),
@@ -241,16 +248,17 @@ export const Projects: CollectionConfig = {
   ],
 }
 
-const sectionKeys: Record<string, ProjectContentBlock> = { 'Главный экран': 'projectHero', 'Фасады': 'ProjectExteriors', 'Планировки': 'ProjectPlans', 'Интерьеры': 'ProjectInteriors', 'Построенные дома': 'ProjectBuilt', 'Ипотечный калькулятор': 'MortgageCalculator', 'Комплектации': 'ProjectConfig', 'Готовый дом — условия продажи': 'ReadyHomeOffer', 'Просмотр дома и консультация': 'ProjectNextSteps', 'Похожие проекты': 'ProjectSimilar', 'Контакты': 'contactsSection' }
+const sectionKeys: Record<string, ProjectContentBlock> = { 'Главный экран': 'projectHero', 'Рендеры фасадов': 'ProjectExteriors', 'Планировки': 'ProjectPlans', 'Рендеры интерьеров': 'ProjectInteriors', 'Построенные дома': 'ProjectBuilt', 'Ипотечный калькулятор': 'MortgageCalculator', 'Комплектации': 'ProjectConfig', 'Готовый дом — условия продажи': 'ReadyHomeOffer', 'Просмотр дома и консультация': 'ProjectNextSteps', 'Похожие проекты': 'ProjectSimilar', 'Контакты': 'contactsSection' }
 for (const field of Projects.fields) {
-  if (field.type === 'collapsible' && typeof field.label === 'string' && sectionKeys[field.label]) {
-    field.admin = {
-      ...field.admin,
-      className: `project-order-section-${sectionKeys[field.label]}`,
-      components: {
-        ...field.admin?.components,
-        Label: { path: './components/admin/ProjectSectionLabel#ProjectSectionLabel', clientProps: { title: field.label, blockKey: sectionKeys[field.label] } },
-      },
-    }
+  if (field.type !== 'collapsible' || typeof field.label !== 'string') continue
+  const blockKey = sectionKeys[field.label]
+  field.admin = {
+    ...field.admin,
+    ...(blockKey ? { className: `project-order-section-${blockKey}` } : {}),
+    components: {
+      ...field.admin?.components,
+      Field: './components/admin/ProjectSectionCard#ProjectSectionCard',
+      ...(blockKey ? { Label: { path: './components/admin/ProjectSectionLabel#ProjectSectionLabel', clientProps: { title: field.label, blockKey } } } : {}),
+    },
   }
 }

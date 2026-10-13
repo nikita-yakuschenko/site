@@ -51,6 +51,9 @@ export function ProjectBlockOrder({ path, readOnly }: JSONFieldClientProps) {
         const section = root.querySelector<HTMLElement>(`.project-order-section-${key}`)
         if (!section) continue
         section.style.order = String(key === 'projectHero' ? 1 : order.indexOf(key) + 2)
+        // Prices are admin-only; they share the configurations slot and follow it in DOM order.
+        const prices = key === 'ProjectConfig' ? root.querySelector<HTMLElement>('.project-prices-section') : null
+        if (prices) prices.style.order = section.style.order
         section.parentElement?.classList.add('project-ordered-fields')
         if (key === 'projectHero') continue
         const header = section.querySelector<HTMLElement>('.collapsible__toggle-wrap')

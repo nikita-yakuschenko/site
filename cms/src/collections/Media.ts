@@ -1,6 +1,12 @@
 import type { Access, CollectionConfig } from 'payload'
 import { authenticated, contentManager, contentWriter } from '../access/staff'
 
+// Имя файла без расширения. Пустые название и alt не должны блокировать сохранение.
+function labelFromFilename(filename?: string | null) {
+  const base = filename?.split(/[/\\]/).pop()?.replace(/\.[^.]+$/, '').trim()
+  return base || 'Изображение'
+}
+
 // Only images actually used by connected public blocks are readable anonymously.
 const readMedia: Access = async ({ req }) => {
   if (await authenticated({ req })) return true
@@ -35,12 +41,22 @@ export function createMedia({ directory, uploadsEnabled }: { directory: string; 
     upload: {
       staticDir: directory,
       mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
-      imageSizes: [{ name: 'thumbnail', width: 320, height: 320, position: 'centre' }],
+      formatOptions: { format: 'webp', options: { quality: 80 } },
+      imageSizes: [{ name: 'thumbnail', width: 320, height: 320, position: 'centre', formatOptions: { format: 'webp', options: { quality: 80 } } }],
       adminThumbnail: 'thumbnail',
     },
+    hooks: {
+      beforeValidate: [({ data, req }) => {
+        if (!data) return data
+        const label = labelFromFilename(typeof data.filename === 'string' ? data.filename : req.file?.name)
+        if (!data.title?.trim()) data.title = label
+        if (!data.alt?.trim()) data.alt = data.title
+        return data
+      }],
+    },
     fields: [
-      { name: 'alt', type: 'text', label: 'Альтернативный текст', required: true },
-      { name: 'title', type: 'text', label: 'Название', required: true },
+      { name: 'alt', type: 'text', label: 'Альтернативный текст', admin: { description: 'Если пусто, подставится имя файла.' } },
+      { name: 'title', type: 'text', label: 'Название', admin: { description: 'Если пусто, подставится имя файла.' } },
       { name: 'description', type: 'textarea', label: 'Описание' },
     ],
   }

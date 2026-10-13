@@ -22,6 +22,17 @@ export function parseBuiltVideo(provider: unknown, value: unknown): BuiltVideo |
   return null
 }
 
+// Provider is inferred from the link, so editors never pick it by hand.
+export function detectBuiltVideo(value: unknown): BuiltVideo | null {
+  return parseBuiltVideo('kinescope', value) || parseBuiltVideo('vk', value)
+}
+
+export function builtVideoEmbed(video: BuiltVideo) {
+  return video.provider === 'kinescope'
+    ? `https://kinescope.io/embed/${video.id}?autoplay=1&muted=0`
+    : `https://vk.com/video_ext.php?oid=${video.oid}&id=${video.id}&hd=2&autoplay=1`
+}
+
 export async function resolveBuiltItems(rows: BuiltRow[], mediaURL: (value: unknown) => Promise<string | null>): Promise<BuiltItem[]> {
   const primary = rows.find(row => row.isPrimary) || rows[0]
   const ordered = primary ? [primary, ...rows.filter(row => row !== primary)] : rows
@@ -29,7 +40,7 @@ export async function resolveBuiltItems(rows: BuiltRow[], mediaURL: (value: unkn
     const image = row.photo ? await mediaURL(row.photo) : row.image || null
     const caption = row.caption || undefined
     if (row.type === 'video') {
-      const video = parseBuiltVideo(row.provider, row.videoUrl)
+      const video = parseBuiltVideo(row.provider, row.videoUrl) || detectBuiltVideo(row.videoUrl)
       return video ? { type: 'video' as const, video, cover: image || undefined, caption } : null
     }
     return image ? { type: 'photo' as const, image, caption } : null

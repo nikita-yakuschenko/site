@@ -14,9 +14,12 @@ import { ProjectImageUpload as ProjectImageUpload_1b5b62a47aa3cb5ed85f1c7771fa66
 import { ProjectHeroImage as ProjectHeroImage_554d65ab25cbc37f8baf167b5e727222 } from '../../components/admin/ProjectImageField'
 import { ProjectMobileHeroImage as ProjectMobileHeroImage_554d65ab25cbc37f8baf167b5e727222 } from '../../components/admin/ProjectImageField'
 import { ProjectSectionLabel as ProjectSectionLabel_eb48d693cc95ac46b04b2bc9069087f8 } from '../../components/admin/ProjectSectionLabel'
+import { ProjectSectionCard as ProjectSectionCard_d765b3f71029d4ead95942beafa9a060 } from '../../components/admin/ProjectSectionCard'
 import { ProjectExteriorImage as ProjectExteriorImage_554d65ab25cbc37f8baf167b5e727222 } from '../../components/admin/ProjectImageField'
+import { GalleryBatchUpload as GalleryBatchUpload_1b5b62a47aa3cb5ed85f1c7771fa66db } from '../../components/admin/ProjectImageUpload'
 import { ExteriorRowLabel as ExteriorRowLabel_52835e53f9a7cfb09782e0cd988c7f5e } from '../../components/admin/ExteriorRowLabel'
 import { ProjectImage as ProjectImage_554d65ab25cbc37f8baf167b5e727222 } from '../../components/admin/ProjectImageField'
+import { RoomsTable as RoomsTable_8ef03fc4f39c757604cd8aac837a62a6 } from '../../components/admin/RoomsTable'
 import { PlanFloorRowLabel as PlanFloorRowLabel_781279d9c4184c9d691553b77d0f6740 } from '../../components/admin/PlanRowLabels'
 import { PlanVariantRowLabel as PlanVariantRowLabel_781279d9c4184c9d691553b77d0f6740 } from '../../components/admin/PlanRowLabels'
 import { BuiltRowLabel as BuiltRowLabel_b8e4a07168dc13b3a952d2dda8d94cd8 } from '../../components/admin/BuiltRowLabel'
@@ -24,6 +27,7 @@ import { ProjectMortgageSummary as ProjectMortgageSummary_882a5c4b4cd6d7039ca39e
 import { ProjectConfigurationSummary as ProjectConfigurationSummary_f032e46c39d5136e6b68293d7c157953 } from '../../components/admin/ProjectConfigurationSummary'
 import { CheckboxField as CheckboxField_447c19cdc69ebf17788038c148799a8d } from '../../components/admin/CheckboxField'
 import { ConfigurationRowLabel as ConfigurationRowLabel_7a3843c074f1a6e82f8f3284ce521fbe } from '../../components/admin/ConfigurationRowLabel'
+import { ProjectPricesEditor as ProjectPricesEditor_0fdbba1ad069907ced6a80052cc362a9 } from '../../components/admin/ProjectPricesEditor'
 import { ProjectNextStepsContent as ProjectNextStepsContent_627cea68a237482f6a707b9cd631985e } from '../../components/admin/ProjectNextStepsContent'
 import { ProjectSearchDescription as ProjectSearchDescription_812b033a5d3e11f57c89523bf45101b5 } from '../../components/admin/ProjectSearchDescription'
 import { MediaEmptyState as MediaEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466 } from '../../components/admin/CollectionEmptyState'
@@ -61,9 +65,12 @@ export const importMap = {
   "./components/admin/ProjectImageField#ProjectHeroImage": ProjectHeroImage_554d65ab25cbc37f8baf167b5e727222,
   "./components/admin/ProjectImageField#ProjectMobileHeroImage": ProjectMobileHeroImage_554d65ab25cbc37f8baf167b5e727222,
   "./components/admin/ProjectSectionLabel#ProjectSectionLabel": ProjectSectionLabel_eb48d693cc95ac46b04b2bc9069087f8,
+  "./components/admin/ProjectSectionCard#ProjectSectionCard": ProjectSectionCard_d765b3f71029d4ead95942beafa9a060,
   "./components/admin/ProjectImageField#ProjectExteriorImage": ProjectExteriorImage_554d65ab25cbc37f8baf167b5e727222,
+  "./components/admin/ProjectImageUpload#GalleryBatchUpload": GalleryBatchUpload_1b5b62a47aa3cb5ed85f1c7771fa66db,
   "./components/admin/ExteriorRowLabel#ExteriorRowLabel": ExteriorRowLabel_52835e53f9a7cfb09782e0cd988c7f5e,
   "./components/admin/ProjectImageField#ProjectImage": ProjectImage_554d65ab25cbc37f8baf167b5e727222,
+  "./components/admin/RoomsTable#RoomsTable": RoomsTable_8ef03fc4f39c757604cd8aac837a62a6,
   "./components/admin/PlanRowLabels#PlanFloorRowLabel": PlanFloorRowLabel_781279d9c4184c9d691553b77d0f6740,
   "./components/admin/PlanRowLabels#PlanVariantRowLabel": PlanVariantRowLabel_781279d9c4184c9d691553b77d0f6740,
   "./components/admin/BuiltRowLabel#BuiltRowLabel": BuiltRowLabel_b8e4a07168dc13b3a952d2dda8d94cd8,
@@ -71,6 +78,7 @@ export const importMap = {
   "./components/admin/ProjectConfigurationSummary#ProjectConfigurationSummary": ProjectConfigurationSummary_f032e46c39d5136e6b68293d7c157953,
   "./components/admin/CheckboxField#CheckboxField": CheckboxField_447c19cdc69ebf17788038c148799a8d,
   "./components/admin/ConfigurationRowLabel#ConfigurationRowLabel": ConfigurationRowLabel_7a3843c074f1a6e82f8f3284ce521fbe,
+  "./components/admin/ProjectPricesEditor#ProjectPricesEditor": ProjectPricesEditor_0fdbba1ad069907ced6a80052cc362a9,
   "./components/admin/ProjectNextStepsContent#ProjectNextStepsContent": ProjectNextStepsContent_627cea68a237482f6a707b9cd631985e,
   "./components/admin/ProjectSearchDescription#ProjectSearchDescription": ProjectSearchDescription_812b033a5d3e11f57c89523bf45101b5,
   "./components/admin/CollectionEmptyState#MediaEmptyState": MediaEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466,

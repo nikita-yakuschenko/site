@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { authenticated, contentManager, contentWriter } from '../access/staff'
 import { configurationKeys, configurationNames, isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
 import { priceImportEndpoint } from './price-import-endpoint'
+import { priceKinds } from '../config/price-kinds'
 
 export const ProjectPrices: CollectionConfig = {
   slug: 'project-prices', labels: { singular: 'Цена проекта', plural: 'Прайс' },
@@ -21,7 +22,7 @@ export const ProjectPrices: CollectionConfig = {
     { name: 'lookupKey', type: 'text', required: true, unique: true, admin: { hidden: true } },
     { name: 'project', label: 'Проект', type: 'relationship', relationTo: 'projects', required: true },
     { name: 'configuration', label: 'Комплектация', type: 'select', required: true, options: Object.entries(configurationNames).map(([value, label]) => ({ value, label })) },
-    { name: 'region', label: 'Регион', type: 'select', required: true, options: [{ value: 'nn', label: 'Нижний Новгород' }, { value: 'msk', label: 'Москва' }] },
+    { name: 'region', label: 'Тип цены', type: 'select', required: true, options: priceKinds.map(kind => ({ value: kind.value, label: kind.label })) },
     { name: 'price', label: 'Цена, ₽', type: 'number', required: true, min: 1, validate: (value: unknown) => typeof value === 'number' && Number.isSafeInteger(value) && value > 0 ? true : 'Укажите положительную целую цену в рублях' },
   ],
 }
