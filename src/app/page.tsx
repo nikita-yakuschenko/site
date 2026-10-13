@@ -6,8 +6,6 @@ import { HOME_LAYOUT } from '../lib/home-layout'
 import { SITE } from '../lib/site'
 
 export default async function HomePage() {
-  // Каталог берётся из фикстур — тех же, что используются на main, когда база
-  // недоступна. Провайдер меняется на payload-provider в AV4-10.
   const catalog = new CmsCatalogProvider()
   // На главной в «Популярных» только 6 проектов, не весь каталог.
   const { items } = await catalog.list({ siteCode: SITE.code, limit: 6 })

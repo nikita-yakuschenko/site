@@ -260,7 +260,7 @@ export function CatalogFilters({
           />
         </fieldset>
 
-        <fieldset className="cfilter__group">
+        {facets.price.max > 0 && <fieldset className="cfilter__group">
           <legend className="cfilter__legend">
             {copy.priceLegend}
             <span>{mlnRange(priceValue[0], priceValue[1])}</span>
@@ -277,7 +277,7 @@ export function CatalogFilters({
               go({ ...filters, price: bound(lo, hi, facets.price) }, SLIDER_DELAY);
             }}
           />
-        </fieldset>
+        </fieldset>}
 
         <Segment
           legend={copy.bedroomsLegend}

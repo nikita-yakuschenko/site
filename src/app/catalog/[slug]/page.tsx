@@ -35,11 +35,6 @@ import { getProjectPageOrder } from '../../../lib/catalog/page-order'
 
 const catalog = new CmsCatalogProvider()
 
-export async function generateStaticParams() {
-  const { items } = await catalog.list({ siteCode: SITE.code })
-  return items.map((project) => ({ slug: project.slug }))
-}
-
 export async function generateMetadata({
   params,
 }: {

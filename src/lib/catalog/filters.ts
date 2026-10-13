@@ -190,12 +190,13 @@ export type CatalogFacets = {
 export function facetsOf(
   projects: readonly { areaValue: number; priceAmount: number | null; bedrooms: string; bathrooms: string; floorsValue: number }[],
 ): CatalogFacets {
-  const areas = projects.map((p) => p.areaValue).filter((n) => n > 0)
-  const prices = projects.map((p) => p.priceAmount ?? 0).filter((n) => n > 0)
+  const areas = projects.map((p) => p.areaValue).filter((n) => Number.isFinite(n) && n > 0)
+  const prices = projects.map((p) => p.priceAmount ?? 0).filter((n) => Number.isFinite(n) && n > 0)
+  const bounds = (values: number[]) => values.length ? { min: Math.min(...values), max: Math.max(...values) } : { min: 0, max: 0 }
   const uniq = (list: number[]) => [...new Set(list)].filter((n) => n > 0).sort((a, b) => a - b)
   return {
-    area: { min: Math.min(...areas), max: Math.max(...areas) },
-    price: { min: Math.min(...prices), max: Math.max(...prices) },
+    area: bounds(areas),
+    price: bounds(prices),
     bedrooms: uniq(projects.map((p) => Number(p.bedrooms))),
     bathrooms: uniq(projects.map((p) => Number(p.bathrooms))),
     floors: uniq(projects.map((p) => p.floorsValue)),

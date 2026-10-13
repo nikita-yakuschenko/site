@@ -1,9 +1,13 @@
 import 'server-only'
 import { cache } from 'react'
+import { connection } from 'next/server'
+import { unstable_rethrow } from 'next/navigation'
 import { FixtureCatalogProvider } from './fixture-provider'
 import type { CatalogProject, ProjectCatalogProvider, ProjectQuery, SiteCatalogContext } from './types'
 
 const readCatalog = cache(async (slug?: string): Promise<CatalogProject[]> => {
+  // CMS records are added after deployment; always read them at request time.
+  await connection()
   const key = process.env.CMS_SITE_API_KEY
   if (!key) return []
   try {
@@ -12,7 +16,7 @@ const readCatalog = cache(async (slug?: string): Promise<CatalogProject[]> => {
     if (!response.ok) return []
     const data = await response.json()
     return Array.isArray(data.items) ? data.items : []
-  } catch { return [] }
+  } catch (error) { unstable_rethrow(error); return [] }
 })
 
 export class CmsCatalogProvider implements ProjectCatalogProvider {
