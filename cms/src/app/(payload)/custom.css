@@ -209,8 +209,7 @@
   .search-filter input { padding-inline-start: 40px; }
   .field-type input:focus, .field-type textarea:focus, .react-select .rs__control--is-focused {
     border-color: var(--ring);
-    outline: 2px solid color-mix(in srgb, var(--ring), transparent 50%);
-    outline-offset: 2px;
+    outline: none;
   }
   .field-type.error input, .field-type.error textarea,
   .react-select--error .rs__control { border-color: var(--destructive); }
@@ -338,16 +337,17 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .page-metadata-field__label { font-size: 12px; color: var(--muted-foreground); }
 .page-record-metadata { display: flex; align-items: center; gap: 10px; min-width: 0; margin-inline-end: auto; }
 .page-record-metadata > span[data-slot='badge'] { flex-shrink: 0; }
-:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__controls:has(.page-record-metadata) { flex: 1; min-width: 0; }
-:is(.collection-edit--pages, .collection-edit--projects) .doc-controls { padding-inline: 24px; z-index: 50; }
-:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__wrapper { align-items: center; }
-:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__controls-wrapper:has(.page-record-metadata) { flex: 1; width: 100%; min-width: 0; padding-inline-start: 0; }
-:is(.collection-edit--pages, .collection-edit--projects) .doc-controls .page-record-metadata { display: flex; align-items: center; gap: 10px; margin-inline-start: 0; margin-inline-end: auto; }
-:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__content:not(:has(.doc-controls__meta > :not(.doc-controls__value-wrap))):not(:has(.doc-controls__meta-icons)) { display: none; }
-:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__value-wrap { display: none; }
-.template-default__wrap:has(.collection-edit--projects) > .doc-header, .collection-edit--projects .doc-controls__content { display: none; }
-.collection-edit--projects :is(.project-details-row, .project-name-field) { display: none; }
-.collection-edit--projects .doc-controls .project-record-metadata { flex: 1; gap: 8px; }.project-record-name-wrap { display: flex; flex: 1 1 280px; max-width: 460px; align-items: center; gap: 8px; min-width: 0; border-bottom: 1px solid var(--input); transition: border-color 150ms; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__controls:has(.page-record-metadata) { flex: 1; min-width: 0; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls { padding-inline: 24px; z-index: 50; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__wrapper { align-items: center; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__controls-wrapper:has(.page-record-metadata) { flex: 1; width: 100%; min-width: 0; padding-inline-start: 0; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls .page-record-metadata { display: flex; align-items: center; gap: 10px; margin-inline-start: 0; margin-inline-end: auto; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__content:not(:has(.doc-controls__meta > :not(.doc-controls__value-wrap))):not(:has(.doc-controls__meta-icons)) { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__value-wrap { display: none; }
+.template-default__wrap:is(:has(.collection-edit--projects), :has(.collection-edit--pages), :has(.collection-edit--blocks), :has(.collection-edit--forms)) > .doc-header, :is(.collection-edit--projects, .collection-edit--pages, .collection-edit--blocks, .collection-edit--forms) .doc-controls__content { display: none; }
+.collection-edit--projects :is(.project-details-row, .project-name-field), .collection-edit--pages :is(.page-details-row, .page-metadata-row, #field-metaTitle), .collection-edit--pages .field-type:has(> * > #field-metaTitle, #field-metaTitle) { display: none; }
+.project-record-metadata .project-record-title { flex: 0 1 260px; min-width: 120px; }
+:is(.collection-edit--projects, .collection-edit--pages, .collection-edit--blocks, .collection-edit--forms) .doc-controls .project-record-metadata { flex: 1; gap: 8px; }.project-record-name-wrap { display: flex; flex: 1 1 280px; max-width: 460px; align-items: center; gap: 8px; min-width: 0; border-bottom: 1px solid var(--input); transition: border-color 150ms; }
 .project-record-name-wrap:focus-within { border-bottom-color: var(--ring); }
 .project-record-name-wrap[aria-invalid] { border-bottom-color: var(--destructive); }
 .project-record-name-wrap > span[data-slot='badge'] { flex-shrink: 0; }
@@ -357,7 +357,7 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .project-record-slug input { padding-right: 36px; }
 .project-record-slug input:disabled { opacity: 1; cursor: default; color: var(--muted-foreground); }
 .project-record-slug button { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); }
-:is(.collection-edit--pages, .collection-edit--projects) .doc-controls__meta:not(:has(> :not(.doc-controls__value-wrap))) { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__meta:not(:has(> :not(.doc-controls__value-wrap))) { display: none; }
 :is(.collection-edit--pages, .collection-edit--projects) .page-details-row .field-type,
 :is(.collection-edit--pages, .collection-edit--projects) .page-metadata-row .field-type { margin-bottom: 0; }
 :is(.collection-edit--pages, .collection-edit--projects) .document-fields__fields { --spacing-field: 12px; }
@@ -455,12 +455,14 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .exterior-row-label button { position: relative; z-index: 2; pointer-events: auto; }
 .exterior-row-label [aria-pressed="true"] { color: var(--brand-yellow); }
 .project-image-preview-trigger { display: block; width: fit-content; max-width: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
-.image-preview-overlay { width: fit-content; max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); margin: auto; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-lg); color: var(--foreground); background: var(--card); box-shadow: 0 24px 80px #0005; }
+.image-preview-overlay { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .image-preview-overlay::backdrop { background: #000b; }
-.image-preview-overlay__header { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 12px; }
+.image-preview-overlay__header { position: absolute; top: 0; right: 0; left: 0; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0; padding: 12px 16px; color: #fff; }
 .image-preview-overlay__header h2 { min-width: 0; margin: 0; overflow-wrap: anywhere; font-size: 14px; font-weight: 500; }
-.image-preview-overlay__image iframe { display: block; width: min(calc(100vw - 66px), calc((100dvh - 132px) * 16 / 9), 1280px); aspect-ratio: 16 / 9; border: 0; border-radius: var(--radius-md); background: #000; }
-.image-preview-overlay__image img { display: block; width: auto; height: auto; max-width: calc(100vw - 66px); max-height: calc(100dvh - 132px); border-radius: var(--radius-md); object-fit: contain; }
+.image-preview-overlay__header button { color: #fff; }
+.image-preview-overlay__image { display: flex; align-items: center; justify-content: center; width: 100vw; height: 100dvh; }
+.image-preview-overlay__image iframe { display: block; width: min(100vw, calc(100dvh * 16 / 9)); height: auto; aspect-ratio: 16 / 9; border: 0; background: #000; }
+.image-preview-overlay__image img { display: block; width: 100vw; height: 100dvh; max-width: none; max-height: none; border-radius: 0; object-fit: contain; }
 .avgst-shell input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
 .avgst-shell input[type="number"]::-webkit-inner-spin-button,
 .avgst-shell input[type="number"]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
@@ -492,8 +494,7 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
   padding: 8px 12px;
 }
 /* Dropdown menus sit above attachment triggers (z-index 10) that cover upload cards below. */
-.avgst-shell .react-select .rs__menu { z-index: 40; }
-.avgst-shell .react-select .rs__control {
+.avgst-shell .react-select .rs__menu { z-index: 40; }.avgst-shell .react-select .rs__control {
   align-items: center;
   flex-wrap: nowrap;
   height: 40px;
@@ -541,8 +542,7 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .avgst-shell .field-type textarea:focus,
 .avgst-shell .react-select .rs__control--is-focused {
   border-color: var(--ring);
-  outline: 2px solid color-mix(in srgb, var(--ring), transparent 50%);
-  outline-offset: 2px;
+  outline: none;
 }
 .project-ordered-fields { display: flex; flex-direction: column; }
 .project-ordered-fields > * { order: 0; }
@@ -552,6 +552,51 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 }
 .project-section-card .collapsible__toggle-wrap > :first-child { flex: 1 1 auto; min-width: 0; }
 .project-section-card [data-slot="card"] { overflow: hidden; }
+:is(.collection-edit--blocks, .collection-edit--forms) .document-fields__fields > .field-type:has(#field-title, #field-key, #field-source, #field-exportName) { display: none; }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts { margin-top: 0; }
+.collection-edit--blocks #field-forms { display: none; }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts > .array-field__header,
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts > .array-field__add-row { display: none; }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__row { margin-bottom: 12px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-xl, 12px); background: var(--card); color: var(--card-foreground); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__row > .collapsible__toggle-wrap { min-height: 48px; background: transparent; border-radius: 0; }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__row:not(.collapsible--collapsed) > .collapsible__toggle-wrap { border-bottom: 1px solid var(--border); }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__row .collapsible__content { padding: 16px; background: transparent; }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__row:has([data-part-key="hero.background"]) .collapsible__content { padding: 12px 16px; }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__row:has([data-part-key="hero.background"]) .field-type { margin: 0; }
+.background-fields { display: flex; flex-direction: column; gap: 8px; }
+.background-fields .attachment-list { margin: 0; gap: 4px; }
+.background-fields .field-label { margin: 0; }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__draggable-rows > :is(:has([data-part-key^="hero.promo."]), :has([data-part-key^="popularProjects.slot."]), :has([data-part-key^="seriesBento.slot."])) { display: none; }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__row:has([data-part-key="popularProjects.heading"], [data-part-key="popularProjects.cards"], [data-part-key="popularProjects.button"], [data-part-key="seriesBento.heading"], [data-part-key="seriesBento.cards"], [data-part-key="seriesBento.button"]) > .collapsible__toggle-wrap :is(.collapsible__drag, .collapsible__actions-wrap) { display: none; }
+.series-slots { display: flex; flex-direction: column; gap: 16px; }
+.series-slot { display: flex; flex-direction: column; gap: 8px; }
+.series-slot + .series-slot { padding-top: 16px; border-top: 1px solid var(--border); }
+.series-slot .field-type, .series-slot .attachment-list { margin: 0; }
+.series-slot [data-slot="select-trigger"] { width: 100%; }
+.project-slots { margin: 0; }
+.promo-slots { display: flex; flex-direction: column; gap: 8px; }
+.promo-slot { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-xl, 12px); background: var(--card); }
+.promo-slot__toggle { display: flex; width: 100%; min-height: 40px; align-items: center; padding: 0 12px; border: 0; background: transparent; color: inherit; font-size: 14px; font-weight: 500; text-align: left; cursor: pointer; }
+.promo-slot[data-open] .promo-slot__toggle { border-bottom: 1px solid var(--border); }
+.promo-slot__body { padding: 10px 12px 12px; }
+.promo-fields { display: flex; flex-direction: column; gap: 8px; }
+.promo-fields .field-type { margin: 0; }
+.promo-fields .field-label { margin-bottom: 4px; }
+.promo-fields textarea { min-height: 0; }
+.promo-fields .attachment-list { margin: 0; }
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .field-type:has([id$="__key"], [id$="__title"]) { display: none; }
+.collection-edit--pages #field-layout > .array-field__header { display: none; }
+.collection-edit--pages #field-layout { margin-top: 0; }
+/* Shared site blocks keep their place on every page */
+.collection-edit--pages #field-layout .array-field__row:has([data-row-fixed]) > .collapsible__toggle-wrap :is(.collapsible__drag, .collapsible__actions-wrap) { visibility: hidden; pointer-events: none; }/* Layout rows look like project section cards */
+.collection-edit--pages #field-layout .array-field__row { margin-bottom: 12px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-xl, 12px); background: var(--card); color: var(--card-foreground); box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05); }
+.collection-edit--pages #field-layout .array-field__row:has(.rs__menu) { overflow: visible; }
+.collection-edit--pages #field-layout .array-field__row > .collapsible__toggle-wrap { min-height: 48px; background: transparent; border-radius: 0; }
+.collection-edit--pages #field-layout .array-field__row:not(.collapsible--collapsed) > .collapsible__toggle-wrap { border-bottom: 1px solid var(--border); }
+.collection-edit--pages #field-layout .array-field__row .collapsible__content { padding: 16px; background: transparent; }
+.array-field__row[data-part-focus] { outline: 2px solid var(--primary); outline-offset: 2px; border-radius: var(--radius-md, 8px); }
+.collection-edit--pages #field-layout .array-field__row[data-preview-active],
+:is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__row[data-preview-active],
 .project-section-card[data-preview-active] [data-slot="card"] { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
 .project-unpublished { display: flex; align-items: center; gap: 4px; margin-inline-start: auto; }
 /* Unpublished marker overlays the card corner without shifting its content */
@@ -572,7 +617,7 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .page-preview:fullscreen .page-preview__stage { flex: 1; min-height: 0; height: auto; }
 
 @media (min-width: 1024px) {
-  :is(.collection-edit--pages, .collection-edit--projects) .document-fields {
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields {
     display: flex;
     --main-width: var(--page-editor-width, 50%);
     --doc-sidebar-width: 0px;
@@ -582,23 +627,27 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
     --main-gutter-h-left: 24px;
     --main-gutter-h-right: 24px;
   }
-  :is(.collection-edit--pages, .collection-edit--projects) .document-fields__main { width: var(--page-editor-width, 50%); min-width: 0; flex: 0 0 var(--page-editor-width, 50%); }
-  :is(.collection-edit--pages, .collection-edit--projects) .document-fields__sidebar-wrap {
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__main { width: var(--page-editor-width, 50%); min-width: 0; flex: 0 0 var(--page-editor-width, 50%); }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-wrap {
     width: var(--page-preview-width, 50%); min-width: 0; flex: 0 0 var(--page-preview-width, 50%); position: sticky;
     top: var(--doc-controls-height);
     height: calc(100dvh - var(--doc-controls-height) - 24px);
   }
+  /* One 24px inset on every side. The sidebar scrollbar was making the preview's right edge shorter than the header. */
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__edit { padding: 24px; }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar { overflow: hidden; }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-fields { padding: 24px 24px 24px 0; }
 }
 @media (min-width: 1600px) {
-  :is(.collection-edit--pages, .collection-edit--projects) .document-fields {
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields {
     --page-editor-width: 33.333333%;
     --page-preview-width: 66.666667%;
   }
 }
 @media (max-width: 1023px) {
-  :is(.collection-edit--pages, .collection-edit--projects) .document-fields { display: block; }
-  :is(.collection-edit--pages, .collection-edit--projects) .document-fields__main,
-  :is(.collection-edit--pages, .collection-edit--projects) .document-fields__sidebar-wrap { width: 100%; min-width: 0; height: auto; position: static; }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields { display: block; }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__main,
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-wrap { width: 100%; min-width: 0; height: auto; position: static; }
 }
 
 

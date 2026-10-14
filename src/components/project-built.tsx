@@ -66,8 +66,8 @@ function ConnectedProjectBuilt({ project, items }: { project: CatalogProject; it
   const displayEntries = entries.slice(1);
   const video = videoOpen === null ? null : entries[videoOpen];
   if (!lead) return null;
-  return <section className="section" aria-labelledby="project-built-title"><div className="section__inner">
-    <h2 id="project-built-title">Как <ProjectName name={project.name} /> выглядит в жизни</h2>
+  return <section className="section" data-cms-block="ProjectBuilt" aria-labelledby="project-built-title"><div className="section__inner">
+    <h2 id="project-built-title" data-cms-block="ProjectBuilt.heading">Как <ProjectName name={project.name} /> выглядит в жизни</h2>
     {lead.type === 'photo' ? <BuiltLeadPhoto image={lead.image} caption={lead.caption} onOpen={() => setOpen(0)} /> : <BuiltVideoTile item={lead} main onOpen={() => setVideoOpen(0)} />}
     {displayEntries.length ? <div className="project-strip">
       {displayEntries.map((item, index) => item.type === 'photo' ? <button key={index} type="button" aria-label={item.caption || copy.galleryOpen} onClick={() => setOpen(photos.indexOf(item))}>
@@ -108,7 +108,7 @@ function LegacyProjectBuilt({ project }: { project: CatalogProject }) {
   const rest = shots.length - offset - tiles.length;
 
   return (
-    <section className="section" aria-labelledby="project-built-title">
+    <section className="section" data-cms-block="ProjectBuilt" aria-labelledby="project-built-title">
       <div className="section__inner">
         <h2 id="project-built-title">
           Как <ProjectName name={project.name} /> выглядит в жизни

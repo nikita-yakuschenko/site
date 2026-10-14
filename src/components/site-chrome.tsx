@@ -247,6 +247,7 @@ export function SiteChrome({
             <button
               type="button"
               className="site-tech-theme"
+              data-cms-block="technicalHeader.theme"
               aria-label={copy.techBarThemeAria}
               aria-pressed={techBarTheme === "light"}
               onClick={toggleTechBarTheme}

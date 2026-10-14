@@ -7,7 +7,7 @@ import {
 } from "@tabler/icons-react";
 import Image from "next/image";
 import { isRegisteredBlock } from "../blocks/registry";
-import { copy, nbspText, projectsInSeries } from "../lib/copy";
+import { copy, nbspText } from "../lib/copy";
 import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
 import type { CatalogProject } from "../lib/catalog/types";
@@ -22,10 +22,10 @@ import {
 } from "./hero-carousel";
 import { IndependentReview } from "./independent-review";
 import { LeadForm } from "./lead-form";
-import { ProjectCard } from "./project-card";
+import { PopularProjects } from "./popular-projects";
 import { ReferralProgram } from "./referral-program";
 import { VideoTestimonials } from "./video-testimonials";
-import { PhotoTile } from "./photo-tile";
+import { SeriesBento } from "./series-bento";
 
 const ADVANTAGE_ICONS = [IconHourglass, IconUsers, IconMedal, IconStar];
 
@@ -76,8 +76,8 @@ function AdvantagesBar({ block }: { block: LayoutBlock }) {
     : [];
   if (!items.length) return null;
   return (
-    <section className="advantages">
-      <ul className="advantages__list" aria-label={copy.heroAdvantagesAria}>
+    <section className="advantages" data-cms-block="advantagesBar">
+      <ul className="advantages__list" aria-label={copy.heroAdvantagesAria} data-cms-block="advantagesBar.items">
         {items.map((item, itemIndex) => {
           const Icon = ADVANTAGE_ICONS[itemIndex];
           return (
@@ -127,105 +127,6 @@ function AdvantagesBar({ block }: { block: LayoutBlock }) {
   );
 }
 
-function PopularProjects({
-  block,
-  projects,
-}: {
-  block: LayoutBlock;
-  projects: CatalogProject[];
-}) {
-  return (
-    <section className="section">
-      <div className="section__inner">
-        <div className="section__head">
-          <div>
-            {block.showEyebrow !== false ? (
-              <p className="eyebrow">
-                {String(block.eyebrow || copy.popularEyebrow)}
-              </p>
-            ) : null}
-            <h2>{String(block.heading || copy.popularHeading)}</h2>
-          </div>
-          <a
-            className="btn btn-yellow section__catalog-cta section__catalog-cta--desktop"
-            href={String(block.catalogHref || "/catalog")}
-          >
-            {String(block.catalogLabel || copy.allProjects)}
-            <IconArrowUpRight size={18} stroke={2} />
-          </a>
-        </div>
-        <div className="grid-3">
-          {projects.map((project) => (
-            <ProjectCard key={project.id} project={project} />
-          ))}
-        </div>
-        <a
-          className="btn btn-yellow section__catalog-cta section__catalog-cta--mobile"
-          href={String(block.catalogHref || "/catalog")}
-        >
-          {String(block.catalogLabel || copy.allProjects)}
-          <IconArrowUpRight size={18} stroke={2} />
-        </a>
-      </div>
-    </section>
-  );
-}
-
-type SeriesTile = {
-  id: string;
-  title: string;
-  href: string;
-  image: string;
-  count?: number;
-};
-
-function SeriesBento({ block }: { block: LayoutBlock }) {
-  const items = Array.isArray(block.items) ? (block.items as SeriesTile[]) : [];
-  if (!items.length) return null;
-  return (
-    <section className="section section--muted">
-      <div className="section__inner">
-        <div className="section__head">
-          <div>
-            {block.showEyebrow !== false ? (
-              <p className="eyebrow">
-                {String(block.eyebrow || copy.seriesEyebrow)}
-              </p>
-            ) : null}
-            <h2>{String(block.heading || copy.seriesHeading)}</h2>
-          </div>
-          <a
-            className="btn btn-yellow section__catalog-cta section__catalog-cta--desktop"
-            href={String(block.catalogHref || "/catalog")}
-          >
-            {String(block.catalogLabel || copy.seriesAll)}
-            <IconArrowUpRight size={18} stroke={2} />
-          </a>
-        </div>
-        <div className="series-bento">
-          {items.map((item) => (
-            <PhotoTile
-              key={item.id}
-              className={`series-bento__tile--${item.id}`}
-              href={item.href}
-              image={item.image}
-              title={item.title}
-              count={item.count != null ? projectsInSeries(item.count) : undefined}
-            />
-          ))}
-        </div>
-        <a
-          className="btn btn-yellow section__catalog-cta section__catalog-cta--mobile"
-          href={String(block.catalogHref || "/catalog")}
-        >
-          {String(block.catalogLabel || copy.seriesAll)}
-          <IconArrowUpRight size={18} stroke={2} />
-        </a>
-      </div>
-    </section>
-  );
-}
-
 function TextSection({ block }: { block: LayoutBlock }) {
   return (
     <section className="section">
@@ -247,12 +148,12 @@ function MortgageShowcase({ block }: { block: LayoutBlock }) {
     { name: "Центр-инвест", src: "/logos/banks/centr-invest.svg" },
   ];
   return (
-    <section className="section mortgage-showcase" aria-labelledby="mortgage-showcase-title">
+    <section className="section mortgage-showcase" data-cms-block="mortgageShowcase" aria-labelledby="mortgage-showcase-title">
       <div className="section__inner mortgage-showcase__grid">
         {/* Заголовок блока живёт внутри баннера: слева рассказ и действие,
             справа кадр. Отдельной строкой над баннером он повторял бы то,
             о чём баннер и так говорит. */}
-        <div className="mortgage-family">
+        <div className="mortgage-family" data-cms-block="mortgageShowcase.banner">
           <div className="mortgage-family__media">
             <Image className="mortgage-family__image" src="/persons/family_1.png" alt="" fill sizes="(min-width: 961px) 60vw, 100vw" />
           </div>
@@ -286,7 +187,7 @@ function MortgageShowcase({ block }: { block: LayoutBlock }) {
           </div>
         </div>
         {/* Семейной в ряду нет: ей посвящён баннер выше. */}
-        <div className="mortgage-showcase__programs">
+        <div className="mortgage-showcase__programs" data-cms-block="mortgageShowcase.programs">
           <a className="mortgage-program mortgage-program--it" href="/it-mortgage">
             <span>IT-ипотека</span><strong>6%</strong><small>Для специалистов <span>IT-компаний</span></small>
             <Image className="mortgage-program__art" src="/persons/it.png" alt="" width={904} height={975} sizes="160px" quality={90} />
@@ -319,7 +220,7 @@ function MortgageShowcase({ block }: { block: LayoutBlock }) {
             </span>
           </a>
         </div>
-        <BankStrip partners={partners} />
+        <div data-cms-block="mortgageShowcase.banks" style={{ display: 'contents' }}><BankStrip partners={partners} /></div>
       </div>
     </section>
   );
@@ -353,13 +254,13 @@ function Production({ block }: { block: LayoutBlock }) {
   ).filter(Boolean);
   const [lead, ...rest] = paragraphs;
   return (
-    <section className="section section--factory">
+    <section className="section section--factory" data-cms-block="productionSection">
       <div className="section__inner production">
         {/* На узком экране обёртка прозрачна: заголовок, кадр, текст.
             На широком она собирает заголовок и текст в одну колонку, чтобы
             кадр мог остаться 4×3 и не рвать абзацы по разным строкам сетки. */}
         <div className="production__text">
-          <div className="production__head">
+          <div className="production__head" data-cms-block="productionSection.heading">
             {block.showEyebrow !== false ? (
               <p className="eyebrow">{String(block.eyebrow || copy.production)}</p>
             ) : null}
@@ -374,7 +275,7 @@ function Production({ block }: { block: LayoutBlock }) {
             </h2>
             {lead ? <p>{nbspText(String(lead))}</p> : null}
           </div>
-          <div className="production__copy">
+          <div className="production__copy" data-cms-block="productionSection.text">
             {rest.map((paragraph, index) => (
               <p key={index}>{nbspText(String(paragraph))}</p>
             ))}
@@ -385,7 +286,7 @@ function Production({ block }: { block: LayoutBlock }) {
               блока просто есть первое действие и второе. */}
           {(block.ctaHref && block.ctaLabel) ||
           (block.moreHref && block.moreLabel) ? (
-            <div className="production__actions">
+            <div className="production__actions" data-cms-block="productionSection.actions">
               {block.ctaHref && block.ctaLabel ? (
                 <a className="btn btn-yellow" href={String(block.ctaHref)}>
                   {String(block.ctaLabel)}
@@ -409,14 +310,14 @@ function Production({ block }: { block: LayoutBlock }) {
           ) : null}
           </div>
         </div>
-        <div className="production__media">
+        <div className="production__media" data-cms-block="productionSection.media">
           <FactoryVideo src={src} srcMobile={srcMobile} alt={copy.factoryAlt} />
         </div>
 
         {/* Подзаголовок связывает ряд с рассказом выше: без него четыре
             карточки читаются как новый блок, начавшийся сам по себе. */}
         {steps.length ? (
-          <div className="production__shops-wrap">
+          <div className="production__shops-wrap" data-cms-block="productionSection.shops">
             <h3 className="production__shops-title">
               {nbspText(String(block.stepsTitle || copy.productionStepsTitle))}
             </h3>
@@ -470,9 +371,10 @@ export function ContactsSection({
         block.muted === false ? "section" : "section section--muted"
       }
       id="contacts"
+      data-cms-block="contactsSection"
     >
       <div className="section__inner contacts">
-        <div className="contacts__col">
+        <div className="contacts__col" data-cms-block="contactsSection.contacts">
           <div className="contacts__intro">
             {block.showEyebrow !== false ? (
               <p className="eyebrow">{copy.contactsEyebrow}</p>
@@ -510,7 +412,7 @@ export function ContactsSection({
             </div>
           </div>
 
-          <ContactsPlace defaultPlace={defaultPlace} />
+          <div data-cms-block="contactsSection.places" style={{ display: 'contents' }}><ContactsPlace defaultPlace={defaultPlace} /></div>
         </div>
         <LeadForm
           siteId={siteId}

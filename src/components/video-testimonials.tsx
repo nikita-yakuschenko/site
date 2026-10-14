@@ -47,10 +47,12 @@ function StoryMeta({ story }: { story: Story }) {
 function StoryCard({
   story,
   featured = false,
+  blockKey,
   onOpen,
 }: {
   story: Story;
   featured?: boolean;
+  blockKey: string;
   onOpen: (story: Story) => void;
 }) {
   return (
@@ -59,6 +61,7 @@ function StoryCard({
       className={
         featured ? "video-story video-story--featured" : "video-story"
       }
+      data-cms-block={blockKey}
       onClick={() => onOpen(story)}
     >
       <img src={story.poster} alt="" />
@@ -104,10 +107,12 @@ export function VideoTestimonials({
   return (
     <section
       className="section section--muted video-stories"
+      data-cms-block="videoTestimonials"
       aria-labelledby="video-stories-title"
     >
       <div className="section__inner video-stories__inner">
         <div className="video-stories__intro">
+          <div data-cms-block="videoTestimonials.heading">
           {showEyebrow ? <p className="eyebrow">{data.eyebrow}</p> : null}
           <h2 id="video-stories-title">
             {data.headingLines.map((line, index) => (
@@ -117,14 +122,15 @@ export function VideoTestimonials({
               </Fragment>
             ))}
           </h2>
-          <div className="video-stories__rating">
+          </div>
+          <div className="video-stories__rating" data-cms-block="videoTestimonials.rating">
             <YandexRating />
           </div>
-          <p className="video-stories__lead">{nbspText(data.lead)}</p>
+          <p className="video-stories__lead" data-cms-block="videoTestimonials.lead">{nbspText(data.lead)}</p>
         </div>
 
         <div className="video-stories__actions">
-          {showAllLink ? <Link href="/stories" className="btn btn-yellow">
+          {showAllLink ? <Link href="/stories" className="btn btn-yellow" data-cms-block="videoTestimonials.all">
             Все дома и истории
             <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
           </Link> : null}
@@ -134,11 +140,12 @@ export function VideoTestimonials({
           <StoryCard
             story={featured}
             featured
+            blockKey="videoTestimonials.story.0"
             onOpen={setActive}
           />
           <div className="video-stories__side">
-            {side.map((story) => (
-              <StoryCard key={story.id} story={story} onOpen={setActive} />
+            {side.map((story, index) => (
+              <StoryCard key={story.id} story={story} blockKey={`videoTestimonials.story.${index + 1}`} onOpen={setActive} />
             ))}
           </div>
         </div>

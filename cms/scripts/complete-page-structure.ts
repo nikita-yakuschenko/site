@@ -7,9 +7,25 @@ if (existsSync('.env')) process.loadEnvFile('.env')
 const { default: config } = await import('../src/payload.config')
 const payload = await getPayload({ config })
 const shared = [
-  { key: 'technicalHeader', title: 'Технический хедер', parts: [{ key: 'technicalHeader.region', title: 'Регион' }, { key: 'technicalHeader.navigation', title: 'Служебная навигация' }, { key: 'technicalHeader.status', title: 'Режим работы' }] },
+  { key: 'technicalHeader', title: 'Технический хедер', parts: [{ key: 'technicalHeader.region', title: 'Регион' }, { key: 'technicalHeader.navigation', title: 'Служебная навигация' }, { key: 'technicalHeader.status', title: 'Режим работы' }, { key: 'technicalHeader.theme', title: 'Переключатель темы' }] },
   { key: 'mainHeader', title: 'Основной хедер', parts: [{ key: 'mainHeader.logo', title: 'Логотип' }, { key: 'mainHeader.navigation', title: 'Основная навигация' }, { key: 'mainHeader.contacts', title: 'Контакты и действия' }] },
   { key: 'footer', title: 'Футер', parts: [{ key: 'footer.navigation', title: 'Навигация' }, { key: 'footer.contacts', title: 'Контакты' }, { key: 'footer.legal', title: 'Юридическая информация' }] },
+  { key: 'productionSection', title: 'Производство', parts: [{ key: 'productionSection.heading', title: 'Заголовок' }, { key: 'productionSection.text', title: 'Текст' }, { key: 'productionSection.actions', title: 'Кнопки' }, { key: 'productionSection.media', title: 'Видео' }, { key: 'productionSection.shops', title: 'Участки цеха' }] },
+  { key: 'advantagesBar', title: 'Преимущества', parts: [{ key: 'advantagesBar.items', title: 'Пункты' }] },
+  { key: 'popularProjects', title: 'Популярные проекты', parts: [{ key: 'popularProjects.heading', title: 'Заголовок' }, { key: 'popularProjects.cards', title: 'Карточки проектов' }, ...[0, 1, 2, 3, 4, 5].map(index => ({ key: `popularProjects.slot.${index}`, title: `Слот ${index + 1}` })), { key: 'popularProjects.button', title: 'Текст кнопки' }] },
+  { key: 'seriesBento', title: 'Подборки', parts: [{ key: 'seriesBento.heading', title: 'Заголовок' }, { key: 'seriesBento.cards', title: 'Подборки' }, ...[0, 1, 2, 3].map(index => ({ key: `seriesBento.slot.${index}`, title: ['Панельно-каркасные дома', 'Барнхаусы', 'Классика', 'Модульные дома'][index] || 'Подборка' })), { key: 'seriesBento.button', title: 'Текст кнопки' }] },
+  { key: 'mortgageShowcase', title: 'Ипотека', parts: [{ key: 'mortgageShowcase.banner', title: 'Семейная ипотека' }, { key: 'mortgageShowcase.programs', title: 'Программы' }, { key: 'mortgageShowcase.banks', title: 'Банки' }] },
+  { key: 'independentReview', title: 'Независимый обзор', parts: [{ key: 'independentReview.heading', title: 'Заголовок' }, { key: 'independentReview.lead', title: 'Текст' }, { key: 'independentReview.channel', title: 'Канал' }, { key: 'independentReview.player', title: 'Плеер' }, { key: 'independentReview.playlist', title: 'Плейлист' }, { key: 'independentReview.video.0', title: 'Норвегия 115' }, { key: 'independentReview.video.1', title: 'Барнхаус 113' }, { key: 'independentReview.video.2', title: 'Симпл 49' }, { key: 'independentReview.video.3', title: 'Производство домов' }] },
+  { key: 'videoTestimonials', title: 'Видеоотзывы', parts: [{ key: 'videoTestimonials.heading', title: 'Заголовок' }, { key: 'videoTestimonials.rating', title: 'Рейтинг' }, { key: 'videoTestimonials.lead', title: 'Текст' }, { key: 'videoTestimonials.all', title: 'Все истории' }, { key: 'videoTestimonials.story.0', title: 'Симпл 57' }, { key: 'videoTestimonials.story.1', title: 'Симпл 49' }, { key: 'videoTestimonials.story.2', title: 'Модульный отель' }] },
+  { key: 'referralProgram', title: 'Реферальная программа', parts: [{ key: 'referralProgram.banner', title: 'Баннер' }] },
+  { key: 'contactsSection', title: 'Контакты', parts: [{ key: 'contactsSection.contacts', title: 'Контакты' }, { key: 'contactsSection.places', title: 'Площадки' }] },
+  { key: 'projectHero', title: 'Главный экран проекта', parts: [{ key: 'projectHero.image', title: 'Изображение' }, { key: 'projectHero.heading', title: 'Название' }, { key: 'projectHero.specs', title: 'Характеристики' }] },
+  { key: 'ProjectExteriors', title: 'Рендеры фасадов', parts: [{ key: 'ProjectExteriors.heading', title: 'Заголовок' }, { key: 'ProjectExteriors.gallery', title: 'Галерея' }] },
+  { key: 'ProjectInteriors', title: 'Рендеры интерьеров', parts: [{ key: 'ProjectInteriors.heading', title: 'Заголовок' }, { key: 'ProjectInteriors.gallery', title: 'Галерея' }] },
+  { key: 'ProjectPlans', title: 'Планировки', parts: [{ key: 'ProjectPlans.heading', title: 'Заголовок' }, { key: 'ProjectPlans.variants', title: 'Варианты' }] },
+  { key: 'ProjectBuilt', title: 'Построенные дома', parts: [{ key: 'ProjectBuilt.heading', title: 'Заголовок' }] },
+  { key: 'ProjectConfig', title: 'Комплектации', parts: [{ key: 'ProjectConfig.heading', title: 'Заголовок' }, { key: 'ProjectConfig.tiers', title: 'Уровни комплектации' }] },
+  { key: 'ProjectSimilar', title: 'Похожие проекты', parts: [{ key: 'ProjectSimilar.heading', title: 'Заголовок' }] },
 ]
 async function usesChrome(source: string, visited = new Set<string>()): Promise<boolean> {
   if (visited.has(source)) return false
@@ -47,10 +63,55 @@ try {
     ts.forEachChild(node, visit)
   }
   visit(copySource)
+  const seriesSeed: Record<string, { text: string; href?: string }> = {
+    'seriesBento.heading': { text: 'Подборки проектов' },
+    'seriesBento.button': { text: 'Все подборки' },
+    'seriesBento.slot.0': { text: 'Панельно-каркасные дома', href: 'panel' },
+    'seriesBento.slot.1': { text: 'Барнхаусы', href: 'barn' },
+    'seriesBento.slot.2': { text: 'Классика', href: 'classic' },
+    'seriesBento.slot.3': { text: 'Модульные дома', href: 'modular' },
+  }
+  for (const chrome of shared) {
+    const existing = (await payload.find({ collection: 'blocks', where: { key: { equals: chrome.key } }, limit: 1, req, overrideAccess: false })).docs[0]
+    if (!existing) continue
+    const current = existing.parts || []
+    const parts = chrome.parts.map(part => {
+      const stored = current.find(item => item.key === part.key)
+      if (stored) {
+        const titled = part.key === 'popularProjects.button' || part.key === 'seriesBento.button' ? { ...stored, title: part.title } : stored
+        const seed = seriesSeed[part.key]
+        if (seed) {
+          const next = { ...titled, text: titled.text || seed.text }
+          return seed.href ? { ...next, href: titled.href || seed.href } : next
+        }
+        return titled.text || part.key !== 'popularProjects.heading' && part.key !== 'popularProjects.button' ? titled : { ...titled, text: part.key === 'popularProjects.heading' ? 'Популярные проекты' : 'Весь каталог' }
+      }
+      const seed = seriesSeed[part.key]
+      if (seed) return { ...part, text: seed.text, ...(seed.href ? { href: seed.href } : {}) }
+      if (part.key === 'popularProjects.heading') return { ...part, text: 'Популярные проекты' }
+      if (part.key === 'popularProjects.button') return { ...part, text: 'Весь каталог' }
+      return part
+    })
+    const same = current.length === parts.length && current.every((item, index) => item.key === parts[index].key && item.title === parts[index].title)
+    const data: { parts?: typeof parts; title?: string } = {}
+    if (!same) data.parts = parts
+    if (chrome.key === 'seriesBento' && existing.title !== chrome.title) data.title = chrome.title
+    if (data.parts || data.title) await payload.update({ collection: 'blocks', id: existing.id, data, req, overrideAccess: false })
+  }
   if (hero) {
-    const parts = [...(hero.parts || [])]
-    for (const part of [{ key: 'hero.heading', title: 'Заголовок' }, { key: 'hero.subtitle', title: 'Подзаголовок' }, { key: 'hero.button', title: 'Кнопка' }, { key: 'hero.promos', title: 'Слоты быстрых промо' }, ...promos]) if (!parts.some(existing => existing.key === part.key)) parts.push(part)
-    await payload.update({ collection: 'blocks', id: hero.id, data: { parts }, req, overrideAccess: false })
+    const content: Record<string, { text: string; textMore?: string; href?: string }> = {
+      'hero.heading': { text: 'Строим модульные и каркасные дома для жизни и отдыха', textMore: '' },
+      'hero.subtitle': { text: 'Через индустриальный подход делаем путь к дому простым и доступным.' },
+      'hero.button': { text: 'Посмотреть проекты домов', href: '/catalog' },
+      'hero.promo.0': { textMore: 'До 1 октября 2026 года', text: 'Могут измениться условия по Семейной ипотеке. Успейте получить одобрение по льготным условиям.', href: 'Рассчитать платёж' },
+      'hero.promo.1': { textMore: 'Экскурсия', text: 'Посмотрите готовый дом, оцените планировку и качество материалов. Почувствуйте уют своего дома.', href: 'Посетить' },
+      'hero.promo.2': { textMore: 'Завод', text: 'Расскажем, как изготавливаются конструкции на производстве и как проходит сборка будущего дома.', href: 'Записаться на экскурсию' },
+    }
+    const order = [{ key: 'hero.background', title: 'Фоновое изображение' }, { key: 'hero.heading', title: 'Заголовок' }, { key: 'hero.subtitle', title: 'Подзаголовок' }, { key: 'hero.button', title: 'Кнопка' }, { key: 'hero.promos', title: 'Слоты быстрых промо' }, ...promos]
+    const current = new Map((hero.parts || []).map(part => [part.key, part]))
+    const parts = [...order.map(part => { const existing = current.get(part.key); return existing ? { ...existing, title: part.key === 'hero.background' ? part.title : existing.title } : part }), ...(hero.parts || []).filter(part => !order.some(item => item.key === part.key))]
+    const filled = parts.map(part => content[part.key] && !('text' in part && part.text) ? { ...part, ...content[part.key] } : part)
+    await payload.update({ collection: 'blocks', id: hero.id, data: { parts: filled }, req, overrideAccess: false })
   }
   let changed = 0
   const nextStepsExisting = (await payload.find({ collection: 'blocks', where: { key: { equals: 'ProjectNextSteps' } }, limit: 1, req, overrideAccess: false })).docs[0]

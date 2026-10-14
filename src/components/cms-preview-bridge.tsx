@@ -39,7 +39,24 @@ export function CMSPreviewBridge() {
       if (typeof key !== 'string' && key !== null) return
       let target: Element | undefined
       if (key) target = [...document.querySelectorAll('[data-cms-block]')].find(element => (element.childElementCount > 0 || element.textContent?.trim()) && (element.getAttribute('data-cms-block') === key || (key === 'leadForm' && element.getAttribute('data-cms-block') === 'LeadForm')))
-      if (target) {
+      const hide = (element: Element) => { element.setAttribute('data-cms-preview-hidden', ''); hidden.add(element) }
+      if (target && event.data.dim) {
+        // The block is one section. The rest of the page is other blocks, so it stays out of this preview.
+        let box = target
+        if (box instanceof HTMLElement && getComputedStyle(box).display === 'contents') box = [...box.children].find(child => !['SCRIPT', 'STYLE', 'LINK'].includes(child.tagName)) ?? box
+        const anchors = [box]
+        if (key === 'hero') { const header = document.querySelector('header.site-header'); if (header) anchors.push(header) }
+        const walk = (element: Element) => {
+          for (const child of element.children) {
+            if (['SCRIPT', 'STYLE', 'LINK'].includes(child.tagName)) continue
+            if (anchors.some(anchor => child.contains(anchor))) walk(child)
+            else if (!anchors.some(anchor => anchor === child || anchor.contains(child))) hide(child)
+          }
+        }
+        walk(document.body)
+        document.documentElement.setAttribute('data-cms-preview-isolated', '')
+        window.scrollTo(0, 0)
+      } else if (target) {
         let current: Element = target
         while (current.parentElement) {
           for (const sibling of current.parentElement.children) if (sibling !== current && !['SCRIPT', 'STYLE', 'LINK'].includes(sibling.tagName)) { sibling.setAttribute('data-cms-preview-hidden', ''); hidden.add(sibling) }

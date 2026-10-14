@@ -10,14 +10,85 @@ import { useBuiltPreview } from './useBuiltPreview'
 import { normalizeNextStepsSettings, type NextStepsSettings } from '../../config/next-steps-settings'
 import type { ConfigurationTemplatesData } from '../../../../src/lib/catalog/configuration-content'
 import type { ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
+import { isCatalogSeries, type CatalogProject } from '../../../../src/lib/catalog/types'
 const devices = [
   { key: 'desktop', label: 'Десктоп', width: 1920, height: 1080, icon: IconDeviceDesktop },
   { key: 'tablet-landscape', label: 'Планшет горизонтально', width: 1180, height: 820, icon: IconDeviceTablet },
   { key: 'tablet-portrait', label: 'Планшет вертикально', width: 820, height: 1180, icon: IconDeviceTablet },
   { key: 'mobile', label: 'Телефон', width: 390, height: 844, icon: IconDeviceMobile },
 ] as const
-export function PagePreview({ siteUrl, project = false, configuration }: { siteUrl: string; project?: boolean; configuration?: { variant: 'panel' | 'modular'; tier: ConfigurationKey } }) {
+const homeBlocks = new Set(['hero', 'advantagesBar', 'popularProjects', 'seriesBento', 'productionSection', 'mortgageShowcase', 'independentReview', 'videoTestimonials', 'referralProgram', 'contactsSection', 'leadForm', 'technicalHeader', 'mainHeader', 'footer'])
+function previewCard(doc: { id?: string; slug?: string | null; name?: string | null; importKey?: string | null; areaValue?: number | null; floorsValue?: number | null; bedrooms?: number | null; bathrooms?: number | null; technologyBadge?: string | null; series?: string | null; priceAmount?: number | null; imageUrl?: string | null; desktopImage?: { url?: string | null } | string | null }): CatalogProject | null {
+  if (!doc.id || !doc.slug || !doc.name) return null
+  const photo = doc.desktopImage && typeof doc.desktopImage === 'object' ? doc.desktopImage.url : ''
+  const imageUrl = photo ? new URL(photo, window.location.origin).href : doc.imageUrl || ''
+  const price = doc.priceAmount && doc.priceAmount > 0 ? doc.priceAmount : null
+  const seriesName = doc.series || ''
+  const series = isCatalogSeries(seriesName) ? seriesName : 'panel'
+  return { id: doc.importKey?.replace(/^catalog:/, '') || `cms:${doc.id}`, cmsId: doc.id, slug: doc.slug, name: doc.name, href: `/catalog/${doc.slug}`, area: String(doc.areaValue ?? ''), areaValue: doc.areaValue ?? 0, floors: String(doc.floorsValue ?? ''), floorsValue: doc.floorsValue ?? 0, bedrooms: String(doc.bedrooms ?? ''), bathrooms: String(doc.bathrooms ?? ''), technology: series === 'modular' ? 'modular' : 'panel', technologyBadge: doc.technologyBadge || '', series, imageUrl, priceAmount: price, priceLabel: price ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется', description: doc.name, about: [], exteriors: [], interiors: [], floorPlans: [], options: [] }
+}
+const catalogBlocks = new Set(['projectHero', 'ProjectExteriors', 'ProjectInteriors', 'ProjectPlans', 'ProjectBuilt', 'ProjectConfig', 'ProjectSimilar', 'MortgageCalculator', 'ProjectNextSteps'])
+function seriesPreview(parts: { key: string; text: string; href: string; image: string }[], counts: Map<string, number>, images: Map<string, string>) {
+  return {
+    type: 'avgst:preview-series' as const,
+    heading: parts.find(part => part.key === 'seriesBento.heading')?.text || '',
+    button: parts.find(part => part.key === 'seriesBento.button')?.text || '',
+    tiles: parts.filter(part => /^seriesBento\.slot\.\d+$/.test(part.key)).map(part => ({ title: part.text, series: part.href, image: part.image ? images.get(part.image) || '' : '', count: counts.get(part.href) || 0 })),
+  }
+}
+
+export function PagePreview({ siteUrl, project = false, configuration, isolateBlock = false }: { siteUrl: string; project?: boolean; configuration?: { variant: 'panel' | 'modular'; tier: ConfigurationKey }; isolateBlock?: boolean }) {
   const { data, hasPublishedDoc } = useDocumentInfo()
+  const blockKey = useFormFields(([fields]) => isolateBlock ? String(fields.key?.value || '') : '')
+  const blockTitle = useFormFields(([fields]) => isolateBlock ? String(fields.title?.value || '') : '')
+  const heroParts = useFormFields(([fields]) => {
+    if (!isolateBlock || String(fields.key?.value || '') !== 'hero') return ''
+    const rows = (fields.parts as { rows?: unknown[] } | undefined)?.rows
+    const count = Array.isArray(rows) ? rows.length : 0
+    const parts = []
+    for (let index = 0; index < count; index++) parts.push({ key: String(fields[`parts.${index}.key`]?.value || ''), text: String(fields[`parts.${index}.text`]?.value || ''), textMore: String(fields[`parts.${index}.textMore`]?.value || ''), href: String(fields[`parts.${index}.href`]?.value || '') })
+    return JSON.stringify(parts)
+  })
+  const heroPartsRef = useRef(heroParts)
+  heroPartsRef.current = heroParts
+  const popularParts = useFormFields(([fields]) => {
+    if (String(fields.key?.value || '') !== 'popularProjects') return ''
+    const rows = (fields.parts as { rows?: unknown[] } | undefined)?.rows
+    const count = Array.isArray(rows) ? rows.length : 0
+    const parts = []
+    for (let index = 0; index < count; index++) parts.push({ key: String(fields[`parts.${index}.key`]?.value || ''), text: String(fields[`parts.${index}.text`]?.value || ''), href: String(fields[`parts.${index}.href`]?.value || '') })
+    return JSON.stringify(parts)
+  })
+  const popularPartsRef = useRef(popularParts)
+  popularPartsRef.current = popularParts
+  const popularCards = useRef(new Map<string, CatalogProject>())
+  const seriesParts = useFormFields(([fields]) => {
+    if (String(fields.key?.value || '') !== 'seriesBento') return ''
+    const rows = (fields.parts as { rows?: unknown[] } | undefined)?.rows
+    const count = Array.isArray(rows) ? rows.length : 0
+    const parts = []
+    for (let index = 0; index < count; index++) {
+      const image = fields[`parts.${index}.image`]?.value
+      const imageId = typeof image === 'string' ? image : image && typeof image === 'object' && 'id' in image ? String((image as { id: unknown }).id) : ''
+      parts.push({ key: String(fields[`parts.${index}.key`]?.value || ''), text: String(fields[`parts.${index}.text`]?.value || ''), href: String(fields[`parts.${index}.href`]?.value || ''), image: imageId })
+    }
+    return JSON.stringify(parts)
+  })
+  const seriesPartsRef = useRef(seriesParts)
+  seriesPartsRef.current = seriesParts
+  const seriesCounts = useRef(new Map<string, number>())
+  const seriesImages = useRef(new Map<string, string>())
+  const [catalogSlug, setCatalogSlug] = useState<string | null>(null)
+  // A project block is previewed on the first published project page
+  useEffect(() => {
+    if (!catalogBlocks.has(blockKey)) return
+    const controller = new AbortController()
+    fetch('/api/projects?limit=1&depth=0&sort=name&where[_status][equals]=published', { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(result => setCatalogSlug(result?.docs?.[0]?.slug || null)).catch(() => {})
+    return () => controller.abort()
+  }, [blockKey])
+  const isolated = isolateBlock && blockKey ? { path: 'block', key: blockKey, title: blockTitle || blockKey } : null
+  const isolatedRef = useRef(isolated)
+  isolatedRef.current = isolated
   const { getDataByPath } = useForm()
   // Unpublished projects have no site page yet, so the preview uses an empty draft page
   const projectDraft = project && !(hasPublishedDoc && typeof data?.slug === 'string')
@@ -87,36 +158,119 @@ export function PagePreview({ siteUrl, project = false, configuration }: { siteU
   useEffect(() => {
     const receive = (event: Event) => {
       const detail = (event as CustomEvent).detail
-      setSelected(current => detail.closed ? current?.path === detail.path ? null : current : detail)
+      setSelected(current => detail.closed ? current?.path === detail.path ? isolatedRef.current : current : detail)
     }
     window.addEventListener('avgst:preview-selection', receive)
     return () => window.removeEventListener('avgst:preview-selection', receive)
   }, [])
+  // The block editor opens on its own block, or on the part that is already expanded
+  useEffect(() => {
+    if (!isolateBlock || !blockKey) return
+    const open = document.querySelector('#field-parts .array-field__row:not(.collapsible--collapsed) [data-part-key]')
+    const key = open?.getAttribute('data-part-key')
+    setSelected(open && key ? { path: open.getAttribute('data-row-path') || 'part', key, title: open.textContent?.trim() || key } : { path: 'block', key: blockKey, title: blockTitle || blockKey })
+  }, [isolateBlock, blockKey])
   useEffect(() => {
     // Outline the section card that the preview currently isolates
-    const card = project && selected ? document.querySelector(`.project-order-section-${selected.key}`) : null
+    const card = !selected ? null : isolateBlock ? document.querySelector(`[data-part-key="${CSS.escape(selected.key)}"]`)?.closest('.array-field__row') ?? null : project ? document.querySelector(`.project-order-section-${selected.key}`) : document.querySelector(`[data-row-path="${selected.path}"]`)?.closest('.array-field__row') ?? null
     card?.setAttribute('data-preview-active', '')
     return () => card?.removeAttribute('data-preview-active')
-  }, [project, selected])
+  }, [project, isolateBlock, selected])
+  const previewKey = isolateBlock ? blockKey || null : selected?.key ?? null
+  const previewMessage = { type: 'avgst:preview-block' as const, key: previewKey, dim: Boolean(isolateBlock && previewKey) }
   useEffect(() => {
-    frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-block', key: selected?.key ?? null }, origin)
+    frame.current?.contentWindow?.postMessage(previewMessage, origin)
     const receive = (event: MessageEvent) => {
       if (event.source === frame.current?.contentWindow && event.origin === origin && event.data?.type === 'avgst:preview-ready') {
-        frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-block', key: selected?.key ?? null }, origin)
+        frame.current?.contentWindow?.postMessage(previewMessage, origin)
         if (currentOrder.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-order', order: currentOrder.current }, origin)
         if (heroDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-hero', hero: heroDraftRef.current }, origin)
+        if (heroPartsRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-hero-copy', parts: JSON.parse(heroPartsRef.current) }, origin)
+        if (popularPartsRef.current) {
+          const parts = JSON.parse(popularPartsRef.current) as { key: string; text: string; href: string }[]
+          frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-popular', heading: parts.find(part => part.key === 'popularProjects.heading')?.text || '', button: parts.find(part => part.key === 'popularProjects.button')?.text || '', projects: parts.filter(part => /^popularProjects\.slot\.\d+$/.test(part.key) && part.href).map(part => popularCards.current.get(part.href)).filter((item): item is CatalogProject => Boolean(item)) }, origin)
+        }
+        if (seriesPartsRef.current) frame.current?.contentWindow?.postMessage(seriesPreview(JSON.parse(seriesPartsRef.current), seriesCounts.current, seriesImages.current), origin)
         if (exteriorDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-exteriors', images: exteriorDraftRef.current }, origin)
         if (interiorDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-interiors', images: interiorDraftRef.current }, origin)
         if (plansDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-plans', variants: plansDraftRef.current }, origin)
         if (builtDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-built', items: builtDraftRef.current }, origin)
         if (nextStepsDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-next-steps', settings: nextStepsDraftRef.current }, origin)
       }
-      if (event.source === frame.current?.contentWindow && event.origin === origin && event.data?.type === 'avgst:preview-block-status' && event.data.key === (selected?.key ?? null)) setMissing(!event.data.found)
+      if (event.source === frame.current?.contentWindow && event.origin === origin && event.data?.type === 'avgst:preview-block-status' && event.data.key === previewKey) setMissing(!event.data.found)
     }
     window.addEventListener('message', receive)
     return () => window.removeEventListener('message', receive)
-  }, [selected, origin, exteriorDraftRef, interiorDraftRef, builtDraftRef, plansDraftRef])
-  const route = configuration ? '/cms-preview/configurations' : project ? (projectDraft ? '/catalog/__draft' : `/catalog/${data?.slug}`) : typeof data?.route === 'string' ? data.route : null
+  }, [selected, previewKey, isolateBlock, origin, exteriorDraftRef, interiorDraftRef, builtDraftRef, plansDraftRef])
+  useEffect(() => {
+    const receive = (event: Event) => {
+      const detail = (event as CustomEvent).detail as { key: string }
+      if (!String(detail?.key || '').startsWith('hero.')) return
+      const current = heroPartsRef.current ? JSON.parse(heroPartsRef.current) as { key: string }[] : []
+      const next = current.some(part => part.key === detail.key) ? current.map(part => part.key === detail.key ? { ...part, ...detail } : part) : [...current, detail]
+      heroPartsRef.current = JSON.stringify(next)
+      frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-hero-copy', parts: next }, origin)
+    }
+    window.addEventListener('avgst:part-draft', receive)
+    return () => window.removeEventListener('avgst:part-draft', receive)
+  }, [origin])
+  useEffect(() => {
+    if (blockKey !== 'popularProjects') return
+    const controller = new AbortController()
+    fetch('/api/projects?limit=300&depth=1&sort=name&where[_status][equals]=published', { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(result => {
+      const cards = new Map<string, CatalogProject>()
+      for (const doc of result?.docs || []) { const card = previewCard(doc); if (card?.cmsId) cards.set(card.cmsId, card) }
+      popularCards.current = cards
+      if (!popularPartsRef.current) return
+      const parts = JSON.parse(popularPartsRef.current) as { key: string; text: string; href: string }[]
+      frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-popular', heading: parts.find(part => part.key === 'popularProjects.heading')?.text || '', button: parts.find(part => part.key === 'popularProjects.button')?.text || '', projects: parts.filter(part => /^popularProjects\.slot\.\d+$/.test(part.key) && part.href).map(part => cards.get(part.href)).filter((item): item is CatalogProject => Boolean(item)) }, origin)
+    }).catch(() => {})
+    return () => controller.abort()
+  }, [blockKey, origin])
+  useEffect(() => {
+    if (blockKey !== 'seriesBento') return
+    const controller = new AbortController()
+    fetch('/api/projects?limit=300&depth=0&where[_status][equals]=published', { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(result => {
+      const counts = new Map<string, number>()
+      for (const doc of result?.docs || []) {
+        const series = isCatalogSeries(String(doc.series || '')) ? String(doc.series) : ''
+        if (series) counts.set(series, (counts.get(series) || 0) + 1)
+      }
+      seriesCounts.current = counts
+      if (seriesPartsRef.current) frame.current?.contentWindow?.postMessage(seriesPreview(JSON.parse(seriesPartsRef.current), counts, seriesImages.current), origin)
+    }).catch(() => {})
+    return () => controller.abort()
+  }, [blockKey, origin])
+  useEffect(() => {
+    if (!seriesParts) return
+    const parts = JSON.parse(seriesParts) as { key: string; text: string; href: string; image: string }[]
+    const controller = new AbortController()
+    const timer = setTimeout(() => {
+      const missing = [...new Set(parts.flatMap(part => part.image && !seriesImages.current.has(part.image) ? [part.image] : []))]
+      Promise.all(missing.map(async id => {
+        const doc = await fetch(`/api/media/${id}?depth=0`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).catch(() => null)
+        if (doc?.url) seriesImages.current.set(id, new URL(doc.url, window.location.origin).href)
+      })).then(() => {
+        if (!controller.signal.aborted) frame.current?.contentWindow?.postMessage(seriesPreview(parts, seriesCounts.current, seriesImages.current), origin)
+      }).catch(() => {})
+    }, 80)
+    return () => { clearTimeout(timer); controller.abort() }
+  }, [seriesParts, origin, revision])
+  useEffect(() => {
+    if (!popularParts) return
+    const parts = JSON.parse(popularParts) as { key: string; text: string; href: string }[]
+    const send = () => frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-popular', heading: parts.find(part => part.key === 'popularProjects.heading')?.text || '', button: parts.find(part => part.key === 'popularProjects.button')?.text || '', projects: parts.filter(part => /^popularProjects\.slot\.\d+$/.test(part.key) && part.href).map(part => popularCards.current.get(part.href)).filter((item): item is CatalogProject => Boolean(item)) }, origin)
+    const timer = setTimeout(send, 80)
+    return () => clearTimeout(timer)
+  }, [popularParts, origin, revision])
+  useEffect(() => {
+    if (!heroParts) return
+    const send = () => frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-hero-copy', parts: JSON.parse(heroParts) }, origin)
+    const timer = setTimeout(send, 80)
+    return () => clearTimeout(timer)
+  }, [heroParts, origin, revision])
+  const blockRoute = homeBlocks.has(blockKey) ? '/' : catalogBlocks.has(blockKey) && catalogSlug ? `/catalog/${catalogSlug}` : null
+  const route = configuration ? '/cms-preview/configurations' : isolateBlock ? blockRoute : project ? (projectDraft ? '/catalog/__draft' : `/catalog/${data?.slug}`) : typeof data?.route === 'string' ? data.route : null
   const validRoute = Boolean(route && !route.includes('['))
   useEffect(() => {
     if (!configuration) return
@@ -144,7 +298,7 @@ export function PagePreview({ siteUrl, project = false, configuration }: { siteU
   const frameURL = `${url}${url.includes('?') ? '&' : '?'}cmsPreview=1`
   return <section ref={panel} className="shadcn-surface page-preview" aria-label={configuration ? 'Предпросмотр комплектаций' : 'Превью страницы'}>
     <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
-      <div><h2 className="text-sm font-medium">{configuration ? 'Комплектации' : selected ? selected.title : 'Превью страницы'}</h2><p className="mt-1 text-xs text-muted-foreground">{configuration ? 'Изменения видны до сохранения' : selected ? 'Блок отдельно' : 'Текущая версия сайта'}</p></div>
+      <div><h2 className="text-sm font-medium">{configuration ? 'Комплектации' : isolateBlock ? blockTitle || 'Блок' : selected ? selected.title : 'Превью страницы'}</h2><p className="mt-1 text-xs text-muted-foreground">{configuration ? 'Изменения видны до сохранения' : isolateBlock ? 'Только этот блок' : selected ? 'Блок отдельно' : 'Текущая версия сайта'}</p></div>
       <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Устройство">
         {devices.map(item => <Button key={item.key} type="button" size="icon" variant={item.key === device.key ? 'secondary' : 'ghost'} title={item.label} aria-label={item.label} aria-pressed={item.key === device.key} onClick={() => setDeviceKey(item.key)}><item.icon className={`size-4 ${item.key === 'tablet-landscape' ? 'rotate-90' : ''}`} /></Button>)}
         <Button type="button" size="icon" variant="ghost" title="Обновить превью" aria-label="Обновить превью" onClick={() => setRevision(value => value + 1)}><IconRefresh className="size-4" /></Button>
@@ -154,13 +308,13 @@ export function PagePreview({ siteUrl, project = false, configuration }: { siteU
     </div>
     <div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2 text-xs">
       <span className="text-muted-foreground">{device.label} · {device.width} × {device.height} px</span>
-      {selected && <Button type="button" size="sm" variant="ghost" onClick={() => setSelected(null)}>Вся страница</Button>}
+      {!isolateBlock && selected && <Button type="button" size="sm" variant="ghost" onClick={() => setSelected(null)}>Вся страница</Button>}
       <Button type="button" size="sm" variant="ghost" aria-label="Переключить масштаб превью" onClick={() => setFit(value => !value)}>{fit ? `Вписать · ${Math.round(scale * 100)}%` : '100%'}</Button>
     </div>
     <div ref={stage} className="page-preview__stage">
       {available.width > 0 && <div className="page-preview__screen" style={{ width: device.width * scale, height: device.height * scale }}>
-        {missing && selected && <p className="absolute inset-0 z-10 flex items-center justify-center bg-card p-6 text-sm">Этот компонент ещё не подключён к изолированному превью.</p>}
-        <iframe ref={frame} onLoad={() => frame.current?.contentWindow?.postMessage(configuration ? { type: 'avgst:preview-configurations', templates: getDataByPath<ConfigurationTemplatesData>('configurationTemplates'), ...configuration } : { type: 'avgst:preview-block', key: selected?.key ?? null }, origin)} key={`${url}:${revision}`} title={`Превью ${route}: ${device.label}`} src={frameURL} style={{ position: 'absolute', top: 0, left: 0, width: device.width, height: device.height, transform: `scale(${scale})`, transformOrigin: 'top left', maxWidth: 'none', border: 0, display: 'block', background: '#fff' }} />
+        {missing && selected && !isolateBlock && <p className="absolute inset-0 z-10 flex items-center justify-center bg-card p-6 text-sm">Этот компонент ещё не подключён к изолированному превью.</p>}
+        <iframe ref={frame} onLoad={() => frame.current?.contentWindow?.postMessage(configuration ? { type: 'avgst:preview-configurations', templates: getDataByPath<ConfigurationTemplatesData>('configurationTemplates'), ...configuration } : previewMessage, origin)} key={`${url}:${revision}`} title={`Превью ${route}: ${device.label}`} src={frameURL} style={{ position: 'absolute', top: 0, left: 0, width: device.width, height: device.height, transform: `scale(${scale})`, transformOrigin: 'top left', maxWidth: 'none', border: 0, display: 'block', background: '#fff' }} />
       </div>}
     </div>
   </section>

@@ -158,6 +158,7 @@ export interface Page {
   importKey?: string | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -428,12 +429,54 @@ export interface Block {
     | {
         key: string;
         title: string;
+        text?: string | null;
+        textMore?: string | null;
+        href?: string | null;
+        image?: (string | null) | Media;
+        imageMobile?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
   forms?: (string | Form)[] | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "media".
+ */
+export interface Media {
+  id: string;
+  /**
+   * Если пусто, подставится имя файла.
+   */
+  alt?: string | null;
+  /**
+   * Если пусто, подставится имя файла.
+   */
+  title?: string | null;
+  description?: string | null;
+  updatedAt: string;
+  createdAt: string;
+  url?: string | null;
+  thumbnailURL?: string | null;
+  filename?: string | null;
+  mimeType?: string | null;
+  filesize?: number | null;
+  width?: number | null;
+  height?: number | null;
+  focalX?: number | null;
+  focalY?: number | null;
+  sizes?: {
+    thumbnail?: {
+      url?: string | null;
+      width?: number | null;
+      height?: number | null;
+      mimeType?: string | null;
+      filesize?: number | null;
+      filename?: string | null;
+    };
+  };
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -458,6 +501,11 @@ export interface Form {
     | {
         key: string;
         title: string;
+        text?: string | null;
+        textMore?: string | null;
+        href?: string | null;
+        image?: (string | null) | Media;
+        imageMobile?: (string | null) | Media;
         id?: string | null;
       }[]
     | null;
@@ -696,43 +744,6 @@ export interface Project {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "media".
- */
-export interface Media {
-  id: string;
-  /**
-   * Если пусто, подставится имя файла.
-   */
-  alt?: string | null;
-  /**
-   * Если пусто, подставится имя файла.
-   */
-  title?: string | null;
-  description?: string | null;
-  updatedAt: string;
-  createdAt: string;
-  url?: string | null;
-  thumbnailURL?: string | null;
-  filename?: string | null;
-  mimeType?: string | null;
-  filesize?: number | null;
-  width?: number | null;
-  height?: number | null;
-  focalX?: number | null;
-  focalY?: number | null;
-  sizes?: {
-    thumbnail?: {
-      url?: string | null;
-      width?: number | null;
-      height?: number | null;
-      mimeType?: string | null;
-      filesize?: number | null;
-      filename?: string | null;
-    };
-  };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "project-prices".
  */
 export interface ProjectPrice {
@@ -915,6 +926,7 @@ export interface PagesSelect<T extends boolean = true> {
   importKey?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1196,6 +1208,11 @@ export interface BlocksSelect<T extends boolean = true> {
     | {
         key?: T;
         title?: T;
+        text?: T;
+        textMore?: T;
+        href?: T;
+        image?: T;
+        imageMobile?: T;
         id?: T;
       };
   forms?: T;
@@ -1218,6 +1235,11 @@ export interface FormsSelect<T extends boolean = true> {
     | {
         key?: T;
         title?: T;
+        text?: T;
+        textMore?: T;
+        href?: T;
+        image?: T;
+        imageMobile?: T;
         id?: T;
       };
   updatedAt?: T;

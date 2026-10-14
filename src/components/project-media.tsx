@@ -60,12 +60,12 @@ export function ProjectExteriors({ project, images, connected = false }: { proje
   const rest = shots.length - tiles.length;
 
   return (
-    <section className="section" aria-labelledby="project-exteriors-title">
+    <section className="section" data-cms-block="ProjectExteriors" aria-labelledby="project-exteriors-title">
       <div className="section__inner">
-        <h2 id="project-exteriors-title">
+        <h2 id="project-exteriors-title" data-cms-block="ProjectExteriors.heading">
           {project.readyHome ? "Дом снаружи" : copy.exteriorsHeading}
         </h2>
-        <div className="project-bento">
+        <div className="project-bento" data-cms-block="ProjectExteriors.gallery">
           {tiles.map((src, index) => {
             const last = rest > 0 && index === tiles.length - 1;
             const classes = [
@@ -130,13 +130,14 @@ export function ProjectInteriors({ project, images, connected = false }: { proje
   return (
     <section
       className="section section--ink"
+      data-cms-block="ProjectInteriors"
       aria-labelledby="project-interiors-title"
     >
       <div className="section__inner">
-        <h2 id="project-interiors-title">
+        <h2 id="project-interiors-title" data-cms-block="ProjectInteriors.heading">
           {project.readyHome ? "Интерьер готового дома" : copy.interiorsHeading}
         </h2>
-        <div className="project-rows">
+        <div className="project-rows" data-cms-block="ProjectInteriors.gallery">
           {tiles.map((src, index) => {
             const last = rest > 0 && index === tiles.length - 1;
             const cls = last ? "project-rows__rest" : "";

@@ -38,14 +38,16 @@ async function loadPublicMediaIds(req: PayloadRequest): Promise<string[]> {
     where: { or: [{ heroContentSource: { equals: 'database' } }, { exteriorsContentSource: { equals: 'database' } }, { interiorsContentSource: { equals: 'database' } }, { builtContentSource: { equals: 'database' } }, { plansContentSource: { equals: 'database' } }] },
     select: { heroContentSource: true, exteriorsContentSource: true, interiorsContentSource: true, builtContentSource: true, plansContentSource: true, plans: true, desktopImage: true, mobileImage: true, exteriors: true, interiors: true, built: true },
   })
-  return projects.docs.flatMap(project => [
+  const projectMedia = projects.docs.flatMap(project => [
     ...(project.heroContentSource === 'database' ? [project.desktopImage, project.mobileImage] : []),
     ...(project.exteriorsContentSource === 'database' ? (project.exteriors || []).map(row => row.photo) : []),
     ...(project.interiorsContentSource === 'database' ? (project.interiors || []).map(row => row.photo) : []),
     ...(project.plansContentSource === 'database' ? (project.plans || []).flatMap(variant => (variant.floors || []).map(floor => floor.photo)) : []),
     ...(project.builtContentSource === 'database' ? (project.built || []).map(row => row.photo) : []),
   ])
-    .filter((id): id is string => typeof id === 'string')
+  const blocks = await req.payload.find({ collection: 'blocks', overrideAccess: true, depth: 0, pagination: false, select: { parts: true } })
+  const blockMedia = blocks.docs.flatMap(block => (block.parts || []).flatMap(part => [part.image, part.imageMobile]))
+  return [...projectMedia, ...blockMedia].filter((id): id is string => typeof id === 'string')
 }
 
 export function createMedia({ directory, uploadsEnabled }: { directory: string; uploadsEnabled: boolean }): CollectionConfig {

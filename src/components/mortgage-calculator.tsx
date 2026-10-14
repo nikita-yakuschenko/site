@@ -408,7 +408,7 @@ export function MortgageCalculator({
     </div>
   ) : null;
   if (projectTiers && (!selectedTier || selectedTier.price <= 0)) return (
-    <section className="section section--muted mortgage-calc mortgage-calc--project" id="mortgage-calc" aria-labelledby="mortgage-calc-title">
+    <section className="section section--muted mortgage-calc mortgage-calc--project" data-cms-block="MortgageCalculator" id="mortgage-calc" aria-labelledby="mortgage-calc-title">
       <div className="section__inner">
         <header className="mortgage-calc__head"><h2 id="mortgage-calc-title">Расчёт ипотеки</h2><p className="mortgage-calc__lead">{lead}</p></header>
         <div className="mortgage-calc__panel"><div className="mortgage-calc__controls">
@@ -426,6 +426,7 @@ export function MortgageCalculator({
           : "section section--muted mortgage-calc"
       }
       id="mortgage-calc"
+      data-cms-block="MortgageCalculator"
       aria-labelledby="mortgage-calc-title"
     >
       <div className="section__inner">

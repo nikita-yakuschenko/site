@@ -7,6 +7,12 @@ import { PageLayoutRowLabel as PageLayoutRowLabel_1d8c816a991502dd0bcbd5842925b4
 import { PageRecordMetadata as PageRecordMetadata_39c824816878a36ded3bfc43acf44e05 } from '../../components/admin/PageMetadataFields'
 import { ConfigurationPreviewField as ConfigurationPreviewField_f36084f4533b8ea164459dde60141639 } from '../../components/admin/PagePreviewField'
 import { ConfigurationContentRowLabel as ConfigurationContentRowLabel_7182bbf8038774676f91098dd728fbdf } from '../../components/admin/ConfigurationContentRowLabel'
+import { BlockPreviewField as BlockPreviewField_f36084f4533b8ea164459dde60141639 } from '../../components/admin/PagePreviewField'
+import { BlockPartFocus as BlockPartFocus_2d2d336a1052969464e1b6893a911fc4 } from '../../components/admin/PageBlockComposition'
+import { PartContentFields as PartContentFields_2d2d336a1052969464e1b6893a911fc4 } from '../../components/admin/PageBlockComposition'
+import { HiddenPartField as HiddenPartField_2d2d336a1052969464e1b6893a911fc4 } from '../../components/admin/PageBlockComposition'
+import { BlockPartLabel as BlockPartLabel_2d2d336a1052969464e1b6893a911fc4 } from '../../components/admin/PageBlockComposition'
+import { BlockRecordMetadata as BlockRecordMetadata_39c824816878a36ded3bfc43acf44e05 } from '../../components/admin/PageMetadataFields'
 import { ProjectPreviewField as ProjectPreviewField_f36084f4533b8ea164459dde60141639 } from '../../components/admin/PagePreviewField'
 import { ProjectBlockOrder as ProjectBlockOrder_b626aa2a57c7088dab2cc79f8690ddf6 } from '../../components/admin/ProjectBlockOrder'
 import { ProjectSectionPreview as ProjectSectionPreview_040d58283f496dc453fb08449be3ba05 } from '../../components/admin/ProjectSectionPreview'
@@ -59,6 +65,12 @@ export const importMap = {
   "./components/admin/PageMetadataFields#PageRecordMetadata": PageRecordMetadata_39c824816878a36ded3bfc43acf44e05,
   "./components/admin/PagePreviewField#ConfigurationPreviewField": ConfigurationPreviewField_f36084f4533b8ea164459dde60141639,
   "./components/admin/ConfigurationContentRowLabel#ConfigurationContentRowLabel": ConfigurationContentRowLabel_7182bbf8038774676f91098dd728fbdf,
+  "./components/admin/PagePreviewField#BlockPreviewField": BlockPreviewField_f36084f4533b8ea164459dde60141639,
+  "./components/admin/PageBlockComposition#BlockPartFocus": BlockPartFocus_2d2d336a1052969464e1b6893a911fc4,
+  "./components/admin/PageBlockComposition#PartContentFields": PartContentFields_2d2d336a1052969464e1b6893a911fc4,
+  "./components/admin/PageBlockComposition#HiddenPartField": HiddenPartField_2d2d336a1052969464e1b6893a911fc4,
+  "./components/admin/PageBlockComposition#BlockPartLabel": BlockPartLabel_2d2d336a1052969464e1b6893a911fc4,
+  "./components/admin/PageMetadataFields#BlockRecordMetadata": BlockRecordMetadata_39c824816878a36ded3bfc43acf44e05,
   "./components/admin/PagePreviewField#ProjectPreviewField": ProjectPreviewField_f36084f4533b8ea164459dde60141639,
   "./components/admin/ProjectBlockOrder#ProjectBlockOrder": ProjectBlockOrder_b626aa2a57c7088dab2cc79f8690ddf6,
   "./components/admin/ProjectSectionPreview#ProjectSectionPreview": ProjectSectionPreview_040d58283f496dc453fb08449be3ba05,

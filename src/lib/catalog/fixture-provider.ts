@@ -13,10 +13,9 @@ import {
 /**
  * Каталог из фикстур.
  *
- * Источник это папки public/catalog, собранные в projects.ts. На главной без
- * отбора отдаём по одному проекту из каждой серии по кругу, чтобы лента
- * «Популярные» не состояла из одних барнхаусов. Полный список без limit
- * нужен странице каталога.
+ * Источник это папки public/catalog, собранные в projects.ts. Запрос с
+ * limit и без фильтров чередует серии, чтобы короткая выборка не состояла
+ * из одних барнхаусов. Полный список без limit нужен странице каталога.
  */
 export class FixtureCatalogProvider implements ProjectCatalogProvider {
   constructor(private readonly source = CATALOG_PROJECTS) {}

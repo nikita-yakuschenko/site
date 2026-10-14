@@ -42,10 +42,11 @@ export function ProjectSimilar({ projects }: { projects: CatalogProject[] }) {
   return (
     <section
       className="section section--muted project-similar"
+      data-cms-block="ProjectSimilar"
       aria-labelledby="project-similar-title"
     >
       <div className="section__inner">
-        <div className="project-similar__head">
+        <div className="project-similar__head" data-cms-block="ProjectSimilar.heading">
           <h2 id="project-similar-title">Похожие проекты</h2>
           <div
             className="project-similar__controls"

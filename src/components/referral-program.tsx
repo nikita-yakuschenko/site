@@ -185,11 +185,12 @@ export function ReferralProgram({
   return (
     <section
       className="section referral"
+      data-cms-block="referralProgram"
       id="referral"
       aria-labelledby="referral-title"
     >
       <div className="section__inner">
-        <div className={open ? "referral__banner is-open" : "referral__banner"}>
+        <div className={open ? "referral__banner is-open" : "referral__banner"} data-cms-block="referralProgram.banner">
           <div className="referral__media" aria-hidden="true">
             <Image
               className="referral__image referral__image--desktop"

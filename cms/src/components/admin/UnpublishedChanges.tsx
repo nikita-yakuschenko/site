@@ -51,9 +51,9 @@ function headersOf(field: Element) {
   return headers
 }
 
-// Counts project sections that differ from the published version and offers a reset
+// Counts sections or blocks that differ from the published version and offers a reset
 export function UnpublishedChanges() {
-  const { id, hasPublishedDoc } = useDocumentInfo()
+  const { id, hasPublishedDoc, collectionSlug } = useDocumentInfo()
   const { getData } = useForm()
   const modified = useFormModified()
   const fields = useFormFields(([state]) => state)
@@ -66,9 +66,9 @@ export function UnpublishedChanges() {
   useEffect(() => {
     if (!id || !hasPublishedDoc || modified) return
     const controller = new AbortController()
-    fetch(`/api/projects/${id}?depth=0`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(setPublished).catch(() => {})
+    fetch(`/api/${collectionSlug}/${id}?depth=0`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(setPublished).catch(() => {})
     return () => controller.abort()
-  }, [id, hasPublishedDoc, modified])
+  }, [id, hasPublishedDoc, modified, collectionSlug])
 
   // Nested blocks mount only when expanded, so re-mark after DOM changes
   const [domVersion, setDomVersion] = useState(0)
@@ -84,12 +84,20 @@ export function UnpublishedChanges() {
     const timer = setTimeout(() => {
       const current = getData() as Record<string, unknown>
       const changed = [...new Set([...Object.keys(current), ...Object.keys(published)])].filter(key => !ignored.has(key) && JSON.stringify(normalize(current[key])) !== JSON.stringify(normalize(published[key])))
-      const fieldsChanged = changed.flatMap(key => diffPaths(normalize(current[key]), normalize(published[key]), [key])).map(fieldOf)
-      const sectionHeaders = changed.map(key => document.querySelector(`[data-section-fields~="${key}"]`)?.closest('.collapsible__toggle-wrap'))
       document.querySelectorAll('[data-unpublished]').forEach(element => element.removeAttribute('data-unpublished'))
-      ;[...sectionHeaders, ...fieldsChanged.flatMap(field => field ? headersOf(field) : [])].forEach(header => header?.setAttribute('data-unpublished', ''))
-      const sections = new Set(sectionHeaders.map(header => header ?? 'other'))
-      setCount(sections.size)
+      // Each change counts once per its outermost section, block row or plain field
+      const units = new Set<Element | string>()
+      for (const key of changed) {
+        const section = document.querySelector(`[data-section-fields~="${key}"]`)?.closest('.collapsible__toggle-wrap')
+        section?.setAttribute('data-unpublished', '')
+        for (const path of diffPaths(normalize(current[key]), normalize(published[key]), [key])) {
+          const field = fieldOf(path)
+          const headers = field ? headersOf(field) : []
+          headers.forEach(header => header.setAttribute('data-unpublished', ''))
+          units.add(section ?? headers.at(-1) ?? key)
+        }
+      }
+      setCount(units.size)
     }, 300)
     return () => clearTimeout(timer)
   }, [published, fields, getData, domVersion])
@@ -99,7 +107,7 @@ export function UnpublishedChanges() {
   const reset = async () => {
     if (!published) return
     setBusy(true)
-    const response = await fetch(`/api/projects/${id}`, { method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...published, _status: 'published' }) }).catch(() => null)
+    const response = await fetch(`/api/${collectionSlug}/${id}`, { method: 'PATCH', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...published, _status: 'published' }) }).catch(() => null)
     setBusy(false)
     if (!response?.ok) return void toast.error('Не удалось отменить изменения')
     window.location.reload()

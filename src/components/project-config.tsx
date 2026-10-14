@@ -78,12 +78,13 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
   return (
     <section
       className="section section--muted"
+      data-cms-block="ProjectConfig"
       aria-labelledby="project-config-title"
     >
       <div className="section__inner">
-        <h2 id="project-config-title">{copy.configHeading}</h2>
+        <h2 id="project-config-title" data-cms-block="ProjectConfig.heading">{copy.configHeading}</h2>
 
-        <div className="project-config">
+        <div className="project-config" data-cms-block="ProjectConfig.tiers">
           <ul className="project-config__tiers">
             {tiers.map((item) => (
               <li key={item.id}>

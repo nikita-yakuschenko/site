@@ -53,7 +53,7 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
         aria-labelledby="project-plans-title"
       >
         <div className="section__inner">
-          <h2 id="project-plans-title">
+          <h2 id="project-plans-title" data-cms-block="ProjectPlans.heading">
             {project.readyHome ? "Планировка дома" : copy.plansHeading}
           </h2>
           <div className="project-plans">
@@ -119,12 +119,12 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
       aria-labelledby="project-plans-title"
     >
       <div className="section__inner">
-        <h2 id="project-plans-title">
+        <h2 id="project-plans-title" data-cms-block="ProjectPlans.heading">
           {project.readyHome ? "Планировка дома" : copy.plansHeading}
         </h2>
 
         {variants.length > 1 ? (
-          <div className="project-plans__tabs" role="tablist" aria-label="Варианты планировки">
+          <div className="project-plans__tabs" data-cms-block="ProjectPlans.variants" role="tablist" aria-label="Варианты планировки">
             {variants.map((variant, index) => (
               <button
                 key={`${variant.label}-${index}`}

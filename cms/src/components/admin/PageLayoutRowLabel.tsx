@@ -3,6 +3,7 @@ import { useRowLabel, useCollapsible } from '@payloadcms/ui'
 import { useEffect, useState } from 'react'
 import { IconForms, IconLayout } from '@tabler/icons-react'
 import { Badge } from '../ui/badge'
+import { fixedBlocks } from '../../config/fixed-blocks'
 type Row = { component?: { relationTo: 'blocks' | 'forms'; value: string | { id: string; title?: string } } }
 export function PageLayoutRowLabel() {
   const { data, rowNumber, path } = useRowLabel<Row>()
@@ -30,5 +31,5 @@ export function PageLayoutRowLabel() {
     }
   }, [isCollapsed, resolved, key, path])
   const Icon = component?.relationTo === 'forms' ? IconForms : IconLayout
-  return <span className="flex min-w-0 items-center gap-3 text-sm font-medium"><span className="shrink-0 tabular-nums text-muted-foreground">{String((rowNumber ?? 0) + 1).padStart(2, '0')}</span><Icon className="size-4 shrink-0 text-muted-foreground" /><span className="truncate">{title || (id ? 'Компонент' : 'Выберите блок или форму')}</span>{resolved?.key === key && resolved.shared && <Badge variant="outline" className="shrink-0" title="Общий блок сайта, используемый на нескольких страницах">Общий</Badge>}</span>
+  return <span data-row-path={path} data-row-fixed={resolved?.key === key && (resolved.shared || fixedBlocks.has(resolved.componentKey)) || undefined} className="flex min-w-0 items-center gap-3 text-sm font-medium"><span className="shrink-0 tabular-nums text-muted-foreground">{String((rowNumber ?? 0) + 1).padStart(2, '0')}</span><Icon className="size-4 shrink-0 text-muted-foreground" /><span className="truncate">{title || (id ? 'Компонент' : 'Выберите блок или форму')}</span>{resolved?.key === key && resolved.shared && <Badge variant="outline" className="shrink-0" title="Общий блок сайта, используемый на нескольких страницах">Общий</Badge>}</span>
 }

@@ -16,9 +16,8 @@ export function ImagePreviewOverlay({ image, onClose }: { image: PreviewImage | 
   }, [image])
 
   return <dialog ref={dialog} className="image-preview-overlay shadcn-surface" aria-labelledby={titleId} onClose={onClose} onClick={event => {
-    if (event.target !== event.currentTarget) return
-    const bounds = event.currentTarget.getBoundingClientRect()
-    if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) event.currentTarget.close()
+    const target = event.target
+    if (target === event.currentTarget || (target instanceof Element && target.classList.contains('image-preview-overlay__image'))) event.currentTarget.close()
   }}>
     <header className="image-preview-overlay__header">
       <h2 id={titleId}>{image?.title || 'Просмотр изображения'}</h2>

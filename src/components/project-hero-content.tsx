@@ -28,17 +28,17 @@ export function ProjectHeroContent({ data, connected, location, payment }: { dat
     { label: copy.bathrooms, value: hero.bathrooms },
   ]
   return <>
-    <picture className="project-hero__media">
+    <picture className="project-hero__media" data-cms-block="projectHero.image">
       {hero.mobileImageUrl && <source media="(max-width: 430px)" srcSet={hero.mobileImageUrl} />}
       {hero.imageUrl && <img src={hero.imageUrl} alt="" />}
     </picture>
     <div className="project-hero__veil" />
     <div className="project-hero__stage">
-      <div className="project-hero__intro"><div className="project-hero__heading">
+      <div className="project-hero__intro" data-cms-block="projectHero.heading"><div className="project-hero__heading">
         <div className="project-hero__labels"><p className="project-hero__badge">{hero.technologyBadge}</p>{location && <p className="project-hero__location">В {location}</p>}</div>
         <h1>{head}{mark ? <span>{mark}</span> : null}{tail}</h1>
       </div></div>
-      <div className="project-hero__bar"><ul className="project-hero__specs">{specs.map(spec => <li key={spec.label}><p>{spec.label}</p><strong>{spec.value}</strong></li>)}</ul>{payment}</div>
+      <div className="project-hero__bar" data-cms-block="projectHero.specs"><ul className="project-hero__specs">{specs.map(spec => <li key={spec.label}><p>{spec.label}</p><strong>{spec.value}</strong></li>)}</ul>{payment}</div>
     </div>
   </>
 }

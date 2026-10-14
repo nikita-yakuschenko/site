@@ -109,6 +109,61 @@ function shiftFor(
     : `translate3d(calc(${base} + ${dx}px), 0, 0)`;
 }
 
+function usePreviewHeroCopy(message: HeroMessage): HeroMessage {
+  const [draft, setDraft] = useState<Partial<HeroMessage> | null>(null);
+  useEffect(() => {
+    if (window.parent === window || !new URLSearchParams(window.location.search).has("cmsPreview")) return;
+    const allowed = new Set(["http://localhost:3001", "https://cms.avgst.ru"]);
+    const receive = (event: MessageEvent) => {
+      if (event.source !== window.parent || !allowed.has(event.origin) || event.data?.type !== "avgst:preview-hero-copy" || !Array.isArray(event.data.parts)) return;
+      const parts = event.data.parts as { key?: string; text?: string; textMore?: string; href?: string; image?: string; imageMobile?: string }[];
+      const heading = parts.find((part) => part.key === "hero.heading");
+      const subtitle = parts.find((part) => part.key === "hero.subtitle");
+      const button = parts.find((part) => part.key === "hero.button");
+      const background = parts.find((part) => part.key === "hero.background");
+      setDraft({
+        heading: heading?.text || message.heading,
+        headingMore: heading?.textMore || "",
+        text: subtitle?.text ?? message.text,
+        cta: button?.text || message.cta,
+        href: button?.href || message.href,
+        image: background?.image || message.image,
+        imageMobile: background?.imageMobile || message.imageMobile,
+      });
+    };
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, [message]);
+  return draft ? { ...message, ...draft } : message;
+}
+
+function usePreviewHeroPromos(promos: readonly HeroPromo[]): readonly HeroPromo[] {
+  const [draft, setDraft] = useState<HeroPromo[] | null>(null);
+  useEffect(() => {
+    if (window.parent === window || !new URLSearchParams(window.location.search).has("cmsPreview")) return;
+    const allowed = new Set(["http://localhost:3001", "https://cms.avgst.ru"]);
+    const receive = (event: MessageEvent) => {
+      if (event.source !== window.parent || !allowed.has(event.origin) || event.data?.type !== "avgst:preview-hero-copy" || !Array.isArray(event.data.parts)) return;
+      const next: HeroPromo[] = promos.map((promo) => ({ ...promo }));
+      for (const part of event.data.parts as { key?: string; title?: string; text?: string; textMore?: string; href?: string; image?: string }[]) {
+        const match = /^hero\.promo\.(\d+)$/.exec(part.key || "");
+        if (!match) continue;
+        const promo = next[Number(match[1])];
+        if (!promo) continue;
+        if (part.title) promo.heading = part.title;
+        if (part.text) promo.text = part.text;
+        promo.eyebrow = part.textMore || "";
+        if (part.href) promo.cta = part.href;
+        if (part.image) promo.image = part.image;
+      }
+      setDraft(next);
+    };
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, [promos]);
+  return draft ?? promos;
+}
+
 export function HeroCarousel({
   message,
   promos,
@@ -116,7 +171,9 @@ export function HeroCarousel({
   message: HeroMessage;
   promos: readonly HeroPromo[];
 }) {
-  const count = promos.length;
+  const shown = usePreviewHeroCopy(message);
+  const slots = usePreviewHeroPromos(promos);
+  const count = slots.length;
 
   /* Бесконечная прокрутка.
    *
@@ -300,19 +357,19 @@ export function HeroCarousel({
    */
   const lane = rotating
     ? [
-        ...promos.slice(-perView).map((promo, i) => ({
+        ...slots.slice(-perView).map((promo, i) => ({
           promo,
           key: `clone-head-${i}`,
           clone: true,
         })),
-        ...promos.map((promo) => ({ promo, key: promo.heading, clone: false })),
-        ...promos.slice(0, perView).map((promo, i) => ({
+        ...slots.map((promo) => ({ promo, key: promo.heading, clone: false })),
+        ...slots.slice(0, perView).map((promo, i) => ({
           promo,
           key: `clone-tail-${i}`,
           clone: true,
         })),
       ]
-    : promos.map((promo) => ({ promo, key: promo.heading, clone: false }));
+    : slots.map((promo) => ({ promo, key: promo.heading, clone: false }));
 
   return (
     <section
@@ -326,13 +383,13 @@ export function HeroCarousel({
     >
       {/* Кадр один: он часть постоянного сообщения и вместе со слотами не
           меняется. */}
-      {message.imageMobile ? (
-        <picture className="hero__frame">
-          <source media="(min-width: 900px)" srcSet={message.image} />
-          <img src={message.imageMobile} alt="" />
+      {shown.imageMobile ? (
+        <picture className="hero__frame" data-cms-block="hero.background">
+          <source media="(min-width: 900px)" srcSet={shown.image} />
+          <img src={shown.imageMobile} alt="" />
         </picture>
       ) : (
-        <img className="hero__frame" src={message.image} alt="" />
+        <img className="hero__frame" src={shown.image} alt="" data-cms-block="hero.background" />
       )}
 
       {/* Ровный тон по кадру: без градиента и без формы, одна плотность во
@@ -342,17 +399,17 @@ export function HeroCarousel({
       <div className="hero__stage">
         <div className="hero__copy">
           <h1 data-cms-block="hero.heading">
-            {nbspText(message.heading)}
-            {message.headingMore ? (
+            {nbspText(shown.heading)}
+            {shown.headingMore ? (
               <>
                 <br />
-                {nbspText(message.headingMore)}
+                {nbspText(shown.headingMore)}
               </>
             ) : null}
           </h1>
-          {message.text ? <p data-cms-block="hero.subtitle">{nbspText(message.text)}</p> : null}
-          <a className="btn btn-yellow hero__cta" href={message.href} data-cms-block="hero.button">
-            {message.cta}
+          {shown.text ? <p data-cms-block="hero.subtitle">{nbspText(shown.text)}</p> : null}
+          <a className="btn btn-yellow hero__cta" href={shown.href} data-cms-block="hero.button">
+            {shown.cta}
             <IconArrowUpRight size={18} stroke={2} />
           </a>
         </div>
@@ -398,7 +455,7 @@ export function HeroCarousel({
                     key={key}
                     type="button"
                     className="hero__promo"
-                    data-cms-block={`hero.promo.${promos.indexOf(promo)}`}
+                    data-cms-block={`hero.promo.${slots.indexOf(promo)}`}
                     aria-hidden={!active}
                     tabIndex={active ? undefined : -1}
                     onClick={() => {
@@ -484,7 +541,7 @@ export function HeroCarousel({
           {/* Полоса прогресса, она же переключатель, у нижней границы
               карточки. Слоем по той же причине, что шевроны. */}
           {rotating ? (
-            <CarouselProgress labels={promos.map(item => item.heading)} index={index} playId={playId} paused={paused} onSelect={goTo} onComplete={() => step(1)} />
+            <CarouselProgress labels={slots.map(item => item.heading)} index={index} playId={playId} paused={paused} onSelect={goTo} onComplete={() => step(1)} />
           ) : null}
         </div>
       </div>

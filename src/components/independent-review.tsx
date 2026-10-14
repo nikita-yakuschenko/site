@@ -24,11 +24,13 @@ export function IndependentReview({
   return (
     <section
       className="section independent-review"
+      data-cms-block="independentReview"
       aria-labelledby="independent-review-title"
     >
       <div className="section__inner independent-review__inner">
         <div className="independent-review__stage">
           <div className="independent-review__copy">
+            <div data-cms-block="independentReview.heading">
             {showEyebrow ? <p className="eyebrow">{data.eyebrow}</p> : null}
             <h2 id="independent-review-title">
               {titleLines.map((line, index) => (
@@ -38,9 +40,10 @@ export function IndependentReview({
                 </Fragment>
               ))}
             </h2>
-            <p className="independent-review__lead">{nbspText(data.lead)}</p>
+            </div>
+            <p className="independent-review__lead" data-cms-block="independentReview.lead">{nbspText(data.lead)}</p>
 
-            <div className="independent-review__channel">
+            <div className="independent-review__channel" data-cms-block="independentReview.channel">
               <img
                 className="independent-review__mark"
                 src={data.channelPhoto}
@@ -61,6 +64,7 @@ export function IndependentReview({
           <button
             type="button"
             className="independent-review__player"
+            data-cms-block="independentReview.player"
             onClick={() => setOpen(true)}
             aria-label={`Смотреть: ${current.title}`}
           >
@@ -85,6 +89,7 @@ export function IndependentReview({
 
         <div
           className="independent-review__playlist"
+          data-cms-block="independentReview.playlist"
           role="tablist"
           aria-label={data.playlistLabel}
         >
@@ -101,6 +106,7 @@ export function IndependentReview({
                     ? "independent-review__item is-active"
                     : "independent-review__item"
                 }
+                data-cms-block={`independentReview.video.${index}`}
                 onClick={() => setActive(index)}
               >
                 <span className="independent-review__num">
