@@ -8,6 +8,7 @@ import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from '../ui/attachment'
 import { IconComponents, IconPencil, IconSearch, IconX } from '@tabler/icons-react'
+import { mediaDocumentId } from './media-id'
 import { ProjectImageUpload } from './ProjectImageUpload'
 
 // The card header already names the part. Inside, the person edits the words the site shows.
@@ -39,9 +40,7 @@ export function HiddenPartField() {
 }
 
 function mediaId(value: unknown) {
-  if (typeof value === 'string') return value
-  if (value && typeof value === 'object' && 'id' in value) return String((value as { id: unknown }).id)
-  return ''
+  return mediaDocumentId(value) || ''
 }
 
 function HeroPromoFields({ row, partKey }: { row: string; partKey: string }) {

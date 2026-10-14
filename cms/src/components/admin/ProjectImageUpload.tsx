@@ -9,7 +9,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { builtVideoEmbed, detectBuiltVideo } from '../../config/built-media'
-import { isRecordId } from '../../../../src/lib/record-id'
+import { mediaDocumentId } from './media-id'
 import { toast } from 'sonner'
 import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from '@/components/ui/attachment'
 import { ImagePreviewOverlay, type PreviewImage } from './ImagePreviewOverlay'
@@ -26,9 +26,7 @@ function isImage(file: File) {
 }
 
 function photoId(value: unknown): string | null {
-  if (isRecordId(value)) return value
-  if (value && typeof value === 'object' && 'id' in value) return photoId((value as { id: unknown }).id)
-  return null
+  return mediaDocumentId(value)
 }
 
 function photoSlot(path: string) {
@@ -73,8 +71,8 @@ function uploadMedia(file: File, onProgress: (percent: number) => void) {
     }
     request.onload = () => {
       const result = JSON.parse(request.responseText || 'null')
-      const id = result?.doc?.id ?? result?.id
-      if (request.status >= 200 && request.status < 300 && isRecordId(id)) resolve(id)
+      const id = mediaDocumentId(result?.doc?.id ?? result?.id)
+      if (request.status >= 200 && request.status < 300 && id) resolve(id)
       else reject(new Error(result?.errors?.[0]?.message || 'Не удалось загрузить фото'))
     }
     request.onerror = () => reject(new Error('Не удалось загрузить фото'))
@@ -96,7 +94,7 @@ function usePhotoPlacer() {
         const index = cursor
         cursor += 1
         if (rowAcceptsPhoto(rows[index], arrayPath)) {
-          dispatchFields({ type: 'UPDATE', path: `${arrayPath}.${index}.photo`, value: id })
+          dispatchFields({ type: 'UPDATE', path: `${arrayPath}.${index}.photo`, value: Number(id) })
           placed = true
           break
         }
@@ -109,7 +107,7 @@ function usePhotoPlacer() {
         schemaPath: arrayPath.replace(/\.\d+(?=\.|$)/g, ''),
         rowIndex: rows.length + offset,
         subFieldState: {
-          photo: { initialValue: id, valid: true, value: id },
+          photo: { initialValue: Number(id), valid: true, value: Number(id) },
           ...(arrayPath === 'built' ? { type: { initialValue: 'photo', valid: true, value: 'photo' } } : {}),
           ...(arrayPath === 'exteriors' || arrayPath === 'built' ? { isPrimary: { initialValue: false, valid: true, value: false } } : {}),
         },
@@ -120,7 +118,7 @@ function usePhotoPlacer() {
     timers.current.push(window.setTimeout(() => {
       fresh.forEach((id, offset) => {
         const path = `${arrayPath}.${rows.length + offset}.photo`
-        if (!photoId(getDataByPath(path))) dispatchFields({ type: 'UPDATE', path, value: id })
+        if (!photoId(getDataByPath(path))) dispatchFields({ type: 'UPDATE', path, value: Number(id) })
       })
     }, 1200))
   }
@@ -141,7 +139,10 @@ function useMediaDocs(ids: string[]) {
       if (cancelled) return
       setDocs(current => {
         const next = { ...current }
-        for (const item of items) if (item && isRecordId(item.id)) next[item.id] = item
+        for (const item of items) {
+          const id = mediaDocumentId(item?.id)
+          if (item && id) next[id] = { ...item, id }
+        }
         return next
       })
     })
@@ -424,7 +425,7 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
   const listedGallery = Boolean(slot && /^(exteriors|interiors|built)$/.test(slot.arrayPath))
   const rowType = useFormFields(([fields]) => slot ? fields[`${slot.arrayPath}.${slot.index}.type`]?.value : null)
   const place = usePhotoPlacer()
-  const { setValue, value } = useField<string | null>({ path: props.path })
+  const { setValue, value } = useField<string | number | null>({ path: props.path })
   const id = photoId(value)
   const docs = useMediaDocs(id ? [id] : [])
   const known = useRef(new Map<string, { name: string; size: number; type: string }>())
@@ -448,7 +449,7 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
       try {
         const mediaId = await uploadMedia(file, progress => setPending(current => current.map(item => item.key === key ? { ...item, progress } : item)))
         known.current.set(mediaId, { name: file.name, size: file.size, type: file.type })
-        if (index === 0) setValue(mediaId)
+        if (index === 0) setValue(Number(mediaId))
         else if (slot) place(slot.arrayPath, [mediaId], slot.index + 1)
         setPending(current => current.filter(item => item.key !== key))
       } catch (error) {

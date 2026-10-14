@@ -3,7 +3,7 @@
 import { Badge } from '../ui/badge'
 import { useFormFields } from '@payloadcms/ui'
 import { projectContentSources, projectSourceLabels, type ProjectContentBlock } from '../../config/project-content-sources'
-import { isRecordId } from '../../../../src/lib/record-id'
+import { mediaDocumentId } from './media-id'
 
 export function ProjectSectionLabel({ title, blockKey, fieldNames = [] }: { title: string; blockKey: ProjectContentBlock; fieldNames?: string[] }) {
   const heroSource = useFormFields(([fields]) => fields.heroContentSource?.value)
@@ -20,7 +20,7 @@ export function ProjectSectionLabel({ title, blockKey, fieldNames = [] }: { titl
       if (!photo && !fields[`${gallery}.${index}.id`]) break
       const value = photo?.value
       const id = value && typeof value === 'object' && 'id' in value ? (value as { id: unknown }).id : value
-      if (isRecordId(id) || fields[`${gallery}.${index}.type`]?.value === 'video') count += 1
+      if (mediaDocumentId(id) || fields[`${gallery}.${index}.type`]?.value === 'video') count += 1
     }
     return count
   })
