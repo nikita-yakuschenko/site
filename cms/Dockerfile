@@ -14,7 +14,12 @@ WORKDIR /app/cms
 COPY cms/ ./
 COPY src/lib/ /app/src/lib/
 USER root
-RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends curl ca-certificates gnupg \
+ && install -d /usr/share/postgresql-common/pgdg \
+ && curl -fsSL -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+ && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt bookworm-pgdg main" > /etc/apt/sources.list.d/pgdg.list \
+ && apt-get update && apt-get install -y --no-install-recommends postgresql-client-18 \
+ && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production
 USER node
 CMD ["sh", "-c", "mkdir -p /app/media/.db-backups && pg_dump \"$DATABASE_URL\" -Fc -f /app/media/.db-backups/cms-20261014.dump && echo BACKUP_OK && node scripts/mark-initial-migration.mjs && npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
