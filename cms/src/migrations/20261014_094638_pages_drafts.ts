@@ -16,7 +16,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   
   CREATE TABLE "_pages_v" (
   	"id" serial PRIMARY KEY NOT NULL,
-  	"parent_id" varchar,
+  	-- pages.id, blocks.id and forms.id are still the default serial integers in production
+  	"parent_id" integer,
   	"version_title" varchar,
   	"version_route" varchar,
   	"version_meta_title" varchar,
@@ -37,8 +38,8 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"order" integer,
   	"parent_id" integer NOT NULL,
   	"path" varchar NOT NULL,
-  	"blocks_id" varchar,
-  	"forms_id" varchar
+  	"blocks_id" integer,
+  	"forms_id" integer
   );
   
   ALTER TABLE "pages" ALTER COLUMN "title" DROP NOT NULL;
@@ -47,16 +48,6 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "pages" ALTER COLUMN "kind" DROP NOT NULL;
   ALTER TABLE "pages" ADD COLUMN "_status" "enum_pages_status" DEFAULT 'draft';
   UPDATE "pages" SET "_status" = 'published';
-  DO $$
-  DECLARE page_id text; block_id text; form_id text;
-  BEGIN
-    SELECT format_type(a.atttypid, a.atttypmod) INTO page_id FROM pg_attribute a JOIN pg_class c ON c.oid = a.attrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'pages' AND a.attname = 'id';
-    SELECT format_type(a.atttypid, a.atttypmod) INTO block_id FROM pg_attribute a JOIN pg_class c ON c.oid = a.attrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'blocks' AND a.attname = 'id';
-    SELECT format_type(a.atttypid, a.atttypmod) INTO form_id FROM pg_attribute a JOIN pg_class c ON c.oid = a.attrelid JOIN pg_namespace n ON n.oid = c.relnamespace WHERE n.nspname = 'public' AND c.relname = 'forms' AND a.attname = 'id';
-    EXECUTE format('ALTER TABLE "_pages_v" ALTER COLUMN "parent_id" TYPE %s USING "parent_id"::%s', page_id, page_id);
-    EXECUTE format('ALTER TABLE "_pages_v_rels" ALTER COLUMN "blocks_id" TYPE %s USING "blocks_id"::%s', block_id, block_id);
-    EXECUTE format('ALTER TABLE "_pages_v_rels" ALTER COLUMN "forms_id" TYPE %s USING "forms_id"::%s', form_id, form_id);
-  END $$;
   ALTER TABLE "_pages_v_version_layout" ADD CONSTRAINT "_pages_v_version_layout_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."_pages_v"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "_pages_v" ADD CONSTRAINT "_pages_v_parent_id_pages_id_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."pages"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "_pages_v_rels" ADD CONSTRAINT "_pages_v_rels_parent_fk" FOREIGN KEY ("parent_id") REFERENCES "public"."_pages_v"("id") ON DELETE cascade ON UPDATE no action;
