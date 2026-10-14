@@ -481,7 +481,7 @@ export function HeroCarousel({
                             playsInline
                           />
                         ) : (
-                          <img src={optimizedSrc(promo.image, 640)} alt="" />
+                          <img src={optimizedSrc(promo.image ?? '', 640)} alt="" />
                         )}
                       </span>
                     ) : null}
