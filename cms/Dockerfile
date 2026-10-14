@@ -15,7 +15,7 @@ COPY cms/ ./
 COPY src/lib/ /app/src/lib/
 ENV NODE_ENV=production
 USER node
-CMD ["npm", "run", "migrate"]
+CMD ["sh", "-c", "npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
 
 FROM runner AS operations
-CMD ["npm", "run", "migrate"]
+CMD ["sh", "-c", "npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
