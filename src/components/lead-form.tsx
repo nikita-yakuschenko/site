@@ -35,7 +35,7 @@ export function LeadForm({
   siteId: number | string
   pageId?: number | string
   projectExternalId?: string
-  projectId?: number
+  projectId?: string
   formId?: string
   heading: string
   body?: string | null

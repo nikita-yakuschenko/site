@@ -30,6 +30,7 @@ import { ConfigurationRowLabel as ConfigurationRowLabel_7a3843c074f1a6e82f8f3284
 import { ProjectPricesEditor as ProjectPricesEditor_0fdbba1ad069907ced6a80052cc362a9 } from '../../components/admin/ProjectPricesEditor'
 import { ProjectNextStepsContent as ProjectNextStepsContent_627cea68a237482f6a707b9cd631985e } from '../../components/admin/ProjectNextStepsContent'
 import { ProjectSearchDescription as ProjectSearchDescription_812b033a5d3e11f57c89523bf45101b5 } from '../../components/admin/ProjectSearchDescription'
+import { ProjectRecordMetadata as ProjectRecordMetadata_39c824816878a36ded3bfc43acf44e05 } from '../../components/admin/PageMetadataFields'
 import { MediaEmptyState as MediaEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466 } from '../../components/admin/CollectionEmptyState'
 import { EmptyNav as EmptyNav_5cbf29a2fd14a00ffc5141ee4b88c905 } from '../../components/admin/AdminShell'
 import { BrandIcon as BrandIcon_3b7459ccde24590d8b1cd329ddb07aed } from '../../components/Brand'
@@ -81,6 +82,7 @@ export const importMap = {
   "./components/admin/ProjectPricesEditor#ProjectPricesEditor": ProjectPricesEditor_0fdbba1ad069907ced6a80052cc362a9,
   "./components/admin/ProjectNextStepsContent#ProjectNextStepsContent": ProjectNextStepsContent_627cea68a237482f6a707b9cd631985e,
   "./components/admin/ProjectSearchDescription#ProjectSearchDescription": ProjectSearchDescription_812b033a5d3e11f57c89523bf45101b5,
+  "./components/admin/PageMetadataFields#ProjectRecordMetadata": ProjectRecordMetadata_39c824816878a36ded3bfc43acf44e05,
   "./components/admin/CollectionEmptyState#MediaEmptyState": MediaEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466,
   "./components/admin/AdminShell#EmptyNav": EmptyNav_5cbf29a2fd14a00ffc5141ee4b88c905,
   "./components/Brand#BrandIcon": BrandIcon_3b7459ccde24590d8b1cd329ddb07aed,

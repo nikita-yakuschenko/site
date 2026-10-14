@@ -1,4 +1,4 @@
-import assert from 'node:assert/strict'
+﻿import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import type { PayloadRequest } from 'payload'
 import type { User } from '../src/payload-types'
@@ -103,13 +103,13 @@ test('anonymous media access is limited to images referenced by connected public
       assert.deepEqual(query.where, { or: [{ heroContentSource: { equals: 'database' } }, { exteriorsContentSource: { equals: 'database' } }, { interiorsContentSource: { equals: 'database' } }, { builtContentSource: { equals: 'database' } }, { plansContentSource: { equals: 'database' } }] })
       assert.deepEqual(query.select, { heroContentSource: true, exteriorsContentSource: true, interiorsContentSource: true, builtContentSource: true, plansContentSource: true, plans: true, desktopImage: true, mobileImage: true, exteriors: true, interiors: true, built: true })
       assert.equal(query.depth, 0)
-      return { docs: [{ heroContentSource: 'database', desktopImage: 5, mobileImage: 9 }, { heroContentSource: 'mock', desktopImage: 99, exteriorsContentSource: 'database', exteriors: [{ photo: 12 }] }, { interiorsContentSource: 'database', interiors: [{ photo: 14 }], exteriors: [{ photo: 98 }] }, { builtContentSource: 'database', built: [{ type: 'photo', photo: 16 }, { type: 'video', photo: 17 }] }, { builtContentSource: 'mock', built: [{ photo: 97 }] }, { plansContentSource: 'database', plans: [{ floors: [{ photo: 21 }, { photo: 22 }] }] }, { plansContentSource: 'mock', plans: [{ floors: [{ photo: 96 }] }] }]  }
+      return { docs: [{ heroContentSource: 'database', desktopImage: 'MEDIA05X', mobileImage: 'MEDIA09X' }, { heroContentSource: 'mock', desktopImage: 'MEDIA99X', exteriorsContentSource: 'database', exteriors: [{ photo: 'MEDIA12X' }] }, { interiorsContentSource: 'database', interiors: [{ photo: 'MEDIA14X' }], exteriors: [{ photo: 'MEDIA98X' }] }, { builtContentSource: 'database', built: [{ type: 'photo', photo: 'MEDIA16X' }, { type: 'video', photo: 'MEDIA17X' }] }, { builtContentSource: 'mock', built: [{ photo: 'MEDIA97X' }] }, { plansContentSource: 'database', plans: [{ floors: [{ photo: 'MEDIA21X' }, { photo: 'MEDIA22X' }] }] }, { plansContentSource: 'mock', plans: [{ floors: [{ photo: 'MEDIA96X' }] }] }]  }
     } },
   } as unknown as PayloadRequest
   clearPublicMediaCache()
-  assert.deepEqual(await media.access!.read!({ req }), { id: { in: [5, 9, 12, 14, 16, 17, 21, 22] } })
+  assert.deepEqual(await media.access!.read!({ req }), { id: { in: ['MEDIA05X', 'MEDIA09X', 'MEDIA12X', 'MEDIA14X', 'MEDIA16X', 'MEDIA17X', 'MEDIA21X', 'MEDIA22X'] } })
   req.payload.find = (async () => ({ docs: [] })) as unknown as typeof req.payload.find
-  assert.deepEqual(await media.access!.read!({ req }), { id: { in: [5, 9, 12, 14, 16, 17, 21, 22] } })
+  assert.deepEqual(await media.access!.read!({ req }), { id: { in: ['MEDIA05X', 'MEDIA09X', 'MEDIA12X', 'MEDIA14X', 'MEDIA16X', 'MEDIA17X', 'MEDIA21X', 'MEDIA22X'] } })
   clearPublicMediaCache()
   assert.equal(await media.access!.read!({ req }), false)
 })

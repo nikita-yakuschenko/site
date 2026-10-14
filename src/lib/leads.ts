@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { recordIdPattern } from './record-id'
 
 export const leadInputSchema = z.object({
   name: z.string().trim().min(2).max(120),
@@ -10,7 +11,7 @@ export const leadInputSchema = z.object({
     .regex(/^[+\d][\d\s()-]{8,}$/),
   siteId: z.union([z.number().int().positive(), z.string().trim().min(1).max(120)]),
   pageId: z.union([z.number().int().positive(), z.string().trim().min(1).max(120)]).optional(),
-  projectId: z.number().int().positive().optional(),
+  projectId: z.string().regex(recordIdPattern).optional(),
   formId: z.string().trim().min(1).max(120).optional(),
   sourceUrl: z.string().url().max(2000).optional(),
   message: z.string().trim().max(5000).optional(),

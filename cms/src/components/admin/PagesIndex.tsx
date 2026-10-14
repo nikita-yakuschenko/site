@@ -7,7 +7,7 @@ import { IconExternalLink, IconSearch, IconChevronLeft, IconChevronRight } from 
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { ChoiceSelect } from './ChoiceSelect'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 
 const kinds: Record<string, string> = { page: 'Страница', template: 'Шаблон', exposition: 'Выставочная площадка', redirect: 'Переадресация', preview: 'Предпросмотр' }
@@ -29,10 +29,7 @@ export function PagesIndex({ siteUrl, pages }: { siteUrl: string; pages: Page[] 
         <IconSearch className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input aria-label="Поиск страниц" placeholder="Поиск по названию или адресу" className="pl-9" value={search} onChange={event => { setSearch(event.target.value); setPage(0) }} />
       </div>
-      <Select value={kind} onValueChange={value => { setKind(value); setPage(0) }}>
-        <SelectTrigger aria-label="Тип страницы" className="w-full sm:w-56"><SelectValue /></SelectTrigger>
-        <SelectContent><SelectItem value="all">Все типы</SelectItem>{Object.entries(kinds).map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}</SelectContent>
-      </Select>
+      <ChoiceSelect label="Тип страницы" className="w-full sm:w-56" value={kind} options={{ all: 'Все типы', ...kinds }} onChange={value => { setKind(value); setPage(0) }} />
       <Button asChild className="sm:ml-auto"><Link href="/collections/pages/create">Создать</Link></Button>
     </div>
     <div className="overflow-hidden rounded-lg border bg-card">

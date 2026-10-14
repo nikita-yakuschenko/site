@@ -69,10 +69,15 @@ function loadYmaps(apikey: string): Promise<YmapsNs> {
 }
 
 /** Один загрузчик и runtime-ключ для карт контактов и выставочных площадок. */
+let keyRequest: Promise<string> | null = null
+
 export async function loadYandexMaps() {
   if (typeof window !== 'undefined' && window.ymaps) return window.ymaps
-  const response = await fetch('/api/maps-key')
-  const data: { key?: string } | null = response.ok ? await response.json() : null
-  if (!data?.key) throw new Error('ключ JS API не задан')
-  return loadYmaps(data.key)
+  // Один запрос ключа на страницу, даже если карт несколько или эффект запущен дважды
+  keyRequest ??= fetch('/api/maps-key').then(async response => {
+    const data: { key?: string } | null = response.ok ? await response.json() : null
+    if (!data?.key) throw new Error('ключ JS API не задан')
+    return data.key
+  }).catch(error => { keyRequest = null; throw error })
+  return loadYmaps(await keyRequest)
 }

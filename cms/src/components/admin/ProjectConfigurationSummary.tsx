@@ -13,7 +13,7 @@ export function ProjectConfigurationSummary() {
   const keys = configurationKeys(isModularTechnology(technology))
   const [templates, setTemplates] = useState<ConfigurationTemplatesData>({})
   const [error, setError] = useState(false)
-  const [blockId, setBlockId] = useState<number | null>(null)
+  const [blockId, setBlockId] = useState<string | null>(null)
   useEffect(() => {
     const controller = new AbortController()
     fetch('/api/blocks?where[key][equals]=ProjectConfig&limit=1&depth=0', { signal: controller.signal }).then(async response => {

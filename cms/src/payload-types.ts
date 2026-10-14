@@ -91,7 +91,7 @@ export interface UserAuthOperations {
  * via the `definition` "users".
  */
 export interface User {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   role: 'super-admin' | 'admin' | 'editor' | 'viewer';
@@ -124,7 +124,7 @@ export interface User {
  * via the `definition` "pages".
  */
 export interface Page {
-  id: number;
+  id: string;
   title: string;
   route: string;
   metaTitle: string;
@@ -136,11 +136,11 @@ export interface Page {
         component:
           | {
               relationTo: 'blocks';
-              value: number | Block;
+              value: string | Block;
             }
           | {
               relationTo: 'forms';
-              value: number | Form;
+              value: string | Form;
             };
         anchor?: string | null;
         parameters?:
@@ -164,7 +164,7 @@ export interface Page {
  * via the `definition` "blocks".
  */
 export interface Block {
-  id: number;
+  id: string;
   title: string;
   configurationTemplates?: {
     panel?: {
@@ -431,7 +431,7 @@ export interface Block {
         id?: string | null;
       }[]
     | null;
-  forms?: (number | Form)[] | null;
+  forms?: (string | Form)[] | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -440,7 +440,7 @@ export interface Block {
  * via the `definition` "forms".
  */
 export interface Form {
-  id: number;
+  id: string;
   title: string;
   key?: string | null;
   source?: string | null;
@@ -469,7 +469,7 @@ export interface Form {
  * via the `definition` "projects".
  */
 export interface Project {
-  id: number;
+  id: string;
   recordType: 'project' | 'ready-home';
   slug: string;
   blockOrder?:
@@ -482,12 +482,12 @@ export interface Project {
     | boolean
     | null;
   name: string;
-  desktopImage?: (number | null) | Media;
+  desktopImage?: (string | null) | Media;
   imageUrl?: string | null;
   /**
    * До 430 px. Если не задано, используется десктопное изображение.
    */
-  mobileImage?: (number | null) | Media;
+  mobileImage?: (string | null) | Media;
   mobileImageUrl?: string | null;
   technologyBadge: 'Панельно-каркасный' | 'Модульный';
   series?: ('panel' | 'barn' | 'classic' | 'modular') | null;
@@ -497,7 +497,7 @@ export interface Project {
   bathrooms: number;
   exteriors?:
     | {
-        photo?: (number | null) | Media;
+        photo?: (string | null) | Media;
         image?: string | null;
         isPrimary?: boolean | null;
         id?: string | null;
@@ -522,7 +522,7 @@ export interface Project {
           | null;
         floors: {
           label?: string | null;
-          photo?: (number | null) | Media;
+          photo?: (string | null) | Media;
           image?: string | null;
           rooms: {
             name: string;
@@ -536,7 +536,7 @@ export interface Project {
     | null;
   interiors?:
     | {
-        photo?: (number | null) | Media;
+        photo?: (string | null) | Media;
         image?: string | null;
         id?: string | null;
       }[]
@@ -550,7 +550,7 @@ export interface Project {
          * Платформа определяется по ссылке автоматически.
          */
         videoUrl?: string | null;
-        photo?: (number | null) | Media;
+        photo?: (string | null) | Media;
         image?: string | null;
         caption?: string | null;
         id?: string | null;
@@ -692,13 +692,14 @@ export interface Project {
     | null;
   updatedAt: string;
   createdAt: string;
+  _status?: ('draft' | 'published') | null;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media".
  */
 export interface Media {
-  id: number;
+  id: string;
   /**
    * Если пусто, подставится имя файла.
    */
@@ -735,9 +736,9 @@ export interface Media {
  * via the `definition` "project-prices".
  */
 export interface ProjectPrice {
-  id: number;
+  id: string;
   lookupKey: string;
-  project: number | Project;
+  project: string | Project;
   configuration: 'start' | 'standard' | 'project' | 'turnkey';
   region: 'msk' | 'nn' | 'special' | 'dealer';
   price: number;
@@ -749,7 +750,7 @@ export interface ProjectPrice {
  * via the `definition` "lead-submissions".
  */
 export interface LeadSubmission {
-  id: number;
+  id: string;
   requestId: string;
   formId: string;
   status: 'pending' | 'test' | 'sent' | 'failed';
@@ -791,40 +792,40 @@ export interface PayloadLockedDocument {
   document?:
     | ({
         relationTo: 'users';
-        value: number | User;
+        value: string | User;
       } | null)
     | ({
         relationTo: 'pages';
-        value: number | Page;
+        value: string | Page;
       } | null)
     | ({
         relationTo: 'blocks';
-        value: number | Block;
+        value: string | Block;
       } | null)
     | ({
         relationTo: 'forms';
-        value: number | Form;
+        value: string | Form;
       } | null)
     | ({
         relationTo: 'projects';
-        value: number | Project;
+        value: string | Project;
       } | null)
     | ({
         relationTo: 'project-prices';
-        value: number | ProjectPrice;
+        value: string | ProjectPrice;
       } | null)
     | ({
         relationTo: 'lead-submissions';
-        value: number | LeadSubmission;
+        value: string | LeadSubmission;
       } | null)
     | ({
         relationTo: 'media';
-        value: number | Media;
+        value: string | Media;
       } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   updatedAt: string;
   createdAt: string;
@@ -837,7 +838,7 @@ export interface PayloadPreference {
   id: number;
   user: {
     relationTo: 'users';
-    value: number | User;
+    value: string | User;
   };
   key?: string | null;
   value?:
@@ -868,6 +869,7 @@ export interface PayloadMigration {
  * via the `definition` "users_select".
  */
 export interface UsersSelect<T extends boolean = true> {
+  id?: T;
   firstName?: T;
   lastName?: T;
   role?: T;
@@ -895,6 +897,7 @@ export interface UsersSelect<T extends boolean = true> {
  * via the `definition` "pages_select".
  */
 export interface PagesSelect<T extends boolean = true> {
+  id?: T;
   title?: T;
   route?: T;
   metaTitle?: T;
@@ -918,6 +921,7 @@ export interface PagesSelect<T extends boolean = true> {
  * via the `definition` "blocks_select".
  */
 export interface BlocksSelect<T extends boolean = true> {
+  id?: T;
   title?: T;
   configurationTemplates?:
     | T
@@ -1203,6 +1207,7 @@ export interface BlocksSelect<T extends boolean = true> {
  * via the `definition` "forms_select".
  */
 export interface FormsSelect<T extends boolean = true> {
+  id?: T;
   title?: T;
   key?: T;
   source?: T;
@@ -1223,6 +1228,7 @@ export interface FormsSelect<T extends boolean = true> {
  * via the `definition` "projects_select".
  */
 export interface ProjectsSelect<T extends boolean = true> {
+  id?: T;
   recordType?: T;
   slug?: T;
   blockOrder?: T;
@@ -1432,12 +1438,14 @@ export interface ProjectsSelect<T extends boolean = true> {
   legacyConfigurations?: T;
   updatedAt?: T;
   createdAt?: T;
+  _status?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "project-prices_select".
  */
 export interface ProjectPricesSelect<T extends boolean = true> {
+  id?: T;
   lookupKey?: T;
   project?: T;
   configuration?: T;
@@ -1451,6 +1459,7 @@ export interface ProjectPricesSelect<T extends boolean = true> {
  * via the `definition` "lead-submissions_select".
  */
 export interface LeadSubmissionsSelect<T extends boolean = true> {
+  id?: T;
   requestId?: T;
   formId?: T;
   status?: T;
@@ -1463,6 +1472,7 @@ export interface LeadSubmissionsSelect<T extends boolean = true> {
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
+  id?: T;
   alt?: T;
   title?: T;
   description?: T;

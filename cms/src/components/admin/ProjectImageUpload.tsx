@@ -9,14 +9,15 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { builtVideoEmbed, detectBuiltVideo } from '../../config/built-media'
+import { isRecordId } from '../../../../src/lib/record-id'
 import { toast } from 'sonner'
 import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from '@/components/ui/attachment'
 import { ImagePreviewOverlay, type PreviewImage } from './ImagePreviewOverlay'
 
 type GalleryTarget = 'exteriors' | 'interiors' | 'built'
 type GalleryRow = { photo?: unknown; type?: string; isPrimary?: boolean }
-type PendingFile = { key: string; name: string; progress: number; error?: string; mediaId?: number }
-type MediaDoc = { id: number; filename?: string; mimeType?: string; filesize?: number; url?: string; thumbnailURL?: string | null }
+type PendingFile = { key: string; name: string; progress: number; error?: string; mediaId?: string }
+type MediaDoc = { id: string; filename?: string; mimeType?: string; filesize?: number; url?: string; thumbnailURL?: string | null }
 
 const imageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif'])
 
@@ -24,9 +25,8 @@ function isImage(file: File) {
   return imageTypes.has(file.type) || /\.(jpe?g|png|webp|avif)$/i.test(file.name)
 }
 
-function photoId(value: unknown): number | null {
-  if (typeof value === 'number' && Number.isFinite(value)) return value
-  if (typeof value === 'string' && /^\d+$/.test(value)) return Number(value)
+function photoId(value: unknown): string | null {
+  if (isRecordId(value)) return value
   if (value && typeof value === 'object' && 'id' in value) return photoId((value as { id: unknown }).id)
   return null
 }
@@ -62,7 +62,7 @@ function fileSummary(mime?: string, name?: string, bytes?: number) {
 }
 
 function uploadMedia(file: File, onProgress: (percent: number) => void) {
-  return new Promise<number>((resolve, reject) => {
+  return new Promise<string>((resolve, reject) => {
     const body = new FormData()
     body.append('file', file)
     const request = new XMLHttpRequest()
@@ -74,7 +74,7 @@ function uploadMedia(file: File, onProgress: (percent: number) => void) {
     request.onload = () => {
       const result = JSON.parse(request.responseText || 'null')
       const id = result?.doc?.id ?? result?.id
-      if (request.status >= 200 && request.status < 300 && typeof id === 'number') resolve(id)
+      if (request.status >= 200 && request.status < 300 && isRecordId(id)) resolve(id)
       else reject(new Error(result?.errors?.[0]?.message || 'Не удалось загрузить фото'))
     }
     request.onerror = () => reject(new Error('Не удалось загрузить фото'))
@@ -86,9 +86,9 @@ function usePhotoPlacer() {
   const { addFieldRow, dispatchFields, getDataByPath, setModified } = useForm()
   const timers = useRef<number[]>([])
   useEffect(() => () => { timers.current.forEach(id => window.clearTimeout(id)) }, [])
-  return (arrayPath: string, ids: number[], startIndex: number) => {
+  return (arrayPath: string, ids: string[], startIndex: number) => {
     const rows = (getDataByPath(arrayPath) as GalleryRow[] | null) || []
-    const fresh: number[] = []
+    const fresh: string[] = []
     let cursor = startIndex
     for (const id of ids) {
       let placed = false
@@ -126,8 +126,8 @@ function usePhotoPlacer() {
   }
 }
 
-function useMediaDocs(ids: number[]) {
-  const [docs, setDocs] = useState<Record<number, MediaDoc>>({})
+function useMediaDocs(ids: string[]) {
+  const [docs, setDocs] = useState<Record<string, MediaDoc>>({})
   const key = ids.join(',')
   useEffect(() => {
     const missing = ids.filter(id => !docs[id])
@@ -141,7 +141,7 @@ function useMediaDocs(ids: number[]) {
       if (cancelled) return
       setDocs(current => {
         const next = { ...current }
-        for (const item of items) if (item && typeof item.id === 'number') next[item.id] = item
+        for (const item of items) if (item && isRecordId(item.id)) next[item.id] = item
         return next
       })
     })
@@ -209,7 +209,7 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
   const signature = useFormFields(([fields]) => gallerySignature(target, fields))
   const rows = signature ? signature.split('|').map(part => {
     const [index, photo, primary] = part.split(':')
-    return { index: Number(index), photo: photo ? Number(photo) : null, primary: primary === '1' }
+    return { index: Number(index), photo: photo || null, primary: primary === '1' }
   }) : []
   const docs = useMediaDocs(rows.flatMap(row => row.photo ? [row.photo] : []))
   const built = target === 'built'
@@ -221,7 +221,7 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
   }))) : '[]')
   const meta = JSON.parse(builtMeta) as { type: 'photo' | 'video'; url: string; caption: string }[]
   const [videoDialog, setVideoDialog] = useState<{ index: number | null; url: string; caption: string } | null>(null)
-  const known = useRef(new Map<number, { name: string; size: number; type: string }>())
+  const known = useRef(new Map<string, { name: string; size: number; type: string }>())
   const fileInput = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<PendingFile[]>([])
   const [preview, setPreview] = useState<PreviewImage | null>(null)
@@ -424,10 +424,10 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
   const listedGallery = Boolean(slot && /^(exteriors|interiors|built)$/.test(slot.arrayPath))
   const rowType = useFormFields(([fields]) => slot ? fields[`${slot.arrayPath}.${slot.index}.type`]?.value : null)
   const place = usePhotoPlacer()
-  const { setValue, value } = useField<number | null>({ path: props.path })
+  const { setValue, value } = useField<string | null>({ path: props.path })
   const id = photoId(value)
   const docs = useMediaDocs(id ? [id] : [])
-  const known = useRef(new Map<number, { name: string; size: number; type: string }>())
+  const known = useRef(new Map<string, { name: string; size: number; type: string }>())
   const fileInput = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<PendingFile[]>([])
   const [preview, setPreview] = useState<PreviewImage | null>(null)

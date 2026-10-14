@@ -7,7 +7,9 @@ import { isProjectHeroData, type ProjectHeroData } from '../lib/catalog/project-
 
 export function ProjectHeroContent({ data, connected, location, payment }: { data: ProjectHeroData; connected: boolean; location?: string; payment: ReactNode }) {
   const [draft, setDraft] = useState<ProjectHeroData | null>(null)
-  const hero = draft || data
+  const current = draft || data
+  // Unfinished drafts show explicit placeholders instead of blanks
+  const hero = { ...current, name: current.name.trim() || 'Без названия', technologyBadge: current.technologyBadge || 'Не выбрана' }
   useEffect(() => {
     if (!connected || window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return
     const allowed = new Set(['http://localhost:3001', 'https://cms.avgst.ru'])
@@ -28,7 +30,7 @@ export function ProjectHeroContent({ data, connected, location, payment }: { dat
   return <>
     <picture className="project-hero__media">
       {hero.mobileImageUrl && <source media="(max-width: 430px)" srcSet={hero.mobileImageUrl} />}
-      <img src={hero.imageUrl} alt="" />
+      {hero.imageUrl && <img src={hero.imageUrl} alt="" />}
     </picture>
     <div className="project-hero__veil" />
     <div className="project-hero__stage">

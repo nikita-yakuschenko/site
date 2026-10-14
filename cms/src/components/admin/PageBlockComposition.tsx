@@ -7,7 +7,7 @@ import { IconComponents } from '@tabler/icons-react'
 
 export function PageBlockComposition({ path }: UIFieldClientProps) {
   const parent = (path || '').replace(/\.composition$/, '')
-  const component = useFormFields(([fields]) => fields[`${parent}.component`]?.value) as { relationTo: string; value: number | { id: number } } | undefined
+  const component = useFormFields(([fields]) => fields[`${parent}.component`]?.value) as { relationTo: string; value: string | { id: string } } | undefined
   const id = typeof component?.value === 'object' ? component.value.id : component?.value
   const recordKey = `${component?.relationTo}:${id}`
   const [record, setRecord] = useState<{ recordKey: string; parts: { key: string; title: string }[] }>()

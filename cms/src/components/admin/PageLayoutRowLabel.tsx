@@ -3,7 +3,7 @@ import { useRowLabel, useCollapsible } from '@payloadcms/ui'
 import { useEffect, useState } from 'react'
 import { IconForms, IconLayout } from '@tabler/icons-react'
 import { Badge } from '../ui/badge'
-type Row = { component?: { relationTo: 'blocks' | 'forms'; value: number | { id: number; title?: string } } }
+type Row = { component?: { relationTo: 'blocks' | 'forms'; value: string | { id: string; title?: string } } }
 export function PageLayoutRowLabel() {
   const { data, rowNumber, path } = useRowLabel<Row>()
   const { isCollapsed } = useCollapsible()

@@ -30,10 +30,14 @@ const galleryBatch = (target: 'exteriors' | 'interiors' | 'built') => ({ path: '
 export const Projects: CollectionConfig = {
   slug: 'projects',
   labels: { singular: 'Запись каталога', plural: 'Каталог' },
-  admin: { useAsTitle: 'name', defaultColumns: ['name', 'recordType', 'technologyBadge', 'areaValue', 'priceAmount'] },
+  admin: { useAsTitle: 'name', defaultColumns: ['name', 'recordType', 'technologyBadge', 'areaValue', 'priceAmount', '_status'], components: { edit: { beforeDocumentControls: ['./components/admin/PageMetadataFields#ProjectRecordMetadata'] } } },
+  versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
   endpoints: [...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint],
-  hooks: { beforeValidate: [({ data, originalDoc }) => {
+  hooks: { beforeDelete: [async ({ id, req }) => {
+    // Price rows require a project, so they go first
+    await req.payload.delete({ collection: 'project-prices', where: { project: { equals: id } }, req, overrideAccess: true })
+  }], beforeValidate: [({ data, originalDoc }) => {
     if (Array.isArray(data?.plans)) data.plans = normalizePlans(data.plans)
     if (data && completeProjectOrder(data.blockOrder)) data.blockOrder = normalizeProjectOrder(data.blockOrder)
     if (Array.isArray(data?.interiors)) data.interiors = data.interiors.map((row: { photo?: unknown; image?: string }) => ({ ...row, image: row.photo ? null : row.image }))
@@ -64,6 +68,8 @@ export const Projects: CollectionConfig = {
     }
     return data
   }], beforeChange: [({ data, operation, originalDoc }) => {
+    // Unnamed drafts get a recognizable name with their record ID
+    if (operation === 'create' && !data.name?.trim() && data.id) data.name = `Черновик #${data.id}`
     const manualProject = (operation === 'create' && !data.importKey) || (originalDoc && !originalDoc.importKey)
     if (manualProject || data.desktopImage) data.heroContentSource = 'database'
     if (manualProject) {
@@ -82,7 +88,7 @@ export const Projects: CollectionConfig = {
     { name: 'blockOrder', label: 'Порядок блоков', type: 'json', validate: (value: unknown) => value == null || validProjectOrder(value) ? true : 'Порядок должен содержать все блоки без повторений', admin: { components: { Field: './components/admin/ProjectBlockOrder#ProjectBlockOrder' } } },
     { type: 'collapsible', label: 'Главный экран', fields: [
       focus('projectHero', 'Главный экран'),
-      { name: 'name', label: 'Название', type: 'text', required: true },
+      { name: 'name', label: 'Название', type: 'text', required: true, admin: { className: 'project-name-field' } },
       { name: 'desktopImage', label: 'Изображение главного экрана: десктоп', type: 'upload', relationTo: 'media', admin: { components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
       { name: 'imageUrl', type: 'text', admin: { hidden: true } },
       { name: 'heroThumbnail', type: 'ui', admin: { components: { Field: './components/admin/ProjectImageField#ProjectHeroImage' } } },
@@ -249,6 +255,8 @@ export const Projects: CollectionConfig = {
 }
 
 const sectionKeys: Record<string, ProjectContentBlock> = { 'Главный экран': 'projectHero', 'Рендеры фасадов': 'ProjectExteriors', 'Планировки': 'ProjectPlans', 'Рендеры интерьеров': 'ProjectInteriors', 'Построенные дома': 'ProjectBuilt', 'Ипотечный калькулятор': 'MortgageCalculator', 'Комплектации': 'ProjectConfig', 'Готовый дом — условия продажи': 'ReadyHomeOffer', 'Просмотр дома и консультация': 'ProjectNextSteps', 'Похожие проекты': 'ProjectSimilar', 'Контакты': 'contactsSection' }
+// Top-level data names inside unnamed layout fields
+const namesOf = (fields: Field[]): string[] => fields.flatMap(field => 'name' in field ? [field.name] : 'fields' in field ? namesOf(field.fields) : [])
 for (const field of Projects.fields) {
   if (field.type !== 'collapsible' || typeof field.label !== 'string') continue
   const blockKey = sectionKeys[field.label]
@@ -258,7 +266,7 @@ for (const field of Projects.fields) {
     components: {
       ...field.admin?.components,
       Field: './components/admin/ProjectSectionCard#ProjectSectionCard',
-      ...(blockKey ? { Label: { path: './components/admin/ProjectSectionLabel#ProjectSectionLabel', clientProps: { title: field.label, blockKey } } } : {}),
+      ...(blockKey ? { Label: { path: './components/admin/ProjectSectionLabel#ProjectSectionLabel', clientProps: { title: field.label, blockKey, fieldNames: namesOf(field.fields) } } } : {}),
     },
   }
 }

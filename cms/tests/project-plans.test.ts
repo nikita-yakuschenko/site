@@ -1,4 +1,4 @@
-import test from 'node:test'
+﻿import test from 'node:test'
 import assert from 'node:assert/strict'
 import { floorName, normalizePlans, validRoomArea, variantName } from '../src/config/project-plans'
 import { isPlanVariants } from '../../src/lib/catalog/project-plans-data'
@@ -18,9 +18,9 @@ test('variant and floor names are positional', () => {
   assert.equal(floorName('Мансарда', 1), '2 этаж')
 })
 test('uploaded floor replaces legacy path and keeps its explication', () => {
-  const [variant] = normalizePlans([{ floors: [{ photo: 15, image: '/old.jpg', rooms: [{ name: 'Спальня', area: '10' }] }] }])
+  const [variant] = normalizePlans([{ floors: [{ photo: 'PLAN15AB', image: '/old.jpg', rooms: [{ name: 'Спальня', area: '10' }] }] }])
   assert.equal(variant.floors[0].image, null)
-  assert.equal(variant.floors[0].photo, 15)
+  assert.equal(variant.floors[0].photo, 'PLAN15AB')
   assert.equal(variant.floors[0].rooms.length, 1)
 })
 test('public plans cannot contain an image without explication', () => {

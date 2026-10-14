@@ -12,6 +12,7 @@ import { ProjectPrices } from './collections/ProjectPrices'
 import { LeadDelivery, LeadSubmissions } from './collections/LeadSubmissions'
 import { createMedia } from './collections/Media'
 import { readEnvironment } from './config/environment'
+import { withRecordId } from './collections/record-id'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const environment = readEnvironment()
@@ -50,7 +51,11 @@ export default buildConfig({
     },
     timezones: { defaultTimezone: 'Europe/Moscow', supportedTimezones: [{ label: 'Москва', value: 'Europe/Moscow' }] },
   },
-  i18n: { supportedLanguages: { ru }, fallbackLanguage: 'ru' },
+  i18n: {
+    supportedLanguages: { ru },
+    fallbackLanguage: 'ru',
+    translations: { ru: { version: { saveDraft: 'Сохранить', publish: 'Опубликовать', publishChanges: 'Опубликовать' } } },
+  },
   cors: [environment.publicURL],
   csrf: [environment.publicURL],
   cookiePrefix: 'avgst-cms',
@@ -59,7 +64,7 @@ export default buildConfig({
   debug: false,
   defaultDepth: 0,
   maxDepth: 3,
-  collections: [Users, Pages, Blocks, Forms, Projects, ProjectPrices, LeadSubmissions, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
+  collections: [Users, Pages, Blocks, Forms, Projects, ProjectPrices, LeadSubmissions, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })].map(withRecordId),
   globals: [LeadDelivery],
   editor: lexicalEditor(),
   sharp,

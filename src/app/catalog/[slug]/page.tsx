@@ -30,10 +30,30 @@ import { resolveProjectExteriors, resolveProjectInteriors } from '../../../lib/c
 import { resolveProjectBuilt } from '../../../lib/catalog/project-built'
 import { resolveProjectNextSteps } from '../../../lib/catalog/project-next-steps'
 import { ProjectHeroContent } from '../../../components/project-hero-content'
+import type { ProjectHeroData } from '../../../lib/catalog/project-hero-data'
+import { DraftPreviewGate } from '../../../components/draft-preview-gate'
 import { SITE } from '../../../lib/site'
 import { getProjectPageOrder } from '../../../lib/catalog/page-order'
 
 const catalog = new CmsCatalogProvider()
+
+const DRAFT_SLUG = '__draft'
+const draftHero: ProjectHeroData = { slug: '', name: 'Без названия', technologyBadge: '', areaValue: 0, floorsValue: 0, bedrooms: 0, bathrooms: 0, imageUrl: '', mobileImageUrl: null }
+const draftProject = {
+  project: { id: DRAFT_SLUG, slug: DRAFT_SLUG, name: 'Без названия', area: '', areaValue: 0, floors: '', floorsValue: 0, bedrooms: '0', bathrooms: '0', priceLabel: 'Цена уточняется', priceAmount: null, imageUrl: '', technologyBadge: '', technology: 'panel', series: 'panel', href: '#', description: '', about: [], exteriors: [], interiors: [], floorPlans: [], options: [] } as CatalogProject,
+  hero: draftHero,
+  source: 'database' as const,
+}
+// Headings shown for sections that have no content yet
+const draftHeadings: Record<string, string> = {
+  ProjectExteriors: copy.exteriorsHeading,
+  ProjectPlans: copy.plansHeading,
+  ProjectInteriors: copy.interiorsHeading,
+  ProjectBuilt: 'Как дом выглядит в жизни',
+  MortgageCalculator: 'Расчёт ипотеки',
+  ProjectConfig: copy.configHeading,
+  ProjectSimilar: 'Похожие проекты',
+}
 
 export async function generateMetadata({
   params,
@@ -41,6 +61,7 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>
 }): Promise<Metadata> {
   const { slug } = await params
+  if (slug === DRAFT_SLUG) return { title: 'Без названия', robots: { index: false, follow: false } }
   const result = await resolveProjectHero(slug)
   if (!result) return { title: copy.notFound }
   return { title: result.hero.name, description: result.project.description }
@@ -49,20 +70,21 @@ export async function generateMetadata({
 /** Карточка проекта из CMS с общими и системными блоками. */
 export default async function ProjectPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ cmsPreview?: string }> }) {
   const { slug } = await params
-  const result = await resolveProjectHero(slug)
+  const query = await searchParams
+  // CMS preview of an unpublished project: empty page filled by form drafts
+  const draft = slug === DRAFT_SLUG
+  if (draft && query.cmsPreview !== '1') notFound()
+  const result = draft ? draftProject : await resolveProjectHero(slug)
   if (!result) notFound()
   const { project, hero, source } = result
-  if (hero.slug !== slug) {
-    const query = await searchParams
-    redirect(`/catalog/${hero.slug}${query.cmsPreview === '1' ? '?cmsPreview=1' : ''}`)
-  }
+  if (!draft && hero.slug !== slug) redirect(`/catalog/${hero.slug}${query.cmsPreview === '1' ? '?cmsPreview=1' : ''}`)
   const heroProject = { ...project, name: hero.name, slug: hero.slug }
-  const [exteriors, interiors, built, nextSteps, plans, configurations] = await Promise.all([resolveProjectExteriors(hero.slug), resolveProjectInteriors(hero.slug), resolveProjectBuilt(hero.slug), resolveProjectNextSteps(hero.slug), resolveProjectPlans(hero.slug), resolveProjectConfigurations(hero.slug)])
+  const [exteriors, interiors, built, nextSteps, plans, configurations] = draft ? [[], [], [], undefined, [], []] : await Promise.all([resolveProjectExteriors(hero.slug), resolveProjectInteriors(hero.slug), resolveProjectBuilt(hero.slug), resolveProjectNextSteps(hero.slug), resolveProjectPlans(hero.slug), resolveProjectConfigurations(hero.slug)])
 
   const pageOrder = await getProjectPageOrder(slug)
   const blockStyle = (key: string) => ({ order: pageOrder.indexOf(key), width: '100%' })
 
-  const { items: catalogProjects } = await catalog.list({ siteCode: SITE.code })
+  const { items: catalogProjects } = draft ? { items: [] } : await catalog.list({ siteCode: SITE.code })
   const similarProjects = catalogProjects
     .filter((item) => item.id !== project.id)
     .sort((a, b) => similarityScore(project, a) - similarityScore(project, b))
@@ -76,6 +98,7 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
 
   return (
     <ProjectLeadProvider project={project}>
+    <DraftPreviewGate enabled={draft}>
     <SiteChrome
       name={SITE.name}
       phone={SITE.contacts.phone}
@@ -129,16 +152,20 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
             ProjectInteriors: <ProjectInteriors project={project} images={interiors ?? undefined} connected={interiors !== null} />,
             ProjectBuilt: <ProjectBuilt project={project} items={built ?? undefined} />,
             ReadyHomeOffer: readyHome ? <ReadyHomeOffer project={project} /> : null,
-            MortgageCalculator: !readyHome && tiers ? <MortgageCalculator projects={[]} initialPropertyPrice={standardPrice || undefined} initialProgramId="family" showMatches={false} projectTiers={tiers} showEyebrow={false} /> : null,
+            MortgageCalculator: !readyHome && tiers && !draft ? <MortgageCalculator projects={[]} initialPropertyPrice={standardPrice || undefined} initialProgramId="family" showMatches={false} projectTiers={tiers} showEyebrow={false} /> : null,
             ProjectConfig: !readyHome ? <ProjectConfig project={heroProject} configurations={configurations ?? []} /> : null,
             ProjectNextSteps: <ProjectNextSteps readyHome={Boolean(readyHome)} reviewImage={project.imageUrl} visitImage={readyHome?.visitImage} settings={nextSteps} />,
             ProjectSimilar: <ProjectSimilar projects={similarProjects} />,
             contactsSection: <ContactsSection block={{ blockType: 'contactsSection', showEyebrow: false, muted: false }} contacts={SITE.contacts} siteId={SITE.id} pageId={project.id} project={{ id: project.id, cmsId: hero.projectId, slug: hero.slug, name: hero.name }} />,
           }
-          return blocks[key] ? <div key={key} data-cms-block={key} style={blockStyle(key)}>{blocks[key]}</div> : null
+          const emptyHeading = draft ? draftHeadings[key] : undefined
+          return blocks[key] || emptyHeading ? <div key={key} data-cms-block={key} style={blockStyle(key)}>{blocks[key]}{emptyHeading && <section className="section project-preview-empty"><div className="section__inner"><h2>{emptyHeading}</h2></div></section>}</div> : null
         })}
+        {/* Heading stays only while the section itself renders nothing */}
+        {draft && <style>{'.project-preview-empty:not(:only-child) { display: none; }'}</style>}
       </main>
     </SiteChrome>
+    </DraftPreviewGate>
     </ProjectLeadProvider>
   )
 }

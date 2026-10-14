@@ -6,7 +6,7 @@ import { projectOrderEndpoints } from '../src/collections/project-order-endpoint
 if (existsSync('.env')) process.loadEnvFile('.env')
 const { default: config } = await import('../src/payload.config')
 const payload = await getPayload({ config })
-const created: number[] = []
+const created: string[] = []
 try {
   const admins = await payload.find({ collection: 'users', where: { and: [{ role: { equals: 'super-admin' } }, { isBlocked: { equals: false } }] }, limit: 1, overrideAccess: true })
   assert(admins.docs[0])

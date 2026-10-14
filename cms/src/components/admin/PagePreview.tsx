@@ -1,8 +1,9 @@
 'use client'
 import { useDocumentInfo, useForm, useFormFields } from '@payloadcms/ui'
 import { useEffect, useRef, useState } from 'react'
-import { IconExternalLink, IconRefresh, IconDeviceDesktop, IconDeviceMobile, IconDeviceTablet, IconMaximize } from '@tabler/icons-react'
+import { IconExternalLink, IconRefresh, IconDeviceDesktop, IconDeviceMobile, IconDeviceTablet, IconMaximize, IconBrowser } from '@tabler/icons-react'
 import { Button } from '../ui/button'
+import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
 import { useGalleryPreview } from './useGalleryPreview'
 import { usePlansPreview } from './usePlansPreview'
 import { useBuiltPreview } from './useBuiltPreview'
@@ -16,8 +17,10 @@ const devices = [
   { key: 'mobile', label: 'Телефон', width: 390, height: 844, icon: IconDeviceMobile },
 ] as const
 export function PagePreview({ siteUrl, project = false, configuration }: { siteUrl: string; project?: boolean; configuration?: { variant: 'panel' | 'modular'; tier: ConfigurationKey } }) {
-  const { data } = useDocumentInfo()
+  const { data, hasPublishedDoc } = useDocumentInfo()
   const { getDataByPath } = useForm()
+  // Unpublished projects have no site page yet, so the preview uses an empty draft page
+  const projectDraft = project && !(hasPublishedDoc && typeof data?.slug === 'string')
   const configurationFields = useFormFields(([fields]) => configuration ? fields : null)
   const nextStepsDraft = useFormFields(([fields]) => project ? normalizeNextStepsSettings({
     enabled: fields['nextStepsSettings.enabled']?.value as boolean,
@@ -25,10 +28,10 @@ export function PagePreview({ siteUrl, project = false, configuration }: { siteU
     secondaryEnabled: fields['nextStepsSettings.secondaryEnabled']?.value as boolean,
     order: fields['nextStepsSettings.order']?.value as NextStepsSettings['order'],
   }) : null)
-  const heroDraft = useFormFields(([fields]) => project && fields.heroContentSource?.value === 'database' ? {
-    slug: fields.slug?.value, name: fields.name?.value, technologyBadge: fields.technologyBadge?.value,
-    areaValue: fields.areaValue?.value, floorsValue: fields.floorsValue?.value, bedrooms: fields.bedrooms?.value, bathrooms: fields.bathrooms?.value,
-    imageUrl: fields.imageUrl?.value, mobileImageUrl: fields.mobileImageUrl?.value || null,
+  const heroDraft = useFormFields(([fields]) => project && (projectDraft || fields.heroContentSource?.value === 'database') ? {
+    slug: fields.slug?.value || '', name: fields.name?.value || '', technologyBadge: fields.technologyBadge?.value || '',
+    areaValue: Number(fields.areaValue?.value) || 0, floorsValue: Number(fields.floorsValue?.value) || 0, bedrooms: Number(fields.bedrooms?.value) || 0, bathrooms: Number(fields.bathrooms?.value) || 0,
+    imageUrl: fields.imageUrl?.value || '', mobileImageUrl: fields.mobileImageUrl?.value || null,
     desktopImage: fields.desktopImage?.value, mobileImage: fields.mobileImage?.value,
   } : null)
   const [deviceKey, setDeviceKey] = useState<string>('desktop')
@@ -90,6 +93,12 @@ export function PagePreview({ siteUrl, project = false, configuration }: { siteU
     return () => window.removeEventListener('avgst:preview-selection', receive)
   }, [])
   useEffect(() => {
+    // Outline the section card that the preview currently isolates
+    const card = project && selected ? document.querySelector(`.project-order-section-${selected.key}`) : null
+    card?.setAttribute('data-preview-active', '')
+    return () => card?.removeAttribute('data-preview-active')
+  }, [project, selected])
+  useEffect(() => {
     frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-block', key: selected?.key ?? null }, origin)
     const receive = (event: MessageEvent) => {
       if (event.source === frame.current?.contentWindow && event.origin === origin && event.data?.type === 'avgst:preview-ready') {
@@ -107,7 +116,7 @@ export function PagePreview({ siteUrl, project = false, configuration }: { siteU
     window.addEventListener('message', receive)
     return () => window.removeEventListener('message', receive)
   }, [selected, origin, exteriorDraftRef, interiorDraftRef, builtDraftRef, plansDraftRef])
-  const route = configuration ? '/cms-preview/configurations' : project ? (typeof data?.slug === 'string' ? `/catalog/${data.slug}` : null) : typeof data?.route === 'string' ? data.route : null
+  const route = configuration ? '/cms-preview/configurations' : project ? (projectDraft ? '/catalog/__draft' : `/catalog/${data?.slug}`) : typeof data?.route === 'string' ? data.route : null
   const validRoute = Boolean(route && !route.includes('['))
   useEffect(() => {
     if (!configuration) return
@@ -124,7 +133,11 @@ export function PagePreview({ siteUrl, project = false, configuration }: { siteU
     observer.observe(element)
     return () => observer.disconnect()
   }, [validRoute])
-  if (!validRoute) return <p className="text-sm text-muted-foreground">Для превью нужен адрес конкретной страницы сайта.</p>
+  if (!validRoute) return <Empty className="h-full min-h-96 rounded-xl border bg-card shadow-xs">
+    <EmptyHeader>
+      <EmptyMedia variant="icon"><IconBrowser /></EmptyMedia>
+      <EmptyTitle>Здесь появится превью</EmptyTitle>    </EmptyHeader>
+  </Empty>
   const device = devices.find(item => item.key === deviceKey) ?? devices[0]
   const scale = fit ? Math.min(1, available.width / device.width, available.height / device.height) : 1
   const url = `${siteUrl}${route}`

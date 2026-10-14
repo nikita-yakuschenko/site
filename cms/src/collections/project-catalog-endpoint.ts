@@ -10,7 +10,7 @@ export const projectCatalogEndpoint: Endpoint = {
     if (denied) return denied
     const slug = new URL(req.url!).searchParams.get('slug')
     if (slug && !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return Response.json({ error: 'Некорректный адрес' }, { status: 400 })
-    const projects = await req.payload.find({ collection: 'projects', pagination: false, sort: 'name', depth: 1, req, overrideAccess: true, ...(slug ? { where: { or: [{ slug: { equals: slug } }, { importKey: { equals: `catalog:${slug}` } }] } } : {}) })
+    const projects = await req.payload.find({ collection: 'projects', pagination: false, sort: 'name', depth: 1, req, overrideAccess: true, where: { and: [{ _status: { equals: 'published' } }, ...(slug ? [{ or: [{ slug: { equals: slug } }, { importKey: { equals: `catalog:${slug}` } }] }] : [])] } })
     const prices = await req.payload.find({ collection: 'project-prices', pagination: false, depth: 0, req, overrideAccess: true })
     const mediaURL = (photo: unknown, fallback?: string | null): string => {
       const url = typeof photo === 'object' && photo && 'url' in photo && typeof photo.url === 'string' ? photo.url : fallback
@@ -18,9 +18,9 @@ export const projectCatalogEndpoint: Endpoint = {
     }
     const items: CatalogProject[] = projects.docs.filter(record => record.desktopImage || record.imageUrl).map(record => {
       const modular = isModularTechnology(record.technologyBadge)
-      const importedPrice = prices.docs.find(row => (typeof row.project === 'number' ? row.project : row.project.id) === record.id && row.configuration === 'standard' && row.region === 'nn')?.price
+      const importedPrice = prices.docs.find(row => (typeof row.project === 'string' ? row.project : row.project.id) === record.id && row.configuration === 'standard' && row.region === 'nn')?.price
       const price = record.recordType === 'ready-home' ? record.readyHome?.salePrice : importedPrice ?? record.configurations?.find(row => row.key === 'standard')?.price ?? record.priceAmount
-      const regionalPrices = Object.fromEntries(prices.docs.filter(row => (typeof row.project === 'number' ? row.project : row.project.id) === record.id && row.configuration === 'standard' && isPublicPriceKind(row.region)).map(row => [row.region, row.price]))
+      const regionalPrices = Object.fromEntries(prices.docs.filter(row => (typeof row.project === 'string' ? row.project : row.project.id) === record.id && row.configuration === 'standard' && isPublicPriceKind(row.region)).map(row => [row.region, row.price]))
       if (!('nn' in regionalPrices) && price && price > 0) regionalPrices.nn = price
       return {
         id: record.importKey?.replace(/^catalog:/, '') || `cms:${record.id}`, cmsId: record.id, slug: record.slug, name: record.name, href: `/catalog/${record.slug}`,

@@ -27,7 +27,7 @@ try {
   const admin = (await payload.find({ collection: 'users', where: { and: [{ role: { equals: 'super-admin' } }, { isBlocked: { equals: false } }] }, limit: 1 })).docs[0]
   if (!admin) throw new Error('Нет действующего суперадминистратора')
   const req = await createLocalReq({ user: { ...admin, collection: 'users' } }, payload)
-  const ids = new Map<string, number>()
+  const ids = new Map<string, string>()
   for (const definition of shared) {
     const existing = (await payload.find({ collection: 'blocks', where: { key: { equals: definition.key } }, limit: 1, req, overrideAccess: false })).docs[0]
     const doc = existing || await payload.create({ collection: 'blocks', data: { ...definition, source: 'src/components/site-chrome.tsx', exportName: 'SiteChrome', defaults: { shared: true } }, req, overrideAccess: false })
@@ -98,7 +98,7 @@ try {
       if (!layout.some(row => rowID(row) === calculator.id)) throw new Error('В шаблоне проекта отсутствует ипотечный калькулятор')
       console.log('Шаблон проекта: ипотечный калькулятор зарегистрирован перед комплектациями.')
     }
-    const contains = (id: number) => layout.some(row => row.component.relationTo === 'blocks' && (typeof row.component.value === 'object' ? row.component.value.id : row.component.value) === id)
+    const contains = (id: string) => layout.some(row => row.component.relationTo === 'blocks' && (typeof row.component.value === 'object' ? row.component.value.id : row.component.value) === id)
     const before = ['technicalHeader', 'mainHeader'].filter(key => !contains(ids.get(key)!)).map(key => ({ component: { relationTo: 'blocks' as const, value: ids.get(key)! } }))
     const after = contains(ids.get('footer')!) ? [] : [{ component: { relationTo: 'blocks' as const, value: ids.get('footer')! } }]
     if (before.length || after.length) { await payload.update({ collection: 'pages', id: page.id, data: { layout: [...before, ...layout, ...after] }, req, overrideAccess: false }); changed++ }

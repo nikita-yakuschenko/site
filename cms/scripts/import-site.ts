@@ -13,9 +13,9 @@ try {
   const admins = await payload.find({ collection: 'users', where: { and: [{ role: { equals: 'super-admin' } }, { isBlocked: { equals: false } }] }, limit: 1, overrideAccess: true })
   if (!admins.docs[0]) throw new Error('Для импорта необходим действующий суперадминистратор')
   const req = await createLocalReq({ user: { ...admins.docs[0], collection: 'users' } }, payload)
-  const references = new Map<string, { relationTo: 'blocks' | 'forms'; value: number }>()
+  const references = new Map<string, { relationTo: 'blocks' | 'forms'; value: string }>()
   let importedProjects = 0
-  for (const project of CATALOG_PROJECTS) {
+  for (const project of process.argv.includes('--skip-projects') ? [] : CATALOG_PROJECTS) {
     const importKey = `catalog:${project.slug}`
     const existing = await payload.find({ collection: 'projects', where: { or: [{ importKey: { equals: importKey } }, { slug: { equals: project.slug } }] }, limit: 1, req, overrideAccess: false })
     const tierContent = {

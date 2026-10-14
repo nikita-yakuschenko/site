@@ -43,6 +43,7 @@ function Segment({
   onToggle: (value: number) => void;
 }) {
   const chosen = active ?? [];
+  if (!values.length) return null;
   return (
     <fieldset className="cfilter__group">
       <legend className="cfilter__legend">{legend}</legend>
@@ -238,7 +239,7 @@ export function CatalogFilters({
           </div>
         </fieldset>
 
-        <fieldset className="cfilter__group">
+        {facets.area.max > facets.area.min && <fieldset className="cfilter__group">
           <legend className="cfilter__legend">
             {copy.areaLegend}
             <span>
@@ -258,9 +259,9 @@ export function CatalogFilters({
               go({ ...filters, area: bound(lo, hi, facets.area) }, SLIDER_DELAY);
             }}
           />
-        </fieldset>
+        </fieldset>}
 
-        {facets.price.max > 0 && <fieldset className="cfilter__group">
+        {facets.price.max > facets.price.min && <fieldset className="cfilter__group">
           <legend className="cfilter__legend">
             {copy.priceLegend}
             <span>{mlnRange(priceValue[0], priceValue[1])}</span>

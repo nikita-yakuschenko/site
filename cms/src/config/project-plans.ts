@@ -2,7 +2,7 @@ import type { Media } from '../payload-types'
 export const validRoomArea = (value: unknown) => typeof value === 'string' && /^\d+(?:[.,]\d+)?(?:\s*м[²2])?$/.test(value.trim()) && Number.parseFloat(value.replace(',', '.')) > 0
 
 type Room = { name: string; area: string; id?: string | null }
-type Floor = { label?: string | null; image?: string | null; photo?: number | Media | null; rooms?: Room[] | null; id?: string | null }
+type Floor = { label?: string | null; image?: string | null; photo?: string | Media | null; rooms?: Room[] | null; id?: string | null }
 type Variant = { label?: string | null; image?: string | null; rooms?: Room[] | null; floors?: Floor[] | null; id?: string | null }
 export function normalizePlans(plans: Variant[]) {
   return plans.map(variant => {

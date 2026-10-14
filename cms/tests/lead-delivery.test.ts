@@ -1,7 +1,7 @@
-import test from 'node:test'
+﻿import test from 'node:test'
 import assert from 'node:assert/strict'
 import { deliverLead } from '../src/config/lead-adapters'
-const lead = { name: 'Тест', phone: '+79990000000', siteId: 'corporate', consent: true as const, formId: 'contacts-question', projectId: 8, meta: { region: 'msk' } }
+const lead = { name: 'Тест', phone: '+79990000000', siteId: 'corporate', consent: true as const, formId: 'contacts-question', projectId: 'PROJ08AB', meta: { region: 'msk' } }
 test('test adapter accepts a lead without any external request', async () => {
   const result = await deliverLead({ mode: 'test' }, lead, 'test-id', async () => { throw Error('unexpected network request') })
   assert.equal(result.status, 'test')

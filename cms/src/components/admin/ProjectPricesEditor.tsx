@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { configurationKeys, configurationNames, isModularTechnology, type ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
 import { priceKinds, type PriceKind } from '../../config/price-kinds'
 
-type PriceDoc = { id: number; configuration: ConfigurationKey; region: PriceKind; price: number }
+type PriceDoc = { id: string; configuration: ConfigurationKey; region: PriceKind; price: number }
 type Status = 'saving' | 'saved' | undefined
 
 const cellKey = (configuration: string, region: string) => `${configuration}:${region}`

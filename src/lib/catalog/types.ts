@@ -99,7 +99,7 @@ export type ReadyHomeSection = {
 
 export type CatalogProject = {
   id: string
-  cmsId?: number
+  cmsId?: string
   mobileImageUrl?: string | null
   slug: string
   name: string

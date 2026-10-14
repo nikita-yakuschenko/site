@@ -7,6 +7,7 @@ import { PhotoLightbox } from "./photo-lightbox";
 import { VideoLightbox, reviewEmbedSrc } from "./video-lightbox";
 import type { CatalogProject } from "../lib/catalog/types";
 import { isBuiltItem, type BuiltItem } from '../lib/catalog/project-built-data';
+import { isProjectHeroData } from '../lib/catalog/project-hero-data';
 
 /**
  * Построенные дома.
@@ -28,6 +29,20 @@ import { isBuiltItem, type BuiltItem } from '../lib/catalog/project-built-data';
 /** Сколько снимков стоит в ряду. Шесть — как у фасадов и интерьеров;
  *  остальное прячется за последней плиткой. */
 const STRIP_TILES = 6;
+
+/** Название проекта в заголовке: в превью CMS берётся из черновика главного экрана. */
+function ProjectName({ name }: { name: string }) {
+  const [draft, setDraft] = useState<string | null>(null);
+  useEffect(() => {
+    if (window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return;
+    const receive = (event: MessageEvent) => {
+      if (event.source === window.parent && ['http://localhost:3001', 'https://cms.avgst.ru'].includes(event.origin) && event.data?.type === 'avgst:preview-hero' && isProjectHeroData(event.data.hero)) setDraft(event.data.hero.name.trim() || null);
+    };
+    window.addEventListener('message', receive);
+    return () => window.removeEventListener('message', receive);
+  }, []);
+  return <span style={{ color: 'var(--brand-yellow)' }}>{draft ?? name}</span>;
+}
 
 export function ProjectBuilt({ project, items }: { project: CatalogProject; items?: BuiltItem[] }) {
   return items ? <ConnectedProjectBuilt project={project} items={items} /> : <LegacyProjectBuilt project={project} />;
@@ -52,7 +67,7 @@ function ConnectedProjectBuilt({ project, items }: { project: CatalogProject; it
   const video = videoOpen === null ? null : entries[videoOpen];
   if (!lead) return null;
   return <section className="section" aria-labelledby="project-built-title"><div className="section__inner">
-    <h2 id="project-built-title">Как {project.name} выглядит в жизни</h2>
+    <h2 id="project-built-title">Как <ProjectName name={project.name} /> выглядит в жизни</h2>
     {lead.type === 'photo' ? <BuiltLeadPhoto image={lead.image} caption={lead.caption} onOpen={() => setOpen(0)} /> : <BuiltVideoTile item={lead} main onOpen={() => setVideoOpen(0)} />}
     {displayEntries.length ? <div className="project-strip">
       {displayEntries.map((item, index) => item.type === 'photo' ? <button key={index} type="button" aria-label={item.caption || copy.galleryOpen} onClick={() => setOpen(photos.indexOf(item))}>
@@ -96,7 +111,7 @@ function LegacyProjectBuilt({ project }: { project: CatalogProject }) {
     <section className="section" aria-labelledby="project-built-title">
       <div className="section__inner">
         <h2 id="project-built-title">
-          Как {project.name} выглядит в жизни
+          Как <ProjectName name={project.name} /> выглядит в жизни
         </h2>
         {tour ? (
           <button

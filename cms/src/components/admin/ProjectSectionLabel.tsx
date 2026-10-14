@@ -3,8 +3,9 @@
 import { Badge } from '../ui/badge'
 import { useFormFields } from '@payloadcms/ui'
 import { projectContentSources, projectSourceLabels, type ProjectContentBlock } from '../../config/project-content-sources'
+import { isRecordId } from '../../../../src/lib/record-id'
 
-export function ProjectSectionLabel({ title, blockKey }: { title: string; blockKey: ProjectContentBlock }) {
+export function ProjectSectionLabel({ title, blockKey, fieldNames = [] }: { title: string; blockKey: ProjectContentBlock; fieldNames?: string[] }) {
   const heroSource = useFormFields(([fields]) => fields.heroContentSource?.value)
   const exteriorsSource = useFormFields(([fields]) => fields.exteriorsContentSource?.value)
   const interiorsSource = useFormFields(([fields]) => fields.interiorsContentSource?.value)
@@ -18,8 +19,8 @@ export function ProjectSectionLabel({ title, blockKey }: { title: string; blockK
       const photo = fields[`${gallery}.${index}.photo`]
       if (!photo && !fields[`${gallery}.${index}.id`]) break
       const value = photo?.value
-      const id = typeof value === 'number' ? value : value && typeof value === 'object' && 'id' in value ? (value as { id: unknown }).id : value
-      if (typeof id === 'number' || (typeof id === 'string' && /^\d+$/.test(id)) || fields[`${gallery}.${index}.type`]?.value === 'video') count += 1
+      const id = value && typeof value === 'object' && 'id' in value ? (value as { id: unknown }).id : value
+      if (isRecordId(id) || fields[`${gallery}.${index}.type`]?.value === 'video') count += 1
     }
     return count
   })
@@ -27,7 +28,7 @@ export function ProjectSectionLabel({ title, blockKey }: { title: string; blockK
   const status = projectSourceLabels[source]
   const description = blockKey === 'MortgageCalculator' ? 'Общий ипотечный калькулятор. На странице проекта отдельно не настраивается.'
     : blockKey === 'ProjectNextSteps' ? 'Общий блок. Для проекта настраиваются показ и порядок карточек.' : status.description
-  return <span className="project-source-label shadcn-surface">
+  return <span className="project-source-label shadcn-surface" data-section-fields={fieldNames.join(' ')}>
     <span className="project-source-label__title">{title}</span>
     {typeof exteriorCount === 'number' ? <span className="project-source-label__count" aria-label={`Загружено: ${exteriorCount}`}>{exteriorCount}</span> : null}
     <Badge variant="outline" className="project-source-label__badge" data-content-source={source} title={source === 'system' ? undefined : description} aria-label={source === 'system' ? status.label : `Источник содержимого: ${status.label}. ${description}`}>{status.label}</Badge>

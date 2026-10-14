@@ -9,9 +9,9 @@ function labelFromFilename(filename?: string | null) {
 
 // Каждая анонимная картинка иначе перечитывает все проекты и исчерпывает пул подключений.
 const PUBLIC_MEDIA_TTL_MS = 10_000
-let publicMediaCache: { expires: number; ids: Promise<number[]> } | null = null
+let publicMediaCache: { expires: number; ids: Promise<string[]> } | null = null
 
-function publicMediaIds(req: PayloadRequest): Promise<number[]> {
+function publicMediaIds(req: PayloadRequest): Promise<string[]> {
   const now = Date.now()
   if (!publicMediaCache || publicMediaCache.expires < now) {
     const ids = loadPublicMediaIds(req)
@@ -32,7 +32,7 @@ const readMedia: Access = async ({ req }) => {
   return ids.length ? { id: { in: ids } } : false
 }
 
-async function loadPublicMediaIds(req: PayloadRequest): Promise<number[]> {
+async function loadPublicMediaIds(req: PayloadRequest): Promise<string[]> {
   const projects = await req.payload.find({
     collection: 'projects', overrideAccess: true, depth: 0, pagination: false,
     where: { or: [{ heroContentSource: { equals: 'database' } }, { exteriorsContentSource: { equals: 'database' } }, { interiorsContentSource: { equals: 'database' } }, { builtContentSource: { equals: 'database' } }, { plansContentSource: { equals: 'database' } }] },
@@ -45,7 +45,7 @@ async function loadPublicMediaIds(req: PayloadRequest): Promise<number[]> {
     ...(project.plansContentSource === 'database' ? (project.plans || []).flatMap(variant => (variant.floors || []).map(floor => floor.photo)) : []),
     ...(project.builtContentSource === 'database' ? (project.built || []).map(row => row.photo) : []),
   ])
-    .filter((id): id is number => typeof id === 'number')
+    .filter((id): id is string => typeof id === 'string')
 }
 
 export function createMedia({ directory, uploadsEnabled }: { directory: string; uploadsEnabled: boolean }): CollectionConfig {

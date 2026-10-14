@@ -459,7 +459,7 @@ export function ContactsSection({
   pageId?: number | string;
   form?: LayoutBlock | null;
   defaultPlace?: import('../lib/office').ContactPlaceId;
-  project?: { id: string; cmsId?: number; slug: string; name: string };
+  project?: { id: string; cmsId?: string; slug: string; name: string };
 }) {
   const useSite = block.useSiteContacts !== false;
   const phone = useSite ? contacts?.phone : (block.phone as string | undefined);

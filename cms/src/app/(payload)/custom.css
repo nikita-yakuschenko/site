@@ -244,6 +244,7 @@
   .nav-group__label { color: var(--muted-foreground); font-size: 12px; font-weight: 500; }
   .app-header { background: var(--card); border-bottom: 1px solid var(--border); }
   .doc-controls { background: var(--card); border-bottom: 1px solid var(--border); }
+  .doc-header { margin-top: 0; padding-block: 24px; }
   .card { background: var(--card); border-radius: var(--radius-xl); border: 1px solid var(--border); padding: 24px; }
   .card--has-onclick:hover { background: var(--muted); border-color: var(--input); box-shadow: none; }
   .card__title { font-size: 16px; line-height: 24px; font-weight: 600; }
@@ -294,6 +295,14 @@
 /* Keep Payload's notification producers; the shared Sonner store is rendered
    by AdminToasts with shadcn styling on authenticated and login screens. */
 .payload-toast-container { display: none !important; }
+
+/* Shadcn base layer is declared after Payload layers and resets button
+   backgrounds; restore Payload button tokens outside of layers. */
+.btn { color: var(--color, inherit); background-color: var(--bg-color, transparent); }
+.btn:not(:disabled):not(.btn--disabled):hover {
+  color: var(--hover-color, var(--color, inherit));
+  background-color: var(--hover-bg, var(--bg-color, transparent));
+}
 .toaster [data-sonner-toast] { font-family: var(--font-sans); }
 
 /* Payload keeps an accessible label on its overlay toggle. The global
@@ -330,12 +339,24 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .page-record-metadata { display: flex; align-items: center; gap: 10px; min-width: 0; margin-inline-end: auto; }
 .page-record-metadata > span[data-slot='badge'] { flex-shrink: 0; }
 :is(.collection-edit--pages, .collection-edit--projects) .doc-controls__controls:has(.page-record-metadata) { flex: 1; min-width: 0; }
-:is(.collection-edit--pages, .collection-edit--projects) .doc-controls { padding-inline: 24px; }
+:is(.collection-edit--pages, .collection-edit--projects) .doc-controls { padding-inline: 24px; z-index: 50; }
 :is(.collection-edit--pages, .collection-edit--projects) .doc-controls__wrapper { align-items: center; }
 :is(.collection-edit--pages, .collection-edit--projects) .doc-controls__controls-wrapper:has(.page-record-metadata) { flex: 1; width: 100%; min-width: 0; padding-inline-start: 0; }
 :is(.collection-edit--pages, .collection-edit--projects) .doc-controls .page-record-metadata { display: flex; align-items: center; gap: 10px; margin-inline-start: 0; margin-inline-end: auto; }
 :is(.collection-edit--pages, .collection-edit--projects) .doc-controls__content:not(:has(.doc-controls__meta > :not(.doc-controls__value-wrap))):not(:has(.doc-controls__meta-icons)) { display: none; }
 :is(.collection-edit--pages, .collection-edit--projects) .doc-controls__value-wrap { display: none; }
+.template-default__wrap:has(.collection-edit--projects) > .doc-header, .collection-edit--projects .doc-controls__content { display: none; }
+.collection-edit--projects :is(.project-details-row, .project-name-field) { display: none; }
+.collection-edit--projects .doc-controls .project-record-metadata { flex: 1; gap: 8px; }.project-record-name-wrap { display: flex; flex: 1 1 280px; max-width: 460px; align-items: center; gap: 8px; min-width: 0; border-bottom: 1px solid var(--input); transition: border-color 150ms; }
+.project-record-name-wrap:focus-within { border-bottom-color: var(--ring); }
+.project-record-name-wrap[aria-invalid] { border-bottom-color: var(--destructive); }
+.project-record-name-wrap > span[data-slot='badge'] { flex-shrink: 0; }
+.project-record-metadata .project-record-name { flex: 1; height: 36px; padding-inline: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; font-size: 16px; font-weight: 600; }
+.project-record-metadata .project-record-name:focus-visible { box-shadow: none; }.project-record-metadata .project-record-type { flex: 0 0 160px; }
+.project-record-metadata .project-record-slug { position: relative; flex: 0 1 220px; }
+.project-record-slug input { padding-right: 36px; }
+.project-record-slug input:disabled { opacity: 1; cursor: default; color: var(--muted-foreground); }
+.project-record-slug button { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); }
 :is(.collection-edit--pages, .collection-edit--projects) .doc-controls__meta:not(:has(> :not(.doc-controls__value-wrap))) { display: none; }
 :is(.collection-edit--pages, .collection-edit--projects) .page-details-row .field-type,
 :is(.collection-edit--pages, .collection-edit--projects) .page-metadata-row .field-type { margin-bottom: 0; }
@@ -531,8 +552,14 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 }
 .project-section-card .collapsible__toggle-wrap > :first-child { flex: 1 1 auto; min-width: 0; }
 .project-section-card [data-slot="card"] { overflow: hidden; }
-.project-section-card .collapsible__toggle-wrap { background: transparent; border-radius: 0; }
-.project-order-toolbar { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+.project-section-card[data-preview-active] [data-slot="card"] { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
+.project-unpublished { display: flex; align-items: center; gap: 4px; margin-inline-start: auto; }
+/* Unpublished marker overlays the card corner without shifting its content */
+.collapsible__toggle-wrap[data-unpublished] { position: relative; }
+.collapsible__toggle-wrap[data-unpublished]::before { content: ''; position: absolute; top: 50%; left: 5px; z-index: 1; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--primary); pointer-events: none; }
+/* An open select menu must extend past the section card */
+.project-section-card :is([data-slot="card"], [data-slot="accordion-content"]):has(.rs__menu) { overflow: visible; }.project-section-card .collapsible__toggle-wrap { background: transparent; border-radius: 0; }
+.project-order-toolbar { display: none; }
 .project-order-actions { display: inline-flex; align-items: center; gap: 2px; position: relative; z-index: 2; }
 @media (max-width: 479px) {
   .project-choice-row > .row__fields { grid-template-columns: minmax(0, 1fr); }
@@ -550,7 +577,7 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
     --main-width: var(--page-editor-width, 50%);
     --doc-sidebar-width: 0px;
     --sidebar-wrap-width: var(--page-preview-width, 50%);
-    --sidebar-gutter-h-left: 24px;
+    --sidebar-gutter-h-left: 0px;
     --sidebar-gutter-h-right: 24px;
     --main-gutter-h-left: 24px;
     --main-gutter-h-right: 24px;
@@ -558,8 +585,8 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
   :is(.collection-edit--pages, .collection-edit--projects) .document-fields__main { width: var(--page-editor-width, 50%); min-width: 0; flex: 0 0 var(--page-editor-width, 50%); }
   :is(.collection-edit--pages, .collection-edit--projects) .document-fields__sidebar-wrap {
     width: var(--page-preview-width, 50%); min-width: 0; flex: 0 0 var(--page-preview-width, 50%); position: sticky;
-    top: calc(var(--app-header-height, 48px) + var(--doc-controls-height));
-    height: calc(100dvh - var(--app-header-height, 48px) - var(--doc-controls-height));
+    top: var(--doc-controls-height);
+    height: calc(100dvh - var(--doc-controls-height) - 24px);
   }
 }
 @media (min-width: 1600px) {
