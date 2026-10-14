@@ -5,6 +5,17 @@ export function mediaUrl(media: MediaLike): string {
   return ''
 }
 
+// Отдаёт уже уменьшенную копию. Исходник в CMS и в public часто в несколько раз
+// больше кадра на странице, и браузер качает его целиком.
+export function optimizedSrc(src: string, width: number, quality = 75): string {
+  if (!src || src.startsWith('data:') || src.startsWith('/_next/image')) return src
+  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality}`
+}
+
+export function optimizedSrcSet(src: string, widths: number[], quality = 75): string {
+  return widths.map((width) => `${optimizedSrc(src, width, quality)} ${width}w`).join(', ')
+}
+
 export function splitHeadline(text: string): [string, string] {
   const normalized = text.trim().replace(/\s+/g, ' ')
   const lower = normalized.toLowerCase()

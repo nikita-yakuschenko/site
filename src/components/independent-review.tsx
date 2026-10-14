@@ -3,6 +3,7 @@
 import { Fragment, useState } from "react";
 import { PhotoLocationBadge } from "./photo-tile";
 import { copy, nbspText } from "../lib/copy";
+import { optimizedSrc } from "../lib/media";
 import { VideoLightbox, reviewEmbedSrc } from "./video-lightbox";
 
 type ReviewVideo = (typeof copy.independentReview.videos)[number];
@@ -46,7 +47,7 @@ export function IndependentReview({
             <div className="independent-review__channel" data-cms-block="independentReview.channel">
               <img
                 className="independent-review__mark"
-                src={data.channelPhoto}
+                src={optimizedSrc(data.channelPhoto, 256)}
                 alt=""
                 width={80}
                 height={80}

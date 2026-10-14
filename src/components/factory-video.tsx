@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { copy } from '../lib/copy'
+import { optimizedSrc } from '../lib/media'
 import { VideoLightbox } from './video-lightbox'
 
 const KINESCOPE_EMBED =
@@ -40,7 +41,7 @@ export function FactoryVideo({
             лежит поверх кадра — иначе кадр не отличить от фотографии. */}
         <span className="factory-video__card">
           <span className="factory-video__thumb">
-            <img src="/production/video-thumb.jpg" alt="" />
+            <img src={optimizedSrc('/production/video-thumb.jpg', 640)} alt="" />
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
             </svg>

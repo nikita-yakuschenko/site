@@ -7,6 +7,7 @@ import {
   IconChevronRight,
 } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
+import { optimizedSrc, optimizedSrcSet } from "../lib/media";
 import { CarouselProgress, CAROUSEL_SLIDE_MS } from "./carousel-progress";
 
 /**
@@ -385,11 +386,11 @@ export function HeroCarousel({
           меняется. */}
       {shown.imageMobile ? (
         <picture className="hero__frame" data-cms-block="hero.background">
-          <source media="(min-width: 900px)" srcSet={shown.image} />
-          <img src={shown.imageMobile} alt="" />
+          <source media="(min-width: 900px)" sizes="100vw" srcSet={optimizedSrcSet(shown.image, [1280, 1920])} />
+          <img src={optimizedSrc(shown.imageMobile, 828)} srcSet={optimizedSrcSet(shown.imageMobile, [384, 828])} sizes="100vw" alt="" fetchPriority="high" decoding="async" />
         </picture>
       ) : (
-        <img className="hero__frame" src={shown.image} alt="" data-cms-block="hero.background" />
+        <img className="hero__frame" src={optimizedSrc(shown.image, 1920)} srcSet={optimizedSrcSet(shown.image, [828, 1280, 1920])} sizes="100vw" alt="" fetchPriority="high" decoding="async" data-cms-block="hero.background" />
       )}
 
       {/* Ровный тон по кадру: без градиента и без формы, одна плотность во
@@ -480,7 +481,7 @@ export function HeroCarousel({
                             playsInline
                           />
                         ) : (
-                          <img src={promo.image} alt="" />
+                          <img src={optimizedSrc(promo.image, 640)} alt="" />
                         )}
                       </span>
                     ) : null}

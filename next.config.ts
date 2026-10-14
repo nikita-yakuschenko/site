@@ -22,6 +22,10 @@ const nextConfig: NextConfig = {
   // заранее, иначе quality={90} у <Image> отбрасывается.
   images: {
     qualities: [75, 90],
+    remotePatterns: [
+      { protocol: 'https', hostname: 'cms.avgst.ru', pathname: '/api/media/file/**' },
+      { protocol: 'http', hostname: 'localhost', port: '3001', pathname: '/api/media/file/**' },
+    ],
   },
   // Политики и правила в корне; старые /legal/* и /personal-data → редирект.
   async redirects() {

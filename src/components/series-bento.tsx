@@ -71,6 +71,9 @@ export function SeriesBento({ block }: { block: LayoutBlock }) {
               href={item.href}
               image={item.image}
               title={item.title}
+              sizes={item.place === 'panel' || item.place === 'modular'
+                ? '(max-width: 719px) calc(100vw - 48px), 60vw'
+                : '(max-width: 719px) calc(100vw - 48px), 30vw'}
               count={item.count != null ? projectsInSeries(item.count) : undefined}
             />
           ))}

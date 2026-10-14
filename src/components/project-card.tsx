@@ -11,6 +11,7 @@ import {
   toggleFavorite,
 } from '../lib/favorites'
 import { shareProject } from '../lib/share'
+import { optimizedSrc } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
 
 export function ProjectCard({ project, showPrice = true, locationLabel }: { project: CatalogProject; showPrice?: boolean; locationLabel?: string }) {
@@ -40,7 +41,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
         <a href={project.href} className="card__media" aria-label={badge ? `${project.name}. ${badge}` : project.name}>
           {project.imageUrl ? (
             <img
-              src={project.imageUrl}
+              src={optimizedSrc(project.imageUrl, 640)}
               alt=""
               loading="lazy"
               decoding="async"
