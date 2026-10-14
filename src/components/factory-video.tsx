@@ -30,11 +30,11 @@ export function FactoryVideo({
             и широкая обрезка выбрасывала половину пролёта. */}
         {srcMobile ? (
           <picture>
-            <source media="(min-width: 900px)" srcSet={src} />
-            <img src={srcMobile} alt={alt} />
+            <source media="(min-width: 900px)" srcSet={optimizedSrc(src, 1080)} />
+            <img src={optimizedSrc(srcMobile, 828, 60)} alt={alt} loading="lazy" decoding="async" />
           </picture>
         ) : (
-          <img src={src} alt={alt} />
+          <img src={optimizedSrc(src, 1080)} alt={alt} loading="lazy" decoding="async" />
         )}
         {/* В плашке кадр из самого ролика, а не отвлечённый значок: по нему
             видно, что там внутри, ещё до нажатия. Значок воспроизведения

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { YandexRating } from "./yandex-rating";
 import { IconArrowUpRight, IconMapPin } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
+import { optimizedSrc } from "../lib/media";
 import { VideoLightbox, kinescopeEmbed } from "./video-lightbox";
 
 type Story = (typeof copy.videoTestimonials.stories)[number];
@@ -64,7 +65,7 @@ function StoryCard({
       data-cms-block={blockKey}
       onClick={() => onOpen(story)}
     >
-      <img src={story.poster} alt="" loading="lazy" decoding="async" />
+      <img src={optimizedSrc(story.poster, 640, 60)} alt="" loading="lazy" decoding="async" />
       <span className="video-story__duration">{story.duration}</span>
       <StoryPlace place={story.place} />
       <span className="video-story__play" aria-hidden="true">

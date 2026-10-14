@@ -70,8 +70,10 @@ export function IndependentReview({
             aria-label={`Смотреть: ${current.title}. ${current.place} ${current.duration}`}
           >
             <img
-              src={current.poster}
+              src={optimizedSrc(current.poster, 828, 60)}
               alt=""
+              loading="lazy"
+              decoding="async"
               style={
                 "posterFocus" in current
                   ? { objectPosition: current.posterFocus }
