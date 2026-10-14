@@ -325,14 +325,9 @@ function Production({ block }: { block: LayoutBlock }) {
               {steps.map((step, index) => (
                 <li key={step.title}>
                   {/* Водяной знак участка, не шаг процедуры. */}
-                  <span
-                    className="production__shops-digit"
-                    style={{
-                      WebkitMaskImage: `url("/img/digits/${index + 1}.png")`,
-                      maskImage: `url("/img/digits/${index + 1}.png")`,
-                    }}
-                    aria-hidden="true"
-                  />
+                  <span className="production__shops-digit" aria-hidden="true">
+                    {index + 1}
+                  </span>
                   <h4>{nbspText(String(step.title))}</h4>
                   {step.text ? <p>{nbspText(step.text)}</p> : null}
                 </li>

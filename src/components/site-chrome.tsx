@@ -32,18 +32,6 @@ import {
 import { OfficeStatusIndicator } from "./office-status";
 import { RegionSwitch } from "./region-switch";
 
-/* Отметка о закрытом уведомлении. Живёт в браузере посетителя и никуда не
-   отправляется: это его выбор, а не наши данные.
-
-   Читается через useSyncExternalStore, а не через эффект с setState:
-   состояние приходит извне React, и эффект, который сразу после монтирования
-   дёргает setState, вызывает лишний каскад перерисовок. Серверный снимок
-   всегда «не закрыто» — на сервере localStorage нет, и если ответить иначе,
-   разметка сервера и браузера разойдутся. */
-const NOTICE_KEY = "avgst-dev-notice";
-
-const noticeListeners = new Set<() => void>();
-
 /* Временная тема только технической полосы. Хранится у посетителя, на
    сервер не уходит. Снять вместе с кнопкой в meta-ряду. */
 const TECH_BAR_THEME_KEY = "avgst:tech-bar-theme";
@@ -78,34 +66,6 @@ function writeTechBarTheme(theme: TechBarTheme) {
     // Не сохранилось — тема живёт до перезагрузки.
   }
   techBarThemeListeners.forEach((listener) => listener());
-}
-
-function subscribeNotice(listener: () => void) {
-  noticeListeners.add(listener);
-  // Чужая вкладка закрыла уведомление — эта должна узнать.
-  window.addEventListener("storage", listener);
-  return () => {
-    noticeListeners.delete(listener);
-    window.removeEventListener("storage", listener);
-  };
-}
-
-function noticeClosedNow() {
-  try {
-    return window.localStorage.getItem(NOTICE_KEY) === "off";
-  } catch {
-    // Приватный режим или запрет хранилища: уведомление просто остаётся.
-    return false;
-  }
-}
-
-function closeNotice() {
-  try {
-    window.localStorage.setItem(NOTICE_KEY, "off");
-  } catch {
-    // Не сохранилось — закроется до перезагрузки страницы.
-  }
-  noticeListeners.forEach((listener) => listener());
 }
 
 type NavItem = { label?: string | null; href?: string | null };
@@ -166,11 +126,6 @@ export function SiteChrome({
   /* Форма из шапки: открывается поверх страницы, а не уводит якорем. */
   const [askOpen, setAskOpen] = useState(false);
 
-  const noticeClosed = useSyncExternalStore(
-    subscribeNotice,
-    noticeClosedNow,
-    () => false,
-  );
   const techBarTheme = useSyncExternalStore(
     subscribeTechBarTheme,
     readTechBarTheme,
@@ -313,33 +268,6 @@ export function SiteChrome({
               это служебный слой страницы, а не часть шапки сайта. Контраст
               им даёт собственная растушёванная подложка, не общая плашка. */}
           {subrow ? <div className="site-header__subrow">{subrow}</div> : null}
-
-          {/* Уведомление о стадии разработки. Лежит отдельным слоем под
-              плашкой: на поток страницы оно не влияет и ничего не сдвигает,
-              поэтому снять его можно в одну строку, не пересчитывая
-              отступы первого экрана. */}
-          {noticeClosed ? null : (
-            <div className="site-notice" role="status">
-              <span>
-                {copy.noticeText}{" "}
-                <a
-                  href={copy.noticeLinkHref}
-                  target="_blank"
-                  rel="noreferrer noopener"
-                >
-                  {copy.noticeLinkLabel}
-                </a>
-              </span>
-              <button
-                type="button"
-                className="site-notice__close"
-                aria-label={copy.close}
-                onClick={closeNotice}
-              >
-                <IconX size={18} stroke={2.2} />
-              </button>
-            </div>
-          )}
         </div>
       </header>
 

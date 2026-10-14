@@ -19,7 +19,8 @@ import { loadYandexMaps, type YmapsMap } from '../lib/yandex-maps'
  * к собственному API ключ читается уже из runtime env работающего контейнера.
  *
  * Карта офиса/производства — necessary: показывает адрес компании, без неё
- * блок контактов не выполняет свою задачу. JS API грузится сразу.
+ * блок контактов не выполняет свою задачу. Библиотека карт тяжёлая, поэтому
+ * скрипт запрашивается, только когда блок уже рядом с экраном.
  */
 
 export function OfficeMap({
@@ -51,7 +52,12 @@ export function OfficeMap({
     let cancelled = false
     let resizeObserver: ResizeObserver | null = null
     let logoObserver: MutationObserver | null = null
+    let stopWatch: (() => void) | null = null
 
+    const start = () => {
+      if (cancelled) return
+      stopWatch?.()
+      stopWatch = null
     loadYandexMaps()
       .then((ymaps) => {
         ymaps.ready(() => {
@@ -95,9 +101,24 @@ export function OfficeMap({
       .catch(() => {
         if (!cancelled) setStatus('failed')
       })
+    }
+
+    const node = host.current
+    if (!node || typeof IntersectionObserver === 'undefined') {
+      start()
+    } else {
+      const observer = new IntersectionObserver((entries) => {
+        if (!entries.some((entry) => entry.isIntersecting)) return
+        observer.disconnect()
+        start()
+      }, { rootMargin: '400px' })
+      observer.observe(node)
+      stopWatch = () => observer.disconnect()
+    }
 
     return () => {
       cancelled = true
+      stopWatch?.()
       logoObserver?.disconnect()
       resizeObserver?.disconnect()
       map?.destroy()

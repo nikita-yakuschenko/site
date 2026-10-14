@@ -311,82 +311,6 @@ a {
   padding: 16px 0 0;
 }
 
-/* Уведомление о стадии разработки.
- *
- * Отдельный слой под шапкой: стоит вне потока, поэтому ни на первый экран,
- * ни на страницы внутри ничего не сдвигает — отступы считаются так, будто
- * его нет. Снимается удалением разметки, пересчитывать ничего не придётся.
- *
- * Жёлтая плашка, а не стеклянная: это временное служебное сообщение, и
- * заметность ему нужнее, чем встроенность в композицию. */
-/* Кнопка закрытия прижата к правому краю, текст занимает остальное.
-   Отметка о закрытии хранится у посетителя в браузере — см. NOTICE_KEY. */
-.site-notice {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  left: 0;
-  z-index: 1;
-  pointer-events: auto;
-  padding: 8px 16px;
-  border-radius: var(--surface-radius);
-  background: var(--brand-yellow);
-  color: var(--avgst-ink);
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.45;
-}
-
-.site-notice > span {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.site-notice__close {
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  /* Поля вынесены в саму кнопку: область нажатия 32px, а видимый крестик
-     остаётся мелким и не спорит с текстом. */
-  width: 32px;
-  height: 32px;
-  margin: -6px -6px -6px 0;
-  padding: 0;
-  border: 0;
-  border-radius: 8px;
-  background: transparent;
-  color: var(--avgst-ink);
-  cursor: pointer;
-  opacity: 0.6;
-  transition:
-    opacity 0.2s var(--ease-out),
-    background-color 0.2s var(--ease-out);
-}
-
-.site-notice__close:hover {
-  opacity: 1;
-  background: var(--line);
-}
-
-.site-notice a {
-  color: inherit;
-  font-weight: 700;
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-@media (max-width: 899px) {
-  .site-notice {
-    top: calc(100% + 8px);
-    padding: 8px 16px;
-    font-size: 12px;
-  }
-}
-
 .site-header__meta {
   /* Высоту полосе задаёт этот отступ, а не размеры того, что внутри:
      элементы остаются прежними, воздуха вокруг них становится больше. */
@@ -741,17 +665,6 @@ a {
 
 .site-header--solid {
   position: relative;
-}
-/* На странице без кадра плашка встаёт в поток.
-   Вне потока она нужна только над фотографией первого экрана, где обязана
-   лежать поверх неё и ничего не двигать. На сплошной шапке кадра нет, и
-   абсолютная плашка просто ложилась на верх содержимого: это не было видно
-   лишь потому, что у секций сверху стоял большой отступ. В потоке она
-   честно занимает своё место, а после закрытия страница подбирается вверх.*/
-.site-header--solid .site-notice {
-  position: relative;
-  top: 0;
-  margin-top: 8px;
 }
 
 .site-header--solid .site-header__plaque {
@@ -6552,62 +6465,27 @@ a {
   min-height: var(--digit-h);
 }
 
-/* Глиф вырезан из 1024-поля файла: ширина коробочки = пропорция цифры,
-   маска сдвинута на bbox, right: 0 — правый край колонки. */
+/* Номер участка — текст той же высоты, что был у вырезанного глифа.
+   Правый край на том же месте: 5px от края ячейки. */
 .production__shops-digit {
-  --digit-canvas: 1024;
   position: absolute;
   /* Совпадает с заголовком, а не с верхней кромкой ячейки: у 2–4 сверху
      паддинг до черты, и top: 0 поднимал цифру над названием. */
   top: var(--digit-top);
-  /* Не на самой черте: 5px от правого края ячейки. На широкой сетке
-     черта стоит в середине split, и край ячейки для зрителя — она. */
   right: 5px;
   z-index: 0;
-  width: calc(var(--digit-h) * var(--gw) / var(--gh));
   height: var(--digit-h);
+  margin: 0;
+  font-size: var(--digit-h);
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: rgb(var(--avgst-ink-rgb) / var(--ghost-mark));
   pointer-events: none;
-  background-color: rgb(var(--avgst-ink-rgb) / var(--ghost-mark));
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
-  mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
-  -webkit-mask-position: calc(-1 * var(--digit-h) * var(--gx) / var(--gh))
-    calc(-1 * var(--digit-h) * var(--gy) / var(--gh));
-  mask-position: calc(-1 * var(--digit-h) * var(--gx) / var(--gh))
-    calc(-1 * var(--digit-h) * var(--gy) / var(--gh));
+  user-select: none;
   transform: translateY(0);
   transform-origin: 100% 100%;
-  /* В покое почти плоские: тень иначе держит цифру поверх текста. */
   filter: drop-shadow(0 1px 0 var(--on-dark-4));
-}
-
-.production__shops li:nth-child(1) .production__shops-digit {
-  --gx: 412;
-  --gy: 282;
-  --gw: 158;
-  --gh: 456;
-}
-
-.production__shops li:nth-child(2) .production__shops-digit {
-  --gx: 350;
-  --gy: 272;
-  --gw: 326;
-  --gh: 466;
-}
-
-.production__shops li:nth-child(3) .production__shops-digit {
-  --gx: 346;
-  --gy: 272;
-  --gw: 334;
-  --gh: 476;
-}
-
-.production__shops li:nth-child(4) .production__shops-digit {
-  --gx: 340;
-  --gy: 282;
-  --gw: 346;
-  --gh: 456;
 }
 
 @media (hover: hover) {
@@ -6615,11 +6493,11 @@ a {
     transition:
       transform 0.22s var(--ease-out),
       filter 0.22s var(--ease-out),
-      background-color 0.22s var(--ease-out);
+      color 0.22s var(--ease-out);
   }
 
   .production__shops li:hover .production__shops-digit {
-    background-color: color-mix(in srgb, var(--brand-yellow) 78%, white);
+    color: color-mix(in srgb, var(--brand-yellow) 78%, white);
     transform: translateY(-8px);
     filter: drop-shadow(0 1px 0 var(--on-dark-0))
       drop-shadow(1px 3px 0 rgb(196 150 8 / 0.35))
@@ -9985,75 +9863,26 @@ html.is-dialog-open {
   background: #fff;
 }
 
-/* Номер шага вырезается из 1024-поля глифа — та же механика, что у
-   участков производства и у правил программы. Стоит в нижнем правом
-   углу, за текстом: счёт ведёт, но строку не занимает. */
+/* Номер шага — текст в нижнем правом углу, за текстом карточки.
+   Высота та же, что была у вырезанного глифа. Строку не занимает. */
 .mortgage-steps__num {
   --digit-h: 4.5rem;
-  --digit-canvas: 1024;
   --digit-lift: 0px;
   position: absolute;
   right: 12px;
   bottom: 8px;
   z-index: 0;
-  width: calc(var(--digit-h) * var(--gw) / var(--gh));
   height: var(--digit-h);
+  margin: 0;
+  font-size: var(--digit-h);
+  font-weight: 500;
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  color: rgb(var(--avgst-ink-rgb) / var(--ghost-mark));
   pointer-events: none;
-  background-color: rgb(var(--avgst-ink-rgb) / var(--ghost-mark));
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
-  mask-size: calc(var(--digit-h) * var(--digit-canvas) / var(--gh));
-  -webkit-mask-position: calc(-1 * var(--digit-h) * var(--gx) / var(--gh))
-    calc(-1 * var(--digit-h) * var(--gy) / var(--gh));
-  mask-position: calc(-1 * var(--digit-h) * var(--gx) / var(--gh))
-    calc(-1 * var(--digit-h) * var(--gy) / var(--gh));
+  user-select: none;
   transform: translateY(var(--digit-lift));
   filter: drop-shadow(0 1px 0 var(--on-dark-4));
-}
-
-.mortgage-steps li:nth-child(1) .mortgage-steps__num {
-  --gx: 412;
-  --gy: 282;
-  --gw: 158;
-  --gh: 456;
-}
-
-.mortgage-steps li:nth-child(2) .mortgage-steps__num {
-  --gx: 350;
-  --gy: 272;
-  --gw: 326;
-  --gh: 466;
-}
-
-.mortgage-steps li:nth-child(3) .mortgage-steps__num {
-  --gx: 346;
-  --gy: 272;
-  --gw: 334;
-  --gh: 476;
-}
-
-.mortgage-steps li:nth-child(4) .mortgage-steps__num {
-  --gx: 340;
-  --gy: 282;
-  --gw: 346;
-  --gh: 456;
-}
-
-/* Пятый и шестой шаги: у сельской процесс длиннее, и без своих рамок
-   выреза глиф не рисовался вовсе — маске нечего было считать. */
-.mortgage-steps li:nth-child(5) .mortgage-steps__num {
-  --gx: 347;
-  --gy: 280;
-  --gw: 332;
-  --gh: 470;
-}
-
-.mortgage-steps li:nth-child(6) .mortgage-steps__num {
-  --gx: 348;
-  --gy: 270;
-  --gw: 330;
-  --gh: 480;
 }
 
 /* Текст поверх знака: описание шага длиннее названия и заходило под цифру. */
@@ -10068,11 +9897,11 @@ html.is-dialog-open {
     transition:
       transform 0.22s var(--ease-out),
       filter 0.22s var(--ease-out),
-      background-color 0.22s var(--ease-out);
+      color 0.22s var(--ease-out);
   }
 
   .mortgage-steps li:hover .mortgage-steps__num {
-    background-color: color-mix(in srgb, var(--brand-yellow) 78%, white);
+    color: color-mix(in srgb, var(--brand-yellow) 78%, white);
     --digit-lift: -8px;
     filter: drop-shadow(0 1px 0 var(--on-dark-0))
       drop-shadow(1px 3px 0 rgb(196 150 8 / 0.35))

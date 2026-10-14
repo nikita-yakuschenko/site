@@ -116,19 +116,11 @@ function MortgageSteps({ content }: { content: MortgageContent }) {
         >
           {steps.map((step, index) => (
             <li key={step.title}>
-              {/* Номер шага — тот же глиф из /img/digits, которым занумерованы
-                  участки производства на главной и правила программы. Мелкая
-                  подпись «01» занимала строку над названием и вела счёт, но
-                  ничего не держала: водяной знак считает так же, а строку
-                  отдаёт названию. */}
-              <span
-                className="mortgage-steps__num"
-                style={{
-                  WebkitMaskImage: `url("/img/digits/${index + 1}.png")`,
-                  maskImage: `url("/img/digits/${index + 1}.png")`,
-                }}
-                aria-hidden="true"
-              />
+              {/* Номер шага — водяной знак. Мелкая подпись «01» занимала строку
+                  над названием и вела счёт, но ничего не держала. */}
+              <span className="mortgage-steps__num" aria-hidden="true">
+                {index + 1}
+              </span>
               <strong>{step.title}</strong>
               <p>{nbspText(step.text)}</p>
             </li>

@@ -64,7 +64,7 @@ function StoryCard({
       data-cms-block={blockKey}
       onClick={() => onOpen(story)}
     >
-      <img src={story.poster} alt="" />
+      <img src={story.poster} alt="" loading="lazy" decoding="async" />
       <span className="video-story__duration">{story.duration}</span>
       <StoryPlace place={story.place} />
       <span className="video-story__play" aria-hidden="true">
