@@ -41,7 +41,7 @@ export function FactoryVideo({
             лежит поверх кадра — иначе кадр не отличить от фотографии. */}
         <span className="factory-video__card">
           <span className="factory-video__thumb">
-            <img src={optimizedSrc('/production/video-thumb.jpg', 384, 60)} alt="" width={182} height={137} />
+            <img src={optimizedSrc('/production/video-thumb.jpg', 384, 60)} alt="" width={182} height={137} loading="lazy" />
             <svg viewBox="0 0 24 24" aria-hidden="true">
               <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
             </svg>

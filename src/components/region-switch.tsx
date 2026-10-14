@@ -48,7 +48,7 @@ export function RegionSwitch() {
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >
-        <img className={`site-region__mark site-region__mark--${current.tone}`} src={current.mark} alt="" width={18} height={24} />
+        <img className={`site-region__mark site-region__mark--${current.tone}`} src={current.mark} alt="" width={18} height={24} fetchPriority="low" />
         <span className="site-region__name">
           <span className="site-region__sizer" aria-hidden="true">
             {REGIONS.map((region) => (
@@ -72,7 +72,7 @@ export function RegionSwitch() {
                 aria-selected={region.code === current.code}
                 onClick={() => select(region.code)}
               >
-                <img className={`site-region__mark site-region__mark--${region.tone}`} src={region.mark} alt="" width={22} height={30} />
+                <img className={`site-region__mark site-region__mark--${region.tone}`} src={region.mark} alt="" width={22} height={30} loading="lazy" />
                 <span className="site-region__option-name">{region.name}</span>
               </button>
             </li>

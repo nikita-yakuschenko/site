@@ -225,6 +225,7 @@ export function SiteChrome({
                 alt=""
                 width={143}
                 height={40}
+                fetchPriority="low"
               />
               <img
                 className="site-header__logo site-header__logo--sm"
@@ -232,6 +233,7 @@ export function SiteChrome({
                 alt=""
                 width={42}
                 height={40}
+                fetchPriority="low"
               />
             </Link>
 
@@ -365,7 +367,7 @@ export function SiteChrome({
         <div className="footer-grid">
           <div className="footer-brand-col">
             <Link href="/" className="site-footer__brand">
-              <img src={src} alt={name} />
+              <img src={src} alt={name} loading="lazy" />
             </Link>
             <nav className="footer-socials" aria-label={copy.socialsAria}>
               {FOOTER_SOCIALS.map((item) => (
@@ -384,6 +386,7 @@ export function SiteChrome({
                     width={22}
                     height={22}
                     decoding="async"
+                    loading="lazy"
                   />
                   <img
                     className="footer-social__icon footer-social__icon--original"
@@ -392,6 +395,7 @@ export function SiteChrome({
                     width={22}
                     height={22}
                     decoding="async"
+                    loading="lazy"
                   />
                 </a>
               ))}

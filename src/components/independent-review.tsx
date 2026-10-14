@@ -51,6 +51,7 @@ export function IndependentReview({
                 alt=""
                 width={80}
                 height={80}
+                loading="lazy"
               />
               <span>
                 <strong>{data.channelName}</strong>

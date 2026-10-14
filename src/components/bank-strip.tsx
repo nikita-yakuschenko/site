@@ -158,11 +158,11 @@ export function BankStrip({ partners, layout = "strip" }: { partners: BankPartne
     partners.map(({ name, src, inkSrc }) =>
       inkSrc ? (
         <span className="mortgage-partner-pair" key={name}>
-          <img className="mortgage-partner mortgage-partner--primsoc" src={inkSrc} alt={name} />
-          <img className="mortgage-partner mortgage-partner--primsoc-brand" src={src} alt="" aria-hidden="true" />
+          <img className="mortgage-partner mortgage-partner--primsoc" src={inkSrc} alt={name} loading="lazy" />
+          <img className="mortgage-partner mortgage-partner--primsoc-brand" src={src} alt="" aria-hidden="true" loading="lazy" />
         </span>
       ) : (
-        <img className="mortgage-partner" key={name} src={src} alt={name} />
+        <img className="mortgage-partner" key={name} src={src} alt={name} loading="lazy" />
       ),
     );
 
