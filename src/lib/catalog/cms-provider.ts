@@ -12,7 +12,7 @@ const readCatalog = cache(async (slug?: string): Promise<CatalogProject[]> => {
   if (!key) return []
   try {
     const origin = process.env.CMS_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://cms.avgst.ru' : 'http://localhost:3001')
-    const response = await fetch(`${origin}/api/projects/catalog${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`, { headers: { Authorization: `Bearer ${key}` }, cache: 'no-store', signal: AbortSignal.timeout(15000) })
+    const response = await fetch(`${origin}/api/projects/catalog${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`, { headers: { Authorization: `Bearer ${key}` }, next: { revalidate: 60 }, signal: AbortSignal.timeout(15000) })
     if (!response.ok) return []
     const data = await response.json()
     return Array.isArray(data.items) ? data.items : []

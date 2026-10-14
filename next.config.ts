@@ -21,7 +21,7 @@ const nextConfig: NextConfig = {
   // оставляют на них мыло. Значения качества в Next 16 нужно объявлять
   // заранее, иначе quality={90} у <Image> отбрасывается.
   images: {
-    qualities: [75, 90],
+    qualities: [60, 75, 90],
     remotePatterns: [
       { protocol: 'https', hostname: 'cms.avgst.ru', pathname: '/api/media/file/**' },
       { protocol: 'http', hostname: 'localhost', port: '3001', pathname: '/api/media/file/**' },

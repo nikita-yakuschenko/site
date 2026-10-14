@@ -386,11 +386,11 @@ export function HeroCarousel({
           меняется. */}
       {shown.imageMobile ? (
         <picture className="hero__frame" data-cms-block="hero.background">
-          <source media="(min-width: 900px)" sizes="100vw" srcSet={optimizedSrcSet(shown.image, [1280, 1920])} />
-          <img src={optimizedSrc(shown.imageMobile, 828)} srcSet={optimizedSrcSet(shown.imageMobile, [384, 828])} sizes="100vw" alt="" fetchPriority="high" decoding="async" />
+          <source media="(min-width: 900px)" sizes="100vw" srcSet={optimizedSrcSet(shown.image, [1080, 1920])} />
+          <img src={optimizedSrc(shown.imageMobile, 828, 60)} srcSet={optimizedSrcSet(shown.imageMobile, [384, 828], 60)} sizes="100vw" alt="" decoding="async" />
         </picture>
       ) : (
-        <img className="hero__frame" src={optimizedSrc(shown.image, 1920)} srcSet={optimizedSrcSet(shown.image, [828, 1280, 1920])} sizes="100vw" alt="" fetchPriority="high" decoding="async" data-cms-block="hero.background" />
+        <img className="hero__frame" src={optimizedSrc(shown.image, 1920)} srcSet={optimizedSrcSet(shown.image, [828, 1080, 1920])} sizes="100vw" alt="" decoding="async" data-cms-block="hero.background" />
       )}
 
       {/* Ровный тон по кадру: без градиента и без формы, одна плотность во

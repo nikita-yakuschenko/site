@@ -223,11 +223,15 @@ export function SiteChrome({
                 className="site-header__logo site-header__logo--lg"
                 src={src}
                 alt=""
+                width={143}
+                height={40}
               />
               <img
                 className="site-header__logo site-header__logo--sm"
                 src="/logo.svg"
                 alt=""
+                width={42}
+                height={40}
               />
             </Link>
 

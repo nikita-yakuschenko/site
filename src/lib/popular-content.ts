@@ -13,7 +13,7 @@ const readParts = cache(async (key: string): Promise<Part[] | null> => {
   if (!apiKey) return null
   try {
     const origin = process.env.CMS_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://cms.avgst.ru' : 'http://localhost:3001')
-    const response = await fetch(`${origin}/api/blocks/content?key=${encodeURIComponent(key)}`, { headers: { Authorization: `Bearer ${apiKey}` }, cache: 'no-store', signal: AbortSignal.timeout(5000) })
+    const response = await fetch(`${origin}/api/blocks/content?key=${encodeURIComponent(key)}`, { headers: { Authorization: `Bearer ${apiKey}` }, next: { revalidate: 60 }, signal: AbortSignal.timeout(5000) })
     if (!response.ok) return null
     const data = await response.json()
     return Array.isArray(data.parts) ? data.parts : null
