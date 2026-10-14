@@ -13,9 +13,11 @@ FROM dependencies AS runner
 WORKDIR /app/cms
 COPY cms/ ./
 COPY src/lib/ /app/src/lib/
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production
 USER node
-CMD ["sh", "-c", "node scripts/mark-initial-migration.mjs && npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
+CMD ["sh", "-c", "mkdir -p /app/media/.db-backups && pg_dump \"$DATABASE_URL\" -Fc -f /app/media/.db-backups/cms-20261014.dump && echo BACKUP_OK && node scripts/mark-initial-migration.mjs && npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
 
 FROM runner AS operations
-CMD ["sh", "-c", "node scripts/mark-initial-migration.mjs && npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
+CMD ["sh", "-c", "mkdir -p /app/media/.db-backups && pg_dump \"$DATABASE_URL\" -Fc -f /app/media/.db-backups/cms-20261014.dump && echo BACKUP_OK && node scripts/mark-initial-migration.mjs && npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
