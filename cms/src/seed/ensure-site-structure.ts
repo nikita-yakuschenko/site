@@ -111,11 +111,11 @@ function blockData(definition: SiteDefinition, refs: Map<string, { relationTo: '
 }
 
 function publicDirectory() {
-  return [
-    path.resolve(process.cwd(), '../public'),
-    path.resolve(process.cwd(), 'public'),
-    path.resolve(import.meta.dirname, '../../../public'),
-  ].find(directory => existsSync(path.join(directory, 'catalog')))
+  // The bundled server has no import.meta.dirname. A missing catalog must skip uploads, not crash startup.
+  const fromHere = import.meta.dirname ? path.resolve(import.meta.dirname, '../../../public') : ''
+  return [path.resolve(process.cwd(), '../public'), path.resolve(process.cwd(), 'public'), fromHere]
+    .filter(directory => directory.length > 0)
+    .find(directory => existsSync(path.join(directory, 'catalog')))
 }
 
 // Same pipeline as the project gallery uploader: POST /api/media converts to WebP and stores a media row.

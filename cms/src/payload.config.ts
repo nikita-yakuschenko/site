@@ -80,7 +80,11 @@ export default buildConfig({
   logger: { options: { level: 'warn', redact: ['password', 'token', 'secret', 'connectionString', 'req.headers.authorization', 'req.headers.cookie'] } },
   onInit: async (payload) => {
     if (!shouldSeedSite()) return
-    const { ensureSiteStructure } = await import('./seed/ensure-site-structure')
-    await ensureSiteStructure(payload)
+    try {
+      const { ensureSiteStructure } = await import('./seed/ensure-site-structure')
+      await ensureSiteStructure(payload)
+    } catch (error) {
+      payload.logger.error({ err: error }, 'Не удалось досоздать структуру сайта')
+    }
   },
 })
