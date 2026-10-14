@@ -33,10 +33,11 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
     { icon: IconBath, label: `${project.bathrooms} ${copy.specBath}` },
   ]
 
+  const badge = project.readyHome ? copy.readyOnly : project.technologyBadge
   return (
     <article className="card">
       <div className="card__top">
-        <a href={project.href} className="card__media" aria-label={project.name}>
+        <a href={project.href} className="card__media" aria-label={badge ? `${project.name}. ${badge}` : project.name}>
           {project.imageUrl ? (
             <img
               src={project.imageUrl}
@@ -53,7 +54,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
             <span className="card__empty">{copy.noPhoto}</span>
           )}
           <span className="badge">
-            {project.readyHome ? copy.readyOnly : project.technologyBadge}
+            {badge}
           </span>
         </a>
         <div className="card__actions">

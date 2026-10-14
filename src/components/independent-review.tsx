@@ -66,7 +66,7 @@ export function IndependentReview({
             className="independent-review__player"
             data-cms-block="independentReview.player"
             onClick={() => setOpen(true)}
-            aria-label={`Смотреть: ${current.title}`}
+            aria-label={`Смотреть: ${current.title}. ${current.place} ${current.duration}`}
           >
             <img
               src={current.poster}

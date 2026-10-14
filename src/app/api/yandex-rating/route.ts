@@ -15,6 +15,7 @@ export async function GET() {
     if (!Number.isFinite(rating) || rating < 0 || rating > 5) throw new Error('Invalid rating')
     return Response.json({ rating, href: REVIEWS_URL }, { headers: { 'Cache-Control': 'public, max-age=300, s-maxage=3600' } })
   } catch {
-    return Response.json({ rating: null, href: REVIEWS_URL }, { status: 503, headers: { 'Cache-Control': 'no-store' } })
+    // 200, а не 503: браузер пишет в консоль любой неуспешный статус, даже если клиент ошибку перехватил.
+    return Response.json({ rating: null, href: REVIEWS_URL }, { headers: { 'Cache-Control': 'no-store' } })
   }
 }

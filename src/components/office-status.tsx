@@ -83,7 +83,7 @@ export function OfficeStatusIndicator() {
       <button
         type="button"
         className="site-office__trigger"
-        aria-label={`${copy.officeStatusAria}: ${trigger}`}
+        aria-label={trigger.includes(triggerShort) ? `${copy.officeStatusAria}: ${trigger}` : `${copy.officeStatusAria}: ${trigger}. ${triggerShort}`}
         aria-expanded={open}
         onClick={() => setOpen((value) => !value)}
       >

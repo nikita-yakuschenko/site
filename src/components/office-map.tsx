@@ -50,6 +50,7 @@ export function OfficeMap({
     let map: YmapsMap | null = null
     let cancelled = false
     let resizeObserver: ResizeObserver | null = null
+    let logoObserver: MutationObserver | null = null
 
     loadYandexMaps()
       .then((ymaps) => {
@@ -72,6 +73,16 @@ export function OfficeMap({
             ),
           )
           map = instance
+          const labelLogo = () => {
+            host.current?.querySelectorAll('a[class*="copyright__logo"]').forEach((logo) => {
+              if (!logo.getAttribute('aria-label')) logo.setAttribute('aria-label', 'Яндекс')
+            })
+          }
+          labelLogo()
+          if (host.current) {
+            logoObserver = new MutationObserver(labelLogo)
+            logoObserver.observe(host.current, { childList: true, subtree: true })
+          }
           setStatus('ready')
           // Контейнер контактов тянется по высоте — карта должна
           // пересчитать кадр, иначе остаётся дыра или обрезок.
@@ -87,6 +98,7 @@ export function OfficeMap({
 
     return () => {
       cancelled = true
+      logoObserver?.disconnect()
       resizeObserver?.disconnect()
       map?.destroy()
     }
@@ -101,23 +113,25 @@ export function OfficeMap({
           ? 'is-failed'
           : ''
   const interactive = status === 'ready' || skeleton
+  const label = markerLabel && !ariaLabel.includes(markerLabel) ? `${ariaLabel}, ${markerLabel}` : ariaLabel
 
   return (
-    <a
-      className={[className, stateClass].filter(Boolean).join(' ')}
-      href={routeUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      aria-label={ariaLabel}
-      aria-busy={skeleton && status === 'pending' ? true : undefined}
-      aria-hidden={interactive ? undefined : true}
-      tabIndex={interactive ? undefined : -1}
-      onClick={onNavigate}
-    >
+    <div className={[className, stateClass].filter(Boolean).join(' ')}>
       {skeleton && status === 'pending' ? (
         <span className="office-map-skeleton" aria-hidden="true" />
       ) : null}
+      <a
+        className="office-map__hit"
+        href={routeUrl}
+        target="_blank"
+        rel="noopener noreferrer"
+        aria-label={label}
+        aria-busy={skeleton && status === 'pending' ? true : undefined}
+        aria-hidden={interactive ? undefined : true}
+        tabIndex={interactive ? undefined : -1}
+        onClick={onNavigate}
+      />
       <div className="site-office__map-canvas" ref={host} />
-    </a>
+    </div>
   )
 }

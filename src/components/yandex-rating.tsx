@@ -17,7 +17,7 @@ export function YandexRating() {
       .finally(() => { if (!controller.signal.aborted) setLoading(false) })
     return () => controller.abort()
   }, [])
-  return <a className="yandex-rating" href={REVIEWS_URL} target="_blank" rel="noopener noreferrer" aria-label={rating !== null ? `Рейтинг на Яндексе: ${rating} из 5. Читать отзывы` : 'Читать отзывы на Яндексе'}>
+  return <a className="yandex-rating" href={REVIEWS_URL} target="_blank" rel="noopener noreferrer">
     <span className="yandex-rating__row">
       <strong>{rating !== null ? rating.toLocaleString('ru-RU', { minimumFractionDigits: 1 }) : loading ? '…' : 'Яндекс'}</strong>
       {rating !== null ? <span className="yandex-rating__stars" aria-hidden>{Array.from({ length: 5 }, (_, index) => <span className="yandex-rating__star" key={index}><IconStarFilled size={20} /><span style={{ width: `${Math.max(0, Math.min(1, rating - index)) * 100}%` }}><IconStarFilled size={20} /></span></span>)}</span> : null}

@@ -3545,7 +3545,7 @@ a {
 }
 
 .independent-review__audience {
-  color: var(--ink-3) !important;
+  color: var(--ink-2) !important;
 }
 
 .independent-review__player {
@@ -3684,11 +3684,11 @@ a {
 .independent-review__num {
   font-size: 14px;
   font-weight: 700;
-  color: var(--ink-4);
+  color: var(--ink-2);
 }
 
 .independent-review__item.is-active .independent-review__num {
-  color: var(--brand-yellow);
+  color: var(--avgst-ink);
 }
 
 .independent-review__meta {
@@ -3717,7 +3717,7 @@ a {
 .independent-review__time {
   font-size: 12px;
   font-weight: 600;
-  color: var(--ink-3);
+  color: var(--ink-2);
   white-space: nowrap;
 }
 
@@ -7171,10 +7171,12 @@ a {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  vertical-align: super;
-  margin: 0 0 0 1px;
-  /* Слева почти без поля — иначе иконка визуально отъезжает от текста. */
-  padding: 5px 5px 5px 1px;
+  vertical-align: middle;
+  box-sizing: border-box;
+  width: 24px;
+  height: 24px;
+  margin: 0 0 0 2px;
+  padding: 0;
   border: 0;
   border-radius: 0;
   background: transparent !important;
@@ -7457,9 +7459,25 @@ a {
   }
 }
 
-.contacts__map:focus-visible {
+.contacts__map:focus-visible,
+.office-map__hit:focus-visible {
   outline: 2px solid var(--brand-yellow);
   outline-offset: 2px;
+}
+
+/* Ссылка не накрывает копирайт Яндекса: иначе имя и зона нажатия спорят с его ссылками. */
+.office-map__hit {
+  position: absolute;
+  z-index: 2;
+  inset: 0 0 32px 0;
+}
+
+.contacts__map [class*="copyright__link"],
+.site-office__map [class*="copyright__link"] {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  min-height: 24px;
 }
 
 /* Скелетон карты: лёгкий шиммер на тёмной плашке. */
@@ -8866,6 +8884,7 @@ html.is-dialog-open {
 }
 
 .site-office__map.is-ready {
+  position: relative;
   display: block;
   margin: 16px 0 0;
   /* 16:9, а не 16:10: логотип Яндекса поверх карты фиксированного размера,
@@ -8877,8 +8896,8 @@ html.is-dialog-open {
 }
 
 .site-office__map-canvas {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
 }
 
 /* Черта под картой. Сверху её роль играет нижняя граница расписания, снизу
@@ -8891,7 +8910,8 @@ html.is-dialog-open {
   border-top: 1px solid var(--tech-panel-line);
 }
 
-.site-office__map:focus-visible {
+.site-office__map:focus-visible,
+.site-office__map .office-map__hit:focus-visible {
   outline: 2px solid var(--brand-yellow);
   outline-offset: 2px;
 }
@@ -9055,6 +9075,9 @@ html.is-dialog-open {
     padding-right: 36px;
   }
 
+  .site-office__trigger {
+    min-height: 24px;
+  }
   .site-office__label--full {
     display: none;
   }
