@@ -1,4 +1,8 @@
-# Контур 4.0 до cutover закрыт от индексации: боевой сайт пока на Tilda,
-# дубли в выдаче нам не нужны. Открывается в задаче AV4-16.
+# Публичные страницы new.avgst.ru открыты для индексации.
+# Служебные адреса в выдачу не пускаем.
 User-agent: *
-Disallow: /
+Allow: /
+
+Disallow: /api/
+Disallow: /preview/
+Disallow: /cms-preview/

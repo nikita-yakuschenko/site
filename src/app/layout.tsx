@@ -26,8 +26,7 @@ export const metadata: Metadata = {
     shortcut: '/favicon.svg',
   },
   openGraph: { locale: OG_LOCALE, title: copy.seoTitle },
-  // Контур закрыт от индексации до cutover: боевой сайт пока на Tilda.
-  robots: { index: false, follow: false },
+  robots: { index: true, follow: true },
 }
 
 export const viewport: Viewport = {
