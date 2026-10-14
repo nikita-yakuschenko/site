@@ -6,7 +6,7 @@ import { authenticated, contentManager, contentWriter, ownAccountOrSuper, superA
 import { readEnvironment } from '../src/config/environment'
 import { validateFirstAdmin } from '../src/access/bootstrap'
 import { Users } from '../src/collections/Users'
-import { createMedia } from '../src/collections/Media'
+import { clearPublicMediaCache, createMedia } from '../src/collections/Media'
 import { GET } from '../src/app/api/health/route'
 
 function request(role: User['role'], blocked = false, signedRole: User['role'] = role): PayloadRequest {
@@ -106,7 +106,10 @@ test('anonymous media access is limited to images referenced by connected public
       return { docs: [{ heroContentSource: 'database', desktopImage: 5, mobileImage: 9 }, { heroContentSource: 'mock', desktopImage: 99, exteriorsContentSource: 'database', exteriors: [{ photo: 12 }] }, { interiorsContentSource: 'database', interiors: [{ photo: 14 }], exteriors: [{ photo: 98 }] }, { builtContentSource: 'database', built: [{ type: 'photo', photo: 16 }, { type: 'video', photo: 17 }] }, { builtContentSource: 'mock', built: [{ photo: 97 }] }, { plansContentSource: 'database', plans: [{ floors: [{ photo: 21 }, { photo: 22 }] }] }, { plansContentSource: 'mock', plans: [{ floors: [{ photo: 96 }] }] }]  }
     } },
   } as unknown as PayloadRequest
+  clearPublicMediaCache()
   assert.deepEqual(await media.access!.read!({ req }), { id: { in: [5, 9, 12, 14, 16, 17, 21, 22] } })
   req.payload.find = (async () => ({ docs: [] })) as unknown as typeof req.payload.find
+  assert.deepEqual(await media.access!.read!({ req }), { id: { in: [5, 9, 12, 14, 16, 17, 21, 22] } })
+  clearPublicMediaCache()
   assert.equal(await media.access!.read!({ req }), false)
 })

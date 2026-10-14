@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { floorName, normalizePlans, validRoomArea } from '../src/config/project-plans'
+import { floorName, normalizePlans, validRoomArea, variantName } from '../src/config/project-plans'
 import { isPlanVariants } from '../../src/lib/catalog/project-plans-data'
 
 test('one storey plans migrate with their own explication', () => {
@@ -11,10 +11,11 @@ test('one storey plans migrate with their own explication', () => {
   assert.equal(variant.image, null)
   assert.deepEqual(variant.rooms, [])
 })
-test('floor names are automatic with optional exceptions', () => {
+test('variant and floor names are positional', () => {
+  assert.equal(variantName(0), 'Вариант А')
+  assert.equal(variantName(2), 'Вариант В')
   assert.equal(floorName(null, 0), '1 этаж')
-  assert.equal(floorName('', 1), '2 этаж')
-  assert.equal(floorName('Мансарда', 1), 'Мансарда')
+  assert.equal(floorName('Мансарда', 1), '2 этаж')
 })
 test('uploaded floor replaces legacy path and keeps its explication', () => {
   const [variant] = normalizePlans([{ floors: [{ photo: 15, image: '/old.jpg', rooms: [{ name: 'Спальня', area: '10' }] }] }])
