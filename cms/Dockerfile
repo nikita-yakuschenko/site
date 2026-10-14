@@ -15,7 +15,7 @@ COPY cms/ ./
 COPY src/lib/ /app/src/lib/
 ENV NODE_ENV=production
 USER node
-CMD ["sh", "-c", "npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
+CMD ["sh", "-c", "node scripts/mark-initial-migration.mjs && npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
 
 FROM runner AS operations
-CMD ["sh", "-c", "npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
+CMD ["sh", "-c", "node scripts/mark-initial-migration.mjs && npm run migrate; echo MIGRATE_EXIT:$?; sleep 180"]
