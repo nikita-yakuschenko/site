@@ -5,7 +5,7 @@ import { createLocalReq, getPayload } from 'payload'
 if (existsSync('.env')) process.loadEnvFile('.env')
 const { default: config } = await import('../src/payload.config')
 const payload = await getPayload({ config })
-let testId: string | undefined
+let testId: number | undefined
 try {
   const admin = (await payload.find({ collection: 'users', where: { and: [{ role: { equals: 'super-admin' } }, { isBlocked: { equals: false } }] }, limit: 1 })).docs[0]
   assert.ok(admin)

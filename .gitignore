@@ -21,6 +21,8 @@ public/media/factory-video.mp4
 data/
 !src/data/
 !src/data/manufacture-frames*.json
+!cms/src/data/
+!cms/src/data/site-index.json
 test-results/
 playwright-report/
 playwright/.cache/

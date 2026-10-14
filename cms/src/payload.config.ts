@@ -12,7 +12,7 @@ import { ProjectPrices } from './collections/ProjectPrices'
 import { LeadDelivery, LeadSubmissions } from './collections/LeadSubmissions'
 import { createMedia } from './collections/Media'
 import { readEnvironment } from './config/environment'
-import { withRecordId } from './collections/record-id'
+import { shouldSeedSite } from './seed/standard-site'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const environment = readEnvironment()
@@ -47,6 +47,7 @@ export default buildConfig({
         integrations: { Component: './components/admin/StructureView#IntegrationsView', path: '/structure/integrations', exact: true },
         dashboard: { Component: './components/admin/Dashboard#Dashboard' },
         login: { Component: './components/admin/LoginView#LoginView', path: '/login', exact: true },
+        createFirstUser: { Component: './components/admin/LoginView#LoginView' },
       },
     },
     timezones: { defaultTimezone: 'Europe/Moscow', supportedTimezones: [{ label: 'Москва', value: 'Europe/Moscow' }] },
@@ -64,7 +65,7 @@ export default buildConfig({
   debug: false,
   defaultDepth: 0,
   maxDepth: 3,
-  collections: [Users, Pages, Blocks, Forms, Projects, ProjectPrices, LeadSubmissions, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })].map(withRecordId),
+  collections: [Users, Pages, Blocks, Forms, Projects, ProjectPrices, LeadSubmissions, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
   globals: [LeadDelivery],
   editor: lexicalEditor(),
   sharp,
@@ -77,4 +78,9 @@ export default buildConfig({
   }),
   typescript: { outputFile: path.resolve(root, 'payload-types.ts') },
   logger: { options: { level: 'warn', redact: ['password', 'token', 'secret', 'connectionString', 'req.headers.authorization', 'req.headers.cookie'] } },
+  onInit: async (payload) => {
+    if (!shouldSeedSite()) return
+    const { ensureSiteStructure } = await import('./seed/ensure-site-structure')
+    await ensureSiteStructure(payload)
+  },
 })

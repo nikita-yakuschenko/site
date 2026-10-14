@@ -34,6 +34,18 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build and publish migration image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./cms/Dockerfile
+          target: migrate
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ghcr.io/nikita-yakuschenko/avgst-cms:sha-${{ github.sha }}-migrate
+          cache-from: type=gha,scope=avgst-cms-migrate
+          cache-to: type=gha,scope=avgst-cms-migrate,mode=max
       - name: Build and publish CMS
         uses: docker/build-push-action@v6
         with:

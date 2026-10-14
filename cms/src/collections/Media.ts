@@ -9,14 +9,16 @@ function labelFromFilename(filename?: string | null) {
 
 // Каждая анонимная картинка иначе перечитывает все проекты и исчерпывает пул подключений.
 const PUBLIC_MEDIA_TTL_MS = 10_000
-let publicMediaCache: { expires: number; ids: Promise<string[]> } | null = null
+let publicMediaCache: { expires: number; ids: Promise<number[]> } | null = null
 
-function publicMediaIds(req: PayloadRequest): Promise<string[]> {
+function publicMediaIds(req: PayloadRequest): Promise<number[]> {
   const now = Date.now()
   if (!publicMediaCache || publicMediaCache.expires < now) {
     const ids = loadPublicMediaIds(req)
-    publicMediaCache = { expires: now + PUBLIC_MEDIA_TTL_MS, ids }
-    ids.catch(() => { publicMediaCache = null })
+    const cache = { expires: now + PUBLIC_MEDIA_TTL_MS, ids }
+    publicMediaCache = cache
+    ids.catch(() => { if (publicMediaCache === cache) publicMediaCache = null })
+    return cache.ids
   }
   return publicMediaCache.ids
 }
@@ -32,7 +34,7 @@ const readMedia: Access = async ({ req }) => {
   return ids.length ? { id: { in: ids } } : false
 }
 
-async function loadPublicMediaIds(req: PayloadRequest): Promise<string[]> {
+async function loadPublicMediaIds(req: PayloadRequest): Promise<number[]> {
   const projects = await req.payload.find({
     collection: 'projects', overrideAccess: true, depth: 0, pagination: false,
     where: { or: [{ heroContentSource: { equals: 'database' } }, { exteriorsContentSource: { equals: 'database' } }, { interiorsContentSource: { equals: 'database' } }, { builtContentSource: { equals: 'database' } }, { plansContentSource: { equals: 'database' } }] },
@@ -47,7 +49,7 @@ async function loadPublicMediaIds(req: PayloadRequest): Promise<string[]> {
   ])
   const blocks = await req.payload.find({ collection: 'blocks', overrideAccess: true, depth: 0, pagination: false, select: { parts: true } })
   const blockMedia = blocks.docs.flatMap(block => (block.parts || []).flatMap(part => [part.image, part.imageMobile]))
-  return [...projectMedia, ...blockMedia].filter((id): id is string => typeof id === 'string')
+  return [...projectMedia, ...blockMedia].filter((id): id is number => typeof id === 'number')
 }
 
 export function createMedia({ directory, uploadsEnabled }: { directory: string; uploadsEnabled: boolean }): CollectionConfig {

@@ -15,6 +15,7 @@ import { projectConfigurationsEndpoint } from './project-configurations-endpoint
 import { projectCatalogEndpoint } from './project-catalog-endpoint'
 import { normalizeConfigurations } from '../config/project-configurations'
 import { configurationKeys, isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
+import { claimProductCode } from './record-id'
 
 const imageFields: Field[] = [
   { name: 'image', label: 'Изображение', type: 'text', required: true },
@@ -37,7 +38,12 @@ export const Projects: CollectionConfig = {
   hooks: { beforeDelete: [async ({ id, req }) => {
     // Price rows require a project, so they go first
     await req.payload.delete({ collection: 'project-prices', where: { project: { equals: id } }, req, overrideAccess: true })
-  }], beforeValidate: [({ data, originalDoc }) => {
+  }], beforeValidate: [async ({ data, operation, req }) => {
+    // The code is the public product identifier. The numeric primary key stays internal.
+    if (operation === 'create' && data) data.code = await claimProductCode(req)
+    if (operation === 'update' && data) delete data.code
+    return data
+  }, ({ data, originalDoc }) => {
     if (Array.isArray(data?.plans)) data.plans = normalizePlans(data.plans)
     if (data && completeProjectOrder(data.blockOrder)) data.blockOrder = normalizeProjectOrder(data.blockOrder)
     if (Array.isArray(data?.interiors)) data.interiors = data.interiors.map((row: { photo?: unknown; image?: string }) => ({ ...row, image: row.photo ? null : row.image }))
@@ -69,7 +75,7 @@ export const Projects: CollectionConfig = {
     return data
   }], beforeChange: [({ data, operation, originalDoc }) => {
     // Unnamed drafts get a recognizable name with their record ID
-    if (operation === 'create' && !data.name?.trim() && data.id) data.name = `Черновик #${data.id}`
+    if (operation === 'create' && !data.name?.trim() && data.code) data.name = `Черновик ${data.code}`
     const manualProject = (operation === 'create' && !data.importKey) || (originalDoc && !originalDoc.importKey)
     if (manualProject || data.desktopImage) data.heroContentSource = 'database'
     if (manualProject) {
@@ -84,6 +90,7 @@ export const Projects: CollectionConfig = {
       { name: 'recordType', label: 'Тип записи', type: 'select', required: true, defaultValue: 'project', options: [{ label: 'Проект дома', value: 'project' }, { label: 'Готовый дом', value: 'ready-home' }] },
       { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
     ] },
+    { name: 'code', label: 'Код', type: 'text', unique: true, index: true, admin: { readOnly: true, position: 'sidebar', description: 'Код товара. Назначается при создании и больше не меняется.' } },
     { name: 'preview', type: 'ui', admin: { position: 'sidebar', components: { Field: './components/admin/PagePreviewField#ProjectPreviewField' } } },
     { name: 'blockOrder', label: 'Порядок блоков', type: 'json', validate: (value: unknown) => value == null || validProjectOrder(value) ? true : 'Порядок должен содержать все блоки без повторений', admin: { components: { Field: './components/admin/ProjectBlockOrder#ProjectBlockOrder' } } },
     { type: 'collapsible', label: 'Главный экран', fields: [

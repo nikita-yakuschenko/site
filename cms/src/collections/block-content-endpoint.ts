@@ -1,10 +1,10 @@
 import type { Endpoint } from 'payload'
 import { authorizeSiteRequest } from './project-hero-endpoint'
 
-type MediaValue = { url?: string | null } | string | null | undefined
+type MediaValue = { url?: string | null } | string | number | null | undefined
 
 function mediaURL(image: MediaValue) {
-  if (!image || typeof image === 'string' || !image.url) return ''
+  if (!image || typeof image !== 'object' || !image.url) return ''
   return new URL(image.url, process.env.CMS_PUBLIC_URL || 'http://localhost:3001').href
 }
 

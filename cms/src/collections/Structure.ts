@@ -4,13 +4,21 @@ import { blockContentEndpoint } from './block-content-endpoint'
 import { clearPublicMediaCache } from './Media'
 import { configurationTemplateFields } from '../config/configuration-template-fields'
 import { fixedBlocks } from '../config/fixed-blocks'
+import { isStandardRecord } from '../seed/standard-site'
 
 const access = { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager }
 
 function registry(slug: 'blocks' | 'forms', singular: string, plural: string): CollectionConfig {
   return {
     slug, labels: { singular, plural }, access,
-    ...(slug === 'blocks' ? { endpoints: [blockContentEndpoint], hooks: { afterChange: [() => { clearPublicMediaCache() }] } } : {}),
+    ...(slug === 'blocks' ? { endpoints: [blockContentEndpoint] } : {}),
+    hooks: {
+      ...(slug === 'blocks' ? { afterChange: [() => { clearPublicMediaCache() }] } : {}),
+      beforeDelete: [async ({ id, req }) => {
+        const doc = await req.payload.findByID({ collection: slug, id, depth: 0, overrideAccess: true, req })
+        if (isStandardRecord(slug, doc)) throw new Error(slug === 'forms' ? 'Штатная форма входит в структуру сайта и не удаляется.' : 'Штатный блок входит в структуру сайта и не удаляется.')
+      }],
+    },
     admin: { useAsTitle: 'title', defaultColumns: ['title', 'key', 'updatedAt'], components: { edit: { beforeDocumentControls: ['./components/admin/PageMetadataFields#BlockRecordMetadata'] } } },
     fields: [
       { name: 'title', label: 'Название', type: 'text', required: true },
@@ -40,7 +48,10 @@ export const Forms = registry('forms', 'Форма', 'Формы')
 export const Pages: CollectionConfig = {
   slug: 'pages', labels: { singular: 'Страница', plural: 'Страницы' }, access,
   versions: { drafts: true, maxPerDoc: 20 },
-  hooks: { beforeChange: [async ({ data, operation, originalDoc, req }) => {
+  hooks: { beforeDelete: [async ({ id, req }) => {
+    const doc = await req.payload.findByID({ collection: 'pages', id, depth: 0, overrideAccess: true, req })
+    if (isStandardRecord('pages', doc)) throw new Error('Штатная страница входит в структуру сайта и не удаляется.')
+  }], beforeChange: [async ({ data, operation, originalDoc, req }) => {
     // Unnamed drafts get a recognizable name with their record ID
     if (operation === 'create' && !data.title?.trim() && data.id) data.title = `Черновик #${data.id}`
     // Shared and hero blocks stay pinned: leading ones at the top, the rest at the bottom

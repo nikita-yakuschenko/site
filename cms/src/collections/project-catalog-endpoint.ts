@@ -18,12 +18,13 @@ export const projectCatalogEndpoint: Endpoint = {
     }
     const items: CatalogProject[] = projects.docs.filter(record => record.desktopImage || record.imageUrl).map(record => {
       const modular = isModularTechnology(record.technologyBadge)
-      const importedPrice = prices.docs.find(row => (typeof row.project === 'string' ? row.project : row.project.id) === record.id && row.configuration === 'standard' && row.region === 'nn')?.price
+      const projectId = (project: number | { id: number }) => typeof project === 'number' ? project : project.id
+      const importedPrice = prices.docs.find(row => projectId(row.project) === record.id && row.configuration === 'standard' && row.region === 'nn')?.price
       const price = record.recordType === 'ready-home' ? record.readyHome?.salePrice : importedPrice ?? record.configurations?.find(row => row.key === 'standard')?.price ?? record.priceAmount
-      const regionalPrices = Object.fromEntries(prices.docs.filter(row => (typeof row.project === 'string' ? row.project : row.project.id) === record.id && row.configuration === 'standard' && isPublicPriceKind(row.region)).map(row => [row.region, row.price]))
+      const regionalPrices = Object.fromEntries(prices.docs.filter(row => projectId(row.project) === record.id && row.configuration === 'standard' && isPublicPriceKind(row.region)).map(row => [row.region, row.price]))
       if (!('nn' in regionalPrices) && price && price > 0) regionalPrices.nn = price
       return {
-        id: record.importKey?.replace(/^catalog:/, '') || `cms:${record.id}`, cmsId: record.id, slug: record.slug, name: record.name, href: `/catalog/${record.slug}`,
+        id: record.importKey?.replace(/^catalog:/, '') || `cms:${record.id}`, cmsId: record.code || undefined, slug: record.slug, name: record.name, href: `/catalog/${record.slug}`,
         area: String(record.areaValue), areaValue: record.areaValue, floors: String(record.floorsValue), floorsValue: record.floorsValue, bedrooms: String(record.bedrooms), bathrooms: String(record.bathrooms),
         technology: modular ? 'modular' : 'panel', technologyBadge: record.technologyBadge, series: record.series || (modular ? 'modular' : 'panel'),
         imageUrl: mediaURL(record.desktopImage, record.imageUrl), mobileImageUrl: mediaURL(record.mobileImage, record.mobileImageUrl) || null,

@@ -3,6 +3,7 @@ import * as migration_20261014_094638_pages_drafts from './20261014_094638_pages
 import * as migration_20261014_105148_block_part_content from './20261014_105148_block_part_content';
 import * as migration_20261014_111009_hero_background from './20261014_111009_hero_background';
 import * as migration_20261014_160000_reconcile_schema from './20261014_160000_reconcile_schema';
+import * as migration_20261014_164500_product_code from './20261014_164500_product_code';
 
 export const migrations = [
   {
@@ -29,5 +30,10 @@ export const migrations = [
     up: migration_20261014_160000_reconcile_schema.up,
     down: migration_20261014_160000_reconcile_schema.down,
     name: '20261014_160000_reconcile_schema'
+  },
+  {
+    up: migration_20261014_164500_product_code.up,
+    down: migration_20261014_164500_product_code.down,
+    name: '20261014_164500_product_code',
   },
 ];

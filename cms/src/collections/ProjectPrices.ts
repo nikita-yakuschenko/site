@@ -13,7 +13,8 @@ export const ProjectPrices: CollectionConfig = {
     if (!data) return data
     const row = { ...originalDoc, ...data }
     const projectID = typeof row.project === 'object' ? row.project.id : row.project
-    const project = await req.payload.findByID({ collection: 'projects', id: projectID, depth: 0, req, overrideAccess: false })
+    // Internal check. Startup seeding has no signed-in user yet.
+    const project = await req.payload.findByID({ collection: 'projects', id: projectID, depth: 0, req, overrideAccess: true })
     if (project.recordType === 'ready-home' || !configurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error('Комплектация не соответствует технологии проекта')
     data.lookupKey = `${projectID}:${row.configuration}:${row.region}`
     return data
