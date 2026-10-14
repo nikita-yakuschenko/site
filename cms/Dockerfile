@@ -18,16 +18,6 @@ RUN --mount=type=cache,id=avgst-cms-next,target=/app/.next/cache,sharing=locked 
     DATABASE_URL=postgresql://build:build@127.0.0.1:5432/build \
     CMS_PUBLIC_URL=https://cms.avgst.ru npm run build
 
-# Explicit maintenance image, built with --target operations. Never deployed.
-# Migrations and bootstrap are separate operator commands, not startup hooks.
-FROM dependencies AS operations
-WORKDIR /app/cms
-COPY cms/ ./
-COPY src/lib/ /app/src/lib/
-ENV NODE_ENV=production
-USER node
-CMD ["npm", "run", "migrate:status"]
-
 FROM base AS runner
 ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
 COPY --from=builder --chown=node:node /app/cms/.next/standalone ./
@@ -40,3 +30,13 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
   CMD node -e "fetch('http://127.0.0.1:3000/api/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
 # Exec form forwards SIGTERM directly to Next.js for graceful shutdown.
 CMD ["node", "cms/server.js"]
+
+# Last stage: Dokploy builds the Dockerfile without --target, so this is what a
+# git deploy of the CMS app runs. CI still publishes the runner via --target runner.
+FROM dependencies AS operations
+WORKDIR /app/cms
+COPY cms/ ./
+COPY src/lib/ /app/src/lib/
+ENV NODE_ENV=production
+USER node
+CMD ["npm", "run", "migrate"]
