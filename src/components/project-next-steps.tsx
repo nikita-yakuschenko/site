@@ -121,7 +121,15 @@ export function ProjectNextSteps({
         {current.order === 'secondary-first' ? <>{secondaryCard}{visitCard}</> : <>{visitCard}{secondaryCard}</>}
       </div>
 
-      {!readyHome && current.secondaryEnabled && consultOpen ? <LeadDialog onClose={() => setConsultOpen(false)} /> : null}
+      {!readyHome && current.secondaryEnabled && consultOpen ? (
+        <LeadDialog
+          heading="Консультация с архитектором"
+          body="Оставьте контакты — перезвоним и запишем на консультацию. Архитектор разместит дом на участке, рассчитает траекторию движения солнца и поможет принять решение."
+          submitLabel="Записаться"
+          formId="architect-consultation"
+          onClose={() => setConsultOpen(false)}
+        />
+      ) : null}
     </section>
   );
 }
