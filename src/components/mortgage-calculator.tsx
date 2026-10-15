@@ -800,7 +800,7 @@ export function MortgageCalculator({
                 <div className="mortgage-calc__quote-summary">
                   {project?.name ? <p className="mortgage-calc__quote-name">{project.name}</p> : null}
                   <p className="mortgage-calc__quote-rate">в ипотеку под {displayRate}</p>
-                  <p className="mortgage-calc__quote-pay">платёж {formatRub(Math.round(paymentResult.monthlyPayment)).replace(/\.$/, "/мес")}</p>
+                  <p className="mortgage-calc__quote-pay">платёж {formatRub(Math.round(paymentResult.monthlyPayment))}/мес</p>
                 </div>
               ) : null}
               <PanelLeadForm
