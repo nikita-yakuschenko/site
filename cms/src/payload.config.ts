@@ -72,7 +72,7 @@ export default buildConfig({
   upload: { limits: { fileSize: 10 * 1024 * 1024 } },
   db: postgresAdapter({
     pool: { connectionString: environment.databaseURL, connectionTimeoutMillis: 5000, max: 10 },
-    push: false,
+    push: !environment.production && process.env.PAYLOAD_DB_PUSH === 'true',
     disableCreateDatabase: true,
     migrationDir: path.resolve(root, 'migrations'),
   }),

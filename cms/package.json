@@ -21,7 +21,7 @@
     "bootstrap": "tsx scripts/bootstrap.ts",
     "import:site": "tsx scripts/import-site.ts",
     "structure:complete": "tsx scripts/complete-page-structure.ts",
-    "test": "tsx --test tests/*.test.ts",
+    "test": "tsx --test tests/*.test.ts tests/*.test.mjs",
     "test:integration": "tsx --test --test-force-exit tests/integration/*.test.ts"
   },
   "dependencies": {

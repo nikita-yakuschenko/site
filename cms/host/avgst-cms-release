@@ -1,0 +1,236 @@
+#!/bin/bash
+# Установленный на сервере скрипт. Workflow не имеет права его подменять.
+# Запуск: sudo /usr/local/sbin/avgst-cms-release <image@sha256:...> <git-sha>
+set -euo pipefail
+umask 077
+
+if [[ "$(id -u)" -ne 0 ]]; then
+  echo "Релиз запускается только от root через sudo." >&2
+  exit 1
+fi
+if [[ "$#" -ne 2 ]]; then
+  echo "Нужны ровно два аргумента: digest образа и SHA коммита." >&2
+  exit 1
+fi
+
+image="$1"
+revision="$2"
+if [[ ! "$image" =~ ^ghcr\.io/nikita-yakuschenko/avgst-cms@sha256:[a-f0-9]{64}$ ]]; then
+  echo "Принимается только образ ghcr.io/nikita-yakuschenko/avgst-cms@sha256:…" >&2
+  exit 1
+fi
+if [[ ! "$revision" =~ ^[a-f0-9]{40}$ ]]; then
+  echo "SHA коммита имеет неверный вид." >&2
+  exit 1
+fi
+
+# Значения, пришедшие от workflow, не используются: секреты читает только этот файл.
+unset DATABASE_URL DOKPLOY_API_KEY GITHUB_TOKEN GHCR_PULL_TOKEN || true
+
+release_env=/etc/avgst/cms-release.env
+runtime_env=/etc/avgst/cms.runtime.env
+if [[ ! -f "$release_env" || ! -f "$runtime_env" ]]; then
+  echo "На сервере нет /etc/avgst/cms-release.env или /etc/avgst/cms.runtime.env." >&2
+  exit 1
+fi
+set -a
+# shellcheck disable=SC1091
+source "$release_env"
+set +a
+
+: "${DOKPLOY_API_URL:?}"
+: "${DOKPLOY_API_KEY:?}"
+: "${DOKPLOY_APPLICATION_ID:?}"
+service="${CMS_SWARM_SERVICE:?}"
+network="${CMS_DOCKER_NETWORK:?}"
+backup_dir="${CMS_BACKUP_DIR:-/var/lib/avgst/cms-backups}"
+origin="${CMS_PUBLIC_ORIGIN:?}"
+expected_database="${CMS_EXPECTED_DATABASE:?}"
+state_dir=/var/lib/avgst
+mkdir -p "$state_dir" "$backup_dir"
+chmod 700 "$state_dir" "$backup_dir"
+exec 9>"$state_dir/migrate.lock"
+if ! flock -n 9; then
+  echo "Уже выполняется другой релиз CMS." >&2
+  exit 1
+fi
+
+if ! command -v curl >/dev/null || ! command -v python3 >/dev/null; then
+  echo "На хосте нужны curl и python3. Они не ставятся из репозитория во время релиза." >&2
+  exit 1
+fi
+
+docker pull "$image" >/dev/null
+source_label="$(docker image inspect "$image" --format '{{index .Config.Labels "org.opencontainers.image.source"}}')"
+revision_label="$(docker image inspect "$image" --format '{{index .Config.Labels "org.opencontainers.image.revision"}}')"
+repo_digests="$(docker image inspect "$image" --format '{{json .RepoDigests}}')"
+if [[ "$source_label" != "https://github.com/nikita-yakuschenko/site" || "$revision_label" != "$revision" || "$repo_digests" != *"sha256:${image##*sha256:}"* ]]; then
+  echo "Образ не соответствует репозиторию site или заявленному коммиту." >&2
+  exit 1
+fi
+target_id="$(docker image inspect "$image" --format '{{.Id}}')"
+
+dokploy_read() {
+  curl --silent --show-error --fail --max-time 30 \
+    --header "x-api-key: ${DOKPLOY_API_KEY}" \
+    "${DOKPLOY_API_URL%/}/application.one?applicationId=${DOKPLOY_APPLICATION_ID}" \
+    | python3 -c 'import json,sys
+raw=json.load(sys.stdin)
+app=raw.get("result",{}).get("data",raw) if isinstance(raw,dict) else raw
+if isinstance(app,dict) and "json" in app: app=app["json"]
+print(app.get("dockerImage") or "")
+print("yes" if app.get("command") else "no")'
+}
+
+dokploy_write() {
+  TARGET_IMAGE="$1" python3 - <<'PY'
+import json, os, urllib.request
+body = {
+    "applicationId": os.environ["DOKPLOY_APPLICATION_ID"],
+    "command": None,
+    "args": None,
+    "autoDeploy": False,
+    "dockerImage": os.environ["TARGET_IMAGE"],
+    "registryUrl": "ghcr.io",
+}
+request = urllib.request.Request(
+    os.environ["DOKPLOY_API_URL"].rstrip("/") + "/application.update",
+    data=json.dumps(body).encode(),
+    headers={"content-type": "application/json", "x-api-key": os.environ["DOKPLOY_API_KEY"]},
+    method="POST",
+)
+with urllib.request.urlopen(request, timeout=30) as response:
+    if response.status >= 300:
+        raise SystemExit(f"Dokploy update вернул HTTP {response.status}")
+provider = {
+    "applicationId": os.environ["DOKPLOY_APPLICATION_ID"],
+    "dockerImage": os.environ["TARGET_IMAGE"],
+    "username": None,
+    "password": None,
+    "registryUrl": "ghcr.io",
+}
+request = urllib.request.Request(
+    os.environ["DOKPLOY_API_URL"].rstrip("/") + "/application.saveDockerProvider",
+    data=json.dumps(provider).encode(),
+    headers={"content-type": "application/json", "x-api-key": os.environ["DOKPLOY_API_KEY"]},
+    method="POST",
+)
+with urllib.request.urlopen(request, timeout=30) as response:
+    if response.status >= 300:
+        raise SystemExit(f"Dokploy provider вернул HTTP {response.status}")
+PY
+}
+
+dokploy_deploy() {
+  python3 - <<'PY'
+import json, os, urllib.request
+body = {
+    "applicationId": os.environ["DOKPLOY_APPLICATION_ID"],
+    "title": "CMS " + os.environ["REVISION"][:12],
+    "description": "Образ переключён после проверенной миграции",
+}
+request = urllib.request.Request(
+    os.environ["DOKPLOY_API_URL"].rstrip("/") + "/application.deploy",
+    data=json.dumps(body).encode(),
+    headers={"content-type": "application/json", "x-api-key": os.environ["DOKPLOY_API_KEY"]},
+    method="POST",
+)
+with urllib.request.urlopen(request, timeout=60) as response:
+    if response.status >= 300:
+        raise SystemExit(f"Dokploy deploy вернул HTTP {response.status}")
+PY
+}
+
+mapfile -t saved < <(dokploy_read)
+saved_image="${saved[0]:-}"
+saved_command="${saved[1]:-yes}"
+if [[ -z "$saved_image" || "$saved_command" != "no" ]]; then
+  echo "В Dokploy сохранена команда контейнера или не задан образ. Релиз остановлен до изменения Swarm." >&2
+  exit 1
+fi
+docker pull "$saved_image" >/dev/null
+saved_id="$(docker image inspect "$saved_image" --format '{{.Id}}')"
+cid="$(docker ps -q --filter "label=com.docker.swarm.service.name=${service}" --filter status=running)"
+cid="${cid%%$'\n'*}"
+if [[ -z "$cid" ]]; then
+  echo "Запущенный контейнер сервиса ${service} не найден." >&2
+  exit 1
+fi
+running_id="$(docker inspect "$cid" --format '{{.Image}}')"
+running_process="$(docker inspect "$cid" --format '{{json .Config.Entrypoint}} {{json .Config.Cmd}}')"
+if [[ "$running_id" != "$saved_id" || "$running_process" == *eval* || "$running_process" == *psql* ]]; then
+  echo "Запись Dokploy и запущенный контейнер расходятся. Сначала сохраните в Dokploy образ работающего контейнера и пустую команду, не нажимая Deploy." >&2
+  exit 1
+fi
+
+dump="cms-${revision}-$(date -u +%Y%m%dT%H%M%SZ).dump"
+docker run --rm --network "$network" --env-file "$runtime_env" \
+  --cap-drop ALL --security-opt no-new-privileges --pids-limit 128 --memory 512m \
+  -e DUMP_NAME="$dump" -v "$backup_dir:/backup" \
+  postgres:18.6 \
+  sh -c 'pg_dump "$DATABASE_URL" -Fc --no-password -f "/backup/$DUMP_NAME" && test -s "/backup/$DUMP_NAME" && pg_restore -l "/backup/$DUMP_NAME" >/dev/null'
+chmod 600 "$backup_dir/$dump"
+echo "Резервная копия $dump читается pg_restore."
+
+docker run --rm --network "$network" --env-file "$runtime_env" \
+  --cap-drop ALL --security-opt no-new-privileges --pids-limit 256 --memory 1536m \
+  --read-only --tmpfs /tmp:rw,nosuid,size=256m \
+  -e CMS_EXPECTED_DATABASE="$expected_database" -e CMS_SEED=0 -e PAYLOAD_DB_PUSH=false -e NODE_ENV=production \
+  --entrypoint /opt/release/cms/docker/entrypoint.sh \
+  "$image" migrate
+
+restore_previous() {
+  echo "Возвращаю в Dokploy предыдущий образ. Схему PostgreSQL это не откатывает." >&2
+  dokploy_write "$saved_image"
+  REVISION="$revision" dokploy_deploy || true
+}
+
+dokploy_write "$image"
+mapfile -t written < <(dokploy_read)
+if [[ "${written[0]:-}" != "$image" || "${written[1]:-}" != "no" ]]; then
+  dokploy_write "$saved_image" || true
+  echo "Dokploy не принял пустую команду и новый digest. Swarm не изменялся." >&2
+  exit 1
+fi
+REVISION="$revision" dokploy_deploy
+
+converged=0
+for _ in $(seq 1 36); do
+  cid="$(docker ps -q --filter "label=com.docker.swarm.service.name=${service}" --filter status=running || true)"
+  cid="${cid%%$'\n'*}"
+  if [[ -n "$cid" ]]; then
+    now_id="$(docker inspect "$cid" --format '{{.Image}}')"
+    now_process="$(docker inspect "$cid" --format '{{json .Config.Entrypoint}} {{json .Config.Cmd}}')"
+    mapfile -t confirmed_state < <(dokploy_read)
+    if [[ "$now_id" == "$target_id" && "${confirmed_state[0]:-}" == "$image" && "$now_process" != *eval* && "$now_process" != *migrate* ]]; then
+      converged=1
+      break
+    fi
+  fi
+  sleep 5
+done
+if [[ "$converged" -ne 1 ]]; then
+  restore_previous
+  echo "Dokploy не перевёл запущенный контейнер на новый digest. Прямое обновление Swarm не выполняется." >&2
+  exit 1
+fi
+
+probe() {
+  local url="$1" attempt
+  for attempt in $(seq 1 12); do
+    if curl --silent --show-error --fail --max-time 20 "$url"; then
+      return 0
+    fi
+    sleep 5
+  done
+  return 1
+}
+health="$(probe "$origin/api/health")" || { restore_previous; echo "Новый процесс не ответил на /api/health." >&2; exit 1; }
+ready="$(probe "$origin/api/ready")" || { restore_previous; echo "База не подтвердила миграции через /api/ready." >&2; exit 1; }
+python3 -c 'import json,sys
+health=json.loads(sys.argv[1]); ready=json.loads(sys.argv[2])
+if health.get("revision")!=sys.argv[3] or ready.get("status")!="ready" or ready.get("revision")!=sys.argv[3]:
+    raise SystemExit(1)' "$health" "$ready" "$revision" \
+  || { restore_previous; echo "Запущенный процесс не совпал с ревизией релиза." >&2; exit 1; }
+
+echo "CMS обслуживает $revision. Образ записан в Dokploy и совпадает с запущенным контейнером."

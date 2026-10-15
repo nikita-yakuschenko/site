@@ -1,0 +1,46 @@
+#!/bin/bash
+# Однократная диагностика истории миграций. GitHub Actions этот скрипт не вызывает.
+# sudo /usr/local/sbin/avgst-cms-bootstrap <image@sha256:...>
+# sudo /usr/local/sbin/avgst-cms-bootstrap <image@sha256:...> --apply
+set -euo pipefail
+umask 077
+
+if [[ "$(id -u)" -ne 0 ]]; then
+  echo "Bootstrap запускается только от root." >&2
+  exit 1
+fi
+image="${1:-}"
+mode="${2:-}"
+if [[ -z "$image" || ( -n "$mode" && "$mode" != "--apply" ) || "$#" -gt 2 ]]; then
+  echo "Использование: avgst-cms-bootstrap <image@sha256:...> [--apply]" >&2
+  exit 1
+fi
+if [[ ! "$image" =~ ^ghcr\.io/nikita-yakuschenko/avgst-cms@sha256:[a-f0-9]{64}$ ]]; then
+  echo "Принимается только образ ghcr.io/nikita-yakuschenko/avgst-cms@sha256:…" >&2
+  exit 1
+fi
+
+unset DOKPLOY_API_KEY GITHUB_TOKEN DATABASE_URL || true
+# shellcheck disable=SC1091
+source /etc/avgst/cms-release.env
+network="${CMS_DOCKER_NETWORK:?}"
+expected_database="${CMS_EXPECTED_DATABASE:?}"
+apply_env=0
+if [[ "$mode" == "--apply" ]]; then
+  apply_env=1
+fi
+
+docker pull "$image" >/dev/null
+source_label="$(docker image inspect "$image" --format '{{index .Config.Labels "org.opencontainers.image.source"}}')"
+if [[ "$source_label" != "https://github.com/nikita-yakuschenko/site" ]]; then
+  echo "Образ собран не из репозитория site." >&2
+  exit 1
+fi
+
+docker run --rm --network "$network" --env-file /etc/avgst/cms.runtime.env \
+  --cap-drop ALL --security-opt no-new-privileges --pids-limit 256 --memory 1536m \
+  --read-only --tmpfs /tmp:rw,nosuid,size=256m \
+  -e CMS_EXPECTED_DATABASE="$expected_database" -e CMS_SEED=0 -e PAYLOAD_DB_PUSH=false -e NODE_ENV=production \
+  -e CMS_BOOTSTRAP_APPLY="$apply_env" \
+  --entrypoint /opt/release/cms/docker/entrypoint.sh \
+  "$image" bootstrap

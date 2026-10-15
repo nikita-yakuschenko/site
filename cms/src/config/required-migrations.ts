@@ -1,0 +1,10 @@
+// Names shipped with this image. The migration-policy test keeps this list equal to src/migrations/index.ts.
+export const requiredMigrations = [
+  '20261014_074208_initial_record_ids',
+  '20261014_094638_pages_drafts',
+  '20261014_105148_block_part_content',
+  '20261014_111009_hero_background',
+  '20261014_160000_reconcile_schema',
+  '20261014_164500_product_code',
+  '20261015_093000_promo_slot_action',
+]

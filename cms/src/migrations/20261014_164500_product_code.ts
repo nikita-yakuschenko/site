@@ -45,8 +45,12 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
     await db.execute(sql`UPDATE "projects" SET "code" = ${code} WHERE "id" = ${row.id}`)
     if (hasVersions) await db.execute(sql`UPDATE "_projects_v" SET "version_code" = ${code} WHERE "parent_id" = ${row.id} AND "version_code" IS NULL`)
   }
-  const block = await payload.find({ collection: 'blocks', where: { key: { equals: 'ProjectConfig' } }, limit: 1, req, overrideAccess: true })
-  if (!block.docs.length) await payload.create({ collection: 'blocks', data: { title: 'Комплектации', key: 'ProjectConfig', source: 'src/components/project-config.tsx', exportName: 'ProjectConfig', configurationTemplates: defaultConfigurationTemplates() }, req, overrideAccess: true })
+  // The current collection schema includes columns from a later migration. Reading blocks before those columns exist fails.
+  const actionColumn = await db.execute(sql`SELECT 1 AS ok FROM information_schema.columns WHERE table_schema = 'public' AND table_name = 'blocks_parts' AND column_name = 'action'`)
+  if (actionColumn.rows.length) {
+    const block = await payload.find({ collection: 'blocks', where: { key: { equals: 'ProjectConfig' } }, limit: 1, req, overrideAccess: true })
+    if (!block.docs.length) await payload.create({ collection: 'blocks', data: { title: 'Комплектации', key: 'ProjectConfig', source: 'src/components/project-config.tsx', exportName: 'ProjectConfig', configurationTemplates: defaultConfigurationTemplates() }, req, overrideAccess: true })
+  }
 }
 
 export async function down({ db }: MigrateDownArgs): Promise<void> {

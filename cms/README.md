@@ -20,7 +20,7 @@ cms/
   src/payload-types.ts    типы, созданные Payload
   scripts/bootstrap.ts    первый суперадминистратор через инфраструктурную CLI
   tests/                  проверки безопасности и интеграционный сценарий
-  Dockerfile              runner и отдельная maintenance-стадия operations
+  Dockerfile              образ release: сервер и Payload CLI
   .dockerignore
   .env.example
   package.json / package-lock.json
@@ -259,38 +259,22 @@ npm run migrate
 
 ## Docker
 
-Из корня репозитория, context строго `./cms`:
+Образ `release` собирается из корня репозитория. В нём веб-сервер и Payload CLI
+с файлами миграций. Обычный запуск поднимает сервер и не применяет миграции.
+`migrate` — отдельная одноразовая команда того же образа: без порта и без сервера.
 
 ```sh
-docker build --target runner -f cms/Dockerfile -t avgst-cms:release ./cms
-docker build --target operations -f cms/Dockerfile -t avgst-cms:operations ./cms
+docker build --target release -f cms/Dockerfile -t avgst-cms:release .
+docker run --rm --network dokploy-network --env-file ./cms.runtime.env \
+  --entrypoint /opt/release/cms/docker/entrypoint.sh avgst-cms:release migrate
 ```
 
-runner содержит только standalone Next.js и его static assets, слушает 3000,
-работает от пользователя node (UID 1000). Exec-form `node cms/server.js` получает
-SIGTERM; задайте stop grace period минимум 30 секунд. Healthcheck каждые 30
-секунд проверяет GET `/api/health`, timeout 5 секунд, start period 30 секунд,
-3 retries. Он проверяет процесс; статус `ok` не доказывает готовность БД.
-Перед переключением трафика дополнительно проверьте вход и чтение коллекций.
-
-operations содержит исходники и CLI. Секреты предоставляет оператор через
-защищённый env-файл вне репозитория с правами 600 либо secrets manager.
-Из каталога с env-файлом, доступным только оператору:
-
-```sh
-docker run --rm --network dokploy-network --env-file ./cms.runtime.env \
-  avgst-cms:operations npm run migrate:status
-docker run --rm --network dokploy-network --env-file ./cms.runtime.env \
-  avgst-cms:operations npm run migrate
-# cms.bootstrap.env дополнительно содержит четыре CMS_BOOTSTRAP_*; удалить после
-docker run --rm --network dokploy-network --env-file ./cms.bootstrap.env \
-  avgst-cms:operations npm run bootstrap
-```
-
-Имя сети берите из реального окружения. В Docker Swarm сеть для разового
-контейнера должна быть attachable; иначе выполните операции отдельной
-maintenance-службой в той же overlay-сети. `operations` нельзя выставлять
-на домен или использовать как runtime CMS. Миграции не являются CMD runner.
+На production этот запуск делает workflow, а не ручная команда. Секреты лежат
+в env-файле на сервере, права 600. `/api/health` показывает только процесс и
+ревизию. Готовность схемы — `/api/ready`. Не используйте `migrate:fresh` и
+`migrate:reset`. Схема production меняется только версионированными миграциями.
+Локальный `push` включается явно через `PAYLOAD_DB_PUSH=true` и в production
+игнорируется.
 
 ## Настройка существующего приложения Dokploy
 
@@ -331,8 +315,8 @@ autoDeploy выключен, домен не задан. Отдельная Post
 
 1. Получить отдельное разрешение на публикацию кода/деплой; исправить настройки CMS.
 2. Создать отдельный PostgreSQL, private network, volume и backup; задать окружение.
-3. Собрать runner и operations из одного утверждённого коммита.
-4. Явно применить миграции operations-образом, проверить migrate:status.
+3. Собрать образ `release` из утверждённого коммита.
+4. Применить миграции отдельной командой `migrate` этого же образа и проверить `/api/ready`.
 5. Явно выполнить bootstrap с индивидуальными реквизитами; удалить bootstrap env.
 6. Запустить runner внутри приватного контура; проверить health, login, ACL, блокировку.
 7. Подключить внешний шлюз/VPN и HTTPS-домен; до этого не публиковать админку в интернет.

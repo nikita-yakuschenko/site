@@ -4,6 +4,7 @@
 !src
 !src/lib
 !src/lib/**
+!package.json
 **/node_modules
 **/.next
 **/.env

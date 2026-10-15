@@ -1,0 +1,7 @@
+# Файл /etc/sudoers.d/avgst-cms, права 440, владелец root.
+# Имя пользователя замените на учётную запись службы GitHub runner.
+# Runner не входит в группу docker и не получает произвольный sudo.
+Defaults:avgst-runner !setenv
+Defaults:avgst-runner env_reset
+Defaults:avgst-runner !requiretty
+avgst-runner ALL=(root) NOPASSWD: /usr/local/sbin/avgst-cms-release

@@ -1,4 +1,4 @@
-name: CMS image
+name: CMS release
 
 on:
   push:
@@ -13,14 +13,73 @@ permissions:
   contents: read
   packages: write
 
+# A later push waits. Canceling would leave a migration and a deploy half-finished.
 concurrency:
-  group: cms-image-main
+  group: cms-release-main
   cancel-in-progress: false
 
 jobs:
-  publish:
+  verify:
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:18.6
+        env:
+          POSTGRES_USER: cms
+          POSTGRES_PASSWORD: cms
+          POSTGRES_DB: cms
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U cms -d cms"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: cms/package-lock.json
+      - name: Install CMS dependencies
+        working-directory: cms
+        run: npm ci --no-audit --no-fund
+      - name: Typecheck
+        working-directory: cms
+        run: npx tsc --noEmit -p .
+      - name: Tests and migration policy
+        working-directory: cms
+        run: npm test
+      - name: Apply migrations to an empty database
+        working-directory: cms
+        env:
+          DATABASE_URL: postgresql://cms:cms@localhost:5432/cms
+          PAYLOAD_SECRET: ci-payload-secret-is-at-least-32-chars
+          CMS_PUBLIC_URL: http://127.0.0.1:3001
+          CMS_SEED: '0'
+          PAYLOAD_DB_PUSH: 'false'
+          NODE_ENV: development
+        run: npm run migrate
+      - name: Fail when the schema still differs from Payload
+        working-directory: cms
+        env:
+          DATABASE_URL: postgresql://cms:cms@localhost:5432/cms
+          PAYLOAD_SECRET: ci-payload-secret-is-at-least-32-chars
+          CMS_PUBLIC_URL: http://127.0.0.1:3001
+          CMS_SEED: '0'
+          PAYLOAD_DB_PUSH: 'false'
+          NODE_ENV: development
+        run: node node_modules/tsx/dist/cli.mjs scripts/check-schema-drift.ts
+
+  publish:
+    needs: verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
+      revision: ${{ github.sha }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -34,53 +93,42 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build and publish migration image
+      - name: Build and publish the immutable CMS image
+        id: build
         uses: docker/build-push-action@v6
         with:
           context: .
           file: ./cms/Dockerfile
-          target: migrate
+          target: release
           platforms: linux/amd64
           push: true
-          tags: |
-            ghcr.io/nikita-yakuschenko/avgst-cms:sha-${{ github.sha }}-migrate
-          cache-from: type=gha,scope=avgst-cms-migrate
-          cache-to: type=gha,scope=avgst-cms-migrate,mode=max
-      - name: Build and publish CMS
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: ./cms/Dockerfile
-          target: runner
-          platforms: linux/amd64
-          push: true
-          tags: |
-            ghcr.io/nikita-yakuschenko/avgst-cms:latest
-            ghcr.io/nikita-yakuschenko/avgst-cms:sha-${{ github.sha }}
+          provenance: false
+          sbom: false
+          build-args: |
+            CMS_REVISION=${{ github.sha }}
+          tags: ghcr.io/nikita-yakuschenko/avgst-cms:sha-${{ github.sha }}
           labels: |
             org.opencontainers.image.source=https://github.com/nikita-yakuschenko/site
             org.opencontainers.image.revision=${{ github.sha }}
           cache-from: type=gha,scope=avgst-cms
           cache-to: type=gha,scope=avgst-cms,mode=max
-      - name: Deploy published image to Dokploy
-        env:
-          DEPLOY_URL: ${{ secrets.DOKPLOY_CMS_DEPLOY_URL }}
-          REVISION: ${{ github.sha }}
-        run: |
-          test -n "$DEPLOY_URL" || { echo 'DOKPLOY_CMS_DEPLOY_URL is missing'; exit 1; }
-          jq -n --arg sha "$REVISION" '{head_commit: {id: $sha, message: "CMS image published by GitHub Actions"}}' > /tmp/cms-deploy.json
-          status=$(curl --silent --output /tmp/cms-deploy-response --write-out '%{http_code}' \
-            --connect-timeout 15 --max-time 60 --request POST \
-            --header 'Content-Type: application/json' --header 'X-GitHub-Event: push' \
-            --data-binary @/tmp/cms-deploy.json "$DEPLOY_URL")
-          case "$status" in
-            2??) echo 'Dokploy accepted the deployment' ;;
-            *) echo "Dokploy rejected the deployment (HTTP $status)"; exit 1 ;;
-          esac
       - name: Published image
-        env:
-          REVISION: ${{ github.sha }}
         run: |
-          echo "### CMS image published" >> "$GITHUB_STEP_SUMMARY"
-          echo 'Dokploy image: `ghcr.io/nikita-yakuschenko/avgst-cms:latest`' >> "$GITHUB_STEP_SUMMARY"
-          echo "Immutable image: ghcr.io/nikita-yakuschenko/avgst-cms:sha-${REVISION}" >> "$GITHUB_STEP_SUMMARY"
+          echo "### CMS image" >> "$GITHUB_STEP_SUMMARY"
+          echo 'ghcr.io/nikita-yakuschenko/avgst-cms@${{ steps.build.outputs.digest }}' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Production не переключается, пока CMS_RELEASE_ENABLED не равна true и на сервере не установлен корневой скрипт.' >> "$GITHUB_STEP_SUMMARY"
+
+  release:
+    needs: publish
+    if: vars.CMS_RELEASE_ENABLED == 'true' && github.repository == 'nikita-yakuschenko/site' && github.ref == 'refs/heads/main'
+    runs-on: [self-hosted, Linux, avgst-cms]
+    timeout-minutes: 30
+    environment: cms-production
+    permissions:
+      contents: none
+    steps:
+      - name: Release through the root-owned host script
+        env:
+          IMAGE: ghcr.io/nikita-yakuschenko/avgst-cms@${{ needs.publish.outputs.digest }}
+          REVISION: ${{ needs.publish.outputs.revision }}
+        run: sudo -- /usr/local/sbin/avgst-cms-release "$IMAGE" "$REVISION"
