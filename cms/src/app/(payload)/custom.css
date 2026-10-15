@@ -644,6 +644,16 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
     --page-preview-width: 66.666667%;
   }
 }
+/* The configuration editor already has its own preview. The collection
+   sidebar preview was leaving that one a few dozen pixels wide. */
+.collection-edit--blocks:has(.configuration-block-settings) .document-fields {
+  --page-editor-width: 100%;
+  --page-preview-width: 0px;
+  --sidebar-wrap-width: 0px;
+}
+.collection-edit--blocks:has(.configuration-block-settings) .document-fields__sidebar-wrap {
+  display: none;
+}
 @media (max-width: 1023px) {
   :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields { display: block; }
   :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__main,
