@@ -404,7 +404,9 @@ export function HeroCarousel({
           меняется. */}
       {shown.imageMobile ? (
         <picture className="hero__frame" data-cms-block="hero.background">
-          <source media="(min-width: 900px)" sizes="100vw" srcSet={optimizedSrcSet(shown.image, [1080, 1920])} />
+          {/* Файл из CMS нельзя отдавать пустым srcSet: браузер выбрасывает
+              source и растягивает вертикальный кадр на весь экран. */}
+          <source media="(min-width: 900px)" sizes="100vw" srcSet={shown.image.startsWith('http') ? shown.image : optimizedSrcSet(shown.image, [1080, 1920])} />
           <img src={optimizedSrc(shown.imageMobile, 828, 60)} srcSet={optimizedSrcSet(shown.imageMobile, [384, 828], 60)} sizes="100vw" alt="" decoding="async" />
         </picture>
       ) : (
