@@ -2,12 +2,12 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-  ALTER TABLE "projects" ADD COLUMN "like_count" numeric DEFAULT 0;
-  ALTER TABLE "projects" ADD COLUMN "share_count" numeric DEFAULT 0;
+  ALTER TABLE "projects" ADD COLUMN "like_count" numeric;
+  ALTER TABLE "projects" ADD COLUMN "share_count" numeric;
   ALTER TABLE "projects" ADD COLUMN "like_voters" jsonb DEFAULT '[]'::jsonb;
   ALTER TABLE "projects" ADD COLUMN "share_voters" jsonb DEFAULT '[]'::jsonb;
-  ALTER TABLE "_projects_v" ADD COLUMN "version_like_count" numeric DEFAULT 0;
-  ALTER TABLE "_projects_v" ADD COLUMN "version_share_count" numeric DEFAULT 0;
+  ALTER TABLE "_projects_v" ADD COLUMN "version_like_count" numeric;
+  ALTER TABLE "_projects_v" ADD COLUMN "version_share_count" numeric;
   ALTER TABLE "_projects_v" ADD COLUMN "version_like_voters" jsonb DEFAULT '[]'::jsonb;
   ALTER TABLE "_projects_v" ADD COLUMN "version_share_voters" jsonb DEFAULT '[]'::jsonb;`)
 }

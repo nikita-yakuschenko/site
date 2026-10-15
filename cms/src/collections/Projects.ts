@@ -269,8 +269,8 @@ export const Projects: CollectionConfig = {
     { name: 'contentImported', type: 'checkbox', admin: { hidden: true } },
     { name: 'configurationsImported', type: 'checkbox', admin: { hidden: true } },
     { name: 'legacyConfigurations', type: 'json', admin: { hidden: true } },
-    { name: 'likeCount', type: 'number', defaultValue: 0, admin: { hidden: true } },
-    { name: 'shareCount', type: 'number', defaultValue: 0, admin: { hidden: true } },
+    { name: 'likeCount', type: 'number', admin: { hidden: true } },
+    { name: 'shareCount', type: 'number', admin: { hidden: true } },
     // Ключи голосов: c: кука, f: отпечаток, позже a: аккаунт. Не список людей.
     { name: 'likeVoters', type: 'json', defaultValue: [], admin: { hidden: true } },
     { name: 'shareVoters', type: 'json', defaultValue: [], admin: { hidden: true } },
