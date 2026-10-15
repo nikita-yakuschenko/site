@@ -1,6 +1,5 @@
 'use client'
 
-import { getImageProps } from 'next/image'
 import { useEffect, useState, type ReactNode } from 'react'
 import { splitProjectName } from '../lib/project-name'
 import { copy } from '../lib/copy'
@@ -28,13 +27,10 @@ export function ProjectHeroContent({ data, connected, location, payment }: { dat
     { label: copy.bedrooms, value: hero.bedrooms },
     { label: copy.bathrooms, value: hero.bathrooms },
   ]
-  const desktop = hero.imageUrl ? getImageProps({ src: hero.imageUrl, alt: '', width: 1920, height: 1080, sizes: '100vw', quality: 75, priority: !hero.mobileImageUrl }).props : null
-  const mobile = hero.mobileImageUrl ? getImageProps({ src: hero.mobileImageUrl, alt: '', width: 828, height: 1100, sizes: '100vw', quality: 75, priority: true }).props : null
-  const frame = (props: NonNullable<typeof desktop>) => ({ ...props, style: { ...props.style, width: '100%', height: '100%', objectFit: 'cover' as const } })
   return <>
     <picture className="project-hero__media" data-cms-block="projectHero.image">
-      {desktop && mobile ? <source media="(min-width: 431px)" srcSet={desktop.srcSet} /> : null}
-      {mobile ? <img {...frame(mobile)} /> : desktop ? <img {...frame(desktop)} /> : null}
+      {hero.mobileImageUrl && <source media="(max-width: 430px)" srcSet={hero.mobileImageUrl} />}
+      {hero.imageUrl && <img src={hero.imageUrl} alt="" />}
     </picture>
     <div className="project-hero__veil" />
     <div className="project-hero__stage">
