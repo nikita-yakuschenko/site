@@ -14040,10 +14040,19 @@ html.is-dialog-open {
   left: 50%;
   z-index: 3;
   display: flex;
-  max-width: calc(100% - 144px);
+  flex-wrap: wrap;
+  justify-content: center;
+  width: max-content;
+  max-width: calc(100% - 32px);
   gap: 8px;
-  overflow-x: auto;
+  overflow: visible;
   transform: translateX(-50%);
+}
+
+.photo-lightbox__variants button:not(.is-active) {
+  border: 1px solid rgb(255 255 255 / 0.72);
+  background: transparent;
+  color: #fff;
 }
 
 .photo-lightbox__close,
