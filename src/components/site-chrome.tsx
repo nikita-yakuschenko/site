@@ -286,6 +286,9 @@ export function SiteChrome({
             onClick={() => setMenuOpen(false)}
           />
           <div className="site-menu__panel">
+            <Link href="/" className="site-menu__brand" aria-label={name} onClick={() => setMenuOpen(false)}>
+              <img className="site-menu__logo" src={src} alt="" width={143} height={40} />
+            </Link>
             <nav>
               <Link href="/" onClick={() => setMenuOpen(false)}>
                 {copy.breadcrumbsHome}
@@ -328,16 +331,6 @@ export function SiteChrome({
                 {phone}
               </a>
             ) : null}
-            <button
-              type="button"
-              className="btn btn-yellow"
-              onClick={() => {
-                setMenuOpen(false);
-                setAskOpen(true);
-              }}
-            >
-              {copy.askQuestion}
-            </button>
             {/* Тема полосы: в ряду на узком экране давала горизонтальный скролл. */}
             <button
               type="button"

@@ -859,6 +859,18 @@ a {
   background: var(--avgst-ink);
   color: white;
 }
+.site-menu__brand {
+  display: block;
+  width: fit-content;
+  margin-bottom: -4px;
+}
+
+.site-menu__logo {
+  display: block;
+  height: 36px;
+  width: auto;
+}
+
 .site-menu__panel nav {
   display: grid;
   gap: 4px;
