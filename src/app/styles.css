@@ -11425,36 +11425,48 @@ html.is-dialog-open {
   display: grid;
   align-content: start;
   gap: 12px;
+  width: 100%;
+  min-width: 0;
   min-height: 0;
   margin: 0;
   padding: 16px 0 0 2px;
 }
 
+/* Одна ширина на все строки: значение прижато к правому краю строки,
+   а не к своей колонке. Иначе на узком телефоне длинная подпись
+   раздувает строку и суммы встают лесенкой. */
 .mortgage-calc__receipt > div {
-  display: grid;
-  grid-template-columns: auto minmax(12px, 1fr) auto;
+  display: flex;
   align-items: baseline;
   gap: 8px;
+  width: 100%;
   min-width: 0;
 }
 
 .mortgage-calc__receipt dt {
+  flex: 0 1 auto;
+  min-width: 0;
   font-size: 12px;
   color: var(--ink-2);
 }
 
 .mortgage-calc__receipt > div > span {
+  flex: 1 0 12px;
+  align-self: center;
   border-bottom: 1px dotted var(--line-2);
 }
 
 .mortgage-calc__receipt dd {
+  flex: 0 0 auto;
   margin: 0;
   font-size: 14px;
   font-weight: 700;
   letter-spacing: -0.02em;
   line-height: 1.2;
   white-space: nowrap;
+  text-align: right;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
 /* Подбор проектов внутри панели.
