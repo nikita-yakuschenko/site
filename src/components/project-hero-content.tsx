@@ -28,10 +28,11 @@ export function ProjectHeroContent({ data, connected, location, payment }: { dat
     { label: copy.bathrooms, value: hero.bathrooms },
   ]
   return <>
-    {hero.mobileImageUrl && <link rel="preload" as="image" href={hero.mobileImageUrl} media="(max-width: 430px)" fetchPriority="high" />}
-    {hero.imageUrl && <link rel="preload" as="image" href={hero.imageUrl} media={hero.mobileImageUrl ? '(min-width: 431px)' : undefined} fetchPriority="high" />}
+    {hero.mobileImageUrl && <link rel="preload" as="image" href={hero.mobileImageUrl} media="(max-width: 480px)" fetchPriority="high" />}
+    {hero.imageUrl && <link rel="preload" as="image" href={hero.imageUrl} media={hero.mobileImageUrl ? '(min-width: 481px)' : undefined} fetchPriority="high" />}
     <picture className="project-hero__media" data-cms-block="projectHero.image">
-      {hero.mobileImageUrl && <source media="(max-width: 430px)" srcSet={hero.mobileImageUrl} />}
+      {/* 430px пропускает iPhone 16 Pro Max (440px): он берёт широкий кадр, и cover зумит его в крыльцо. */}
+      {hero.mobileImageUrl && <source media="(max-width: 480px)" srcSet={hero.mobileImageUrl} />}
       {hero.imageUrl && <img src={hero.imageUrl} alt="" fetchPriority="high" />}
     </picture>
     <div className="project-hero__veil" />
