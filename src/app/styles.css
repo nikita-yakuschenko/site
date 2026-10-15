@@ -12860,6 +12860,18 @@ html.is-dialog-open {
   }
 }
 
+@media (max-width: 899px) {
+  .project-strip {
+    grid-auto-columns: calc((100% - var(--gap-tile)) / 2);
+    padding-bottom: 0;
+    scrollbar-width: none;
+  }
+
+  .project-strip::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 .project-strip > * {
   position: relative;
   overflow: hidden;
