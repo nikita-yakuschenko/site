@@ -87,6 +87,7 @@ async function changeCount(db: Adapter, slug: string, delta: 1 | -1, keys: strin
   const present = keys.map((key) => sql`COALESCE("like_voters", '[]'::jsonb) @> ${JSON.stringify([key])}::jsonb`)
   const anyKey = sql.join(present, sql` OR `)
   const added = JSON.stringify(keys)
+  const cleared = keys.reduce((query, key) => sql`${query} - ${key}`, sql`COALESCE("like_voters", '[]'::jsonb)`)
   const result = delta > 0
     ? await db.drizzle.execute(sql`
         UPDATE "projects"
@@ -103,11 +104,7 @@ async function changeCount(db: Adapter, slug: string, delta: 1 | -1, keys: strin
     : await db.drizzle.execute(sql`
         UPDATE "projects"
         SET "like_count" = GREATEST(COALESCE("like_count", 0) - 1, 0),
-            "like_voters" = COALESCE((
-              SELECT jsonb_agg(to_jsonb(item))
-              FROM jsonb_array_elements_text(COALESCE("like_voters", '[]'::jsonb)) AS item
-              WHERE NOT (item = ANY(${keys}))
-            ), '[]'::jsonb)
+            "like_voters" = ${cleared}
         WHERE "id" = (
           SELECT "id" FROM "projects"
           WHERE "slug" = ${slug} OR "import_key" = ${`catalog:${slug}`}
