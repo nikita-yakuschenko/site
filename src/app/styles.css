@@ -14251,6 +14251,29 @@ html.is-dialog-open {
   box-shadow: none;
 }
 
+/* На светлом фоне раздела залитая плашка читается выбранной.
+   Поэтому здесь выбран тёмный пункт, а остальные только обведены. */
+.project-plans__tab {
+  border: 1px solid var(--line-2);
+  background: #fff;
+  color: var(--avgst-ink);
+}
+
+.project-plans__tab:hover,
+.project-plans__tab:focus-visible {
+  border-color: var(--avgst-ink);
+  background: #fff;
+  color: var(--avgst-ink);
+}
+
+.project-plans__tab--on,
+.project-plans__tab--on:hover,
+.project-plans__tab--on:focus-visible {
+  border-color: var(--avgst-ink);
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
 .project-plans__body {
   display: grid;
   gap: var(--gap-tile);
