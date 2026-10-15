@@ -7,4 +7,5 @@ export const requiredMigrations = [
   '20261014_160000_reconcile_schema',
   '20261014_164500_product_code',
   '20261015_093000_promo_slot_action',
+  '20261015_235500_project_reactions',
 ]

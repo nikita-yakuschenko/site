@@ -1,6 +1,6 @@
 'use client'
 
-import { useSyncExternalStore } from 'react'
+import { useState, useSyncExternalStore } from 'react'
 import { IconHeart, IconShare3 } from '@tabler/icons-react'
 import { useConsent } from '../consent/ConsentProvider'
 import { canPersistFunctional } from '../consent/functional-persist'
@@ -15,23 +15,41 @@ import { shareProject } from '../lib/share'
 import type { CatalogProject } from '../lib/catalog/types'
 
 /**
- * Избранное и «поделиться» в карточке проекта.
- *
- * Числа рядом с иконками — счётчики записанных действий. Хранилища у них
- * пока нет: избранное живёт в localStorage и приватно для браузера, а
- * репосты никто не считает. Поэтому счётчики честно показывают ноль и
- * оживут, когда появится общее хранилище.
+ * Лайк один на устройство и проект. Шеринг считается каждый успешный раз.
  */
 export type ProjectStats = { likes: number; shares: number }
+
+function deviceSignals() {
+  return {
+    tz: Intl.DateTimeFormat().resolvedOptions().timeZone,
+    screen: `${window.screen.width}x${window.screen.height}x${window.devicePixelRatio || 1}`,
+    lang: navigator.language,
+    cores: navigator.hardwareConcurrency,
+  }
+}
+
+async function sendReaction(slug: string, action: 'like' | 'unlike' | 'share') {
+  const response = await fetch('/api/reactions', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ slug, action, signals: deviceSignals() }),
+  })
+  if (!response.ok) return null
+  return response.json() as Promise<ProjectStats & { already?: boolean; liked?: boolean }>
+}
 
 export function ProjectActions({
   project,
   stats,
+  liked = false,
 }: {
   project: CatalogProject
   stats: ProjectStats
+  liked?: boolean
 }) {
   const { openConsentSettings } = useConsent()
+  const [counts, setCounts] = useState(stats)
+  const [pressed, setPressed] = useState(liked)
   const favorites = useSyncExternalStore(
     subscribeFavorites,
     readFavorites,
@@ -39,12 +57,36 @@ export function ProjectActions({
   )
   const favorite = favorites.includes(project.id)
 
-  function onFavorite() {
+  async function onFavorite() {
     if (!canPersistFunctional()) {
       openConsentSettings()
       return
     }
-    toggleFavorite(project.id)
+    const removing = pressed
+    setPressed(!removing)
+    if (favorite === removing) toggleFavorite(project.id)
+    setCounts((current) => ({ ...current, likes: Math.max(0, current.likes + (removing ? -1 : 1)) }))
+    const result = await sendReaction(project.slug, removing ? 'unlike' : 'like')
+    if (!result) {
+      setPressed(removing)
+      if (favorite === removing) toggleFavorite(project.id)
+      setCounts((current) => ({ ...current, likes: Math.max(0, current.likes + (removing ? 1 : -1)) }))
+      return
+    }
+    setCounts({ likes: result.likes, shares: result.shares })
+    setPressed(removing ? false : true)
+  }
+
+  async function onShare() {
+    const shared = await shareProject(project)
+    if (!shared) return
+    setCounts((current) => ({ ...current, shares: current.shares + 1 }))
+    const result = await sendReaction(project.slug, 'share')
+    if (!result) {
+      setCounts((current) => ({ ...current, shares: Math.max(0, current.shares - 1) }))
+      return
+    }
+    setCounts({ likes: result.likes, shares: result.shares })
   }
 
   return (
@@ -53,25 +95,25 @@ export function ProjectActions({
         type="button"
         className="project-actions__btn"
         aria-label={favorite ? copy.favoriteRemove : copy.favoriteAdd}
-        aria-pressed={favorite}
-        onClick={onFavorite}
+        aria-pressed={pressed}
+        onClick={() => void onFavorite()}
       >
         <IconHeart
           size={26}
           stroke={1.6}
-          fill={favorite ? 'currentColor' : 'none'}
+          fill={pressed ? 'currentColor' : 'none'}
           aria-hidden="true"
         />
-        <span>{stats.likes + (favorite ? 1 : 0)}</span>
+        <span>{counts.likes}</span>
       </button>
       <button
         type="button"
         className="project-actions__btn"
         aria-label={copy.share}
-        onClick={() => void shareProject(project)}
+        onClick={() => void onShare()}
       >
         <IconShare3 size={26} stroke={1.6} aria-hidden="true" />
-        <span>{stats.shares}</span>
+        <span>{counts.shares}</span>
       </button>
     </div>
   )

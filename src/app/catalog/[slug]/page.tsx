@@ -3,6 +3,8 @@ import { resolveProjectConfigurations } from '../../../lib/catalog/project-confi
 import { ProjectHeroPayment } from '../../../components/project-hero-payment'
 import { ProjectSectionTones } from '../../../components/project-section-tones'
 import type { Metadata } from 'next'
+import { cookies } from 'next/headers'
+import { readProjectReactions, VOTER_COOKIE } from '../../../lib/reactions'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { IconChevronRight } from '@tabler/icons-react'
@@ -79,6 +81,8 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
   const { project, hero, source } = result
   if (!draft && hero.slug !== slug) redirect(`/catalog/${hero.slug}${query.cmsPreview === '1' ? '?cmsPreview=1' : ''}`)
   const heroProject = { ...project, name: hero.name, slug: hero.slug }
+  const voter = draft ? undefined : (await cookies()).get(VOTER_COOKIE)?.value
+  const reactions = draft ? { likes: 0, shares: 0, liked: false } : await readProjectReactions(hero.slug, voter)
   const [exteriors, interiors, built, nextSteps, plans, configurations] = draft ? [[], [], [], undefined, [], []] : await Promise.all([resolveProjectExteriors(hero.slug), resolveProjectInteriors(hero.slug), resolveProjectBuilt(hero.slug), resolveProjectNextSteps(hero.slug), resolveProjectPlans(hero.slug), resolveProjectConfigurations(hero.slug)])
 
   const pageOrder = await getProjectPageOrder(slug)
@@ -121,7 +125,7 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
                 некуда, и aria-current сообщает это программам чтения. */}
             <span aria-current="page">{hero.name}</span>
           </nav>
-          <ProjectActions project={heroProject} stats={{ likes: 0, shares: 0 }} />
+          <ProjectActions project={heroProject} stats={reactions} liked={reactions.liked} />
         </>
       }
     >
