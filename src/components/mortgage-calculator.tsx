@@ -43,6 +43,7 @@ import {
 } from "../lib/regions";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { LeadReveal } from "./lead-reveal";
+import { PanelLeadForm } from "./panel-lead-form";
 import { ProjectCard } from "./project-card";
 import "./mortgage-family.css";
 
@@ -119,6 +120,7 @@ export function MortgageCalculator({
   showMatches = true,
   projectTiers,
   showEyebrow = true,
+  project,
 }: {
   projects: CatalogProject[];
   initialPropertyPrice?: number;
@@ -130,6 +132,8 @@ export function MortgageCalculator({
   projectTiers?: readonly PricedTier[];
   /** На страницах ипотечных программ заголовок уже сам называет блок. */
   showEyebrow?: boolean;
+  /** Дом, к которому относится расчёт. Нужен заявке с мобильной кнопки. */
+  project?: { id: string; name: string };
 }) {
   const siteRegion = useSyncExternalStore(
     subscribeRegion,
@@ -185,6 +189,7 @@ export function MortgageCalculator({
   const [rateInput, setRateInput] = useState(() =>
     formatRateValue(program.rate),
   );
+  const [quoteOpen, setQuoteOpen] = useState(false);
 
   /* Программа сменилась — поле ставки берёт её значение. Сверка идёт в
      рендере, а не эффектом: setState внутри эффекта тянет лишний проход
@@ -788,6 +793,23 @@ export function MortgageCalculator({
               </p>
             ) : <p>{t.disclaimer}</p>}
           </div> : null}
+
+          {isProjectCalculator ? (
+            <div className="mortgage-calc__quote" data-form={quoteOpen ? "true" : "false"}>
+              <PanelLeadForm
+                formId="mortgage-calculator"
+                label={copy.getQuote}
+                heading={copy.getQuote}
+                projectExternalId={project?.id}
+                onOpenChange={setQuoteOpen}
+                meta={{
+                  ...leadMeta,
+                  ...(project ? { project: project.name } : {}),
+                  ...(selectedTier ? { tier: selectedTier.name } : {}),
+                }}
+              />
+            </div>
+          ) : null}
 
           {/* На ипотечной странице подбор проектов — часть калькулятора. На
               карточке конкретного дома он выключен: цену уже задал проект. */}

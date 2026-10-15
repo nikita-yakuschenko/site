@@ -13336,6 +13336,50 @@ html.is-dialog-open {
   }
 }
 
+/* На узком экране калькулятор проекта заканчивается той же заявкой,
+   что панель комплектации ниже: жёлтая кнопка, на месте которой
+   вырастает форма, а подложка под ней становится тёмной. */
+@media (min-width: 960px) {
+  .mortgage-calc--project .mortgage-calc__quote {
+    display: none;
+  }
+}
+
+.mortgage-calc__quote .btn {
+  width: 100%;
+  gap: 6px;
+}
+
+.mortgage-calc__quote[data-form="true"] {
+  padding: 6px 16px 16px;
+  border-radius: 16px;
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+.mortgage-calc__quote[data-form="true"] .lead-card {
+  --lead-ink: 255 255 255;
+}
+
+.mortgage-calc__quote[data-form="true"] .lead-card input {
+  border-color: var(--on-dark-4);
+  background: var(--tint-on-dark);
+  color: #fff;
+}
+
+.mortgage-calc__quote[data-form="true"] .lead-card input::placeholder {
+  color: var(--on-dark-4);
+}
+
+.mortgage-calc__quote[data-form="true"] .panel-lead__form .lead-card input:focus-visible {
+  border-color: var(--on-dark-2);
+  box-shadow: 0 0 0 3px var(--tint-on-dark);
+}
+
+.mortgage-calc__quote[data-form="true"] .lead-form__consent {
+  color: var(--on-dark-2);
+}
+
 .project-config__total-note {
   margin: 12px 0 0;
   font-size: 12px;

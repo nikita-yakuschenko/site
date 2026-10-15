@@ -152,7 +152,7 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
             ProjectInteriors: <ProjectInteriors project={project} images={interiors ?? undefined} connected={interiors !== null} />,
             ProjectBuilt: <ProjectBuilt project={project} items={built ?? undefined} />,
             ReadyHomeOffer: readyHome ? <ReadyHomeOffer project={project} /> : null,
-            MortgageCalculator: !readyHome && tiers && !draft ? <MortgageCalculator projects={[]} initialPropertyPrice={standardPrice || undefined} initialProgramId="family" showMatches={false} projectTiers={tiers} showEyebrow={false} /> : null,
+            MortgageCalculator: !readyHome && tiers && !draft ? <MortgageCalculator projects={[]} initialPropertyPrice={standardPrice || undefined} initialProgramId="family" showMatches={false} projectTiers={tiers} showEyebrow={false} project={{ id: heroProject.id, name: heroProject.name }} /> : null,
             ProjectConfig: !readyHome ? <ProjectConfig project={heroProject} configurations={configurations ?? []} /> : null,
             ProjectNextSteps: <ProjectNextSteps readyHome={Boolean(readyHome)} reviewImage={project.imageUrl} visitImage={readyHome?.visitImage} settings={nextSteps} />,
             ProjectSimilar: <ProjectSimilar projects={similarProjects} />,

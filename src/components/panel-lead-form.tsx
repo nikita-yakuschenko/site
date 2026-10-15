@@ -21,6 +21,7 @@ export function PanelLeadForm({
   label,
   heading,
   submitLabel,
+  formId = "project-configuration",
   projectExternalId,
   meta,
   onOpenChange,
@@ -28,6 +29,7 @@ export function PanelLeadForm({
   label: string;
   heading: string;
   submitLabel?: string;
+  formId?: string;
   projectExternalId?: string;
   meta?: Record<string, unknown>;
   onOpenChange?: (open: boolean) => void;
@@ -55,7 +57,7 @@ export function PanelLeadForm({
 
       <div className="panel-lead__form" data-open={open ? "true" : "false"}>
         <div>
-          <LeadForm formId="project-configuration"
+          <LeadForm formId={formId}
             siteId={SITE.id}
             projectExternalId={projectExternalId}
             variant="card"
