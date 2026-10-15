@@ -107,8 +107,8 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
         if (variant.image && variant.rooms) {
           return [{ label: variant.label, image: variant.image, rooms: variant.rooms }];
         }
-        const firstFloor = variant.floors?.[0];
-        return firstFloor ? [firstFloor] : [];
+      const firstFloor = variant.floors?.[0];
+      return firstFloor ? [{ label: variant.label, image: firstFloor.image, rooms: firstFloor.rooms }] : [];
       });
 
   return (
