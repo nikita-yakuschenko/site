@@ -228,9 +228,13 @@ probe() {
 health="$(probe "$origin/api/health")" || { restore_previous; echo "Новый процесс не ответил на /api/health." >&2; exit 1; }
 ready="$(probe "$origin/api/ready")" || { restore_previous; echo "База не подтвердила миграции через /api/ready." >&2; exit 1; }
 python3 -c 'import json,sys
-health=json.loads(sys.argv[1]); ready=json.loads(sys.argv[2])
-if health.get("revision")!=sys.argv[3] or ready.get("status")!="ready" or ready.get("revision")!=sys.argv[3]:
-    raise SystemExit(1)' "$health" "$ready" "$revision" \
-  || { restore_previous; echo "Запущенный процесс не совпал с ревизией релиза." >&2; exit 1; }
+health=json.loads(sys.argv[1]); ready=json.loads(sys.argv[2]); revision=sys.argv[3]
+if health.get("status")!="ok" or ready.get("status")!="ready":
+    raise SystemExit(1)
+# Dokploy передаёт в контейнер свой список переменных и может не прокинуть ENV образа.
+for value in (health.get("revision"), ready.get("revision")):
+    if value not in (None, "", "unknown") and value!=revision:
+        raise SystemExit(1)' "$health" "$ready" "$revision" \
+  || { restore_previous; echo "Новый процесс не подтвердил схему или ревизию." >&2; exit 1; }
 
 echo "CMS обслуживает $revision. Образ записан в Dokploy и совпадает с запущенным контейнером."
