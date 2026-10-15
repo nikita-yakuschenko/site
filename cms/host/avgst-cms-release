@@ -196,45 +196,37 @@ REVISION="$revision" dokploy_deploy
 
 converged=0
 for _ in $(seq 1 36); do
-  cid="$(docker ps -q --filter "label=com.docker.swarm.service.name=${service}" --filter status=running || true)"
-  cid="${cid%%$'\n'*}"
-  if [[ -n "$cid" ]]; then
-    now_id="$(docker inspect "$cid" --format '{{.Image}}')"
-    now_process="$(docker inspect "$cid" --format '{{json .Config.Entrypoint}} {{json .Config.Cmd}}')"
-    mapfile -t confirmed_state < <(dokploy_read)
-    if [[ "$now_id" == "$target_id" && "${confirmed_state[0]:-}" == "$image" && "$now_process" != *eval* && "$now_process" != *migrate* ]]; then
-      converged=1
-      break
-    fi
+  mapfile -t ids < <(docker ps -q --filter "label=com.docker.swarm.service.name=${service}" --filter status=running || true)
+  all_new=0
+  if [[ "${#ids[@]}" -gt 0 ]]; then
+    all_new=1
+    for cid in "${ids[@]}"; do
+      now_id="$(docker inspect "$cid" --format '{{.Image}}')"
+      now_process="$(docker inspect "$cid" --format '{{json .Config.Entrypoint}} {{json .Config.Cmd}}')"
+      if [[ "$now_id" != "$target_id" || "$now_process" == *eval* || "$now_process" == *psql* ]]; then
+        all_new=0
+      fi
+    done
+  fi
+  mapfile -t confirmed_state < <(dokploy_read)
+  health="$(curl --silent --show-error --fail --max-time 20 "$origin/api/health" || true)"
+  ready="$(curl --silent --show-error --fail --max-time 20 "$origin/api/ready" || true)"
+  if [[ "$all_new" -eq 1 && "${confirmed_state[0]:-}" == "$image" ]] && python3 -c 'import json,sys
+health=json.loads(sys.argv[1]); ready=json.loads(sys.argv[2]); revision=sys.argv[3]
+if health.get("status")!="ok" or ready.get("status")!="ready":
+    raise SystemExit(1)
+for value in (health.get("revision"), ready.get("revision")):
+    if value not in (None, "", "unknown") and value!=revision:
+        raise SystemExit(1)' "$health" "$ready" "$revision"; then
+    converged=1
+    break
   fi
   sleep 5
 done
 if [[ "$converged" -ne 1 ]]; then
   restore_previous
-  echo "Dokploy не перевёл запущенный контейнер на новый digest. Прямое обновление Swarm не выполняется." >&2
+  echo "Новый контейнер не стал единственным работающим процессом либо не подтвердил схему." >&2
   exit 1
 fi
-
-probe() {
-  local url="$1" attempt
-  for attempt in $(seq 1 12); do
-    if curl --silent --show-error --fail --max-time 20 "$url"; then
-      return 0
-    fi
-    sleep 5
-  done
-  return 1
-}
-health="$(probe "$origin/api/health")" || { restore_previous; echo "Новый процесс не ответил на /api/health." >&2; exit 1; }
-ready="$(probe "$origin/api/ready")" || { restore_previous; echo "База не подтвердила миграции через /api/ready." >&2; exit 1; }
-python3 -c 'import json,sys
-health=json.loads(sys.argv[1]); ready=json.loads(sys.argv[2]); revision=sys.argv[3]
-if health.get("status")!="ok" or ready.get("status")!="ready":
-    raise SystemExit(1)
-# Dokploy передаёт в контейнер свой список переменных и может не прокинуть ENV образа.
-for value in (health.get("revision"), ready.get("revision")):
-    if value not in (None, "", "unknown") and value!=revision:
-        raise SystemExit(1)' "$health" "$ready" "$revision" \
-  || { restore_previous; echo "Новый процесс не подтвердил схему или ревизию." >&2; exit 1; }
 
 echo "CMS обслуживает $revision. Образ записан в Dokploy и совпадает с запущенным контейнером."
