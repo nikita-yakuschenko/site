@@ -46,6 +46,8 @@ jobs:
       - name: Install CMS dependencies
         working-directory: cms
         run: npm ci --no-audit --no-fund
+      - name: Install shared module used by the CMS
+        run: npm install --no-save --no-package-lock --ignore-scripts --no-audit --no-fund zod
       - name: Typecheck
         working-directory: cms
         run: npx tsc --noEmit -p .
