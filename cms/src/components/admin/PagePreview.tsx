@@ -11,6 +11,7 @@ import { normalizeNextStepsSettings, type NextStepsSettings } from '../../config
 import type { ConfigurationTemplatesData } from '../../../../src/lib/catalog/configuration-content'
 import type { ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
 import { isCatalogSeries, type CatalogProject } from '../../../../src/lib/catalog/types'
+import { isTechnologyCollection } from '../../../../src/lib/catalog/collection'
 const devices = [
   { key: 'desktop', label: 'Десктоп', width: 1920, height: 1080, icon: IconDeviceDesktop },
   { key: 'tablet-landscape', label: 'Планшет горизонтально', width: 1180, height: 820, icon: IconDeviceTablet },
@@ -234,7 +235,9 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
       const counts = new Map<string, number>()
       for (const doc of result?.docs || []) {
         const series = isCatalogSeries(String(doc.series || '')) ? String(doc.series) : ''
-        if (series) counts.set(series, (counts.get(series) || 0) + 1)
+        const tech = String(doc.technologyBadge || '') === 'Модульный' ? 'modular' : 'panel'
+        if (series && !isTechnologyCollection(series)) counts.set(series, (counts.get(series) || 0) + 1)
+        counts.set(tech, (counts.get(tech) || 0) + 1)
       }
       seriesCounts.current = counts
       if (seriesPartsRef.current) frame.current?.contentWindow?.postMessage(seriesPreview(JSON.parse(seriesPartsRef.current), counts, seriesImages.current), origin)

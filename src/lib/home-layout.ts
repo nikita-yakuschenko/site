@@ -41,7 +41,7 @@ export const HOME_LAYOUT: LayoutBlock[] = [
       {
         id: "panel",
         title: copy.seriesPanel,
-        href: "/catalog?series=panel",
+        href: "/catalog?tech=panel",
         image: "/series/panel.jpg",
         count: countBySeries("panel"),
       },
@@ -62,7 +62,7 @@ export const HOME_LAYOUT: LayoutBlock[] = [
       {
         id: "modular",
         title: copy.seriesModular,
-        href: "/catalog?series=modular",
+        href: "/catalog?tech=modular",
         image: "/series/modular.jpg",
         count: countBySeries("modular"),
       },

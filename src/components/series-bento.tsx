@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { IconArrowUpRight } from '@tabler/icons-react'
 import { copy, projectsInSeries } from '../lib/copy'
 import { isCatalogSeries, type CatalogSeries } from '../lib/catalog/types'
+import { collectionHref } from '../lib/catalog/collection'
 import type { LayoutBlock } from './block-renderer'
 import { PhotoTile } from './photo-tile'
 
@@ -44,7 +45,7 @@ export function SeriesBento({ block }: { block: LayoutBlock }) {
       id: current?.id || `slot-${index}`,
       place: current?.place || ['panel', 'barn', 'classic', 'modular'][index] || 'panel',
       title: tile.title || current?.title || '',
-      href: `/catalog?series=${series}`,
+      href: collectionHref(series),
       image: tile.image || fallbackImage[series],
       count: typeof tile.count === 'number' ? tile.count : 0,
     }

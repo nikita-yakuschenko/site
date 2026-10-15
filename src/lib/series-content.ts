@@ -4,6 +4,7 @@ import { connection } from 'next/server'
 import type { LayoutBlock } from '../components/block-renderer'
 import type { CmsCatalogProvider } from './catalog/cms-provider'
 import { isCatalogSeries, type CatalogSeries } from './catalog/types'
+import { collectionHref, isTechnologyCollection } from './catalog/collection'
 
 type Part = { key?: string; text?: string; href?: string; image?: string }
 
@@ -34,14 +35,18 @@ const fallbackTitle: Record<CatalogSeries, string> = {
 }
 const places: CatalogSeries[] = ['panel', 'barn', 'classic', 'modular']
 
-// The badge counts published catalog projects of the bound series. The number is not stored.
+// Число на плитке считается по её признаку: панельные и модульные — по технологии, остальные — по серии.
 export async function applySeriesBento(blocks: readonly LayoutBlock[], catalog: CmsCatalogProvider, siteCode: string) {
   const parts = await readParts('seriesBento')
   const heading = parts?.find(part => part.key === 'seriesBento.heading')?.text
   const button = parts?.find(part => part.key === 'seriesBento.button')?.text
   const { items } = await catalog.list({ siteCode })
   const counts = new Map<string, number>()
-  for (const item of items) counts.set(item.series, (counts.get(item.series) || 0) + 1)
+  for (const item of items) {
+    const key = isTechnologyCollection(item.series) ? '' : item.series
+    if (key) counts.set(key, (counts.get(key) || 0) + 1)
+    if (isTechnologyCollection(item.technology)) counts.set(item.technology, (counts.get(item.technology) || 0) + 1)
+  }
   const tiles = places.map((place, index) => {
     const part = parts?.find(item => item.key === `seriesBento.slot.${index}`)
     const series = part?.href && isCatalogSeries(part.href) ? part.href : place
@@ -49,7 +54,7 @@ export async function applySeriesBento(blocks: readonly LayoutBlock[], catalog: 
       id: `slot-${index}`,
       place,
       title: part?.text || fallbackTitle[series],
-      href: `/catalog?series=${series}`,
+      href: collectionHref(series),
       image: part?.image || fallbackImage[series],
       count: counts.get(series) || 0,
     }
