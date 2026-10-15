@@ -148,6 +148,7 @@ export function LeadDialogButton({
   body?: string | null;
   submitLabel?: string;
   pageId?: string;
+  formId?: string;
   withMessage?: boolean;
   meta?: Record<string, unknown>;
 }) {
