@@ -158,7 +158,7 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
             <Image
               key={current.image}
               src={current.image}
-              unoptimized={database}
+              quality={90}
               alt={`${copy.plansHeading}: ${currentVariant.label}, ${current.label}`}
               width={1680}
               height={1188}
