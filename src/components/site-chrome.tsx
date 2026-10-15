@@ -286,9 +286,24 @@ export function SiteChrome({
             onClick={() => setMenuOpen(false)}
           />
           <div className="site-menu__panel">
-            <Link href="/" className="site-menu__brand" aria-label={name} onClick={() => setMenuOpen(false)}>
-              <img className="site-menu__logo" src={src} alt="" width={143} height={40} />
-            </Link>
+            <div className="site-menu__top">
+              <Link href="/" className="site-menu__brand" aria-label={name} onClick={() => setMenuOpen(false)}>
+                <img className="site-menu__logo" src={src} alt="" width={143} height={40} />
+              </Link>
+              <button
+                type="button"
+                className="site-menu__theme"
+                aria-label={copy.techBarThemeAria}
+                aria-pressed={techBarTheme === "light"}
+                onClick={toggleTechBarTheme}
+              >
+                {techBarTheme === "light" ? (
+                  <IconMoon size={18} stroke={1.75} aria-hidden="true" />
+                ) : (
+                  <IconSun size={18} stroke={1.75} aria-hidden="true" />
+                )}
+              </button>
+            </div>
             <nav>
               <Link href="/" onClick={() => setMenuOpen(false)}>
                 {copy.breadcrumbsHome}
@@ -333,32 +348,10 @@ export function SiteChrome({
             ) : null}
             <button
               type="button"
-              className="btn btn-outline site-menu__ask"
-              onClick={() => {
-                setMenuOpen(false);
-                setAskOpen(true);
-              }}
+              className="btn btn-yellow site-menu__ask"
+              onClick={() => setAskOpen(true)}
             >
               {copy.askQuestion}
-            </button>
-            {/* Тема полосы: в ряду на узком экране давала горизонтальный скролл. */}
-            <button
-              type="button"
-              className="site-menu__theme"
-              aria-label={copy.techBarThemeAria}
-              aria-pressed={techBarTheme === "light"}
-              onClick={toggleTechBarTheme}
-            >
-              {techBarTheme === "light" ? (
-                <IconMoon size={20} stroke={1.75} aria-hidden="true" />
-              ) : (
-                <IconSun size={20} stroke={1.75} aria-hidden="true" />
-              )}
-              <span>
-                {techBarTheme === "light"
-                  ? copy.techBarThemeToDark
-                  : copy.techBarThemeToLight}
-              </span>
             </button>
           </div>
         </div>
