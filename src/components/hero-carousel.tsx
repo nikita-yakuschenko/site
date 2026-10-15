@@ -9,6 +9,7 @@ import {
 import { copy, nbspText } from "../lib/copy";
 import { optimizedSrc, optimizedSrcSet } from "../lib/media";
 import { CarouselProgress, CAROUSEL_SLIDE_MS } from "./carousel-progress";
+import { LeadDialog } from "./lead-dialog";
 
 /**
  * Сообщение баннера. Постоянное: это то, что компания говорит о себе
@@ -41,7 +42,10 @@ export type HeroPromo = {
   heading: string;
   text?: string;
   cta: string;
-  /** Раньше вёл на страницу; слот теперь открывает форму заявки. */
+  /** Подпись кнопки остаётся в cta. action решает, куда ведёт карточка. */
+  action?: "link" | "form";
+  url?: string;
+  formKey?: string;
   href?: string;
   image?: string;
   video?: string;
@@ -146,7 +150,7 @@ function usePreviewHeroPromos(promos: readonly HeroPromo[]): readonly HeroPromo[
     const receive = (event: MessageEvent) => {
       if (event.source !== window.parent || !allowed.has(event.origin) || event.data?.type !== "avgst:preview-hero-copy" || !Array.isArray(event.data.parts)) return;
       const next: HeroPromo[] = promos.map((promo) => ({ ...promo }));
-      for (const part of event.data.parts as { key?: string; title?: string; text?: string; textMore?: string; href?: string; image?: string }[]) {
+      for (const part of event.data.parts as { key?: string; title?: string; text?: string; textMore?: string; href?: string; image?: string; action?: string; url?: string; formKey?: string }[]) {
         const match = /^hero\.promo\.(\d+)$/.exec(part.key || "");
         if (!match) continue;
         const promo = next[Number(match[1])];
@@ -156,6 +160,9 @@ function usePreviewHeroPromos(promos: readonly HeroPromo[]): readonly HeroPromo[
         promo.eyebrow = part.textMore || "";
         if (part.href) promo.cta = part.href;
         if (part.image) promo.image = part.image;
+        promo.action = part.action === "link" ? "link" : "form";
+        promo.url = part.url || "";
+        promo.formKey = part.formKey || "";
       }
       setDraft(next);
     };
@@ -174,6 +181,7 @@ export function HeroCarousel({
 }) {
   const shown = usePreviewHeroCopy(message);
   const slots = usePreviewHeroPromos(promos);
+  const [lead, setLead] = useState<HeroPromo | null>(null);
   const count = slots.length;
 
   /* Бесконечная прокрутка.
@@ -373,6 +381,7 @@ export function HeroCarousel({
     : slots.map((promo) => ({ promo, key: promo.heading, clone: false }));
 
   return (
+    <>
     <section
       className="hero"
       style={
@@ -460,7 +469,11 @@ export function HeroCarousel({
                     aria-hidden={!active}
                     tabIndex={active ? undefined : -1}
                     onClick={() => {
-                      // Форму заявки подключим отдельно; слот не уводит со страницы.
+                      if (promo.action === "link") {
+                        if (/^https?:\/\//i.test(promo.url || "") || (promo.url || "").startsWith("/")) window.location.assign(promo.url || "");
+                        return;
+                      }
+                      setLead(promo);
                     }}
                   >
                     {promo.video || promo.image ? (
@@ -547,5 +560,7 @@ export function HeroCarousel({
         </div>
       </div>
     </section>
+    {lead ? <LeadDialog heading={lead.heading} body={lead.text} submitLabel={lead.cta} pageId="home" formId={lead.formKey || "hero-promo"} meta={{ promo: lead.heading }} onClose={() => setLead(null)} /> : null}
+  </>
   );
 }

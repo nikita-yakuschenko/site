@@ -68,6 +68,7 @@ export function ReferralProgram({
   const data = copy.referralProgram;
   const [status, setStatus] = useState<Status>("idle");
   const [phone, setPhone] = useState("+7");
+  const [rules, setRules] = useState(true);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const nameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
@@ -90,6 +91,7 @@ export function ReferralProgram({
 
   function openForm() {
     setInvalid({});
+    setRules(true);
     setStatus("open");
     window.setTimeout(() => nameRef.current?.focus(), 40);
   }
@@ -148,8 +150,7 @@ export function ReferralProgram({
       String(new FormData(form).get("name") || ""),
     ).trim();
     const email = String(new FormData(form).get("email") || "").trim();
-    const rulesOn = form.querySelector<HTMLInputElement>('[name="rules"]')
-      ?.checked;
+    const rulesOn = rules;
     const phoneDigits = digits(phone);
     const next: Record<string, boolean> = {};
     if (nameLetters(name).length < 2) next.name = true;
@@ -397,10 +398,12 @@ export function ReferralProgram({
                         <input
                           name="rules"
                           type="checkbox"
+                          checked={rules}
                           required
-                          onChange={() =>
-                            setInvalid((prev) => ({ ...prev, rules: false }))
-                          }
+                          onChange={(event) => {
+                            setRules(event.target.checked);
+                            setInvalid((prev) => ({ ...prev, rules: false }));
+                          }}
                         />
                         <span>
                           {data.rulesPrefix}

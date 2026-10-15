@@ -24,6 +24,8 @@ export function LeadDialog({
   body = copy.askDialogBody,
   submitLabel = copy.sendLead,
   pageId,
+  formId = "consultation-dialog",
+  withMessage = false,
   meta,
 }: {
   onClose: () => void;
@@ -32,6 +34,8 @@ export function LeadDialog({
   submitLabel?: string;
   /** Откуда пришла заявка: страница сама себя и называет. */
   pageId?: string;
+  formId?: string;
+  withMessage?: boolean;
   meta?: Record<string, unknown>;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -108,13 +112,14 @@ export function LeadDialog({
         >
           <IconX size={18} stroke={2.2} />
         </button>
-        <LeadForm formId="consultation-dialog"
+        <LeadForm formId={formId}
           siteId={SITE.id}
           pageId={pageId}
           variant="card"
           heading={heading}
           body={body}
           submitLabel={submitLabel}
+          withMessage={withMessage}
           meta={meta}
         />
       </div>
@@ -143,6 +148,7 @@ export function LeadDialogButton({
   body?: string | null;
   submitLabel?: string;
   pageId?: string;
+  withMessage?: boolean;
   meta?: Record<string, unknown>;
 }) {
   const [open, setOpen] = useState(false);

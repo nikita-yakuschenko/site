@@ -408,6 +408,7 @@ function MortgageContacts() {
         <LeadForm
           siteId={SITE.id}
           variant="card"
+          withMessage
           heading={fm.formHeading}
           body={fm.formBody}
           submitLabel={fm.formSubmit}

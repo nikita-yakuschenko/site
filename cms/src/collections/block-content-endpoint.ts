@@ -8,6 +8,11 @@ function mediaURL(image: MediaValue) {
   return new URL(image.url, process.env.CMS_PUBLIC_URL || 'http://localhost:3001').href
 }
 
+function formKey(form: unknown) {
+  if (!form || typeof form !== 'object' || !('key' in form)) return ''
+  return typeof form.key === 'string' ? form.key : ''
+}
+
 // The public site reads saved block copy. The admin API stays staff-only.
 export const blockContentEndpoint: Endpoint = {
   path: '/content', method: 'get', handler: async req => {
@@ -22,6 +27,9 @@ export const blockContentEndpoint: Endpoint = {
       text: part.text || '',
       textMore: part.textMore || '',
       href: part.href || '',
+      action: part.action === 'link' ? 'link' : part.action === 'form' ? 'form' : '',
+      url: part.link || '',
+      form: formKey(part.form),
       image: mediaURL(part.image),
       imageMobile: mediaURL(part.imageMobile),
     }))

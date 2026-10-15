@@ -7,7 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Input } from '../ui/input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from '../ui/attachment'
-import { IconComponents, IconPencil, IconSearch, IconX } from '@tabler/icons-react'
+import { IconComponents, IconForms, IconPencil, IconSearch, IconX } from '@tabler/icons-react'
 import { mediaDocumentId } from './media-id'
 import { ProjectImageUpload } from './ProjectImageUpload'
 
@@ -43,13 +43,32 @@ function mediaId(value: unknown) {
   return mediaDocumentId(value) || ''
 }
 
+type FormOption = { id: string; title: string; key: string }
+let formOptionsRequest: Promise<FormOption[]> | null = null
+function formOptions() {
+  formOptionsRequest ??= fetch('/api/forms?limit=50&depth=0&sort=title', { credentials: 'include' }).then(response => response.ok ? response.json() : { docs: [] }).then(data => (Array.isArray(data.docs) ? data.docs : []).flatMap((doc: { id?: unknown; title?: unknown; key?: unknown }) => {
+    const id = mediaId(doc.id)
+    const title = typeof doc.title === 'string' && doc.title ? doc.title : ''
+    if (!id || !title) return []
+    return [{ id, title, key: typeof doc.key === 'string' ? doc.key : '' }]
+  })).catch(() => [])
+  return formOptionsRequest
+}
+
 function HeroPromoFields({ row, partKey }: { row: string; partKey: string }) {
   const title = useField<string>({ path: `${row}.title` })
   const eyebrow = useField<string>({ path: `${row}.textMore` })
   const text = useField<string>({ path: `${row}.text` })
   const cta = useField<string>({ path: `${row}.href` })
+  const action = useField<string>({ path: `${row}.action` })
+  const link = useField<string>({ path: `${row}.link` })
+  const form = useField<number | string | null>({ path: `${row}.form` })
   const image = useField<string | null>({ path: `${row}.image` })
   const [imageUrl, setImageUrl] = useState('')
+  const [forms, setForms] = useState<FormOption[]>([])
+  const [formKey, setFormKey] = useState('')
+  const actionValue = action.value === 'link' ? 'link' : 'form'
+  const formId = mediaId(form.value)
   useEffect(() => {
     let cancelled = false
     const id = mediaId(image.value)
@@ -60,15 +79,24 @@ function HeroPromoFields({ row, partKey }: { row: string; partKey: string }) {
     })
     return () => { cancelled = true }
   }, [image.value])
+  useEffect(() => { let cancelled = false; formOptions().then(items => { if (!cancelled) setForms(items) }); return () => { cancelled = true } }, [])
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent('avgst:part-draft', { detail: { key: partKey, title: title.value || '', textMore: eyebrow.value || '', text: text.value || '', href: cta.value || '', image: imageUrl } }))
-  }, [partKey, title.value, eyebrow.value, text.value, cta.value, imageUrl])
+    const chosen = forms.find(item => item.id === formId)
+    setFormKey(chosen?.key || '')
+  }, [forms, formId])
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('avgst:part-draft', { detail: { key: partKey, title: title.value || '', textMore: eyebrow.value || '', text: text.value || '', href: cta.value || '', image: imageUrl, action: actionValue, url: link.value || '', formKey } }))
+  }, [partKey, title.value, eyebrow.value, text.value, cta.value, imageUrl, actionValue, link.value, formKey])
   return <div className="promo-fields">
     <ProjectImageUpload path={`${row}.image`} field={{ name: 'image', label: 'Изображение', type: 'upload', relationTo: 'media' } as UploadFieldClientProps['field']} />
     <div className="field-type text"><label className="field-label" htmlFor={`${row}-eyebrow`}>Надстрочник</label><input id={`${row}-eyebrow`} type="text" value={eyebrow.value || ''} onChange={event => eyebrow.setValue(event.target.value)} /></div>
     <div className="field-type text"><label className="field-label" htmlFor={`${row}-title`}>Заголовок</label><input id={`${row}-title`} type="text" value={title.value || ''} onChange={event => title.setValue(event.target.value)} /></div>
     <div className="field-type textarea"><label className="field-label" htmlFor={`${row}-text`}>Текст</label><textarea id={`${row}-text`} rows={2} value={text.value || ''} onChange={event => text.setValue(event.target.value)} /></div>
     <div className="field-type text"><label className="field-label" htmlFor={`${row}-cta`}>Кнопка</label><input id={`${row}-cta`} type="text" value={cta.value || ''} onChange={event => cta.setValue(event.target.value)} /></div>
+    <div className="field-type select"><label className="field-label" htmlFor={`${row}-action`}>Действие</label><Select value={actionValue} onValueChange={action.setValue}><SelectTrigger id={`${row}-action`} className="w-full"><SelectValue /></SelectTrigger><SelectContent position="popper"><SelectItem value="link">Переход по ссылке</SelectItem><SelectItem value="form">Открытие формы</SelectItem></SelectContent></Select></div>
+    {actionValue === 'link'
+      ? <PageLinkField path={`${row}.link`} />
+      : <FormField path={`${row}.form`} heading={title.value || ''} body={text.value || ''} submit={cta.value || ''} />}
   </div>
 }
 
@@ -93,6 +121,124 @@ function HeroPromoSlots() {
   })
   const rows = JSON.parse(slots) as { index: number; key: string }[]
   return <div className="promo-slots">{rows.map(slot => <PromoSlot key={slot.key} row={`parts.${slot.index}`} partKey={slot.key} />)}</div>
+}
+
+type PageOption = { id: string; title: string; route: string; kind: string }
+const pageKindLabel: Record<string, string> = { page: 'Страница', exposition: 'Выставочная площадка', redirect: 'Переадресация' }
+let pageOptionsRequest: Promise<PageOption[]> | null = null
+function pageOptions() {
+  pageOptionsRequest ??= fetch('/api/pages?limit=300&depth=0&sort=title&where[_status][equals]=published', { credentials: 'include' }).then(response => response.ok ? response.json() : { docs: [] }).then(data => (Array.isArray(data.docs) ? data.docs : []).flatMap((doc: { id?: unknown; title?: unknown; route?: unknown; kind?: unknown }) => {
+    const id = mediaId(doc.id)
+    const title = typeof doc.title === 'string' ? doc.title : ''
+    const route = typeof doc.route === 'string' ? doc.route : ''
+    const kind = typeof doc.kind === 'string' ? doc.kind : ''
+    if (!id || !title || !route.startsWith('/') || route.includes('[') || kind === 'template' || kind === 'preview') return []
+    return [{ id, title, route, kind }]
+  })).catch(() => [])
+  return pageOptionsRequest
+}
+
+function PageLinkField({ path }: { path: string }) {
+  const link = useField<string>({ path })
+  const [pages, setPages] = useState<PageOption[]>([])
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  useEffect(() => { let cancelled = false; pageOptions().then(items => { if (!cancelled) setPages(items) }); return () => { cancelled = true } }, [])
+  const chosen = pages.find(item => item.route === link.value)
+  const query = search.trim().toLocaleLowerCase('ru')
+  const matches = pages.filter(item => `${item.title} ${item.route}`.toLocaleLowerCase('ru').includes(query))
+  const pick = (item: PageOption) => { link.setValue(item.route); setOpen(false); setSearch('') }
+  return <>
+    <Attachment state={chosen || link.value ? 'done' : 'idle'} className="w-full">
+      <AttachmentMedia variant="icon"><IconSearch /></AttachmentMedia>
+      <AttachmentContent>
+        <AttachmentTitle>{chosen?.title || link.value || 'Выберите страницу'}</AttachmentTitle>
+        <AttachmentDescription>{chosen ? `${pageKindLabel[chosen.kind] || 'Страница'} · ${chosen.route}` : 'Страница сайта'}</AttachmentDescription>
+      </AttachmentContent>
+      {link.value ? <AttachmentActions><AttachmentAction type="button" aria-label="Убрать страницу" onClick={() => link.setValue('')}><IconX /></AttachmentAction></AttachmentActions> : null}
+      <AttachmentTrigger aria-label={chosen ? `Заменить ${chosen.title}` : 'Выберите страницу'} onClick={() => setOpen(true)} />
+    </Attachment>
+    <Dialog open={open} onOpenChange={next => { setOpen(next); if (!next) setSearch('') }}>
+      <DialogContent className="shadcn-surface">
+        <DialogHeader>
+          <DialogTitle>Страница сайта</DialogTitle>
+          <DialogDescription>Найдите страницу и выберите её для этой кнопки.</DialogDescription>
+        </DialogHeader>
+        <div className="relative">
+          <IconSearch className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input aria-label="Поиск страницы" placeholder="Поиск страницы" className="pl-9" value={search} onChange={event => setSearch(event.target.value)} />
+        </div>
+        <div className="h-80 overflow-auto">{matches.map(item => <button key={item.id} type="button" className="flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-muted" onClick={() => pick(item)}>
+          <span className="min-w-0"><span className="block truncate text-sm font-medium">{item.title}</span><span className="block truncate text-xs text-muted-foreground">{item.route}</span></span>
+        </button>)}{matches.length === 0 ? <p className="px-2 py-6 text-center text-sm text-muted-foreground">Ничего не найдено</p> : null}</div>
+      </DialogContent>
+    </Dialog>
+  </>
+}
+
+function FormField({ path, heading, body, submit }: { path: string; heading: string; body: string; submit: string }) {
+  const form = useField<number | string | null>({ path })
+  const [forms, setForms] = useState<FormOption[]>([])
+  const [open, setOpen] = useState(false)
+  const [search, setSearch] = useState('')
+  const [pinned, setPinned] = useState<FormOption | null>(null)
+  useEffect(() => { let cancelled = false; formOptions().then(items => { if (!cancelled) setForms(items) }); return () => { cancelled = true } }, [])
+  const formId = mediaId(form.value)
+  const chosen = forms.find(item => item.id === formId)
+  const query = search.trim().toLocaleLowerCase('ru')
+  const matches = forms.filter(item => `${item.title} ${item.key}`.toLocaleLowerCase('ru').includes(query))
+  const shown = pinned || chosen
+  const close = () => { setOpen(false); setSearch(''); setPinned(null) }
+  const confirm = () => { if (!pinned) return; form.setValue(pinned.id); close() }
+  return <>
+    <Attachment state={chosen ? 'done' : 'idle'} className="w-full">
+      <AttachmentMedia variant="icon"><IconForms /></AttachmentMedia>
+      <AttachmentContent>
+        <AttachmentTitle>{chosen?.title || 'Выберите форму'}</AttachmentTitle>
+        <AttachmentDescription>{chosen?.key || 'Откроется по кнопке'}</AttachmentDescription>
+      </AttachmentContent>
+      {chosen ? <AttachmentActions><AttachmentAction type="button" aria-label="Убрать форму" onClick={() => form.setValue(null)}><IconX /></AttachmentAction></AttachmentActions> : null}
+      <AttachmentTrigger aria-label={chosen ? `Заменить ${chosen.title}` : 'Выберите форму'} onClick={() => setOpen(true)} />
+    </Attachment>
+    <Dialog open={open} onOpenChange={next => { if (next) setOpen(true); else close() }}>
+      <DialogContent className="shadcn-surface sm:max-w-4xl">
+        <DialogHeader>
+          <DialogTitle>Форма</DialogTitle>
+          <DialogDescription>Нажмите форму, чтобы закрепить её в превью, затем подтвердите.</DialogDescription>
+        </DialogHeader>
+        <div className="grid items-start gap-4 sm:grid-cols-[minmax(0,1fr)_24rem]">
+          <div className="flex min-w-0 flex-col gap-4">
+            <div className="relative">
+              <IconSearch className="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input aria-label="Поиск формы" placeholder="Поиск формы" className="pl-9" value={search} onChange={event => setSearch(event.target.value)} />
+            </div>
+            <div className="min-h-80">{matches.map(item => <button key={item.id} type="button" className={`flex w-full items-center gap-3 rounded-lg px-2 py-2 text-left hover:bg-muted ${item.id === shown?.id ? 'bg-muted' : ''}`} onClick={() => setPinned(item)}>
+              <span className="min-w-0"><span className="block truncate text-sm font-medium">{item.title}</span>{item.key ? <span className="block truncate text-xs text-muted-foreground">{item.key}</span> : null}</span>
+            </button>)}{matches.length === 0 ? <p className="px-2 py-6 text-center text-sm text-muted-foreground">Ничего не найдено</p> : null}</div>
+          </div>
+          <div className="flex flex-col gap-3">
+            <FormPreview name={shown?.title || ''} formKey={shown?.key || ''} heading={heading} body={body} submit={submit} />
+            <Button type="button" className={`w-full ${pinned ? '' : 'invisible'}`} disabled={!pinned} tabIndex={pinned ? 0 : -1} onClick={confirm}>Подтвердить</Button>
+          </div>
+        </div>
+      </DialogContent>
+    </Dialog>
+  </>
+}
+
+function FormPreview({ name, formKey, heading, body, submit }: { name: string; formKey: string; heading: string; body: string; submit: string }) {
+  const field = 'mt-1 h-8 rounded-md border border-neutral-200 bg-neutral-50'
+  return <div className="rounded-xl bg-neutral-900 p-3">
+    <p className="mb-2 truncate text-xs text-white/70">{name ? (formKey ? `${name} · ${formKey}` : name) : 'Выберите форму слева'}</p>
+    <div className="rounded-2xl bg-white p-4 text-neutral-900">
+      <p className="pr-6 text-sm font-semibold">{heading || 'Задать вопрос'}</p>
+      {body ? <p className="mt-1 text-xs leading-snug text-neutral-500">{body}</p> : null}
+      <p className="mt-3 text-xs font-medium">Имя</p><div className={field} />
+      <p className="mt-2 text-xs font-medium">Телефон</p><div className={`${field} px-2 text-xs leading-8 text-neutral-400`}>+7</div>
+      <p className="mt-3 flex items-start gap-2 text-[11px] leading-snug text-neutral-500"><span className="mt-0.5 size-3 shrink-0 rounded-sm bg-neutral-900" aria-hidden="true" />Согласен на обработку персональных данных</p>
+      <div className="mt-3 flex h-9 items-center justify-center rounded-md bg-[#fcc90c] text-sm font-semibold">{submit || 'Задать вопрос'}</div>
+    </div>
+  </div>
 }
 
 type CatalogOption = { id: string; name: string; area: string; badge: string; image: string }

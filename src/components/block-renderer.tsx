@@ -21,6 +21,7 @@ import {
   type HeroPromo,
 } from "./hero-carousel";
 import { IndependentReview } from "./independent-review";
+import { LeadDialogButton } from "./lead-dialog";
 import { LeadForm } from "./lead-form";
 import { PopularProjects } from "./popular-projects";
 import { ReferralProgram } from "./referral-program";
@@ -240,7 +241,7 @@ function Cta({ block }: { block: LayoutBlock }) {
   );
 }
 
-function Production({ block }: { block: LayoutBlock }) {
+function Production({ block, pageId }: { block: LayoutBlock; pageId?: string }) {
   const steps =
     (block.steps as Array<{ title?: string; text?: string }> | undefined) || [];
   const src = mediaUrl(block.media as MediaLike) || "/fixtures/factory.jpg";
@@ -284,14 +285,17 @@ function Production({ block }: { block: LayoutBlock }) {
           {/* Две кнопки разного веса. Жёлтая — главный выход блока, второй
               выход идёт контуром. Что из них главное, решает раскладка: у
               блока просто есть первое действие и второе. */}
-          {(block.ctaHref && block.ctaLabel) ||
-          (block.moreHref && block.moreLabel) ? (
+          {block.ctaLabel || (block.moreHref && block.moreLabel) ? (
             <div className="production__actions" data-cms-block="productionSection.actions">
-              {block.ctaHref && block.ctaLabel ? (
-                <a className="btn btn-yellow" href={String(block.ctaHref)}>
-                  {String(block.ctaLabel)}
-                  <IconArrowUpRight size={18} stroke={2} />
-                </a>
+              {block.ctaLabel ? (
+                <LeadDialogButton
+                  label={String(block.ctaLabel)}
+                  heading={String(block.ctaLabel)}
+                  body="Оставьте контакты, мы свяжемся и согласуем удобное время."
+                  submitLabel={String(block.ctaLabel)}
+                  pageId={pageId}
+                  formId="factory-tour"
+                />
               ) : null}
               {block.moreHref && block.moreLabel ? (
                 <a
@@ -417,6 +421,7 @@ export function ContactsSection({
           projectExternalId={project?.id}
           meta={project ? { blockKey: 'contactsSection', projectSlug: project.slug, projectName: project.name } : { blockKey: 'contactsSection' }}
           variant="card"
+          withMessage
           heading={form?.heading ? String(form.heading) : copy.haveQuestion}
           body={form?.body ? String(form.body) : copy.haveQuestionBody}
           submitLabel={
@@ -532,7 +537,7 @@ export function BlockRenderer({
           return <TextSection key={index} block={block} />;
         if (block.blockType === "cta") return <Cta key={index} block={block} />;
         if (block.blockType === "productionSection")
-          return <Production key={index} block={block} />;
+          return <Production key={index} block={block} pageId={pageId === undefined ? undefined : String(pageId)} />;
         if (block.blockType === "contactsSection") {
           return (
             <ContactsSection

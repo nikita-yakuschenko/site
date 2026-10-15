@@ -30,6 +30,7 @@ export function LeadForm({
   successText,
   variant = 'page',
   compact = false,
+  withMessage = false,
   meta,
 }: {
   siteId: number | string
@@ -51,6 +52,8 @@ export function LeadForm({
    * уже прочитав условия, вопросы задаст по телефону.
    */
   compact?: boolean
+  /** Поле «Сообщение» только у вопроса в шапке и у формы в блоке контактов. */
+  withMessage?: boolean
   /**
    * Произвольные данные, уходящие вместе с заявкой.
    *
@@ -64,6 +67,7 @@ export function LeadForm({
   const resolvedFormId = formId || 'lead-form'
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
   const [phone, setPhone] = useState('+7')
+  const [consent, setConsent] = useState(true)
   const [invalid, setInvalid] = useState<{
     name?: boolean
     phone?: boolean
@@ -76,11 +80,11 @@ export function LeadForm({
     const form = event.currentTarget
     const data = new FormData(form)
     const name = sanitizeName(String(data.get('name') || '')).trim()
-    const consent = data.get('consent') === 'on'
+    const agreed = data.get('consent') === 'on'
     const next: typeof invalid = {}
     if (!isValidName(name)) next.name = true
     if (!isValidRuMobile(phone)) next.phone = true
-    if (!consent) next.consent = true
+    if (!agreed) next.consent = true
     setInvalid(next)
     if (Object.keys(next).length) return
 
@@ -93,7 +97,7 @@ export function LeadForm({
           name,
           phone: phoneE164(phone),
           message: String(data.get('message') || '').trim(),
-          consent,
+          consent: agreed,
           siteId,
           pageId: pageId ?? project?.slug,
           projectExternalId: projectExternalId ?? project?.id,
@@ -108,6 +112,7 @@ export function LeadForm({
       setStatus('ok')
       form.reset()
       setPhone('+7')
+      setConsent(true)
       setInvalid({})
     } catch (error) {
       console.error(error)
@@ -217,7 +222,7 @@ export function LeadForm({
           </span>
         ) : null}
       </label>
-      {compact ? null : (
+      {compact || !withMessage ? null : (
         <label>
           {copy.message}
           <textarea
@@ -239,7 +244,11 @@ export function LeadForm({
         <input
           name="consent"
           type="checkbox"
-          onChange={() => setInvalid((prev) => ({ ...prev, consent: false }))}
+          checked={consent}
+          onChange={(event) => {
+            setConsent(event.target.checked)
+            setInvalid((prev) => ({ ...prev, consent: false }))
+          }}
         />
         <span>
           {copy.consentPrefix}

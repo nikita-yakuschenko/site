@@ -432,12 +432,52 @@ export interface Block {
         text?: string | null;
         textMore?: string | null;
         href?: string | null;
+        action?: ('link' | 'form') | null;
+        link?: string | null;
+        form?: (number | null) | Form;
         image?: (number | null) | Media;
         imageMobile?: (number | null) | Media;
         id?: string | null;
       }[]
     | null;
   forms?: (number | Form)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "forms".
+ */
+export interface Form {
+  id: number;
+  title: string;
+  key?: string | null;
+  source?: string | null;
+  exportName?: string | null;
+  defaults?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  parts?:
+    | {
+        key: string;
+        title: string;
+        text?: string | null;
+        textMore?: string | null;
+        href?: string | null;
+        action?: ('link' | 'form') | null;
+        link?: string | null;
+        form?: (number | null) | Form;
+        image?: (number | null) | Media;
+        imageMobile?: (number | null) | Media;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -477,40 +517,6 @@ export interface Media {
       filename?: string | null;
     };
   };
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "forms".
- */
-export interface Form {
-  id: number;
-  title: string;
-  key?: string | null;
-  source?: string | null;
-  exportName?: string | null;
-  defaults?:
-    | {
-        [k: string]: unknown;
-      }
-    | unknown[]
-    | string
-    | number
-    | boolean
-    | null;
-  parts?:
-    | {
-        key: string;
-        title: string;
-        text?: string | null;
-        textMore?: string | null;
-        href?: string | null;
-        image?: (number | null) | Media;
-        imageMobile?: (number | null) | Media;
-        id?: string | null;
-      }[]
-    | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1212,6 +1218,9 @@ export interface BlocksSelect<T extends boolean = true> {
         text?: T;
         textMore?: T;
         href?: T;
+        action?: T;
+        link?: T;
+        form?: T;
         image?: T;
         imageMobile?: T;
         id?: T;
@@ -1238,6 +1247,9 @@ export interface FormsSelect<T extends boolean = true> {
         text?: T;
         textMore?: T;
         href?: T;
+        action?: T;
+        link?: T;
+        form?: T;
         image?: T;
         imageMobile?: T;
         id?: T;

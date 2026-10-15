@@ -78,12 +78,9 @@ export const HOME_LAYOUT: LayoutBlock[] = [
     headingLines: ["Производство", "Авангард Строй"],
     body: copy.productionBody,
     steps: copy.productionSteps,
-    /* Главный выход — запись на экскурсию: это действие, а не чтение.
-       Страница завода остаётся второй ссылкой рядом. Оба выхода нужны
-       здесь, а не только в баннере: лента слотов крутится, и слот про
-       завод человек может не увидеть вовсе. */
+    /* Главный выход — форма записи на экскурсию, не якорь в контакты.
+       Страница завода остаётся второй ссылкой рядом. */
     ctaLabel: copy.factoryTour,
-    ctaHref: "/#contacts",
     moreLabel: copy.factoryMore,
     moreHref: "/manufacture",
     theme: "light",

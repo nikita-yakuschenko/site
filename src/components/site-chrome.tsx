@@ -516,7 +516,7 @@ export function SiteChrome({
         </div>
       </footer>
 
-      {askOpen ? <LeadDialog onClose={() => setAskOpen(false)} /> : null}
+      {askOpen ? <LeadDialog withMessage onClose={() => setAskOpen(false)} /> : null}
     </div>
   );
 }

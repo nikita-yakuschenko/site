@@ -4,7 +4,7 @@ import { connection } from 'next/server'
 import type { LayoutBlock } from '../components/block-renderer'
 import type { HeroMessage, HeroPromo } from '../components/hero-carousel'
 
-type Part = { key?: string; title?: string; text?: string; textMore?: string; href?: string; image?: string; imageMobile?: string }
+type Part = { key?: string; title?: string; text?: string; textMore?: string; href?: string; action?: string; url?: string; form?: string; image?: string; imageMobile?: string }
 
 const readHeroParts = cache(async (): Promise<Part[] | null> => {
   await connection()
@@ -48,6 +48,9 @@ export async function withHeroContent(blocks: readonly LayoutBlock[]): Promise<L
       if (item.text) promo.text = item.text
       if (item.textMore) promo.eyebrow = item.textMore
       if (item.href) promo.cta = item.href
+      promo.action = item.action === 'link' ? 'link' : 'form'
+      promo.url = item.url || ''
+      promo.formKey = item.form || ''
       if (item.image) { promo.image = item.image; promo.cutout = false }
     }
     return { ...block, message, promos }

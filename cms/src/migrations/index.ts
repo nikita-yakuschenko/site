@@ -4,6 +4,7 @@ import * as migration_20261014_105148_block_part_content from './20261014_105148
 import * as migration_20261014_111009_hero_background from './20261014_111009_hero_background';
 import * as migration_20261014_160000_reconcile_schema from './20261014_160000_reconcile_schema';
 import * as migration_20261014_164500_product_code from './20261014_164500_product_code';
+import * as migration_20261015_093000_promo_slot_action from './20261015_093000_promo_slot_action';
 
 export const migrations = [
   {
@@ -35,5 +36,10 @@ export const migrations = [
     up: migration_20261014_164500_product_code.up,
     down: migration_20261014_164500_product_code.down,
     name: '20261014_164500_product_code',
+  },
+  {
+    up: migration_20261015_093000_promo_slot_action.up,
+    down: migration_20261015_093000_promo_slot_action.down,
+    name: '20261015_093000_promo_slot_action',
   },
 ];

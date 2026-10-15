@@ -21,6 +21,8 @@ const nextConfig: NextConfig = {
   // оставляют на них мыло. Значения качества в Next 16 нужно объявлять
   // заранее, иначе quality={90} у <Image> отбрасывается.
   images: {
+    // Локальный CMS на localhost:3001. Оптимизатор иначе отказывается скачивать картинки с частного адреса.
+    dangerouslyAllowLocalIP: true,
     qualities: [60, 75, 90],
     remotePatterns: [
       { protocol: 'https', hostname: 'cms.avgst.ru', pathname: '/api/media/file/**' },

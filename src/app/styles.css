@@ -6484,24 +6484,18 @@ a {
   pointer-events: none;
   user-select: none;
   transform: translateY(0);
-  transform-origin: 100% 100%;
-  filter: drop-shadow(0 1px 0 var(--on-dark-4));
 }
 
 @media (hover: hover) {
   .production__shops-digit {
     transition:
       transform 0.22s var(--ease-out),
-      filter 0.22s var(--ease-out),
       color 0.22s var(--ease-out);
   }
 
   .production__shops li:hover .production__shops-digit {
-    color: color-mix(in srgb, var(--brand-yellow) 78%, white);
-    transform: translateY(-8px);
-    filter: drop-shadow(0 1px 0 var(--on-dark-0))
-      drop-shadow(1px 3px 0 rgb(196 150 8 / 0.35))
-      drop-shadow(0 16px 20px var(--line-2));
+    color: var(--brand-yellow);
+    transform: translateY(-6px);
   }
 }
 
@@ -9882,7 +9876,6 @@ html.is-dialog-open {
   pointer-events: none;
   user-select: none;
   transform: translateY(var(--digit-lift));
-  filter: drop-shadow(0 1px 0 var(--on-dark-4));
 }
 
 /* Текст поверх знака: описание шага длиннее названия и заходило под цифру. */
@@ -9896,16 +9889,12 @@ html.is-dialog-open {
   .mortgage-steps__num {
     transition:
       transform 0.22s var(--ease-out),
-      filter 0.22s var(--ease-out),
       color 0.22s var(--ease-out);
   }
 
   .mortgage-steps li:hover .mortgage-steps__num {
-    color: color-mix(in srgb, var(--brand-yellow) 78%, white);
-    --digit-lift: -8px;
-    filter: drop-shadow(0 1px 0 var(--on-dark-0))
-      drop-shadow(1px 3px 0 rgb(196 150 8 / 0.35))
-      drop-shadow(0 16px 20px var(--line-2));
+    color: var(--brand-yellow);
+    --digit-lift: -6px;
   }
 }
 

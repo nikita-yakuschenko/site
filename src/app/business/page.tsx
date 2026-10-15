@@ -69,7 +69,7 @@ function Inquiry({
       label={label}
       heading={label}
       submitLabel="Отправить заявку"
-      body="Расскажите о компании и задаче в сообщении. Обсудим проект и комплектацию."
+      body="Оставьте контакты. Обсудим проект и комплектацию."
       pageId="business"
       meta={{ direction: "b2b", topic }}
       className={secondary ? "btn b2b-secondary" : "btn btn-yellow"}
