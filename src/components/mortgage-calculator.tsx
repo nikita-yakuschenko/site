@@ -395,16 +395,17 @@ export function MortgageCalculator({
       : (activeResult.parts[0]?.annualRate ?? program.rate),
   );
   const tierSelector = mortgageTiers ? (
-    <div className="mortgage-calc__modes mortgage-calc__modes--tiers" role="tablist" aria-label="Комплектация"
-      style={{ '--mortgage-tier-count': mortgageTiers.length } as React.CSSProperties}>
+    <div className="mortgage-calc__tier-picker" style={{ '--mortgage-tier-count': mortgageTiers.length } as React.CSSProperties}>
       <span className="mortgage-calc__tier-label">Комплектация:</span>
-      {mortgageTiers.map(tier => (
-        <button key={tier.id} type="button" role="tab" aria-selected={tier.id === selectedTier?.id}
-          className={tier.id === selectedTier?.id ? 'mortgage-calc__mode is-active' : 'mortgage-calc__mode'}
-          onClick={() => { writeTier(tier.id); if (tier.price > 0) scheduleAnalytics(); }}>
-          {tier.name}
-        </button>
-      ))}
+      <div className="mortgage-calc__modes mortgage-calc__modes--tiers" role="tablist" aria-label="Комплектация">
+        {mortgageTiers.map(tier => (
+          <button key={tier.id} type="button" role="tab" aria-selected={tier.id === selectedTier?.id}
+            className={tier.id === selectedTier?.id ? 'mortgage-calc__mode is-active' : 'mortgage-calc__mode'}
+            onClick={() => { writeTier(tier.id); if (tier.price > 0) scheduleAnalytics(); }}>
+            {tier.name}
+          </button>
+        ))}
+      </div>
     </div>
   ) : null;
   if (projectTiers && (!selectedTier || selectedTier.price <= 0)) return (
