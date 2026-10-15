@@ -331,6 +331,16 @@ export function SiteChrome({
                 {phone}
               </a>
             ) : null}
+            <button
+              type="button"
+              className="btn btn-outline site-menu__ask"
+              onClick={() => {
+                setMenuOpen(false);
+                setAskOpen(true);
+              }}
+            >
+              {copy.askQuestion}
+            </button>
             {/* Тема полосы: в ряду на узком экране давала горизонтальный скролл. */}
             <button
               type="button"
