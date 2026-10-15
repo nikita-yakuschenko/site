@@ -12861,9 +12861,13 @@ html.is-dialog-open {
   grid-auto-columns: minmax(220px, 32%);
   gap: var(--gap-tile);
   margin-top: var(--gap-tile);
-  padding-bottom: 6px;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+}
+
+.project-strip::-webkit-scrollbar {
+  display: none;
 }
 
 @media (min-width: 900px) {
@@ -12875,12 +12879,6 @@ html.is-dialog-open {
 @media (max-width: 899px) {
   .project-strip {
     grid-auto-columns: calc((100% - var(--gap-tile)) / 2);
-    padding-bottom: 0;
-    scrollbar-width: none;
-  }
-
-  .project-strip::-webkit-scrollbar {
-    display: none;
   }
 }
 
