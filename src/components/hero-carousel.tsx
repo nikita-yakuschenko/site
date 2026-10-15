@@ -256,6 +256,8 @@ export function HeroCarousel({
 
   const track = useRef<HTMLDivElement>(null);
   const dragFrom = useRef<number | null>(null);
+  // Смах открывал бы форму: click приходит следом за pointerup.
+  const suppressClick = useRef(false);
 
   /* Доворот с клона на настоящий слот — перед шагом, а не после анимации.
    *
@@ -321,11 +323,15 @@ export function HeroCarousel({
     node.style.transform = shiftFor(pos, dx, perView, gap);
   }
 
-  function onPointerDown(event: React.PointerEvent) {
-    if (!rotating) return;
-    if ((event.target as HTMLElement).closest("button")) return;
+  function onPointerDown(event: React.PointerEvent<HTMLElement>) {
+    if (!rotating || event.button !== 0) return;
+    // Карточка сама кнопка. Пропускать любой button значит не пускать жест
+    // по ней вообще. В стороне остаются только стрелки и полоса прогресса.
+    const target = event.target;
+    if (target instanceof Element && target.closest(".hero__promo-nav, .hero__promo-progress")) return;
     dragFrom.current = event.clientX;
     setHinted(true);
+    event.currentTarget.setPointerCapture(event.pointerId);
     applyShift(0);
   }
 
@@ -349,7 +355,10 @@ export function HeroCarousel({
     const width = slotWidth();
     dragFrom.current = null;
     applyShift(null);
-    if (width && Math.abs(dx) > width * SWIPE_RATIO) step(dx < 0 ? 1 : -1);
+    if (width && Math.abs(dx) > width * SWIPE_RATIO) {
+      suppressClick.current = true;
+      step(dx < 0 ? 1 : -1);
+    }
   }
 
 
@@ -469,6 +478,10 @@ export function HeroCarousel({
                     aria-hidden={!active}
                     tabIndex={active ? undefined : -1}
                     onClick={() => {
+                      if (suppressClick.current) {
+                        suppressClick.current = false;
+                        return;
+                      }
                       if (promo.action === "link") {
                         if (/^https?:\/\//i.test(promo.url || "") || (promo.url || "").startsWith("/")) window.location.assign(promo.url || "");
                         return;
