@@ -125,6 +125,7 @@ function LegacyProjectBuilt({ project }: { project: CatalogProject }) {
               width={1920}
               height={824}
               sizes="100vw"
+              unoptimized={/^https?:\/\//.test(tour.cover)}
             />
             {/* Треугольник нарисован здесь, а не взят из набора: у значка
                 из набора он уже смещён вправо, и вместе с полем у круга
@@ -164,6 +165,7 @@ function LegacyProjectBuilt({ project }: { project: CatalogProject }) {
                     width={1200}
                     height={675}
                     sizes="(min-width: 900px) 25vw, 60vw"
+                    unoptimized={/^https?:\/\//.test(shot.image)}
                   />
                   {last ? (
                     <span>

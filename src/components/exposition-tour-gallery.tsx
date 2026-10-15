@@ -21,7 +21,7 @@ export function ExpositionTourGallery({ photos }: { photos: readonly ExpositionT
         return <button key={photo.src} type="button" className={classes || undefined}
           aria-label={last ? `${copy.galleryRest} ${rest}` : `${copy.galleryOpen}: ${photo.alt}`}
           onClick={() => setOpen(index)}>
-          <Image src={photo.src} alt={photo.alt} width={1920} height={1280} quality={90}
+          <Image src={photo.src} alt={photo.alt} width={1920} height={1280} quality={90} unoptimized={/^https?:\/\//.test(photo.src)}
             sizes={index === 0
               ? '(min-width: 1200px) 763px, (min-width: 900px) 66vw, calc(100vw - 48px)'
               : '(min-width: 1200px) 374px, (min-width: 900px) 33vw, calc((100vw - 64px) / 2)'} />

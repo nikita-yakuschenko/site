@@ -85,6 +85,7 @@ export function ProjectNextSteps({
               alt=""
               fill
               sizes="(min-width: 720px) 50vw, 100vw"
+              unoptimized={/^https?:\/\//.test(reviewImage)}
             />
           </Link>
         ) : (

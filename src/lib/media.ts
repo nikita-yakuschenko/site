@@ -5,14 +5,15 @@ export function mediaUrl(media: MediaLike): string {
   return ''
 }
 
-// Отдаёт уже уменьшенную копию. Исходник в CMS и в public часто в несколько раз
-// больше кадра на странице, и браузер качает его целиком.
+// Локальные файлы из public уменьшаем. Файлы, загруженные в CMS, отдаём как есть:
+// серверный оптимизатор на них рвёт отрисовку главного кадра.
 export function optimizedSrc(src: string, width: number, quality = 75): string {
-  if (!src || src.startsWith('data:') || src.startsWith('/_next/image')) return src
+  if (!src || src.startsWith('data:') || src.startsWith('/_next/image') || /^https?:\/\//.test(src)) return src
   return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality}`
 }
 
 export function optimizedSrcSet(src: string, widths: number[], quality = 75): string {
+  if (/^https?:\/\//.test(src)) return ''
   return widths.map((width) => `${optimizedSrc(src, width, quality)} ${width}w`).join(', ')
 }
 
