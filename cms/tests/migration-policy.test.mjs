@@ -48,6 +48,7 @@ test('dev marker is not an automatic release action', () => {
   assert.equal(devMarkerDecision([{ name: 'dev', batch: -1 }, { name: files[0], batch: 1 }], files).action, 'remove-marker')
   assert.equal(devMarkerDecision([{ name: files[0], batch: 1 }], files).action, 'none')
   assert.equal(devMarkerDecision([{ name: 'dev', batch: -1 }, { name: 'unknown', batch: 1 }], files).action, 'blocked')
+  assert.equal(devMarkerDecision([{ name: '20261012_154042_initial', batch: 1 }, { name: files[0], batch: 2 }], files, ['20261012_154042_initial']).action, 'none')
   assert.equal(devMarkerDecision([{ name: 'other', batch: -1 }], files).action, 'blocked')
   assert.equal(devMarkerDecision([{ name: 'dev', batch: -1 }, { name: 'dev', batch: -1 }], files).action, 'blocked')
 })

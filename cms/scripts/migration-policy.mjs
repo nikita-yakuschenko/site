@@ -141,8 +141,8 @@ export function rollbackViolations(upSql) {
   return problems
 }
 
-export function devMarkerDecision(rows, fileNames) {
-  const files = new Set(fileNames)
+export function devMarkerDecision(rows, fileNames, historicalNames = []) {
+  const files = new Set([...fileNames, ...historicalNames])
   const markers = rows.filter((row) => Number(row.batch) === -1)
   const applied = rows.filter((row) => Number(row.batch) !== -1)
   const unknown = applied.map((row) => row.name).filter((name) => !files.has(name))
@@ -173,6 +173,7 @@ function readMigrationUp(name) {
 export function checkRepositoryMigrations() {
   const names = migrationNames(readFileSync(path.join(migrationsDir, 'index.ts'), 'utf8'))
   const exceptions = new Set(exceptionNames(readFileSync(path.join(migrationsDir, 'expand-exceptions.txt'), 'utf8')))
+  const history = exceptionNames(readFileSync(path.join(migrationsDir, 'history-baseline.txt'), 'utf8'))
   const missingFiles = names.filter((name) => {
     try {
       readFileSync(path.join(migrationsDir, `${name}.ts`))
@@ -185,7 +186,7 @@ export function checkRepositoryMigrations() {
     ...missingFiles.map((name) => `${name}: файл миграции не найден`),
     ...names.filter((name) => !exceptions.has(name)).flatMap((name) => rollbackViolations(readMigrationUp(name)).map((problem) => `${name}: ${problem}`)),
   ]
-  return { names, problems, exceptions: [...exceptions] }
+  return { names, problems, exceptions: [...exceptions], history }
 }
 
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {

@@ -73,7 +73,7 @@ try {
     console.log('Таблицы payload_migrations ещё нет: это пустая база.')
   }
 
-  const decision = devMarkerDecision(rows, repository.names)
+  const decision = devMarkerDecision(rows, repository.names, repository.history)
   if (decision.action !== 'none') {
     fail(`${decision.reason} Обычный релиз маркер не удаляет. Сначала выполните однократный bootstrap.`)
   }

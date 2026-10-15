@@ -80,7 +80,7 @@ try {
     }
   }
 
-  const decision = devMarkerDecision(rows, repository.names)
+  const decision = devMarkerDecision(rows, repository.names, repository.history)
   console.log(decision.reason)
   if (!apply) {
     console.log(decision.action === 'remove-marker'
