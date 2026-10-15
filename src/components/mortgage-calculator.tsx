@@ -796,6 +796,13 @@ export function MortgageCalculator({
 
           {isProjectCalculator ? (
             <div className="mortgage-calc__quote" data-form={quoteOpen ? "true" : "false"}>
+              {quoteOpen ? (
+                <div className="mortgage-calc__quote-summary">
+                  {project?.name ? <p className="mortgage-calc__quote-name">{project.name}</p> : null}
+                  <p className="mortgage-calc__quote-rate">в ипотеку под {displayRate}</p>
+                  <p className="mortgage-calc__quote-pay">платёж {sentenceMoney(paymentResult.monthlyPayment).replace(" руб.", " руб./мес")}</p>
+                </div>
+              ) : null}
               <PanelLeadForm
                 formId="mortgage-calculator"
                 label={copy.getQuote}

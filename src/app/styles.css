@@ -13351,10 +13351,38 @@ html.is-dialog-open {
 }
 
 .mortgage-calc__quote[data-form="true"] {
-  padding: 6px 16px 16px;
+  padding: 22px 22px 16px;
   border-radius: 16px;
   background: var(--avgst-ink);
   color: #fff;
+}
+
+.mortgage-calc__quote-summary {
+  display: grid;
+  gap: 2px;
+}
+
+.mortgage-calc__quote-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.15;
+}
+
+.mortgage-calc__quote-rate {
+  margin: 2px 0 0;
+  font-size: 13px;
+  line-height: 1.3;
+  color: var(--on-dark-3);
+}
+
+.mortgage-calc__quote-pay {
+  margin: 8px 0 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: var(--avgst-green);
 }
 
 .mortgage-calc__quote[data-form="true"] .lead-card {
