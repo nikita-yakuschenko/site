@@ -285,10 +285,10 @@ export function SiteChrome({
             aria-label={copy.close}
             onClick={() => setMenuOpen(false)}
           />
-          <div className="site-menu__panel">
+          <div className="site-menu__panel" data-tech-theme={techBarTheme}>
             <div className="site-menu__top">
               <Link href="/" className="site-menu__brand" aria-label={name} onClick={() => setMenuOpen(false)}>
-                <img className="site-menu__logo" src={src} alt="" width={143} height={40} />
+                <img className="site-menu__logo" src={techBarTheme === "light" ? "/logo_lg_black.svg" : src} alt="" width={143} height={40} />
               </Link>
               <button
                 type="button"

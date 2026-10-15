@@ -921,6 +921,20 @@ a {
   color: #fff;
 }
 
+.site-menu__panel[data-tech-theme="light"] {
+  background: #fff;
+  color: var(--avgst-ink);
+}
+
+.site-menu__panel[data-tech-theme="light"] nav a,
+.site-menu__panel[data-tech-theme="light"] .site-menu__theme {
+  color: var(--avgst-ink);
+}
+
+.site-menu__panel[data-tech-theme="light"] .site-menu__theme:hover {
+  color: var(--avgst-ink);
+}
+
 @media (max-width: 1023px) {
   .site-menu__theme {
     display: inline-flex;
