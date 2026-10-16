@@ -6403,37 +6403,22 @@ a {
 @media (min-width: 900px) {
   .grid-2 .card .card__body,
   .grid-3 .card .card__body {
-    gap: 16px;
+    gap: 8px;
   }
 
-  .grid-2 .card .card__line,
-  .grid-3 .card .card__line {
+  .grid-2 .card .card__line:has(.card__cta),
+  .grid-3 .card .card__line:has(.card__cta) {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px 16px;
-  }
-
-  .grid-2 .card .card__line:has(.specs),
-  .grid-3 .card .card__line:has(.specs) {
-    flex-wrap: wrap;
-  }
-
-  .grid-2 .card .card__line > a,
-  .grid-3 .card .card__line > a,
-  .grid-2 .card .card__line > .card__heading,
-  .grid-3 .card .card__line > .card__heading {
-    flex: 0 1 auto;
-    min-width: auto;
+    gap: 12px 16px;
+    margin-top: 8px;
   }
 
   .grid-2 .card .card__line .specs,
   .grid-3 .card .card__line .specs {
-    flex: 0 0 auto;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
-    gap: 4px 8px;
-    margin: 0 0 0 auto;
+    justify-content: flex-start;
+    margin: 0;
   }
 
   .grid-2 .card .card__line .price,
