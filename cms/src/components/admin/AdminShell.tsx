@@ -8,7 +8,7 @@ import { IconExternalLink as ExternalLink, IconPhoto as Images, IconLayoutDashbo
 import type { CSSProperties, ReactNode } from 'react'
 import type { User } from '../../payload-types'
 import { structure } from '../../config/structure'
-import { IconWorld, IconFiles, IconBuildingCommunity, IconBlocks, IconForms, IconSitemap, IconPlugConnected } from '@tabler/icons-react'
+import { IconWorld, IconFiles, IconBuildingCommunity, IconCash, IconDatabase, IconBlocks, IconForms, IconSitemap, IconPlugConnected } from '@tabler/icons-react'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { Button } from '../ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
@@ -17,7 +17,8 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupConte
 
 export function EmptyNav() { return null }
 
-const structureIcons = { site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
+const structureIcons = { site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, prices: IconCash, registers: IconDatabase, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
+const collectionPath = (href: string) => href === '/structure/catalog' ? '/collections/projects' : href === '/structure/prices' ? '/collections/project-prices' : href.replace('/structure/', '/collections/')
 const navigation = [
   { title: 'Сайт', items: [{ title: 'Обзор', href: '/', icon: LayoutDashboard }, ...structure.filter(item => item.key !== 'integrations').map(item => ({ ...item, icon: structureIcons[item.key] }))] },
   { title: 'Обмен данными', items: structure.filter(item => item.key === 'integrations').map(item => ({ ...item, icon: structureIcons[item.key] })) },
@@ -39,7 +40,7 @@ function AppSidebar() {
     </SidebarMenuButton></SidebarMenuItem></SidebarMenu></SidebarHeader>
     <SidebarContent>{navigation.map(group => <SidebarGroup key={group.title}><SidebarGroupLabel>{group.title}</SidebarGroupLabel><SidebarGroupContent><SidebarMenu>
       {group.items.filter(item => !('collection' in item) || permissions?.collections?.[item.collection as 'users' | 'media']?.read).map(item => <SidebarMenuItem key={item.href}>
-        <SidebarMenuButton asChild isActive={item.href === '/' ? pathname === '/' : pathname.startsWith(item.href) || pathname.startsWith((item.href === '/structure/catalog' ? '/collections/projects' : item.href.replace('/structure/', '/collections/')))} tooltip={item.title}>
+        <SidebarMenuButton asChild isActive={item.href === '/' ? pathname === '/' : pathname.startsWith(item.href) || pathname.startsWith(collectionPath(item.href))} tooltip={item.title}>
           <Link href={item.href} onClick={() => setOpenMobile(false)}><item.icon /><span>{item.title}</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>)}
@@ -62,7 +63,7 @@ function AppSidebar() {
 function SiteHeader() {
   const pathname = usePathname()
   const { theme, setTheme } = useTheme()
-  const title = structure.find(item => pathname === item.href || pathname.startsWith((item.href === '/structure/catalog' ? '/collections/projects' : item.href.replace('/structure/', '/collections/'))))?.title ?? (pathname === '/' ? 'Обзор' : pathname.startsWith('/account') ? 'Аккаунт' : pathname.includes('/media') ? 'Медиафайлы' : pathname.includes('/users') ? 'Пользователи' : 'Панель управления')
+  const title = structure.find(item => pathname === item.href || pathname.startsWith(collectionPath(item.href)))?.title ?? (pathname === '/' ? 'Обзор' : pathname.startsWith('/account') ? 'Аккаунт' : pathname.includes('/media') ? 'Медиафайлы' : pathname.includes('/users') ? 'Пользователи' : 'Панель управления')
   return <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-card md:rounded-t-xl">
     <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
     <SidebarTrigger aria-label="Переключить меню" className="-ml-1" /><Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
