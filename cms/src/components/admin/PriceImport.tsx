@@ -3,6 +3,7 @@
 import { useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { parsePriceFile, type PriceInput } from '../../config/price-import'
+import type { MarketingChoice } from '../../config/marketing-prices'
 import { configurationNames } from '../../../../src/lib/catalog/configuration-rules'
 import { priceKinds } from '../../config/price-kinds'
 import { Button } from '../ui/button'
@@ -13,25 +14,46 @@ import { DataTableFrame, useDataPage } from './DataTable'
 export function PriceImport() {
   const router = useRouter()
   const [rows, setRows] = useState<PriceInput[]>([])
+  const [choices, setChoices] = useState<MarketingChoice[]>([])
+  const [unmatched, setUnmatched] = useState<string[]>([])
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
   const [filename, setFilename] = useState('')
   const preview = useDataPage(rows)
   async function upload(file?: File) {
-    setRows([]); setMessage('')
+    setRows([]); setChoices([]); setUnmatched([]); setMessage('')
     if (!file) return
     setFilename(file.name)
     setBusy(true)
     try {
       if (file.size > 2 * 1024 * 1024) throw new Error('Файл должен быть меньше 2 МБ')
-      const data = parsePriceFile(await file.text())
-      const response = await fetch('/api/project-prices/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rows: data, dryRun: true }) })
+      const marketing = file.name.toLowerCase().endsWith('.xlsx')
+      const payload = marketing ? await marketingPayload(file) : parsePriceFile(await file.text())
+      if (marketing) return
+      const response = await fetch('/api/project-prices/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rows: payload, dryRun: true }) })
       const result = await response.json()
       if (!response.ok) throw new Error(result.error)
-      setRows(data); setMessage(`Проверено строк: ${data.length}. Можно загрузить прайс.`)
+      setRows(payload); setMessage(`Проверено строк: ${payload.length}. Можно загрузить прайс.`)
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Не удалось прочитать файл') }
     finally { setBusy(false) }
+  }
+  async function marketingPayload(file: File) {
+    const bytes = new Uint8Array(await file.arrayBuffer())
+    let binary = ''
+    for (let index = 0; index < bytes.length; index += 0x8000) binary += String.fromCharCode(...bytes.subarray(index, index + 0x8000))
+    const response = await fetch('/api/project-prices/preview-marketing', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, file: btoa(binary) }) })
+    const result = await response.json()
+    if (!response.ok) throw new Error(result.error)
+    const found: MarketingChoice[] = result.choices || []
+    const missing: string[] = result.unmatched || []
+    setChoices(found)
+    setUnmatched(missing)
+    if (missing.length) throw new Error(`Не найдены проекты: ${missing.join(', ')}`)
+    const data = result.rows as PriceInput[]
+    setRows(data)
+    setMessage(`Проверено строк: ${data.length}. Можно загрузить прайс.`)
+    return data
   }
   async function save() {
     setBusy(true)
@@ -39,7 +61,7 @@ export function PriceImport() {
       const response = await fetch('/api/project-prices/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rows }) })
       const result = await response.json()
       if (!response.ok) throw new Error(result.error)
-      setMessage(`Прайс загружен. Обновлено цен: ${result.updated}.`); setRows([]); setFilename('')
+      setMessage(`Прайс загружен. Обновлено цен: ${result.updated}.`); setRows([]); setChoices([]); setUnmatched([]); setFilename('')
       router.refresh()
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Не удалось загрузить прайс') }
     finally { setBusy(false) }
@@ -53,8 +75,12 @@ export function PriceImport() {
         {filename && <span className="text-sm text-muted-foreground">{filename}</span>}
       </div>
     </div>
-    <input ref={fileInput} type="file" className="hidden" accept=".csv,.json" disabled={busy} aria-label="Файл прайса" onChange={event => { void upload(event.target.files?.[0]); event.target.value = '' }} />
+    <input ref={fileInput} type="file" className="hidden" accept=".csv,.json,.xlsx" disabled={busy} aria-label="Файл прайса" onChange={event => { void upload(event.target.files?.[0]); event.target.value = '' }} />
     {message && <p role="status" className="text-sm">{message}</p>}
+    {unmatched.length > 0 && <p className="text-sm">Цены не загружены, пока каждый дом из файла не найден среди проектов этой технологии.</p>}
+    {choices.some(choice => choice.skipped.length > 0) && <ul className="flex flex-col gap-1 text-sm text-muted-foreground">
+      {choices.filter(choice => choice.skipped.length > 0).map(choice => <li key={choice.projectName}>{choice.projectName}: берём «{choice.sourceName}», не берём {choice.skipped.map(name => `«${name}»`).join(', ')}</li>)}
+    </ul>}
     {rows.length > 0 && <>
       <DataTableFrame page={preview.page} pageCount={preview.pageCount} pageSize={preview.pageSize} onPage={preview.setPage} onPageSize={preview.setPageSize}>
         <Table>

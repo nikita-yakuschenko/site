@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { IconCheck, IconLoader2 } from '@tabler/icons-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Input } from '@/components/ui/input'
-import { configurationKeys, configurationNames, isModularTechnology, type ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
+import { configurationNames, isModularTechnology, priceConfigurationKeys, type ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
 import { priceKindsInForm, type PriceKind } from '../../config/price-kinds'
 
 type PriceDoc = { id: string; configuration: ConfigurationKey; region: PriceKind; price: number }
@@ -25,7 +25,8 @@ async function request(url: string, init: RequestInit) {
 export function ProjectPricesEditor() {
   const { id } = useDocumentInfo()
   const technology = useFormFields(([fields]) => fields.technologyBadge?.value)
-  const keys = configurationKeys(isModularTechnology(technology))
+  const modular = isModularTechnology(technology)
+  const keys = priceConfigurationKeys(modular)
   // Older projects keep the NN price on the project itself; the site falls back to it.
   const legacyPrices = useFormFields(([fields]) => JSON.stringify(Object.fromEntries([0, 1, 2, 3].map(index => [fields[`configurations.${index}.key`]?.value, fields[`configurations.${index}.price`]?.value]).filter(([key, price]) => key && typeof price === 'number' && price > 0))))
   const legacy = JSON.parse(legacyPrices) as Partial<Record<ConfigurationKey, number>>
@@ -88,7 +89,7 @@ export function ProjectPricesEditor() {
             const key = cellKey(configuration, kind.value)
             const value = key in drafts ? drafts[key] : formatPrice(docs[key]?.price)
             return <label key={configuration} className="flex items-center gap-3">
-              <span className="w-36 shrink-0 text-sm">{configurationNames[configuration]}</span>
+              <span className="w-36 shrink-0 text-sm">{configurationNames[configuration]}{modular && configuration === 'start' && <span className="mt-0.5 block text-xs font-normal text-muted-foreground">не на сайте</span>}</span>
               <span className="relative w-48">
                 <Input inputMode="numeric" className="h-8 pr-7 text-right tabular-nums" placeholder={kind.value === 'nn' && legacy[configuration] ? formatPrice(legacy[configuration]) : '—'} value={value} aria-label={`${kind.label}: ${configurationNames[configuration]}`}
                   onChange={event => { const text = event.target.value; setDrafts(current => ({ ...current, [key]: formatPrice(parsePrice(text)) })) }}

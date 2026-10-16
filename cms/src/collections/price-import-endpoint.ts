@@ -1,7 +1,7 @@
 import type { Endpoint } from 'payload'
 import { contentWriter } from '../access/staff'
 import { parsePriceRows } from '../config/price-import'
-import { configurationKeys, isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
+import { isModularTechnology, priceConfigurationKeys } from '../../../src/lib/catalog/configuration-rules'
 
 export const priceImportEndpoint: Endpoint = {
   path: '/import', method: 'post', handler: async req => {
@@ -16,7 +16,7 @@ export const priceImportEndpoint: Endpoint = {
       const prepared = rows.map(row => {
         const project = projects.docs.find(project => project.slug === row.projectSlug || project.importKey === `catalog:${row.projectSlug}`)
         if (!project || project.recordType === 'ready-home') throw new Error(`Проект ${row.projectSlug} не найден`)
-        if (!configurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error(`${row.projectSlug}: комплектация ${row.configuration} не подходит для технологии`)
+        if (!priceConfigurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error(`${row.projectSlug}: комплектация ${row.configuration} не подходит для технологии`)
         return { lookupKey: `${project.id}:${row.configuration}:${row.region}`, project: project.id, configuration: row.configuration, region: row.region, price: row.price }
       })
       if (new Set(prepared.map(row => row.lookupKey)).size !== prepared.length) throw new Error('Один проект повторён под разными адресами')

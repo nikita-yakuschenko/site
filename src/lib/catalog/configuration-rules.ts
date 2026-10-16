@@ -1,6 +1,8 @@
 export const configurationNames = { start: 'Стартовая', standard: 'Стандартная', project: 'Проектная', turnkey: 'Под ключ' } as const
 export type ConfigurationKey = keyof typeof configurationNames
 export const configurationKeys = (modular: boolean): ConfigurationKey[] => modular ? ['standard', 'project', 'turnkey'] : ['start', 'standard', 'project']
+// Стартовая у модульного дома хранится в прайсе и не входит в публичные комплектации.
+export const priceConfigurationKeys = (modular: boolean): ConfigurationKey[] => modular ? ['start', 'standard', 'project', 'turnkey'] : configurationKeys(false)
 export const isModularTechnology = (badge: unknown) => typeof badge === 'string' && /модул/i.test(badge)
 export const mortgageAllowed = (key: string) => key !== 'start'
 

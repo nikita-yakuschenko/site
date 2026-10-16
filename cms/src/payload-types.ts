@@ -758,7 +758,7 @@ export interface ProjectPrice {
   lookupKey: string;
   project: number | Project;
   configuration: 'start' | 'standard' | 'project' | 'turnkey';
-  region: 'msk' | 'nn' | 'special' | 'special-msk' | 'dealer';
+  region: 'msk' | 'nn' | 'special' | 'special-msk' | 'dealer' | 'special-dealer';
   price: number;
   history?: { date: string; amount: number }[] | null;
   updatedAt: string;

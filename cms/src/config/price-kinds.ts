@@ -6,10 +6,11 @@ export const priceKinds = [
   { value: 'special', label: 'Спеццена НН', public: false },
   { value: 'special-msk', label: 'Спеццена МСК', public: false },
   { value: 'dealer', label: 'Дилер', public: false },
+  { value: 'special-dealer', label: 'Спеццена дилер', public: false },
 ] as const
 
 export type PriceKind = (typeof priceKinds)[number]['value']
-const priceKindFormOrder = ['nn', 'special', 'msk', 'special-msk', 'dealer'] as const satisfies readonly PriceKind[]
+const priceKindFormOrder = ['nn', 'special', 'msk', 'special-msk', 'dealer', 'special-dealer'] as const satisfies readonly PriceKind[]
 export const priceKindsInForm = priceKindFormOrder.map(value => priceKinds.find(kind => kind.value === value)!)
 
 export const isPriceKind = (value: unknown): value is PriceKind => priceKinds.some(kind => kind.value === value)

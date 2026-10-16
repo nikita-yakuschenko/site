@@ -34,6 +34,7 @@
     "@tailwindcss/postcss": "4.3.3",
     "class-variance-authority": "^0.7.1",
     "cn": "^0.4.0",
+    "exceljs": "4.4.0",
     "geist": "1.4.2",
     "graphql": "16.11.0",
     "next": "16.4.0",

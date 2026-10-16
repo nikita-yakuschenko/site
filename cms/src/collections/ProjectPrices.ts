@@ -1,7 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import { authenticated, contentManager, contentWriter } from '../access/staff'
-import { configurationKeys, configurationNames, isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
+import { configurationNames, isModularTechnology, priceConfigurationKeys } from '../../../src/lib/catalog/configuration-rules'
 import { priceImportEndpoint } from './price-import-endpoint'
+import { marketingPricePreviewEndpoint } from './marketing-price-endpoint'
 import { priceKinds } from '../config/price-kinds'
 import { nextPriceHistory } from '../config/price-history'
 
@@ -9,14 +10,14 @@ export const ProjectPrices: CollectionConfig = {
   slug: 'project-prices', labels: { singular: 'Цена проекта', plural: 'Прайс' },
   admin: { useAsTitle: 'lookupKey', defaultColumns: ['project', 'configuration', 'region', 'price', 'updatedAt'] },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
-  endpoints: [priceImportEndpoint],
+  endpoints: [priceImportEndpoint, marketingPricePreviewEndpoint],
   hooks: { beforeValidate: [async ({ data, originalDoc, req }) => {
     if (!data) return data
     const row = { ...originalDoc, ...data }
     const projectID = typeof row.project === 'object' ? row.project.id : row.project
     // Internal check. Startup seeding has no signed-in user yet.
     const project = await req.payload.findByID({ collection: 'projects', id: projectID, depth: 0, req, overrideAccess: true })
-    if (project.recordType === 'ready-home' || !configurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error('Комплектация не соответствует технологии проекта')
+    if (project.recordType === 'ready-home' || !priceConfigurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error('Комплектация не соответствует технологии проекта')
     data.lookupKey = `${projectID}:${row.configuration}:${row.region}`
     return data
   }], beforeChange: [({ data, originalDoc, operation }) => {
