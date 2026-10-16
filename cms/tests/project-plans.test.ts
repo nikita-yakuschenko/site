@@ -15,13 +15,20 @@ test('variant and floor names are positional', () => {
   assert.equal(variantName(0), 'Вариант А')
   assert.equal(variantName(2), 'Вариант В')
   assert.equal(floorName(null, 0), '1 этаж')
-  assert.equal(floorName('Мансарда', 1), '2 этаж')
+  assert.equal(floorName('  ', 1), '2 этаж')
+  assert.equal(floorName('Секция 1', 0), 'Секция 1')
 })
 test('uploaded floor replaces legacy path and keeps its explication', () => {
   const [variant] = normalizePlans([{ floors: [{ photo: 'PLAN15AB', image: '/old.jpg', rooms: [{ name: 'Спальня', area: '10' }] }] }])
   assert.equal(variant.floors[0].image, null)
   assert.equal(variant.floors[0].photo, 'PLAN15AB')
   assert.equal(variant.floors[0].rooms.length, 1)
+  assert.equal(variant.floors[0].label, null)
+})
+test('a custom floor name is kept and a blank name stays positional', () => {
+  const [variant] = normalizePlans([{ floors: [{ label: ' Секция 1 ', rooms: [] }, { label: '  ', rooms: [] }] }])
+  assert.equal(variant.floors[0].label, 'Секция 1')
+  assert.equal(variant.floors[1].label, null)
 })
 test('public plans cannot contain an image without explication', () => {
   assert.equal(isPlanVariants([{ label: 'Вариант 1', floors: [{ label: '1 этаж', image: '/plan.jpg', rooms: [] }] }]), false)

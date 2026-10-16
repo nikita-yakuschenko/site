@@ -7,10 +7,10 @@ type Variant = { label?: string | null; image?: string | null; rooms?: Room[] | 
 export function normalizePlans(plans: Variant[]) {
   return plans.map(variant => {
     const floors = variant.floors?.length ? variant.floors : variant.image ? [{ image: variant.image, rooms: variant.rooms || [] }] : []
-    return { ...variant, label: null, image: null, rooms: [], floors: floors.map(floor => ({ ...floor, label: null, image: floor.photo ? null : floor.image, rooms: floor.rooms || [] })) }
+    return { ...variant, label: null, image: null, rooms: [], floors: floors.map(floor => ({ ...floor, label: floor.label?.trim() || null, image: floor.photo ? null : floor.image, rooms: floor.rooms || [] })) }
   })
 }
 // Names are positional: variants follow the Russian alphabet, floors are numbered.
 const variantLetters = 'АБВГДЕЁЖЗИКЛМНОПРСТУФХЦЧШЩЭЮЯ'
 export const variantName = (index: number) => `Вариант ${variantLetters[index] ?? index + 1}`
-export const floorName = (_label: string | null | undefined, index: number) => `${index + 1} этаж`
+export const floorName = (label: string | null | undefined, index: number) => label?.trim() || `${index + 1} этаж`

@@ -454,6 +454,9 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .exterior-row-label { display: inline-flex; align-items: center; gap: 12px; }
 .exterior-row-label button { position: relative; z-index: 2; pointer-events: auto; }
 .exterior-row-label [aria-pressed="true"] { color: var(--brand-yellow); }
+.plan-floor-label { display: inline-flex; align-items: center; gap: 4px; }
+.plan-floor-label button { position: relative; z-index: 2; pointer-events: auto; }
+.plan-floor-label__input { position: relative; z-index: 2; width: 9rem; margin: 0; padding: 0; border: 0; background: transparent; color: inherit; font: inherit; outline: none; }
 .project-image-preview-trigger { display: block; width: fit-content; max-width: 100%; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
 .image-preview-overlay { width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .image-preview-overlay::backdrop { background: #000b; }
