@@ -6394,6 +6394,57 @@ a {
   margin-top: 8px;
 }
 
+/* На узком экране строки прозрачны, и порядок остаётся прежним:
+   название, метрики, цена, кнопка. */
+.card__line {
+  display: contents;
+}
+
+@media (min-width: 900px) {
+  .grid-2 .card .card__line,
+  .grid-3 .card .card__line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 16px;
+  }
+
+  .grid-2 .card .card__line > a,
+  .grid-3 .card .card__line > a,
+  .grid-2 .card .card__line > .card__heading,
+  .grid-3 .card .card__line > .card__heading {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .grid-2 .card .card__line h3,
+  .grid-3 .card .card__line h3 {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .grid-2 .card .card__line .specs,
+  .grid-3 .card .card__line .specs {
+    flex: 1 1 auto;
+    justify-content: flex-end;
+    min-width: 0;
+    margin: 0;
+  }
+
+  .grid-2 .card .card__line .price,
+  .grid-3 .card .card__line .price {
+    margin: 0;
+    white-space: nowrap;
+  }
+
+  .grid-2 .card .card__line .card__cta,
+  .grid-3 .card .card__line .card__cta {
+    margin: 0 0 0 auto;
+    flex-shrink: 0;
+  }
+}
+
 /* Разделу отдано больше воздуха, чем соседним: он несёт главный довод за
    заводскую сборку, и пролистывать его так же быстро, как ряд карточек,
    не должно хотеться. */

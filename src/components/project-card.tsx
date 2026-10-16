@@ -74,27 +74,31 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
         </div>
       </div>
       <div className="card__body">
-        {locationLabel ? <div className="card__heading">
-          <a href={project.href}><h3>{project.name}</h3></a>
-          <span className="card__location-badge" aria-label={`Выставочная площадка: ${locationLabel}`}>{locationLabel}</span>
-        </div> : <a href={project.href}>
-          <h3>{project.name}</h3>
-        </a>}
-        <ul className="specs">
-          {specs.map((spec) => {
-            const Icon = spec.icon
-            return (
-              <li key={spec.label}>
-                <Icon size={16} stroke={1.75} />
-                <span>{spec.label}</span>
-              </li>
-            )
-          })}
-        </ul>
-        {showPrice && <p className="price">{priceLabel}</p>}
-        <a className="btn btn-yellow card__cta" href={project.href}>
-          {project.readyHome ? copy.viewReadyHome : copy.viewProject}
-        </a>
+        <div className="card__line">
+          {locationLabel ? <div className="card__heading">
+            <a href={project.href}><h3>{project.name}</h3></a>
+            <span className="card__location-badge" aria-label={`Выставочная площадка: ${locationLabel}`}>{locationLabel}</span>
+          </div> : <a href={project.href}>
+            <h3>{project.name}</h3>
+          </a>}
+          <ul className="specs">
+            {specs.map((spec) => {
+              const Icon = spec.icon
+              return (
+                <li key={spec.label}>
+                  <Icon size={16} stroke={1.75} />
+                  <span>{spec.label}</span>
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+        <div className="card__line">
+          {showPrice && <p className="price">{priceLabel}</p>}
+          <a className="btn btn-yellow card__cta" href={project.href}>
+            {project.readyHome ? copy.viewReadyHome : copy.viewProject}
+          </a>
+        </div>
       </div>
     </article>
   )
