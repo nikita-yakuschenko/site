@@ -87,8 +87,10 @@ const recordTypes = { project: 'Проект дома', 'ready-home': 'Гото�
 const projectFields: RecordFields = { name: 'name', type: 'recordType', types: recordTypes, typeLabel: 'Тип записи', slug: 'slug', slugFrom: projectSlugFromName, placeholder: 'Введите название проекта' }
 
 export function ProjectRecordMetadata() {
-  const { id, hasPublishedDoc } = useDocumentInfo()
+  const { id, hasPublishedDoc, data } = useDocumentInfo()
+  const code = typeof data?.code === 'string' ? data.code : ''
   return <RecordMetadata fields={projectFields} badge={<Badge variant={hasPublishedDoc ? 'default' : 'outline'}>{hasPublishedDoc ? 'Опубликован' : 'Черновик'}</Badge>}>
+    {code && <span className="project-record-code" title="Код проекта">{code}</span>}
     {!id && <DraftLeavePrompt />}
     <UnpublishedChanges />
   </RecordMetadata>

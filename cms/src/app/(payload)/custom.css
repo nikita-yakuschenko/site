@@ -357,6 +357,7 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .project-record-slug input { padding-right: 36px; }
 .project-record-slug input:disabled { opacity: 1; cursor: default; color: var(--muted-foreground); }
 .project-record-slug button { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); }
+.project-record-code { flex: 0 0 auto; color: var(--muted-foreground); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; letter-spacing: 0.04em; }
 :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__meta:not(:has(> :not(.doc-controls__value-wrap))) { display: none; }
 :is(.collection-edit--pages, .collection-edit--projects) .page-details-row .field-type,
 :is(.collection-edit--pages, .collection-edit--projects) .page-metadata-row .field-type { margin-bottom: 0; }
