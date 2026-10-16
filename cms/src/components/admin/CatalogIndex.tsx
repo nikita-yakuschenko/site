@@ -109,7 +109,7 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
   return <>
     <div className="flex flex-wrap items-center justify-between gap-3">
       <Tabs value={recordType} onValueChange={value => { setRecordType(value as 'project' | 'ready-home'); table.setPage(0) }}>
-        <TabsList className="**:data-[slot=badge]:size-5 **:data-[slot=badge]:rounded-full **:data-[slot=badge]:bg-muted-foreground/30 **:data-[slot=badge]:px-1">
+        <TabsList>
           <TabsTrigger value="project">Проекты домов <Badge variant="secondary">{projectCount}</Badge></TabsTrigger>
           <TabsTrigger value="ready-home">Готовые дома <Badge variant="secondary">{readyCount}</Badge></TabsTrigger>
         </TabsList>
