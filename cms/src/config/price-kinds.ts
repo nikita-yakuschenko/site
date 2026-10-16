@@ -15,3 +15,6 @@ export const priceKindsInForm = priceKindFormOrder.map(value => priceKinds.find(
 
 export const isPriceKind = (value: unknown): value is PriceKind => priceKinds.some(kind => kind.value === value)
 export const isPublicPriceKind = (value: unknown) => priceKinds.some(kind => kind.value === value && kind.public)
+
+// В сводной таблице городские цены — стандартная комплектация. У дилера в файле одна колонка «Старт».
+export const summaryConfiguration = (kind: PriceKind) => kind === 'dealer' || kind === 'special-dealer' ? 'start' : 'standard'

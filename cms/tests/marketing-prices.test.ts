@@ -1,6 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { configurationKeys, priceConfigurationKeys } from '../../src/lib/catalog/configuration-rules'
+import { summaryConfiguration } from '../src/config/price-kinds'
 import { marketingFileKind, matchMarketingCatalog, parseMarketingGrid, priceNameKey } from '../src/config/marketing-prices'
 import { mergePriceRows, type PriceInput } from '../src/config/price-import'
 
@@ -90,6 +91,13 @@ test('a draft without a slug still receives its prices', () => {
   assert.equal(matched.rows.find(row => row.projectId === '10')?.projectSlug, '')
   assert.equal(matched.issues.length, 0)
   assert.deepEqual(matched.unmatched, ['Норвегия 90'])
+})
+
+test('the price summary reads dealer prices from the only dealer kit', () => {
+  assert.equal(summaryConfiguration('dealer'), 'start')
+  assert.equal(summaryConfiguration('special-dealer'), 'start')
+  assert.equal(summaryConfiguration('nn'), 'standard')
+  assert.equal(summaryConfiguration('msk'), 'standard')
 })
 
 test('modular start stays in the price list and off the public kits', () => {

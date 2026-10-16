@@ -7,7 +7,7 @@ import { CatalogIndex } from './CatalogIndex'
 import { PriceImport } from './PriceImport'
 import { PricesTable, type PriceTableRow } from './PricesTable'
 import Link from 'next/link'
-import { priceKindsInForm, type PriceKind } from '../../config/price-kinds'
+import { isPriceKind, summaryConfiguration, type PriceKind } from '../../config/price-kinds'
 
 async function StructureView({ view, initPageResult }: AdminViewServerProps & { view: typeof structure[number]['key'] }) {
   if (!initPageResult.req.user) redirect('/login')
@@ -43,13 +43,13 @@ async function priceTable(req: AdminViewServerProps['initPageResult']['req']): P
   const payload = req.payload
   const [projects, prices] = await Promise.all([
     payload.find({ collection: 'projects', pagination: false, sort: 'name', depth: 0, draft: true, req, overrideAccess: false, where: { recordType: { equals: 'project' } } }),
-    payload.find({ collection: 'project-prices', pagination: false, depth: 0, req, overrideAccess: false, where: { configuration: { equals: 'standard' } } }),
+    payload.find({ collection: 'project-prices', pagination: false, depth: 0, req, overrideAccess: false, where: { configuration: { in: ['standard', 'start'] } } }),
   ])
   const byProject = new Map<number, PriceTableRow['prices']>()
   for (const row of prices.docs) {
     const projectId = typeof row.project === 'number' ? row.project : row.project.id
     const kind = row.region
-    if (!priceKindsInForm.some(item => item.value === kind)) continue
+    if (!isPriceKind(kind) || row.configuration !== summaryConfiguration(kind)) continue
     const cells = byProject.get(projectId) ?? {}
     cells[kind as PriceKind] = { price: row.price, updatedAt: row.updatedAt }
     byProject.set(projectId, cells)
