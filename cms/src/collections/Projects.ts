@@ -118,7 +118,7 @@ export const Projects: CollectionConfig = {
         { name: 'series', label: 'Серия', type: 'select', options: [{ label: 'Панельные', value: 'panel' }, { label: 'Барнхаусы', value: 'barn' }, { label: 'Классические', value: 'classic' }, { label: 'Модульные', value: 'modular' }, { label: 'А-фрейм', value: 'aframe' }] },
       ] },
       { type: 'row', admin: { className: 'project-specs-row' }, fields: [
-        { name: 'areaValue', label: 'Площадь, м²', type: 'number', required: true, min: 0, admin: { width: '25%' } },
+        { name: 'areaValue', label: 'Площадь', type: 'number', required: true, min: 0, admin: { width: '25%' } },
         { name: 'floorsValue', label: 'Этажи', type: 'number', required: true, min: 1, validate: integerCount(1), admin: { step: 1, width: '25%' } },
         { name: 'bedrooms', label: 'Спальни', type: 'number', required: true, min: 0, validate: integerCount(0), admin: { step: 1, width: '25%' } },
         { name: 'bathrooms', label: 'Санузлы', type: 'number', required: true, min: 0, validate: integerCount(0), admin: { step: 1, width: '25%' } },
