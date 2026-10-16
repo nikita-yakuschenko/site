@@ -782,3 +782,12 @@ html[data-theme="dark"] .avgst-shell [data-slot="tabs-trigger"][data-state="acti
   font-weight: 500;
   line-height: 1;
 }
+@keyframes avgst-shimmer { from { background-position: 100% 0; } to { background-position: 0 0; } }
+.shimmer {
+  background-image: linear-gradient(90deg, var(--muted-foreground) 20%, var(--foreground) 45%, var(--muted-foreground) 70%);
+  background-size: 200% 100%;
+  background-clip: text;
+  color: transparent;
+  animation: avgst-shimmer 1.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) { .shimmer { animation: none; color: var(--muted-foreground); background: none; } }
