@@ -92,14 +92,15 @@ export function parseMarketingGrid(grid: unknown[][], filename: string) {
   return { choices, rows }
 }
 
-export type MarketingIssue = { projectName: string; kind: 'address' | 'technology' | 'duplicate'; detail: string }
-export type CatalogPriceProject = { name: string; slug: string | null; modular: boolean }
+export type MarketingIssue = { projectName: string; kind: 'technology' | 'duplicate'; detail: string }
+export type CatalogPriceProject = { id: string; name: string; slug: string | null; modular: boolean }
 
-// Проект без адреса, чужой технологии или с двойником не отменяет цены остальных домов из того же файла.
+// Чужая технология или два проекта с одним названием не отменяют цены остальных домов из файла.
+// Slug черновику не нужен: цена хранится на номере карточки.
 export function matchMarketingCatalog(parsed: { choices: MarketingChoice[]; rows: MarketingPriceRow[] }, projects: CatalogPriceProject[], modular: boolean) {
   const issues: MarketingIssue[] = []
   const blocked = new Set<string>()
-  const byKey = new Map<string, string>()
+  const byKey = new Map<string, { id: string; slug: string; name: string }>()
   const grouped = new Map<string, CatalogPriceProject[]>()
   for (const project of projects) {
     const key = priceNameKey(project.name)
@@ -121,21 +122,15 @@ export function matchMarketingCatalog(parsed: { choices: MarketingChoice[]; rows
       blocked.add(key)
       continue
     }
-    const slug = same[0].slug?.trim() || ''
-    if (!slug) {
-      issues.push({ projectName: choice.projectName, kind: 'address', detail: `У проекта «${same[0].name}» нет адреса, его цены пропущены` })
-      blocked.add(key)
-      continue
-    }
-    byKey.set(key, slug)
+    byKey.set(key, { id: same[0].id, slug: same[0].slug?.trim() || '', name: same[0].name })
   }
   const unmatched = parsed.choices.filter(choice => {
     const key = priceNameKey(choice.projectName)
     return !byKey.has(key) && !blocked.has(key)
   }).map(choice => choice.projectName)
   const rows = parsed.rows.flatMap(row => {
-    const projectSlug = byKey.get(priceNameKey(row.projectName))
-    return projectSlug ? [{ projectSlug, configuration: row.configuration, region: row.region, price: row.price }] : []
+    const project = byKey.get(priceNameKey(row.projectName))
+    return project ? [{ projectId: project.id, projectSlug: project.slug, label: project.name, configuration: row.configuration, region: row.region, price: row.price }] : []
   })
   return { rows, unmatched, issues }
 }

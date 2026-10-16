@@ -186,8 +186,8 @@ export function PriceImport() {
             <TableHead>Тип цены</TableHead>
             <TableHead className="pr-4 text-right">Цена, ₽</TableHead>
           </TableRow></TableHeader>
-          <TableBody>{preview.rows.map(row => <TableRow key={`${row.projectSlug}:${row.configuration}:${row.region}`}>
-            <TableCell className="pl-4">{row.projectSlug}</TableCell>
+          <TableBody>{preview.rows.map(row => <TableRow key={`${row.projectId || row.projectSlug}:${row.configuration}:${row.region}`}>
+            <TableCell className="pl-4">{row.label || row.projectSlug}</TableCell>
             <TableCell>{configurationNames[row.configuration]}</TableCell>
             <TableCell>{priceKinds.find(kind => kind.value === row.region)?.label}</TableCell>
             <TableCell className="pr-4 text-right tabular-nums">{row.price.toLocaleString('ru-RU')}</TableCell>

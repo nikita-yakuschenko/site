@@ -69,7 +69,7 @@ test('later price file replaces the same project price', () => {
   assert.deepEqual(mergePriceRows([first, second]), [second[0], second[1]])
 })
 
-test('a project without an address does not cancel the other prices in the file', () => {
+test('a draft without a slug still receives its prices', () => {
   const parsed = parseMarketingGrid([
     ['Название проекта', null, null, null, null, 'Экохаус 132', 'Экохаус 132', 'Экохаус 132'],
     [null, null, null, null, null, 'Старт', 'Базовая', 'Проектная'],
@@ -82,12 +82,13 @@ test('a project without an address does not cancel the other prices in the file'
     ['Стоимость дома', null, null, null, null, 1200000, 2200000, 3200000],
   ], '41. НН. ПКД. Маркетинг. Октябрь 2026.xlsx')
   const matched = matchMarketingCatalog(parsed, [
-    { name: 'Экохаус 132', slug: '', modular: false },
-    { name: 'Барнхаус 115', slug: 'barnhouse-115', modular: false },
-    { name: 'Барнхаус 115', slug: 'barnhouse-115-copy', modular: true },
+    { id: '10', name: 'Экохаус 132', slug: '', modular: false },
+    { id: '11', name: 'Барнхаус 115', slug: 'barnhouse-115', modular: false },
+    { id: '12', name: 'Барнхаус 115', slug: 'barnhouse-115-copy', modular: true },
   ], false)
-  assert.deepEqual(matched.rows.map(row => row.projectSlug), ['barnhouse-115', 'barnhouse-115', 'barnhouse-115'])
-  assert.deepEqual(matched.issues.map(issue => issue.kind), ['address'])
+  assert.deepEqual([...new Set(matched.rows.map(row => row.projectId))], ['10', '11'])
+  assert.equal(matched.rows.find(row => row.projectId === '10')?.projectSlug, '')
+  assert.equal(matched.issues.length, 0)
   assert.deepEqual(matched.unmatched, ['Норвегия 90'])
 })
 

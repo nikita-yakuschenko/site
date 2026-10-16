@@ -16,7 +16,7 @@ export const marketingPricePreviewEndpoint: Endpoint = {
       const parsed = await parseMarketingWorkbook(body.filename, data)
       const kind = marketingFileKind(body.filename)
       const projects = await req.payload.find({ collection: 'projects', pagination: false, depth: 0, req, overrideAccess: false, select: { name: true, slug: true, technologyBadge: true, recordType: true } })
-      const catalog = projects.docs.flatMap(project => project.recordType === 'ready-home' || typeof project.name !== 'string' ? [] : [{ name: project.name, slug: typeof project.slug === 'string' ? project.slug : null, modular: isModularTechnology(project.technologyBadge) }])
+      const catalog = projects.docs.flatMap(project => project.recordType === 'ready-home' || typeof project.name !== 'string' ? [] : [{ id: String(project.id), name: project.name, slug: typeof project.slug === 'string' ? project.slug : null, modular: isModularTechnology(project.technologyBadge) }])
       const matched = matchMarketingCatalog(parsed, catalog, kind.modular)
       return Response.json({ rows: matched.rows.length ? parsePriceRows(matched.rows) : [], choices: parsed.choices, unmatched: matched.unmatched, issues: matched.issues })
     } catch (error) {

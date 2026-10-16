@@ -14,9 +14,12 @@ export const priceImportEndpoint: Endpoint = {
     try {
       const projects = await req.payload.find({ collection: 'projects', pagination: false, depth: 0, req, overrideAccess: false })
       const prepared = rows.map(row => {
-        const project = projects.docs.find(project => project.slug === row.projectSlug || project.importKey === `catalog:${row.projectSlug}`)
-        if (!project || project.recordType === 'ready-home') throw new Error(`Проект ${row.projectSlug} не найден`)
-        if (!priceConfigurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error(`${row.projectSlug}: комплектация ${row.configuration} не подходит для технологии`)
+        const project = row.projectId
+          ? projects.docs.find(item => String(item.id) === row.projectId)
+          : projects.docs.find(item => item.slug === row.projectSlug || item.importKey === `catalog:${row.projectSlug}`)
+        const name = row.label || row.projectSlug || row.projectId
+        if (!project || project.recordType === 'ready-home') throw new Error(`Проект ${name} не найден`)
+        if (!priceConfigurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error(`${name}: комплектация ${row.configuration} не подходит для технологии`)
         return { lookupKey: `${project.id}:${row.configuration}:${row.region}`, project: project.id, configuration: row.configuration, region: row.region, price: row.price }
       })
       if (new Set(prepared.map(row => row.lookupKey)).size !== prepared.length) throw new Error('Один проект повторён под разными адресами')
