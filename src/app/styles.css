@@ -8172,13 +8172,12 @@ html.is-dialog-open {
 
 .project-hero__media {
   position: absolute;
-  top: 0;
-  right: 0;
-  left: 0;
-  /* Кадр ровно на весь вьюпорт Chrome считает фоном и выбрасывает из LCP.
-     Тогда на странице не остаётся кандидата, и PageSpeed пишет NO_LCP.
-     Четыре пикселя снизу прячутся под нижней вуалью и возвращают фото в замер. */
-  height: calc(100svh - 4px);
+  inset: 0;
+}
+
+/* Следующий блок начинается сразу от кадра, без белой полосы сверху. */
+[data-project-sections] > .project-hero + [data-cms-block] > .section {
+  padding-top: 0;
 }
 
 .project-hero__media img {
