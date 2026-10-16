@@ -1,8 +1,8 @@
 // На сайт уходят только публичные типы. Спеццены и дилер остаются в панели.
 export const priceKinds = [
-  { value: 'msk', label: 'Москва', public: true },
   { value: 'nn', label: 'Нижний Новгород', public: true },
   { value: 'special', label: 'Спеццена НН', public: false },
+  { value: 'msk', label: 'Москва', public: true },
   { value: 'special-msk', label: 'Спеццена МСК', public: false },
   { value: 'dealer', label: 'Дилер', public: false },
 ] as const
