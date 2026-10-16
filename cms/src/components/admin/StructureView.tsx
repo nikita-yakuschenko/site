@@ -7,6 +7,7 @@ import { PriceImport } from './PriceImport'
 import { PricesTable, type PriceTableRow } from './PricesTable'
 import Link from 'next/link'
 import { priceKindsInForm, type PriceKind } from '../../config/price-kinds'
+import { readPriceHistory } from '../../config/price-history'
 
 async function StructureView({ view, initPageResult }: AdminViewServerProps & { view: typeof structure[number]['key'] }) {
   if (!initPageResult.req.user) redirect('/login')
@@ -49,7 +50,7 @@ async function priceTable(req: AdminViewServerProps['initPageResult']['req']): P
     const kind = row.region
     if (!priceKindsInForm.some(item => item.value === kind)) continue
     const cells = byProject.get(projectId) ?? {}
-    cells[kind as PriceKind] = { price: row.price, updatedAt: row.updatedAt }
+    cells[kind as PriceKind] = { price: row.price, updatedAt: row.updatedAt, history: readPriceHistory(row.history) }
     byProject.set(projectId, cells)
   }
   return projects.docs.map(project => ({ id: project.id, code: project.code ?? null, name: project.name, prices: byProject.get(project.id) ?? {} }))

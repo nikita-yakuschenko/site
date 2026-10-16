@@ -3,6 +3,7 @@ import { authenticated, contentManager, contentWriter } from '../access/staff'
 import { configurationKeys, configurationNames, isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
 import { priceImportEndpoint } from './price-import-endpoint'
 import { priceKinds } from '../config/price-kinds'
+import { nextPriceHistory } from '../config/price-history'
 
 export const ProjectPrices: CollectionConfig = {
   slug: 'project-prices', labels: { singular: 'Цена проекта', plural: 'Прайс' },
@@ -18,6 +19,11 @@ export const ProjectPrices: CollectionConfig = {
     if (project.recordType === 'ready-home' || !configurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error('Комплектация не соответствует технологии проекта')
     data.lookupKey = `${projectID}:${row.configuration}:${row.region}`
     return data
+  }], beforeChange: [({ data, originalDoc, operation }) => {
+    if (!data || typeof data.price !== 'number') return data
+    const previous = operation === 'update' ? originalDoc : null
+    data.history = nextPriceHistory(previous?.history, typeof previous?.price === 'number' ? previous.price : null, previous?.updatedAt ?? null, data.price)
+    return data
   }] },
   fields: [
     { name: 'lookupKey', type: 'text', required: true, unique: true, admin: { hidden: true } },
@@ -25,5 +31,6 @@ export const ProjectPrices: CollectionConfig = {
     { name: 'configuration', label: 'Комплектация', type: 'select', required: true, options: Object.entries(configurationNames).map(([value, label]) => ({ value, label })) },
     { name: 'region', label: 'Тип цены', type: 'select', required: true, options: priceKinds.map(kind => ({ value: kind.value, label: kind.label })) },
     { name: 'price', label: 'Цена, ₽', type: 'number', required: true, min: 1, validate: (value: unknown) => typeof value === 'number' && Number.isSafeInteger(value) && value > 0 ? true : 'Укажите положительную целую цену в рублях' },
+    { name: 'history', label: 'История цены', type: 'json', admin: { hidden: true } },
   ],
 }

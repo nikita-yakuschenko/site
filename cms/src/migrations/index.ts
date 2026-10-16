@@ -7,6 +7,7 @@ import * as migration_20261014_164500_product_code from './20261014_164500_produ
 import * as migration_20261015_093000_promo_slot_action from './20261015_093000_promo_slot_action';
 import * as migration_20261015_235500_project_reactions from './20261015_235500_project_reactions';
 import * as migration_20261016_095500_special_msk_price from './20261016_095500_special_msk_price';
+import * as migration_20261016_105500_price_history from './20261016_105500_price_history';
 
 export const migrations = [
   {
@@ -53,5 +54,10 @@ export const migrations = [
     up: migration_20261016_095500_special_msk_price.up,
     down: migration_20261016_095500_special_msk_price.down,
     name: '20261016_095500_special_msk_price',
+  },
+  {
+    up: migration_20261016_105500_price_history.up,
+    down: migration_20261016_105500_price_history.down,
+    name: '20261016_105500_price_history',
   },
 ];

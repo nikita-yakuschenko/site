@@ -9,4 +9,5 @@ export const requiredMigrations = [
   '20261015_093000_promo_slot_action',
   '20261015_235500_project_reactions',
   '20261016_095500_special_msk_price',
+  '20261016_105500_price_history',
 ]

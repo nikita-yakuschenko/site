@@ -763,6 +763,7 @@ export interface ProjectPrice {
   configuration: 'start' | 'standard' | 'project' | 'turnkey';
   region: 'msk' | 'nn' | 'special' | 'special-msk' | 'dealer';
   price: number;
+  history?: { date: string; amount: number }[] | null;
   updatedAt: string;
   createdAt: string;
 }
