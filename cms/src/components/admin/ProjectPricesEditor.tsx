@@ -76,19 +76,21 @@ export function ProjectPricesEditor() {
   if (!id) return <p className="shadcn-surface text-sm text-muted-foreground">Сохраните проект, чтобы задать цены.</p>
 
   return <div className="shadcn-surface flex flex-col gap-3">
-    <p className="text-sm text-muted-foreground">Цена сохраняется сразу после ввода. Пустое поле — цена не задана. Спеццена и цена для дилера на сайте не показываются.</p>
+    <p className="text-sm text-muted-foreground">Сверху тип цены, внутри — стоимость каждой комплектации. Цена сохраняется сразу после ввода. Пустое поле — цена не задана.</p>
     {error && <p role="alert" className="text-sm">Не удалось загрузить цены. Обновите страницу.</p>}
     <Accordion type="multiple" className="flex flex-col gap-2">
-      {keys.map(configuration => <AccordionItem key={configuration} value={configuration} className="rounded-lg border bg-card px-4 last:border-b">
-        <AccordionTrigger className="py-3 hover:no-underline">{configurationNames[configuration]}</AccordionTrigger>
+      {priceKinds.map(kind => <AccordionItem key={kind.value} value={kind.value} className="rounded-lg border bg-card px-4 last:border-b">
+        <AccordionTrigger className="py-3 hover:no-underline">
+          <span className="flex items-baseline gap-2">{kind.label}{!kind.public && <span className="text-sm font-normal text-muted-foreground">не показывается на сайте</span>}</span>
+        </AccordionTrigger>
         <AccordionContent className="flex flex-col gap-2 px-1 pt-1 pb-4">
-          {priceKinds.map(kind => {
+          {keys.map(configuration => {
             const key = cellKey(configuration, kind.value)
             const value = key in drafts ? drafts[key] : formatPrice(docs[key]?.price)
-            return <label key={kind.value} className="flex items-center gap-3">
-              <span className="w-36 shrink-0 text-sm">{kind.label}</span>
+            return <label key={configuration} className="flex items-center gap-3">
+              <span className="w-36 shrink-0 text-sm">{configurationNames[configuration]}</span>
               <span className="relative w-48">
-                <Input inputMode="numeric" className="h-8 pr-7 text-right tabular-nums" placeholder={kind.value === 'nn' && legacy[configuration] ? formatPrice(legacy[configuration]) : '—'} value={value} aria-label={`${configurationNames[configuration]}: ${kind.label}`}
+                <Input inputMode="numeric" className="h-8 pr-7 text-right tabular-nums" placeholder={kind.value === 'nn' && legacy[configuration] ? formatPrice(legacy[configuration]) : '—'} value={value} aria-label={`${kind.label}: ${configurationNames[configuration]}`}
                   onChange={event => { const text = event.target.value; setDrafts(current => ({ ...current, [key]: formatPrice(parsePrice(text)) })) }}
                   onBlur={() => void commit(configuration, kind.value)}
                   onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); event.currentTarget.blur() } }} />
