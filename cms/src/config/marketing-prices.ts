@@ -91,3 +91,51 @@ export function parseMarketingGrid(grid: unknown[][], filename: string) {
   choices.sort((left, right) => left.projectName.localeCompare(right.projectName, 'ru'))
   return { choices, rows }
 }
+
+export type MarketingIssue = { projectName: string; kind: 'address' | 'technology' | 'duplicate'; detail: string }
+export type CatalogPriceProject = { name: string; slug: string | null; modular: boolean }
+
+// Проект без адреса, чужой технологии или с двойником не отменяет цены остальных домов из того же файла.
+export function matchMarketingCatalog(parsed: { choices: MarketingChoice[]; rows: MarketingPriceRow[] }, projects: CatalogPriceProject[], modular: boolean) {
+  const issues: MarketingIssue[] = []
+  const blocked = new Set<string>()
+  const byKey = new Map<string, string>()
+  const grouped = new Map<string, CatalogPriceProject[]>()
+  for (const project of projects) {
+    const key = priceNameKey(project.name)
+    if (!parsed.choices.some(item => priceNameKey(item.projectName) === key)) continue
+    grouped.set(key, [...(grouped.get(key) || []), project])
+  }
+  for (const choice of parsed.choices) {
+    const key = priceNameKey(choice.projectName)
+    const found = grouped.get(key) || []
+    const same = found.filter(project => project.modular === modular)
+    if (!found.length) continue
+    if (!same.length) {
+      issues.push({ projectName: choice.projectName, kind: 'technology', detail: `«${choice.projectName}» совпало с проектом «${found[0].name}» другой технологии` })
+      blocked.add(key)
+      continue
+    }
+    if (same.length > 1) {
+      issues.push({ projectName: choice.projectName, kind: 'duplicate', detail: `Два проекта называются «${same[0].name}», цены не записаны` })
+      blocked.add(key)
+      continue
+    }
+    const slug = same[0].slug?.trim() || ''
+    if (!slug) {
+      issues.push({ projectName: choice.projectName, kind: 'address', detail: `У проекта «${same[0].name}» нет адреса, его цены пропущены` })
+      blocked.add(key)
+      continue
+    }
+    byKey.set(key, slug)
+  }
+  const unmatched = parsed.choices.filter(choice => {
+    const key = priceNameKey(choice.projectName)
+    return !byKey.has(key) && !blocked.has(key)
+  }).map(choice => choice.projectName)
+  const rows = parsed.rows.flatMap(row => {
+    const projectSlug = byKey.get(priceNameKey(row.projectName))
+    return projectSlug ? [{ projectSlug, configuration: row.configuration, region: row.region, price: row.price }] : []
+  })
+  return { rows, unmatched, issues }
+}

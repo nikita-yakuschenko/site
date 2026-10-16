@@ -1,7 +1,7 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { configurationKeys, priceConfigurationKeys } from '../../src/lib/catalog/configuration-rules'
-import { marketingFileKind, parseMarketingGrid, priceNameKey } from '../src/config/marketing-prices'
+import { marketingFileKind, matchMarketingCatalog, parseMarketingGrid, priceNameKey } from '../src/config/marketing-prices'
 import { mergePriceRows, type PriceInput } from '../src/config/price-import'
 
 const kits = [null, null, null, null, null, 'Старт', 'Базовая', 'Проектная', 'Под ключ']
@@ -67,6 +67,28 @@ test('later price file replaces the same project price', () => {
   const first: PriceInput[] = [{ projectSlug: 'barn-46', configuration: 'standard', region: 'nn', price: 100 }]
   const second: PriceInput[] = [{ projectSlug: 'barn-46', configuration: 'standard', region: 'nn', price: 200 }, { projectSlug: 'barn-46', configuration: 'standard', region: 'msk', price: 300 }]
   assert.deepEqual(mergePriceRows([first, second]), [second[0], second[1]])
+})
+
+test('a project without an address does not cancel the other prices in the file', () => {
+  const parsed = parseMarketingGrid([
+    ['Название проекта', null, null, null, null, 'Экохаус 132', 'Экохаус 132', 'Экохаус 132'],
+    [null, null, null, null, null, 'Старт', 'Базовая', 'Проектная'],
+    ['Стоимость дома', null, null, null, null, 1000000, 2000000, 3000000],
+    ['Название проекта', null, null, null, null, 'Барнхаус 115', 'Барнхаус 115', 'Барнхаус 115'],
+    [null, null, null, null, null, 'Старт', 'Базовая', 'Проектная'],
+    ['Стоимость дома', null, null, null, null, 1100000, 2100000, 3100000],
+    ['Название проекта', null, null, null, null, 'Норвегия 90', 'Норвегия 90', 'Норвегия 90'],
+    [null, null, null, null, null, 'Старт', 'Базовая', 'Проектная'],
+    ['Стоимость дома', null, null, null, null, 1200000, 2200000, 3200000],
+  ], '41. НН. ПКД. Маркетинг. Октябрь 2026.xlsx')
+  const matched = matchMarketingCatalog(parsed, [
+    { name: 'Экохаус 132', slug: '', modular: false },
+    { name: 'Барнхаус 115', slug: 'barnhouse-115', modular: false },
+    { name: 'Барнхаус 115', slug: 'barnhouse-115-copy', modular: true },
+  ], false)
+  assert.deepEqual(matched.rows.map(row => row.projectSlug), ['barnhouse-115', 'barnhouse-115', 'barnhouse-115'])
+  assert.deepEqual(matched.issues.map(issue => issue.kind), ['address'])
+  assert.deepEqual(matched.unmatched, ['Норвегия 90'])
 })
 
 test('modular start stays in the price list and off the public kits', () => {
