@@ -603,11 +603,22 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 :is(.collection-edit--blocks, .collection-edit--forms) #field-parts .array-field__row[data-preview-active],
 .project-section-card[data-preview-active] [data-slot="card"] { border-color: var(--primary); box-shadow: 0 0 0 1px var(--primary); }
 .project-unpublished { display: flex; align-items: center; gap: 4px; margin-inline-start: auto; }
-/* Точка стоит у названия, а не на краю карточки. */
-.collapsible__toggle-wrap[data-unpublished] :is(.project-source-label, .collapsible__header-wrap) { position: relative; padding-left: 14px; }
-.collapsible__toggle-wrap[data-unpublished] :is(.project-source-label, .collapsible__header-wrap)::before { content: ''; position: absolute; top: 50%; left: 0; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--primary); pointer-events: none; }
-.collapsible__toggle-wrap[data-unpublished]:not(:has(.project-source-label, .collapsible__header-wrap)) { position: relative; }
-.collapsible__toggle-wrap[data-unpublished]:not(:has(.project-source-label, .collapsible__header-wrap))::before { content: ''; position: absolute; top: 50%; left: 16px; z-index: 1; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--primary); pointer-events: none; }
+/* Точка вне потока: справа от края, перед названием, заголовок не сдвигается. */
+.collapsible__toggle-wrap[data-unpublished] :is(.project-source-label, .collapsible__header-wrap) { position: relative; }
+.collapsible__toggle-wrap[data-unpublished] .collapsible__header-wrap { overflow: visible; }
+.collapsible__toggle-wrap[data-unpublished] :is(.project-source-label, .collapsible__header-wrap)::before,
+.collapsible__toggle-wrap[data-unpublished]:not(:has(.project-source-label, .collapsible__header-wrap))::before { content: ''; position: absolute; top: 50%; left: -12px; width: 6px; height: 6px; margin-top: -3px; border-radius: 50%; background: var(--primary); pointer-events: none; opacity: 0; transform: scale(0.4); animation: unpublished-dot-in 220ms cubic-bezier(0.2, 0, 0, 1) 80ms forwards; }
+.collapsible__toggle-wrap[data-unpublished]:not(:has(.project-source-label, .collapsible__header-wrap))::before { left: 16px; z-index: 1; }
+.collapsible__toggle-wrap[data-unpublished="out"] :is(.project-source-label, .collapsible__header-wrap)::before,
+.collapsible__toggle-wrap[data-unpublished="out"]:not(:has(.project-source-label, .collapsible__header-wrap))::before { animation: unpublished-dot-out 280ms cubic-bezier(0.4, 0, 0.2, 1) 240ms both; }
+@keyframes unpublished-dot-in { to { opacity: 1; transform: scale(1); } }
+@keyframes unpublished-dot-out { from { opacity: 1; transform: scale(1); } to { opacity: 0; transform: scale(0.4); } }
+@media (prefers-reduced-motion: reduce) {
+  .collapsible__toggle-wrap[data-unpublished] :is(.project-source-label, .collapsible__header-wrap)::before,
+  .collapsible__toggle-wrap[data-unpublished]:not(:has(.project-source-label, .collapsible__header-wrap))::before { animation: none; opacity: 1; transform: none; }
+  .collapsible__toggle-wrap[data-unpublished="out"] :is(.project-source-label, .collapsible__header-wrap)::before,
+  .collapsible__toggle-wrap[data-unpublished="out"]:not(:has(.project-source-label, .collapsible__header-wrap))::before { animation: none; opacity: 0; }
+}
 /* An open select menu must extend past the section card */
 .project-section-card :is([data-slot="card"], [data-slot="accordion-content"]):has(.rs__menu) { overflow: visible; }.project-section-card .collapsible__toggle-wrap { background: transparent; border-radius: 0; }
 .project-order-toolbar { display: none; }

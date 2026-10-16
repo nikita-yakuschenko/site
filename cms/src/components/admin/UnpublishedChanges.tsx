@@ -85,22 +85,30 @@ export function UnpublishedChanges() {
     const timer = setTimeout(() => {
       const current = getData() as Record<string, unknown>
       const changed = [...new Set([...Object.keys(current), ...Object.keys(published)])].filter(key => !ignored.has(key) && JSON.stringify(normalize(current[key])) !== JSON.stringify(normalize(published[key])))
-      document.querySelectorAll('[data-unpublished]').forEach(element => element.removeAttribute('data-unpublished'))
-      // Each change counts once per its outermost section, block row or plain field
+      // Снятые метки ещё видны и гаснут стилем, новые ставятся сразу.
+      const marked = new Set<Element>()
       const units = new Set<Element | string>()
       for (const key of changed) {
         const section = document.querySelector(`[data-section-fields~="${key}"]`)?.closest('.collapsible__toggle-wrap')
-        section?.setAttribute('data-unpublished', '')
+        if (section) marked.add(section)
         for (const path of diffPaths(normalize(current[key]), normalize(published[key]), [key])) {
           const field = fieldOf(path)
           const headers = field ? headersOf(field) : []
-          headers.forEach(header => header.setAttribute('data-unpublished', ''))
+          headers.forEach(header => marked.add(header))
           units.add(section ?? headers.at(-1) ?? key)
         }
       }
+      document.querySelectorAll('[data-unpublished]').forEach(element => {
+        if (marked.has(element) || element.getAttribute('data-unpublished') === 'out') return
+        element.setAttribute('data-unpublished', 'out')
+      })
+      marked.forEach(header => {
+        if (header.getAttribute('data-unpublished') !== '') header.setAttribute('data-unpublished', '')
+      })
       setCount(units.size)
     }, 300)
-    return () => clearTimeout(timer)
+    const clearOut = setTimeout(() => document.querySelectorAll('[data-unpublished="out"]').forEach(element => element.removeAttribute('data-unpublished')), 900)
+    return () => { clearTimeout(timer); clearTimeout(clearOut) }
   }, [published, fields, getData, domVersion])
   useEffect(() => () => document.querySelectorAll('[data-unpublished]').forEach(element => element.removeAttribute('data-unpublished')), [])
 
