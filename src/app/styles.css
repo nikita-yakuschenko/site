@@ -6401,6 +6401,11 @@ a {
 }
 
 @media (min-width: 900px) {
+  .grid-2 .card .card__body,
+  .grid-3 .card .card__body {
+    gap: 16px;
+  }
+
   .grid-2 .card .card__line,
   .grid-3 .card .card__line {
     display: flex;
@@ -6435,13 +6440,15 @@ a {
 
   .grid-2 .card .card__line .price,
   .grid-3 .card .card__line .price {
-    margin: 0;
+    order: 2;
+    margin: 0 0 0 auto;
     white-space: nowrap;
   }
 
   .grid-2 .card .card__line .card__cta,
   .grid-3 .card .card__line .card__cta {
-    margin: 0 0 0 auto;
+    order: 1;
+    margin: 0;
     flex-shrink: 0;
   }
 }
