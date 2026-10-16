@@ -258,7 +258,7 @@ async function createSample(payload: Payload, sample: { source: CatalogProject; 
   })
   for (const configuration of project.configurations || []) {
     for (const kind of priceKinds) {
-      const factor = { msk: 1, nn: 0.94, special: 0.86, dealer: 0.78 }[kind.value]
+      const factor = ({ msk: 1, nn: 0.94, special: 0.86, 'special-msk': 0.9, dealer: 0.78 } as const)[kind.value]
       await payload.create({
         collection: 'project-prices',
         overrideAccess: true,

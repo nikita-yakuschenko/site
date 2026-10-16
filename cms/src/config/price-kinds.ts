@@ -1,8 +1,9 @@
-// Only public kinds are sent to the site; special and dealer prices stay inside the admin.
+// На сайт уходят только публичные типы. Спеццены и дилер остаются в панели.
 export const priceKinds = [
   { value: 'msk', label: 'Москва', public: true },
   { value: 'nn', label: 'Нижний Новгород', public: true },
-  { value: 'special', label: 'Спеццена', public: false },
+  { value: 'special', label: 'Спеццена НН', public: false },
+  { value: 'special-msk', label: 'Спеццена МСК', public: false },
   { value: 'dealer', label: 'Дилер', public: false },
 ] as const
 

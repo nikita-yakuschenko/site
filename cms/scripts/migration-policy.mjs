@@ -103,6 +103,7 @@ export function rollbackViolations(upSql) {
   const problems = []
   for (const statement of sqlTexts(upSql).flatMap((text) => splitSql(text))) {
     if (/^create type\s+\S+\s+as\s+enum\s*\(/i.test(statement)) continue
+    if (/^alter type\s+\S+\s+add value\s+/i.test(statement)) continue
     if (/^comment on\b/i.test(statement)) continue
     const column = addedColumn(statement, added)
     if (column?.error) {

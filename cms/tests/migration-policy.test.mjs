@@ -29,6 +29,8 @@ test('constraint, type and existing-column changes are rejected', () => {
   assert.ok(rollbackViolations('CREATE TABLE "audit" ("id" serial PRIMARY KEY)').length > 0)
   assert.ok(rollbackViolations('UPDATE "pages" SET "title" = \'x\' WHERE "title" IS NULL').length > 0)
   assert.ok(rollbackViolations('ALTER TABLE "blocks_parts" DROP COLUMN "action"').length > 0)
+  assert.deepEqual(rollbackViolations(`ALTER TYPE "public"."enum_project_prices_region" ADD VALUE 'special-msk' BEFORE 'dealer'`), [])
+  assert.ok(rollbackViolations(`ALTER TYPE "public"."enum_project_prices_region" RENAME VALUE 'special' TO 'other'`).length > 0)
 })
 
 test('a nullable column with a default can be rolled back to the previous CMS', () => {

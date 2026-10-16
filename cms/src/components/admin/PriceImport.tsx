@@ -4,6 +4,7 @@ import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { parsePriceFile, type PriceInput } from '../../config/price-import'
 import { configurationNames } from '../../../../src/lib/catalog/configuration-rules'
+import { priceKinds } from '../../config/price-kinds'
 import { Button } from '../ui/button'
 import { IconUpload } from '@tabler/icons-react'
 
@@ -45,6 +46,6 @@ export function PriceImport() {
     <div className="flex items-center gap-3"><Button type="button" variant="outline" disabled={busy} onClick={() => fileInput.current?.click()}><IconUpload size={16} />{busy ? 'Обработка…' : 'Выбрать файл прайса'}</Button><span className="text-sm text-muted-foreground">{filename || 'CSV или JSON, до 2 МБ'}</span></div>
     <input ref={fileInput} type="file" className="hidden" accept=".csv,.json" disabled={busy} aria-label="Файл прайса" onChange={event => { void upload(event.target.files?.[0]); event.target.value = '' }} />
     {message && <p role="status" className="text-sm">{message}</p>}
-    {rows.length > 0 && <><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr><th>Проект</th><th>Комплектация</th><th>Регион</th><th>Цена, ₽</th></tr></thead><tbody>{rows.slice(0,5).map(row => <tr key={`${row.projectSlug}:${row.configuration}:${row.region}`}><td>{row.projectSlug}</td><td>{configurationNames[row.configuration]}</td><td>{row.region === 'nn' ? 'Нижний Новгород' : 'Москва'}</td><td>{row.price.toLocaleString('ru-RU')}</td></tr>)}</tbody></table></div><button type="button" disabled={busy} onClick={() => void save()} className="self-start rounded-lg border px-4 py-2">{busy ? 'Загрузка…' : `Загрузить ${rows.length} цен`}</button></>}
+    {rows.length > 0 && <><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr><th>Проект</th><th>Комплектация</th><th>Регион</th><th>Цена, ₽</th></tr></thead><tbody>{rows.slice(0,5).map(row => <tr key={`${row.projectSlug}:${row.configuration}:${row.region}`}><td>{row.projectSlug}</td><td>{configurationNames[row.configuration]}</td><td>{priceKinds.find(kind => kind.value === row.region)?.label}</td><td>{row.price.toLocaleString('ru-RU')}</td></tr>)}</tbody></table></div><button type="button" disabled={busy} onClick={() => void save()} className="self-start rounded-lg border px-4 py-2">{busy ? 'Загрузка…' : `Загрузить ${rows.length} цен`}</button></>}
   </section>
 }
