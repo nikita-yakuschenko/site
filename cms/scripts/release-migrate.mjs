@@ -86,7 +86,8 @@ try {
     if (violations.length) fail(`Миграция ${name} несовместима с откатом на предыдущий образ (${violations.join('; ')}).`)
   }
 
-  const migrated = await run('npm', ['run', 'migrate', '--silent'])
+  // npm run migrate --silent в read-only контейнере завершался с кодом 0 и не записывал миграцию.
+  const migrated = await run(process.execPath, ['node_modules/payload/bin.js', 'migrate'])
   if (/would you like to proceed|data loss will occur/i.test(migrated.output)) {
     fail('Payload запросил интерактивное подтверждение и не применил миграцию.')
   }
