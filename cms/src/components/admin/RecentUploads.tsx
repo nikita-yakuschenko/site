@@ -12,6 +12,7 @@ export function RecentUploads({ files }: { files: Upload[] }) {
   const table = useDataPage(files)
   return <DataTableFrame page={table.page} pageCount={table.pageCount} pageSize={table.pageSize} onPage={table.setPage} onPageSize={table.setPageSize}>
     <Table>
+      <colgroup><col className="w-[38%]" /><col className="w-[42%]" /><col className="w-[20%]" /></colgroup>
       <TableHeader><TableRow>
         <TableHead className="pl-4">Название</TableHead>
         <TableHead>Файл</TableHead>

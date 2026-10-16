@@ -49,13 +49,14 @@
 .avgst-shell .collection-list .table a { color: var(--foreground); text-decoration: none; }
 .avgst-shell .collection-list .table a:hover { text-decoration: underline; }
 
-/* Data tables keep one row divider. Cell grids are not part of the shadcn table. */
-.avgst-shell [data-slot="table"] { border-collapse: collapse; }
+/* Column widths stay on the header. Page content must not resize them. */
+.avgst-shell [data-slot="table"] { border-collapse: collapse; table-layout: fixed; }
 .avgst-shell [data-slot="table-head"],
 .avgst-shell [data-slot="table-cell"] {
-  width: auto;
   border-width: 0;
   border-bottom: 1px solid var(--border);
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .avgst-shell [data-slot="table-body"] [data-slot="table-row"]:last-child { border-bottom-width: 0; }
 .avgst-shell [data-slot="table-body"] [data-slot="table-row"]:last-child [data-slot="table-cell"] { border-bottom: 0; }

@@ -58,6 +58,7 @@ export function PriceImport() {
     {rows.length > 0 && <>
       <DataTableFrame page={preview.page} pageCount={preview.pageCount} pageSize={preview.pageSize} onPage={preview.setPage} onPageSize={preview.setPageSize}>
         <Table>
+          <colgroup><col className="w-[28%]" /><col className="w-[28%]" /><col className="w-[28%]" /><col className="w-[16%]" /></colgroup>
           <TableHeader><TableRow>
             <TableHead className="pl-4">Проект</TableHead>
             <TableHead>Комплектация</TableHead>

@@ -31,10 +31,11 @@ export function PagesIndex({ siteUrl, pages }: { siteUrl: string; pages: Page[] 
     </div>
     <DataTableFrame page={table.page} pageCount={table.pageCount} pageSize={table.pageSize} onPage={table.setPage} onPageSize={table.setPageSize}>
       <Table>
-        <TableHeader><TableRow><TableHead className="pl-4">Название</TableHead><TableHead>Адрес</TableHead><TableHead>Тип</TableHead><TableHead className="w-12"><span className="sr-only">Открыть</span></TableHead></TableRow></TableHeader>
+        <colgroup><col className="w-[34%]" /><col className="w-[42%]" /><col className="w-[18%]" /><col className="w-[6%]" /></colgroup>
+        <TableHeader><TableRow><TableHead className="pl-4">Название</TableHead><TableHead>Адрес</TableHead><TableHead>Тип</TableHead><TableHead><span className="sr-only">Открыть</span></TableHead></TableRow></TableHeader>
         <TableBody>
           {table.rows.map(item => <TableRow key={item.route}>
-            <TableCell className="h-12 max-w-md pl-4 whitespace-normal">
+            <TableCell className="h-12 pl-4">
               <Link className="block py-1 font-medium underline-offset-4 hover:underline" href={`/collections/pages/${item.id}`}>{item.title}</Link>
             </TableCell>
             <TableCell className="text-muted-foreground">{item.route}</TableCell>

@@ -14,6 +14,7 @@ export function PricesTable({ rows }: { rows: PriceTableRow[] }) {
   const table = useDataPage(rows)
   return <DataTableFrame page={table.page} pageCount={table.pageCount} pageSize={table.pageSize} onPage={table.setPage} onPageSize={table.setPageSize}>
     <Table>
+      <colgroup><col className="w-[12%]" /><col className="w-[18%]" />{priceKindsInForm.map(kind => <col key={kind.value} className="w-[14%]" />)}</colgroup>
       <TableHeader><TableRow>
         <TableHead className="pl-4">Код проекта</TableHead>
         <TableHead>Название проекта</TableHead>
