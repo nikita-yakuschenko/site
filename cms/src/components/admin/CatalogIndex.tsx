@@ -86,7 +86,7 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
   const initial = useSearchParams()
   const [search, setSearch] = useState(initial.get('q') ?? '')
   const [recordType, setRecordType] = useState<'project' | 'ready-home'>(initial.get('tab') === 'ready' ? 'ready-home' : 'project')
-  const [facets, setFacets] = useState(() => facetsFrom(initial))
+  const [facets, setFacets] = useState<typeof emptyFacets>(() => facetsFrom(initial))
   const [removing, setRemoving] = useState<Project | null>(null)
   const [busy, setBusy] = useState(false)
   const router = useRouter()
