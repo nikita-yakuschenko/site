@@ -53,7 +53,7 @@ function headersOf(field: Element) {
 
 // Counts sections or blocks that differ from the published version and offers a reset
 export function UnpublishedChanges() {
-  const { id, hasPublishedDoc, collectionSlug } = useDocumentInfo()
+  const { id, hasPublishedDoc, collectionSlug, lastUpdateTime } = useDocumentInfo()
   const { getData } = useForm()
   const modified = useFormModified()
   const fields = useFormFields(([state]) => state)
@@ -62,13 +62,14 @@ export function UnpublishedChanges() {
   const [confirming, setConfirming] = useState(false)
   const [busy, setBusy] = useState(false)
 
-  // Refetch after every save or publish
+  // После публикации форма уже чистая, а ответ сервера приходит следом.
+  // lastUpdateTime меняется, когда сохранение закончилось, и тогда берём опубликованную версию заново.
   useEffect(() => {
     if (!id || !hasPublishedDoc || modified) return
     const controller = new AbortController()
-    fetch(`/api/${collectionSlug}/${id}?depth=0`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(setPublished).catch(() => {})
+    fetch(`/api/${collectionSlug}/${id}?depth=0&draft=false`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(setPublished).catch(() => {})
     return () => controller.abort()
-  }, [id, hasPublishedDoc, modified, collectionSlug])
+  }, [id, hasPublishedDoc, modified, collectionSlug, lastUpdateTime])
 
   // Nested blocks mount only when expanded, so re-mark after DOM changes
   const [domVersion, setDomVersion] = useState(0)
