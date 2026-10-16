@@ -1,18 +1,14 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { IconCircleCheck, IconFileSpreadsheet, IconLoader2, IconUpload } from '@tabler/icons-react'
 import { mergePriceRows, parsePriceFile, type PriceInput } from '../../config/price-import'
 import type { MarketingChoice, MarketingIssue } from '../../config/marketing-prices'
-import { configurationNames } from '../../../../src/lib/catalog/configuration-rules'
-import { priceKinds } from '../../config/price-kinds'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Button } from '../ui/button'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { CodeBlock, CodeBlockActions, CodeBlockContent, CodeBlockCopyButton, CodeBlockHeader, CodeBlockTitle } from '../ui/code-block'
 import { Trace, TraceCollapsible, TraceCollapsibleContent, TraceCollapsibleTrigger, TraceDescription, TraceIcon, TraceLine, TraceTitle } from '../ui/trace'
-import { DataTableFrame, useDataPage } from './DataTable'
 
 type PriceReport = { file: string; error?: string; unmatched: string[]; issues: MarketingIssue[]; layouts: MarketingChoice[]; ready: number; note?: string }
 type Preview = { rows: PriceInput[]; choices: MarketingChoice[]; unmatched: string[]; issues: MarketingIssue[] }
@@ -43,7 +39,7 @@ export function PriceImport() {
   const [logOpen, setLogOpen] = useState(false)
   const [drag, setDrag] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
-  const preview = useDataPage(rows)
+  const logPane = useRef<HTMLDivElement>(null)
   const missing = reports.reduce((sum, report) => sum + report.unmatched.length, 0)
   const failed = reports.filter(report => report.error).length
   const skipped = reports.reduce((sum, report) => sum + report.issues.length, 0)
@@ -52,6 +48,11 @@ export function PriceImport() {
     : busy
       ? rows.length ? 'Записываем цены' : 'Проверяем прайс'
       : [rows.length ? `К записи ${countLabel(rows.length, 'цена', 'цены', 'цен')}.` : reports.length ? 'К записи нет ни одной цены.' : '', skipped ? `${countLabel(skipped, 'проект пропущен', 'проекта пропущены', 'проектов пропущены')}.` : '', missing ? `${countLabel(missing, 'проект', 'проекта', 'проектов')} нет в каталоге.` : '', failed ? `${countLabel(failed, 'файл не прочитан', 'файла не прочитаны', 'файлов не прочитаны')}.` : ''].filter(Boolean).join(' ')
+
+  useEffect(() => {
+    const pane = logPane.current
+    if (pane) pane.scrollTop = pane.scrollHeight
+  }, [reports, reading, saved, busy, message])
 
   async function readMarketing(file: File): Promise<Preview> {
     const response = await fetch('/api/project-prices/preview-marketing', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ filename: file.name, file: await fileBase64(file) }) })
@@ -130,7 +131,7 @@ export function PriceImport() {
     </div>
     <input ref={fileInput} type="file" multiple className="hidden" accept=".csv,.json,.xlsx" disabled={busy} aria-label="Файлы прайса" onChange={event => { void take(event.target.files || []); event.target.value = '' }} />
     <Dialog open={logOpen} onOpenChange={setLogOpen}>
-      <DialogContent className="shadcn-surface flex max-h-[min(40rem,calc(100%-2rem))] flex-col overflow-hidden sm:max-w-2xl">
+      <DialogContent style={{ display: 'flex' }} className="shadcn-surface h-[36rem] max-h-[calc(100%-2rem)] w-full max-w-[calc(100%-2rem)] flex-col overflow-hidden sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Загрузка прайса</DialogTitle>
           <DialogDescription>{saved || outcome || 'Перетащите один или несколько файлов прайса'}</DialogDescription>
@@ -138,10 +139,8 @@ export function PriceImport() {
         <div className={`flex items-center justify-center gap-3 rounded-xl border px-4 py-4 text-center ${drag ? 'ring-3 ring-ring/50' : ''}`} onDragEnter={event => { event.preventDefault(); setDrag(true) }} onDragOver={event => { event.preventDefault(); setDrag(true) }} onDragLeave={event => { if (event.currentTarget.contains(event.relatedTarget as Node)) return; setDrag(false) }} onDrop={event => { event.preventDefault(); setDrag(false); if (!busy) void take(event.dataTransfer.files) }}>
           <Button type="button" variant="outline" disabled={busy} onClick={() => fileInput.current?.click()}><IconUpload />{busy ? 'Обработка…' : 'Выбрать файлы'}</Button>
         </div>
-        <div className="min-h-0 overflow-y-auto">
+        <div ref={logPane} className="price-log min-h-0 flex-1 overflow-y-auto">
           <Trace>
-            {busy && <TraceLine status="running"><TraceIcon><IconLoader2 className="animate-spin" /></TraceIcon><TraceTitle>{reading ? `Читаем «${reading}»` : rows.length ? 'Записываем цены' : 'Проверяем прайс'}</TraceTitle></TraceLine>}
-            {saved && <TraceLine><TraceIcon><IconCircleCheck /></TraceIcon><TraceTitle>{saved}</TraceTitle></TraceLine>}
             {reports.map((report, index) => {
               const detail = report.note || report.error || [countLabel(report.ready, 'цена к записи', 'цены к записи', 'цен к записи'), report.issues.length ? `${report.issues.length} пропущено` : '', report.unmatched.length ? `${report.unmatched.length} нет в каталоге` : ''].filter(Boolean).join(' · ')
               const problem = Boolean(report.error || report.issues.length || report.unmatched.length)
@@ -168,6 +167,8 @@ export function PriceImport() {
                 </TraceCollapsibleContent>
               </TraceCollapsible>
             })}
+            {busy && <TraceLine status="running"><TraceIcon><IconLoader2 className="animate-spin" /></TraceIcon><TraceTitle>{reading ? `Читаем «${reading}»` : rows.length ? 'Записываем цены' : 'Проверяем прайс'}</TraceTitle></TraceLine>}
+            {saved && !busy && <TraceLine><TraceIcon><IconCircleCheck /></TraceIcon><TraceTitle>{saved}</TraceTitle></TraceLine>}
           </Trace>
         </div>
         {message && <p role="status" className="text-sm">{message}</p>}
@@ -177,25 +178,5 @@ export function PriceImport() {
         </DialogFooter>
       </DialogContent>
     </Dialog>
-    {rows.length > 0 && <>
-      <DataTableFrame page={preview.page} pageCount={preview.pageCount} pageSize={preview.pageSize} onPage={preview.setPage} onPageSize={preview.setPageSize}>
-        <Table>
-          <colgroup><col className="w-[28%]" /><col className="w-[28%]" /><col className="w-[28%]" /><col className="w-[16%]" /></colgroup>
-          <TableHeader><TableRow>
-            <TableHead className="pl-4">Проект</TableHead>
-            <TableHead>Комплектация</TableHead>
-            <TableHead>Тип цены</TableHead>
-            <TableHead className="pr-4 text-right">Цена, ₽</TableHead>
-          </TableRow></TableHeader>
-          <TableBody>{preview.rows.map(row => <TableRow key={`${row.projectId || row.projectSlug}:${row.configuration}:${row.region}`}>
-            <TableCell className="pl-4">{row.label || row.projectSlug}</TableCell>
-            <TableCell>{configurationNames[row.configuration]}</TableCell>
-            <TableCell>{priceKinds.find(kind => kind.value === row.region)?.label}</TableCell>
-            <TableCell className="pr-4 text-right tabular-nums">{row.price.toLocaleString('ru-RU')}</TableCell>
-          </TableRow>)}</TableBody>
-        </Table>
-      </DataTableFrame>
-      <Button type="button" className="self-start" disabled={busy} onClick={() => void save()}>{busy ? 'Обновление…' : `Обновить ${countLabel(rows.length, 'цену', 'цены', 'цен')}`}</Button>
-    </>}
   </div>
 }
