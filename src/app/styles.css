@@ -6428,6 +6428,7 @@ a {
   .grid-3 .card .card__line .specs {
     flex: 1 1 auto;
     justify-content: flex-end;
+    gap: 4px 8px;
     min-width: 0;
     margin: 0;
   }
