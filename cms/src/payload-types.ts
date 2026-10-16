@@ -526,9 +526,6 @@ export interface Project {
   id: number;
   recordType: 'project' | 'ready-home';
   slug: string;
-  /**
-   * Код товара. Назначается при создании и больше не меняется.
-   */
   code?: string | null;
   blockOrder?:
     | {

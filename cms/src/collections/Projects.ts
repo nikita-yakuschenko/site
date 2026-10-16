@@ -101,7 +101,7 @@ export const Projects: CollectionConfig = {
       { name: 'recordType', label: 'Тип записи', type: 'select', required: true, defaultValue: 'project', options: [{ label: 'Проект дома', value: 'project' }, { label: 'Готовый дом', value: 'ready-home' }] },
       { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
     ] },
-    { name: 'code', label: 'Код', type: 'text', unique: true, index: true, admin: { readOnly: true, position: 'sidebar', description: 'Код товара. Назначается при создании и больше не меняется.' } },
+    { name: 'code', label: 'Код', type: 'text', unique: true, index: true, admin: { hidden: true } },
     { name: 'preview', type: 'ui', admin: { position: 'sidebar', components: { Field: './components/admin/PagePreviewField#ProjectPreviewField' } } },
     { name: 'blockOrder', label: 'Порядок блоков', type: 'json', validate: (value: unknown) => value == null || validProjectOrder(value) ? true : 'Порядок должен содержать все блоки без повторений', admin: { components: { Field: './components/admin/ProjectBlockOrder#ProjectBlockOrder' } } },
     { type: 'collapsible', label: 'Главный экран', fields: [
