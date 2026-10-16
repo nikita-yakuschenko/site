@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { redirect } from 'next/navigation'
 import type { AdminViewServerProps } from 'payload'
 import { structure } from '../../config/structure'
@@ -23,7 +24,7 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
     {view === 'sampling' && <p className="max-w-2xl text-sm text-muted-foreground">{item.description}</p>}
     {view === 'integrations' && <div className="rounded-xl border p-4 flex flex-col gap-3"><h2 className="text-lg font-semibold">Передача заявок</h2><p className="text-sm text-muted-foreground">Формы передают данные общему обработчику. Здесь выбирается тестовый режим или отправка через API / вебхук.</p><Link href="/globals/lead-delivery">Настроить отправку заявок</Link><Link href="/collections/lead-submissions">Посмотреть отправки форм</Link></div>}
     {view === 'pages' && pages && <PagesIndex siteUrl={siteUrl} pages={pages.docs} />}
-    {view === 'catalog' && projects && <CatalogIndex siteUrl={siteUrl} projects={projects.docs} />}
+    {view === 'catalog' && projects && <Suspense><CatalogIndex siteUrl={siteUrl} projects={projects.docs} /></Suspense>}
   </div>
 }
 

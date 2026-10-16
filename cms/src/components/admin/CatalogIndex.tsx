@@ -1,9 +1,9 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import type { Project } from '../../payload-types'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { IconExternalLink, IconSearch, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus } from '@tabler/icons-react'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
@@ -17,6 +17,24 @@ import { DataTableFrame, useDataPage } from './DataTable'
 
 const seriesLabels = { panel: 'Панельные', barn: 'Барнхаусы', classic: 'Классические', modular: 'Модульные', aframe: 'А-фрейм' } as const
 const emptyFacets = { status: [] as string[], tech: [] as string[], series: [] as string[], floors: [] as number[], bedrooms: [] as number[], bathrooms: [] as number[], areaMin: '', areaMax: '' }
+
+function paramList(params: { get(name: string): string | null }, key: string) {
+  return params.get(key)?.split(',').map(item => item.trim()).filter(Boolean) ?? []
+}
+
+function facetsFrom(params: { get(name: string): string | null }) {
+  const numbers = (key: string) => paramList(params, key).map(Number).filter(value => Number.isInteger(value))
+  return {
+    status: paramList(params, 'status').filter(value => value === 'published' || value === 'draft'),
+    tech: paramList(params, 'tech').filter(value => value === 'Панельно-каркасный' || value === 'Модульный'),
+    series: paramList(params, 'series'),
+    floors: numbers('floors'),
+    bedrooms: numbers('bedrooms'),
+    bathrooms: numbers('bathrooms'),
+    areaMin: params.get('areaMin') ?? '',
+    areaMax: params.get('areaMax') ?? '',
+  }
+}
 
 function inRange(value: number | null | undefined, min: string, max: string) {
   const bound = (raw: string) => raw.trim() === '' ? null : Number(raw.replace(/\s/g, ''))
@@ -65,9 +83,10 @@ function RangeFilter({ title, min, max, onMin, onMax }: { title: string; min: st
 }
 
 export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects: Project[] }) {
-  const [search, setSearch] = useState('')
-  const [recordType, setRecordType] = useState<'project' | 'ready-home'>('project')
-  const [facets, setFacets] = useState(emptyFacets)
+  const initial = useSearchParams()
+  const [search, setSearch] = useState(initial.get('q') ?? '')
+  const [recordType, setRecordType] = useState<'project' | 'ready-home'>(initial.get('tab') === 'ready' ? 'ready-home' : 'project')
+  const [facets, setFacets] = useState(() => facetsFrom(initial))
   const [removing, setRemoving] = useState<Project | null>(null)
   const [busy, setBusy] = useState(false)
   const router = useRouter()
@@ -99,6 +118,23 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
   })
   const table = useDataPage(filtered)
   const tune = (next: Partial<typeof emptyFacets>) => { setFacets(current => ({ ...current, ...next })); table.setPage(0) }
+  useEffect(() => {
+    const params = new URLSearchParams()
+    if (recordType === 'ready-home') params.set('tab', 'ready')
+    if (search.trim()) params.set('q', search.trim())
+    const put = (key: string, values: Array<string | number>) => { if (values.length) params.set(key, values.join(',')) }
+    put('status', facets.status)
+    put('tech', facets.tech)
+    put('series', facets.series)
+    put('floors', facets.floors)
+    put('bedrooms', facets.bedrooms)
+    put('bathrooms', facets.bathrooms)
+    if (facets.areaMin.trim()) params.set('areaMin', facets.areaMin.trim())
+    if (facets.areaMax.trim()) params.set('areaMax', facets.areaMax.trim())
+    const next = params.toString()
+    if (next === window.location.search.replace(/^\?/, '')) return
+    window.history.replaceState(window.history.state, '', `${window.location.pathname}${next ? `?${next}` : ''}${window.location.hash}`)
+  }, [recordType, search, facets])
   const filtersOn = facets.status.length + facets.tech.length + facets.series.length + facets.floors.length + facets.bedrooms.length + facets.bathrooms.length > 0 || [facets.areaMin, facets.areaMax].some(Boolean)
   const seriesOrder = ['panel', 'barn', 'classic', 'modular', 'aframe', 'none']
   const seriesOptions = [...new Set(inTab.map(project => project.series || 'none'))].sort((a, b) => seriesOrder.indexOf(a) - seriesOrder.indexOf(b)).map(value => ({ value, label: value === 'none' ? 'Без серии' : seriesLabels[value as keyof typeof seriesLabels] }))
