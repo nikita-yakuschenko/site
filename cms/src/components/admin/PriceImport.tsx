@@ -123,20 +123,21 @@ export function PriceImport() {
   return <div className="flex flex-col gap-4">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <h1 className="text-2xl font-semibold tracking-tight">Цены</h1>
-      <Button variant="outline" asChild><a href="data:text/csv;charset=utf-8,projectSlug%3Bconfiguration%3Bregion%3Bprice%0Abarnhouse-113%3Bstandard%3Bnn%3B5750000" download="price-template.csv">Шаблон CSV</a></Button>
-    </div>
-    <div className={`flex min-h-28 flex-col items-center justify-center gap-3 rounded-xl border bg-card px-4 py-8 text-center ${drag ? 'ring-3 ring-ring/50' : ''}`} onDragEnter={event => { event.preventDefault(); setDrag(true) }} onDragOver={event => { event.preventDefault(); setDrag(true) }} onDragLeave={event => { if (event.currentTarget.contains(event.relatedTarget as Node)) return; setDrag(false) }} onDrop={event => { event.preventDefault(); setDrag(false); if (!busy) void take(event.dataTransfer.files) }}>
-      <p className="text-sm text-muted-foreground">Перетащите один или несколько файлов прайса</p>
-      <Button type="button" variant="outline" disabled={busy} onClick={() => fileInput.current?.click()}><IconUpload />{busy ? 'Обработка…' : 'Выбрать файлы'}</Button>
+      <div className="flex flex-wrap gap-2">
+        <Button type="button" variant="outline" onClick={() => setLogOpen(true)}><IconUpload />Выбрать файлы</Button>
+        <Button variant="outline" asChild><a href="data:text/csv;charset=utf-8,projectSlug%3Bconfiguration%3Bregion%3Bprice%0Abarnhouse-113%3Bstandard%3Bnn%3B5750000" download="price-template.csv">Шаблон CSV</a></Button>
+      </div>
     </div>
     <input ref={fileInput} type="file" multiple className="hidden" accept=".csv,.json,.xlsx" disabled={busy} aria-label="Файлы прайса" onChange={event => { void take(event.target.files || []); event.target.value = '' }} />
-    {(reports.length > 0 || saved) && !logOpen && <Button type="button" variant="outline" className="self-start" onClick={() => setLogOpen(true)}>Журнал загрузки</Button>}
     <Dialog open={logOpen} onOpenChange={setLogOpen}>
       <DialogContent className="shadcn-surface flex max-h-[min(40rem,calc(100%-2rem))] flex-col overflow-hidden sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>Загрузка прайса</DialogTitle>
-          <DialogDescription>{saved || outcome}</DialogDescription>
+          <DialogDescription>{saved || outcome || 'Перетащите один или несколько файлов прайса'}</DialogDescription>
         </DialogHeader>
+        <div className={`flex items-center justify-center gap-3 rounded-xl border px-4 py-4 text-center ${drag ? 'ring-3 ring-ring/50' : ''}`} onDragEnter={event => { event.preventDefault(); setDrag(true) }} onDragOver={event => { event.preventDefault(); setDrag(true) }} onDragLeave={event => { if (event.currentTarget.contains(event.relatedTarget as Node)) return; setDrag(false) }} onDrop={event => { event.preventDefault(); setDrag(false); if (!busy) void take(event.dataTransfer.files) }}>
+          <Button type="button" variant="outline" disabled={busy} onClick={() => fileInput.current?.click()}><IconUpload />{busy ? 'Обработка…' : 'Выбрать файлы'}</Button>
+        </div>
         <div className="min-h-0 overflow-y-auto">
           <Trace>
             {busy && <TraceLine status="running"><TraceIcon><IconLoader2 className="animate-spin" /></TraceIcon><TraceTitle>{reading ? `Читаем «${reading}»` : rows.length ? 'Записываем цены' : 'Проверяем прайс'}</TraceTitle></TraceLine>}
