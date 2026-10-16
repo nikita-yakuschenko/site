@@ -10,6 +10,7 @@ const RUB_PER_M2: Record<CatalogSeries, number> = {
   barn: 50_000,
   panel: 52_000,
   classic: 48_000,
+  aframe: 52_000,
 };
 
 export function resolveProjectPrice(project: CatalogProject): number | null {

@@ -15,7 +15,7 @@ import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { DataTableFrame, useDataPage } from './DataTable'
 
-const seriesLabels = { panel: 'Панельные', barn: 'Барнхаусы', classic: 'Классические', modular: 'Модульные' } as const
+const seriesLabels = { panel: 'Панельные', barn: 'Барнхаусы', classic: 'Классические', modular: 'Модульные', aframe: 'А-фрейм' } as const
 const emptyFacets = { status: [] as string[], tech: [] as string[], series: [] as string[], floors: [] as number[], bedrooms: [] as number[], bathrooms: [] as number[], areaMin: '', areaMax: '' }
 
 function inRange(value: number | null | undefined, min: string, max: string) {
@@ -100,7 +100,7 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
   const table = useDataPage(filtered)
   const tune = (next: Partial<typeof emptyFacets>) => { setFacets(current => ({ ...current, ...next })); table.setPage(0) }
   const filtersOn = facets.status.length + facets.tech.length + facets.series.length + facets.floors.length + facets.bedrooms.length + facets.bathrooms.length > 0 || [facets.areaMin, facets.areaMax].some(Boolean)
-  const seriesOrder = ['panel', 'barn', 'classic', 'modular', 'none']
+  const seriesOrder = ['panel', 'barn', 'classic', 'modular', 'aframe', 'none']
   const seriesOptions = [...new Set(inTab.map(project => project.series || 'none'))].sort((a, b) => seriesOrder.indexOf(a) - seriesOrder.indexOf(b)).map(value => ({ value, label: value === 'none' ? 'Без серии' : seriesLabels[value as keyof typeof seriesLabels] }))
   return <>
     <div className="flex flex-wrap items-center justify-between gap-3">

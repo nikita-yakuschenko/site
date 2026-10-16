@@ -548,7 +548,7 @@ export interface Project {
   mobileImage?: (number | null) | Media;
   mobileImageUrl?: string | null;
   technologyBadge: 'Панельно-каркасный' | 'Модульный';
-  series?: ('panel' | 'barn' | 'classic' | 'modular') | null;
+  series?: ('panel' | 'barn' | 'classic' | 'modular' | 'aframe') | null;
   areaValue: number;
   floorsValue: number;
   bedrooms: number;

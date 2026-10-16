@@ -1,4 +1,4 @@
-export const CATALOG_SERIES = ['panel', 'barn', 'classic', 'modular'] as const
+export const CATALOG_SERIES = ['panel', 'barn', 'classic', 'modular', 'aframe'] as const
 
 export type CatalogSeries = (typeof CATALOG_SERIES)[number]
 

@@ -1716,6 +1716,7 @@ export const copy = {
   seriesBarn: "Барнхаусы",
   seriesClassic: "Классика",
   seriesPanel: "Панельно-каркасные дома",
+  seriesAframe: "А-фрейм",
   catalogCta: "Каталог",
   seoTitle: 'Авангард Строй - Строительство домов "под ключ"',
   seoDescription:
@@ -1793,11 +1794,12 @@ export function projectsInSeries(n: number): string {
 }
 
 export function seriesTitle(
-  series: "panel" | "barn" | "classic" | "modular",
+  series: "panel" | "barn" | "classic" | "modular" | "aframe",
 ): string {
   if (series === "panel") return copy.seriesPanel;
   if (series === "barn") return copy.seriesBarn;
   if (series === "classic") return copy.seriesClassic;
+  if (series === "aframe") return copy.seriesAframe;
   return copy.seriesModular;
 }
 

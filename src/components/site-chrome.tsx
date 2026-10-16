@@ -440,6 +440,7 @@ export function SiteChrome({
                 <Link href="/catalog?series=modular">{copy.seriesModular}</Link>
                 <Link href="/catalog?series=panel">{copy.seriesPanel}</Link>
                 <Link href="/catalog?series=barn">{copy.seriesBarn}</Link>
+                <Link href="/catalog?series=aframe">{copy.seriesAframe}</Link>
               </nav>
             </div>
             <div className="footer-section">

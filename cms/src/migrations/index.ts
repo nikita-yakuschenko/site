@@ -8,6 +8,7 @@ import * as migration_20261015_093000_promo_slot_action from './20261015_093000_
 import * as migration_20261015_235500_project_reactions from './20261015_235500_project_reactions';
 import * as migration_20261016_095500_special_msk_price from './20261016_095500_special_msk_price';
 import * as migration_20261016_105500_price_history from './20261016_105500_price_history';
+import * as migration_20261016_151900_aframe_series from './20261016_151900_aframe_series';
 
 export const migrations = [
   {
@@ -59,5 +60,10 @@ export const migrations = [
     up: migration_20261016_105500_price_history.up,
     down: migration_20261016_105500_price_history.down,
     name: '20261016_105500_price_history',
+  },
+  {
+    up: migration_20261016_151900_aframe_series.up,
+    down: migration_20261016_151900_aframe_series.down,
+    name: '20261016_151900_aframe_series',
   },
 ];
