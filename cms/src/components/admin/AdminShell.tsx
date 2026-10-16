@@ -8,7 +8,7 @@ import { IconExternalLink as ExternalLink, IconPhoto as Images, IconLayoutDashbo
 import type { CSSProperties, ReactNode } from 'react'
 import type { User } from '../../payload-types'
 import { structure } from '../../config/structure'
-import { IconWorld, IconFiles, IconBuildingCommunity, IconCash, IconDatabase, IconBlocks, IconForms, IconSitemap, IconPlugConnected } from '@tabler/icons-react'
+import { IconWorld, IconFiles, IconBuildingCommunity, IconCash, IconDatabase, IconFlask, IconBlocks, IconForms, IconSitemap, IconPlugConnected } from '@tabler/icons-react'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { Button } from '../ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
@@ -17,7 +17,7 @@ import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupConte
 
 export function EmptyNav() { return null }
 
-const structureIcons = { site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, prices: IconCash, registers: IconDatabase, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
+const structureIcons = { site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, prices: IconCash, registers: IconDatabase, sampling: IconFlask, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
 const collectionPath = (href: string) => href === '/structure/catalog' ? '/collections/projects' : href === '/structure/prices' ? '/collections/project-prices' : href.replace('/structure/', '/collections/')
 const navigation = [
   { title: 'Сайт', items: [{ title: 'Обзор', href: '/', icon: LayoutDashboard }, ...structure.filter(item => item.key !== 'integrations').map(item => ({ ...item, icon: structureIcons[item.key] }))] },

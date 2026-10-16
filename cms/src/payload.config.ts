@@ -43,6 +43,7 @@ export default buildConfig({
         catalog: { Component: './components/admin/StructureView#CatalogView', path: '/structure/catalog', exact: true },
         prices: { Component: './components/admin/StructureView#PricesView', path: '/structure/prices', exact: true },
         registers: { Component: './components/admin/StructureView#RegistersView', path: '/structure/registers', exact: true },
+        sampling: { Component: './components/admin/StructureView#SamplingView', path: '/structure/sampling', exact: true },
         blocks: { Component: './components/admin/StructureView#BlocksView', path: '/structure/blocks', exact: true },
         forms: { Component: './components/admin/StructureView#FormsView', path: '/structure/forms', exact: true },
         sections: { Component: './components/admin/StructureView#SectionsView', path: '/structure/sections', exact: true },

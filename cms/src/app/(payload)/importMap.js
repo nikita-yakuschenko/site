@@ -48,6 +48,7 @@ import { PagesView as PagesView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../c
 import { CatalogView as CatalogView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { PricesView as PricesView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { RegistersView as RegistersView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
+import { SamplingView as SamplingView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { BlocksView as BlocksView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { FormsView as FormsView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { SectionsView as SectionsView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
@@ -108,6 +109,7 @@ export const importMap = {
   "./components/admin/StructureView#CatalogView": CatalogView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#PricesView": PricesView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#RegistersView": RegistersView_1226fdfc491f100b8cb8d80d236e0a07,
+  "./components/admin/StructureView#SamplingView": SamplingView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#BlocksView": BlocksView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#FormsView": FormsView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#SectionsView": SectionsView_1226fdfc491f100b8cb8d80d236e0a07,
