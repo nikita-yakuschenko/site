@@ -6,7 +6,7 @@ import { IconCheck, IconLoader2 } from '@tabler/icons-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Input } from '@/components/ui/input'
 import { configurationKeys, configurationNames, isModularTechnology, type ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
-import { priceKinds, type PriceKind } from '../../config/price-kinds'
+import { priceKindsInForm, type PriceKind } from '../../config/price-kinds'
 
 type PriceDoc = { id: string; configuration: ConfigurationKey; region: PriceKind; price: number }
 type Status = 'saving' | 'saved' | undefined
@@ -79,7 +79,7 @@ export function ProjectPricesEditor() {
     <p className="text-sm text-muted-foreground">Сверху тип цены, внутри — стоимость каждой комплектации. Цена сохраняется сразу после ввода. Пустое поле — цена не задана.</p>
     {error && <p role="alert" className="text-sm">Не удалось загрузить цены. Обновите страницу.</p>}
     <Accordion type="multiple" className="flex flex-col gap-2">
-      {priceKinds.map(kind => <AccordionItem key={kind.value} value={kind.value} className="rounded-lg border bg-card px-4 last:border-b">
+      {priceKindsInForm.map(kind => <AccordionItem key={kind.value} value={kind.value} className="rounded-lg border bg-card px-4 last:border-b">
         <AccordionTrigger className="py-3 hover:no-underline">
           <span className="flex items-baseline gap-2">{kind.label}{!kind.public && <span className="text-sm font-normal text-muted-foreground">не показывается на сайте</span>}</span>
         </AccordionTrigger>
