@@ -3,8 +3,8 @@ import { IconPhoto as Images, IconPlus as Plus, IconUsers as Users, IconArrowUpR
 import type { AdminViewServerProps } from 'payload'
 import { Button } from '../ui/button'
 import { Card, CardHeader, CardTitle, CardDescription, CardContent, CardFooter } from '../ui/card'
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { EmptyState } from './EmptyState'
+import { RecentUploads } from './RecentUploads'
 
 export async function Dashboard({ initPageResult }: AdminViewServerProps) {
   const { req } = initPageResult
@@ -30,9 +30,7 @@ export async function Dashboard({ initPageResult }: AdminViewServerProps) {
       <CardFooter className="flex items-center justify-between gap-2"><span className="text-sm text-muted-foreground">{stat.description}</span><Button asChild variant="ghost" size="icon" aria-label={`Открыть: ${stat.label}`}><Link href={stat.href}><stat.icon /></Link></Button></CardFooter>
     </Card>)}</div>
     <Card className="gap-4 shadow-none"><CardHeader className="flex flex-wrap items-center justify-between gap-4"><div className="space-y-1"><CardTitle>Последние загрузки</CardTitle><CardDescription>Недавно добавленные медиафайлы</CardDescription></div><Button asChild variant="outline" size="sm"><Link href="/collections/media">Вся медиатека<ArrowUpRight /></Link></Button></CardHeader>
-      <CardContent>{recent.docs.length ? <Table><TableHeader><TableRow><TableHead>Название</TableHead><TableHead>Файл</TableHead><TableHead className="text-right">Добавлен</TableHead></TableRow></TableHeader><TableBody>{recent.docs.map(file => <TableRow key={file.id}>
-        <TableCell className="font-medium"><Link href={`/collections/media/${file.id}`} className="hover:underline">{file.title}</Link></TableCell><TableCell className="text-muted-foreground">{file.filename}</TableCell><TableCell className="text-right tabular-nums">{new Intl.DateTimeFormat('ru-RU', { dateStyle: 'medium', timeZone: 'Europe/Moscow' }).format(new Date(file.createdAt))}</TableCell>
-      </TableRow>)}</TableBody></Table> : <EmptyState icon={<Images />} title="Пока нет медиафайлов" description="Файлы, добавленные в медиатеку, появятся здесь." />}</CardContent>
+      <CardContent>{recent.docs.length ? <RecentUploads files={recent.docs.map(file => ({ id: file.id, title: file.title || file.filename || 'Файл', filename: file.filename || '', createdAt: file.createdAt }))} /> : <EmptyState icon={<Images />} title="Пока нет медиафайлов" description="Файлы, добавленные в медиатеку, появятся здесь." />}</CardContent>
     </Card>
   </div>
 }

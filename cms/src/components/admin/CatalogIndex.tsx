@@ -5,7 +5,7 @@ import Link from 'next/link'
 import type { Project } from '../../payload-types'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { IconExternalLink, IconSearch, IconChevronLeft, IconChevronRight, IconTrash, IconDots, IconPencil } from '@tabler/icons-react'
+import { IconExternalLink, IconSearch, IconTrash, IconDots, IconPencil } from '@tabler/icons-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Input } from '../ui/input'
@@ -13,10 +13,10 @@ import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { ChoiceSelect } from './ChoiceSelect'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
+import { DataTableFrame, useDataPage } from './DataTable'
 
 export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects: Project[] }) {
   const [search, setSearch] = useState('')
-  const [page, setPage] = useState(0)
   const [recordType, setRecordType] = useState('all')
   const [removing, setRemoving] = useState<Project | null>(null)
   const [busy, setBusy] = useState(false)
@@ -33,17 +33,15 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
   }
   const query = search.trim().toLocaleLowerCase('ru')
   const filtered = projects.filter(project => (recordType === 'all' || project.recordType === recordType) && `${project.name ?? ''} ${project.slug ?? ''} ${project.technologyBadge ?? ''}`.toLocaleLowerCase('ru').includes(query))
-  const lastPage = Math.max(0, Math.ceil(filtered.length / 20) - 1)
-  const currentPage = Math.min(page, lastPage)
-  const visible = filtered.slice(currentPage * 20, (currentPage + 1) * 20)
+  const table = useDataPage(filtered)
   return <>
     <div className="flex items-center justify-between gap-3"><div className="relative w-full max-w-lg">
       <IconSearch className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-      <Input aria-label="Поиск проектов" placeholder="Поиск проектов" className="pl-9" value={search} onChange={event => { setSearch(event.target.value); setPage(0) }} />
-    </div><ChoiceSelect label="Тип записи" className="w-48" value={recordType} options={{ all: 'Все записи', project: 'Проекты домов', 'ready-home': 'Готовые дома' }} onChange={value => { setRecordType(value); setPage(0) }} /><Button asChild><Link href="/collections/projects/create">Создать</Link></Button></div>
-    <div className="overflow-hidden rounded-lg border bg-card"><Table>
+      <Input aria-label="Поиск проектов" placeholder="Поиск проектов" className="pl-9" value={search} onChange={event => { setSearch(event.target.value); table.setPage(0) }} />
+    </div><ChoiceSelect label="Тип записи" className="w-48" value={recordType} options={{ all: 'Все записи', project: 'Проекты домов', 'ready-home': 'Готовые дома' }} onChange={value => { setRecordType(value); table.setPage(0) }} /><Button asChild><Link href="/collections/projects/create">Создать</Link></Button></div>
+    <DataTableFrame page={table.page} pageCount={table.pageCount} pageSize={table.pageSize} onPage={table.setPage} onPageSize={table.setPageSize}><Table>
       <TableHeader><TableRow className="hover:bg-transparent [&>th]:text-muted-foreground"><TableHead className="w-full pl-4">Название</TableHead><TableHead>Статус</TableHead><TableHead>Тип</TableHead><TableHead>Технология</TableHead><TableHead className="text-right">Площадь, м²</TableHead><TableHead className="text-right">Этажи</TableHead><TableHead className="text-right">Спальни</TableHead><TableHead className="text-right">Цена, ₽</TableHead><TableHead className="w-12 pr-4"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
-      <TableBody>{visible.map(project => { const published = project._status === 'published'; return <TableRow key={project.id}>
+      <TableBody>{table.rows.map(project => { const published = project._status === 'published'; return <TableRow key={project.id}>
         <TableCell className="h-12 pl-4"><Link className="font-medium underline-offset-4 hover:underline" href={`/collections/projects/${project.id}`}>{project.name || '[Без названия]'}</Link></TableCell>
         <TableCell><Badge variant="outline" className="gap-1.5 text-muted-foreground"><span className={`size-1.5 rounded-full ${published ? 'bg-primary' : 'bg-muted-foreground/50'}`} />{published ? 'Опубликован' : 'Черновик'}</Badge></TableCell>
         <TableCell className="text-muted-foreground">{project.recordType === 'ready-home' ? 'Готовый дом' : 'Проект дома'}</TableCell>
@@ -53,12 +51,11 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
           {published && project.slug && <DropdownMenuItem asChild><a href={`${siteUrl}/catalog/${project.slug}`} target="_blank" rel="noreferrer"><IconExternalLink />Открыть на сайте</a></DropdownMenuItem>}
           <DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onSelect={() => setRemoving(project)}><IconTrash />Удалить</DropdownMenuItem>
         </DropdownMenuContent></DropdownMenu></TableCell>
-      </TableRow> })}{visible.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={9} className="h-32 text-center text-muted-foreground">Записи не найдены</TableCell></TableRow>}</TableBody>
-    </Table></div>
+      </TableRow> })}{table.rows.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={9} className="h-24 text-center text-muted-foreground">Записи не найдены</TableCell></TableRow>}</TableBody>
+    </Table></DataTableFrame>
     <Dialog open={!!removing} onOpenChange={open => { if (!open && !busy) setRemoving(null) }}><DialogContent className="shadcn-surface">
       <DialogHeader><DialogTitle>Удалить «{removing?.name || '[Без названия]'}»?</DialogTitle><DialogDescription>Запись пропадёт из каталога и с сайта вместе с её ценами. Отменить удаление нельзя.</DialogDescription></DialogHeader>
       <DialogFooter><DialogClose asChild><Button variant="outline" disabled={busy}>Отмена</Button></DialogClose><Button variant="destructive" disabled={busy} onClick={remove}>{busy ? 'Удаление…' : 'Удалить'}</Button></DialogFooter>
     </DialogContent></Dialog>
-    <div className="flex items-center justify-between gap-3 text-sm"><span className="text-muted-foreground">{filtered.length ? `${currentPage * 20 + 1}–${Math.min((currentPage + 1) * 20, filtered.length)} из ${filtered.length}` : '0 из 0'}</span><div className="flex items-center gap-2"><Button variant="outline" size="icon" aria-label="Предыдущая страница" disabled={currentPage === 0} onClick={() => setPage(currentPage - 1)}><IconChevronLeft className="size-4" /></Button><Button variant="outline" size="icon" aria-label="Следующая страница" disabled={currentPage === lastPage} onClick={() => setPage(currentPage + 1)}><IconChevronRight className="size-4" /></Button></div></div>
   </>
 }

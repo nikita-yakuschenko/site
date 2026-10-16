@@ -1,19 +1,23 @@
 'use client'
 
 import { useRef, useState } from 'react'
-import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 import { parsePriceFile, type PriceInput } from '../../config/price-import'
 import { configurationNames } from '../../../../src/lib/catalog/configuration-rules'
 import { priceKinds } from '../../config/price-kinds'
 import { Button } from '../ui/button'
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { IconUpload } from '@tabler/icons-react'
+import { DataTableFrame, useDataPage } from './DataTable'
 
 export function PriceImport() {
+  const router = useRouter()
   const [rows, setRows] = useState<PriceInput[]>([])
   const [message, setMessage] = useState('')
   const [busy, setBusy] = useState(false)
   const fileInput = useRef<HTMLInputElement>(null)
   const [filename, setFilename] = useState('')
+  const preview = useDataPage(rows)
   async function upload(file?: File) {
     setRows([]); setMessage('')
     if (!file) return
@@ -35,17 +39,40 @@ export function PriceImport() {
       const response = await fetch('/api/project-prices/import', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ rows }) })
       const result = await response.json()
       if (!response.ok) throw new Error(result.error)
-      setMessage(`Прайс загружен. Обновлено цен: ${result.updated}.`); setRows([])
+      setMessage(`Прайс загружен. Обновлено цен: ${result.updated}.`); setRows([]); setFilename('')
+      router.refresh()
     } catch (error) { setMessage(error instanceof Error ? error.message : 'Не удалось загрузить прайс') }
     finally { setBusy(false) }
   }
-  return <section className="shadcn-surface rounded-xl border p-4 flex flex-col gap-3">
-    <div className="flex items-center justify-between gap-3"><h2 className="text-lg font-semibold">Региональный прайс</h2><Link href="/collections/project-prices">Все цены</Link></div>
-    <p className="text-sm text-muted-foreground">Загрузите CSV или JSON. Цены обновляются по проекту, комплектации и региону.</p>
-    <a href="data:text/csv;charset=utf-8,projectSlug%3Bconfiguration%3Bregion%3Bprice%0Abarnhouse-113%3Bstandard%3Bnn%3B5750000" download="price-template.csv">Скачать шаблон CSV</a>
-    <div className="flex items-center gap-3"><Button type="button" variant="outline" disabled={busy} onClick={() => fileInput.current?.click()}><IconUpload size={16} />{busy ? 'Обработка…' : 'Выбрать файл прайса'}</Button><span className="text-sm text-muted-foreground">{filename || 'CSV или JSON, до 2 МБ'}</span></div>
+  return <div className="flex flex-col gap-4">
+    <div className="flex flex-wrap items-center justify-between gap-3">
+      <h1 className="text-2xl font-semibold tracking-tight">Цены</h1>
+      <div className="flex flex-wrap items-center gap-3">
+        <Button variant="outline" asChild><a href="data:text/csv;charset=utf-8,projectSlug%3Bconfiguration%3Bregion%3Bprice%0Abarnhouse-113%3Bstandard%3Bnn%3B5750000" download="price-template.csv">Шаблон CSV</a></Button>
+        <Button type="button" variant="outline" disabled={busy} onClick={() => fileInput.current?.click()}><IconUpload />{busy ? 'Обработка…' : 'Обновить прайс'}</Button>
+        {filename && <span className="text-sm text-muted-foreground">{filename}</span>}
+      </div>
+    </div>
     <input ref={fileInput} type="file" className="hidden" accept=".csv,.json" disabled={busy} aria-label="Файл прайса" onChange={event => { void upload(event.target.files?.[0]); event.target.value = '' }} />
     {message && <p role="status" className="text-sm">{message}</p>}
-    {rows.length > 0 && <><div className="overflow-x-auto"><table className="w-full text-sm"><thead><tr><th>Проект</th><th>Комплектация</th><th>Регион</th><th>Цена, ₽</th></tr></thead><tbody>{rows.slice(0,5).map(row => <tr key={`${row.projectSlug}:${row.configuration}:${row.region}`}><td>{row.projectSlug}</td><td>{configurationNames[row.configuration]}</td><td>{priceKinds.find(kind => kind.value === row.region)?.label}</td><td>{row.price.toLocaleString('ru-RU')}</td></tr>)}</tbody></table></div><button type="button" disabled={busy} onClick={() => void save()} className="self-start rounded-lg border px-4 py-2">{busy ? 'Загрузка…' : `Загрузить ${rows.length} цен`}</button></>}
-  </section>
+    {rows.length > 0 && <>
+      <DataTableFrame page={preview.page} pageCount={preview.pageCount} pageSize={preview.pageSize} onPage={preview.setPage} onPageSize={preview.setPageSize}>
+        <Table>
+          <TableHeader><TableRow>
+            <TableHead className="pl-4">Проект</TableHead>
+            <TableHead>Комплектация</TableHead>
+            <TableHead>Тип цены</TableHead>
+            <TableHead className="pr-4 text-right">Цена, ₽</TableHead>
+          </TableRow></TableHeader>
+          <TableBody>{preview.rows.map(row => <TableRow key={`${row.projectSlug}:${row.configuration}:${row.region}`}>
+            <TableCell className="pl-4">{row.projectSlug}</TableCell>
+            <TableCell>{configurationNames[row.configuration]}</TableCell>
+            <TableCell>{priceKinds.find(kind => kind.value === row.region)?.label}</TableCell>
+            <TableCell className="pr-4 text-right tabular-nums">{row.price.toLocaleString('ru-RU')}</TableCell>
+          </TableRow>)}</TableBody>
+        </Table>
+      </DataTableFrame>
+      <Button type="button" className="self-start" disabled={busy} onClick={() => void save()}>{busy ? 'Загрузка…' : `Загрузить ${rows.length} цен`}</Button>
+    </>}
+  </div>
 }
