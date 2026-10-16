@@ -28,11 +28,11 @@ export const marketingPricePreviewEndpoint: Endpoint = {
         byKey.set(key, project.slug)
       }
       const unmatched = parsed.choices.filter(choice => !byKey.has(priceNameKey(choice.projectName))).map(choice => choice.projectName)
-      const rows = unmatched.length ? [] : parsePriceRows(parsed.rows.flatMap(row => {
+      const matched = parsed.rows.flatMap(row => {
         const projectSlug = byKey.get(priceNameKey(row.projectName))
         return projectSlug ? [{ projectSlug, configuration: row.configuration, region: row.region, price: row.price }] : []
-      }))
-      return Response.json({ rows, choices: parsed.choices, unmatched })
+      })
+      return Response.json({ rows: matched.length ? parsePriceRows(matched) : [], choices: parsed.choices, unmatched })
     } catch (error) {
       return Response.json({ error: error instanceof Error ? error.message : 'Не удалось прочитать файл' }, { status: 400 })
     }

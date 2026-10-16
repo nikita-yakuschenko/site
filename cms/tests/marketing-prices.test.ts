@@ -2,6 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { configurationKeys, priceConfigurationKeys } from '../../src/lib/catalog/configuration-rules'
 import { marketingFileKind, parseMarketingGrid, priceNameKey } from '../src/config/marketing-prices'
+import { mergePriceRows, type PriceInput } from '../src/config/price-import'
 
 const kits = [null, null, null, null, null, 'Старт', 'Базовая', 'Проектная', 'Под ключ']
 
@@ -60,6 +61,12 @@ test('a dealer file keeps the start price and the dealer special', () => {
   ])
   assert.equal(marketingFileKind('16. Дилер. МД. Маркетинг. Октябрь 2026.xlsx').modular, true)
   assert.equal(priceNameKey('Барн 90 (23,8)'), 'барнхаус 90')
+})
+
+test('later price file replaces the same project price', () => {
+  const first: PriceInput[] = [{ projectSlug: 'barn-46', configuration: 'standard', region: 'nn', price: 100 }]
+  const second: PriceInput[] = [{ projectSlug: 'barn-46', configuration: 'standard', region: 'nn', price: 200 }, { projectSlug: 'barn-46', configuration: 'standard', region: 'msk', price: 300 }]
+  assert.deepEqual(mergePriceRows([first, second]), [second[0], second[1]])
 })
 
 test('modular start stays in the price list and off the public kits', () => {

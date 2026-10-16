@@ -14,6 +14,12 @@ export function parsePriceRows(value: unknown): PriceInput[] {
   })
 }
 
+export function mergePriceRows(groups: PriceInput[][]) {
+  const seen = new Map<string, PriceInput>()
+  for (const rows of groups) for (const row of rows) seen.set(`${row.projectSlug}:${row.configuration}:${row.region}`, row)
+  return [...seen.values()]
+}
+
 export function parsePriceFile(text: string): PriceInput[] {
   const source = text.replace(/^\uFEFF/, '').trim()
   if (source.startsWith('[') || source.startsWith('{')) {
