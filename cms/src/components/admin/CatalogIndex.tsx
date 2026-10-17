@@ -195,11 +195,11 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       <FacetFilter title="Санузлы" options={numbers(project => project.bathrooms).map(value => ({ value, label: String(value) }))} selected={facets.bathrooms} onChange={bathrooms => tune({ bathrooms })} />
       {filtersOn && <Button type="button" variant="ghost" size="sm" className="h-8" onClick={() => tune(emptyFacets)}>Сбросить</Button>}
     </div>
-    <DataTableFrame page={table.page} pageCount={table.pageCount} pageSize={table.pageSize} onPage={table.setPage} onPageSize={table.setPageSize}><Table className="w-max" style={{ minWidth: 'calc(220ch + 4.5rem)' }}>
-      {/* Ширина зафиксирована и не зависит от строк на экране. Название — 50 знаков, технология — 40, числа — до миллиона, действия — под кнопку. */}
+    <DataTableFrame page={table.page} pageCount={table.pageCount} pageSize={table.pageSize} onPage={table.setPage} onPageSize={table.setPageSize}><Table>
+      {/* Доли ширины окна, не содержимого страницы: технология на «Панельно-каркасная», статус на бейдж, площадь на заголовок. */}
       <colgroup>
-        <col style={{ width: '50ch' }} /><col style={{ width: '28ch' }} /><col style={{ width: '40ch' }} />
-        <col style={{ width: '16ch' }} /><col style={{ width: '14ch' }} /><col style={{ width: '14ch' }} /><col style={{ width: '16ch' }} /><col style={{ width: '14ch' }} /><col style={{ width: '14ch' }} /><col style={{ width: '14ch' }} /><col style={{ width: '4.5rem' }} />
+        <col style={{ width: '19%' }} /><col style={{ width: '12%' }} /><col style={{ width: '14%' }} />
+        <col style={{ width: '9%' }} /><col style={{ width: '6%' }} /><col style={{ width: '7%' }} /><col style={{ width: '10%' }} /><col style={{ width: '6%' }} /><col style={{ width: '5%' }} /><col style={{ width: '7%' }} /><col style={{ width: '5%' }} />
       </colgroup>
       <TableHeader><TableRow className="hover:bg-transparent [&>th]:text-muted-foreground"><TableHead className="pl-4">Название</TableHead><TableHead>Статус</TableHead><TableHead>Технология</TableHead><TableHead className="text-right">Площадь, м²</TableHead><TableHead className="text-right">Этажи</TableHead><TableHead className="text-right">Спальни</TableHead><TableHead className="text-right">Просмотры</TableHead><TableHead className="text-right">Лайки</TableHead><TableHead className="text-right">Шеры</TableHead><TableHead className="text-right">Заявки</TableHead><TableHead className="pr-4"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
       <TableBody>{table.rows.map(project => { const published = project._status === 'published'; return <TableRow key={project.id}>
