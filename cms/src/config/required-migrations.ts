@@ -12,4 +12,5 @@ export const requiredMigrations = [
   '20261016_105500_price_history',
   '20261016_151900_aframe_series',
   '20261016_174800_special_dealer_price',
+  '20261017_201500_project_views',
 ]
