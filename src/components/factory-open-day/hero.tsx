@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { OpenDayBookButton } from './form'
 import { OpenDayArrow, OpenDayRules } from './rules'
 import { OpenDayThemeToggle } from './theme'
 
@@ -39,7 +40,7 @@ export function FactoryOpenDayHero() {
               </ul>
             </div>
             <div className="ags-hero__act">
-              <a className="ags-cta" href="#ags-form">Записаться <OpenDayArrow /></a>
+              <OpenDayBookButton className="ags-cta">Записаться <OpenDayArrow /></OpenDayBookButton>
               <p className="ags-hero__free">Бесплатно, по записи</p>
             </div>
           </div>

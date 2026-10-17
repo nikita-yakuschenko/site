@@ -1,13 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { isValidName, isValidRuMobile, maskPhone, phoneE164, sanitizeName } from '../../lib/phone'
 import { OpenDayArrow, OpenDayRules } from './rules'
 
+const OPEN_BOOKING = 'ags-open-booking'
+
+export function OpenDayBookButton({ className, children }: { className: string; children: React.ReactNode }) {
+  return <button type="button" className={className} aria-haspopup="dialog" aria-controls="ags-booking-dialog" onClick={() => window.dispatchEvent(new Event(OPEN_BOOKING))}>{children}</button>
+}
+
 export function FactoryOpenDayForm() {
   const [phone, setPhone] = useState('+7')
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
   const [invalid, setInvalid] = useState<{ name?: boolean; phone?: boolean; email?: boolean; consent?: boolean }>({})
+  const [open, setOpen] = useState(false)
+  const [hold, setHold] = useState(0)
+  const slot = useRef<HTMLDivElement>(null)
+  const dialog = useRef<HTMLDialogElement>(null)
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -47,6 +59,55 @@ export function FactoryOpenDayForm() {
     }
   }
 
+  function openDialog() {
+    const height = slot.current?.firstElementChild?.getBoundingClientRect().height ?? 0
+    if (height) setHold(height)
+    setOpen(true)
+  }
+
+  useEffect(() => {
+    const onOpen = () => openDialog()
+    window.addEventListener(OPEN_BOOKING, onOpen)
+    return () => window.removeEventListener(OPEN_BOOKING, onOpen)
+  })
+
+  useEffect(() => {
+    const node = dialog.current
+    if (!node) return
+    if (open) {
+      if (!node.open) node.showModal()
+      node.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true })
+    } else if (node.open) node.close()
+  }, [open])
+
+  const fields = status === 'ok' ? <div className="ags-form ags-form--success" role="status">
+    <h3>Спасибо за регистрацию!</h3>
+    <p className="ags-form__status">Программу мероприятия и напоминание накануне пришлём на почту, указанную при регистрации.</p>
+  </div> : <form className="ags-form" onSubmit={onSubmit} noValidate>
+    <div className="ags-field">
+      <label className="ags-field__label" htmlFor="ags-name">Имя</label>
+      <input className="ags-field__input" id="ags-name" name="name" type="text" autoComplete="name" placeholder="Иван Иванов" value={name} aria-invalid={invalid.name || undefined} onChange={event => setName(event.target.value)} required />
+    </div>
+    <div className="ags-field">
+      <label className="ags-field__label" htmlFor="ags-phone">Телефон</label>
+      <input className="ags-field__input" id="ags-phone" name="phone" type="tel" autoComplete="tel" placeholder="+7 9XX XXX XX XX" inputMode="tel" value={phone} aria-invalid={invalid.phone || undefined} onChange={event => setPhone(maskPhone(event.target.value))} required />
+    </div>
+    <div className="ags-field">
+      <label className="ags-field__label" htmlFor="ags-email">Email</label>
+      <input className="ags-field__input" id="ags-email" name="email" type="email" autoComplete="email" placeholder="name@example.ru" value={email} aria-invalid={invalid.email || undefined} onChange={event => setEmail(event.target.value)} required />
+    </div>
+    <label className="ags-agree">
+      <input className="ags-agree__box" type="checkbox" name="consent" required aria-invalid={invalid.consent || undefined} />
+      <span className="ags-agree__tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M4.5 12.5 9.5 17.5 19.5 6.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
+      <span className="ags-agree__text">Согласен на <a href="/legal/privacy" target="_blank" rel="noopener">обработку персональных данных</a></span>
+    </label>
+    <button className="ags-submit" type="submit" disabled={status === 'sending'}>
+      <span className="ags-submit-label">{status === 'sending' ? 'Отправка…' : 'Записаться'}</span>
+      <OpenDayArrow />
+    </button>
+    {status === 'error' ? <p className="ags-form__status" data-error="true">Не удалось отправить. Попробуйте ещё раз.</p> : null}
+  </form>
+
   return <section className="ags ags-book" id="ags-form">
     <OpenDayRules />
     <div className="ags-sheet">
@@ -55,34 +116,22 @@ export function FactoryOpenDayForm() {
           <h2 className="ags-book__title">До встречи 14 ноября</h2>
           <p className="ags-book__note">Участие бесплатное, по записи. Заполните форму <span className="ags-form-direction--desktop">справа</span><span className="ags-form-direction--compact">ниже</span>, мы пришлём программу мероприятия и напоминание накануне</p>
         </div>
-        {status === 'ok' ? <div className="ags-form ags-form--success" role="status">
-          <h3>Спасибо за регистрацию!</h3>
-          <p className="ags-form__status">Программу мероприятия и напоминание накануне пришлём на почту, указанную при регистрации.</p>
-        </div> : <form className="ags-form" onSubmit={onSubmit} noValidate>
-          <div className="ags-field">
-            <label className="ags-field__label" htmlFor="ags-name">Имя</label>
-            <input className="ags-field__input" id="ags-name" name="name" type="text" autoComplete="name" placeholder="Иван Иванов" aria-invalid={invalid.name || undefined} required />
-          </div>
-          <div className="ags-field">
-            <label className="ags-field__label" htmlFor="ags-phone">Телефон</label>
-            <input className="ags-field__input" id="ags-phone" name="phone" type="tel" autoComplete="tel" placeholder="+7 9XX XXX XX XX" inputMode="tel" value={phone} aria-invalid={invalid.phone || undefined} onChange={event => setPhone(maskPhone(event.target.value))} required />
-          </div>
-          <div className="ags-field">
-            <label className="ags-field__label" htmlFor="ags-email">Email</label>
-            <input className="ags-field__input" id="ags-email" name="email" type="email" autoComplete="email" placeholder="name@example.ru" aria-invalid={invalid.email || undefined} required />
-          </div>
-          <label className="ags-agree">
-            <input className="ags-agree__box" type="checkbox" name="consent" required aria-invalid={invalid.consent || undefined} />
-            <span className="ags-agree__tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M4.5 12.5 9.5 17.5 19.5 6.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
-            <span className="ags-agree__text">Согласен на <a href="/legal/privacy" target="_blank" rel="noopener">обработку персональных данных</a></span>
-          </label>
-          <button className="ags-submit" type="submit" disabled={status === 'sending'}>
-            <span className="ags-submit-label">{status === 'sending' ? 'Отправка…' : 'Записаться'}</span>
-            <OpenDayArrow />
-          </button>
-          {status === 'error' ? <p className="ags-form__status" data-error="true">Не удалось отправить. Попробуйте ещё раз.</p> : null}
-        </form>}
+        <div ref={slot} style={{ display: 'contents' }}>{open ? <div className="ags-form-placeholder" style={{ height: hold }} /> : fields}</div>
       </div>
     </div>
+    <dialog
+      ref={dialog}
+      id="ags-booking-dialog"
+      className="ags ags-dialog"
+      aria-labelledby="ags-dialog-title"
+      onCancel={event => { event.preventDefault(); setOpen(false) }}
+      onClick={event => { if (event.target === dialog.current) setOpen(false) }}
+    >
+      <button type="button" className="ags-dialog__close" aria-label="Закрыть окно" onClick={() => setOpen(false)}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" /></svg>
+      </button>
+      <h2 id="ags-dialog-title">Записаться<span className="ags-dialog__title-line">на <span className="ags-highlight">День открытых дверей</span></span></h2>
+      <div className="ags-dialog__form">{open ? fields : null}</div>
+    </dialog>
   </section>
 }
