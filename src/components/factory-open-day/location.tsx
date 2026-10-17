@@ -10,7 +10,7 @@ export function FactoryOpenDayLocation() {
           <dl className="ags-spec">
             <div className="ags-spec__row"><dt>Адрес</dt><dd>Н. Новгород, <strong>ул. Зайцева, 31к1</strong></dd></div>
             <div className="ags-spec__row"><dt>Ориентир</dt><dd>Проходная бывшего завода ЗКПД-4</dd></div>
-            <div className="ags-spec__row"><dt>Дата</dt><dd><span className="ags-live">12 сентября</span></dd></div>
+            <div className="ags-spec__row"><dt>Дата</dt><dd><span className="ags-live">14 ноября</span></dd></div>
           </dl>
           <nav className="ags-ref ags-ref--routes" aria-label="Маршрут до производства">
             <div className="ags-ref__acts">

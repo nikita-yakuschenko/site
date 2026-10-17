@@ -1,38 +1,54 @@
+import Link from 'next/link'
 import { OpenDayArrow, OpenDayRules } from './rules'
+import { OpenDayThemeToggle } from './theme'
+
+const points = [
+  ['Узнайте, как строится ваш будущий дом', 'Покажем производство и технологии, которые используем.'],
+  ['Почувствуете себя как дома', 'Посетите выставочные дома, сравните планировки и выпейте согревающий глинтвейн.'],
+  ['Познакомитесь с трендами загородной архитектуры', 'Архитектор расскажет о последних тенденциях, цветовых решениях и актуальных проектах 2027 года.'],
+  ['Сколько стоит свой дом в 2027?', 'Разберём изменения на рынке ИЖС, условия по ипотеке и ежемесячный платёж.'],
+]
 
 export function FactoryOpenDayHero() {
-  return <section className="ags ags-hero">
-    <OpenDayRules />
-    <div className="ags-sheet">
-      <header className="ags-hero__rail">
-        <img className="ags-hero__logo" src="/factory-open-day/logo.svg" alt="Авангард Строй" width={199} height={56} />
-        <nav className="ags-hero__nav" aria-label="Основная навигация">
-          <a href="/catalog">Каталог домов</a>
-          <a href="/">Основной сайт</a>
-        </nav>
-      </header>
-      <div className="ags-hero__body">
-        <div className="ags-hero__lead">
-          <h1 className="ags-hero__title">День открытых дверей<br />на производстве<br />«Авангард Строй»</h1>
-          <p className="ags-hero__subtitle"><span className="ags-hero__subtitle-highlight">Посмотрите, как производится ваш дом.</span></p>
-          <div className="ags-hero__intro">
-            <p className="ags-hero__text"><strong>12 сентября</strong> производство «Авангард Строй» открывает двери.</p>
-            <ul className="ags-hero__benefits" role="list">
-              <li><strong>Пройдёте весь путь производства</strong><span>От отбора пиломатериала до готового дома под крышей.</span></li>
-              <li><strong>Посмотрите дом изнутри</strong><span>Обойдёте будущий дом, а не только увидите его на картинке.</span></li>
-              <li><strong>Зададите вопросы архитектору</strong><span>Обсудите то, что важно решить до начала стройки.</span></li>
-            </ul>
+  return (
+    <section className="ags ags-hero">
+      <OpenDayRules />
+      <div className="ags-sheet">
+        <header className="ags-hero__rail">
+          <img className="ags-hero__symbol" src="/factory-open-day/mark.svg" alt="" />
+          <img className="ags-hero__logo" src="/factory-open-day/logo.svg" alt="Авангард Строй" />
+          <nav className="ags-hero__nav" aria-label="Основная навигация">
+            <Link href="/catalog">Каталог домов</Link>
+            <Link href="/">Основной сайт</Link>
+          </nav>
+          <OpenDayThemeToggle />
+        </header>
+        <div className="ags-hero__body">
+          <div className="ags-hero__lead">
+            <h1 className="ags-hero__title">Новый взгляд<br />на загородный дом</h1>
+            <p className="ags-hero__subtitle"><span className="ags-hero__subtitle-highlight">Какие дома будут строить в этом сезоне?</span></p>
+            <div className="ags-hero__intro">
+              <p className="ags-hero__text">14 ноября разберём архитектурные тренды, цветовые решения, актуальные планировки и проекты, а главное — покажем, как они воплощаются в готовом доме.</p>
+              <ul className="ags-hero__benefits">
+                {points.map(([title, text]) => (
+                  <li key={title}>
+                    <strong>{title}</strong>
+                    <span>{text}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="ags-hero__act">
+              <a className="ags-cta" href="#ags-form">Записаться <OpenDayArrow /></a>
+              <p className="ags-hero__free">Бесплатно, по записи</p>
+            </div>
           </div>
-          <div className="ags-hero__act">
-            <a href="#ags-form" className="ags-cta">Записаться <OpenDayArrow /></a>
-            <p className="ags-hero__free">Бесплатно, по записи</p>
-          </div>
+          <figure className="ags-hero__photo">
+            <img src="/factory-open-day/hero.webp" alt="Гости в выставочном доме «Авангард Строй»" width={1024} height={1536} />
+            <figcaption>Выставочный дом «Авангард Строй», Нижний Новгород</figcaption>
+          </figure>
         </div>
-        <figure className="ags-hero__photo">
-          <img src="/factory-open-day/factory.webp" alt="Сборка каркасных домов в цеху «Авангард Строй»" width={1680} height={1120} decoding="async" fetchPriority="high" />
-          <figcaption>Производство «Авангард Строй», Нижний Новгород</figcaption>
-        </figure>
       </div>
-    </div>
-  </section>
+    </section>
+  )
 }

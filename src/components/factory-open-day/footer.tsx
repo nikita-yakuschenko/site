@@ -15,7 +15,7 @@ export function FactoryOpenDayFooter() {
         <nav className="ags-foot__col" aria-label="Контакты">
           <p className="ags-foot__h">Связь</p>
           <ul className="ags-list">
-            <li><a href="tel:+78312666645" className="ags-link ags-num">+7 831 266-66-45</a></li>
+            <li><a href="tel:+78312003889" className="ags-link ags-num">+7 (831) 200-38-89</a></li>
             <li><a href="mailto:info@avgst.ru" className="ags-link">info@avgst.ru</a></li>
           </ul>
         </nav>
@@ -31,7 +31,7 @@ export function FactoryOpenDayFooter() {
           <p className="ags-foot__h">Производство</p>
           <ul className="ags-list">
             <li className="ags-plain ags-foot__address">город Нижний Новгород,<br />улица Зайцева 31, корпус 1 (проходная),<br />Территория бывшего завода ЗКПД-4</li>
-            <li><a href="#ags-form" className="ags-link ags-link--go">Записаться на 12 сентября<OpenDayArrow size={13} /></a></li>
+            <li><a href="#ags-form" className="ags-link ags-link--go">Записаться на <span className="ags-footer-highlight">14 ноября</span><OpenDayArrow size={13} /></a></li>
           </ul>
         </div>
       </div>

@@ -623,13 +623,12 @@ html body .ags .ags-foot__colophon { border-color:rgba(128,128,128,.16); }
 
 html[data-ags-theme="dark"] {color-scheme:dark;}
 .ags-page { min-height:100%; }
-.ags-page .ags-hero__logo,
-.ags-page .ags-foot__logo { display:block; width:150px; height:auto; }
-html:not([data-ags-theme="dark"]) .ags-page .ags-hero__logo,
-html:not([data-ags-theme="dark"]) .ags-page .ags-foot__logo { filter:brightness(0); }
-@media (max-width:600px) {
-  html body .ags.ags-hero header.ags-hero__rail { display:flex; }
-  html body .ags.ags-hero header.ags-hero__rail .ags-hero__logo { display:block; width:120px; }
+html body .ags-page .ags-hero__logo,
+html body .ags-page .ags-foot__logo { display:block; width:150px; height:auto; filter:none; }
+html:not([data-ags-theme="dark"]) body .ags-page .ags-hero__logo,
+html:not([data-ags-theme="dark"]) body .ags-page .ags-foot__logo { filter:brightness(0); }
+html body .ags.ags-hero .ags-hero__photo img {
+  width:100%; height:100%; left:0; top:0; object-fit:cover; transform:none;
 }
 
 /* 2 */

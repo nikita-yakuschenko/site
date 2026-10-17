@@ -30,14 +30,14 @@ export function FactoryOpenDayForm() {
         body: JSON.stringify({
           name,
           phone: phoneE164(phone),
-          message: `Запись на день открытых дверей 12 сентября. Email: ${email}`,
+          message: `Запись на встречу 14 ноября. Email: ${email}`,
           consent: true,
           siteId: 'corporate',
           pageId: 'factory-open-day',
           formId: 'FactoryOpenDayForm',
           sourceUrl: window.location.href,
           sourcePath: window.location.pathname,
-          meta: { email, event: 'factory-open-day', date: '12 сентября' },
+          meta: { email, event: 'factory-open-day', date: '14 ноября' },
         }),
       })
       if (!response.ok) throw new Error('lead-failed')
@@ -52,7 +52,7 @@ export function FactoryOpenDayForm() {
     <div className="ags-sheet">
       <div className="ags-book__body">
         <div className="ags-book__col">
-          <h2 className="ags-book__title">Записаться <br className="ags-br" />на 12 сентября</h2>
+          <h2 className="ags-book__title">До встречи 14 ноября</h2>
           <p className="ags-book__note">Участие бесплатное, по записи. Заполните форму <span className="ags-form-direction--desktop">справа</span><span className="ags-form-direction--compact">ниже</span>, мы пришлём программу мероприятия и напоминание накануне</p>
         </div>
         {status === 'ok' ? <div className="ags-form ags-form--success" role="status">
