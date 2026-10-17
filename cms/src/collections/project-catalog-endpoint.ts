@@ -16,7 +16,9 @@ export const projectCatalogEndpoint: Endpoint = {
       const url = typeof photo === 'object' && photo && 'url' in photo && typeof photo.url === 'string' ? photo.url : fallback
       return url ? new URL(url, process.env.CMS_PUBLIC_URL).href : ''
     }
-    const items: CatalogProject[] = projects.docs.filter(record => record.desktopImage || record.imageUrl).map(record => {
+    // Кадр может быть ещё не загружен. Такой проект остаётся в каталоге:
+    // иначе его адрес открывается страницей 404.
+    const items: CatalogProject[] = projects.docs.map(record => {
       const modular = isModularTechnology(record.technologyBadge)
       const projectId = (project: number | { id: number }) => typeof project === 'number' ? project : project.id
       const importedPrice = prices.docs.find(row => projectId(row.project) === record.id && row.configuration === 'standard' && row.region === 'nn')?.price

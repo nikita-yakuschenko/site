@@ -25,7 +25,9 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
   // Состояние загрузки привязано к конкретному адресу картинки, поэтому при
   // смене проекта сбрасывается само, без эффекта.
   const [loadedUrl, setLoadedUrl] = useState<string | null>(null)
+  const [failedUrl, setFailedUrl] = useState<string | null>(null)
   const imageLoaded = loadedUrl !== null && loadedUrl === project.imageUrl
+  const imageMissing = !project.imageUrl || failedUrl === project.imageUrl
 
   const specs = [
     { icon: IconRulerMeasure, label: `${project.area} ${copy.specArea}` },
@@ -39,20 +41,23 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
     <article className="card">
       <div className="card__top">
         <a href={project.href} className="card__media" aria-label={badge ? `${project.name}. ${badge}` : project.name}>
-          {project.imageUrl ? (
+          {imageMissing ? (
+            <span className="card__empty">{copy.noPhoto}</span>
+          ) : (
             <img
               src={optimizedSrc(project.imageUrl, 640)}
               alt=""
               loading="lazy"
               decoding="async"
               className={imageLoaded ? 'is-loaded' : ''}
-              onLoad={() => setLoadedUrl(project.imageUrl ?? null)}
+              onLoad={() => setLoadedUrl(project.imageUrl)}
+              onError={() => setFailedUrl(project.imageUrl)}
               ref={(el) => {
-                if (el?.complete && el.naturalWidth > 0) setLoadedUrl(project.imageUrl ?? null)
+                if (!el?.complete) return
+                if (el.naturalWidth > 0) setLoadedUrl(project.imageUrl)
+                else setFailedUrl(project.imageUrl)
               }}
             />
-          ) : (
-            <span className="card__empty">{copy.noPhoto}</span>
           )}
           <span className="badge">
             {badge}

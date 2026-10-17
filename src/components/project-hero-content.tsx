@@ -7,6 +7,7 @@ import { isProjectHeroData, type ProjectHeroData } from '../lib/catalog/project-
 
 export function ProjectHeroContent({ data, connected, location, payment }: { data: ProjectHeroData; connected: boolean; location?: string; payment: ReactNode }) {
   const [draft, setDraft] = useState<ProjectHeroData | null>(null)
+  const [brokenImage, setBrokenImage] = useState('')
   const current = draft || data
   // Unfinished drafts show explicit placeholders instead of blanks
   const hero = { ...current, name: current.name.trim() || 'Без названия', technologyBadge: current.technologyBadge || 'Не выбрана' }
@@ -27,13 +28,15 @@ export function ProjectHeroContent({ data, connected, location, payment }: { dat
     { label: copy.bedrooms, value: hero.bedrooms },
     { label: copy.bathrooms, value: hero.bathrooms },
   ]
+  const imageUrl = hero.imageUrl && brokenImage !== hero.imageUrl ? hero.imageUrl : ''
+  const mobileImageUrl = hero.mobileImageUrl && brokenImage !== hero.mobileImageUrl ? hero.mobileImageUrl : ''
   return <>
-    {hero.mobileImageUrl && <link rel="preload" as="image" href={hero.mobileImageUrl} media="(max-width: 480px)" fetchPriority="high" />}
-    {hero.imageUrl && <link rel="preload" as="image" href={hero.imageUrl} media={hero.mobileImageUrl ? '(min-width: 481px)' : undefined} fetchPriority="high" />}
+    {mobileImageUrl && <link rel="preload" as="image" href={mobileImageUrl} media="(max-width: 480px)" fetchPriority="high" />}
+    {imageUrl && <link rel="preload" as="image" href={imageUrl} media={mobileImageUrl ? '(min-width: 481px)' : undefined} fetchPriority="high" />}
     <picture className="project-hero__media" data-cms-block="projectHero.image">
       {/* 430px пропускает iPhone 16 Pro Max (440px): он берёт широкий кадр, и cover зумит его в крыльцо. */}
-      {hero.mobileImageUrl && <source media="(max-width: 480px)" srcSet={hero.mobileImageUrl} />}
-      {hero.imageUrl && <img src={hero.imageUrl} alt="" fetchPriority="high" />}
+      {mobileImageUrl && <source media="(max-width: 480px)" srcSet={mobileImageUrl} />}
+      {imageUrl && <img src={imageUrl} alt="" fetchPriority="high" onError={() => setBrokenImage(imageUrl)} ref={(el) => { if (el?.complete && el.naturalWidth === 0) setBrokenImage(imageUrl) }} />}
     </picture>
     <div className="project-hero__veil" />
     <div className="project-hero__stage">
