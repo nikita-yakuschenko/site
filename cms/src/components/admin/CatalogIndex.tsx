@@ -16,6 +16,8 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 import { DataTableFrame, useDataPage } from './DataTable'
 
 const seriesLabels = { panel: 'Панельные', barn: 'Барнхаусы', classic: 'Классические', modular: 'Модульные', aframe: 'А-фрейм' } as const
+// Числа в названии сравниваются как числа: «46» раньше «113», а не как текст.
+const byName = new Intl.Collator('ru', { numeric: true, sensitivity: 'base' })
 const emptyFacets = { status: [] as string[], tech: [] as string[], series: [] as string[], floors: [] as number[], bedrooms: [] as number[], bathrooms: [] as number[], areaMin: '', areaMax: '' }
 
 function paramList(params: { get(name: string): string | null }, key: string) {
@@ -115,7 +117,7 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
     if (facets.bedrooms.length && !facets.bedrooms.includes(project.bedrooms)) return false
     if (facets.bathrooms.length && !facets.bathrooms.includes(project.bathrooms)) return false
     return inRange(project.areaValue, facets.areaMin, facets.areaMax)
-  })
+  }).sort((left, right) => byName.compare(left.name || '', right.name || ''))
   const table = useDataPage(filtered, {
     page: Math.max(0, (Number(initial.get('page')) || 1) - 1),
     pageSize: Number(initial.get('size')) || undefined,
