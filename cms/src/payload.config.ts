@@ -23,6 +23,7 @@ export default buildConfig({
   routes: { admin: '/', api: '/api' },
   admin: {
     user: 'users',
+    autoRefresh: true,
     dateFormat: 'dd.MM.yyyy, HH:mm',
     meta: {
       title: 'Панель управления | avgst.ru',

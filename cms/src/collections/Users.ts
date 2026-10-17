@@ -8,7 +8,7 @@ export const Users: CollectionConfig = {
   admin: { useAsTitle: 'email', defaultColumns: ['email', 'firstName', 'lastName', 'role', 'isBlocked'], components: { afterListTable: ['./components/admin/CollectionEmptyState#UsersEmptyState'] } },
   timestamps: true,
   auth: {
-    tokenExpiration: 7200,
+    tokenExpiration: 60 * 60 * 24 * 30,
     maxLoginAttempts: 5,
     lockTime: 15 * 60 * 1000,
     useSessions: true,
