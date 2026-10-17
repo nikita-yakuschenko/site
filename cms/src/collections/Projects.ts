@@ -9,7 +9,7 @@ import { projectInteriorsEndpoint } from './project-interiors-endpoint'
 import { projectBuiltEndpoint } from './project-built-endpoint'
 import { detectBuiltVideo } from '../config/built-media'
 import { projectPlansEndpoint } from './project-plans-endpoint'
-import { normalizePlans, validRoomArea } from '../config/project-plans'
+import { blankRoom, normalizePlans, validRoomArea } from '../config/project-plans'
 import { projectNextStepsEndpoint } from './project-next-steps-endpoint'
 import { projectConfigurationsEndpoint } from './project-configurations-endpoint'
 import { projectCatalogEndpoint } from './project-catalog-endpoint'
@@ -23,7 +23,10 @@ const imageFields: Field[] = [
   { name: 'thumbnail', type: 'ui', admin: { components: { Field: './components/admin/ProjectImageField#ProjectImage' } } },
 ]
 const rooms: Field = { name: 'rooms', label: 'Экспликация', required: true, minRows: 1, labels: { singular: 'Помещение', plural: 'Помещения' }, type: 'array', admin: { initCollapsed: true, components: { Field: './components/admin/RoomsTable#RoomsTable' } }, fields: [
-  { type: 'row', fields: [{ name: 'name', label: 'Название', type: 'text', required: true }, { name: 'area', label: 'Площадь, м²', type: 'text', required: true, validate: (value: unknown) => validRoomArea(value) ? true : 'Укажите площадь больше нуля' }] },
+  { type: 'row', fields: [
+    { name: 'name', label: 'Название', type: 'text', validate: (value: unknown, { siblingData }: { siblingData?: { area?: unknown } }) => blankRoom({ name: value, area: siblingData?.area }) ? true : typeof value === 'string' && value.trim() ? true : 'Укажите название' },
+    { name: 'area', label: 'Площадь, м²', type: 'text', validate: (value: unknown, { siblingData }: { siblingData?: { name?: unknown } }) => blankRoom({ name: siblingData?.name, area: value }) ? true : validRoomArea(value) ? true : 'Укажите площадь больше нуля' },
+  ] },
 ] }
 const integerCount = (minimum: number) => (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= minimum ? true : "Укажите целое число не меньше " + minimum
 const focus = (previewKey: string, previewTitle: string): Field => ({ name: `${previewKey}Preview`, type: 'ui', custom: { previewKey, previewTitle }, admin: { components: { Field: './components/admin/ProjectSectionPreview#ProjectSectionPreview' } } })

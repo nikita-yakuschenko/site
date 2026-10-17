@@ -1,6 +1,6 @@
 ﻿import test from 'node:test'
 import assert from 'node:assert/strict'
-import { floorName, normalizePlans, validRoomArea, variantName } from '../src/config/project-plans'
+import { blankRoom, floorName, normalizePlans, validRoomArea, variantName } from '../src/config/project-plans'
 import { isPlanVariants } from '../../src/lib/catalog/project-plans-data'
 
 test('one storey plans migrate with their own explication', () => {
@@ -29,6 +29,22 @@ test('a custom floor name is kept and a blank name stays positional', () => {
   const [variant] = normalizePlans([{ floors: [{ label: ' Секция 1 ', rooms: [] }, { label: '  ', rooms: [] }] }])
   assert.equal(variant.floors[0].label, 'Секция 1')
   assert.equal(variant.floors[1].label, null)
+})
+test('a blank room row is dropped and a half-filled row stays', () => {
+  const [variant] = normalizePlans([{ floors: [{ rooms: [
+    { name: 'Кухня', area: '12,5' },
+    { name: '', area: '' },
+    { name: '  ', area: '0,0' },
+    { name: 'Спальня', area: '' },
+    { name: '', area: '4,5' },
+  ] }] }])
+  assert.deepEqual(variant.floors[0].rooms, [
+    { name: 'Кухня', area: '12,5' },
+    { name: 'Спальня', area: '' },
+    { name: '', area: '4,5' },
+  ])
+  assert.equal(blankRoom({ name: '', area: '0' }), true)
+  assert.equal(blankRoom({ name: 'Холл', area: '0,0' }), false)
 })
 test('public plans cannot contain an image without explication', () => {
   assert.equal(isPlanVariants([{ label: 'Вариант 1', floors: [{ label: '1 этаж', image: '/plan.jpg', rooms: [] }] }]), false)
