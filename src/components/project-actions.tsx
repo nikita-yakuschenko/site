@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import { IconHeart, IconShare3 } from '@tabler/icons-react'
 import { useConsent } from '../consent/ConsentProvider'
 import { canPersistFunctional } from '../consent/functional-persist'
@@ -12,6 +12,7 @@ import {
   toggleFavorite,
 } from '../lib/favorites'
 import { shareProject } from '../lib/share'
+import { recordSessionView } from '../lib/project-view'
 import type { CatalogProject } from '../lib/catalog/types'
 
 /**
@@ -57,6 +58,8 @@ export function ProjectActions({
   )
   const favorite = favorites.includes(project.id)
 
+  useEffect(() => { void recordSessionView(project.slug) }, [project.slug])
+
   async function onFavorite() {
     if (!canPersistFunctional()) {
       openConsentSettings()
@@ -75,6 +78,7 @@ export function ProjectActions({
     }
     setCounts({ likes: result.likes, shares: result.shares })
     setPressed(removing ? false : true)
+    if (!removing) void recordSessionView(project.slug)
   }
 
   async function onShare() {
@@ -87,6 +91,7 @@ export function ProjectActions({
       return
     }
     setCounts({ likes: result.likes, shares: result.shares })
+    void recordSessionView(project.slug)
   }
 
   return (

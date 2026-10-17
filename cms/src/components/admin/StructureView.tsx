@@ -8,6 +8,7 @@ import { PriceImport } from './PriceImport'
 import { PricesTable, type PriceTableRow } from './PricesTable'
 import Link from 'next/link'
 import { isPriceKind, summaryConfiguration, type PriceKind } from '../../config/price-kinds'
+import { countProjectLeads } from '../../config/catalog-lead-counts'
 
 async function StructureView({ view, initPageResult }: AdminViewServerProps & { view: typeof structure[number]['key'] }) {
   if (!initPageResult.req.user) redirect('/login')
@@ -16,6 +17,8 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
   if (view === 'blocks' || view === 'forms') redirect(`/collections/${view}`)
   const pages = view === 'pages' ? await initPageResult.req.payload.find({ collection: 'pages', limit: 1000, sort: 'route', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
   const projects = view === 'catalog' ? await initPageResult.req.payload.find({ collection: 'projects', limit: 1000, sort: 'name', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
+  const submissions = view === 'catalog' ? await initPageResult.req.payload.find({ collection: 'lead-submissions', pagination: false, depth: 0, req: initPageResult.req, overrideAccess: false, select: { status: true, payload: true } }) : null
+  const leads = projects && submissions ? Object.fromEntries(countProjectLeads(projects.docs, submissions.docs)) : {}
   const priceRows = view === 'prices' ? await priceTable(initPageResult.req) : null
   return <div className="shadcn-surface flex flex-col gap-6 p-4 lg:p-6">
     {view === 'prices' ? <PriceImport /> : <h1 className="text-2xl font-semibold tracking-tight">{item.title}</h1>}
@@ -24,7 +27,7 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
     {view === 'sampling' && <p className="max-w-2xl text-sm text-muted-foreground">{item.description}</p>}
     {view === 'integrations' && <div className="rounded-xl border p-4 flex flex-col gap-3"><h2 className="text-lg font-semibold">Передача заявок</h2><p className="text-sm text-muted-foreground">Формы передают данные общему обработчику. Здесь выбирается тестовый режим или отправка через API / вебхук.</p><Link href="/globals/lead-delivery">Настроить отправку заявок</Link><Link href="/collections/lead-submissions">Посмотреть отправки форм</Link></div>}
     {view === 'pages' && pages && <PagesIndex siteUrl={siteUrl} pages={pages.docs} />}
-    {view === 'catalog' && projects && <Suspense><CatalogIndex siteUrl={siteUrl} projects={projects.docs} /></Suspense>}
+    {view === 'catalog' && projects && <Suspense><CatalogIndex siteUrl={siteUrl} projects={projects.docs} leads={leads} /></Suspense>}
   </div>
 }
 

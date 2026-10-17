@@ -4,7 +4,7 @@ import { authorizeSiteRequest } from './project-hero-endpoint'
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
-type Row = { like_count: string | number | null; share_count: string | number | null; liked?: boolean | null }
+type Row = { like_count: string | number | null; share_count: string | number | null; view_count?: string | number | null; liked?: boolean | null }
 type Adapter = { drizzle: { execute: (query: ReturnType<typeof sql>) => Promise<{ rows: Row[] }> } }
 
 function countsOf(row: Row) {
@@ -66,6 +66,32 @@ export const projectReactionsWriteEndpoint: Endpoint = {
     const counts = await changeCount(db, slug, action === 'unlike' ? -1 : 1, keys)
     if (!counts) return Response.json({ error: 'Проект не найден' }, { status: 404 })
     return Response.json(counts, { headers: { 'Cache-Control': 'no-store' } })
+  },
+}
+
+export const projectViewsEndpoint: Endpoint = {
+  path: '/views',
+  method: 'post',
+  handler: async (req) => {
+    const denied = authorizeSiteRequest(req)
+    if (denied) return denied
+    let body: { slug?: unknown }
+    try { body = await req.json!() } catch { return Response.json({ error: 'Некорректные данные' }, { status: 400 }) }
+    const slug = typeof body.slug === 'string' ? body.slug : ''
+    if (!slugPattern.test(slug)) return Response.json({ error: 'Некорректные данные' }, { status: 400 })
+    const db = req.payload.db as unknown as Adapter
+    const result = await db.drizzle.execute(sql`
+      UPDATE "projects"
+      SET "view_count" = COALESCE("view_count", 0) + 1
+      WHERE "id" = (
+        SELECT "id" FROM "projects"
+        WHERE "slug" = ${slug} OR "import_key" = ${`catalog:${slug}`}
+        ORDER BY "id" LIMIT 1
+      )
+      RETURNING "view_count"
+    `)
+    if (!result.rows[0]) return Response.json({ error: 'Проект не найден' }, { status: 404 })
+    return Response.json({ views: Math.max(0, Number(result.rows[0].view_count) || 0) }, { headers: { 'Cache-Control': 'no-store' } })
   },
 }
 

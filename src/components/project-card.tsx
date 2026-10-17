@@ -11,6 +11,7 @@ import {
   toggleFavorite,
 } from '../lib/favorites'
 import { shareProject } from '../lib/share'
+import { recordCardShare, recordSessionView } from '../lib/project-view'
 import { optimizedSrc } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
 
@@ -64,7 +65,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
           </span>
         </a>
         <div className="card__actions">
-          <button type="button" className="icon-btn" aria-label={copy.share} onClick={() => void shareProject(project)}>
+          <button type="button" className="icon-btn" aria-label={copy.share} onClick={() => void shareProject(project).then(shared => { if (shared) return recordCardShare(project.slug) })}>
             <IconShare3 size={16} stroke={1.75} />
           </button>
           <button
@@ -72,7 +73,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
             className="icon-btn"
             aria-label={favorite ? copy.favoriteRemove : copy.favoriteAdd}
             aria-pressed={favorite}
-            onClick={() => toggleFavorite(project.id)}
+            onClick={() => { const next = toggleFavorite(project.id); if (!favorite && next.includes(project.id)) void recordSessionView(project.slug) }}
           >
             <IconHeart size={16} fill={favorite ? 'currentColor' : 'none'} className={favorite ? 'is-fav' : undefined} />
           </button>

@@ -745,6 +745,9 @@ export interface Project {
     | number
     | boolean
     | null;
+  likeCount?: number | null;
+  shareCount?: number | null;
+  viewCount?: number | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;

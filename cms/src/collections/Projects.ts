@@ -13,7 +13,7 @@ import { blankRoom, normalizePlans, validRoomArea } from '../config/project-plan
 import { projectNextStepsEndpoint } from './project-next-steps-endpoint'
 import { projectConfigurationsEndpoint } from './project-configurations-endpoint'
 import { projectCatalogEndpoint } from './project-catalog-endpoint'
-import { projectReactionsEndpoint, projectReactionsWriteEndpoint } from './project-reactions-endpoint'
+import { projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint } from './project-reactions-endpoint'
 import { normalizeConfigurations } from '../config/project-configurations'
 import { configurationKeys, isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
 import { claimProductCode } from './record-id'
@@ -38,7 +38,7 @@ export const Projects: CollectionConfig = {
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'recordType', 'technologyBadge', 'areaValue', 'priceAmount', '_status'], components: { edit: { beforeDocumentControls: ['./components/admin/PageMetadataFields#ProjectRecordMetadata'] } } },
   versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
-  endpoints: [...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint],
+  endpoints: [...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
   hooks: { beforeDelete: [async ({ id, req }) => {
     // Price rows require a project, so they go first
     await req.payload.delete({ collection: 'project-prices', where: { project: { equals: id } }, req, overrideAccess: true })
@@ -94,6 +94,7 @@ export const Projects: CollectionConfig = {
     if (data && originalDoc) {
       data.likeCount = originalDoc.likeCount ?? 0
       data.shareCount = originalDoc.shareCount ?? 0
+      data.viewCount = originalDoc.viewCount ?? 0
       data.likeVoters = originalDoc.likeVoters ?? []
       data.shareVoters = originalDoc.shareVoters ?? []
     }
@@ -274,6 +275,7 @@ export const Projects: CollectionConfig = {
     { name: 'legacyConfigurations', type: 'json', admin: { hidden: true } },
     { name: 'likeCount', type: 'number', admin: { hidden: true } },
     { name: 'shareCount', type: 'number', admin: { hidden: true } },
+    { name: 'viewCount', type: 'number', admin: { hidden: true } },
     // Ключи голосов: c: кука, f: отпечаток, позже a: аккаунт. Не список людей.
     { name: 'likeVoters', type: 'json', defaultValue: [], admin: { hidden: true } },
     { name: 'shareVoters', type: 'json', defaultValue: [], admin: { hidden: true } },

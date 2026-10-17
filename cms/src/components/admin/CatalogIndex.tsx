@@ -85,7 +85,12 @@ function RangeFilter({ title, min, max, onMin, onMax }: { title: string; min: st
   </DropdownMenu>
 }
 
-export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects: Project[] }) {
+function stat(value: unknown) {
+  const number = Number(value)
+  return Number.isFinite(number) ? Math.max(0, Math.round(number)) : 0
+}
+
+export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; projects: Project[]; leads: Record<string, number> }) {
   const initial = useSearchParams()
   const [search, setSearch] = useState(initial.get('q') ?? '')
   const [recordType, setRecordType] = useState<'project' | 'ready-home'>(initial.get('tab') === 'ready' ? 'ready-home' : 'project')
@@ -191,18 +196,18 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
       {filtersOn && <Button type="button" variant="ghost" size="sm" className="h-8" onClick={() => tune(emptyFacets)}>Сбросить</Button>}
     </div>
     <DataTableFrame page={table.page} pageCount={table.pageCount} pageSize={table.pageSize} onPage={table.setPage} onPageSize={table.setPageSize}><Table>
-      <colgroup><col className="w-[18%]" /><col className="w-[16%]" /><col className="w-[24%]" /><col className="w-[14%]" /><col className="w-[10%]" /><col className="w-[12%]" /><col className="w-[6%]" /></colgroup>
-      <TableHeader><TableRow className="hover:bg-transparent [&>th]:text-muted-foreground"><TableHead className="pl-4">Название</TableHead><TableHead>Статус</TableHead><TableHead>Технология</TableHead><TableHead className="text-right">Площадь, м²</TableHead><TableHead className="text-right">Этажи</TableHead><TableHead className="text-right">Спальни</TableHead><TableHead className="pr-4"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
+      <TableHeader><TableRow className="hover:bg-transparent [&>th]:text-muted-foreground"><TableHead className="pl-4">Название</TableHead><TableHead className="w-[1%] whitespace-nowrap">Статус</TableHead><TableHead className="w-[1%] whitespace-nowrap">Технология</TableHead><TableHead className="w-[1%] whitespace-nowrap text-right">Площадь, м²</TableHead><TableHead className="w-[1%] whitespace-nowrap text-right">Этажи</TableHead><TableHead className="w-[1%] whitespace-nowrap text-right">Спальни</TableHead><TableHead className="w-[1%] whitespace-nowrap text-right">Просмотры</TableHead><TableHead className="w-[1%] whitespace-nowrap text-right">Лайки</TableHead><TableHead className="w-[1%] whitespace-nowrap text-right">Шеры</TableHead><TableHead className="w-[1%] whitespace-nowrap text-right">Заявки</TableHead><TableHead className="w-[1%] pr-4"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
       <TableBody>{table.rows.map(project => { const published = project._status === 'published'; return <TableRow key={project.id}>
         <TableCell className="h-12 whitespace-nowrap pl-4"><Link className="font-medium underline-offset-4 hover:underline" href={`/collections/projects/${project.id}`}>{project.name || '[Без названия]'}</Link></TableCell>
-        <TableCell><Badge variant="outline" className="text-foreground">{published ? <IconCircleCheckFilled className="text-(--avgst-green)" /> : <IconCircleDashed className="text-muted-foreground" />}{published ? 'Опубликован' : 'Черновик'}</Badge></TableCell>
-        <TableCell className="text-muted-foreground">{project.technologyBadge === 'Модульный' ? 'Модульная' : 'Панельно-каркасная'}</TableCell><TableCell className="text-right tabular-nums">{project.areaValue?.toLocaleString('ru-RU') ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.floorsValue ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.bedrooms ?? '—'}</TableCell>
-        <TableCell className="pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8 text-muted-foreground data-[state=open]:bg-muted" aria-label={`Действия: ${project.name || 'без названия'}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface w-44">
+        <TableCell className="w-[1%] whitespace-nowrap"><Badge variant="outline" className="text-foreground">{published ? <IconCircleCheckFilled className="text-(--avgst-green)" /> : <IconCircleDashed className="text-muted-foreground" />}{published ? 'Опубликован' : 'Черновик'}</Badge></TableCell>
+        <TableCell className="w-[1%] whitespace-nowrap text-muted-foreground">{project.technologyBadge === 'Модульный' ? 'Модульная' : 'Панельно-каркасная'}</TableCell><TableCell className="w-[1%] whitespace-nowrap text-right tabular-nums">{project.areaValue?.toLocaleString('ru-RU') ?? '—'}</TableCell><TableCell className="w-[1%] whitespace-nowrap text-right tabular-nums">{project.floorsValue ?? '—'}</TableCell><TableCell className="w-[1%] whitespace-nowrap text-right tabular-nums">{project.bedrooms ?? '—'}</TableCell>
+        <TableCell className="w-[1%] whitespace-nowrap text-right tabular-nums">{stat(project.viewCount)}</TableCell><TableCell className="w-[1%] whitespace-nowrap text-right tabular-nums">{stat(project.likeCount)}</TableCell><TableCell className="w-[1%] whitespace-nowrap text-right tabular-nums">{stat(project.shareCount)}</TableCell><TableCell className="w-[1%] whitespace-nowrap text-right tabular-nums">{leads[project.id] ?? 0}</TableCell>
+        <TableCell className="w-[1%] pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8 text-muted-foreground data-[state=open]:bg-muted" aria-label={`Действия: ${project.name || 'без названия'}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface w-44">
           <DropdownMenuItem asChild><Link href={`/collections/projects/${project.id}`}><IconPencil />Редактировать</Link></DropdownMenuItem>
           {published && project.slug && <DropdownMenuItem asChild><a href={`${siteUrl}/catalog/${project.slug}`} target="_blank" rel="noreferrer"><IconExternalLink />Открыть на сайте</a></DropdownMenuItem>}
           <DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onSelect={() => setRemoving(project)}><IconTrash />Удалить</DropdownMenuItem>
         </DropdownMenuContent></DropdownMenu></TableCell>
-      </TableRow> })}{table.rows.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={7} className="h-24 text-center text-muted-foreground">Записи не найдены</TableCell></TableRow>}</TableBody>
+      </TableRow> })}{table.rows.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={11} className="h-24 text-center text-muted-foreground">Записи не найдены</TableCell></TableRow>}</TableBody>
     </Table></DataTableFrame>
     <Dialog open={!!removing} onOpenChange={open => { if (!open && !busy) setRemoving(null) }}><DialogContent className="shadcn-surface">
       <DialogHeader><DialogTitle>Удалить «{removing?.name || '[Без названия]'}»?</DialogTitle><DialogDescription>Запись пропадёт из каталога и с сайта вместе с её ценами. Отменить удаление нельзя.</DialogDescription></DialogHeader>
