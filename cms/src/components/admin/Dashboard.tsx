@@ -18,9 +18,14 @@ export async function Dashboard({ initPageResult }: AdminViewServerProps) {
   ])
   const leads = countProjectLeads(projects.docs, submissions.docs)
   const rows: PopularityRow[] = projects.docs
-    .map(project => ({ name: project.name || 'Без названия', views: amount(project.viewCount), leads: leads.get(project.id) ?? 0, likes: amount(project.likeCount), shares: amount(project.shareCount) }))
+    .map(project => ({ name: project.name || 'Без названия', views: amount(project.viewCount), leads: leads.get(project.id) ?? 0 }))
     .sort((left, right) => right.views - left.views || right.leads - left.leads || left.name.localeCompare(right.name, 'ru'))
-  const totals = rows.reduce((sum, row) => ({ views: sum.views + row.views, leads: sum.leads + row.leads, likes: sum.likes + row.likes, shares: sum.shares + row.shares }), { views: 0, leads: 0, likes: 0, shares: 0 })
+  const totals = {
+    views: rows.reduce((sum, row) => sum + row.views, 0),
+    leads: rows.reduce((sum, row) => sum + row.leads, 0),
+    likes: projects.docs.reduce((sum, project) => sum + amount(project.likeCount), 0),
+    shares: projects.docs.reduce((sum, project) => sum + amount(project.shareCount), 0),
+  }
   const chartRows = rows.filter(row => row.views > 0 || row.leads > 0).slice(0, 12)
   const cards = [
     { label: 'Просмотры', value: totals.views, description: 'Открытия карточек проектов' },
