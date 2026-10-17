@@ -276,11 +276,11 @@ body .ags button.ags-link { font:inherit; font-size:13px; background:none; borde
   body .ags.ags-hero .ags-hero__act { width:calc((100% + var(--column-space)) * 3 / 7); }
   body .ags.ags-hero .ags-hero__act .ags-cta { width:100%; justify-content:center; }
 }
-body dialog.ags.ags-dialog { position:fixed; inset:0; width:calc(100% - 32px); max-width:640px; max-height:calc(100dvh - 32px); height:fit-content; margin:auto; padding:36px; overflow:auto; border:1px solid #454545; color:#fff; background:#0A0A0A; }
+body dialog.ags.ags-dialog { position:fixed; inset:0; width:calc(100% - 32px); max-width:420px; max-height:calc(100dvh - 32px); height:fit-content; margin:auto; padding:36px; overflow:auto; border:1px solid #454545; color:#fff; background:#0A0A0A; }
 body dialog.ags-dialog::backdrop { background:rgba(0,0,0,.76); }
 body .ags-dialog h2 { margin:0 32px 28px 0; font-family:var(--font-ags-display),'Unbounded',sans-serif; font-size:28px; line-height:1.2; }
 body .ags-dialog h2 span { color:var(--signal); }
-body .ags-dialog h2 .ags-dialog__title-line { display:block; color:inherit; white-space:nowrap; font-size:clamp(12px,3.6vw,24px); }
+body .ags-dialog h2 .ags-dialog__title-line { display:block; color:inherit; white-space:normal; font-size:18px; }
 body .ags .ags-field__error { display:block; color:#FF8A6B; font-size:13px; line-height:1.4; margin-top:6px; }
 body .ags .ags-field__error:empty { display:none; }
 body .ags .ags-field__input[aria-invalid="true"] { border-bottom-color:#FF8A6B; outline:1px solid #FF8A6B; outline-offset:-1px; }
