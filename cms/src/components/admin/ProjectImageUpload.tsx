@@ -151,10 +151,11 @@ function useMediaDocs(ids: string[]) {
   return docs
 }
 
-function FileAttachment({ name, description, state, imageUrl, icon, onRemove, onOpen, onPrimary, primary, caption, kind }: {
+function FileAttachment({ name, description, state, imageUrl, icon, onRemove, onOpen, onPrimary, primary, caption, kind, drop }: {
   name: string
   description: string
   state: 'idle' | 'uploading' | 'error' | 'done'
+  drop?: boolean
   imageUrl?: string
   icon?: ReactNode
   onRemove?: () => void
@@ -164,7 +165,7 @@ function FileAttachment({ name, description, state, imageUrl, icon, onRemove, on
   caption?: { value: string; onChange: (value: string) => void }
   kind?: { icon: ReactNode; label: string }
 }) {
-  return <Attachment state={state} className="w-full">
+  return <Attachment state={state} className={drop ? 'is-file-drop w-full' : 'w-full'}>
     <AttachmentMedia variant={imageUrl && state !== 'uploading' ? 'image' : 'icon'}>
       {state === 'uploading' ? <IconLoader2 className="animate-spin" /> : imageUrl ? <img src={imageUrl} alt="" draggable={false} /> : icon || <IconPhoto />}
     </AttachmentMedia>
@@ -294,7 +295,7 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
     if (!event.dataTransfer || !Array.from(event.dataTransfer.types).includes('Files')) return
     event.preventDefault()
     setFileDrag(true)
-  }} onDragLeave={() => setFileDrag(false)} onDrop={event => {
+  }} onDragLeave={event => { if (event.currentTarget.contains(event.relatedTarget as Node)) return; setFileDrag(false) }} onDrop={event => {
     const files = [...(event.dataTransfer?.files || [])]
     if (!files.length) return
     event.preventDefault()
@@ -308,7 +309,7 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
     }} />
     <div className="flex items-stretch gap-2">
       <div className="min-w-0 flex-1">
-        <FileAttachment name="Перетащите фото сюда" description="JPG, PNG, WebP или AVIF. Можно сразу несколько." state="idle" onOpen={() => fileInput.current?.click()} />
+        <FileAttachment name="Перетащите фото сюда" description="JPG, PNG, WebP или AVIF. Можно сразу несколько." state="idle" drop={fileDrag} onOpen={() => fileInput.current?.click()} />
       </div>
       {built ? <Button type="button" variant="outline" className="h-auto shrink-0 rounded-xl border-dashed px-4" onClick={() => setVideoDialog({ index: null, url: '', caption: '' })}>
         <IconPlayerPlay /> Добавить видео
@@ -432,6 +433,7 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
   const fileInput = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<PendingFile[]>([])
   const [preview, setPreview] = useState<PreviewImage | null>(null)
+  const [fileDrag, setFileDrag] = useState(false)
   const field = props.field as { label?: unknown; admin?: { description?: unknown } }
   const label = typeof field.label === 'string' ? field.label : ''
   const hint = typeof field.admin?.description === 'string' ? field.admin.description : ''
@@ -464,13 +466,15 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
   const name = doc?.filename || local?.name || label || 'Фото'
   const url = doc?.url || ''
   const idleName = plan ? 'Перетащите планировку сюда' : rowType === 'video' ? 'Обложка видео' : 'Перетащите фото сюда'
-  return <div className="attachment-list" onDragOver={event => {
+  return <div className={fileDrag ? 'attachment-list is-drag' : 'attachment-list'} onDragOver={event => {
     if (!event.dataTransfer || !Array.from(event.dataTransfer.types).includes('Files')) return
     event.preventDefault()
-  }} onDrop={event => {
+    setFileDrag(true)
+  }} onDragLeave={event => { if (event.currentTarget.contains(event.relatedTarget as Node)) return; setFileDrag(false) }} onDrop={event => {
     const files = [...(event.dataTransfer?.files || [])]
     if (!files.length) return
     event.preventDefault()
+    setFileDrag(false)
     void run(files)
   }}>
     {label ? <span className="field-label">{label}</span> : null}
@@ -479,9 +483,9 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
       event.target.value = ''
       void run(files)
     }} />
-    {id ? <FileAttachment name={name} description={fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)} state="done" imageUrl={doc?.thumbnailURL || url || undefined} onRemove={() => setValue(null)} onOpen={url ? () => setPreview({ src: url, title: name }) : undefined} /> : null}
+    {id ? <FileAttachment name={name} description={fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)} state="done" drop={fileDrag} imageUrl={doc?.thumbnailURL || url || undefined} onRemove={() => setValue(null)} onOpen={url ? () => setPreview({ src: url, title: name }) : undefined} /> : null}
     {pending.map(item => <FileAttachment key={item.key} name={item.name} description={item.error || `Загрузка · ${item.progress}%`} state={item.error ? 'error' : 'uploading'} onRemove={() => setPending(current => current.filter(entry => entry.key !== item.key))} />)}
-    {!id && !pending.length ? <FileAttachment name={idleName} description="JPG, PNG, WebP или AVIF" state="idle" onOpen={() => fileInput.current?.click()} /> : null}
+    {!id && !pending.length ? <FileAttachment name={idleName} description="JPG, PNG, WebP или AVIF" state="idle" drop={fileDrag} onOpen={() => fileInput.current?.click()} /> : null}
     {hint ? <p className="field-description">{hint}</p> : null}
     <ImagePreviewOverlay image={preview} onClose={() => setPreview(null)} />
   </div>
