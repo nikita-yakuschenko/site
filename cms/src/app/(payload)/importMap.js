@@ -42,6 +42,7 @@ import { EmptyNav as EmptyNav_5cbf29a2fd14a00ffc5141ee4b88c905 } from '../../com
 import { BrandIcon as BrandIcon_3b7459ccde24590d8b1cd329ddb07aed } from '../../components/Brand'
 import { Brand as Brand_3b7459ccde24590d8b1cd329ddb07aed } from '../../components/Brand'
 import { AdminShell as AdminShell_5cbf29a2fd14a00ffc5141ee4b88c905 } from '../../components/admin/AdminShell'
+import { AdminShellRoot as AdminShellRoot_5cbf29a2fd14a00ffc5141ee4b88c905 } from '../../components/admin/AdminShellRoot'
 import { AdminToasts as AdminToasts_c50bb2264ce0fa960ba738ec7a026948 } from '../../components/admin/AdminToasts'
 import { SiteView as SiteView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { PagesView as PagesView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
@@ -103,6 +104,7 @@ export const importMap = {
   "./components/Brand#BrandIcon": BrandIcon_3b7459ccde24590d8b1cd329ddb07aed,
   "./components/Brand#Brand": Brand_3b7459ccde24590d8b1cd329ddb07aed,
   "./components/admin/AdminShell#AdminShell": AdminShell_5cbf29a2fd14a00ffc5141ee4b88c905,
+  "./components/admin/AdminShellRoot#AdminShellRoot": AdminShellRoot_5cbf29a2fd14a00ffc5141ee4b88c905,
   "./components/admin/AdminToasts#AdminToasts": AdminToasts_c50bb2264ce0fa960ba738ec7a026948,
   "./components/admin/StructureView#SiteView": SiteView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#PagesView": PagesView_1226fdfc491f100b8cb8d80d236e0a07,

@@ -35,7 +35,7 @@ export default buildConfig({
     importMap: { baseDir: root, importMapFile: path.resolve(root, 'app/(payload)/importMap.js') },
     components: {
       graphics: { Logo: './components/Brand#Brand', Icon: './components/Brand#BrandIcon' },
-      providers: ['./components/admin/AdminShell#AdminShell', './components/admin/AdminToasts#AdminToasts'],
+      providers: ['./components/admin/AdminShellRoot#AdminShellRoot', './components/admin/AdminToasts#AdminToasts'],
       Nav: './components/admin/AdminShell#EmptyNav',
       views: {
         site: { Component: './components/admin/StructureView#SiteView', path: '/structure/site', exact: true },

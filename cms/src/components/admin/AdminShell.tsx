@@ -1,6 +1,6 @@
 'use client'
 
-import { useAuth, useTheme } from '@payloadcms/ui'
+import { useAuth, useNav, usePreferences, useTheme } from '@payloadcms/ui'
 import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -75,11 +75,13 @@ function SiteHeader() {
   </header>
 }
 
-export function AdminShell({ children }: { children?: ReactNode }) {
+export function AdminShell({ children, cookieOpen }: { children?: ReactNode; cookieOpen?: boolean }) {
   const { user } = useAuth()
   const pathname = usePathname()
+  const { navOpen } = useNav()
+  const { setPreference } = usePreferences()
   if (!user || ['/login', '/logout', '/forgot', '/reset', '/create-first-user', '/unauthorized'].some(path => pathname.startsWith(path))) return children
-  return <SidebarProvider className="avgst-shell shadcn-surface" style={{ '--sidebar-width': '18rem' } as CSSProperties}>
+  return <SidebarProvider defaultOpen={cookieOpen ?? navOpen} onOpenChange={open => { void setPreference('nav', { open }, true) }} className="avgst-shell shadcn-surface" style={{ '--sidebar-width': '18rem' } as CSSProperties}>
     <AppSidebar /><SidebarInset><SiteHeader /><div className="min-w-0 flex-1">{children}</div></SidebarInset>
   </SidebarProvider>
 }
