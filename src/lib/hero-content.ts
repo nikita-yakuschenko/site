@@ -19,7 +19,7 @@ const readHeroParts = cache(async (): Promise<Part[] | null> => {
   } catch { return null }
 })
 
-// Saved hero copy replaces the coded banner. An empty CMS field keeps the coded value.
+// Saved hero copy replaces the coded banner. A cleared subtitle is removed.
 export async function withHeroContent(blocks: readonly LayoutBlock[]): Promise<LayoutBlock[]> {
   const parts = await readHeroParts()
   if (!parts?.length) return [...blocks]
@@ -34,7 +34,8 @@ export async function withHeroContent(blocks: readonly LayoutBlock[]): Promise<L
     const background = part('hero.background')
     if (heading?.text) message.heading = heading.text
     if (heading?.textMore) message.headingMore = heading.textMore
-    if (subtitle?.text) message.text = subtitle.text
+    // Пустой подзаголовок в CMS снимает текст. Раньше пустая строка считалась «поле не задано» и оставалась фраза из кода.
+    if (subtitle) message.text = subtitle.text || ''
     if (button?.text) message.cta = button.text
     if (button?.href) message.href = button.href
     if (background?.image) message.image = background.image
