@@ -5,7 +5,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { IconExternalLink as ExternalLink, IconPhoto as Images, IconLayoutDashboard as LayoutDashboard, IconLogout as LogOut, IconDotsVertical as MoreVertical, IconSettings as Settings, IconSun as Sun, IconMoon as Moon, IconUsers as Users } from '@tabler/icons-react'
-import type { CSSProperties, ReactNode } from 'react'
+import { Fragment, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import type { User } from '../../payload-types'
 import { structure } from '../../config/structure'
 import { IconWorld, IconFiles, IconBuildingCommunity, IconCash, IconDatabase, IconFlask, IconBlocks, IconForms, IconSitemap, IconPlugConnected } from '@tabler/icons-react'
@@ -15,6 +15,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { Separator } from '../ui/separator'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar } from '../ui/sidebar'
 import { catalogHref } from './catalog-query'
+import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbPage, BreadcrumbSeparator } from '../ui/breadcrumb'
 
 export function EmptyNav() { return null }
 
@@ -62,14 +63,74 @@ function AppSidebar() {
   </Sidebar>
 }
 
-function SiteHeader() {
+const sections = [
+  { title: 'Обзор', href: '/', lists: ['/'] },
+  ...structure.map(item => ({ title: item.title, href: item.href, lists: [item.href, collectionPath(item.href)] })),
+  { title: 'Медиафайлы', href: '/collections/media', lists: ['/collections/media'] },
+  { title: 'Пользователи', href: '/collections/users', lists: ['/collections/users'] },
+  { title: 'Аккаунт', href: '/account', lists: ['/account'] },
+]
+
+function sectionOf(pathname: string) {
+  if (pathname === '/globals/lead-delivery' || pathname.startsWith('/collections/lead-submissions')) return sections.find(item => item.href === '/structure/integrations')!
+  return sections.find(item => item.lists.some(list => list !== '/' && (pathname === list || pathname.startsWith(`${list}/`)))) ?? sections[0]
+}
+
+function recordLabel(slug: string, data: Record<string, unknown>) {
+  if (slug === 'users') {
+    const name = [data.firstName, data.lastName].filter((part): part is string => typeof part === 'string' && Boolean(part.trim())).join(' ')
+    return name || (typeof data.email === 'string' ? data.email : 'Пользователь')
+  }
+  const key = slug === 'projects' ? 'name' : slug === 'media' ? 'filename' : slug === 'project-prices' ? 'lookupKey' : slug === 'lead-submissions' ? 'requestId' : 'title'
+  const value = data[key]
+  return typeof value === 'string' && value.trim() ? value : 'Запись'
+}
+
+function HeaderBreadcrumb() {
   const pathname = usePathname()
+  const section = sectionOf(pathname)
+  const collection = pathname.match(/^\/collections\/([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?$/)
+  const doc = collection?.[2] && collection[2] !== 'create' ? { slug: collection[1], id: collection[2] } : null
+  const [docLabel, setDocLabel] = useState('')
+  useEffect(() => {
+    setDocLabel('')
+    if (!doc) return
+    const controller = new AbortController()
+    fetch(`/api/${doc.slug}/${doc.id}?depth=0`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(data => { if (data && typeof data === 'object') setDocLabel(recordLabel(doc.slug, data as Record<string, unknown>)) }).catch(() => {})
+    return () => controller.abort()
+  }, [doc?.slug, doc?.id])
+  const tail: { label: string; href?: string }[] = []
+  if (pathname === '/globals/lead-delivery') tail.push({ label: 'Отправка заявок' })
+  else if (pathname.startsWith('/collections/lead-submissions')) {
+    tail.push({ label: 'Отправки форм', href: pathname === '/collections/lead-submissions' ? undefined : '/collections/lead-submissions' })
+    if (collection?.[2] === 'create') tail.push({ label: 'Создать' })
+    else if (doc && docLabel) tail.push({ label: docLabel, href: collection?.[3] === 'versions' ? `/collections/lead-submissions/${doc.id}` : undefined })
+    if (collection?.[3] === 'versions' && docLabel) tail.push({ label: 'Версии' })
+  } else if (collection?.[2] === 'create') tail.push({ label: 'Создать' })
+  else if (doc && docLabel) {
+    tail.push({ label: docLabel, href: collection?.[3] === 'versions' ? `/collections/${doc.slug}/${doc.id}` : undefined })
+    if (collection?.[3] === 'versions') tail.push({ label: 'Версии' })
+  }
+  const crumbs = [{ label: section.title, href: tail.length ? section.href : undefined }, ...tail]
+  return <Breadcrumb className="min-w-0">
+    <BreadcrumbList>
+      {crumbs.map((crumb, index) => {
+        const last = index === crumbs.length - 1
+        return <Fragment key={`${crumb.href ?? ''}:${crumb.label}:${index}`}>
+          {index > 0 && <BreadcrumbSeparator />}
+          <BreadcrumbItem>{last || !crumb.href ? <BreadcrumbPage>{crumb.label}</BreadcrumbPage> : <BreadcrumbLink asChild><Link href={crumb.href}>{crumb.label}</Link></BreadcrumbLink>}</BreadcrumbItem>
+        </Fragment>
+      })}
+    </BreadcrumbList>
+  </Breadcrumb>
+}
+
+function SiteHeader() {
   const { theme, setTheme } = useTheme()
-  const title = structure.find(item => pathname === item.href || pathname.startsWith(collectionPath(item.href)))?.title ?? (pathname === '/' ? 'Обзор' : pathname.startsWith('/account') ? 'Аккаунт' : pathname.includes('/media') ? 'Медиафайлы' : pathname.includes('/users') ? 'Пользователи' : 'Панель управления')
   return <header className="flex h-12 shrink-0 items-center gap-2 border-b bg-card md:rounded-t-xl">
     <div className="flex w-full items-center gap-1 px-4 lg:gap-2 lg:px-6">
     <SidebarTrigger aria-label="Переключить меню" className="-ml-1" /><Separator orientation="vertical" className="mx-2 data-[orientation=vertical]:h-4" />
-    <span className="text-base font-medium">{title}</span>
+    <HeaderBreadcrumb />
     <Button className="ml-auto" variant="ghost" size="icon" aria-label={theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'} onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}>
       {theme === 'dark' ? <Sun /> : <Moon />}
     </Button>
