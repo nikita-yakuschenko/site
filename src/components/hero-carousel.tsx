@@ -256,7 +256,13 @@ export function HeroCarousel({
 
   const track = useRef<HTMLDivElement>(null);
   const dragFrom = useRef<number | null>(null);
+  const dragY = useRef(0);
+  // Тяга начинается после сдвига пальца. До этого карточка остаётся кнопкой,
+  // иначе захват указателя на ленте съедает click и слот срабатывает через раз.
+  const dragging = useRef(false);
+  const pressed = useRef<HeroPromo | null>(null);
   // Смах открывал бы форму: click приходит следом за pointerup.
+  // Флаг сам гаснет: если click не дошёл до кнопки, следующий тап не глотается.
   const suppressClick = useRef(false);
 
   /* Доворот с клона на настоящий слот — перед шагом, а не после анимации.
@@ -323,16 +329,42 @@ export function HeroCarousel({
     node.style.transform = shiftFor(pos, dx, perView, gap);
   }
 
+  function promoAt(target: EventTarget | null): HeroPromo | null {
+    if (!(target instanceof Element)) return null;
+    const card = target.closest(".hero__promo");
+    if (!card) return null;
+    const index = Number(card.getAttribute("data-promo-index"));
+    return slots[index] ?? null;
+  }
+
+  function openPromo(promo: HeroPromo) {
+    if (promo.action === "link") {
+      const url = promo.url || "";
+      if (/^https?:\/\//i.test(url) || url.startsWith("/")) window.location.assign(url);
+      return;
+    }
+    setLead(promo);
+  }
+
+  function armSuppressClick() {
+    suppressClick.current = true;
+    window.setTimeout(() => {
+      suppressClick.current = false;
+    }, 400);
+  }
+
   function onPointerDown(event: React.PointerEvent<HTMLElement>) {
     if (!rotating || event.button !== 0) return;
     // Карточка сама кнопка. Пропускать любой button значит не пускать жест
     // по ней вообще. В стороне остаются только стрелки и полоса прогресса.
     const target = event.target;
     if (target instanceof Element && target.closest(".hero__promo-nav, .hero__promo-progress")) return;
+    const promo = promoAt(target);
+    if (!promo) return;
     dragFrom.current = event.clientX;
-    setHinted(true);
-    event.currentTarget.setPointerCapture(event.pointerId);
-    applyShift(0);
+    dragY.current = event.clientY;
+    dragging.current = false;
+    pressed.current = promo;
   }
 
   /** Ширина одного слота: в кадре их perView, дорожка шире ровно во столько. */
@@ -340,9 +372,28 @@ export function HeroCarousel({
     return ((track.current?.offsetWidth ?? 0) + gap) / perView;
   }
 
-  function onPointerMove(event: React.PointerEvent) {
+  function onPointerMove(event: React.PointerEvent<HTMLElement>) {
     if (dragFrom.current === null) return;
+    if (event.buttons === 0) {
+      dragFrom.current = null;
+      pressed.current = null;
+      return;
+    }
     const dx = event.clientX - dragFrom.current;
+    const dy = event.clientY - dragY.current;
+    if (!dragging.current) {
+      // Короткое касание не трогает ленту: иначе click не доходит до карточки.
+      if (Math.hypot(dx, dy) < 10) return;
+      // Вертикаль — прокрутка страницы, жест ленты отпускаем.
+      if (Math.abs(dy) > Math.abs(dx)) {
+        dragFrom.current = null;
+        pressed.current = null;
+        return;
+      }
+      dragging.current = true;
+      setHinted(true);
+      event.currentTarget.setPointerCapture(event.pointerId);
+    }
     const width = slotWidth();
     // Ограничение шириной слота: дальше одного шага за раз лента не уходит,
     // а упора по краям нет — за ними лежат клоны.
@@ -350,15 +401,24 @@ export function HeroCarousel({
   }
 
   function onPointerEnd(event: React.PointerEvent) {
-    if (dragFrom.current === null) return;
-    const dx = event.clientX - dragFrom.current;
-    const width = slotWidth();
+    const from = dragFrom.current;
+    const promo = pressed.current;
+    const moved = dragging.current;
     dragFrom.current = null;
+    pressed.current = null;
+    dragging.current = false;
+    if (from === null) return;
+    if (!moved) return;
+    const dx = event.clientX - from;
+    const width = slotWidth();
     applyShift(null);
+    // Захват указателя уже съел click. Короткий сдвиг — то же нажатие карточки.
+    armSuppressClick();
     if (width && Math.abs(dx) > width * SWIPE_RATIO) {
-      suppressClick.current = true;
       step(dx < 0 ? 1 : -1);
+      return;
     }
+    if (promo) openPromo(promo);
   }
 
 
@@ -480,6 +540,7 @@ export function HeroCarousel({
                     key={key}
                     type="button"
                     className="hero__promo"
+                    data-promo-index={slots.indexOf(promo)}
                     data-cms-block={`hero.promo.${slots.indexOf(promo)}`}
                     aria-hidden={!active}
                     tabIndex={active ? undefined : -1}
@@ -488,11 +549,7 @@ export function HeroCarousel({
                         suppressClick.current = false;
                         return;
                       }
-                      if (promo.action === "link") {
-                        if (/^https?:\/\//i.test(promo.url || "") || (promo.url || "").startsWith("/")) window.location.assign(promo.url || "");
-                        return;
-                      }
-                      setLead(promo);
+                      openPromo(promo);
                     }}
                   >
                     {promo.video || promo.image ? (
