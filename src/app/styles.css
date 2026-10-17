@@ -8249,11 +8249,6 @@ html.is-dialog-open {
   inset: 0;
 }
 
-/* Следующий блок начинается сразу от кадра, без белой полосы сверху. */
-[data-project-sections] > .project-hero + [data-cms-block] > .section {
-  padding-top: 0;
-}
-
 .project-hero__media img {
   display: block;
   width: 100%;
