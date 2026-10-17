@@ -1281,6 +1281,23 @@
       "template": "/exposition/[slug]"
     },
     {
+      "source": "src/app/factory-open-day/page.tsx",
+      "components": [
+        "OpenDayTheme",
+        "FactoryOpenDayHero",
+        "FactoryOpenDayProgram",
+        "FactoryOpenDayLocation",
+        "FactoryOpenDayForm",
+        "FactoryOpenDayFooter"
+      ],
+      "sections": [],
+      "redirect": null,
+      "route": "/factory-open-day",
+      "title": "День открытых дверей на производстве",
+      "kind": "page",
+      "template": null
+    },
+    {
       "source": "src/app/family-mortgage/page.tsx",
       "components": [
         "MortgageProgramPage"
@@ -2141,6 +2158,10 @@
       "source": "src/app/api/maps-key/route.ts"
     },
     {
+      "route": "/api/reactions",
+      "source": "src/app/api/reactions/route.ts"
+    },
+    {
       "route": "/api/yandex-rating",
       "source": "src/app/api/yandex-rating/route.ts"
     },
@@ -2150,6 +2171,14 @@
     }
   ],
   "definitions": [
+    {
+      "key": "FactoryOpenDayForm",
+      "title": "День открытых дверей: запись",
+      "source": "src/components/factory-open-day/form.tsx",
+      "exportName": "FactoryOpenDayForm",
+      "kind": "forms",
+      "forms": []
+    },
     {
       "key": "LeadForm",
       "title": "Форма заявки",
@@ -2434,6 +2463,38 @@
       "forms": []
     },
     {
+      "key": "FactoryOpenDayHero",
+      "title": "День открытых дверей: первый экран",
+      "source": "src/components/factory-open-day/hero.tsx",
+      "exportName": "FactoryOpenDayHero",
+      "kind": "blocks",
+      "forms": []
+    },
+    {
+      "key": "FactoryOpenDayProgram",
+      "title": "День открытых дверей: программа",
+      "source": "src/components/factory-open-day/program.tsx",
+      "exportName": "FactoryOpenDayProgram",
+      "kind": "blocks",
+      "forms": []
+    },
+    {
+      "key": "FactoryOpenDayLocation",
+      "title": "День открытых дверей: как доехать",
+      "source": "src/components/factory-open-day/location.tsx",
+      "exportName": "FactoryOpenDayLocation",
+      "kind": "blocks",
+      "forms": []
+    },
+    {
+      "key": "FactoryOpenDayFooter",
+      "title": "День открытых дверей: подвал",
+      "source": "src/components/factory-open-day/footer.tsx",
+      "exportName": "FactoryOpenDayFooter",
+      "kind": "blocks",
+      "forms": []
+    },
+    {
       "key": "ManufactureProjectQuestions",
       "title": "ManufactureProjectQuestions",
       "source": "src/components/manufacture-faq.tsx",
@@ -2657,7 +2718,6 @@
     },
     {
       "blockType": "productionSection",
-      "ctaHref": "/#contacts",
       "moreHref": "/manufacture",
       "theme": "light"
     },

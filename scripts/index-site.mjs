@@ -53,7 +53,7 @@ const projects = await records('src/lib/catalog/projects.ts', 'CATALOG_PROJECTS'
 const places = await records('src/lib/exposition.ts', 'EXPOSITION_PLACES')
 const mortgage = await records('src/lib/mortgage/routes.ts', 'MORTGAGE_ROUTES')
 const definitions = new Map()
-const ignoredComponents = new Set(['Link', 'Image', 'SiteChrome', 'ExpositionShell', 'ExpositionPhotoPlaceholder', 'ProjectCard', 'ProjectActions', 'BlockRenderer'])
+const ignoredComponents = new Set(['Link', 'Image', 'SiteChrome', 'ExpositionShell', 'ExpositionPhotoPlaceholder', 'ProjectCard', 'ProjectActions', 'BlockRenderer', 'OpenDayTheme'])
 const componentSources = new Map()
 for (const file of (await files(path.join(root, 'src/components'))).filter(file => file.endsWith('.tsx'))) componentSources.set(relative(file), await fs.readFile(file, 'utf8'))
 function associatedForms(file, visited = new Set()) {
@@ -131,6 +131,8 @@ for (const file of appFiles.filter(file => /[/\\]page\.tsx$/.test(file)).sort())
     pages.push({ ...base, route, title, kind: redirect ? 'redirect' : route.startsWith('/preview/') ? 'preview' : 'page', template: null })
   }
 }
+const openDayTitles = { FactoryOpenDayHero: 'День открытых дверей: первый экран', FactoryOpenDayProgram: 'День открытых дверей: программа', FactoryOpenDayLocation: 'День открытых дверей: как доехать', FactoryOpenDayForm: 'День открытых дверей: запись', FactoryOpenDayFooter: 'День открытых дверей: подвал' }
+for (const [key, title] of Object.entries(openDayTitles)) { const definition = definitions.get(key); if (definition) definition.title = title }
 pages.sort((a, b) => a.route.localeCompare(b.route, 'en'))
 if (new Set(pages.map(page => page.route)).size !== pages.length) throw new Error('Duplicate routes')
 const services = appFiles.filter(file => /[/\\]route\.ts$/.test(file)).map(file => ({ route: '/' + relative(file).replace(/^src\/app\//, '').replace(/\/route\.ts$/, ''), source: relative(file) })).sort((a, b) => a.route.localeCompare(b.route))
