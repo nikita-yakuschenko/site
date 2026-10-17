@@ -16,8 +16,10 @@ export function FactoryOpenDayHero() {
       <OpenDayRules />
       <div className="ags-sheet">
         <header className="ags-hero__rail">
-          <img className="ags-hero__symbol" src="/factory-open-day/mark.svg" alt="" />
-          <img className="ags-hero__logo" src="/factory-open-day/logo.svg" alt="Авангард Строй" />
+          <Link href="/" className="ags-hero__brand" aria-label="На главную">
+            <img className="ags-hero__symbol" src="/factory-open-day/mark.svg" alt="" />
+            <img className="ags-hero__logo" src="/factory-open-day/logo.svg" alt="Авангард Строй" />
+          </Link>
           <nav className="ags-hero__nav" aria-label="Основная навигация">
             <Link href="/catalog">Каталог домов</Link>
             <Link href="/">Основной сайт</Link>
