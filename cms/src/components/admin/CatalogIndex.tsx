@@ -116,7 +116,10 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
     if (facets.bathrooms.length && !facets.bathrooms.includes(project.bathrooms)) return false
     return inRange(project.areaValue, facets.areaMin, facets.areaMax)
   })
-  const table = useDataPage(filtered)
+  const table = useDataPage(filtered, {
+    page: Math.max(0, (Number(initial.get('page')) || 1) - 1),
+    pageSize: Number(initial.get('size')) || undefined,
+  })
   const tune = (next: Partial<typeof emptyFacets>) => { setFacets(current => ({ ...current, ...next })); table.setPage(0) }
   useEffect(() => {
     const params = new URLSearchParams()
@@ -131,10 +134,12 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
     put('bathrooms', facets.bathrooms)
     if (facets.areaMin.trim()) params.set('areaMin', facets.areaMin.trim())
     if (facets.areaMax.trim()) params.set('areaMax', facets.areaMax.trim())
+    if (table.page > 0) params.set('page', String(table.page + 1))
+    if (table.pageSize !== 10) params.set('size', String(table.pageSize))
     const next = params.toString()
     if (next === window.location.search.replace(/^\?/, '')) return
     window.history.replaceState(window.history.state, '', `${window.location.pathname}${next ? `?${next}` : ''}${window.location.hash}`)
-  }, [recordType, search, facets])
+  }, [recordType, search, facets, table.page, table.pageSize])
   const filtersOn = facets.status.length + facets.tech.length + facets.series.length + facets.floors.length + facets.bedrooms.length + facets.bathrooms.length > 0 || [facets.areaMin, facets.areaMax].some(Boolean)
   const seriesOrder = ['panel', 'barn', 'classic', 'modular', 'aframe', 'none']
   const seriesOptions = [...new Set(inTab.map(project => project.series || 'none'))].sort((a, b) => seriesOrder.indexOf(a) - seriesOrder.indexOf(b)).map(value => ({ value, label: value === 'none' ? 'Без серии' : seriesLabels[value as keyof typeof seriesLabels] }))

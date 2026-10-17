@@ -6,11 +6,11 @@ import { Button } from '../ui/button'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
-const pageSizes = [10, 20, 30, 40, 50]
+const pageSizes = [10, 15, 20, 30, 40, 50]
 
-export function useDataPage<T>(rows: T[]) {
-  const [pageIndex, setPageIndex] = useState(0)
-  const [pageSize, setPageSize] = useState(10)
+export function useDataPage<T>(rows: T[], initial?: { page?: number; pageSize?: number }) {
+  const [pageIndex, setPageIndex] = useState(Math.max(0, initial?.page ?? 0))
+  const [pageSize, setPageSize] = useState(initial?.pageSize && pageSizes.includes(initial.pageSize) ? initial.pageSize : 10)
   const pageCount = Math.max(1, Math.ceil(rows.length / pageSize))
   const page = Math.min(pageIndex, pageCount - 1)
   const start = page * pageSize
