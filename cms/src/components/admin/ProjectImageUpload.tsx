@@ -12,7 +12,7 @@ import { builtVideoEmbed, detectBuiltVideo } from '../../config/built-media'
 import { mediaDocumentId } from './media-id'
 import { toast } from 'sonner'
 import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from '@/components/ui/attachment'
-import { ImagePreviewOverlay, type PreviewImage } from './ImagePreviewOverlay'
+import { openAssetPreview } from './ImagePreviewOverlay'
 
 type GalleryTarget = 'exteriors' | 'interiors' | 'built'
 type GalleryRow = { photo?: unknown; type?: string; isPrimary?: boolean }
@@ -226,7 +226,6 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
   const known = useRef(new Map<string, { name: string; size: number; type: string }>())
   const fileInput = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<PendingFile[]>([])
-  const [preview, setPreview] = useState<PreviewImage | null>(null)
   const [fileDrag, setFileDrag] = useState(false)
   const [rowDrag, setRowDrag] = useState<RowDrag | null>(null)
   const rowDragRef = useRef<RowDrag | null>(null)
@@ -343,7 +342,7 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
             caption={built ? { value: info?.caption || '', onChange: value => setField(`built.${row.index}.caption`, value) } : undefined}
             primary={target !== 'interiors' && row.primary} onPrimary={target !== 'interiors' ? () => makePrimary(row) : undefined}
             onRemove={() => removeFieldRow({ path: target, rowIndex: row.index })}
-            onOpen={video ? () => setPreview({ src: builtVideoEmbed(video), title: info?.caption || name, embed: true }) : !isVideo && url ? () => setPreview({ src: url, title: name }) : undefined} />
+            onOpen={video ? () => openAssetPreview({ src: builtVideoEmbed(video), title: info?.caption || name, embed: true }) : !isVideo && url ? () => openAssetPreview({ src: url, title: name }) : undefined} />
         </div>
       })}
     </div>
@@ -365,7 +364,6 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
       setVideoDialog(null)
     }} /> : null}
     {pending.filter(item => !item.mediaId || !rows.some(row => row.photo === item.mediaId)).map(item => <FileAttachment key={item.key} name={item.name} description={item.error || `Загрузка · ${item.progress}%`} state={item.error ? 'error' : 'uploading'} onRemove={() => setPending(current => current.filter(entry => entry.key !== item.key))} />)}
-    <ImagePreviewOverlay image={preview} onClose={() => setPreview(null)} />
   </div>
 }
 
@@ -432,7 +430,6 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
   const known = useRef(new Map<string, { name: string; size: number; type: string }>())
   const fileInput = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<PendingFile[]>([])
-  const [preview, setPreview] = useState<PreviewImage | null>(null)
   const [fileDrag, setFileDrag] = useState(false)
   const field = props.field as { label?: unknown; admin?: { description?: unknown } }
   const label = typeof field.label === 'string' ? field.label : ''
@@ -483,10 +480,9 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
       event.target.value = ''
       void run(files)
     }} />
-    {id ? <FileAttachment name={name} description={fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)} state="done" drop={fileDrag} imageUrl={doc?.thumbnailURL || url || undefined} onRemove={() => setValue(null)} onOpen={url ? () => setPreview({ src: url, title: name }) : undefined} /> : null}
+    {id ? <FileAttachment name={name} description={fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)} state="done" drop={fileDrag} imageUrl={doc?.thumbnailURL || url || undefined} onRemove={() => setValue(null)} onOpen={url ? () => openAssetPreview({ src: url, title: name }) : undefined} /> : null}
     {pending.map(item => <FileAttachment key={item.key} name={item.name} description={item.error || `Загрузка · ${item.progress}%`} state={item.error ? 'error' : 'uploading'} onRemove={() => setPending(current => current.filter(entry => entry.key !== item.key))} />)}
     {!id && !pending.length ? <FileAttachment name={idleName} description="JPG, PNG, WebP или AVIF" state="idle" drop={fileDrag} onOpen={() => fileInput.current?.click()} /> : null}
     {hint ? <p className="field-description">{hint}</p> : null}
-    <ImagePreviewOverlay image={preview} onClose={() => setPreview(null)} />
   </div>
 }

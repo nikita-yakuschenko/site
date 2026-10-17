@@ -6,6 +6,10 @@ import { Button } from '../ui/button'
 
 export type PreviewImage = { src: string; title: string; embed?: boolean }
 
+export function openAssetPreview(image: PreviewImage) {
+  window.dispatchEvent(new CustomEvent('avgst:asset-preview', { detail: image }))
+}
+
 export function ImagePreviewOverlay({ image, onClose }: { image: PreviewImage | null; onClose: () => void }) {
   const dialog = useRef<HTMLDialogElement>(null)
   const titleId = useId()

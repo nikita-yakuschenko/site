@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react'
 import { IconExternalLink, IconRefresh, IconDeviceDesktop, IconDeviceMobile, IconDeviceTablet, IconMaximize, IconBrowser } from '@tabler/icons-react'
 import { Button } from '../ui/button'
 import { Empty, EmptyHeader, EmptyMedia, EmptyTitle } from '../ui/empty'
+import { type PreviewImage } from './ImagePreviewOverlay'
 import { useGalleryPreview } from './useGalleryPreview'
 import { usePlansPreview } from './usePlansPreview'
 import { useBuiltPreview } from './useBuiltPreview'
@@ -114,6 +115,7 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
   const panel = useRef<HTMLElement>(null)
   const frame = useRef<HTMLIFrameElement>(null)
   const [selected, setSelected] = useState<{ path: string; key: string; title: string } | null>(null)
+  const [asset, setAsset] = useState<PreviewImage | null>(null)
   const [missing, setMissing] = useState(false)
   const currentOrder = useRef<string[] | null>(null)
   const origin = new URL(siteUrl).origin
@@ -163,6 +165,14 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
     }
     window.addEventListener('avgst:preview-selection', receive)
     return () => window.removeEventListener('avgst:preview-selection', receive)
+  }, [])
+  useEffect(() => {
+    const receive = (event: Event) => {
+      const detail = (event as CustomEvent<PreviewImage | null>).detail
+      setAsset(detail?.src ? detail : null)
+    }
+    window.addEventListener('avgst:asset-preview', receive)
+    return () => window.removeEventListener('avgst:asset-preview', receive)
   }, [])
   // The block editor opens on its own block, or on the part that is already expanded
   useEffect(() => {
@@ -299,23 +309,24 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
   const scale = fit ? Math.min(1, available.width / device.width, available.height / device.height) : 1
   const url = `${siteUrl}${route}`
   const frameURL = `${url}${url.includes('?') ? '&' : '?'}cmsPreview=1`
-  return <section ref={panel} className="shadcn-surface page-preview" aria-label={configuration ? 'Предпросмотр комплектаций' : 'Превью страницы'}>
+  return <section ref={panel} className="shadcn-surface page-preview" aria-label={asset ? 'Просмотр файла' : configuration ? 'Предпросмотр комплектаций' : 'Превью страницы'}>
     <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
-      <div><h2 className="text-sm font-medium">{configuration ? 'Комплектации' : isolateBlock ? blockTitle || 'Блок' : selected ? selected.title : 'Превью страницы'}</h2><p className="mt-1 text-xs text-muted-foreground">{configuration ? 'Изменения видны до сохранения' : isolateBlock ? 'Только этот блок' : selected ? 'Блок отдельно' : 'Текущая версия сайта'}</p></div>
-      <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Устройство">
+      <div className="min-w-0"><h2 className="truncate text-sm font-medium">{asset ? asset.title : configuration ? 'Комплектации' : isolateBlock ? blockTitle || 'Блок' : selected ? selected.title : 'Превью страницы'}</h2><p className="mt-1 text-xs text-muted-foreground">{asset ? 'Загруженный файл' : configuration ? 'Изменения видны до сохранения' : isolateBlock ? 'Только этот блок' : selected ? 'Блок отдельно' : 'Текущая версия сайта'}</p></div>
+      {asset ? <Button type="button" size="sm" variant="outline" onClick={() => setAsset(null)}>Закрыть</Button> : <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Устройство">
         {devices.map(item => <Button key={item.key} type="button" size="icon" variant={item.key === device.key ? 'secondary' : 'ghost'} title={item.label} aria-label={item.label} aria-pressed={item.key === device.key} onClick={() => setDeviceKey(item.key)}><item.icon className={`size-4 ${item.key === 'tablet-landscape' ? 'rotate-90' : ''}`} /></Button>)}
         <Button type="button" size="icon" variant="ghost" title="Обновить превью" aria-label="Обновить превью" onClick={() => setRevision(value => value + 1)}><IconRefresh className="size-4" /></Button>
         <Button type="button" size="icon" variant="ghost" title="Развернуть превью" aria-label="Развернуть превью" onClick={() => { if (document.fullscreenElement) void document.exitFullscreen(); else void panel.current?.requestFullscreen() }}><IconMaximize className="size-4" /></Button>
         {!configuration && <Button size="icon" variant="ghost" asChild><a href={url} target="_blank" rel="noreferrer" title="Открыть страницу сайта" aria-label="Открыть страницу сайта"><IconExternalLink className="size-4" /></a></Button>}
-      </div>
+      </div>}
     </div>
-    <div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2 text-xs">
+    {!asset && <div className="flex flex-wrap items-center justify-between gap-2 border-b px-4 py-2 text-xs">
       <span className="text-muted-foreground">{device.label} · {device.width} × {device.height} px</span>
       {!isolateBlock && selected && <Button type="button" size="sm" variant="ghost" onClick={() => setSelected(null)}>Вся страница</Button>}
       <Button type="button" size="sm" variant="ghost" aria-label="Переключить масштаб превью" onClick={() => setFit(value => !value)}>{fit ? `Вписать · ${Math.round(scale * 100)}%` : '100%'}</Button>
-    </div>
-    <div ref={stage} className="page-preview__stage">
-      {available.width > 0 && <div className="page-preview__screen" style={{ width: device.width * scale, height: device.height * scale }}>
+    </div>}
+    <div ref={stage} className={asset ? 'page-preview__stage page-preview__stage--file' : 'page-preview__stage'}>
+      {asset?.embed ? <iframe src={asset.src} title={asset.title} allow="autoplay; fullscreen; picture-in-picture; encrypted-media" /> : asset ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={asset.src} alt={asset.title} /> : null}
+      {available.width > 0 && <div className="page-preview__screen" hidden={Boolean(asset)} style={{ width: device.width * scale, height: device.height * scale }}>
         {missing && selected && !isolateBlock && <p className="absolute inset-0 z-10 flex items-center justify-center bg-card p-6 text-sm">Этот компонент ещё не подключён к изолированному превью.</p>}
         <iframe ref={frame} onLoad={() => frame.current?.contentWindow?.postMessage(configuration ? { type: 'avgst:preview-configurations', templates: getDataByPath<ConfigurationTemplatesData>('configurationTemplates'), ...configuration } : previewMessage, origin)} key={`${url}:${revision}`} title={`Превью ${route}: ${device.label}`} src={frameURL} style={{ position: 'absolute', top: 0, left: 0, width: device.width, height: device.height, transform: `scale(${scale})`, transformOrigin: 'top left', maxWidth: 'none', border: 0, display: 'block', background: '#fff' }} />
       </div>}

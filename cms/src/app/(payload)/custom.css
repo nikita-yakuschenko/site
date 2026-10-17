@@ -332,6 +332,9 @@
 html[data-theme="dark"] .project-source-label__badge[data-content-source="database"] { color: #4ade80; border-color: #4ade8066; background: #4ade8014; }
 .page-preview { margin-bottom: 24px; overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--card); }
 .page-preview__stage { height: max(360px, calc(100dvh - 300px)); overflow: auto; padding: 16px; background: var(--muted); }
+.page-preview__stage--file { display: flex; align-items: center; justify-content: center; }
+.page-preview__stage--file img { display: block; max-width: 100%; max-height: 100%; object-fit: contain; }
+.page-preview__stage--file iframe { display: block; width: min(100%, 960px); aspect-ratio: 16 / 9; height: auto; border: 0; background: #000; }
 .page-preview__screen { position: relative; margin-inline: auto; box-shadow: 0 2px 8px rgb(11 16 32 / 0.12); }
 .page-metadata-field { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; min-height: 28px; padding-block: 4px; }
 .page-metadata-field__label { font-size: 12px; color: var(--muted-foreground); }
