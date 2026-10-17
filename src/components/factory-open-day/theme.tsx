@@ -41,8 +41,8 @@ export function OpenDayThemeToggle() {
         setTheme(next)
       }}
     >
-      <IconMoon className="ags-theme-moon" size={24} stroke={2} aria-hidden />
-      <IconSun className="ags-theme-sun" size={24} stroke={2} aria-hidden />
+      <IconMoon className="ags-theme-moon" size={18} stroke={2} aria-hidden />
+      <IconSun className="ags-theme-sun" size={18} stroke={2} aria-hidden />
     </button>
   )
 }
