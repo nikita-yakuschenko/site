@@ -58,5 +58,6 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+.avgst-shell [data-slot="table-cell"].catalog-actions { overflow: visible; text-overflow: clip; text-align: end; }
 .avgst-shell [data-slot="table-body"] [data-slot="table-row"]:last-child { border-bottom-width: 0; }
 .avgst-shell [data-slot="table-body"] [data-slot="table-row"]:last-child [data-slot="table-cell"] { border-bottom: 0; }
