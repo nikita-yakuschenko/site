@@ -13,14 +13,14 @@ export function FactoryOpenDayFooter() {
           </div>
         </div>
         <nav className="ags-foot__col" aria-label="Контакты">
-          <p className="ags-foot__h">Связь</p>
+          <p className="ags-foot__h"><span className="ags-footer-highlight">Связь</span></p>
           <ul className="ags-list">
             <li><a href="tel:+78312003889" className="ags-link ags-num">+7 (831) 200-38-89</a></li>
             <li><a href="mailto:info@avgst.ru" className="ags-link">info@avgst.ru</a></li>
           </ul>
         </nav>
         <nav className="ags-foot__col" aria-label="Соцсети">
-          <p className="ags-foot__h">Соцсети</p>
+          <p className="ags-foot__h"><span className="ags-footer-highlight">Соцсети</span></p>
           <ul className="ags-list">
             <li><a href="https://vk.ru/avg_st" className="ags-link ags-link--ext">ВКонтакте<OpenDayArrow size={13} /></a></li>
             <li><a href="https://t.me/avgstroy" className="ags-link ags-link--ext">Telegram<OpenDayArrow size={13} /></a></li>
@@ -28,7 +28,7 @@ export function FactoryOpenDayFooter() {
           </ul>
         </nav>
         <div className="ags-foot__col ags-foot__col--last">
-          <p className="ags-foot__h">Производство</p>
+          <p className="ags-foot__h"><span className="ags-footer-highlight">Производство</span></p>
           <ul className="ags-list">
             <li className="ags-plain ags-foot__address">город Нижний Новгород,<br />улица Зайцева 31, корпус 1 (проходная),<br />Территория бывшего завода ЗКПД-4</li>
             <li><a href="#ags-form" className="ags-link ags-link--go">Записаться на <span className="ags-footer-highlight">14 ноября</span><OpenDayArrow size={13} /></a></li>

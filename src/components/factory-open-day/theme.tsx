@@ -1,5 +1,6 @@
 'use client'
 
+import { IconMoon, IconSun } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
 
 type Theme = 'dark' | 'light'
@@ -40,10 +41,8 @@ export function OpenDayThemeToggle() {
         setTheme(next)
       }}
     >
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path className="ags-theme-sun" d="M12 4.2V2.8M12 21.2v-1.4M4.2 12H2.8M21.2 12h-1.4M6.1 6.1 5.1 5.1M18.9 18.9l-1-1M6.1 17.9l-1 1M18.9 5.1l-1 1M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z" />
-        <path className="ags-theme-moon" d="M15 3.4A8 8 0 1 0 20.6 15 6.4 6.4 0 0 1 15 3.4Z" />
-      </svg>
+      <IconMoon className="ags-theme-moon" size={24} stroke={2} aria-hidden />
+      <IconSun className="ags-theme-sun" size={24} stroke={2} aria-hidden />
     </button>
   )
 }
