@@ -3,7 +3,7 @@
 import { useAuth, useNav, usePreferences, useTheme } from '@payloadcms/ui'
 import Image from 'next/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
 import { IconExternalLink as ExternalLink, IconPhoto as Images, IconLayoutDashboard as LayoutDashboard, IconLogout as LogOut, IconDotsVertical as MoreVertical, IconSettings as Settings, IconSun as Sun, IconMoon as Moon, IconUsers as Users } from '@tabler/icons-react'
 import type { CSSProperties, ReactNode } from 'react'
 import type { User } from '../../payload-types'
@@ -14,6 +14,7 @@ import { Button } from '../ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import { Separator } from '../ui/separator'
 import { Sidebar, SidebarContent, SidebarFooter, SidebarGroup, SidebarGroupContent, SidebarGroupLabel, SidebarHeader, SidebarInset, SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarProvider, SidebarTrigger, useSidebar } from '../ui/sidebar'
+import { catalogHref } from './catalog-query'
 
 export function EmptyNav() { return null }
 
@@ -30,6 +31,7 @@ const navigation = [
 
 function AppSidebar() {
   const pathname = usePathname()
+  const router = useRouter()
   const { user, permissions } = useAuth<User>()
   const { setOpenMobile } = useSidebar()
   if (!user) return null
@@ -41,7 +43,7 @@ function AppSidebar() {
     <SidebarContent>{navigation.map(group => <SidebarGroup key={group.title}><SidebarGroupLabel>{group.title}</SidebarGroupLabel><SidebarGroupContent><SidebarMenu>
       {group.items.filter(item => !('collection' in item) || permissions?.collections?.[item.collection as 'users' | 'media']?.read).map(item => <SidebarMenuItem key={item.href}>
         <SidebarMenuButton asChild isActive={item.href === '/' ? pathname === '/' : pathname.startsWith(item.href) || pathname.startsWith(collectionPath(item.href))} tooltip={item.title}>
-          <Link href={item.href} onClick={() => setOpenMobile(false)}><item.icon /><span>{item.title}</span></Link>
+          <Link href={item.href} onClick={event => { setOpenMobile(false); if (item.href !== '/structure/catalog') return; const href = catalogHref(); if (href === item.href) return; event.preventDefault(); router.push(href) }}><item.icon /><span>{item.title}</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>)}
     </SidebarMenu></SidebarGroupContent></SidebarGroup>)}

@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { Project } from '../../payload-types'
 import { useRouter, useSearchParams } from 'next/navigation'
@@ -14,6 +14,7 @@ import { Badge } from '../ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { DataTableFrame, useDataPage } from './DataTable'
+import { rememberCatalogQuery, savedCatalogQuery } from './catalog-query'
 
 const seriesLabels = { panel: 'Панельные', barn: 'Барнхаусы', classic: 'Классические', modular: 'Модульные', aframe: 'А-фрейм' } as const
 // Числа в названии сравниваются как числа: «46» раньше «113», а не как текст.
@@ -123,6 +124,21 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
     pageSize: Number(initial.get('size')) || undefined,
   })
   const tune = (next: Partial<typeof emptyFacets>) => { setFacets(current => ({ ...current, ...next })); table.setPage(0) }
+  const restored = useRef('')
+  useLayoutEffect(() => {
+    if (window.location.search.replace(/^\?/, '')) return
+    const saved = savedCatalogQuery()
+    if (!saved) return
+    const params = new URLSearchParams(saved)
+    restored.current = saved
+    setSearch(params.get('q') ?? '')
+    setRecordType(params.get('tab') === 'ready' ? 'ready-home' : 'project')
+    setFacets(facetsFrom(params))
+    const size = Number(params.get('size'))
+    if ([15, 20, 30, 40, 50].includes(size)) table.setPageSize(size)
+    table.setPage(Math.max(0, (Number(params.get('page')) || 1) - 1))
+    window.history.replaceState(window.history.state, '', `${window.location.pathname}?${saved}${window.location.hash}`)
+  }, [])
   useEffect(() => {
     const params = new URLSearchParams()
     if (recordType === 'ready-home') params.set('tab', 'ready')
@@ -139,6 +155,9 @@ export function CatalogIndex({ siteUrl, projects }: { siteUrl: string; projects:
     if (table.page > 0) params.set('page', String(table.page + 1))
     if (table.pageSize !== 10) params.set('size', String(table.pageSize))
     const next = params.toString()
+    if (restored.current && next !== restored.current) return
+    restored.current = ''
+    rememberCatalogQuery(next)
     if (next === window.location.search.replace(/^\?/, '')) return
     window.history.replaceState(window.history.state, '', `${window.location.pathname}${next ? `?${next}` : ''}${window.location.hash}`)
   }, [recordType, search, facets, table.page, table.pageSize])
