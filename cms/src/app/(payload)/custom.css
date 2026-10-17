@@ -390,7 +390,7 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .collection-edit--projects .attachment-list.is-drag [data-slot="attachment"]:not(.is-file-drop),
 .collection-edit--projects .attachment-list.is-drag [data-slot="attachment"]:not(.is-file-drop):hover { background: var(--card); }
 .collection-edit--projects .attachment-list.is-drag [data-slot="attachment"]:not(.is-file-drop) [data-slot="attachment-trigger"] { pointer-events: none; }
-.collection-edit--projects [data-slot="attachment"].is-file-drop { border-style: dashed; border-color: var(--primary); background: var(--card); outline: none; box-shadow: none; }
+.collection-edit--projects [data-slot="attachment"].is-file-drop { border-style: dashed; border-color: var(--primary); background: var(--accent); outline: none; box-shadow: none; }
 .gallery-attachments > .array-field__header,
 .gallery-attachments > .array-field__draggable-rows,
 .gallery-attachments > .array-field__add-row { display: none; }
@@ -401,8 +401,10 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .rooms-table th + th, .rooms-table td + td { border-left: 1px solid var(--rooms-line); }
 .rooms-table tbody tr:last-child td { border-bottom: 0; }
 .rooms-table tr.is-dragging { opacity: 0.4; }
-.rooms-table tr.is-over-before { box-shadow: inset 0 2px 0 var(--primary); }
-.rooms-table tr.is-over-after { box-shadow: inset 0 -2px 0 var(--primary); }
+.rooms-table tr.is-over-before,
+.rooms-table tr.is-over-after { box-shadow: inset 0 0 0 1px var(--primary); }
+.rooms-table tr.is-over-before > td,
+.rooms-table tr.is-over-after > td { background: var(--accent); }
 /* Plan variants and floors read as nested cards: variant = strong header, floor = light header. */
 .avgst-shell #field-plans .array-field__row {
   --plan-line: color-mix(in srgb, var(--foreground) 14%, var(--border));
@@ -434,20 +436,20 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .gallery-sort__item { transition: transform 180ms ease; cursor: grab; }
 .gallery-sort__item:active { cursor: grabbing; }
 .gallery-sort__item.is-dragging { opacity: 0.28; }
-.gallery-insert { position: absolute; left: 0; right: 0; border-radius: var(--radius-xl); background: color-mix(in srgb, var(--primary) 24%, transparent); box-shadow: inset 0 0 0 1px var(--primary); pointer-events: none; z-index: 2; transition: top 180ms ease; }
+.gallery-insert { position: absolute; left: 0; right: 0; border-radius: var(--radius-xl); background: var(--accent); box-shadow: inset 0 0 0 1px var(--primary); pointer-events: none; z-index: 2; transition: top 180ms ease; }
 @media (prefers-reduced-motion: reduce) {
   .gallery-sort__item, .gallery-insert { transition: none; }
 }
 .shimmer { background-image: linear-gradient(90deg, currentColor 0%, color-mix(in oklch, currentColor 35%, transparent) 45%, currentColor 90%); background-size: 200% 100%; background-clip: text; color: transparent; animation: attachment-shimmer 1.4s linear infinite; }
 @keyframes attachment-shimmer { from { background-position: 100% 0; } to { background-position: -100% 0; } }
 .gallery-batch-upload__zone { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 24px 16px; border: 1px dashed var(--input); border-radius: var(--radius-lg); background: var(--muted); text-align: center; }
-.gallery-batch-upload__zone.is-drag { border-color: var(--primary); background: var(--muted); box-shadow: none; outline: none; }
+.gallery-batch-upload__zone.is-drag { border-color: var(--primary); background: var(--accent); box-shadow: none; outline: none; }
 .gallery-batch-upload__title { margin: 0; font-size: 14px; font-weight: 500; }
 .gallery-batch-upload__zone .field-description { margin: 0; }
 .gallery-batch-upload__zone button { min-height: 38px; padding: 10px 16px; border: 1px solid var(--primary); border-radius: var(--radius-md); background: var(--primary); color: var(--primary-foreground); font-size: 13px; font-weight: 500; cursor: pointer; }
 .gallery-batch-upload__zone button:disabled { cursor: progress; opacity: 0.7; }
 .field-type.upload .dropzone { display: block; padding: 24px 16px; border: 1px dashed var(--input); border-radius: var(--radius-lg); background: var(--muted); }
-.collection-edit--projects .field-type.upload .dropzone.dragging { border-color: var(--primary); background: var(--muted); box-shadow: none; outline: none; }
+.collection-edit--projects .field-type.upload .dropzone.dragging { border-color: var(--primary); background: var(--accent); box-shadow: none; outline: none; }
 .field-type.upload .upload__dropzoneContent { display: flex; flex-direction: column; align-items: center; gap: 16px; }
 .field-type.upload .upload__dragAndDropText { display: block; order: -1; margin: 0; color: var(--muted-foreground); font-size: 13px; line-height: 1.6; text-align: center; text-transform: none; white-space: pre-line; }
 .field-type.upload .upload__dragAndDropText::first-line { color: var(--foreground); font-size: 14px; font-weight: 500; }
@@ -688,11 +690,10 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .project-order-grip:focus-visible { outline:2px solid var(--theme-text); outline-offset:2px; }
 [class*="project-order-section-"] { position:relative; }
 .project-block-dragging > .collapsible__toggle-wrap { opacity:.45; }
-[data-project-drop]::before { content:''; position:absolute; left:12px; right:12px; height:3px; background:#e8b400; border-radius:3px; z-index:5; pointer-events:none; box-shadow:0 0 0 3px var(--theme-bg); }
-[data-project-drop="before"]::before { top:-3px; }
-[data-project-drop="after"]::before { bottom:-3px; }
-[data-project-drop] > .collapsible__toggle-wrap { background:rgba(232,180,0,.10); }
-.project-order-actions { pointer-events: auto; } .project-block-dragging .collapsible__toggle-wrap { opacity:.45; } [data-project-drop] > .collapsible > .collapsible__toggle-wrap { background:rgba(232,180,0,.10); }
+[data-project-drop]::before { content: none; }
+[data-project-drop] > .collapsible__toggle-wrap,
+[data-project-drop] > .collapsible > .collapsible__toggle-wrap { background: var(--accent); box-shadow: inset 0 0 0 1px var(--primary); }
+.project-order-actions { pointer-events: auto; } .project-block-dragging .collapsible__toggle-wrap { opacity:.45; }
 
 .project-order-section-contactsSection .collapsible__toggle,
 .project-order-section-contactsSection .collapsible__indicator,
