@@ -12,6 +12,7 @@ import { ProjectPrices } from './collections/ProjectPrices'
 import { LeadDelivery, LeadSubmissions } from './collections/LeadSubmissions'
 import { createMedia } from './collections/Media'
 import { readEnvironment } from './config/environment'
+import { migrations } from './migrations'
 import { shouldSeedSite } from './seed/standard-site'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
@@ -79,6 +80,7 @@ export default buildConfig({
     push: !environment.production && process.env.PAYLOAD_DB_PUSH === 'true',
     disableCreateDatabase: true,
     migrationDir: path.resolve(root, 'migrations'),
+    prodMigrations: migrations,
   }),
   typescript: { outputFile: path.resolve(root, 'payload-types.ts') },
   logger: { options: { level: 'warn', redact: ['password', 'token', 'secret', 'connectionString', 'req.headers.authorization', 'req.headers.cookie'] } },
