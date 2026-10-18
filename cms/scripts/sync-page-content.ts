@@ -87,8 +87,15 @@ try {
           if (row.component.relationTo !== 'blocks') return true
           const id = typeof row.component.value === 'object' ? row.component.value.id : row.component.value
           return !technicalBlocks.has(blocks.find(block => block.id === id)?.key || '')
+        }).map(row => {
+          if (row.component.relationTo !== 'blocks') return row
+          const id = typeof row.component.value === 'object' ? row.component.value.id : row.component.value
+          const key = blocks.find(block => block.id === id)?.key
+          const replacement = key === 'ContactsSection' ? byKey.get('contactsSection') : key === 'ProjectPreview' ? byKey.get('ProjectHeroContent') : null
+          return replacement ? { ...row, component: { relationTo: 'blocks' as const, value: replacement.id } } : row
         })
-        if (layout.length !== page.layout?.length) await payload.update({ collection: 'pages', id: page.id, data: { layout }, req, overrideAccess: false })
+        const ids = (rows: typeof layout) => rows.map(row => `${row.component.relationTo}:${typeof row.component.value === 'object' ? row.component.value.id : row.component.value}`)
+        if (JSON.stringify(ids(layout)) !== JSON.stringify(ids(page.layout || []))) await payload.update({ collection: 'pages', id: page.id, data: { layout }, req, overrideAccess: false })
       }
       continue
     }
