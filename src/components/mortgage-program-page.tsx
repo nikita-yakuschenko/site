@@ -45,7 +45,7 @@ export async function MortgageProgramPage({
       }
     >
       <main>
-        <MortgagePageContent projects={items} programId={programId} />
+        <MortgagePageContent data-cms-content-connected projects={items} programId={programId} />
       </main>
     </SiteChrome>
   );

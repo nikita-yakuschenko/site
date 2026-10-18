@@ -29,7 +29,7 @@ function previewCard(doc: { id?: string; slug?: string | null; name?: string | n
   const series = isCatalogSeries(seriesName) ? seriesName : 'panel'
   return { id: doc.importKey?.replace(/^catalog:/, '') || `cms:${doc.id}`, cmsId: doc.id, slug: doc.slug, name: doc.name, href: `/catalog/${doc.slug}`, area: String(doc.areaValue ?? ''), areaValue: doc.areaValue ?? 0, floors: String(doc.floorsValue ?? ''), floorsValue: doc.floorsValue ?? 0, bedrooms: String(doc.bedrooms ?? ''), bathrooms: String(doc.bathrooms ?? ''), technology: series === 'modular' ? 'modular' : 'panel', technologyBadge: doc.technologyBadge || '', series, imageUrl, priceAmount: price, priceLabel: price ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется', description: doc.name, about: [], exteriors: [], interiors: [], floorPlans: [], options: [] }
 }
-const catalogBlocks = new Set(['projectHero', 'ProjectExteriors', 'ProjectInteriors', 'ProjectPlans', 'ProjectBuilt', 'ProjectConfig', 'ProjectSimilar', 'MortgageCalculator', 'ProjectNextSteps'])
+const catalogBlocks = new Set(['projectHero', 'ProjectHeroContent', 'ProjectHeroPayment', 'ReadyHomeOffer', 'ContactsSection', 'ProjectExteriors', 'ProjectInteriors', 'ProjectPlans', 'ProjectBuilt', 'ProjectConfig', 'ProjectSimilar', 'MortgageCalculator', 'ProjectNextSteps'])
 function seriesPreview(parts: { key: string; text: string; href: string; image: string }[], counts: Map<string, number>, images: Map<string, string>) {
   return {
     type: 'avgst:preview-series' as const,
@@ -43,6 +43,36 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
   const { data, hasPublishedDoc } = useDocumentInfo()
   const blockKey = useFormFields(([fields]) => isolateBlock ? String(fields.key?.value || '') : '')
   const blockTitle = useFormFields(([fields]) => isolateBlock ? String(fields.title?.value || '') : '')
+  const contentScope = useFormFields(([fields]) => isolateBlock ? String((fields.defaults?.value as { contentScope?: string } | undefined)?.contentScope || '') : '')
+  const contentDraft = useFormFields(([fields]) => {
+    if (!isolateBlock) return ''
+    const count = (fields.parts as { rows?: unknown[] } | undefined)?.rows?.length || 0
+    const parts = []
+    for (let index = 0; index < count; index++) {
+      const row = `parts.${index}`
+      const key = String(fields[`${row}.key`]?.value || '')
+      if (key.includes('.content.')) parts.push({ key, text: String(fields[`${row}.text`]?.value ?? ''), href: String(fields[`${row}.href`]?.value ?? ''), imageId: fields[`${row}.image`]?.value, image: String(fields[`${row}.textMore`]?.value || ''), originalImage: String(fields[`${row}.textMore`]?.value || '') })
+    }
+    return JSON.stringify(parts)
+  })
+  const contentDraftRef = useRef<unknown[]>([])
+  useEffect(() => {
+    if (!contentDraft || !blockKey) return
+    let cancelled = false
+    const parts = JSON.parse(contentDraft) as { key: string; imageId?: unknown; image: string }[]
+    Promise.all(parts.map(async part => {
+      const id = part.imageId && typeof part.imageId === 'object' && 'id' in part.imageId ? part.imageId.id : part.imageId
+      if (!id) return part
+      const response = await fetch(`/api/media/${id}?depth=0`, { credentials: 'include' })
+      const media = response.ok ? await response.json() : null
+      return { ...part, image: media?.url ? new URL(media.url, window.location.origin).href : part.image }
+    })).then(parts => {
+      if (cancelled) return
+      contentDraftRef.current = parts
+      frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-content', key: blockKey, parts }, new URL(siteUrl).origin)
+    })
+    return () => { cancelled = true }
+  }, [contentDraft, blockKey, siteUrl])
   const heroParts = useFormFields(([fields]) => {
     if (!isolateBlock || String(fields.key?.value || '') !== 'hero') return ''
     const rows = (fields.parts as { rows?: unknown[] } | undefined)?.rows
@@ -81,13 +111,15 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
   const seriesCounts = useRef(new Map<string, number>())
   const seriesImages = useRef(new Map<string, string>())
   const [catalogSlug, setCatalogSlug] = useState<string | null>(null)
+  const template = !project && !isolateBlock && data?.route === '/catalog/[slug]'
   // A project block is previewed on the first published project page
   useEffect(() => {
-    if (!catalogBlocks.has(blockKey)) return
+    if (!catalogBlocks.has(blockKey) && !template) return
     const controller = new AbortController()
-    fetch('/api/projects?limit=1&depth=0&sort=name&where[_status][equals]=published', { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(result => setCatalogSlug(result?.docs?.[0]?.slug || null)).catch(() => {})
+    const type = blockKey === 'ReadyHomeOffer' ? 'ready-home' : 'project'
+    fetch(`/api/projects?limit=1&depth=0&sort=name&where[_status][equals]=published&where[recordType][equals]=${type}`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).then(result => setCatalogSlug(result?.docs?.[0]?.slug || null)).catch(() => {})
     return () => controller.abort()
-  }, [blockKey])
+  }, [blockKey, template])
   const isolated = isolateBlock && blockKey ? { path: 'block', key: blockKey, title: blockTitle || blockKey } : null
   const isolatedRef = useRef(isolated)
   isolatedRef.current = isolated
@@ -193,6 +225,7 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
     frame.current?.contentWindow?.postMessage(previewMessage, origin)
     const receive = (event: MessageEvent) => {
       if (event.source === frame.current?.contentWindow && event.origin === origin && event.data?.type === 'avgst:preview-ready') {
+        if (contentDraftRef.current.length) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-content', key: blockKey, parts: contentDraftRef.current }, origin)
         frame.current?.contentWindow?.postMessage(previewMessage, origin)
         if (currentOrder.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-order', order: currentOrder.current }, origin)
         if (heroDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-hero', hero: heroDraftRef.current }, origin)
@@ -282,8 +315,8 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
     const timer = setTimeout(send, 80)
     return () => clearTimeout(timer)
   }, [heroParts, origin, revision])
-  const blockRoute = homeBlocks.has(blockKey) ? '/' : catalogBlocks.has(blockKey) && catalogSlug ? `/catalog/${catalogSlug}` : null
-  const route = configuration ? '/cms-preview/configurations' : isolateBlock ? blockRoute : project ? (projectDraft ? '/catalog/__draft' : `/catalog/${data?.slug}`) : typeof data?.route === 'string' ? data.route : null
+  const blockRoute = contentScope || (homeBlocks.has(blockKey) ? '/' : catalogBlocks.has(blockKey) && catalogSlug ? `/catalog/${catalogSlug}` : null)
+  const route = configuration ? '/cms-preview/configurations' : isolateBlock ? blockRoute : project ? (projectDraft ? '/catalog/__draft' : `/catalog/${data?.slug}`) : template ? catalogSlug ? `/catalog/${catalogSlug}` : null : typeof data?.route === 'string' ? data.route : null
   const validRoute = Boolean(route && !route.includes('['))
   useEffect(() => {
     if (!configuration) return

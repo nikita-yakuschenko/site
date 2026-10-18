@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from '../../../components/cms-static-content'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import { notFound } from 'next/navigation'
@@ -30,7 +31,7 @@ export default async function ExpositionPlacePage({ params }: Props) {
   const projects = place.projectSlugs.flatMap((projectSlug) => CATALOG_PROJECTS.filter((project) => project.slug === projectSlug))
   return (
     <ExpositionShell placeName={place.name} overlay>
-      <section className="project-hero exposition-detail-hero" aria-labelledby="exposition-place-title">
+      <CMSStaticBlock cmsBlockKey="Pageexposition--slug-Section0" scope={`/exposition/${slug}`}><section className="project-hero exposition-detail-hero" aria-labelledby="exposition-place-title">
         <div className="project-hero__media">
           {place.slug === 'vysokiy-kvartal' ? (
             <Image src="/img/pages/vysokiy-kvartal-aerial.webp" alt="Панорама КП Высокий Квартал с высоты"
@@ -55,9 +56,9 @@ export default async function ExpositionPlacePage({ params }: Props) {
               meta={{ requestType: 'exposition-tour', exposition: place.slug }} />
           </div>
         </div>
-      </section>
+      </section></CMSStaticBlock>
 
-      <section className="section exposition-detail-projects" aria-labelledby="exposition-projects-title">
+      <CMSStaticBlock cmsBlockKey="Pageexposition--slug-Section1" scope={`/exposition/${slug}`}><section className="section exposition-detail-projects" aria-labelledby="exposition-projects-title">
         <div className="section__inner">
           <h2 id="exposition-projects-title">Проекты в экспозиции</h2>
           {projects.length > 0 ? (
@@ -69,27 +70,27 @@ export default async function ExpositionPlacePage({ params }: Props) {
             ))}
           </div>}
         </div>
-      </section>
+      </section></CMSStaticBlock>
 
-      <ExpositionVisit />
+      <ExpositionVisit data-cms-content-connected />
 
-      <section className="section section--ink" aria-labelledby="exposition-tour-title">
+      <CMSStaticBlock cmsBlockKey="Pageexposition--slug-Section2" scope={`/exposition/${slug}`}><section className="section section--ink" aria-labelledby="exposition-tour-title">
         <div className="section__inner">
           <h2 id="exposition-tour-title">Как проходит экскурсия</h2>
-          {place.tourPhotos.length > 0 ? <ExpositionTourGallery photos={place.tourPhotos} /> : <div className="project-bento exposition-detail-gallery exposition-tour-gallery">
+          {place.tourPhotos.length > 0 ? <ExpositionTourGallery data-cms-content-connected photos={place.tourPhotos} /> : <div className="project-bento exposition-detail-gallery exposition-tour-gallery">
             {Array.from({ length: 6 }, (_, index) => (
               <ExpositionPhotoPlaceholder key={index} label="Фото с дня открытых дверей"
                 className={index === 0 ? 'project-bento__lead' : ''} />
             ))}
           </div>}
         </div>
-      </section>
+      </section></CMSStaticBlock>
 
-      <section className="section exposition-directions" aria-labelledby="directions-title">
+      <CMSStaticBlock cmsBlockKey="Pageexposition--slug-Section3" scope={`/exposition/${slug}`}><section className="section exposition-directions" aria-labelledby="directions-title">
         <div className="section__inner">
-          <ExpositionLocations place={place} pageId={`exposition/${place.slug}`} />
+          <ExpositionLocations data-cms-content-connected place={place} pageId={`exposition/${place.slug}`} />
         </div>
-      </section>
+      </section></CMSStaticBlock>
     </ExpositionShell>
   )
 }

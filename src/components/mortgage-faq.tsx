@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import { nbspText } from "../lib/copy";
 import { BankStrip, type BankPartner } from "./bank-strip";
@@ -26,7 +27,7 @@ const PARTNERS: BankPartner[] = [
 
 /** FAQ семейной ипотеки + банки в одной секции (без ложной полосы между ними). */
 export function MortgageFaq({ content }: { content: WithFaq }) {
-  return (
+  return (<CMSContentBlock cmsBlockKey="MortgageFaq">{(
     <section
       className="section section--muted"
       aria-labelledby="mortgage-faq-title"
@@ -48,5 +49,5 @@ export function MortgageFaq({ content }: { content: WithFaq }) {
         </div>
       </div>
     </section>
-  );
+  )}</CMSContentBlock>);
 }

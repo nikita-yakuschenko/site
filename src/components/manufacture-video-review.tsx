@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import { useState } from "react";
 import { IconBuildingFactory2, IconUser } from "@tabler/icons-react";
@@ -14,9 +15,8 @@ const videos = [
 export function ManufactureVideoReview() {
   const [active, setActive] = useState(0);
   const [open, setOpen] = useState(false);
-  const current = videos[active];
 
-  return (
+  return (<CMSContentBlock cmsBlockKey="ManufactureVideoReview">{(
     <section className="section independent-review manufacture-video-review" aria-labelledby="manufacture-video-title">
       <div className="section__inner independent-review__inner">
         <div className="independent-review__stage">
@@ -69,5 +69,5 @@ export function ManufactureVideoReview() {
 
       {open ? <VideoLightbox title="Обзор производства" embedSrc={kinescopeEmbed("npS4zk5fgxhM7XbFGRkoq7")} onClose={() => setOpen(false)} /> : null}
     </section>
-  );
+  )}</CMSContentBlock>);
 }

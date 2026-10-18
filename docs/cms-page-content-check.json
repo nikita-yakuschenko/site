@@ -1,0 +1,1248 @@
+[
+  {
+    "id": 157,
+    "key": "FactoryOpenDayHero-page-26",
+    "route": "/factory-open-day",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 157,
+    "key": "FactoryOpenDayHero-page-26",
+    "route": "/factory-open-day",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 157,
+    "key": "FactoryOpenDayHero-page-26",
+    "route": "/factory-open-day",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 156,
+    "key": "LeadReveal-instance-inline-request-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 155,
+    "key": "MortgageFaq-page-14",
+    "route": "/it-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 155,
+    "key": "MortgageFaq-page-14",
+    "route": "/it-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 154,
+    "key": "LeadReveal-instance-mortgage-consultation-page-14",
+    "route": "/it-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 153,
+    "key": "MortgageWhoFits-page-14",
+    "route": "/it-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 153,
+    "key": "MortgageWhoFits-page-14",
+    "route": "/it-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 152,
+    "key": "LeadReveal-instance-mortgage-calculator-page-14",
+    "route": "/it-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 151,
+    "key": "MortgageFaq-page-12",
+    "route": "/family-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 151,
+    "key": "MortgageFaq-page-12",
+    "route": "/family-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 150,
+    "key": "LeadReveal-instance-mortgage-consultation-page-12",
+    "route": "/family-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 149,
+    "key": "MortgageWhoFits-page-12",
+    "route": "/family-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 149,
+    "key": "MortgageWhoFits-page-12",
+    "route": "/family-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 148,
+    "key": "LeadReveal-instance-mortgage-calculator-page-12",
+    "route": "/family-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 147,
+    "key": "PhotoTile-instance--exposition-vysokiy-kvartal-page-9",
+    "route": "/exposition",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 147,
+    "key": "PhotoTile-instance--exposition-vysokiy-kvartal-page-9",
+    "route": "/exposition",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 147,
+    "key": "PhotoTile-instance--exposition-vysokiy-kvartal-page-9",
+    "route": "/exposition",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 146,
+    "key": "ExpositionVideoTile-instance--exposition-avangard-page-9",
+    "route": "/exposition",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 146,
+    "key": "ExpositionVideoTile-instance--exposition-avangard-page-9",
+    "route": "/exposition",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 146,
+    "key": "ExpositionVideoTile-instance--exposition-avangard-page-9",
+    "route": "/exposition",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 145,
+    "key": "PagebusinessSection-partnership-page-5",
+    "route": "/business",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 144,
+    "key": "PagebusinessSection-technology-comparison-page-5",
+    "route": "/business",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 143,
+    "key": "PagebusinessSection-products-page-5",
+    "route": "/business",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 142,
+    "key": "MortgageFaq-page-4",
+    "route": "/basic-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 142,
+    "key": "MortgageFaq-page-4",
+    "route": "/basic-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 141,
+    "key": "LeadReveal-instance-mortgage-consultation-page-4",
+    "route": "/basic-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 140,
+    "key": "MortgageWhoFits-page-4",
+    "route": "/basic-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 140,
+    "key": "MortgageWhoFits-page-4",
+    "route": "/basic-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 139,
+    "key": "LeadReveal-instance-mortgage-calculator-page-4",
+    "route": "/basic-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 138,
+    "key": "MortgageFaq-page-3",
+    "route": "/agro-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 138,
+    "key": "MortgageFaq-page-3",
+    "route": "/agro-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 137,
+    "key": "LeadReveal-instance-mortgage-consultation-page-3",
+    "route": "/agro-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 136,
+    "key": "MortgageWhoFits-page-3",
+    "route": "/agro-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 136,
+    "key": "MortgageWhoFits-page-3",
+    "route": "/agro-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 135,
+    "key": "LeadReveal-instance-mortgage-calculator-page-3",
+    "route": "/agro-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 134,
+    "key": "PhotoTile-instance--catalog-tech-modular-page-1",
+    "route": "/",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 134,
+    "key": "PhotoTile-instance--catalog-tech-modular-page-1",
+    "route": "/",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 134,
+    "key": "PhotoTile-instance--catalog-tech-modular-page-1",
+    "route": "/",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 133,
+    "key": "PhotoTile-instance--catalog-series-classic-page-1",
+    "route": "/",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 133,
+    "key": "PhotoTile-instance--catalog-series-classic-page-1",
+    "route": "/",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 133,
+    "key": "PhotoTile-instance--catalog-series-classic-page-1",
+    "route": "/",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 132,
+    "key": "PhotoTile-instance--catalog-series-barn-page-1",
+    "route": "/",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 132,
+    "key": "PhotoTile-instance--catalog-series-barn-page-1",
+    "route": "/",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 132,
+    "key": "PhotoTile-instance--catalog-series-barn-page-1",
+    "route": "/",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 131,
+    "key": "PhotoTile-instance--catalog-tech-panel-page-1",
+    "route": "/",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 131,
+    "key": "PhotoTile-instance--catalog-tech-panel-page-1",
+    "route": "/",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 131,
+    "key": "PhotoTile-instance--catalog-tech-panel-page-1",
+    "route": "/",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 130,
+    "key": "FactoryOpenDayFooter-page-26",
+    "route": "/factory-open-day",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 130,
+    "key": "FactoryOpenDayFooter-page-26",
+    "route": "/factory-open-day",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 130,
+    "key": "FactoryOpenDayFooter-page-26",
+    "route": "/factory-open-day",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 129,
+    "key": "FactoryOpenDayForm-page-26",
+    "route": "/factory-open-day",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 129,
+    "key": "FactoryOpenDayForm-page-26",
+    "route": "/factory-open-day",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 128,
+    "key": "FactoryOpenDayLocation-page-26",
+    "route": "/factory-open-day",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 128,
+    "key": "FactoryOpenDayLocation-page-26",
+    "route": "/factory-open-day",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 127,
+    "key": "FactoryOpenDayProgram-page-26",
+    "route": "/factory-open-day",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 126,
+    "key": "VideoTestimonials-page-24",
+    "route": "/stories",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 126,
+    "key": "VideoTestimonials-page-24",
+    "route": "/stories",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 125,
+    "key": "PagestoriesSection0-page-24",
+    "route": "/stories",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 124,
+    "key": "ReferralRules-page-23",
+    "route": "/referral",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 124,
+    "key": "ReferralRules-page-23",
+    "route": "/referral",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 123,
+    "key": "PageprivacySection0-page-22",
+    "route": "/privacy",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 123,
+    "key": "PageprivacySection0-page-22",
+    "route": "/privacy",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 122,
+    "key": "ManufactureFaq-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 121,
+    "key": "PagemanufactureSection5-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 121,
+    "key": "PagemanufactureSection5-page-18",
+    "route": "/manufacture",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 120,
+    "key": "ManufactureMountingVideos-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 120,
+    "key": "ManufactureMountingVideos-page-18",
+    "route": "/manufacture",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 119,
+    "key": "PagemanufactureSection4-page-18",
+    "route": "/manufacture",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 115,
+    "key": "PagemanufactureSection2-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 115,
+    "key": "PagemanufactureSection2-page-18",
+    "route": "/manufacture",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 114,
+    "key": "ManufactureVideoReview-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 114,
+    "key": "ManufactureVideoReview-page-18",
+    "route": "/manufacture",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 113,
+    "key": "PagemanufactureSection1-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 113,
+    "key": "PagemanufactureSection1-page-18",
+    "route": "/manufacture",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 112,
+    "key": "ManufacturePreparationQuestions-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 111,
+    "key": "PagemanufactureSection0-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 111,
+    "key": "PagemanufactureSection0-page-18",
+    "route": "/manufacture",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 110,
+    "key": "ManufactureProjectQuestions-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 109,
+    "key": "PageHero-page-18",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 109,
+    "key": "PageHero-page-18",
+    "route": "/manufacture",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 108,
+    "key": "MortgageProgramPage-page-14",
+    "route": "/it-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 108,
+    "key": "MortgageProgramPage-page-14",
+    "route": "/it-mortgage",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 108,
+    "key": "MortgageProgramPage-page-14",
+    "route": "/it-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 106,
+    "key": "PageHero-page-14",
+    "route": "/it-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 106,
+    "key": "PageHero-page-14",
+    "route": "/it-mortgage",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 106,
+    "key": "PageHero-page-14",
+    "route": "/it-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 105,
+    "key": "MortgageProgramPage-page-12",
+    "route": "/family-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 105,
+    "key": "MortgageProgramPage-page-12",
+    "route": "/family-mortgage",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 105,
+    "key": "MortgageProgramPage-page-12",
+    "route": "/family-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 103,
+    "key": "PageHero-page-12",
+    "route": "/family-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 103,
+    "key": "PageHero-page-12",
+    "route": "/family-mortgage",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 103,
+    "key": "PageHero-page-12",
+    "route": "/family-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 102,
+    "key": "ExpositionLocations-page-11",
+    "route": "/exposition/vysokiy-kvartal",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 102,
+    "key": "ExpositionLocations-page-11",
+    "route": "/exposition/vysokiy-kvartal",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 101,
+    "key": "Pageexposition--slug-Section2-page-11",
+    "route": "/exposition/vysokiy-kvartal",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 100,
+    "key": "ExpositionVisit-page-11",
+    "route": "/exposition/vysokiy-kvartal",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 100,
+    "key": "ExpositionVisit-page-11",
+    "route": "/exposition/vysokiy-kvartal",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 99,
+    "key": "Pageexposition--slug-Section1-page-11",
+    "route": "/exposition/vysokiy-kvartal",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 98,
+    "key": "Pageexposition--slug-Section0-page-11",
+    "route": "/exposition/vysokiy-kvartal",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 98,
+    "key": "Pageexposition--slug-Section0-page-11",
+    "route": "/exposition/vysokiy-kvartal",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 97,
+    "key": "ExpositionLocations-page-10",
+    "route": "/exposition/avangard",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 97,
+    "key": "ExpositionLocations-page-10",
+    "route": "/exposition/avangard",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 96,
+    "key": "Pageexposition--slug-Section2-page-10",
+    "route": "/exposition/avangard",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 95,
+    "key": "ExpositionTourGallery-page-10",
+    "route": "/exposition/avangard",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 95,
+    "key": "ExpositionTourGallery-page-10",
+    "route": "/exposition/avangard",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 94,
+    "key": "ExpositionVisit-page-10",
+    "route": "/exposition/avangard",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 94,
+    "key": "ExpositionVisit-page-10",
+    "route": "/exposition/avangard",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 93,
+    "key": "Pageexposition--slug-Section1-page-10",
+    "route": "/exposition/avangard",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 92,
+    "key": "Pageexposition--slug-Section0-page-10",
+    "route": "/exposition/avangard",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 92,
+    "key": "Pageexposition--slug-Section0-page-10",
+    "route": "/exposition/avangard",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 91,
+    "key": "ExpositionLocations-page-9",
+    "route": "/exposition",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 91,
+    "key": "ExpositionLocations-page-9",
+    "route": "/exposition",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 90,
+    "key": "PageexpositionSection2-page-9",
+    "route": "/exposition",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 90,
+    "key": "PageexpositionSection2-page-9",
+    "route": "/exposition",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 89,
+    "key": "ExpositionVisit-page-9",
+    "route": "/exposition",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 89,
+    "key": "ExpositionVisit-page-9",
+    "route": "/exposition",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 85,
+    "key": "PageexpositionSection0-page-9",
+    "route": "/exposition",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 85,
+    "key": "PageexpositionSection0-page-9",
+    "route": "/exposition",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 84,
+    "key": "InfoPage-page-8",
+    "route": "/dealers",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 83,
+    "key": "PagecookiesSection0-page-7",
+    "route": "/cookies",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 83,
+    "key": "PagecookiesSection0-page-7",
+    "route": "/cookies",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 82,
+    "key": "PagecatalogSection0-page-6",
+    "route": "/catalog",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 81,
+    "key": "BusinessBenefitsBento-page-5",
+    "route": "/business",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 80,
+    "key": "BusinessTechnologyComparison-page-5",
+    "route": "/business",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 80,
+    "key": "BusinessTechnologyComparison-page-5",
+    "route": "/business",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 78,
+    "key": "BusinessProductBento-page-5",
+    "route": "/business",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 78,
+    "key": "BusinessProductBento-page-5",
+    "route": "/business",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 77,
+    "key": "PageHero-page-5",
+    "route": "/business",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 77,
+    "key": "PageHero-page-5",
+    "route": "/business",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 76,
+    "key": "MortgageProgramPage-page-4",
+    "route": "/basic-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 76,
+    "key": "MortgageProgramPage-page-4",
+    "route": "/basic-mortgage",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 76,
+    "key": "MortgageProgramPage-page-4",
+    "route": "/basic-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 74,
+    "key": "PageHero-page-4",
+    "route": "/basic-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 74,
+    "key": "PageHero-page-4",
+    "route": "/basic-mortgage",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 74,
+    "key": "PageHero-page-4",
+    "route": "/basic-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 73,
+    "key": "MortgageProgramPage-page-3",
+    "route": "/agro-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 73,
+    "key": "MortgageProgramPage-page-3",
+    "route": "/agro-mortgage",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 73,
+    "key": "MortgageProgramPage-page-3",
+    "route": "/agro-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 71,
+    "key": "PageHero-page-3",
+    "route": "/agro-mortgage",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 71,
+    "key": "PageHero-page-3",
+    "route": "/agro-mortgage",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 71,
+    "key": "PageHero-page-3",
+    "route": "/agro-mortgage",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 70,
+    "key": "VideoTestimonials-page-2",
+    "route": "/about",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 70,
+    "key": "VideoTestimonials-page-2",
+    "route": "/about",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 70,
+    "key": "VideoTestimonials-page-2",
+    "route": "/about",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 68,
+    "key": "AboutTimeline-page-2",
+    "route": "/about",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 68,
+    "key": "AboutTimeline-page-2",
+    "route": "/about",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 68,
+    "key": "AboutTimeline-page-2",
+    "route": "/about",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 67,
+    "key": "AboutCompanyBento-page-2",
+    "route": "/about",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 67,
+    "key": "AboutCompanyBento-page-2",
+    "route": "/about",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 67,
+    "key": "AboutCompanyBento-page-2",
+    "route": "/about",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 66,
+    "key": "PageaboutSection0-page-2",
+    "route": "/about",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 66,
+    "key": "PageaboutSection0-page-2",
+    "route": "/about",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 65,
+    "key": "VideoTestimonials-page-1",
+    "route": "/",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 65,
+    "key": "VideoTestimonials-page-1",
+    "route": "/",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 65,
+    "key": "VideoTestimonials-page-1",
+    "route": "/",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 58,
+    "key": "footer",
+    "route": "/catalog/barnhouse-113",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 58,
+    "key": "footer",
+    "route": "/catalog/barnhouse-113",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 58,
+    "key": "footer",
+    "route": "/catalog/barnhouse-113",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 57,
+    "key": "mainHeader",
+    "route": "/catalog/barnhouse-113",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 57,
+    "key": "mainHeader",
+    "route": "/catalog/barnhouse-113",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 57,
+    "key": "mainHeader",
+    "route": "/catalog/barnhouse-113",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 56,
+    "key": "technicalHeader",
+    "route": "/catalog/barnhouse-113",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 56,
+    "key": "technicalHeader",
+    "route": "/catalog/barnhouse-113",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 53,
+    "key": "contactsSection",
+    "route": "/manufacture",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 53,
+    "key": "contactsSection",
+    "route": "/manufacture",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 52,
+    "key": "productionSection",
+    "route": "/about",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 52,
+    "key": "productionSection",
+    "route": "/about",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 52,
+    "key": "productionSection",
+    "route": "/about",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 49,
+    "key": "referralProgram",
+    "route": "/",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 49,
+    "key": "referralProgram",
+    "route": "/",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 49,
+    "key": "referralProgram",
+    "route": "/",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 47,
+    "key": "independentReview",
+    "route": "/",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 47,
+    "key": "independentReview",
+    "route": "/",
+    "kind": "image",
+    "result": "passed"
+  },
+  {
+    "id": 46,
+    "key": "mortgageShowcase",
+    "route": "/",
+    "kind": "text",
+    "result": "passed"
+  },
+  {
+    "id": 46,
+    "key": "mortgageShowcase",
+    "route": "/",
+    "kind": "link",
+    "result": "passed"
+  },
+  {
+    "id": 46,
+    "key": "mortgageShowcase",
+    "route": "/",
+    "kind": "image",
+    "result": "passed"
+  }
+]

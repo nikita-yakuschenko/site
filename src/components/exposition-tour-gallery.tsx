@@ -1,4 +1,5 @@
 'use client'
+import { CMSContentBlock, useCMSMedia } from './cms-content'
 
 import Image from 'next/image'
 import { useState } from 'react'
@@ -8,12 +9,13 @@ import { PhotoLightbox } from './photo-lightbox'
 
 const GALLERY_TILES = 6
 
-export function ExpositionTourGallery({ photos }: { photos: readonly ExpositionTourPhoto[] }) {
+export function ExpositionTourGallery({ photos: sourcePhotos }: { photos: readonly ExpositionTourPhoto[] }) {
+  const photos = useCMSMedia('ExpositionTourGallery', sourcePhotos)
   const [open, setOpen] = useState<number | null>(null)
   const tiles = photos.slice(0, GALLERY_TILES)
   const rest = photos.length - tiles.length
 
-  return <>
+  return (<CMSContentBlock cmsBlockKey="ExpositionTourGallery" mediaBound galleryImages={sourcePhotos.map(photo => photo.src)}>{<>
     <div className="project-bento exposition-tour-gallery">
       {tiles.map((photo, index) => {
         const last = rest > 0 && index === tiles.length - 1
@@ -31,5 +33,5 @@ export function ExpositionTourGallery({ photos }: { photos: readonly ExpositionT
     </div>
     {open !== null && <PhotoLightbox images={photos.map((photo) => photo.src)} labels={photos.map((photo) => photo.alt)}
       index={open} onIndex={setOpen} onClose={() => setOpen(null)} />}
-  </>
+  </>}</CMSContentBlock>)
 }

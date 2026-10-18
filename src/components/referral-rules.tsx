@@ -1,3 +1,5 @@
+'use client'
+import { CMSContentBlock } from './cms-content'
 import Link from "next/link";
 import type { ReactNode } from "react";
 
@@ -61,7 +63,7 @@ function Group({
  * термины, группы пунктов и ставки — наши классы рядом с legal-doc.
  */
 export function ReferralRules() {
-  return (
+  return (<CMSContentBlock cmsBlockKey="ReferralRules">{(
     <article className="referral-rules">
       <header className="referral-rules__head">
         <h1>Правила реферальной программы</h1>
@@ -648,5 +650,5 @@ export function ReferralRules() {
         </Link>
       </footer>
     </article>
-  );
+  )}</CMSContentBlock>);
 }

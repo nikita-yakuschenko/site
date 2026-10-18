@@ -8,6 +8,20 @@ import { Button } from '../ui/button'
 import { projectBlockOrder, validProjectOrder, normalizeProjectOrder } from '../../config/project-order'
 
 export function ProjectBlockOrder({ path, readOnly }: JSONFieldClientProps) {
+  useEffect(() => {
+    const key = window.location.hash.match(/^#block-([A-Za-z]+)$/)?.[1]
+    if (!key) return
+    let tries = 0
+    const timer = window.setInterval(() => {
+      const section = document.querySelector<HTMLElement>(`.project-order-section-${CSS.escape(key)}`)
+      if (!section && ++tries < 25) return
+      window.clearInterval(timer)
+      if (!section) return
+      if (section.classList.contains('collapsible--collapsed')) section.querySelector<HTMLButtonElement>('button.collapsible__toggle')?.click()
+      section.scrollIntoView({ block: 'start' })
+    }, 200)
+    return () => window.clearInterval(timer)
+  }, [])
   const { value, setValue } = useField<string[]>({ path })
   const [defaultOrder, setDefaultOrder] = useState(projectBlockOrder)
   const order = normalizeProjectOrder(value ?? defaultOrder)

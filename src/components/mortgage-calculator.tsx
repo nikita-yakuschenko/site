@@ -664,7 +664,7 @@ export function MortgageCalculator({
                 в одной клетке и перекрещиваются прозрачностью. Раньше он
                 был здесь переписан заново — теперь это общий LeadReveal,
                 которому переданы местные классы раскладки. */}
-            <LeadReveal
+            <LeadReveal data-cms-content-connected
               formId="mortgage-calculator"
               siteId={SITE.id}
               label={t.resultCta}

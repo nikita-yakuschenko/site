@@ -1,3 +1,5 @@
+'use client'
+import { CMSContentBlock } from './cms-content'
 import Image from 'next/image'
 import Link from 'next/link'
 import { IconArrowUpRight } from '@tabler/icons-react'
@@ -20,7 +22,7 @@ const BANK_PARTNERS = [
 ]
 
 export function AboutCompanyBento() {
-  return (
+  return (<CMSContentBlock cmsBlockKey="AboutCompanyBento">{(
     <section className="section about-company" aria-label="О компании">
       <div className="section__inner">
         <div className="company-bento">
@@ -132,5 +134,5 @@ export function AboutCompanyBento() {
         </div>
       </div>
     </section>
-  )
+  )}</CMSContentBlock>)
 }

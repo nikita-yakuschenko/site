@@ -1,4 +1,5 @@
 'use client'
+import { CMSContentBlock } from './cms-content'
 
 import { IconArrowUpRight, IconX } from '@tabler/icons-react'
 import { useState } from 'react'
@@ -46,7 +47,7 @@ export function LeadReveal({
 }) {
   const [open, setOpen] = useState(false)
 
-  return (
+  return (<CMSContentBlock cmsBlockKey={`LeadReveal-instance-${formId.replace(/[^a-zA-Z0-9]+/g, "-")}`}>{(
     <div
       className={[
         'lead-reveal',
@@ -94,5 +95,5 @@ export function LeadReveal({
         </div>
       </div>
     </div>
-  )
+  )}</CMSContentBlock>)
 }

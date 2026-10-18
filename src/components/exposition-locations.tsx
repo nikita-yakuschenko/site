@@ -1,4 +1,5 @@
 'use client'
+import { CMSContentBlock } from './cms-content'
 
 import { useState } from 'react'
 import { IconDoorEnter, IconLayoutGrid, IconMapPin, IconTag } from '@tabler/icons-react'
@@ -40,7 +41,7 @@ export function ExpositionLocations({ place: fixedPlace, pageId = 'exposition' }
   const place = fixedPlace ?? EXPOSITION_PLACES[selected] ?? EXPOSITION_PLACES[0]
   const routeUrl = expositionRouteUrl(place.coordinates)
 
-  return <>
+  return (<CMSContentBlock cmsBlockKey="ExpositionLocations">{<>
     <h2 id="directions-title">Запишитесь на просмотр домов</h2>
     <div className={`contacts__place exposition-locations${fixedPlace ? ' exposition-locations--single' : ''}`}>
       {!fixedPlace && <div className="contacts__tabs" role="tablist" aria-label="Выставочные площадки">
@@ -79,5 +80,5 @@ export function ExpositionLocations({ place: fixedPlace, pageId = 'exposition' }
         <a className="exposition-locations__route" href={routeUrl} target="_blank" rel="noopener noreferrer">Построить маршрут</a>
       </div>
     </div>
-  </>
+  </>}</CMSContentBlock>)
 }

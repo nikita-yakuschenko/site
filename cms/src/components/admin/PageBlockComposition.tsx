@@ -10,6 +10,8 @@ import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, Att
 import { IconComponents, IconForms, IconPencil, IconSearch, IconX } from '@tabler/icons-react'
 import { mediaDocumentId } from './media-id'
 import { ProjectImageUpload } from './ProjectImageUpload'
+import { projectBlockParts } from '../../config/project-block-parts'
+import { configurationKeys, configurationNames } from '../../../../src/lib/catalog/configuration-rules'
 
 // The card header already names the part. Inside, the person edits the words the site shows.
 const partFields: Record<string, { name: 'text' | 'textMore' | 'href'; label: string; rows?: number; bare?: boolean }[]> = {
@@ -368,6 +370,14 @@ export function PartContentFields({ path }: TextareaFieldClientProps) {
   const link = useField<string>({ path: `${row}.href` })
   const bound = { text, textMore: more, href: link }
   const fields = partFields[key]
+  const galleryPaths = useFormFields(([formFields]) => {
+    const group = /^(.*(?:\.prop\.images|\.content\.gallery))\.\d+\.image$/.exec(key)?.[1]
+    if (!group) return ''
+    const count = (formFields.parts as { rows?: unknown[] } | undefined)?.rows?.length || 0
+    const paths = []
+    for (let index = 0; index < count; index++) if (String(formFields[`parts.${index}.key`]?.value || '').startsWith(`${group}.`)) paths.push(`parts.${index}.image`)
+    return JSON.stringify(paths.slice(Math.max(0, paths.indexOf(`${row}.image`))))
+  })
   useEffect(() => {
     if (!fields) return
     window.dispatchEvent(new CustomEvent('avgst:part-draft', { detail: { key, text: text.value || '', textMore: more.value || '', href: link.value || '' } }))
@@ -377,6 +387,11 @@ export function PartContentFields({ path }: TextareaFieldClientProps) {
   if (/^seriesBento\.slot\.\d+$/.test(key) || key === 'seriesBento.cards') return key === 'seriesBento.cards' ? <SeriesSlots /> : null
   if (/^hero\.promo\.\d+$/.test(key)) return null
   if (key === 'hero.promos') return <HeroPromoSlots />
+  if (key.includes('.content.')) return <div className="flex flex-col gap-4">
+    {key.endsWith('.image') ? <>
+      <ProjectImageUpload path={`${row}.image`} fallbackImageUrl={more.value || ''} batchPaths={galleryPaths ? JSON.parse(galleryPaths) as string[] : undefined} galleryPrefix={/^(.*\.content\.gallery)\.\d+\.image$/.exec(key)?.[1]} field={{ name: 'image', label: 'Изображение', type: 'upload', relationTo: 'media' } as UploadFieldClientProps['field']} />
+    </> : key.endsWith('.href') ? <Input aria-label="Ссылка" value={link.value || ''} onChange={event => link.setValue(event.target.value)} /> : <textarea aria-label="Текст" className="w-full" rows={3} value={text.value || ''} onChange={event => text.setValue(event.target.value)} />}
+  </div>
   if (!fields) return <p className="text-sm text-muted-foreground">Содержимое этой части пока задаётся в коде сайта.</p>
   return <div className="flex flex-col gap-4">{fields.map(field => <div key={field.name} className={`field-type ${field.name === 'href' || !field.rows ? 'text' : 'textarea'}`}>
     {field.bare ? null : <label className="field-label" htmlFor={`${row}-${field.name}`}>{field.label}</label>}
@@ -423,15 +438,28 @@ export function PageBlockComposition({ path }: UIFieldClientProps) {
   const component = useFormFields(([fields]) => fields[`${parent}.component`]?.value) as { relationTo: string; value: string | { id: string } } | undefined
   const id = typeof component?.value === 'object' ? component.value.id : component?.value
   const recordKey = `${component?.relationTo}:${id}`
-  const [record, setRecord] = useState<{ recordKey: string; parts: { key: string; title: string }[] }>()
+  const [record, setRecord] = useState<{ recordKey: string; structureOnly: boolean; editURL?: string; parts: { key: string; title: string }[] }>()
   useEffect(() => {
     if (!id || !['blocks', 'forms'].includes(component?.relationTo || '')) return
     const controller = new AbortController()
-    fetch(`/api/${component?.relationTo}/${id}?depth=0`, { signal: controller.signal }).then(response => response.ok ? response.json() : null).then(data => { if (data) setRecord({ recordKey, parts: data.parts || [] }) }).catch(() => {})
+    fetch(`/api/${component?.relationTo}/${id}?depth=0`, { signal: controller.signal }).then(response => response.ok ? response.json() : null).then(async data => {
+      if (!data) return
+      const projectBlock = projectBlockParts[data.key]
+      let editURL: string | undefined
+      if (projectBlock) {
+        const type = data.key === 'ReadyHomeOffer' ? 'ready-home' : 'project'
+        const response = await fetch(`/api/projects?limit=1&depth=0&sort=name&where[_status][equals]=published&where[recordType][equals]=${type}`, { signal: controller.signal })
+        const project = response.ok ? (await response.json()).docs?.[0] : null
+        if (project) editURL = `/collections/projects/${project.id}#block-${projectBlock.section}`
+      }
+      const configurationParts = data.key === 'ProjectConfig' ? [false, true].flatMap(modular => configurationKeys(modular).map(key => ({ key: `ProjectConfig.${modular ? 'modular' : 'panel'}.${key}`, title: `${modular ? 'Модульные' : 'Панельно-каркасные'}: ${configurationNames[key]}` }))) : null
+      setRecord({ recordKey, structureOnly: data.defaults?.structureOnly === true, editURL, parts: projectBlock?.parts || configurationParts || data.parts || [] })
+    }).catch(() => {})
     return () => controller.abort()
   }, [id, component?.relationTo, recordKey])
   if (record?.recordKey !== recordKey) return null
-  const editURL = `/collections/${component?.relationTo}/${id}`
+  if (record.structureOnly) return <p className="text-sm text-muted-foreground">Секвенции производства. Содержимое пока не привязано к редактору.</p>
+  const editURL = record.editURL || `/collections/${component?.relationTo}/${id}`
   const slotsOf = (key: string) => key === 'hero.promos' ? record.parts.filter(part => /^hero\.promo\.\d+$/.test(part.key)) : key === 'seriesBento.cards' ? record.parts.filter(part => /^seriesBento\.slot\.\d+$/.test(part.key)) : []
   const parts = record.parts.filter(part => !/^hero\.promo\.\d+$/.test(part.key) && !/^seriesBento\.slot\.\d+$/.test(part.key))
   return <div className="shadcn-surface mb-4">
@@ -442,7 +470,7 @@ export function PageBlockComposition({ path }: UIFieldClientProps) {
     <div className="flex flex-col gap-1">{parts.map(part => <div key={part.key}>
       <div className="group flex items-center gap-1">
         <Button type="button" variant="ghost" className="flex-1 justify-start" onClick={() => window.dispatchEvent(new CustomEvent('avgst:preview-selection', { detail: { path: parent, key: part.key, title: partTitle(part.key, part.title) } }))}><IconComponents className="size-4 text-muted-foreground" />{partTitle(part.key, part.title)}</Button>
-        <Button size="icon-sm" variant="ghost" className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100" asChild><a href={`${editURL}#part-${part.key}`} aria-label={`Редактировать «${partTitle(part.key, part.title)}»`} title={`Редактировать «${partTitle(part.key, part.title)}»`}><IconPencil /></a></Button>
+        <Button size="icon-sm" variant="ghost" className="opacity-0 group-hover:opacity-100 focus-visible:opacity-100" asChild><a href={record.editURL || `${editURL}#part-${part.key}`} aria-label={`Редактировать «${partTitle(part.key, part.title)}»`} title={`Редактировать «${partTitle(part.key, part.title)}»`}><IconPencil /></a></Button>
       </div>
       {slotsOf(part.key).map(slot => <div key={slot.key} className="group ml-6 flex items-center gap-1">
         <Button type="button" variant="ghost" className="flex-1 justify-start" onClick={() => window.dispatchEvent(new CustomEvent('avgst:preview-selection', { detail: { path: parent, key: slot.key, title: slot.title } }))}><IconComponents className="size-4 text-muted-foreground" />{slot.title}</Button>

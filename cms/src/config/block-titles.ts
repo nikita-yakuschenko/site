@@ -1,0 +1,30 @@
+export const blockTitles: Record<string, string> = {
+  MortgageWhoFits: 'Кому подходит ипотека', MortgageFaq: 'Вопросы об ипотеке',
+  PageaboutSection0: 'Главный экран: О компании', PagecatalogSection0: 'Каталог проектов',
+  PagecookiesSection0: 'Политика использования cookie', PageprivacySection0: 'Политика обработки персональных данных',
+  PagestoriesSection0: 'Заголовок страницы историй', PageexpositionSection0: 'Главный экран выставочных площадок',
+  PageexpositionSection1: 'Выставочные площадки', PageexpositionSection2: 'Проекты в экспозиции',
+  'Pageexposition--slug-Section0': 'Главный экран выставочной площадки', 'Pageexposition--slug-Section1': 'Проекты в экспозиции', 'Pageexposition--slug-Section2': 'Как проходит экскурсия',
+  AboutCompanyBento: 'О компании', AboutTimeline: 'История компании', VideoTestimonials: 'Видеоотзывы',
+  MortgageProgramPage: 'Ипотечная программа', LeadDialogButton: 'Кнопка заявки', PageHero: 'Главный экран',
+  BusinessProductBento: 'Продукты для бизнеса', BusinessTechnologyComparison: 'Сравнение технологий', BusinessBenefitsBento: 'Преимущества для бизнеса',
+  ContactsSection: 'Контакты', ProjectLeadProvider: 'Данные заявки проекта', DraftPreviewGate: 'Предпросмотр черновика', ProjectSectionTones: 'Оформление разделов проекта',
+  ProjectHeroContent: 'Главный экран проекта', ProjectHeroPayment: 'Стоимость и платёж', ProjectExteriors: 'Рендеры фасадов', ProjectPlans: 'Планировки',
+  ProjectInteriors: 'Рендеры интерьеров', ProjectBuilt: 'Построенные дома', ReadyHomeOffer: 'Готовый дом', MortgageCalculator: 'Ипотечный калькулятор',
+  ProjectNextSteps: 'Просмотр дома и консультация', ProjectSimilar: 'Похожие проекты', ProjectConfig: 'Комплектации', CatalogBoard: 'Каталог проектов',
+  InfoPage: 'Дилерство', ExpositionVisit: 'Посещение выставочной площадки', ExpositionTourGallery: 'Галерея выставочной площадки',
+  ExpositionLocations: 'Как добраться', ExpositionVideoTile: 'Выставочная площадка: видео', PhotoTile: 'Выставочная площадка: фотография',
+  ManufactureProjectQuestions: 'Вопросы о проекте', ManufacturePreparationQuestions: 'Подготовка к строительству', ManufactureVideoReview: 'Обзор производства',
+  ManufactureTruckTransition: 'Производство: перевозка модулей', ManufactureModuleScene: 'Производство: изготовление и сборка модулей',
+  LeadReveal: 'Заявка на консультацию', ManufactureMountingVideos: 'Видео монтажа', ManufactureFaq: 'Вопросы о производстве',
+  ProjectPreview: 'Макет страницы проекта', ReferralRules: 'Правила реферальной программы',
+  hero: 'Главный экран', advantagesBar: 'Преимущества', popularProjects: 'Популярные проекты', seriesBento: 'Подборки проектов',
+  mortgageShowcase: 'Ипотека', independentReview: 'Независимый обзор', videoTestimonials: 'Видеоотзывы', referralProgram: 'Реферальная программа',
+  textSection: 'Текстовый блок', cta: 'Призыв к действию', productionSection: 'Производство', contactsSection: 'Контакты', projectsCatalog: 'Каталог проектов', faq: 'Вопросы и ответы',
+  technicalHeader: 'Технический хедер', mainHeader: 'Основной хедер', footer: 'Футер',
+  FactoryOpenDayHero: 'День открытых дверей: главный экран', FactoryOpenDayProgram: 'День открытых дверей: программа',
+  FactoryOpenDayLocation: 'День открытых дверей: как доехать', FactoryOpenDayForm: 'День открытых дверей: запись', FactoryOpenDayFooter: 'День открытых дверей: подвал',
+}
+
+export const structureOnlyBlocks = new Set(['ManufactureTruckTransition', 'ManufactureModuleScene'])
+export const technicalBlocks = new Set(['ProjectLeadProvider', 'DraftPreviewGate', 'ProjectSectionTones', 'ProjectHeroPayment'])

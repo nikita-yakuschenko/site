@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import {
   Accordion,
@@ -57,7 +58,7 @@ const questions = [
 ];
 
 export function ManufactureProjectQuestions() {
-  return (
+  return (<CMSContentBlock cmsBlockKey="ManufactureProjectQuestions">{(
     <div className="manufacture-docs__questions">
       <h3 className="mortgage-rules__title">Вопросы о проекте</h3>
       <Accordion type="multiple" defaultValue={[]} className="ui-accordion mortgage-rules manufacture-questions">
@@ -69,11 +70,11 @@ export function ManufactureProjectQuestions() {
         ))}
       </Accordion>
     </div>
-  );
+  )}</CMSContentBlock>);
 }
 
 export function ManufacturePreparationQuestions() {
-  return (
+  return (<CMSContentBlock cmsBlockKey="ManufacturePreparationQuestions">{(
     <div className="manufacture-prep__questions">
       <h3 className="mortgage-rules__title">Вопросы о подготовке деталей</h3>
       <Accordion type="multiple" defaultValue={[]} className="ui-accordion mortgage-rules manufacture-questions">
@@ -85,11 +86,11 @@ export function ManufacturePreparationQuestions() {
         ))}
       </Accordion>
     </div>
-  );
+  )}</CMSContentBlock>);
 }
 
 export function ManufactureFaq() {
-  return (
+  return (<CMSContentBlock cmsBlockKey="ManufactureFaq">{(
     <section className="section manufacture-faq" aria-labelledby="manufacture-faq-title">
       <div className="section__inner">
         <h2 id="manufacture-faq-title">Частые вопросы</h2>
@@ -103,5 +104,5 @@ export function ManufactureFaq() {
         </Accordion>
       </div>
     </section>
-  );
+  )}</CMSContentBlock>);
 }

@@ -1,3 +1,5 @@
+'use client'
+import { CMSContentBlock } from '../cms-content'
 import { OpenDayRules } from './rules'
 
 const steps = [
@@ -13,7 +15,7 @@ const steps = [
 ]
 
 export function FactoryOpenDayProgram() {
-  return (
+  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayProgram">{(
     <section className="ags ags-prog">
       <OpenDayRules />
       <div className="ags-sheet">
@@ -33,5 +35,5 @@ export function FactoryOpenDayProgram() {
         <div className="ags-route__total"><span>Всего</span><b>около 3 часов 5 минут</b></div>
       </div>
     </section>
-  )
+  )}</CMSContentBlock>)
 }

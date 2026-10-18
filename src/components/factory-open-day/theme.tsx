@@ -1,7 +1,7 @@
 'use client'
 
 import { IconMoon, IconSun } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useSyncExternalStore } from 'react'
 
 type Theme = 'dark' | 'light'
 
@@ -26,9 +26,15 @@ export function OpenDayTheme() {
   return null
 }
 
+function subscribeTheme(notify: () => void) {
+  const observer = new MutationObserver(notify)
+  observer.observe(document.documentElement, { attributes: true, attributeFilter: ['data-ags-theme'] })
+  window.addEventListener('storage', notify)
+  return () => { observer.disconnect(); window.removeEventListener('storage', notify) }
+}
+
 export function OpenDayThemeToggle() {
-  const [theme, setTheme] = useState<Theme>('dark')
-  useEffect(() => { setTheme(storedTheme()) }, [])
+  const theme = useSyncExternalStore(subscribeTheme, storedTheme, () => 'dark' as Theme)
   return (
     <button
       className="ags-theme-toggle"
@@ -38,7 +44,6 @@ export function OpenDayThemeToggle() {
         const next: Theme = document.documentElement.dataset.agsTheme === 'dark' ? 'light' : 'dark'
         localStorage.setItem('ags-theme', next)
         document.documentElement.dataset.agsTheme = next
-        setTheme(next)
       }}
     >
       <IconMoon className="ags-theme-moon" size={18} stroke={2} aria-hidden />

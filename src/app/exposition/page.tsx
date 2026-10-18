@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -28,7 +29,7 @@ function TourButton({ place }: { place?: (typeof EXPOSITION_PLACES)[number] }) {
 export default function ExpositionPage() {
   return (
     <ExpositionShell>
-      <section className="section exposition-hero" aria-labelledby="exposition-title">
+      <CMSStaticBlock cmsBlockKey="PageexpositionSection0" scope={"/exposition"}><section className="section exposition-hero" aria-labelledby="exposition-title">
         <div className="section__inner mortgage-family">
           <div className="mortgage-family__media">
             <Image className="mortgage-family__image" src="/img/pages/exposition-main.jpg" alt="Дом с просторной террасой среди берёз" fill preload sizes="(max-width: 767px) 100vw, 60vw" />
@@ -40,21 +41,21 @@ export default function ExpositionPage() {
             <span className="exposition-hero__caption">2 площадки · Нижний Новгород и область</span>
           </div>
         </div>
-      </section>
-      <section className="section exposition-places" id="places" aria-label="Наши выставочные площадки">
+      </section></CMSStaticBlock>
+      <CMSStaticBlock cmsBlockKey="PageexpositionSection1" scope={"/exposition"}><section className="section exposition-places" id="places" aria-label="Наши выставочные площадки">
         <div className="section__inner exposition-places__grid">
           {EXPOSITION_PLACES.map((place, index) => index === 0 ? (
-            <ExpositionVideoTile key={place.slug} href={`/exposition/${place.slug}`} title={place.name} address={place.address} mobileAddress={place.shortAddress} />
+            <ExpositionVideoTile data-cms-content-connected key={place.slug} href={`/exposition/${place.slug}`} title={place.name} address={place.address} mobileAddress={place.shortAddress} />
           ) : (
-            <PhotoTile key={place.slug} className="exposition-place"
+            <PhotoTile data-cms-content-connected key={place.slug} className="exposition-place"
               href={`/exposition/${place.slug}`} title={place.name} address={place.address} mobileAddress={place.shortAddress}
               image="/img/pages/vysokiy-kvartal-aerial.webp" quality={90}
               sizes="(max-width: 767px) calc(100vw - 48px), (max-width: 1199px) calc(50vw - 32px), 568px" />
           ))}
         </div>
-      </section>
-      <ExpositionVisit />
-      <section className="section exposition-projects" aria-labelledby="exposition-projects-title">
+      </section></CMSStaticBlock>
+      <ExpositionVisit data-cms-content-connected />
+      <CMSStaticBlock cmsBlockKey="PageexpositionSection2" scope={"/exposition"}><section className="section exposition-projects" aria-labelledby="exposition-projects-title">
         <div className="section__inner">
           <div className="section__head"><h2 id="exposition-projects-title">Знакомство с домом<br />начинается здесь</h2><Link className="btn btn-yellow section__catalog-cta section__catalog-cta--desktop" href="/catalog">Все проекты домов <IconArrowUpRight size={18} stroke={2} /></Link></div>
           <p className="exposition-projects__intro">Изучите проекты перед поездкой. Какие дома доступны для просмотра на площадке, уточним при записи.</p>
@@ -62,8 +63,8 @@ export default function ExpositionPage() {
             locationLabel={project.slug === 'norvegiya-132' ? 'Авангард' : 'Высокий Квартал'} />)}</div>
           <Link className="btn btn-yellow section__catalog-cta section__catalog-cta--mobile" href="/catalog">Все проекты домов <IconArrowUpRight size={18} stroke={2} /></Link>
         </div>
-      </section>
-      <section className="section exposition-directions" aria-labelledby="directions-title"><div className="section__inner"><ExpositionLocations /></div></section>
+      </section></CMSStaticBlock>
+      <CMSStaticBlock cmsBlockKey="PageexpositionSection3" scope={"/exposition"}><section className="section exposition-directions" aria-labelledby="directions-title"><div className="section__inner"><ExpositionLocations data-cms-content-connected /></div></section></CMSStaticBlock>
     </ExpositionShell>
   )
 }

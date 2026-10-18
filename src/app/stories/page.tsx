@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from 'next'
 import { SiteChrome } from '../../components/site-chrome'
 import { VideoTestimonials } from '../../components/video-testimonials'
@@ -8,6 +9,6 @@ export const metadata: Metadata = { title: 'Дома и истории - Ава�
 
 export default function StoriesPage() {
   return <SiteChrome name={SITE.name} phone={SITE.contacts.phone} email={SITE.contacts.email} address={SITE.contacts.address} navigation={[...SITE.navigation]} footer={SITE.footer.legal} about={footerAboutFor(SITE.name)}>
-    <main><section className="section"><div className="section__inner"><h1>Дома и истории</h1></div></section><VideoTestimonials showEyebrow={false} showAllLink={false} /></main>
+    <main><CMSStaticBlock cmsBlockKey="PagestoriesSection0" scope={"/stories"}><section className="section"><div className="section__inner"><h1>Дома и истории</h1></div></section></CMSStaticBlock><VideoTestimonials data-cms-content-connected showEyebrow={false} showAllLink={false} /></main>
   </SiteChrome>
 }

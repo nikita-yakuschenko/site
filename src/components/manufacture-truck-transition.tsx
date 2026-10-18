@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import { useEffect, useRef } from "react";
 import Image from "next/image";
@@ -78,7 +79,7 @@ export function ManufactureTruckTransition() {
     };
   }, []);
 
-  return (
+  return (<CMSContentBlock cmsBlockKey="ManufactureTruckTransition">{(
     <section className="section manufacture-dispatch" aria-labelledby="manufacture-dispatch-title">
       <div className="section__inner">
         <div className="manufacture-section-head">
@@ -92,5 +93,5 @@ export function ManufactureTruckTransition() {
         </div>
       </div>
     </section>
-  );
+  )}</CMSContentBlock>);
 }

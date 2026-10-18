@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from './cms-static-content'
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { Fragment } from "react";
 import Image from "next/image";
@@ -42,7 +43,7 @@ export function MortgagePageContent({
   /* Разделы, описывающие саму программу, показываются только там, где для
      них есть текст. У семейной он написан, у остальных трёх пока нет, и
      сочинять правила государственных программ вместо заказчика нельзя. */
-  return (
+  return (<CMSStaticBlock cmsBlockKey="MortgageProgramPage" scope={`/${programId === "market" ? "basic" : programId === "rural" ? "agro" : programId}-mortgage`}>{(
     <>
       <MortgageHero content={content} />
       <MortgageCalculator
@@ -50,21 +51,21 @@ export function MortgagePageContent({
         initialProgramId={programId}
         showEyebrow={false}
       />
-      {hasWho(content) ? <MortgageWhoFits content={content} /> : null}
+      {hasWho(content) ? <MortgageWhoFits data-cms-content-connected content={content} /> : null}
       <MortgageSteps content={content} />
       <MortgageFinance content={content} projectCount={projects.length} programId={programId} />
       {hasConditions(content) ? <MortgageConditions content={content} /> : null}
       <MortgageMidCta content={content} programId={programId} />
-      {hasFaq(content) ? <MortgageFaq content={content} /> : null}
+      {hasFaq(content) ? <MortgageFaq data-cms-content-connected content={content} /> : null}
       <MortgageOtherPrograms current={programId} />
       <MortgageContacts programId={programId} />
     </>
-  );
+  )}</CMSStaticBlock>);
 }
 
 function MortgageHero({ content }: { content: MortgageContent }) {
     return (
-      <PageHero
+      <PageHero data-cms-content-connected
         headingId="mortgage-hero-title"
         sectionClassName="mortgage-page mortgage-page--hero"
         title={
@@ -349,7 +350,7 @@ function MortgageMidCta({ content, programId }: { content: MortgageContent; prog
             к калькулятору — тому самому, который человек только что
             пролистал. */}
         <div className="mortgage-mid-cta__body">
-          <LeadReveal
+          <LeadReveal data-cms-content-connected
             siteId={SITE.id}
             formId="mortgage-consultation"
             meta={{ program: programId }}

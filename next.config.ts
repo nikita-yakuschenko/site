@@ -25,6 +25,7 @@ const nextConfig: NextConfig = {
     dangerouslyAllowLocalIP: true,
     qualities: [60, 75, 90],
     remotePatterns: [
+      { protocol: 'https', hostname: 'new.avgst.ru', pathname: '/**' },
       { protocol: 'https', hostname: 'cms.avgst.ru', pathname: '/api/media/file/**' },
       { protocol: 'http', hostname: 'localhost', port: '3001', pathname: '/api/media/file/**' },
     ],

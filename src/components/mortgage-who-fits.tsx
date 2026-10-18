@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import { IconInfoCircle } from "@tabler/icons-react";
 import Image from "next/image";
@@ -86,7 +87,7 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
     });
   }, []);
 
-  return (
+  return (<CMSContentBlock cmsBlockKey="MortgageWhoFits">{(
     <section className="section" aria-labelledby="mortgage-who-title">
       <div className="section__inner">
         <h2 id="mortgage-who-title">{content.whoHeading}</h2>
@@ -201,7 +202,7 @@ export function MortgageWhoFits({ content }: { content: WithWho }) {
         </div>
       </div>
     </section>
-  );
+  )}</CMSContentBlock>);
 }
 
 /**

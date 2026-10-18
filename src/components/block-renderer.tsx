@@ -14,7 +14,7 @@ import type { CatalogProject } from "../lib/catalog/types";
 import { BankStrip } from "./bank-strip";
 import { ContactsPlace } from "./contacts-place";
 import { CopyButton } from "./copy-button";
-import { FactoryVideo } from "./factory-video";
+import { FactoryVideo, FACTORY_VIDEO_EMBED } from "./factory-video";
 import {
   HeroCarousel,
   type HeroMessage,
@@ -315,7 +315,7 @@ function Production({ block, pageId }: { block: LayoutBlock; pageId?: string }) 
           </div>
         </div>
         <div className="production__media" data-cms-block="productionSection.media">
-          <FactoryVideo src={src} srcMobile={srcMobile} alt={copy.factoryAlt} />
+          <FactoryVideo src={src} srcMobile={srcMobile} alt={copy.factoryAlt} embedSrc={FACTORY_VIDEO_EMBED} />
         </div>
 
         {/* Подзаголовок связывает ряд с рассказом выше: без него четыре
@@ -364,7 +364,7 @@ export function ContactsSection({
   const useSite = block.useSiteContacts !== false;
   const phone = useSite ? contacts?.phone : (block.phone as string | undefined);
   const email = useSite ? contacts?.email : (block.email as string | undefined);
-  return (
+  return (<CMSStaticBlock cmsBlockKey="contactsSection">{(
     <section
       className={
         block.muted === false ? "section" : "section section--muted"
@@ -431,7 +431,7 @@ export function ContactsSection({
         />
       </div>
     </section>
-  );
+  )}</CMSStaticBlock>);
 }
 
 function Faq({ block }: { block: LayoutBlock }) {
@@ -512,7 +512,7 @@ export function BlockRenderer({
         if (block.blockType === "mortgageShowcase") return <MortgageShowcase key={index} block={block} />;
         if (block.blockType === "independentReview")
           return (
-            <IndependentReview
+            <IndependentReview data-cms-content-connected
               key={index}
               showEyebrow={block.showEyebrow !== false}
               headingLines={
@@ -524,14 +524,14 @@ export function BlockRenderer({
           );
         if (block.blockType === "videoTestimonials")
           return (
-            <VideoTestimonials
+            <VideoTestimonials data-cms-content-connected
               key={index}
               showEyebrow={block.showEyebrow !== false}
             />
           );
         if (block.blockType === "referralProgram")
           return (
-            <ReferralProgram key={index} siteId={siteId} pageId={pageId} />
+            <ReferralProgram data-cms-content-connected key={index} siteId={siteId} pageId={pageId} />
           );
         if (block.blockType === "textSection")
           return <TextSection key={index} block={block} />;
@@ -540,7 +540,7 @@ export function BlockRenderer({
           return <Production key={index} block={block} pageId={pageId === undefined ? undefined : String(pageId)} />;
         if (block.blockType === "contactsSection") {
           return (
-            <ContactsSection
+            <ContactsSection data-cms-content-connected
               key={index}
               block={block}
               contacts={contacts}
@@ -580,8 +580,9 @@ export function BlockRenderer({
         if (block.blockType === "faq") return <Faq key={index} block={block} />;
         return <UnknownBlock key={index} type={block.blockType} />;
         };
-        return <div key={`${block.blockType}-${index}`} data-cms-block={block.blockType} style={{ display: 'contents' }}>{render()}</div>;
+        return <div key={`${block.blockType}-${index}`} data-cms-block={block.blockType} style={{ display: 'contents' }}>{['hero', 'popularProjects', 'seriesBento', 'contactsSection', 'independentReview', 'referralProgram'].includes(block.blockType) ? render() : <CMSStaticBlock cmsBlockKey={block.blockType}>{render()}</CMSStaticBlock>}</div>;
       })}
     </>
   );
 }
+import { CMSStaticBlock } from './cms-static-content'

@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import { useState } from "react";
 import Image from "next/image";
@@ -30,7 +31,7 @@ export function BusinessTechnologyComparison() {
   const technology = technologies[selectedTechnology]!;
   const loads = operations.map(({original}) => Math.round(original[selectedTechnology]! / original[0] * 100));
   const payroll = calculateBusinessPayroll(loads, technology.supervisors);
-  return (
+  return (<CMSContentBlock cmsBlockKey="BusinessTechnologyComparison">{(
     <>
       <p className="technology-comparison__lead">Чем выше заводская готовность, тем меньше работ остаётся на площадке. Это создаёт условия для снижения операционных расходов и фонда оплаты труда, а также роста маржинальной прибыли компании.</p>
       <div className="technology-comparison__cards">
@@ -100,5 +101,5 @@ export function BusinessTechnologyComparison() {
         <p className="technology-comparison__scope"><IconInfoCircle size={20} aria-hidden="true" /><span>Расходы на бэкофис - бухгалтерию, маркетинг, юридическое сопровождение и HR - не включены. Пример служит для сравнения технологий и не заменяет финансовую модель конкретного бизнеса.</span></p>
       </div>
     </>
-  );
+  )}</CMSContentBlock>);
 }

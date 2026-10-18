@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import {
   Fragment,
@@ -170,7 +171,7 @@ export function SiteChrome({
         {/* Технический ряд — сплошная полоса во всю ширину вьюпорта, поэтому
             он лежит вне контейнера с ограниченной шириной: полоса тянется от
             края до края, а содержимое внутри держит ширину страницы. */}
-        <div className="site-header__bar" data-tech-theme={techBarTheme} data-cms-block="technicalHeader">
+        <CMSContentBlock cmsBlockKey="technicalHeader"><div className="site-header__bar" data-tech-theme={techBarTheme} data-cms-block="technicalHeader">
           <div className="site-header__meta">
             <span data-cms-block="technicalHeader.region" style={{ display: 'contents' }}><RegionSwitch /></span>
             {/* Одна группа: всё покупательское уехало в плашку, служебным
@@ -214,9 +215,9 @@ export function SiteChrome({
               )}
             </button>
           </div>
-        </div>
+        </div></CMSContentBlock>
 
-        <div className="site-header__inner" data-cms-block="mainHeader">
+        <CMSContentBlock cmsBlockKey="mainHeader"><div className="site-header__inner" data-cms-block="mainHeader">
           <div className="site-header__plaque">
             <Link href="/" className="site-header__brand" aria-label={name} data-cms-block="mainHeader.logo">
               <img
@@ -274,7 +275,7 @@ export function SiteChrome({
               это служебный слой страницы, а не часть шапки сайта. Контраст
               им даёт собственная растушёванная подложка, не общая плашка. */}
           {subrow ? <div className="site-header__subrow">{subrow}</div> : null}
-        </div>
+        </div></CMSContentBlock>
       </header>
 
       {menuOpen ? (
@@ -359,7 +360,7 @@ export function SiteChrome({
 
       {children}
 
-      <footer className="site-footer" id="footer" data-cms-block="footer">
+      <CMSContentBlock cmsBlockKey="footer"><footer className="site-footer" id="footer" data-cms-block="footer">
         <div className="footer-grid">
           <div className="footer-brand-col">
             <Link href="/" className="site-footer__brand">
@@ -511,7 +512,7 @@ export function SiteChrome({
             </div>
           </div>
         </div>
-      </footer>
+      </footer></CMSContentBlock>
 
       {askOpen ? <LeadDialog withMessage formId="header-question" meta={{ pageTitle: typeof document === "undefined" ? "" : document.title }} onClose={() => setAskOpen(false)} /> : null}
     </div>

@@ -1,3 +1,5 @@
+'use client'
+import { CMSContentBlock } from '../cms-content'
 import Link from 'next/link'
 import { OpenDayBookButton } from './form'
 import { OpenDayArrow, OpenDayRules } from './rules'
@@ -11,7 +13,7 @@ const points = [
 ]
 
 export function FactoryOpenDayHero({ date }: { date: string }) {
-  return (
+  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayHero">{(
     <section className="ags ags-hero">
       <OpenDayRules />
       <div className="ags-sheet">
@@ -53,5 +55,5 @@ export function FactoryOpenDayHero({ date }: { date: string }) {
         </div>
       </div>
     </section>
-  )
+  )}</CMSContentBlock>)
 }

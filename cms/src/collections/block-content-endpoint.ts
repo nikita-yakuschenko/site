@@ -18,7 +18,18 @@ export const blockContentEndpoint: Endpoint = {
   path: '/content', method: 'get', handler: async req => {
     const denied = authorizeSiteRequest(req)
     if (denied) return denied
-    const key = new URL(req.url || '').searchParams.get('key') || ''
+    const params = new URL(req.url || '').searchParams
+    if (params.get('all') === '1') {
+      const result = await req.payload.find({ collection: 'blocks', pagination: false, depth: 1, overrideAccess: true, req, select: { key: true, defaults: true, parts: true } })
+      const route = params.get('route')
+      return Response.json({ blocks: result.docs.filter(block => (block.defaults as { contentBinding?: string } | null)?.contentBinding === 'react' && (!route || !(block.defaults as { contentScope?: string } | null)?.contentScope || (block.defaults as { contentScope?: string }).contentScope === route)).map(block => ({
+        key: block.key,
+        scope: (block.defaults as { contentScope?: string } | null)?.contentScope || '',
+        gallery: (block.defaults as { contentGallery?: boolean } | null)?.contentGallery === true,
+        parts: (block.parts || []).filter(part => part.key.includes('.content.')).map(part => ({ key: part.key, title: part.title || '', text: part.text ?? '', href: part.href ?? '', image: mediaURL(part.image) || part.textMore || '', originalImage: part.textMore || '' })),
+      })) }, { headers: { 'Cache-Control': 'no-store' } })
+    }
+    const key = params.get('key') || ''
     if (!/^[A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*$/.test(key)) return Response.json({ error: 'Некорректный ключ' }, { status: 400 })
     const result = await req.payload.find({ collection: 'blocks', where: { key: { equals: key } }, limit: 1, depth: 1, overrideAccess: true, req })
     const parts = (result.docs[0]?.parts || []).map(part => ({

@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from 'next'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -39,7 +40,7 @@ export default function AboutPage() {
       footer={SITE.footer.legal} about={footerAboutFor(SITE.name)}
       subrow={<nav className="project-hero__crumbs" aria-label="Хлебные крошки"><Link href="/">Главная</Link><IconChevronRight size={14} stroke={2} aria-hidden /><span aria-current="page">О компании</span></nav>}>
       <main className="about-page">
-        <section className="section project-hero about-hero" aria-labelledby="about-title">
+        <CMSStaticBlock cmsBlockKey="PageaboutSection0" scope={"/about"}><section className="section project-hero about-hero" aria-labelledby="about-title">
           <div className="project-hero__media"><Image src="/img/pages/exposition-main.jpg" alt="Загородный дом с террасой среди деревьев" fill preload sizes="100vw" /></div>
           <div className="project-hero__veil" />
           <div className="project-hero__stage">
@@ -50,11 +51,11 @@ export default function AboutPage() {
               </div>
             </div>
           </div>
-        </section>
-        <AboutCompanyBento />
-        <section className="section about-tinted" aria-labelledby="about-history"><div className="section__inner"><AboutTimeline entries={history} /></div></section>
+        </section></CMSStaticBlock>
+        <AboutCompanyBento data-cms-content-connected />
+        <CMSStaticBlock cmsBlockKey="PageaboutSection1" scope={"/about"}><section className="section about-tinted" aria-labelledby="about-history"><div className="section__inner"><AboutTimeline data-cms-content-connected entries={history} /></div></section></CMSStaticBlock>
         <BlockRenderer blocks={HOME_LAYOUT.filter(block => block.blockType === 'productionSection')} projects={[]} contacts={SITE.contacts} siteId={SITE.id} pageId="about" />
-        <VideoTestimonials showEyebrow={false} />
+        <VideoTestimonials data-cms-content-connected showEyebrow={false} />
         <BlockRenderer blocks={HOME_LAYOUT.filter(block => block.blockType === 'contactsSection' || block.blockType === 'leadForm')} projects={[]} contacts={SITE.contacts} siteId={SITE.id} pageId="about" />
       </main>
     </SiteChrome>

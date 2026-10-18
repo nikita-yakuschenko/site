@@ -418,7 +418,8 @@ function BuiltVideoDialog({ state, onClose, onSave }: { state: VideoDraft | null
   </Dialog>
 }
 
-export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?: 'plan' }) {
+export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?: 'plan'; fallbackImageUrl?: string; batchPaths?: string[]; galleryPrefix?: string }) {
+  const { addFieldRow, dispatchFields, getDataByPath, removeFieldRow, setModified } = useForm()
   const plan = props.imageKind === 'plan'
   const slot = photoSlot(props.path)
   const listedGallery = Boolean(slot && /^(exteriors|interiors|built)$/.test(slot.arrayPath))
@@ -440,15 +441,29 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
       if (files.length) toast.error('Можно загружать только JPG, PNG, WebP или AVIF')
       return
     }
-    if (!slot && images.length > 1) toast.message('В это поле можно загрузить одно изображение')
-    const batch = slot ? images : images.slice(0, 1)
+    if (!slot && !props.batchPaths && images.length > 1) toast.message('В это поле можно загрузить одно изображение')
+    if (props.batchPaths && !props.galleryPrefix && images.length > props.batchPaths.length) toast.message(`В этой галерее ${props.batchPaths.length} изображений`)
+    const batch = props.galleryPrefix ? images : props.batchPaths ? images.slice(0, props.batchPaths.length) : slot ? images : images.slice(0, 1)
+    const rows = (getDataByPath('parts') as { key?: string }[] | undefined) || []
+    let nextKey = Math.max(-1, ...rows.filter(row => row.key?.startsWith(`${props.galleryPrefix}.`)).map(row => Number(row.key?.slice(props.galleryPrefix!.length + 1).split('.')[0]) || 0)) + 1
+    let added = 0
     for (const [index, file] of batch.entries()) {
       const key = `${file.name}-${crypto.randomUUID()}`
       setPending(current => [...current, { key, name: file.name, progress: 0 }])
       try {
         const mediaId = await uploadMedia(file, progress => setPending(current => current.map(item => item.key === key ? { ...item, progress } : item)))
         known.current.set(mediaId, { name: file.name, size: file.size, type: file.type })
-        if (index === 0) setValue(Number(mediaId))
+        if (props.batchPaths?.[index]) { dispatchFields({ type: 'UPDATE', path: props.batchPaths[index], value: Number(mediaId) }); setModified(true) }
+        else if (props.galleryPrefix) {
+          const key = `${props.galleryPrefix}.${nextKey}.image`
+          const title = `Изображение ${nextKey + 1}`
+          nextKey++
+          await addFieldRow({ path: 'parts', schemaPath: 'parts', rowIndex: rows.length + added++, subFieldState: {
+            key: { initialValue: key, value: key, valid: true }, title: { initialValue: title, value: title, valid: true }, image: { initialValue: Number(mediaId), value: Number(mediaId), valid: true }, textMore: { initialValue: '', value: '', valid: true },
+          } })
+          setModified(true)
+        }
+        else if (index === 0) setValue(Number(mediaId))
         else if (slot) place(slot.arrayPath, [mediaId], slot.index + 1)
         setPending(current => current.filter(item => item.key !== key))
       } catch (error) {
@@ -461,7 +476,7 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
   const doc = id ? docs[id] : undefined
   const local = id ? known.current.get(id) : undefined
   const name = doc?.filename || local?.name || label || 'Фото'
-  const url = doc?.url || ''
+  const url = doc?.url || (!id ? props.fallbackImageUrl : '') || ''
   const idleName = plan ? 'Перетащите планировку сюда' : rowType === 'video' ? 'Обложка видео' : 'Перетащите фото сюда'
   return <div className={fileDrag ? 'attachment-list is-drag' : 'attachment-list'} onDragOver={event => {
     if (!event.dataTransfer || !Array.from(event.dataTransfer.types).includes('Files')) return
@@ -475,12 +490,12 @@ export function ProjectImageUpload(props: UploadFieldClientProps & { imageKind?:
     void run(files)
   }}>
     {label ? <span className="field-label">{label}</span> : null}
-    <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple={Boolean(slot)} hidden onChange={event => {
+    <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple={Boolean(slot || props.batchPaths)} hidden onChange={event => {
       const files = [...(event.target.files || [])]
       event.target.value = ''
       void run(files)
     }} />
-    {id ? <FileAttachment name={name} description={fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)} state="done" drop={fileDrag} imageUrl={doc?.thumbnailURL || url || undefined} onRemove={() => setValue(null)} onOpen={url ? () => openAssetPreview({ src: url, title: name }) : undefined} /> : null}
+    {id || url ? <FileAttachment name={name} description={fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)} state="done" drop={fileDrag} imageUrl={doc?.thumbnailURL || url || undefined} onRemove={props.galleryPrefix ? () => removeFieldRow({ path: 'parts', rowIndex: Number(props.path.split('.')[1]) }) : id ? () => setValue(null) : undefined} onOpen={url ? () => openAssetPreview({ src: url, title: name }) : undefined} /> : null}
     {pending.map(item => <FileAttachment key={item.key} name={item.name} description={item.error || `Загрузка · ${item.progress}%`} state={item.error ? 'error' : 'uploading'} onRemove={() => setPending(current => current.filter(entry => entry.key !== item.key))} />)}
     {!id && !pending.length ? <FileAttachment name={idleName} description="JPG, PNG, WebP или AVIF" state="idle" drop={fileDrag} onOpen={() => fileInput.current?.click()} /> : null}
     {hint ? <p className="field-description">{hint}</p> : null}

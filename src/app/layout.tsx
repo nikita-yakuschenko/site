@@ -6,6 +6,8 @@ import { ConsentShell } from '../consent/ConsentShell'
 import { YandexMetrica } from '../components/yandex-metrica'
 import { RoistatCounter } from '../components/roistat-counter'
 import { CMSPreviewBridge } from '../components/cms-preview-bridge'
+import { CMSContentProvider } from '../components/cms-content'
+import { readCMSContent } from '../lib/cms/content'
 import { parseConsent } from '../consent/storage'
 import {
   CONSENT_COOKIE,
@@ -48,6 +50,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   /* Номер счётчика — из CMS (интеграции → Яндекс), с запасным ENV/фолбэком. */
   const counter = await activeMetricaCounterId()
   const roistatProjectId = await activeRoistatProjectId()
+  const content = await readCMSContent()
 
   const fresh = parsed && parsed.version === CONSENT_VERSION ? parsed : null
   const initialState = fresh && isConsentDecided(fresh) ? fresh : null
@@ -55,7 +58,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <ConsentShell initialState={initialState}>{children}</ConsentShell>
+        <Suspense><CMSContentProvider records={content}><ConsentShell initialState={initialState}>{children}</ConsentShell></CMSContentProvider></Suspense>
         <CMSPreviewBridge />
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
         {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в

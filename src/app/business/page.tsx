@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from "next";
 import type { ReactNode } from "react";
 import Image from "next/image";
@@ -89,7 +90,7 @@ function Section({
   children: ReactNode;
 }) {
   return (
-    <section
+    <CMSStaticBlock cmsBlockKey={`PagebusinessSection-${id}`} scope={"/business"}><section
       id={id}
       className={`section b2b-section${muted ? " section--muted" : ""}`}
       aria-labelledby={`${id}-title`}
@@ -98,7 +99,7 @@ function Section({
         <h2 id={`${id}-title`}>{title}</h2>
         {children}
       </div>
-    </section>
+    </section></CMSStaticBlock>
   );
 }
 
@@ -123,7 +124,7 @@ export default function BusinessPage() {
     >
       <main>
         <div className="b2b-page">
-        <PageHero
+        <PageHero data-cms-content-connected
           headingId="business-title"
           sectionClassName="b2b-intro"
           className="b2b-hero"
@@ -146,7 +147,7 @@ export default function BusinessPage() {
           title="Решения для бизнеса"
           muted
         >
-          <BusinessProductBento
+          <BusinessProductBento data-cms-content-connected
             materialsAction={
               <Inquiry
                 label="Обсудить комплектацию"
@@ -207,7 +208,7 @@ export default function BusinessPage() {
           id="technology-comparison"
           title="Технологии и прибыль"
         >
-          <BusinessTechnologyComparison />
+          <BusinessTechnologyComparison data-cms-content-connected />
         </Section>
 
         {SHOW_CONTRACT && (
@@ -284,11 +285,11 @@ export default function BusinessPage() {
             Готовые решения и поддержка, чтобы расширять ассортимент, сокращать
             сроки и выполнять больше заказов.
           </p>
-          <BusinessBenefitsBento />
+          <BusinessBenefitsBento data-cms-content-connected />
         </Section>
 
         </div>
-        <ContactsSection
+        <ContactsSection data-cms-content-connected
           block={{ ...HOME_LAYOUT.find((block) => block.blockType === "contactsSection")!, muted: false }}
           form={HOME_LAYOUT.find((block) => block.blockType === "leadForm")}
           contacts={SITE.contacts}

@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 }
 
 export default function DealersPage() {
-  return <InfoPage eyebrow={copy.dealers} title={copy.dealersTitle} lead={copy.dealersLead} cta={copy.dealersCta} />
+  return <InfoPage data-cms-content-connected eyebrow={copy.dealers} title={copy.dealersTitle} lead={copy.dealersLead} cta={copy.dealersCta} />
 }

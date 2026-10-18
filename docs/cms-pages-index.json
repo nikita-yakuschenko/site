@@ -1,0 +1,3293 @@
+{
+  "capturedAt": "2026-10-18T16:59:30.335Z",
+  "source": "https://cms.avgst.ru/pages",
+  "pageCount": 26,
+  "layoutCount": 132,
+  "blockRecordCount": 62,
+  "pages": [
+    {
+      "id": 1,
+      "title": "Главная",
+      "route": "/",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 42,
+          "collection": "blocks",
+          "key": "hero",
+          "title": "Главный экран",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [
+            {
+              "key": "hero.background",
+              "title": "Фоновое изображение"
+            },
+            {
+              "key": "hero.heading",
+              "title": "Заголовок"
+            },
+            {
+              "key": "hero.subtitle",
+              "title": "Подзаголовок"
+            },
+            {
+              "key": "hero.button",
+              "title": "Кнопка"
+            },
+            {
+              "key": "hero.promos",
+              "title": "Слоты быстрых промо"
+            },
+            {
+              "key": "hero.promo.0",
+              "title": "Семейная ипотека под 6%"
+            },
+            {
+              "key": "hero.promo.1",
+              "title": "Выставочные площадки"
+            },
+            {
+              "key": "hero.promo.2",
+              "title": "Посетите наше производство"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 44,
+          "collection": "blocks",
+          "key": "popularProjects",
+          "title": "Популярные проекты",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [
+            {
+              "key": "popularProjects.heading",
+              "title": "Заголовок"
+            },
+            {
+              "key": "popularProjects.cards",
+              "title": "Карточки проектов"
+            },
+            {
+              "key": "popularProjects.slot.0",
+              "title": "Слот 1"
+            },
+            {
+              "key": "popularProjects.slot.1",
+              "title": "Слот 2"
+            },
+            {
+              "key": "popularProjects.slot.2",
+              "title": "Слот 3"
+            },
+            {
+              "key": "popularProjects.slot.3",
+              "title": "Слот 4"
+            },
+            {
+              "key": "popularProjects.slot.4",
+              "title": "Слот 5"
+            },
+            {
+              "key": "popularProjects.slot.5",
+              "title": "Слот 6"
+            },
+            {
+              "key": "popularProjects.button",
+              "title": "Текст кнопки"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 45,
+          "collection": "blocks",
+          "key": "seriesBento",
+          "title": "Подборки",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [
+            {
+              "key": "seriesBento.heading",
+              "title": "Заголовок"
+            },
+            {
+              "key": "seriesBento.cards",
+              "title": "Подборки"
+            },
+            {
+              "key": "seriesBento.slot.0",
+              "title": "Панельно-каркасные дома"
+            },
+            {
+              "key": "seriesBento.slot.1",
+              "title": "Барнхаусы"
+            },
+            {
+              "key": "seriesBento.slot.2",
+              "title": "Классика"
+            },
+            {
+              "key": "seriesBento.slot.3",
+              "title": "Модульные дома"
+            },
+            {
+              "key": "seriesBento.button",
+              "title": "Текст кнопки"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 52,
+          "collection": "blocks",
+          "key": "productionSection",
+          "title": "Производство",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [
+            {
+              "key": "productionSection.heading",
+              "title": "Заголовок"
+            },
+            {
+              "key": "productionSection.text",
+              "title": "Текст"
+            },
+            {
+              "key": "productionSection.actions",
+              "title": "Кнопки"
+            },
+            {
+              "key": "productionSection.media",
+              "title": "Видео"
+            },
+            {
+              "key": "productionSection.shops",
+              "title": "Участки цеха"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 46,
+          "collection": "blocks",
+          "key": "mortgageShowcase",
+          "title": "Ипотека",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [
+            {
+              "key": "mortgageShowcase.banner",
+              "title": "Семейная ипотека"
+            },
+            {
+              "key": "mortgageShowcase.programs",
+              "title": "Программы"
+            },
+            {
+              "key": "mortgageShowcase.banks",
+              "title": "Банки"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 47,
+          "collection": "blocks",
+          "key": "independentReview",
+          "title": "Независимый обзор",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [
+            {
+              "key": "independentReview.heading",
+              "title": "Заголовок"
+            },
+            {
+              "key": "independentReview.lead",
+              "title": "Текст"
+            },
+            {
+              "key": "independentReview.channel",
+              "title": "Канал"
+            },
+            {
+              "key": "independentReview.player",
+              "title": "Плеер"
+            },
+            {
+              "key": "independentReview.playlist",
+              "title": "Плейлист"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 48,
+          "collection": "blocks",
+          "key": "videoTestimonials",
+          "title": "Видеоотзывы",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [
+            {
+              "key": "videoTestimonials.heading",
+              "title": "Заголовок"
+            },
+            {
+              "key": "videoTestimonials.rating",
+              "title": "Рейтинг"
+            },
+            {
+              "key": "videoTestimonials.lead",
+              "title": "Текст"
+            },
+            {
+              "key": "videoTestimonials.all",
+              "title": "Все истории"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 49,
+          "collection": "blocks",
+          "key": "referralProgram",
+          "title": "Реферальная программа",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [
+            {
+              "key": "referralProgram.banner",
+              "title": "Баннер"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 53,
+          "collection": "blocks",
+          "key": "contactsSection",
+          "title": "Контакты",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [
+            {
+              "key": "contactsSection.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "contactsSection.places",
+              "title": "Площадки"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 3,
+          "collection": "forms",
+          "key": "leadForm",
+          "title": "Форма заявки",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": true,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "title": "О компании - Авангард Строй",
+      "route": "/about",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/about/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 2,
+          "collection": "blocks",
+          "key": "AboutCompanyBento",
+          "title": "AboutCompanyBento",
+          "source": "src/components/about-company-bento.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 3,
+          "collection": "blocks",
+          "key": "AboutTimeline",
+          "title": "AboutTimeline",
+          "source": "src/components/about-timeline.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 4,
+          "collection": "blocks",
+          "key": "VideoTestimonials",
+          "title": "VideoTestimonials",
+          "source": "src/components/video-testimonials.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Сельская ипотека",
+      "route": "/agro-mortgage",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/agro-mortgage/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 5,
+          "collection": "blocks",
+          "key": "MortgageProgramPage",
+          "title": "MortgageProgramPage",
+          "source": "src/components/mortgage-program-page.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Рыночная ипотека",
+      "route": "/basic-mortgage",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/basic-mortgage/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 5,
+          "collection": "blocks",
+          "key": "MortgageProgramPage",
+          "title": "MortgageProgramPage",
+          "source": "src/components/mortgage-program-page.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Решения для бизнеса",
+      "route": "/business",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/business/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 6,
+          "collection": "blocks",
+          "key": "LeadDialogButton",
+          "title": "LeadDialogButton",
+          "source": "src/components/lead-dialog.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 8,
+          "collection": "blocks",
+          "key": "BusinessProductBento",
+          "title": "BusinessProductBento",
+          "source": "src/components/business-product-bento.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 9,
+          "collection": "blocks",
+          "key": "BusinessTechnologyComparison",
+          "title": "BusinessTechnologyComparison",
+          "source": "src/components/business-technology-comparison.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 10,
+          "collection": "blocks",
+          "key": "BusinessBenefitsBento",
+          "title": "BusinessBenefitsBento",
+          "source": "src/components/business-benefits-bento.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 11,
+          "collection": "blocks",
+          "key": "ContactsSection",
+          "title": "ContactsSection",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 7,
+          "collection": "blocks",
+          "key": "PageHero",
+          "title": "PageHero",
+          "source": "src/components/page-hero.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "Проекты домов",
+      "route": "/catalog",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/catalog/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 25,
+          "collection": "blocks",
+          "key": "CatalogBoard",
+          "title": "CatalogBoard",
+          "source": "src/components/catalog-board.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Политика использования файлов cookie и аналогичных технологий",
+      "route": "/cookies",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/cookies/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Дилерство",
+      "route": "/dealers",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/dealers/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 26,
+          "collection": "blocks",
+          "key": "InfoPage",
+          "title": "InfoPage",
+          "source": "src/components/info-page.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Выставочные площадки",
+      "route": "/exposition",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/exposition/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 6,
+          "collection": "blocks",
+          "key": "LeadDialogButton",
+          "title": "LeadDialogButton",
+          "source": "src/components/lead-dialog.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 30,
+          "collection": "blocks",
+          "key": "ExpositionVideoTile",
+          "title": "ExpositionVideoTile",
+          "source": "src/components/exposition-video-tile.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 31,
+          "collection": "blocks",
+          "key": "PhotoTile",
+          "title": "PhotoTile",
+          "source": "src/components/photo-tile.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 27,
+          "collection": "blocks",
+          "key": "ExpositionVisit",
+          "title": "ExpositionVisit",
+          "source": "src/components/exposition-visit.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 29,
+          "collection": "blocks",
+          "key": "ExpositionLocations",
+          "title": "ExpositionLocations",
+          "source": "src/components/exposition-locations.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Авангард",
+      "route": "/exposition/avangard",
+      "kind": "exposition",
+      "status": "published",
+      "source": "src/app/exposition/[slug]/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 6,
+          "collection": "blocks",
+          "key": "LeadDialogButton",
+          "title": "LeadDialogButton",
+          "source": "src/components/lead-dialog.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 27,
+          "collection": "blocks",
+          "key": "ExpositionVisit",
+          "title": "ExpositionVisit",
+          "source": "src/components/exposition-visit.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 28,
+          "collection": "blocks",
+          "key": "ExpositionTourGallery",
+          "title": "ExpositionTourGallery",
+          "source": "src/components/exposition-tour-gallery.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 29,
+          "collection": "blocks",
+          "key": "ExpositionLocations",
+          "title": "ExpositionLocations",
+          "source": "src/components/exposition-locations.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Высокий Квартал",
+      "route": "/exposition/vysokiy-kvartal",
+      "kind": "exposition",
+      "status": "published",
+      "source": "src/app/exposition/[slug]/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 6,
+          "collection": "blocks",
+          "key": "LeadDialogButton",
+          "title": "LeadDialogButton",
+          "source": "src/components/lead-dialog.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 27,
+          "collection": "blocks",
+          "key": "ExpositionVisit",
+          "title": "ExpositionVisit",
+          "source": "src/components/exposition-visit.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 28,
+          "collection": "blocks",
+          "key": "ExpositionTourGallery",
+          "title": "ExpositionTourGallery",
+          "source": "src/components/exposition-tour-gallery.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 29,
+          "collection": "blocks",
+          "key": "ExpositionLocations",
+          "title": "ExpositionLocations",
+          "source": "src/components/exposition-locations.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "title": "Семейная ипотека",
+      "route": "/family-mortgage",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/family-mortgage/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 5,
+          "collection": "blocks",
+          "key": "MortgageProgramPage",
+          "title": "MortgageProgramPage",
+          "source": "src/components/mortgage-program-page.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "title": "Готовые дома",
+      "route": "/for-sale",
+      "kind": "redirect",
+      "status": "published",
+      "source": "src/app/for-sale/page.tsx",
+      "blocks": []
+    },
+    {
+      "id": 14,
+      "title": "IT-ипотека",
+      "route": "/it-mortgage",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/it-mortgage/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 5,
+          "collection": "blocks",
+          "key": "MortgageProgramPage",
+          "title": "MortgageProgramPage",
+          "source": "src/components/mortgage-program-page.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "title": "Политика использования файлов cookie и аналогичных технологий",
+      "route": "/legal/cookies",
+      "kind": "redirect",
+      "status": "published",
+      "source": "src/app/legal/cookies/page.tsx",
+      "blocks": []
+    },
+    {
+      "id": 16,
+      "title": "Политика в отношении обработки персональных данных",
+      "route": "/legal/privacy",
+      "kind": "redirect",
+      "status": "published",
+      "source": "src/app/legal/privacy/page.tsx",
+      "blocks": []
+    },
+    {
+      "id": 17,
+      "title": "Правила реферальной программы",
+      "route": "/legal/referral",
+      "kind": "redirect",
+      "status": "published",
+      "source": "src/app/legal/referral/page.tsx",
+      "blocks": []
+    },
+    {
+      "id": 18,
+      "title": "Производство домокомплектов",
+      "route": "/manufacture",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/manufacture/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 7,
+          "collection": "blocks",
+          "key": "PageHero",
+          "title": "PageHero",
+          "source": "src/components/page-hero.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 6,
+          "collection": "blocks",
+          "key": "LeadDialogButton",
+          "title": "LeadDialogButton",
+          "source": "src/components/lead-dialog.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 32,
+          "collection": "blocks",
+          "key": "ManufactureProjectQuestions",
+          "title": "ManufactureProjectQuestions",
+          "source": "src/components/manufacture-faq.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 33,
+          "collection": "blocks",
+          "key": "ManufacturePreparationQuestions",
+          "title": "ManufacturePreparationQuestions",
+          "source": "src/components/manufacture-faq.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 34,
+          "collection": "blocks",
+          "key": "ManufactureVideoReview",
+          "title": "ManufactureVideoReview",
+          "source": "src/components/manufacture-video-review.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 35,
+          "collection": "blocks",
+          "key": "ManufactureTruckTransition",
+          "title": "ManufactureTruckTransition",
+          "source": "src/components/manufacture-truck-transition.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 36,
+          "collection": "blocks",
+          "key": "ManufactureModuleScene",
+          "title": "ManufactureModuleScene",
+          "source": "src/components/manufacture-module-scene.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 37,
+          "collection": "blocks",
+          "key": "LeadReveal",
+          "title": "LeadReveal",
+          "source": "src/components/lead-reveal.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 38,
+          "collection": "blocks",
+          "key": "ManufactureMountingVideos",
+          "title": "ManufactureMountingVideos",
+          "source": "src/components/manufacture-mounting-videos.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 39,
+          "collection": "blocks",
+          "key": "ManufactureFaq",
+          "title": "ManufactureFaq",
+          "source": "src/components/manufacture-faq.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 11,
+          "collection": "blocks",
+          "key": "ContactsSection",
+          "title": "ContactsSection",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "title": "Ипотека",
+      "route": "/mortgage",
+      "kind": "redirect",
+      "status": "published",
+      "source": "src/app/mortgage/page.tsx",
+      "blocks": []
+    },
+    {
+      "id": 20,
+      "title": "Политика в отношении обработки персональных данных",
+      "route": "/personal-data",
+      "kind": "redirect",
+      "status": "published",
+      "source": "src/app/personal-data/page.tsx",
+      "blocks": []
+    },
+    {
+      "id": 21,
+      "title": "Макет страницы проекта",
+      "route": "/preview/project",
+      "kind": "preview",
+      "status": "published",
+      "source": "src/app/preview/project/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 40,
+          "collection": "blocks",
+          "key": "ProjectPreview",
+          "title": "ProjectPreview",
+          "source": "src/components/preview/project-preview.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "title": "Политика в отношении обработки персональных данных",
+      "route": "/privacy",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/privacy/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "title": "Правила реферальной программы",
+      "route": "/referral",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/referral/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 41,
+          "collection": "blocks",
+          "key": "ReferralRules",
+          "title": "ReferralRules",
+          "source": "src/components/referral-rules.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "title": "Дома и истории - Авангард Строй",
+      "route": "/stories",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/stories/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 4,
+          "collection": "blocks",
+          "key": "VideoTestimonials",
+          "title": "VideoTestimonials",
+          "source": "src/components/video-testimonials.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "title": "Страница проекта",
+      "route": "/catalog/[slug]",
+      "kind": "template",
+      "status": "published",
+      "source": "src/app/catalog/[slug]/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 12,
+          "collection": "blocks",
+          "key": "ProjectLeadProvider",
+          "title": "ProjectLeadProvider",
+          "source": "src/components/project-lead-context.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 13,
+          "collection": "blocks",
+          "key": "DraftPreviewGate",
+          "title": "DraftPreviewGate",
+          "source": "src/components/draft-preview-gate.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 14,
+          "collection": "blocks",
+          "key": "ProjectSectionTones",
+          "title": "ProjectSectionTones",
+          "source": "src/components/project-section-tones.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 15,
+          "collection": "blocks",
+          "key": "ProjectHeroContent",
+          "title": "ProjectHeroContent",
+          "source": "src/components/project-hero-content.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 16,
+          "collection": "blocks",
+          "key": "ProjectHeroPayment",
+          "title": "ProjectHeroPayment",
+          "source": "src/components/project-hero-payment.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 17,
+          "collection": "blocks",
+          "key": "ProjectExteriors",
+          "title": "ProjectExteriors",
+          "source": "src/components/project-media.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 18,
+          "collection": "blocks",
+          "key": "ProjectPlans",
+          "title": "ProjectPlans",
+          "source": "src/components/project-plans.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 19,
+          "collection": "blocks",
+          "key": "ProjectInteriors",
+          "title": "ProjectInteriors",
+          "source": "src/components/project-media.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 20,
+          "collection": "blocks",
+          "key": "ProjectBuilt",
+          "title": "ProjectBuilt",
+          "source": "src/components/project-built.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 21,
+          "collection": "blocks",
+          "key": "ReadyHomeOffer",
+          "title": "ReadyHomeOffer",
+          "source": "src/components/ready-home-offer.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 22,
+          "collection": "blocks",
+          "key": "MortgageCalculator",
+          "title": "MortgageCalculator",
+          "source": "src/components/mortgage-calculator.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 1,
+          "collection": "blocks",
+          "key": "ProjectConfig",
+          "title": "Комплектации",
+          "source": "src/components/project-config.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": true,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 23,
+          "collection": "blocks",
+          "key": "ProjectNextSteps",
+          "title": "ProjectNextSteps",
+          "source": "src/components/project-next-steps.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 24,
+          "collection": "blocks",
+          "key": "ProjectSimilar",
+          "title": "ProjectSimilar",
+          "source": "src/components/project-similar.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 11,
+          "collection": "blocks",
+          "key": "ContactsSection",
+          "title": "ContactsSection",
+          "source": "src/components/block-renderer.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": false,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "title": "День открытых дверей на производстве",
+      "route": "/factory-open-day",
+      "kind": "page",
+      "status": "published",
+      "source": "src/app/factory-open-day/page.tsx",
+      "blocks": [
+        {
+          "id": 56,
+          "collection": "blocks",
+          "key": "technicalHeader",
+          "title": "Технический хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "technicalHeader.region",
+              "title": "Регион"
+            },
+            {
+              "key": "technicalHeader.navigation",
+              "title": "Служебная навигация"
+            },
+            {
+              "key": "technicalHeader.status",
+              "title": "Режим работы"
+            },
+            {
+              "key": "technicalHeader.theme",
+              "title": "Переключатель темы"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 57,
+          "collection": "blocks",
+          "key": "mainHeader",
+          "title": "Основной хедер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "mainHeader.logo",
+              "title": "Логотип"
+            },
+            {
+              "key": "mainHeader.navigation",
+              "title": "Основная навигация"
+            },
+            {
+              "key": "mainHeader.contacts",
+              "title": "Контакты и действия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 59,
+          "collection": "blocks",
+          "key": "FactoryOpenDayHero",
+          "title": "День открытых дверей: первый экран",
+          "source": "src/components/factory-open-day/hero.tsx",
+          "parts": [
+            {
+              "key": "openDay.date",
+              "title": "Дата мероприятия"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 60,
+          "collection": "blocks",
+          "key": "FactoryOpenDayProgram",
+          "title": "День открытых дверей: программа",
+          "source": "src/components/factory-open-day/program.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": true,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 61,
+          "collection": "blocks",
+          "key": "FactoryOpenDayLocation",
+          "title": "День открытых дверей: как доехать",
+          "source": "src/components/factory-open-day/location.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": true,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 4,
+          "collection": "forms",
+          "key": "FactoryOpenDayForm",
+          "title": "День открытых дверей: запись",
+          "source": "src/components/factory-open-day/form.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": true,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 62,
+          "collection": "blocks",
+          "key": "FactoryOpenDayFooter",
+          "title": "День открытых дверей: подвал",
+          "source": "src/components/factory-open-day/footer.tsx",
+          "parts": [],
+          "checks": {
+            "russianName": true,
+            "composition": false,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        },
+        {
+          "id": 58,
+          "collection": "blocks",
+          "key": "footer",
+          "title": "Футер",
+          "source": "src/components/site-chrome.tsx",
+          "parts": [
+            {
+              "key": "footer.navigation",
+              "title": "Навигация"
+            },
+            {
+              "key": "footer.contacts",
+              "title": "Контакты"
+            },
+            {
+              "key": "footer.legal",
+              "title": "Юридическая информация"
+            }
+          ],
+          "checks": {
+            "russianName": true,
+            "composition": true,
+            "preview": "not-tested",
+            "editor": "not-tested",
+            "persistence": "not-tested"
+          }
+        }
+      ]
+    }
+  ]
+}

@@ -1,3 +1,5 @@
+'use client'
+import { CMSContentBlock } from './cms-content'
 import { BUSINESS } from "../lib/business-content";
 import "./business-benefits-bento.css";
 
@@ -14,7 +16,7 @@ const cards = [
 ] as const;
 
 export function BusinessBenefitsBento() {
-  return (
+  return (<CMSContentBlock cmsBlockKey="BusinessBenefitsBento">{(
     <div className="business-benefits-bento">
       {cards.map(({ content: [title, description], name, ...card }, index) => (
         <article
@@ -29,5 +31,5 @@ export function BusinessBenefitsBento() {
         </article>
       ))}
     </div>
-  );
+  )}</CMSContentBlock>);
 }

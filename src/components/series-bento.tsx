@@ -66,7 +66,7 @@ export function SeriesBento({ block }: { block: LayoutBlock }) {
         </div>
         <div className="series-bento" data-cms-block="seriesBento.cards">
           {items.map(item => (
-            <PhotoTile
+            <PhotoTile data-cms-content-connected
               key={item.id}
               className={`series-bento__tile--${item.place || item.id}`}
               href={item.href}

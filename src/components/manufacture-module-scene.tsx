@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import { useEffect, useId, useRef, useState } from "react";
 import Image from "next/image";
@@ -508,7 +509,7 @@ export function ManufactureModuleScene() {
     };
   }, []);
 
-  return (
+  return (<CMSContentBlock cmsBlockKey="ManufactureModuleScene">{(
     <>
       <div className="manufacture-section-head manufacture-module__intro">
         <h2 id="manufacture-routes-title" ref={introRef}>А&nbsp;для модульного дома<br />всё только начинается</h2>
@@ -597,5 +598,5 @@ export function ManufactureModuleScene() {
         <canvas ref={fourthFrameCanvasRef} width={fourthFrameSequence.width} height={fourthFrameSequence.height} className="manufacture-module__video" style={{ zIndex: 30 }} role="img" aria-label="Комплектация и упаковка готового модуля при прокрутке" />
       </div>
     </>
-  );
+  )}</CMSContentBlock>);
 }

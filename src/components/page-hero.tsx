@@ -1,3 +1,5 @@
+'use client'
+import { CMSContentBlock } from './cms-content'
 import Image, { type StaticImageData } from "next/image";
 import type { ReactNode } from "react";
 import "./page-hero.css";
@@ -28,7 +30,7 @@ export function PageHero({
     ? "mortgage-family"
     : variant === "manufacture" ? "manufacture-intro__banner" : "";
   const mediaClass = variant === "family" ? "mortgage-family__media" : "";
-  return (
+  return (<CMSContentBlock cmsBlockKey="PageHero">{(
     <section
       className={`section page-hero-section ${sectionClassName}`}
       aria-labelledby={headingId}
@@ -61,5 +63,5 @@ export function PageHero({
         </div>
       </div>
     </section>
-  );
+  )}</CMSContentBlock>);
 }

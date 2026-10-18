@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import { useState } from "react";
 import { VideoLightbox, vkEmbed } from "./video-lightbox";
@@ -20,7 +21,7 @@ export function ManufactureMountingVideos() {
   const [active, setActive] = useState<number | null>(null);
   const selected = active !== null ? episodes[active] : undefined;
 
-  return (
+  return (<CMSContentBlock cmsBlockKey="ManufactureMountingVideos">{(
     <div className="manufacture-mounting-videos">
       <h3 className="mortgage-rules__title">Посмотрите двухсерийный фильм о&nbsp;том, как перевозится и&nbsp;собирается дом</h3>
       <div className="manufacture-mounting-videos__grid">
@@ -51,5 +52,5 @@ export function ManufactureMountingVideos() {
         />
       ) : null}
     </div>
-  );
+  )}</CMSContentBlock>);
 }

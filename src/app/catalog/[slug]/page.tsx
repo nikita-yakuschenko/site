@@ -160,7 +160,7 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
             ProjectConfig: !readyHome ? <ProjectConfig project={heroProject} configurations={configurations ?? []} /> : null,
             ProjectNextSteps: <ProjectNextSteps readyHome={Boolean(readyHome)} reviewImage={project.imageUrl} visitImage={readyHome?.visitImage} settings={nextSteps} />,
             ProjectSimilar: <ProjectSimilar projects={similarProjects} />,
-            contactsSection: <ContactsSection block={{ blockType: 'contactsSection', showEyebrow: false, muted: false }} contacts={SITE.contacts} siteId={SITE.id} pageId={project.id} project={{ id: project.id, cmsId: hero.projectId, slug: hero.slug, name: hero.name }} />,
+            contactsSection: <ContactsSection data-cms-content-connected block={{ blockType: 'contactsSection', showEyebrow: false, muted: false }} contacts={SITE.contacts} siteId={SITE.id} pageId={project.id} project={{ id: project.id, cmsId: hero.projectId, slug: hero.slug, name: hero.name }} />,
           }
           const emptyHeading = draft ? draftHeadings[key] : undefined
           return blocks[key] || emptyHeading ? <div key={key} data-cms-block={key} style={blockStyle(key)}>{blocks[key]}{emptyHeading && <section className="section project-preview-empty"><div className="section__inner"><h2>{emptyHeading}</h2></div></section>}</div> : null

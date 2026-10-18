@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
@@ -184,7 +185,7 @@ export function ReferralProgram({
     }
   }
 
-  return (
+  return (<CMSContentBlock cmsBlockKey="referralProgram">{(
     <section
       className="section referral"
       data-cms-block="referralProgram"
@@ -504,5 +505,5 @@ export function ReferralProgram({
         </div>
       </div>
     </section>
-  );
+  )}</CMSContentBlock>);
 }

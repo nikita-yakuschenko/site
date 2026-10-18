@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from "next";
 import { ReferralRules } from "../../components/referral-rules";
 import { SiteChrome } from "../../components/site-chrome";
@@ -23,11 +24,11 @@ export default function ReferralRulesPage() {
       about={footerAboutFor(SITE.name)}
     >
       <main>
-        <section className="section legal-doc">
+        <CMSStaticBlock cmsBlockKey="PagereferralSection0" scope={"/referral"}><section className="section legal-doc">
           <div className="section__inner legal-doc__inner">
-            <ReferralRules />
+            <ReferralRules data-cms-content-connected />
           </div>
-        </section>
+        </section></CMSStaticBlock>
       </main>
     </SiteChrome>
   );

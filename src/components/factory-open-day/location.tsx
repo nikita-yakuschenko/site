@@ -1,7 +1,9 @@
+'use client'
+import { CMSContentBlock } from '../cms-content'
 import { OpenDayArrow, OpenDayRules } from './rules'
 
 export function FactoryOpenDayLocation({ date }: { date: string }) {
-  return <section className="ags ags-loc">
+  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayLocation">{<section className="ags ags-loc">
     <OpenDayRules />
     <div className="ags-sheet">
       <div className="ags-loc__body">
@@ -24,5 +26,5 @@ export function FactoryOpenDayLocation({ date }: { date: string }) {
         </div>
       </div>
     </div>
-  </section>
+  </section>}</CMSContentBlock>)
 }

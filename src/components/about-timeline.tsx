@@ -1,4 +1,5 @@
 'use client'
+import { CMSContentBlock, useCMSMedia } from './cms-content'
 
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
@@ -11,7 +12,8 @@ type HistoryBlocks = readonly [readonly [string, string]] | readonly [readonly [
 type EventLogo = { src: string; alt: string; width: number; height: number; edition?: string }
 export type HistoryEntry = { year: string; events: HistoryBlocks; eventLogos?: readonly (EventLogo | readonly EventLogo[] | null)[]; links?: readonly string[]; linkWords?: readonly string[]; images?: readonly string[]; imageAlt?: string; imageFit?: 'cover' | 'contain'; imagePosition?: string; logo?: boolean; stacked?: boolean; bankLogos?: readonly { src: string; alt: string; width?: number; height?: number }[] }
 
-export function AboutTimeline({ entries }: { entries: readonly HistoryEntry[] }) {
+export function AboutTimeline({ entries: sourceEntries }: { entries: readonly HistoryEntry[] }) {
+  const entries = useCMSMedia('AboutTimeline', sourceEntries)
   const rail = useRef<HTMLDivElement>(null)
   const scale = useRef<HTMLElement>(null)
   const [active, setActive] = useState(0)
@@ -83,7 +85,7 @@ export function AboutTimeline({ entries }: { entries: readonly HistoryEntry[] })
     element.scrollTo({ left: Math.max(0, Math.min(element.scrollWidth - element.clientWidth, index * step)), behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' })
   }
 
-  return (
+  return (<CMSContentBlock cmsBlockKey="AboutTimeline" mediaBound>{(
     <>
       <div className="about-timeline__heading">
         <h2 id="about-history"><span className="about-timeline__title">История компании</span> <span className="about-timeline__year" aria-live="polite">{entries[active]?.year}</span></h2>
@@ -114,5 +116,5 @@ export function AboutTimeline({ entries }: { entries: readonly HistoryEntry[] })
       </div>
       {gallery && galleryImages ? <PhotoLightbox backdrop="form" images={galleryImages} index={gallery.index} onIndex={index => setGallery({ ...gallery, index })} onClose={() => setGallery(null)} /> : null}
     </>
-  )
+  )}</CMSContentBlock>)
 }

@@ -1,3 +1,5 @@
+'use client'
+import { CMSContentBlock } from './cms-content'
 import { LeadDialogButton } from './lead-dialog'
 import { SiteChrome } from './site-chrome'
 import { copy, footerAboutFor } from '../lib/copy'
@@ -37,7 +39,7 @@ export function InfoPage({
       about={footerAboutFor(SITE.name)}
     >
       <main>
-        <section className="section">
+        <CMSContentBlock cmsBlockKey="InfoPage"><section className="section">
           <div className="section__inner">
             <p className="eyebrow">{eyebrow}</p>
             <h1>{title}</h1>
@@ -59,7 +61,7 @@ export function InfoPage({
               pageId={eyebrow}
             />
           </div>
-        </section>
+        </section></CMSContentBlock>
       </main>
     </SiteChrome>
   )

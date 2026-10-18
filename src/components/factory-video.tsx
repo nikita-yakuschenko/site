@@ -5,17 +5,19 @@ import { copy } from '../lib/copy'
 import { optimizedSrc } from '../lib/media'
 import { VideoLightbox } from './video-lightbox'
 
-const KINESCOPE_EMBED =
+export const FACTORY_VIDEO_EMBED =
   'https://kinescope.io/embed/npS4zk5fgxhM7XbFGRkoq7?autoplay=1&muted=0'
 
 export function FactoryVideo({
   src = '/fixtures/factory.jpg',
   srcMobile,
   alt = copy.factoryAlt,
+  embedSrc = FACTORY_VIDEO_EMBED,
 }: {
   src?: string
   srcMobile?: string
   alt?: string
+  embedSrc?: string
 }) {
   const [open, setOpen] = useState(false)
 
@@ -58,7 +60,7 @@ export function FactoryVideo({
       {open ? (
         <VideoLightbox
           title={copy.factoryVideoTitle}
-          embedSrc={KINESCOPE_EMBED}
+          embedSrc={embedSrc}
           onClose={() => setOpen(false)}
         />
       ) : null}

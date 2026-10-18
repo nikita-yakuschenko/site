@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import { Fragment, useState } from "react";
 import { PhotoLocationBadge } from "./photo-tile";
@@ -22,7 +23,7 @@ export function IndependentReview({
   const [open, setOpen] = useState(false);
   const current: ReviewVideo = data.videos[active] ?? data.videos[0];
 
-  return (
+  return (<CMSContentBlock cmsBlockKey="independentReview">{(
     <section
       className="section independent-review"
       data-cms-block="independentReview"
@@ -135,5 +136,5 @@ export function IndependentReview({
         />
       ) : null}
     </section>
-  );
+  )}</CMSContentBlock>);
 }

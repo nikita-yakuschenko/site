@@ -1,3 +1,5 @@
+'use client'
+import { CMSContentBlock } from './cms-content'
 import type { ReactNode } from "react";
 import Image from "next/image";
 import {
@@ -23,7 +25,7 @@ export function BusinessProductBento({
 }: {
   materialsAction: ReactNode;
 }) {
-  return (
+  return (<CMSContentBlock cmsBlockKey="BusinessProductBento">{(
     <div className="business-product-bento">
       {ORDER.map((id) => {
         const product = BUSINESS.products.find((item) => item.id === id)!;
@@ -106,5 +108,5 @@ export function BusinessProductBento({
         </div>
       </article>
     </div>
-  );
+  )}</CMSContentBlock>);
 }

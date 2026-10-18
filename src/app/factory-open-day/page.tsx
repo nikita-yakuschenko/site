@@ -25,10 +25,10 @@ export default async function FactoryOpenDayPage() {
   return <main className={`ags-page ${inter.variable} ${unbounded.variable}`}>
     <script dangerouslySetInnerHTML={{ __html: `(function(){try{var p=localStorage.getItem('ags-theme');var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.agsTheme=(p==='light'||p==='dark')?p:(d?'dark':'light')}catch(e){}})()` }} />
     <OpenDayTheme />
-    <FactoryOpenDayHero date={date} />
-    <FactoryOpenDayProgram />
-    <FactoryOpenDayLocation date={date} />
-    <FactoryOpenDayForm date={date} />
-    <FactoryOpenDayFooter date={date} />
+    <FactoryOpenDayHero data-cms-content-connected date={date} />
+    <FactoryOpenDayProgram data-cms-content-connected />
+    <FactoryOpenDayLocation data-cms-content-connected date={date} />
+    <FactoryOpenDayForm data-cms-content-connected date={date} />
+    <FactoryOpenDayFooter data-cms-content-connected date={date} />
   </main>
 }

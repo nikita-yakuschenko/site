@@ -1,4 +1,5 @@
 'use client'
+import { CMSContentBlock } from '../cms-content'
 
 import { useEffect, useRef, useState } from 'react'
 import { isValidName, isValidRuMobile, maskPhone, phoneE164, sanitizeName } from '../../lib/phone'
@@ -108,7 +109,7 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
     {status === 'error' ? <p className="ags-form__status" data-error="true">Не удалось отправить. Попробуйте ещё раз.</p> : null}
   </form>
 
-  return <section className="ags ags-book" id="ags-form">
+  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayForm">{<section className="ags ags-book" id="ags-form">
     <OpenDayRules />
     <div className="ags-sheet">
       <div className="ags-book__body">
@@ -133,5 +134,5 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
       <h2 id="ags-dialog-title">Записаться<span className="ags-dialog__title-line">на <span className="ags-highlight">День открытых дверей</span></span></h2>
       <div className="ags-dialog__form">{open ? fields : null}</div>
     </dialog>
-  </section>
+  </section>}</CMSContentBlock>)
 }

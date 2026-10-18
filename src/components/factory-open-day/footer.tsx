@@ -1,8 +1,10 @@
+'use client'
+import { CMSContentBlock } from '../cms-content'
 import { OpenDayBookButton } from './form'
 import { OpenDayArrow, OpenDayRules } from './rules'
 
 export function FactoryOpenDayFooter({ date }: { date: string }) {
-  return <footer className="ags ags-foot">
+  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayFooter">{<footer className="ags ags-foot">
     <OpenDayRules />
     <div className="ags-sheet">
       <div className="ags-foot__body">
@@ -40,5 +42,5 @@ export function FactoryOpenDayFooter({ date }: { date: string }) {
         <a href="/legal/privacy" className="ags-link ags-link--muted">Политика конфиденциальности</a>
       </div>
     </div>
-  </footer>
+  </footer>}</CMSContentBlock>)
 }

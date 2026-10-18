@@ -37,12 +37,14 @@ import { ProjectPricesEditor as ProjectPricesEditor_0fdbba1ad069907ced6a80052cc3
 import { ProjectNextStepsContent as ProjectNextStepsContent_627cea68a237482f6a707b9cd631985e } from '../../components/admin/ProjectNextStepsContent'
 import { ProjectSearchDescription as ProjectSearchDescription_812b033a5d3e11f57c89523bf45101b5 } from '../../components/admin/ProjectSearchDescription'
 import { ProjectRecordMetadata as ProjectRecordMetadata_39c824816878a36ded3bfc43acf44e05 } from '../../components/admin/PageMetadataFields'
+import { LeadSubmissionDetails as LeadSubmissionDetails_104c0e96c9b5dcfae77c460f4ed9e458 } from '../../components/admin/LeadSubmissionView'
+import { LeadSubmissionPayload as LeadSubmissionPayload_104c0e96c9b5dcfae77c460f4ed9e458 } from '../../components/admin/LeadSubmissionView'
+import { LeadsListRedirect as LeadsListRedirect_e85e6671bf049c3011d2f667f456a2e6 } from '../../components/admin/LeadsView'
 import { MediaEmptyState as MediaEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466 } from '../../components/admin/CollectionEmptyState'
 import { EmptyNav as EmptyNav_5cbf29a2fd14a00ffc5141ee4b88c905 } from '../../components/admin/AdminShell'
 import { BrandIcon as BrandIcon_3b7459ccde24590d8b1cd329ddb07aed } from '../../components/Brand'
 import { Brand as Brand_3b7459ccde24590d8b1cd329ddb07aed } from '../../components/Brand'
-import { AdminShell as AdminShell_5cbf29a2fd14a00ffc5141ee4b88c905 } from '../../components/admin/AdminShell'
-import { AdminShellRoot as AdminShellRoot_5cbf29a2fd14a00ffc5141ee4b88c905 } from '../../components/admin/AdminShellRoot'
+import { AdminShellRoot as AdminShellRoot_e024f5d68acb191c51ad1e3b9f2df952 } from '../../components/admin/AdminShellRoot'
 import { AdminToasts as AdminToasts_c50bb2264ce0fa960ba738ec7a026948 } from '../../components/admin/AdminToasts'
 import { SiteView as SiteView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { PagesView as PagesView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
@@ -50,15 +52,21 @@ import { CatalogView as CatalogView_1226fdfc491f100b8cb8d80d236e0a07 } from '../
 import { PricesView as PricesView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { RegistersView as RegistersView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { SamplingView as SamplingView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
-import { BlocksView as BlocksView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
-import { FormsView as FormsView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { SectionsView as SectionsView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { IntegrationsView as IntegrationsView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
+import { LeadsView as LeadsView_e85e6671bf049c3011d2f667f456a2e6 } from '../../components/admin/LeadsView'
+import { BlocksView as BlocksView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
+import { FormsView as FormsView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
+import { LegacySite as LegacySite_073a07866257bb196ab219598fb86b3d } from '../../components/admin/LegacyRoutes'
+import { LegacyPages as LegacyPages_073a07866257bb196ab219598fb86b3d } from '../../components/admin/LegacyRoutes'
+import { LegacyCatalog as LegacyCatalog_073a07866257bb196ab219598fb86b3d } from '../../components/admin/LegacyRoutes'
+import { LegacyPrices as LegacyPrices_073a07866257bb196ab219598fb86b3d } from '../../components/admin/LegacyRoutes'
+import { LegacyRegisters as LegacyRegisters_073a07866257bb196ab219598fb86b3d } from '../../components/admin/LegacyRoutes'
+import { LegacySampling as LegacySampling_073a07866257bb196ab219598fb86b3d } from '../../components/admin/LegacyRoutes'
+import { LegacySections as LegacySections_073a07866257bb196ab219598fb86b3d } from '../../components/admin/LegacyRoutes'
+import { LegacyIntegrations as LegacyIntegrations_073a07866257bb196ab219598fb86b3d } from '../../components/admin/LegacyRoutes'
 import { Dashboard as Dashboard_f0f8d4a7080efd2cd25bb6be37c094c0 } from '../../components/admin/Dashboard'
-import { LeadSubmissionDetails as LeadSubmissionDetails_c8e41a7b0d6f2a19e5b3c4d7a8f90123, LeadSubmissionPayload as LeadSubmissionPayload_c8e41a7b0d6f2a19e5b3c4d7a8f90123 } from '../../components/admin/LeadSubmissionView'
 import { LoginView as LoginView_1732cc817b3048038c3e58a486fc7be7 } from '../../components/admin/LoginView'
-import { LeadsView as LeadsView_4c1e8a0b7d2f49e6a5c3b8d1e0f6a927, LeadsListRedirect as LeadsListRedirect_4c1e8a0b7d2f49e6a5c3b8d1e0f6a927 } from '../../components/admin/LeadsView'
-import { LegacySite as LegacySite_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyPages as LegacyPages_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyCatalog as LegacyCatalog_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyPrices as LegacyPrices_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyRegisters as LegacyRegisters_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacySampling as LegacySampling_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacySections as LegacySections_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyIntegrations as LegacyIntegrations_9b2d6e4a1c8f70e5d3a6b9c2f1e04783 } from '../../components/admin/LegacyRoutes'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -102,12 +110,14 @@ export const importMap = {
   "./components/admin/ProjectNextStepsContent#ProjectNextStepsContent": ProjectNextStepsContent_627cea68a237482f6a707b9cd631985e,
   "./components/admin/ProjectSearchDescription#ProjectSearchDescription": ProjectSearchDescription_812b033a5d3e11f57c89523bf45101b5,
   "./components/admin/PageMetadataFields#ProjectRecordMetadata": ProjectRecordMetadata_39c824816878a36ded3bfc43acf44e05,
+  "./components/admin/LeadSubmissionView#LeadSubmissionDetails": LeadSubmissionDetails_104c0e96c9b5dcfae77c460f4ed9e458,
+  "./components/admin/LeadSubmissionView#LeadSubmissionPayload": LeadSubmissionPayload_104c0e96c9b5dcfae77c460f4ed9e458,
+  "./components/admin/LeadsView#LeadsListRedirect": LeadsListRedirect_e85e6671bf049c3011d2f667f456a2e6,
   "./components/admin/CollectionEmptyState#MediaEmptyState": MediaEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466,
   "./components/admin/AdminShell#EmptyNav": EmptyNav_5cbf29a2fd14a00ffc5141ee4b88c905,
   "./components/Brand#BrandIcon": BrandIcon_3b7459ccde24590d8b1cd329ddb07aed,
   "./components/Brand#Brand": Brand_3b7459ccde24590d8b1cd329ddb07aed,
-  "./components/admin/AdminShell#AdminShell": AdminShell_5cbf29a2fd14a00ffc5141ee4b88c905,
-  "./components/admin/AdminShellRoot#AdminShellRoot": AdminShellRoot_5cbf29a2fd14a00ffc5141ee4b88c905,
+  "./components/admin/AdminShellRoot#AdminShellRoot": AdminShellRoot_e024f5d68acb191c51ad1e3b9f2df952,
   "./components/admin/AdminToasts#AdminToasts": AdminToasts_c50bb2264ce0fa960ba738ec7a026948,
   "./components/admin/StructureView#SiteView": SiteView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#PagesView": PagesView_1226fdfc491f100b8cb8d80d236e0a07,
@@ -115,23 +125,20 @@ export const importMap = {
   "./components/admin/StructureView#PricesView": PricesView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#RegistersView": RegistersView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#SamplingView": SamplingView_1226fdfc491f100b8cb8d80d236e0a07,
-  "./components/admin/StructureView#BlocksView": BlocksView_1226fdfc491f100b8cb8d80d236e0a07,
-  "./components/admin/StructureView#FormsView": FormsView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#SectionsView": SectionsView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#IntegrationsView": IntegrationsView_1226fdfc491f100b8cb8d80d236e0a07,
+  "./components/admin/LeadsView#LeadsView": LeadsView_e85e6671bf049c3011d2f667f456a2e6,
+  "./components/admin/StructureView#BlocksView": BlocksView_1226fdfc491f100b8cb8d80d236e0a07,
+  "./components/admin/StructureView#FormsView": FormsView_1226fdfc491f100b8cb8d80d236e0a07,
+  "./components/admin/LegacyRoutes#LegacySite": LegacySite_073a07866257bb196ab219598fb86b3d,
+  "./components/admin/LegacyRoutes#LegacyPages": LegacyPages_073a07866257bb196ab219598fb86b3d,
+  "./components/admin/LegacyRoutes#LegacyCatalog": LegacyCatalog_073a07866257bb196ab219598fb86b3d,
+  "./components/admin/LegacyRoutes#LegacyPrices": LegacyPrices_073a07866257bb196ab219598fb86b3d,
+  "./components/admin/LegacyRoutes#LegacyRegisters": LegacyRegisters_073a07866257bb196ab219598fb86b3d,
+  "./components/admin/LegacyRoutes#LegacySampling": LegacySampling_073a07866257bb196ab219598fb86b3d,
+  "./components/admin/LegacyRoutes#LegacySections": LegacySections_073a07866257bb196ab219598fb86b3d,
+  "./components/admin/LegacyRoutes#LegacyIntegrations": LegacyIntegrations_073a07866257bb196ab219598fb86b3d,
   "./components/admin/Dashboard#Dashboard": Dashboard_f0f8d4a7080efd2cd25bb6be37c094c0,
-  "./components/admin/LeadsView#LeadsView": LeadsView_4c1e8a0b7d2f49e6a5c3b8d1e0f6a927,
-  "./components/admin/LeadsView#LeadsListRedirect": LeadsListRedirect_4c1e8a0b7d2f49e6a5c3b8d1e0f6a927,
-  "./components/admin/LegacyRoutes#LegacySite": LegacySite_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
-  "./components/admin/LegacyRoutes#LegacyPages": LegacyPages_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
-  "./components/admin/LegacyRoutes#LegacyCatalog": LegacyCatalog_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
-  "./components/admin/LegacyRoutes#LegacyPrices": LegacyPrices_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
-  "./components/admin/LegacyRoutes#LegacyRegisters": LegacyRegisters_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
-  "./components/admin/LegacyRoutes#LegacySampling": LegacySampling_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
-  "./components/admin/LegacyRoutes#LegacySections": LegacySections_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
-  "./components/admin/LegacyRoutes#LegacyIntegrations": LegacyIntegrations_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
-  "./components/admin/LeadSubmissionView#LeadSubmissionDetails": LeadSubmissionDetails_c8e41a7b0d6f2a19e5b3c4d7a8f90123,
-  "./components/admin/LeadSubmissionView#LeadSubmissionPayload": LeadSubmissionPayload_c8e41a7b0d6f2a19e5b3c4d7a8f90123,
   "./components/admin/LoginView#LoginView": LoginView_1732cc817b3048038c3e58a486fc7be7,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

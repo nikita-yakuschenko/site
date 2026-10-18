@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from '../../components/cms-static-content'
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import type { Metadata } from "next";
@@ -30,14 +31,14 @@ export default function PrivacyPage() {
       about={footerAboutFor(SITE.name)}
     >
       <main>
-        <section className="section legal-doc">
+        <CMSStaticBlock cmsBlockKey="PageprivacySection0" scope={"/privacy"}><section className="section legal-doc">
           <div className="section__inner legal-doc__inner">
             {renderMdDoc(source, {
               backHref: "/#footer",
               backLabel: "Вернуться на главную",
             })}
           </div>
-        </section>
+        </section></CMSStaticBlock>
       </main>
     </SiteChrome>
   );

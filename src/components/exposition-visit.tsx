@@ -1,3 +1,5 @@
+'use client'
+import { CMSContentBlock } from './cms-content'
 import Image from 'next/image'
 
 const benefits = [
@@ -8,7 +10,7 @@ const benefits = [
 ]
 
 export function ExpositionVisit() {
-  return (
+  return (<CMSContentBlock cmsBlockKey="ExpositionVisit">{(
     <section className="section exposition-visit" aria-labelledby="visit-title">
       <div className="section__inner">
         <div className="exposition-visit__top">
@@ -23,5 +25,5 @@ export function ExpositionVisit() {
         ))}</ul>
       </div>
     </section>
-  )
+  )}</CMSContentBlock>)
 }

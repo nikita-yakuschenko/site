@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from 'next'
 import { permanentRedirect } from 'next/navigation'
 import { CatalogBoard, type BoardItem } from '../../components/catalog-board'
@@ -58,8 +59,13 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
   const params = await searchParams
   const filters = parseFilters(params)
 
-  const canonical = canonicalRedirect(params, filters)
-  if (canonical) permanentRedirect(canonical)
+  const filterParams = Object.fromEntries(Object.entries(params).filter(([key]) => key !== 'cmsPreview' && key !== 'cmsIndex'))
+  const canonical = canonicalRedirect(filterParams, filters)
+  if (canonical) {
+    const target = new URL(canonical, 'http://localhost')
+    for (const key of ['cmsPreview', 'cmsIndex']) if (typeof params[key] === 'string') target.searchParams.set(key, params[key])
+    permanentRedirect(`${target.pathname}${target.search}`)
+  }
 
   const { items, rest } = await catalog.list({ siteCode: SITE.code, filters })
   const heading = filters.status === 'ready' ? copy.readyHousesTitle : copy.catalogTitle
@@ -78,7 +84,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
       about={footerAboutFor(SITE.name)}
     >
       <main>
-        <section className="section catalog-section">
+        <CMSStaticBlock cmsBlockKey="PagecatalogSection0" scope={"/catalog"}><section className="section catalog-section">
           <div className="section__inner">
             {/* Заголовок без картинки: человеку и так видно, куда он попал,
                 а поиску и скринридеру страница без h1 не годится. */}
@@ -92,7 +98,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
               picked={!isEmpty(filters)}
             />
           </div>
-        </section>
+        </section></CMSStaticBlock>
       </main>
     </SiteChrome>
   )

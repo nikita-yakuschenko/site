@@ -1,4 +1,5 @@
 "use client";
+import { CMSContentBlock } from './cms-content'
 
 import { Fragment, useState } from "react";
 import Link from "next/link";
@@ -105,7 +106,7 @@ export function VideoTestimonials({
 
   if (!featured) return null;
 
-  return (
+  return (<CMSContentBlock cmsBlockKey="VideoTestimonials">{(
     <section
       className="section section--muted video-stories"
       data-cms-block="videoTestimonials"
@@ -160,5 +161,5 @@ export function VideoTestimonials({
         />
       ) : null}
     </section>
-  );
+  )}</CMSContentBlock>);
 }

@@ -1,3 +1,4 @@
+import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from "next";
 import { IconChevronRight } from "@tabler/icons-react";
 import Link from "next/link";
@@ -41,7 +42,7 @@ export default function ManufacturePage() {
       about={footerAboutFor(SITE.name)}
     >
       <main>
-        <PageHero
+        <PageHero data-cms-content-connected
           headingId="manufacture-hero-title"
           sectionClassName="manufacture-intro"
           variant="manufacture"
@@ -63,7 +64,7 @@ export default function ManufacturePage() {
               />
           }
         />
-        <section className="section manufacture-docs" aria-labelledby="manufacture-documentation-title">
+        <CMSStaticBlock cmsBlockKey="PagemanufactureSection0" scope={"/manufacture"}><section className="section manufacture-docs" aria-labelledby="manufacture-documentation-title">
           <div className="section__inner">
             <h2 id="manufacture-documentation-title">Проект и документация</h2>
             <p className="manufacture-docs__lead">Прежде чем производить домокомплект, архитекторы, проектировщики, конструкторы и сметчики готовят обширную документацию.</p>
@@ -82,10 +83,10 @@ export default function ManufacturePage() {
                 </li>
               ))}
             </ol>
-            <ManufactureProjectQuestions />
+            <ManufactureProjectQuestions data-cms-content-connected />
           </div>
-        </section>
-        <section className="section manufacture-machines" aria-labelledby="manufacture-machines-title">
+        </section></CMSStaticBlock>
+        <CMSStaticBlock cmsBlockKey="PagemanufactureSection1" scope={"/manufacture"}><section className="section manufacture-machines" aria-labelledby="manufacture-machines-title">
           <div className="section__inner">
             <div className="manufacture-section-head">
               <h2 id="manufacture-machines-title">Подготовка деталей</h2>
@@ -102,11 +103,11 @@ export default function ManufacturePage() {
                 </li>
               ))}
             </ol>
-            <ManufacturePreparationQuestions />
+            <ManufacturePreparationQuestions data-cms-content-connected />
           </div>
-        </section>
-        <ManufactureVideoReview />
-        <section className="section manufacture-assembly" aria-labelledby="manufacture-assembly-title">
+        </section></CMSStaticBlock>
+        <ManufactureVideoReview data-cms-content-connected />
+        <CMSStaticBlock cmsBlockKey="PagemanufactureSection2" scope={"/manufacture"}><section className="section manufacture-assembly" aria-labelledby="manufacture-assembly-title">
           <div className="section__inner">
             <div className="manufacture-section-head">
               <h2 id="manufacture-assembly-title">Сборка панелей</h2>
@@ -136,20 +137,20 @@ export default function ManufacturePage() {
               ))}
             </ol>
           </div>
-        </section>
-        <ManufactureTruckTransition />
-        <section className="section manufacture-routes manufacture-module" aria-labelledby="manufacture-routes-title">
+        </section></CMSStaticBlock>
+        <ManufactureTruckTransition data-cms-content-connected />
+        <CMSStaticBlock cmsBlockKey="PagemanufactureSection3" scope={"/manufacture"}><section className="section manufacture-routes manufacture-module" aria-labelledby="manufacture-routes-title">
           <div className="section__inner manufacture-module__sticky">
-            <ManufactureModuleScene />
+            <ManufactureModuleScene data-cms-content-connected />
           </div>
-        </section>
-        <section className="section mortgage-mid-cta" aria-labelledby="manufacture-tour-title">
+        </section></CMSStaticBlock>
+        <CMSStaticBlock cmsBlockKey="PagemanufactureSection4" scope={"/manufacture"}><section className="section mortgage-mid-cta" aria-labelledby="manufacture-tour-title">
           <div className="section__inner mortgage-mid-cta__inner mortgage-mid-cta__inner--reversed">
             <div className="mortgage-mid-cta__media" aria-hidden="true">
               <Image src="/fixtures/factory.jpg" alt="" fill sizes="(min-width: 900px) 40vw, 100vw" />
             </div>
             <div className="mortgage-mid-cta__body">
-              <LeadReveal
+              <LeadReveal data-cms-content-connected
                 siteId={SITE.id}
                 label="Записаться на экскурсию"
                 heading="Записаться на экскурсию"
@@ -161,8 +162,8 @@ export default function ManufacturePage() {
               </LeadReveal>
             </div>
           </div>
-        </section>
-        <section className="section manufacture-finish" aria-labelledby="manufacture-finish-title">
+        </section></CMSStaticBlock>
+        <CMSStaticBlock cmsBlockKey="PagemanufactureSection5" scope={"/manufacture"}><section className="section manufacture-finish" aria-labelledby="manufacture-finish-title">
           <div className="section__inner manufacture-finish__layout">
             <h2 id="manufacture-finish-title">Сборка дома на участке</h2>
             <div className="manufacture-finish__image">
@@ -173,12 +174,12 @@ export default function ManufacturePage() {
                 <p>К&nbsp;началу строительства домокомплект доставляют заказчику.</p>
                 <p>Панели перевозят фурами, а&nbsp;модули низкорамными тралами. На&nbsp;участке конструкции разгружают и&nbsp;с&nbsp;помощью крана за&nbsp;несколько дней собирают дом.</p>
               </div>
-              <ManufactureMountingVideos />
+              <ManufactureMountingVideos data-cms-content-connected />
             </div>
           </div>
-        </section>
-        <ManufactureFaq />
-        <ContactsSection
+        </section></CMSStaticBlock>
+        <ManufactureFaq data-cms-content-connected />
+        <ContactsSection data-cms-content-connected
           defaultPlace="factory"
           block={{ blockType: "contactsSection", showEyebrow: false, heading: "Остались вопросы?", body: "Приезжайте в\u00a0гости, мы покажем, как изготавливаем домокомплекты, и\u00a0ответим на\u00a0вопросы о\u00a0вашем будущем доме", useSiteContacts: true }}
           contacts={SITE.contacts}

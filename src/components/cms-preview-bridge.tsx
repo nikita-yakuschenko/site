@@ -7,6 +7,9 @@ export function CMSPreviewBridge() {
     if (window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return
     const allowed = new Set(['http://localhost:3001', 'https://cms.avgst.ru'])
     const hidden = new Set<Element>()
+    let pending: MessageEvent | null = null
+    let retryTimer: ReturnType<typeof setTimeout> | undefined
+    let retryUntil = 0
     const style = document.createElement('style')
     style.textContent = '[data-cms-preview-hidden]{display:none!important}[data-cms-preview-path]{transform:none!important}header[data-cms-preview-path]{position:relative!important}html[data-cms-preview-isolated] body{overflow:auto!important}'
     document.head.append(style)
@@ -39,12 +42,37 @@ export function CMSPreviewBridge() {
       if (typeof key !== 'string' && key !== null) return
       let target: Element | undefined
       if (key) target = [...document.querySelectorAll('[data-cms-block]')].find(element => (element.childElementCount > 0 || element.textContent?.trim()) && (element.getAttribute('data-cms-block') === key || (key === 'leadForm' && element.getAttribute('data-cms-block') === 'LeadForm')))
+      if (!target && typeof key === 'string') {
+        const aliases: Record<string, string> = { ProjectHeroContent: 'projectHero', ProjectHeroPayment: 'projectHero', ContactsSection: 'contactsSection', ProjectPreview: 'projectHero' }
+        const alias = aliases[key]
+        if (alias) target = [...document.querySelectorAll('[data-cms-block]')].find(element => element.getAttribute('data-cms-block') === alias)
+      }
+      if (!target && typeof key === 'string' && key.includes('.content.')) {
+        const blockKey = key.split('.content.')[0]
+        target = [...document.querySelectorAll('[data-cms-block]')].find(element => element.getAttribute('data-cms-block') === blockKey)
+      }
+      if (!target && typeof key === 'string' && /^(Project|ReadyHomeOffer)/.test(key)) {
+        target = [...document.querySelectorAll('[data-cms-block]')].find(element => element.getAttribute('data-cms-block') === key.split('.')[0])
+      }
+      // Streaming pages can mount this bridge before their sections arrive.
+      // Wait for the requested markup instead of reporting a missing block early.
+      if (key && !target) {
+        if (pending?.data?.key !== key) retryUntil = Date.now() + 15000
+        pending = event
+        if (Date.now() < retryUntil) {
+          clearTimeout(retryTimer)
+          retryTimer = setTimeout(() => { if (pending) receive(pending) }, 200)
+          return
+        }
+      }
+      pending = null
+      clearTimeout(retryTimer)
       const hide = (element: Element) => { element.setAttribute('data-cms-preview-hidden', ''); hidden.add(element) }
       if (target && event.data.dim) {
         // The block is one section. The rest of the page is other blocks, so it stays out of this preview.
-        let box = target
-        if (box instanceof HTMLElement && getComputedStyle(box).display === 'contents') box = [...box.children].find(child => !['SCRIPT', 'STYLE', 'LINK'].includes(child.tagName)) ?? box
-        const anchors = [box]
+        const box = target
+        const children = [...box.children].filter(child => !['SCRIPT', 'STYLE', 'LINK'].includes(child.tagName))
+        const anchors = box instanceof HTMLElement && getComputedStyle(box).display === 'contents' && children.length ? children : [box]
         if (key === 'hero') { const header = document.querySelector('header.site-header'); if (header) anchors.push(header) }
         const walk = (element: Element) => {
           for (const child of element.children) {
@@ -71,7 +99,7 @@ export function CMSPreviewBridge() {
     }
     window.addEventListener('message', receive)
     window.parent.postMessage({ type: 'avgst:preview-ready' }, '*')
-    return () => { restore(); style.remove(); window.removeEventListener('message', receive) }
+    return () => { clearTimeout(retryTimer); pending = null; restore(); style.remove(); window.removeEventListener('message', receive) }
   }, [])
   return null
 }
