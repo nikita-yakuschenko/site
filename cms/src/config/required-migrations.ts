@@ -16,4 +16,5 @@ export const requiredMigrations = [
   '20261018_090000_roistat_delivery',
   '20261018_100000_lead_submission_title',
   '20261018_120000_roistat_settings',
+  '20261018_140000_yandex_settings',
 ]

@@ -5,6 +5,7 @@ import { authorizeSiteRequest } from './project-hero-endpoint'
 import { leadInputSchema } from '../../../src/lib/leads'
 import { activeRoistatProjectId, deliverLead, deliveryIsEnabled, roistatWebhookUrlError } from '../config/lead-adapters'
 import { leadTitle } from '../config/lead-title'
+import { normalizeMapsApiKey, normalizeMetricaCounterId, publicMapsKey, publicMetrica } from '../config/yandex'
 
 export const LeadDelivery: GlobalConfig = {
   slug: 'lead-delivery', label: 'Отправка заявок', access: { read: superAdmin, update: superAdmin },
@@ -13,18 +14,37 @@ export const LeadDelivery: GlobalConfig = {
     { name: 'deliveryEnabled', label: 'Передача включена', type: 'checkbox', defaultValue: true, admin: { hidden: true } },
     { name: 'roistatWebhookUrl', label: 'Адрес вебхука Roistat', type: 'text', admin: { hidden: true }, validate: (value: unknown) => roistatWebhookUrlError(value) || true },
     { name: 'roistatCounters', label: 'Счётчики Roistat', type: 'json', admin: { hidden: true } },
+    { name: 'metricaEnabled', label: 'Метрика включена', type: 'checkbox', defaultValue: true, admin: { hidden: true } },
+    { name: 'metricaCounterId', label: 'Номер счётчика Метрики', type: 'text', admin: { hidden: true }, validate: (value: unknown) => !value || Boolean(normalizeMetricaCounterId(value)) || 'Укажите номер счётчика цифрами' },
+    { name: 'metricaConnectedAt', label: 'Дата подключения Метрики', type: 'text', admin: { hidden: true } },
+    { name: 'mapsEnabled', label: 'Карты включены', type: 'checkbox', defaultValue: true, admin: { hidden: true } },
+    { name: 'mapsApiKey', label: 'Ключ API Яндекс.Карт', type: 'text', admin: { hidden: true }, validate: (value: unknown) => !value || Boolean(normalizeMapsApiKey(value)) || 'Укажите ключ JS API Яндекс.Карт' },
     { name: 'url', label: 'Адрес API / вебхука', type: 'text', admin: { condition: data => data.mode === 'webhook' }, validate: (value: unknown, { siblingData }: { siblingData?: { mode?: string } }) => {
       if (siblingData?.mode !== 'webhook') return true
       try { const url = new URL(String(value)); return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? true : 'Укажите адрес HTTP или HTTPS без логина и пароля' } catch { return 'Укажите адрес HTTP или HTTPS' }
     } },
     { name: 'authorizationEnv', label: 'Переменная окружения с заголовком Authorization', type: 'text', admin: { condition: data => data.mode === 'webhook', description: 'Необязательно. Например, CRM_AUTHORIZATION. Значение с токеном задаётся в окружении CMS.' }, validate: (value: unknown) => !value || typeof value === 'string' && /^[A-Z][A-Z0-9_]*$/.test(value) ? true : 'Укажите имя переменной окружения' },
   ],
-  endpoints: [{
-    path: '/counter', method: 'get', handler: async req => {
-      const settings = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: true })
-      return Response.json(activeRoistatProjectId(settings.roistatCounters), { headers: { 'Cache-Control': 'public, max-age=60' } })
+  endpoints: [
+    {
+      path: '/counter', method: 'get', handler: async req => {
+        const settings = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: true })
+        return Response.json(activeRoistatProjectId(settings.roistatCounters), { headers: { 'Cache-Control': 'public, max-age=60' } })
+      },
     },
-  }],
+    {
+      path: '/metrica', method: 'get', handler: async req => {
+        const settings = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: true })
+        return Response.json(publicMetrica(settings), { headers: { 'Cache-Control': 'public, max-age=60' } })
+      },
+    },
+    {
+      path: '/maps-key', method: 'get', handler: async req => {
+        const settings = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: true })
+        return Response.json(publicMapsKey(settings), { headers: { 'Cache-Control': 'public, max-age=60' } })
+      },
+    },
+  ],
 }
 
 function storedLeadTitle(doc: { title?: unknown; requestId?: unknown; payload?: unknown }) {

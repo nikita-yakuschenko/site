@@ -15,6 +15,7 @@ import {
 import { copy } from '../lib/copy'
 import { OG_LOCALE } from '../lib/locale'
 import { activeRoistatProjectId } from '../lib/roistat'
+import { activeMetricaCounterId } from '../lib/yandex'
 import './styles.css'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -44,9 +45,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
      считается неданным, и баннер спросит заново. Раньше это делал эффект
      провайдера, и ему приходилось переписывать состояние уже после
      отрисовки, хотя кука прочитана прямо тут. */
-  /* Номер счётчика читается на сервере: так он берётся из окружения в
-     рантайме и не зависит от того, был ли задан на сборке. */
-  const counter = Number(process.env.NEXT_PUBLIC_YM_ID) || 0
+  /* Номер счётчика — из CMS (интеграции → Яндекс), с запасным ENV/фолбэком. */
+  const counter = await activeMetricaCounterId()
   const roistatProjectId = await activeRoistatProjectId()
 
   const fresh = parsed && parsed.version === CONSENT_VERSION ? parsed : null

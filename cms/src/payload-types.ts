@@ -1592,6 +1592,11 @@ export interface LeadDelivery {
         enabled?: boolean | null;
       }[]
     | null;
+  metricaEnabled?: boolean | null;
+  metricaCounterId?: string | null;
+  metricaConnectedAt?: string | null;
+  mapsEnabled?: boolean | null;
+  mapsApiKey?: string | null;
   url?: string | null;
   /**
    * Необязательно. Например, CRM_AUTHORIZATION. Значение с токеном задаётся в окружении CMS.
@@ -1609,6 +1614,11 @@ export interface LeadDeliverySelect<T extends boolean = true> {
   deliveryEnabled?: T;
   roistatWebhookUrl?: T;
   roistatCounters?: T;
+  metricaEnabled?: T;
+  metricaCounterId?: T;
+  metricaConnectedAt?: T;
+  mapsEnabled?: T;
+  mapsApiKey?: T;
   url?: T;
   authorizationEnv?: T;
   updatedAt?: T;

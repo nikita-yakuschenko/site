@@ -30,6 +30,14 @@ export type DeliverySettings = {
   counters: { projectId: string; connectedAt: string; enabled: boolean }[]
 } | null
 
+export type YandexPanelSettings = {
+  metricaEnabled: boolean
+  metricaCounterId: string
+  metricaConnectedAt: string
+  mapsEnabled: boolean
+  mapsApiKey: string
+} | null
+
 const deliveryLabel: Record<DeliveryMode, string> = { test: 'Тестовый режим', webhook: 'Вебхук', roistat: 'Через Roistat' }
 const modeOptions: { value: DeliveryMode; label: string }[] = [
   { value: 'roistat', label: 'Roistat (универсальный вебхук)' },
@@ -73,7 +81,7 @@ function rowsFrom(settings: DeliverySettings): CounterRow[] {
   return (settings?.counters ?? []).map(row => ({ ...row, key: crypto.randomUUID() }))
 }
 
-export function IntegrationsPanel({ delivery }: { delivery: DeliverySettings }) {
+export function IntegrationsPanel({ delivery, yandex }: { delivery: DeliverySettings; yandex: YandexPanelSettings }) {
   const params = useSearchParams()
   const asked = params.get('provider')
   const [provider, setProvider] = useState<Provider>(providers.includes(asked as Provider) ? asked as Provider : 'roistat')
@@ -81,10 +89,20 @@ export function IntegrationsPanel({ delivery }: { delivery: DeliverySettings }) 
   const [enabled, setEnabled] = useState(delivery?.enabled ?? false)
   const [webhookUrl, setWebhookUrl] = useState(delivery?.webhookUrl ?? '')
   const [counters, setCounters] = useState<CounterRow[]>(() => rowsFrom(delivery))
+  const [metricaEnabled, setMetricaEnabled] = useState(yandex?.metricaEnabled ?? true)
+  const [metricaCounterId, setMetricaCounterId] = useState(yandex?.metricaCounterId ?? '')
+  const [metricaConnectedAt, setMetricaConnectedAt] = useState(yandex?.metricaConnectedAt ?? '')
+  const [mapsEnabled, setMapsEnabled] = useState(yandex?.mapsEnabled ?? true)
+  const [mapsApiKey, setMapsApiKey] = useState(yandex?.mapsApiKey ?? '')
   const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  const [yandexState, setYandexState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
   const [webhookError, setWebhookError] = useState('')
+  const [metricaError, setMetricaError] = useState('')
+  const [mapsError, setMapsError] = useState('')
   const bitrixOn = Boolean(delivery) && enabled && mode === 'roistat'
   const activeCounters = counters.filter(row => row.enabled && row.projectId.trim()).length
+  const metricaOn = Boolean(yandex) && metricaEnabled && /^\d{6,12}$/.test(metricaCounterId.trim())
+  const mapsOn = Boolean(yandex) && mapsEnabled && /^[a-zA-Z0-9-]{20,80}$/.test(mapsApiKey.trim())
 
   async function persist(next: { mode: DeliveryMode; enabled: boolean; webhookUrl: string; counters: CounterRow[] }) {
     if (!delivery) return
@@ -118,6 +136,53 @@ export function IntegrationsPanel({ delivery }: { delivery: DeliverySettings }) 
       setWebhookUrl(previous.webhookUrl)
       setCounters(previous.counters)
       setState('error')
+    }
+  }
+
+  async function persistYandex(next: { metricaEnabled: boolean; metricaCounterId: string; metricaConnectedAt: string; mapsEnabled: boolean; mapsApiKey: string }) {
+    if (!yandex) return
+    const counter = next.metricaCounterId.trim()
+    const key = next.mapsApiKey.trim()
+    const counterError = counter && !/^\d{6,12}$/.test(counter) ? 'Укажите номер счётчика цифрами' : ''
+    const keyError = key && !/^[a-zA-Z0-9-]{20,80}$/.test(key) ? 'Укажите ключ JS API Яндекс.Карт' : ''
+    setMetricaError(counterError)
+    setMapsError(keyError)
+    if (counterError || keyError) {
+      setYandexState('error')
+      return
+    }
+    const previous = { metricaEnabled, metricaCounterId, metricaConnectedAt, mapsEnabled, mapsApiKey }
+    setMetricaEnabled(next.metricaEnabled)
+    setMetricaCounterId(next.metricaCounterId)
+    setMetricaConnectedAt(next.metricaConnectedAt)
+    setMapsEnabled(next.mapsEnabled)
+    setMapsApiKey(next.mapsApiKey)
+    setYandexState('saving')
+    try {
+      const current = await fetch('/api/globals/lead-delivery?depth=0', { credentials: 'include' }).then(response => response.json())
+      const { id: _id, globalType: _globalType, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = current
+      const response = await fetch('/api/globals/lead-delivery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          ...data,
+          metricaEnabled: next.metricaEnabled,
+          metricaCounterId: counter,
+          metricaConnectedAt: next.metricaConnectedAt.trim(),
+          mapsEnabled: next.mapsEnabled,
+          mapsApiKey: key,
+        }),
+      })
+      if (!response.ok) throw new Error()
+      setYandexState('saved')
+    } catch {
+      setMetricaEnabled(previous.metricaEnabled)
+      setMetricaCounterId(previous.metricaCounterId)
+      setMetricaConnectedAt(previous.metricaConnectedAt)
+      setMapsEnabled(previous.mapsEnabled)
+      setMapsApiKey(previous.mapsApiKey)
+      setYandexState('error')
     }
   }
 
@@ -238,7 +303,52 @@ export function IntegrationsPanel({ delivery }: { delivery: DeliverySettings }) 
     <TabsContent value="yandex">
       <Card className="shadow-none">
         <CardContent className="flex flex-col gap-8 py-6">
-          <IntegrationRow title="Метрика" status="Не подключено" tone="off" text="Посещаемость всего сайта появится после подключения. Сейчас в обзоре — открытия карточек проектов, которые сайт считает сам." />
+          <IntegrationRow
+            title="Метрика"
+            text="Номер счётчика из кабинета Яндекс.Метрики. Сайт подхватывает его без правки окружения сервера."
+            aside={yandex ? <div className="flex items-center space-x-2">
+              <Switch id="metrica-enabled" checked={metricaEnabled} disabled={yandexState === 'saving'} onCheckedChange={value => void persistYandex({ metricaEnabled: value, metricaCounterId, metricaConnectedAt, mapsEnabled, mapsApiKey })} />
+              <Label htmlFor="metrica-enabled">{metricaEnabled ? 'Включена' : 'Выключена'}</Label>
+            </div> : null}
+            status={yandex ? (metricaOn ? 'Подключена' : metricaEnabled ? 'Нет номера' : 'Выключена') : undefined}
+            tone={yandex ? (metricaOn ? 'on' : 'off') : undefined}
+          >
+            {yandex ? <div className="flex flex-col gap-4">
+              <div className="grid gap-4 lg:grid-cols-2">
+                <Field>
+                  <FieldLabel htmlFor="metrica-counter-id">Номер счётчика</FieldLabel>
+                  <TokenField id="metrica-counter-id" value={metricaCounterId} placeholder="112879989" copyLabel="Скопировать номер счётчика" onChange={value => { setMetricaCounterId(value); setMetricaError('') }} onBlur={value => { if (value.trim() !== (yandex.metricaCounterId || '').trim()) void persistYandex({ metricaEnabled, metricaCounterId: value, metricaConnectedAt, mapsEnabled, mapsApiKey }) }} />
+                  {metricaError ? <p className="text-sm text-destructive">{metricaError}</p> : <p className="text-xs text-muted-foreground">Только цифры, как в кабинете Метрики.</p>}
+                </Field>
+                <Field>
+                  <FieldLabel htmlFor="metrica-connected-at">Дата подключения</FieldLabel>
+                  <Input id="metrica-connected-at" type="date" value={metricaConnectedAt} className="w-full max-w-xs" onChange={event => void persistYandex({ metricaEnabled, metricaCounterId, metricaConnectedAt: event.target.value, mapsEnabled, mapsApiKey })} />
+                </Field>
+              </div>
+              <div className="min-h-5 text-sm">
+                {yandexState === 'saving' && <span className="text-muted-foreground">Сохранение…</span>}
+                {yandexState === 'saved' && <span className="text-muted-foreground">Сохранено</span>}
+                {yandexState === 'error' && !metricaError && !mapsError && <span className="text-destructive">Не удалось сохранить</span>}
+              </div>
+            </div> : <p className="text-sm text-muted-foreground">Нет доступа к настройке Метрики.</p>}
+          </IntegrationRow>
+          <Separator />
+          <IntegrationRow
+            title="Карты"
+            text="Ключ JavaScript API Яндекс.Карт для карты офиса. Ограничение по HTTP Referer задаётся в кабинете разработчика."
+            aside={yandex ? <div className="flex items-center space-x-2">
+              <Switch id="maps-enabled" checked={mapsEnabled} disabled={yandexState === 'saving'} onCheckedChange={value => void persistYandex({ metricaEnabled, metricaCounterId, metricaConnectedAt, mapsEnabled: value, mapsApiKey })} />
+              <Label htmlFor="maps-enabled">{mapsEnabled ? 'Включены' : 'Выключены'}</Label>
+            </div> : null}
+            status={yandex ? (mapsOn ? 'Подключены' : mapsEnabled ? 'Нет ключа' : 'Выключены') : undefined}
+            tone={yandex ? (mapsOn ? 'on' : 'off') : undefined}
+          >
+            {yandex ? <Field className="max-w-2xl">
+              <FieldLabel htmlFor="maps-api-key">Ключ API</FieldLabel>
+              <TokenField id="maps-api-key" value={mapsApiKey} placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx" copyLabel="Скопировать ключ API" onChange={value => { setMapsApiKey(value); setMapsError('') }} onBlur={value => { if (value.trim() !== (yandex.mapsApiKey || '').trim()) void persistYandex({ metricaEnabled, metricaCounterId, metricaConnectedAt, mapsEnabled, mapsApiKey: value }) }} />
+              {mapsError ? <p className="text-sm text-destructive">{mapsError}</p> : <p className="text-xs text-muted-foreground">Ключ из кабинета разработчика Яндекса.</p>}
+            </Field> : <p className="text-sm text-muted-foreground">Нет доступа к ключу карт.</p>}
+          </IntegrationRow>
           <Separator />
           <IntegrationRow title="Директ" status="Не подключено" tone="off" text="Рекламные кампании и расход. Подключение ещё не настроено." />
         </CardContent>
