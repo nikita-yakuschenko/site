@@ -384,10 +384,21 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .shadcn-surface [data-slot="checkbox"] { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; min-height: 16px; padding: 0; border: 1px solid var(--input); border-radius: 4px; background: var(--card); color: var(--foreground); }
 .shadcn-surface [data-slot="checkbox"][data-state="checked"] { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); }
 .shadcn-surface [data-slot="checkbox"]:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-/* Не трогать transform/translate у switch: Tailwind v4 двигает бегунок через property translate; transform поверх него удваивает сдвиг. */
+/* Switch из shadcn Base UI: не трогать property translate (иначе сдвиг удваивается).
+   Бегунок — absolute + margin-block:auto, чтобы сверху и снизу был одинаковый зазор
+   при высоте дорожки 18.4px и кружке 16px (items-center даёт субпиксельный перекос). */
 .shadcn-surface [data-slot="switch"] {
+  position: relative;
   justify-content: flex-start;
+  align-items: center;
   padding: 0;
+}
+.shadcn-surface [data-slot="switch-thumb"] {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  margin-block: auto;
 }
 .project-image-preview { display: block; width: auto; max-width: 100%; height: auto; max-height: 180px; margin: 8px 0 12px; border-radius: var(--radius-md); }
 .upload-field-card, .thumbnail, .thumbnail img { border-radius: var(--radius-md); }
