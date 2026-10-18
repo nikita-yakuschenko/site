@@ -59,8 +59,8 @@ function IntegrationEditor({ id, title, label, value, enabled, busy, onSave, val
           <Label className="w-20" htmlFor={`${id}-enabled`}>{active ? 'Включено' : 'Выключено'}</Label>
         </div>
         <div className="grid w-18 shrink-0 grid-cols-2">
-        <Button type="submit" form={`${id}-form`} variant="ghost" size="icon" className={editing ? '' : 'invisible'} aria-label={`Сохранить: ${title}`} title="Сохранить" disabled={!editing || busy}><IconCheck /></Button>
-        {editing ? <Button key="cancel" type="button" variant="ghost" size="icon" aria-label={`Отмена: ${title}`} title="Отмена" disabled={busy} onClick={cancel}><IconX /></Button> : <Button key="edit" type="button" variant="ghost" size="icon" aria-label={`Изменить: ${title}`} title="Изменить" disabled={busy} onClick={() => {
+        <Button type="submit" form={`${id}-form`} variant="ghost" size="icon" className={`text-green-700 hover:text-green-800 focus-visible:text-green-800 dark:text-green-400 dark:hover:text-green-300 dark:focus-visible:text-green-300${editing ? '' : ' invisible'}`} aria-label={`Сохранить: ${title}`} title="Сохранить" disabled={!editing || busy}><IconCheck /></Button>
+        {editing ? <Button key="cancel" type="button" variant="ghost" size="icon" className="text-destructive hover:text-destructive focus-visible:text-destructive" aria-label={`Отмена: ${title}`} title="Отмена" disabled={busy} onClick={cancel}><IconX /></Button> : <Button key="edit" type="button" variant="ghost" size="icon" aria-label={`Изменить: ${title}`} title="Изменить" disabled={busy} onClick={() => {
           setDraft(value)
           setDraftEnabled(enabled)
           setError('')
