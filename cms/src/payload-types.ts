@@ -1583,6 +1583,15 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
 export interface LeadDelivery {
   id: number;
   mode: 'disabled' | 'test' | 'webhook' | 'roistat';
+  deliveryEnabled?: boolean | null;
+  roistatWebhookUrl?: string | null;
+  roistatCounters?:
+    | {
+        projectId?: string | null;
+        connectedAt?: string | null;
+        enabled?: boolean | null;
+      }[]
+    | null;
   url?: string | null;
   /**
    * Необязательно. Например, CRM_AUTHORIZATION. Значение с токеном задаётся в окружении CMS.
@@ -1597,6 +1606,9 @@ export interface LeadDelivery {
  */
 export interface LeadDeliverySelect<T extends boolean = true> {
   mode?: T;
+  deliveryEnabled?: T;
+  roistatWebhookUrl?: T;
+  roistatCounters?: T;
   url?: T;
   authorizationEnv?: T;
   updatedAt?: T;

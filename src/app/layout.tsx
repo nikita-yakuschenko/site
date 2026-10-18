@@ -14,6 +14,7 @@ import {
 } from '../consent/types'
 import { copy } from '../lib/copy'
 import { OG_LOCALE } from '../lib/locale'
+import { activeRoistatProjectId } from '../lib/roistat'
 import './styles.css'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -46,6 +47,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   /* Номер счётчика читается на сервере: так он берётся из окружения в
      рантайме и не зависит от того, был ли задан на сборке. */
   const counter = Number(process.env.NEXT_PUBLIC_YM_ID) || 0
+  const roistatProjectId = await activeRoistatProjectId()
 
   const fresh = parsed && parsed.version === CONSENT_VERSION ? parsed : null
   const initialState = fresh && isConsentDecided(fresh) ? fresh : null
@@ -55,7 +57,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       <body suppressHydrationWarning>
         <ConsentShell initialState={initialState}>{children}</ConsentShell>
         <CMSPreviewBridge />
-        <RoistatCounter />
+        {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
         {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в
             клиентский код на сборке, и если переменную задать только в
             окружении контейнера, в бандле окажется undefined. Здесь она
