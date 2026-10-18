@@ -384,21 +384,62 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .shadcn-surface [data-slot="checkbox"] { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; min-height: 16px; padding: 0; border: 1px solid var(--input); border-radius: 4px; background: var(--card); color: var(--foreground); }
 .shadcn-surface [data-slot="checkbox"][data-state="checked"] { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); }
 .shadcn-surface [data-slot="checkbox"]:focus-visible { outline: 2px solid var(--ring); outline-offset: 2px; }
-/* Switch из shadcn Base UI: не трогать property translate (иначе сдвиг удваивается).
-   Бегунок — absolute + margin-block:auto, чтобы сверху и снизу был одинаковый зазор
-   при высоте дорожки 18.4px и кружке 16px (items-center даёт субпиксельный перекос). */
+/* Switch: геометрия из подгона (34×20, thumb 16, inset 2, travel 14).
+   Tailwind translate на thumb перекрываем — иначе сдвиг удваивается. */
 .shadcn-surface [data-slot="switch"] {
   position: relative;
+  display: inline-flex;
+  width: 34px;
+  height: 20px;
+  min-width: 34px;
+  min-height: 20px;
+  max-height: 20px;
   justify-content: flex-start;
   align-items: center;
   padding: 0;
+  border: 0;
+  border-radius: 9999px;
+  overflow: visible;
+  flex-shrink: 0;
+  box-sizing: border-box;
 }
+.shadcn-surface [data-slot="switch"][data-size="sm"] {
+  width: 24px;
+  height: 14px;
+  min-width: 24px;
+  min-height: 14px;
+  max-height: 14px;
+}
+.shadcn-surface [data-slot="switch"][data-checked],
+.shadcn-surface [data-slot="switch"][data-state="checked"] { background-color: var(--primary); }
+.shadcn-surface [data-slot="switch"]:not([data-checked]):not([data-state="checked"]),
+.shadcn-surface [data-slot="switch"][data-unchecked],
+.shadcn-surface [data-slot="switch"][data-state="unchecked"] { background-color: var(--input); }
 .shadcn-surface [data-slot="switch-thumb"] {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  margin-block: auto;
+  top: 50%;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  border-radius: 9999px;
+  background-color: var(--background);
+  box-shadow: 0 1px 2px #00000026;
+  translate: 0 -50%;
+  transition: translate 150ms;
+  pointer-events: none;
+}
+.shadcn-surface [data-slot="switch"][data-size="sm"] [data-slot="switch-thumb"] {
+  width: 12px;
+  height: 12px;
+}
+.shadcn-surface [data-slot="switch"][data-checked] [data-slot="switch-thumb"],
+.shadcn-surface [data-slot="switch"][data-state="checked"] [data-slot="switch-thumb"] {
+  translate: 14px -50%;
+}
+.shadcn-surface [data-slot="switch"][data-size="sm"][data-checked] [data-slot="switch-thumb"],
+.shadcn-surface [data-slot="switch"][data-size="sm"][data-state="checked"] [data-slot="switch-thumb"] {
+  translate: 8px -50%;
 }
 .project-image-preview { display: block; width: auto; max-width: 100%; height: auto; max-height: 180px; margin: 8px 0 12px; border-radius: var(--radius-md); }
 .upload-field-card, .thumbnail, .thumbnail img { border-radius: var(--radius-md); }
