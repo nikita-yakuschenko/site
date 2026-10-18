@@ -1,0 +1,53 @@
+{
+  "environment": "production",
+  "catalogItems": 46,
+  "countsFromCatalog": {
+    "panel": 26,
+    "barn": 16,
+    "classic": 22,
+    "modular": 20
+  },
+  "previewsRestored": 4,
+  "checks": [
+    {
+      "href": "/catalog?tech=panel",
+      "count": 26,
+      "image": "https://cms.avgst.ru/api/media/file/panel.webp",
+      "loaded": true,
+      "genericEditor": false,
+      "collection": "panel",
+      "expected": 26,
+      "result": "passed"
+    },
+    {
+      "href": "/catalog?series=barn",
+      "count": 16,
+      "image": "https://cms.avgst.ru/api/media/file/barn.webp",
+      "loaded": true,
+      "genericEditor": false,
+      "collection": "barn",
+      "expected": 16,
+      "result": "passed"
+    },
+    {
+      "href": "/catalog?series=classic",
+      "count": 22,
+      "image": "https://cms.avgst.ru/api/media/file/classic.webp",
+      "loaded": true,
+      "genericEditor": false,
+      "collection": "classic",
+      "expected": 22,
+      "result": "passed"
+    },
+    {
+      "href": "/catalog?tech=modular",
+      "count": 20,
+      "image": "https://cms.avgst.ru/api/media/file/modular.webp",
+      "loaded": true,
+      "genericEditor": false,
+      "collection": "modular",
+      "expected": 20,
+      "result": "passed"
+    }
+  ]
+}

@@ -1,0 +1,833 @@
+[
+  {
+    "route": "/",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "hero",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "popularProjects",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "seriesBento",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "productionSection",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "mortgageShowcase",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "independentReview",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "VideoTestimonials-page-1",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "referralProgram",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "contactsSection",
+    "result": "passed"
+  },
+  {
+    "route": "/",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/about",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/about",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/about",
+    "key": "PageaboutSection0-page-2",
+    "result": "passed"
+  },
+  {
+    "route": "/about",
+    "key": "AboutCompanyBento-page-2",
+    "result": "passed"
+  },
+  {
+    "route": "/about",
+    "key": "AboutTimeline-page-2",
+    "result": "passed"
+  },
+  {
+    "route": "/about",
+    "key": "productionSection",
+    "result": "passed"
+  },
+  {
+    "route": "/about",
+    "key": "VideoTestimonials-page-2",
+    "result": "passed"
+  },
+  {
+    "route": "/about",
+    "key": "contactsSection",
+    "result": "passed"
+  },
+  {
+    "route": "/about",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/agro-mortgage",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/agro-mortgage",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/agro-mortgage",
+    "key": "PageHero-page-3",
+    "result": "passed"
+  },
+  {
+    "route": "/agro-mortgage",
+    "key": "LeadReveal-instance-mortgage-calculator-page-3",
+    "result": "passed"
+  },
+  {
+    "route": "/agro-mortgage",
+    "key": "MortgageWhoFits-page-3",
+    "result": "passed"
+  },
+  {
+    "route": "/agro-mortgage",
+    "key": "LeadReveal-instance-mortgage-consultation-page-3",
+    "result": "passed"
+  },
+  {
+    "route": "/agro-mortgage",
+    "key": "MortgageFaq-page-3",
+    "result": "passed"
+  },
+  {
+    "route": "/agro-mortgage",
+    "key": "MortgageProgramPage-page-3",
+    "result": "passed"
+  },
+  {
+    "route": "/agro-mortgage",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/basic-mortgage",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/basic-mortgage",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/basic-mortgage",
+    "key": "PageHero-page-4",
+    "result": "passed"
+  },
+  {
+    "route": "/basic-mortgage",
+    "key": "LeadReveal-instance-mortgage-calculator-page-4",
+    "result": "passed"
+  },
+  {
+    "route": "/basic-mortgage",
+    "key": "MortgageWhoFits-page-4",
+    "result": "passed"
+  },
+  {
+    "route": "/basic-mortgage",
+    "key": "LeadReveal-instance-mortgage-consultation-page-4",
+    "result": "passed"
+  },
+  {
+    "route": "/basic-mortgage",
+    "key": "MortgageFaq-page-4",
+    "result": "passed"
+  },
+  {
+    "route": "/basic-mortgage",
+    "key": "MortgageProgramPage-page-4",
+    "result": "passed"
+  },
+  {
+    "route": "/basic-mortgage",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "PageHero-page-5",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "BusinessProductBento-page-5",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "PagebusinessSection-products-page-5",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "BusinessTechnologyComparison-page-5",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "PagebusinessSection-technology-comparison-page-5",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "BusinessBenefitsBento-page-5",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "PagebusinessSection-partnership-page-5",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "contactsSection",
+    "result": "passed"
+  },
+  {
+    "route": "/business",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog",
+    "key": "PagecatalogSection0-page-6",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/cookies",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/cookies",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/cookies",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/cookies",
+    "key": "PagecookiesSection0-page-7",
+    "result": "passed"
+  },
+  {
+    "route": "/dealers",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/dealers",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/dealers",
+    "key": "InfoPage-page-8",
+    "result": "passed"
+  },
+  {
+    "route": "/dealers",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition",
+    "key": "PageexpositionSection0-page-9",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition",
+    "key": "ExpositionVideoTile-instance--exposition-avangard-page-9",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition",
+    "key": "PhotoTile-instance--exposition-vysokiy-kvartal-page-9",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition",
+    "key": "ExpositionVisit-page-9",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition",
+    "key": "PageexpositionSection2-page-9",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition",
+    "key": "ExpositionLocations-page-9",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/avangard",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/avangard",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/avangard",
+    "key": "Pageexposition--slug-Section0-page-10",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/avangard",
+    "key": "Pageexposition--slug-Section1-page-10",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/avangard",
+    "key": "ExpositionVisit-page-10",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/avangard",
+    "key": "ExpositionTourGallery-page-10",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/avangard",
+    "key": "Pageexposition--slug-Section2-page-10",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/avangard",
+    "key": "ExpositionLocations-page-10",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/avangard",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/vysokiy-kvartal",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/vysokiy-kvartal",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/vysokiy-kvartal",
+    "key": "Pageexposition--slug-Section0-page-11",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/vysokiy-kvartal",
+    "key": "Pageexposition--slug-Section1-page-11",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/vysokiy-kvartal",
+    "key": "ExpositionVisit-page-11",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/vysokiy-kvartal",
+    "key": "Pageexposition--slug-Section2-page-11",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/vysokiy-kvartal",
+    "key": "ExpositionLocations-page-11",
+    "result": "passed"
+  },
+  {
+    "route": "/exposition/vysokiy-kvartal",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/family-mortgage",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/family-mortgage",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/family-mortgage",
+    "key": "PageHero-page-12",
+    "result": "passed"
+  },
+  {
+    "route": "/family-mortgage",
+    "key": "LeadReveal-instance-mortgage-calculator-page-12",
+    "result": "passed"
+  },
+  {
+    "route": "/family-mortgage",
+    "key": "MortgageWhoFits-page-12",
+    "result": "passed"
+  },
+  {
+    "route": "/family-mortgage",
+    "key": "LeadReveal-instance-mortgage-consultation-page-12",
+    "result": "passed"
+  },
+  {
+    "route": "/family-mortgage",
+    "key": "MortgageFaq-page-12",
+    "result": "passed"
+  },
+  {
+    "route": "/family-mortgage",
+    "key": "MortgageProgramPage-page-12",
+    "result": "passed"
+  },
+  {
+    "route": "/family-mortgage",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/for-sale",
+    "result": "redirect",
+    "blocks": 0
+  },
+  {
+    "route": "/it-mortgage",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/it-mortgage",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/it-mortgage",
+    "key": "PageHero-page-14",
+    "result": "passed"
+  },
+  {
+    "route": "/it-mortgage",
+    "key": "LeadReveal-instance-mortgage-calculator-page-14",
+    "result": "passed"
+  },
+  {
+    "route": "/it-mortgage",
+    "key": "MortgageWhoFits-page-14",
+    "result": "passed"
+  },
+  {
+    "route": "/it-mortgage",
+    "key": "LeadReveal-instance-mortgage-consultation-page-14",
+    "result": "passed"
+  },
+  {
+    "route": "/it-mortgage",
+    "key": "MortgageFaq-page-14",
+    "result": "passed"
+  },
+  {
+    "route": "/it-mortgage",
+    "key": "MortgageProgramPage-page-14",
+    "result": "passed"
+  },
+  {
+    "route": "/it-mortgage",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/legal/cookies",
+    "result": "redirect",
+    "blocks": 0
+  },
+  {
+    "route": "/legal/privacy",
+    "result": "redirect",
+    "blocks": 0
+  },
+  {
+    "route": "/legal/referral",
+    "result": "redirect",
+    "blocks": 0
+  },
+  {
+    "route": "/manufacture",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "PageHero-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "ManufactureProjectQuestions-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "PagemanufactureSection0-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "ManufacturePreparationQuestions-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "PagemanufactureSection1-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "ManufactureVideoReview-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "PagemanufactureSection2-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "ManufactureTruckTransition-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "ManufactureModuleScene-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "LeadReveal-instance-inline-request-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "PagemanufactureSection4-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "ManufactureMountingVideos-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "PagemanufactureSection5-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "ManufactureFaq-page-18",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "contactsSection",
+    "result": "passed"
+  },
+  {
+    "route": "/manufacture",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/mortgage",
+    "result": "redirect",
+    "blocks": 0
+  },
+  {
+    "route": "/personal-data",
+    "result": "redirect",
+    "blocks": 0
+  },
+  {
+    "route": "/preview/project",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/preview/project",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/preview/project",
+    "key": "ProjectHeroContent",
+    "result": "passed"
+  },
+  {
+    "route": "/preview/project",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/privacy",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/privacy",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/privacy",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/privacy",
+    "key": "PageprivacySection0-page-22",
+    "result": "passed"
+  },
+  {
+    "route": "/referral",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/referral",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/referral",
+    "key": "ReferralRules-page-23",
+    "result": "passed"
+  },
+  {
+    "route": "/referral",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/stories",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/stories",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/stories",
+    "key": "PagestoriesSection0-page-24",
+    "result": "passed"
+  },
+  {
+    "route": "/stories",
+    "key": "VideoTestimonials-page-24",
+    "result": "passed"
+  },
+  {
+    "route": "/stories",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "technicalHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "mainHeader",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "ProjectHeroContent",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "ProjectExteriors",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "ProjectPlans",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "ProjectInteriors",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "ProjectBuilt",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "ReadyHomeOffer",
+    "result": "conditional",
+    "reason": "В проверяемой базе нет опубликованного готового дома"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "MortgageCalculator",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "ProjectConfig",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "ProjectNextSteps",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "ProjectSimilar",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "contactsSection",
+    "result": "passed"
+  },
+  {
+    "route": "/catalog/[slug]",
+    "key": "footer",
+    "result": "passed"
+  },
+  {
+    "route": "/factory-open-day",
+    "key": "FactoryOpenDayHero-page-26",
+    "result": "passed"
+  },
+  {
+    "route": "/factory-open-day",
+    "key": "FactoryOpenDayProgram-page-26",
+    "result": "passed"
+  },
+  {
+    "route": "/factory-open-day",
+    "key": "FactoryOpenDayLocation-page-26",
+    "result": "passed"
+  },
+  {
+    "route": "/factory-open-day",
+    "key": "FactoryOpenDayForm-page-26",
+    "result": "passed"
+  },
+  {
+    "route": "/factory-open-day",
+    "key": "FactoryOpenDayFooter-page-26",
+    "result": "passed"
+  }
+]

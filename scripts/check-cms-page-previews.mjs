@@ -34,8 +34,8 @@ try {
     let loaded = ''
     for (const block of owner.blocks) {
       const route = owner.route.includes('[') || owner.kind === 'preview' ? `/catalog/${block.key === 'ReadyHomeOffer' && readySlug ? readySlug : projectSlug}` : owner.route
-      if (block.key === 'ReadyHomeOffer' && !readySlug && !process.env.CMS_AUDIT_INDEX) {
-        report.push({ route: owner.route, key: block.key, result: 'conditional', reason: 'В тестовой базе нет опубликованного готового дома' }); continue
+      if (block.key === 'ReadyHomeOffer' && !readySlug) {
+        report.push({ route: owner.route, key: block.key, result: 'conditional', reason: 'В проверяемой базе нет опубликованного готового дома' }); continue
       }
       try {
         if (!/[А-Яа-яЁё]/.test(block.title || '')) throw new Error('Название блока не переведено')

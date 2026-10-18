@@ -1,0 +1,162 @@
+{
+  "environment": "production",
+  "capturedAt": "2026-10-18T18:44:21.656Z",
+  "pages": [
+    {
+      "route": "/",
+      "status": 200,
+      "blocks": 15,
+      "errors": []
+    },
+    {
+      "route": "/about",
+      "status": 200,
+      "blocks": 11,
+      "errors": []
+    },
+    {
+      "route": "/agro-mortgage",
+      "status": 200,
+      "blocks": 9,
+      "errors": []
+    },
+    {
+      "route": "/basic-mortgage",
+      "status": 200,
+      "blocks": 9,
+      "errors": []
+    },
+    {
+      "route": "/business",
+      "status": 200,
+      "blocks": 11,
+      "errors": []
+    },
+    {
+      "route": "/catalog",
+      "status": 200,
+      "blocks": 4,
+      "errors": []
+    },
+    {
+      "route": "/cookies",
+      "status": 200,
+      "blocks": 4,
+      "errors": []
+    },
+    {
+      "route": "/dealers",
+      "status": 200,
+      "blocks": 4,
+      "errors": []
+    },
+    {
+      "route": "/exposition",
+      "status": 200,
+      "blocks": 11,
+      "errors": []
+    },
+    {
+      "route": "/exposition/avangard",
+      "status": 200,
+      "blocks": 10,
+      "errors": []
+    },
+    {
+      "route": "/exposition/vysokiy-kvartal",
+      "status": 200,
+      "blocks": 9,
+      "errors": []
+    },
+    {
+      "route": "/family-mortgage",
+      "status": 200,
+      "blocks": 9,
+      "errors": []
+    },
+    {
+      "route": "/for-sale",
+      "status": "redirect",
+      "blocks": 0,
+      "errors": []
+    },
+    {
+      "route": "/it-mortgage",
+      "status": 200,
+      "blocks": 9,
+      "errors": []
+    },
+    {
+      "route": "/legal/cookies",
+      "status": "redirect",
+      "blocks": 0,
+      "errors": []
+    },
+    {
+      "route": "/legal/privacy",
+      "status": "redirect",
+      "blocks": 0,
+      "errors": []
+    },
+    {
+      "route": "/legal/referral",
+      "status": "redirect",
+      "blocks": 0,
+      "errors": []
+    },
+    {
+      "route": "/manufacture",
+      "status": 200,
+      "blocks": 19,
+      "errors": []
+    },
+    {
+      "route": "/mortgage",
+      "status": "redirect",
+      "blocks": 0,
+      "errors": []
+    },
+    {
+      "route": "/personal-data",
+      "status": "redirect",
+      "blocks": 0,
+      "errors": []
+    },
+    {
+      "route": "/preview/project",
+      "status": 200,
+      "blocks": 3,
+      "errors": []
+    },
+    {
+      "route": "/privacy",
+      "status": 200,
+      "blocks": 4,
+      "errors": []
+    },
+    {
+      "route": "/referral",
+      "status": 200,
+      "blocks": 5,
+      "errors": []
+    },
+    {
+      "route": "/stories",
+      "status": 200,
+      "blocks": 5,
+      "errors": []
+    },
+    {
+      "route": "/catalog/[slug]",
+      "status": 200,
+      "blocks": 4,
+      "errors": []
+    },
+    {
+      "route": "/factory-open-day",
+      "status": 200,
+      "blocks": 5,
+      "errors": []
+    }
+  ]
+}

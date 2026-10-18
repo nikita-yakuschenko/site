@@ -1,0 +1,27 @@
+{
+  "environment": "production",
+  "checks": [
+    {
+      "route": "/about",
+      "width": 1440,
+      "status": 200,
+      "overflow": false,
+      "blocks": 11,
+      "brokenLoadedImages": 0
+    },
+    {
+      "route": "/about",
+      "width": 390,
+      "status": 200,
+      "overflow": false,
+      "blocks": 11,
+      "brokenLoadedImages": 0
+    },
+    {
+      "route": "/factory-open-day",
+      "font": "unbounded, \"unbounded Fallback\", Unbounded, sans-serif",
+      "fontStatus": "loaded"
+    }
+  ],
+  "errors": []
+}
