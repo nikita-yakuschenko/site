@@ -44,7 +44,7 @@
   .shadcn-surface a { text-decoration: none; }
   .shadcn-surface :where(p, h1, h2, h3, h4, ul, ol) { margin: 0; }
   .shadcn-surface :where(ul, ol), [data-slot='sidebar-menu'] { list-style: none; padding: 0; }
-  .shadcn-surface :where(button) { background: transparent; color: inherit; }
+  .shadcn-surface :where(button):not([data-slot="switch"]) { background: transparent; color: inherit; }
   a[data-slot] { text-decoration: none; }
-  button[data-slot] { background-color: transparent; color: inherit; }
+  button[data-slot]:not([data-slot="switch"]) { background-color: transparent; color: inherit; }
 }

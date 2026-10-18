@@ -145,9 +145,9 @@ export function IntegrationsPanel({ delivery }: { delivery: DeliverySettings }) 
           <IntegrationRow
             title="Передача заявок"
             text="Заявки с сайта уходят в Roistat и становятся сделками в Битрикс24. Адрес вебхука можно сменить здесь, без правки окружения сервера."
-            aside={delivery ? <div className="flex items-center gap-2">
-              <Label htmlFor="lead-delivery-enabled" className="text-sm font-normal text-muted-foreground">{enabled ? 'Включена' : 'Выключена'}</Label>
+            aside={delivery ? <div className="flex items-center space-x-2">
               <Switch id="lead-delivery-enabled" checked={enabled} disabled={state === 'saving'} onCheckedChange={value => void persist({ mode, enabled: value, webhookUrl, counters })} />
+              <Label htmlFor="lead-delivery-enabled">{enabled ? 'Включена' : 'Выключена'}</Label>
             </div> : null}
           >
             {delivery ? <div className="flex flex-col gap-4">
@@ -204,9 +204,9 @@ export function IntegrationsPanel({ delivery }: { delivery: DeliverySettings }) 
                         <Input type="date" aria-label="Дата подключения" value={row.connectedAt} className="w-40" onChange={event => updateCounter(row.key, { connectedAt: event.target.value }, true)} />
                       </TableCell>
                       <TableCell className="align-middle">
-                        <div className="flex items-center gap-2">
-                          <Switch checked={row.enabled} aria-label="Статус счётчика" disabled={state === 'saving'} onCheckedChange={value => updateCounter(row.key, { enabled: value }, true)} />
-                          <span className="text-sm text-muted-foreground">{row.enabled ? 'Подключён' : 'Выключен'}</span>
+                        <div className="flex items-center space-x-2">
+                          <Switch id={`counter-enabled-${row.key}`} checked={row.enabled} disabled={state === 'saving'} onCheckedChange={value => updateCounter(row.key, { enabled: value }, true)} />
+                          <Label htmlFor={`counter-enabled-${row.key}`}>{row.enabled ? 'Подключён' : 'Выключен'}</Label>
                         </div>
                       </TableCell>
                       <TableCell className="align-middle">
