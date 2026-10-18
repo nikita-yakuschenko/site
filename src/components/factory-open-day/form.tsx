@@ -114,7 +114,7 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
     <div className="ags-sheet">
       <div className="ags-book__body">
         <div className="ags-book__col">
-          <h2 className="ags-book__title">До встречи {date}</h2>
+          <h2 className="ags-book__title">До встречи <span data-cms-content-connected>{date}</span></h2>
           <p className="ags-book__note">Участие бесплатное, по записи. Заполните форму <span className="ags-form-direction--desktop">справа</span><span className="ags-form-direction--compact">ниже</span>, мы пришлём программу мероприятия и напоминание накануне</p>
         </div>
         <div ref={slot} style={{ display: 'contents' }}>{open ? <div className="ags-form-placeholder" style={{ height: hold }} /> : fields}</div>

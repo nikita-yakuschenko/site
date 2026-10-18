@@ -4,7 +4,7 @@ import { connection } from 'next/server'
 import type { LayoutBlock } from '../components/block-renderer'
 import type { CmsCatalogProvider } from './catalog/cms-provider'
 import { isCatalogSeries } from './catalog/types'
-import { collectionHref, isTechnologyCollection } from './catalog/collection'
+import { collectionHref, countCollectionProjects } from './catalog/collection'
 
 type Part = { key?: string; text?: string; href?: string; image?: string }
 
@@ -44,12 +44,6 @@ export async function applySeriesBento(blocks: readonly LayoutBlock[], catalog: 
   const heading = parts?.find(part => part.key === 'seriesBento.heading')?.text
   const button = parts?.find(part => part.key === 'seriesBento.button')?.text
   const { items } = await catalog.list({ siteCode })
-  const counts = new Map<string, number>()
-  for (const item of items) {
-    const key = isTechnologyCollection(item.series) ? '' : item.series
-    if (key) counts.set(key, (counts.get(key) || 0) + 1)
-    if (isTechnologyCollection(item.technology)) counts.set(item.technology, (counts.get(item.technology) || 0) + 1)
-  }
   const tiles = places.map((place, index) => {
     const part = parts?.find(item => item.key === `seriesBento.slot.${index}`)
     const series = part?.href && isCatalogSeries(part.href) && part.href !== 'aframe' ? part.href : place
@@ -59,7 +53,7 @@ export async function applySeriesBento(blocks: readonly LayoutBlock[], catalog: 
       title: part?.text || fallbackTitle[series],
       href: collectionHref(series),
       image: part?.image || fallbackImage[series],
-      count: counts.get(series) || 0,
+      count: countCollectionProjects(items, series),
     }
   })
   return blocks.map(block => block.blockType === 'seriesBento' ? { ...block, ...(heading ? { heading } : {}), ...(button ? { catalogLabel: button } : {}), items: tiles } : block)

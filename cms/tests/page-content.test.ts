@@ -2,8 +2,26 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { createElement, type ReactElement, type ReactNode } from 'react'
 import { bindMarkedContent, bindReactContent } from '../../src/lib/cms/react-content'
+import { countCollectionProjects } from '../../src/lib/catalog/collection'
 
 function props(node: ReactNode) { return (node as ReactElement<Record<string, unknown>>).props }
+
+test('collection counts follow current catalog records and distinguish technology from series', () => {
+  const items = [{ technology: 'panel', series: 'barn' }, { technology: 'modular', series: 'barn' }, { technology: 'panel', series: 'classic' }]
+  assert.equal(countCollectionProjects(items, 'panel'), 2)
+  assert.equal(countCollectionProjects(items, 'barn'), 2)
+  assert.equal(countCollectionProjects(items, 'modular'), 1)
+  assert.equal(countCollectionProjects([...items, { technology: 'modular', series: 'classic' }], 'modular'), 2)
+  assert.equal(countCollectionProjects(items.slice(1), 'panel'), 1)
+})
+
+test('a calculated badge cannot be overwritten by saved generic text', () => {
+  const badge = (count: string) => createElement('span', { 'data-cms-content-connected': true }, count)
+  const saved = [{ key: 'Card.content.0.children', text: '1 проект' }]
+  assert.deepEqual(bindReactContent('Card', badge('26 проектов'), saved).fields, [])
+  assert.equal(props(bindReactContent('Card', badge('26 проектов'), saved).content).children, '26 проектов')
+  assert.equal(props(bindReactContent('Card', badge('27 проектов'), saved).content).children, '27 проектов')
+})
 
 test('saved copy, links and images replace their own fields without changing handlers or the source tree', () => {
   const onClick = () => 'clicked'

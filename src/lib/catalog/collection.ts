@@ -7,6 +7,10 @@ export function isTechnologyCollection(token: string): token is 'panel' | 'modul
   return token === 'panel' || token === 'modular'
 }
 
+export function countCollectionProjects(items: readonly { technology: string; series: string }[], collection: string): number {
+  return items.filter(item => isTechnologyCollection(collection) ? item.technology === collection : item.series === collection).length
+}
+
 export function collectionHref(token: string): string {
   if (isTechnologyCollection(token)) return `/catalog?tech=${token}`
   if (isCatalogSeries(token)) return `/catalog?series=${token}`

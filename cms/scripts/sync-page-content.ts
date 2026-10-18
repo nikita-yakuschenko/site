@@ -101,8 +101,32 @@ try {
     }
     const layout: { component: { relationTo: 'blocks'; value: number } }[] = []
     const seen = new Set<string>()
+    if (page.route === '/' && apply) {
+      // These cards already have a database-backed editor. Never flatten their
+      // selected collection or calculated project count into generic text.
+      for (const block of blocks.filter(block => block.key?.startsWith('PhotoTile-instance-') && (block.defaults as { contentScope?: string } | null)?.contentScope === '/')) {
+        if ((block.defaults as { contentBinding?: string } | null)?.contentBinding === 'react') await payload.update({ collection: 'blocks', id: block.id, data: { defaults: { ...(block.defaults as Record<string, unknown>), contentBinding: 'managed-by-series' } }, req, overrideAccess: false })
+      }
+      const series = byKey.get('seriesBento')
+      if (series) {
+        let changed = false
+        const parts = await Promise.all((series.parts || []).map(async part => {
+          if (!/^seriesBento\.slot\.\d+$/.test(part.key) || part.image) return part
+          const group = part.href === 'panel' || part.href === 'modular' ? 'tech' : 'series'
+          const captured = byKey.get(`PhotoTile-instance--catalog-${group}-${part.href}-page-${page.id}`)
+          const existingImage = captured?.parts?.find(item => item.key.endsWith('.image'))?.image
+          const fallback = existingImage ? null : await imageID(`/series/${part.href}.jpg`, part.title || 'Превью подборки')
+          const image = existingImage || (fallback && 'id' in fallback ? fallback.id : null)
+          if (!image) return part
+          changed = true
+          return { ...part, image }
+        }))
+        if (changed) byKey.set('seriesBento', await payload.update({ collection: 'blocks', id: series.id, data: { parts }, req, overrideAccess: false }))
+      }
+    }
     for (const captured of snapshot.blocks || []) {
       const base = captured.key.split('-page-')[0]!
+      if (page.route === '/' && base.startsWith('PhotoTile-instance-')) continue
       if (seen.has(base) || !captured.fields.length && !structureOnlyBlocks.has(base)) continue
       seen.add(base)
       const key = shared.has(base) ? base : `${base}-page-${page.id}`

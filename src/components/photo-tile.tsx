@@ -10,14 +10,15 @@ export function PhotoLocationBadge({ address, mobileAddress, factory = false }: 
 }
 
 /** Общая фотокарточка подборок и выставочных площадок. */
-export function PhotoTile({ href, image, title, className = '', count, address, mobileAddress, sizes = '(max-width: 767px) 100vw, (max-width: 959px) 50vw, 66vw', quality }: {
-  href: string; image: string; title: string; className?: string; count?: string; address?: string; mobileAddress?: string; sizes?: string; quality?: number
+export function PhotoTile({ href, image, title, className = '', count, address, mobileAddress, sizes = '(max-width: 767px) 100vw, (max-width: 959px) 50vw, 66vw', quality, cmsManaged = true }: {
+  href: string; image: string; title: string; className?: string; count?: string; address?: string; mobileAddress?: string; sizes?: string; quality?: number; cmsManaged?: boolean
 }) {
-  return (<CMSContentBlock cmsBlockKey={`PhotoTile-instance-${href.replace(/[^a-zA-Z0-9]+/g, "-")}`}>{<Link href={href} className={`series-bento__tile ${className}`}>
+  const content = <Link href={href} className={`series-bento__tile ${className}`}>
     <Image src={image} alt="" fill sizes={sizes} quality={quality} unoptimized={image.startsWith('http')} />
-    {count != null && <span className="badge series-bento__count">{count}</span>}
+    {count != null && <span className="badge series-bento__count" data-cms-content-connected>{count}</span>}
     {address && <PhotoLocationBadge address={address} mobileAddress={mobileAddress} />}
     <span className="series-bento__go" aria-hidden="true"><IconArrowUpRight size={18} stroke={2} /></span>
     <span className="series-bento__label"><span className="series-bento__name">{title}</span></span>
-  </Link>}</CMSContentBlock>)
+  </Link>
+  return cmsManaged ? <CMSContentBlock cmsBlockKey={`PhotoTile-instance-${href.replace(/[^a-zA-Z0-9]+/g, "-")}`}>{content}</CMSContentBlock> : content
 }

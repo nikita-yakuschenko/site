@@ -33,7 +33,7 @@ export function FactoryOpenDayHero({ date }: { date: string }) {
             <h1 className="ags-hero__title">Новый взгляд<br />на загородный дом</h1>
             <p className="ags-hero__subtitle"><span className="ags-hero__subtitle-highlight">Какие дома будут строить в этом сезоне?</span></p>
             <div className="ags-hero__intro">
-              <p className="ags-hero__text">{date} разберём архитектурные тренды, цветовые решения, актуальные планировки и проекты, а главное — покажем, как они воплощаются в готовом доме.</p>
+              <p className="ags-hero__text"><span data-cms-content-connected>{date}</span> разберём архитектурные тренды, цветовые решения, актуальные планировки и проекты, а главное — покажем, как они воплощаются в готовом доме.</p>
               <ul className="ags-hero__benefits">
                 {points.map(([title, text]) => (
                   <li key={title}>

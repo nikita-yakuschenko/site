@@ -149,126 +149,6 @@
         ]
       },
       {
-        "key": "PhotoTile-instance--catalog-tech-panel-page-1",
-        "route": "/",
-        "fields": [
-          {
-            "key": "PhotoTile-instance--catalog-tech-panel-page-1.content.0.href",
-            "title": "Ссылка",
-            "kind": "link",
-            "href": "/catalog?tech=panel"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-tech-panel-page-1.content.0.children.0.image",
-            "title": "Изображение",
-            "kind": "image",
-            "image": "http://localhost:3001/api/media/file/panel.webp"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-tech-panel-page-1.content.0.children.1.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "1 проект"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-tech-panel-page-1.content.0.children.4.children.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "Панельно-каркасные дома"
-          }
-        ]
-      },
-      {
-        "key": "PhotoTile-instance--catalog-series-barn-page-1",
-        "route": "/",
-        "fields": [
-          {
-            "key": "PhotoTile-instance--catalog-series-barn-page-1.content.0.href",
-            "title": "Ссылка",
-            "kind": "link",
-            "href": "/catalog?series=barn"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-series-barn-page-1.content.0.children.0.image",
-            "title": "Изображение",
-            "kind": "image",
-            "image": "http://localhost:3001/api/media/file/barn.webp"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-series-barn-page-1.content.0.children.1.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "0 проектов"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-series-barn-page-1.content.0.children.4.children.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "Барнхаусы"
-          }
-        ]
-      },
-      {
-        "key": "PhotoTile-instance--catalog-series-classic-page-1",
-        "route": "/",
-        "fields": [
-          {
-            "key": "PhotoTile-instance--catalog-series-classic-page-1.content.0.href",
-            "title": "Ссылка",
-            "kind": "link",
-            "href": "/catalog?series=classic"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-series-classic-page-1.content.0.children.0.image",
-            "title": "Изображение",
-            "kind": "image",
-            "image": "http://localhost:3001/api/media/file/classic.webp"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-series-classic-page-1.content.0.children.1.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "0 проектов"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-series-classic-page-1.content.0.children.4.children.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "Классика"
-          }
-        ]
-      },
-      {
-        "key": "PhotoTile-instance--catalog-tech-modular-page-1",
-        "route": "/",
-        "fields": [
-          {
-            "key": "PhotoTile-instance--catalog-tech-modular-page-1.content.0.href",
-            "title": "Ссылка",
-            "kind": "link",
-            "href": "/catalog?tech=modular"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-tech-modular-page-1.content.0.children.0.image",
-            "title": "Изображение",
-            "kind": "image",
-            "image": "http://localhost:3001/api/media/file/modular.webp"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-tech-modular-page-1.content.0.children.1.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "1 проект"
-          },
-          {
-            "key": "PhotoTile-instance--catalog-tech-modular-page-1.content.0.children.4.children.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "Модульные дома"
-          }
-        ]
-      },
-      {
         "key": "productionSection",
         "route": "/",
         "fields": [
@@ -26405,12 +26285,6 @@
             "text": "Какие дома будут строить в этом сезоне?"
           },
           {
-            "key": "FactoryOpenDayHero-page-26.content.0.children.1.children.1.children.0.children.2.children.0.children.0",
-            "title": "Текст",
-            "kind": "text",
-            "text": "14 ноября"
-          },
-          {
             "key": "FactoryOpenDayHero-page-26.content.0.children.1.children.1.children.0.children.2.children.0.children.1",
             "title": "Текст",
             "kind": "text",
@@ -26777,12 +26651,6 @@
             "text": "Дата"
           },
           {
-            "key": "FactoryOpenDayLocation-page-26.content.0.children.1.children.children.0.children.1.children.2.children.1.children.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "14 ноября"
-          },
-          {
             "key": "FactoryOpenDayLocation-page-26.content.0.children.1.children.children.0.children.2.children.children.0.href",
             "title": "Ссылка",
             "kind": "link",
@@ -26823,12 +26691,6 @@
             "title": "Заголовок",
             "kind": "text",
             "text": "До встречи "
-          },
-          {
-            "key": "FactoryOpenDayForm-page-26.content.0.children.1.children.children.0.children.0.children.1",
-            "title": "Заголовок",
-            "kind": "text",
-            "text": "14 ноября"
           },
           {
             "key": "FactoryOpenDayForm-page-26.content.0.children.1.children.children.0.children.1.children.0",
@@ -27045,12 +26907,6 @@
             "title": "Текст",
             "kind": "text",
             "text": "Записаться на "
-          },
-          {
-            "key": "FactoryOpenDayFooter-page-26.content.0.children.1.children.0.children.3.children.1.children.1.children.children.1.children",
-            "title": "Текст",
-            "kind": "text",
-            "text": "14 ноября"
           },
           {
             "key": "FactoryOpenDayFooter-page-26.content.0.children.1.children.1.children.href",
