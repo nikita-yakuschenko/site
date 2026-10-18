@@ -3,15 +3,20 @@
 import { useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
+import { IconArrowRight } from '@tabler/icons-react'
 import { Badge } from '../ui/badge'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { Button } from '../ui/button'
+import { Card, CardContent } from '../ui/card'
+import { Field, FieldLabel } from '../ui/field'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Separator } from '../ui/separator'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 
 const providers = ['roistat', 'bitrix', 'yandex'] as const
 type Provider = (typeof providers)[number]
-
 type DeliveryMode = 'disabled' | 'test' | 'webhook' | 'roistat'
+type Tone = 'on' | 'off' | 'warn'
+
 const deliveryLabel: Record<DeliveryMode, string> = { disabled: 'Отключена', test: 'Тестовый режим', webhook: 'Вебхук', roistat: 'Через Roistat' }
 const modeOptions: { value: DeliveryMode; label: string }[] = [
   { value: 'disabled', label: 'Отключено' },
@@ -20,7 +25,27 @@ const modeOptions: { value: DeliveryMode; label: string }[] = [
   { value: 'roistat', label: 'Roistat (универсальный вебхук)' },
 ]
 
-// Inline control that saves the lead-delivery mode via the Payload global REST API
+function StatusBadge({ tone, children }: { tone: Tone; children: string }) {
+  return <Badge variant={tone === 'on' ? 'default' : tone === 'warn' ? 'destructive' : 'outline'}>{children}</Badge>
+}
+
+function IntegrationRow({ title, status, tone, text, children }: { title: string; status: string; tone: Tone; text: string; children?: ReactNode }) {
+  return <section className="flex flex-col gap-4">
+    <div className="flex flex-wrap items-start justify-between gap-3">
+      <div className="min-w-0 space-y-1">
+        <h2 className="text-base font-semibold">{title}</h2>
+        <p className="max-w-prose text-sm text-muted-foreground">{text}</p>
+      </div>
+      <StatusBadge tone={tone}>{status}</StatusBadge>
+    </div>
+    {children}
+  </section>
+}
+
+function SubmissionsLink() {
+  return <Button asChild variant="outline" size="sm"><Link href="/collections/lead-submissions">Отправки форм<IconArrowRight /></Link></Button>
+}
+
 function DeliveryModeControl({ initialMode }: { initialMode: DeliveryMode | null }) {
   const [mode, setMode] = useState<DeliveryMode>(initialMode ?? 'disabled')
   const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
@@ -45,26 +70,30 @@ function DeliveryModeControl({ initialMode }: { initialMode: DeliveryMode | null
       setState('error')
     }
   }
-  return <div className="flex flex-col gap-2 text-sm">
-    <span className="font-medium">Способ отправки</span>
-    <Select value={mode} disabled={state === 'saving'} onValueChange={value => save(value as DeliveryMode)}>
-      <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
-      <SelectContent>{modeOptions.map(option => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
-    </Select>
-    {state === 'saving' && <span className="text-muted-foreground">Сохранение…</span>}
-    {state === 'saved' && <span className="text-muted-foreground">Сохранено</span>}
-    {state === 'error' && <span className="text-destructive">Не удалось сохранить</span>}
-    {mode === 'webhook' && <Link className="underline-offset-4 hover:underline" href="/globals/lead-delivery">Указать адрес вебхука</Link>}
-    <Link className="underline-offset-4 hover:underline" href="/collections/lead-submissions">Отправки форм</Link>
+  return <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+    <Field className="max-w-sm">
+      <FieldLabel htmlFor="lead-delivery-mode">Способ отправки</FieldLabel>
+      <Select value={mode} disabled={state === 'saving'} onValueChange={value => save(value as DeliveryMode)}>
+        <SelectTrigger id="lead-delivery-mode" className="w-full"><SelectValue /></SelectTrigger>
+        <SelectContent>{modeOptions.map(option => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+      </Select>
+      {state === 'saving' && <p className="text-sm text-muted-foreground">Сохранение…</p>}
+      {state === 'saved' && <p className="text-sm text-muted-foreground">Сохранено</p>}
+      {state === 'error' && <p className="text-sm text-destructive">Не удалось сохранить</p>}
+      {mode === 'webhook' && <Button asChild variant="link" className="h-auto justify-start px-0"><Link href="/globals/lead-delivery">Указать адрес вебхука</Link></Button>}
+    </Field>
+    <SubmissionsLink />
   </div>
 }
 
-export function IntegrationsPanel({ deliveryMode, roistatReady }: { deliveryMode: keyof typeof deliveryLabel | null; roistatReady: boolean }) {
-  const roistatStatus = deliveryMode === 'roistat' ? (roistatReady ? 'Включена' : 'Нет адреса вебхука') : deliveryMode ? 'Выключена' : 'Нет доступа к настройке'
+export function IntegrationsPanel({ deliveryMode, roistatReady }: { deliveryMode: DeliveryMode | null; roistatReady: boolean }) {
   const params = useSearchParams()
   const asked = params.get('provider')
   const [provider, setProvider] = useState<Provider>(providers.includes(asked as Provider) ? asked as Provider : 'roistat')
-  return <Tabs value={provider} onValueChange={value => {
+  const deliveryTone: Tone = deliveryMode === 'roistat' ? (roistatReady ? 'on' : 'warn') : 'off'
+  const deliveryStatus = deliveryMode === 'roistat' ? (roistatReady ? 'Включена' : 'Нет адреса вебхука') : deliveryMode ? 'Выключена' : 'Нет доступа'
+  const bitrixOn = deliveryMode === 'roistat'
+  return <Tabs className="gap-6" value={provider} onValueChange={value => {
     const next = value as Provider
     setProvider(next)
     const query = new URLSearchParams(window.location.search)
@@ -76,33 +105,34 @@ export function IntegrationsPanel({ deliveryMode, roistatReady }: { deliveryMode
       <TabsTrigger value="bitrix">Битрикс24</TabsTrigger>
       <TabsTrigger value="yandex">Яндекс</TabsTrigger>
     </TabsList>
-    <TabsContent value="roistat" className="grid gap-4 md:grid-cols-2">
-      <ProviderCard title="Передача заявок" status={roistatStatus} text={`Каждая заявка с сайта уходит в универсальный вебхук Roistat с номером визита и названием сделки. Адрес вебхука в окружении CMS: ${roistatReady ? 'задан' : 'не задан'}.`}>
-        <DeliveryModeControl initialMode={deliveryMode} />
-      </ProviderCard>
-      <ProviderCard title="Счётчик на сайте" status="Подключён" text="Счётчик Roistat стоит на сайте с первого захода и связывает визит с рекламным источником. Проект тот же, что у старого сайта." />
+    <TabsContent value="roistat">
+      <Card className="shadow-none">
+        <CardContent className="flex flex-col gap-8 py-6">
+          <IntegrationRow title="Передача заявок" status={deliveryStatus} tone={deliveryTone} text={roistatReady ? 'Заявки с сайта уходят в Roistat и становятся сделками в Битрикс24. Адрес вебхука задан в окружении CMS.' : 'Заявки с сайта уходят в Roistat и становятся сделками в Битрикс24. Адрес вебхука в окружении CMS не задан.'}>
+            <DeliveryModeControl initialMode={deliveryMode} />
+          </IntegrationRow>
+          <Separator />
+          <IntegrationRow title="Счётчик на сайте" status="Подключён" tone="on" text="Счётчик грузится до баннера и связывает визит с рекламным источником. Проект тот же, что у старого сайта." />
+        </CardContent>
+      </Card>
     </TabsContent>
-    <TabsContent value="bitrix" className="grid gap-4 md:grid-cols-2">
-      <ProviderCard title="Сделки в CRM" status={deliveryMode ? deliveryLabel[deliveryMode] : 'Нет доступа к настройке'} text={deliveryMode === 'roistat' ? 'Сделку в Битрикс24 создаёт Roistat через свою интеграцию «Битрикс24 (Сделки)».' : 'Формы сайта передают обращения через общий обработчик. Для сделок в Битрикс24 выберите отправку через Roistat во вкладке Roistat.'}>
-        <Link className="text-sm underline-offset-4 hover:underline" href="/collections/lead-submissions">Отправки форм</Link>
-      </ProviderCard>
+    <TabsContent value="bitrix">
+      <Card className="shadow-none">
+        <CardContent className="flex flex-col gap-6 py-6">
+          <IntegrationRow title="Сделки в CRM" status={bitrixOn ? 'Через Roistat' : deliveryMode ? deliveryLabel[deliveryMode] : 'Нет доступа'} tone={bitrixOn ? 'on' : 'off'} text={bitrixOn ? 'Сделку в Битрикс24 создаёт Roistat через интеграцию «Битрикс24 (Сделки)».' : 'Чтобы сделки создавались в Битрикс24, во вкладке Roistat выберите отправку через универсальный вебхук.'}>
+            <SubmissionsLink />
+          </IntegrationRow>
+        </CardContent>
+      </Card>
     </TabsContent>
-    <TabsContent value="yandex" className="grid gap-4 md:grid-cols-2">
-      <ProviderCard title="Метрика" status="Не подключено" text="Посещаемость всего сайта будет приходить из Метрики. Сейчас в обзоре — открытия карточек проектов, которые сайт считает сам." />
-      <ProviderCard title="Директ" status="Не подключено" text="Рекламные кампании и расход. Подключение не настроено, цифр отсюда на обзоре нет." />
+    <TabsContent value="yandex">
+      <Card className="shadow-none">
+        <CardContent className="flex flex-col gap-8 py-6">
+          <IntegrationRow title="Метрика" status="Не подключено" tone="off" text="Посещаемость всего сайта появится после подключения. Сейчас в обзоре — открытия карточек проектов, которые сайт считает сам." />
+          <Separator />
+          <IntegrationRow title="Директ" status="Не подключено" tone="off" text="Рекламные кампании и расход. Подключение ещё не настроено." />
+        </CardContent>
+      </Card>
     </TabsContent>
   </Tabs>
-}
-
-function ProviderCard({ title, status, text, children }: { title: string; status: string; text: string; children?: ReactNode }) {
-  return <Card className="shadow-none">
-    <CardHeader>
-      <div className="flex flex-wrap items-center justify-between gap-2">
-        <CardTitle>{title}</CardTitle>
-        <Badge variant="outline">{status}</Badge>
-      </div>
-      <CardDescription>{text}</CardDescription>
-    </CardHeader>
-    {children ? <CardContent>{children}</CardContent> : null}
-  </Card>
 }
