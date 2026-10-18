@@ -40,11 +40,8 @@ registerIntegration({
 registerIntegration({
   id: "roistat",
   category: "analytics",
-  init: async () => {
-    const key = process.env.NEXT_PUBLIC_ROISTAT_ID;
-    if (!key) return;
-    // Adapter placeholder — без ID скрипт не грузим.
-  },
+  /* Счётчик грузится сразу компонентом RoistatCounter в layout, как Метрика.
+     Запись нужна очистке при отзыве согласия: ключи roistat* в cleanup.ts. */
 });
 
 registerIntegration({

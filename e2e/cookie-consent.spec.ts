@@ -4,7 +4,6 @@ import { test, expect, type Page, type Request } from "@playwright/test";
 const BLOCKED_HOST_PARTS = [
   "mc.yandex.ru",
   "metrika",
-  "roistat",
   "analytics.avgst.ru",
   "vk.com/ads",
   "top-fwz1.mail.ru",
