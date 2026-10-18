@@ -20,10 +20,10 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 export function EmptyNav() { return null }
 
 const structureIcons = { site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, prices: IconCash, registers: IconDatabase, sampling: IconFlask, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
-const documentsOf: Record<string, string> = { '/pages': '/collections/pages', '/catalog': '/collections/projects', '/prices': '/collections/project-prices' }
+const aliases: Record<string, string> = { '/pages': '/collections/pages', '/catalog': '/collections/projects', '/prices': '/collections/project-prices', '/blocks': '/collections/blocks', '/forms': '/collections/forms', '/media': '/collections/media', '/users': '/collections/users' }
 function sectionPaths(href: string) {
   if (href === '/integrations') return [href, '/leads', '/collections/lead-submissions', '/globals/lead-delivery']
-  return documentsOf[href] ? [href, documentsOf[href]] : [href]
+  return aliases[href] ? [href, aliases[href]] : [href]
 }
 function sectionActive(pathname: string, href: string) {
   return sectionPaths(href).some(path => pathname === path || pathname.startsWith(`${path}/`))
@@ -32,8 +32,8 @@ const navigation = [
   { title: 'Сайт', items: [{ title: 'Обзор', href: '/', icon: LayoutDashboard }, ...structure.filter(item => item.key !== 'integrations').map(item => ({ ...item, icon: structureIcons[item.key] }))] },
   { title: 'Обмен данными', items: structure.filter(item => item.key === 'integrations').map(item => ({ ...item, icon: structureIcons[item.key] })) },
   { title: 'Администрирование', items: [
-    { title: 'Медиафайлы', href: '/collections/media', icon: Images, collection: 'media' },
-    { title: 'Пользователи', href: '/collections/users', icon: Users, collection: 'users' },
+    { title: 'Медиафайлы', href: '/media', icon: Images, collection: 'media' },
+    { title: 'Пользователи', href: '/users', icon: Users, collection: 'users' },
   ] },
 ]
 
@@ -73,8 +73,8 @@ function AppSidebar() {
 const sections = [
   { title: 'Обзор', href: '/', lists: ['/'] },
   ...structure.map(item => ({ title: item.title, href: item.href, lists: sectionPaths(item.href) })),
-  { title: 'Медиафайлы', href: '/collections/media', lists: ['/collections/media'] },
-  { title: 'Пользователи', href: '/collections/users', lists: ['/collections/users'] },
+  { title: 'Медиафайлы', href: '/media', lists: sectionPaths('/media') },
+  { title: 'Пользователи', href: '/users', lists: sectionPaths('/users') },
   { title: 'Аккаунт', href: '/account', lists: ['/account'] },
 ]
 
@@ -95,8 +95,9 @@ function recordLabel(slug: string, data: Record<string, unknown>) {
 function HeaderBreadcrumb() {
   const pathname = usePathname()
   const section = sectionOf(pathname)
-  const collection = pathname.match(/^\/collections\/([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?$/)
-  const doc = collection?.[2] && collection[2] !== 'create' ? { slug: collection[1], id: collection[2] } : null
+  const collection = pathname.match(/^\/(?:collections\/)?([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?$/)
+  const ownSection = collection && ['blocks', 'forms', 'media', 'users', 'pages', 'projects', 'project-prices', 'lead-submissions'].includes(collection[1])
+  const doc = ownSection && collection?.[2] && collection[2] !== 'create' ? { slug: collection[1], id: collection[2] } : null
   const [docLabel, setDocLabel] = useState('')
   useEffect(() => {
     setDocLabel('')
@@ -115,7 +116,7 @@ function HeaderBreadcrumb() {
     if (collection?.[3] === 'versions' && docLabel) tail.push({ label: 'Версии' })
   } else if (collection?.[2] === 'create') tail.push({ label: 'Создать' })
   else if (doc && docLabel) {
-    tail.push({ label: docLabel, href: collection?.[3] === 'versions' ? `/collections/${doc.slug}/${doc.id}` : undefined })
+    tail.push({ label: docLabel, href: collection?.[3] === 'versions' ? `${['blocks', 'forms', 'media', 'users'].includes(doc.slug) ? '' : '/collections'}/${doc.slug}/${doc.id}` : undefined })
     if (collection?.[3] === 'versions') tail.push({ label: 'Версии' })
   }
   const crumbs = [{ label: section.title, href: tail.length ? section.href : undefined }, ...tail]

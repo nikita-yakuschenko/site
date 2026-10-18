@@ -19,7 +19,7 @@ export function RecentUploads({ files }: { files: Upload[] }) {
         <TableHead className="pr-4 text-right">Добавлен</TableHead>
       </TableRow></TableHeader>
       <TableBody>{table.rows.map(file => <TableRow key={file.id}>
-        <TableCell className="pl-4 font-medium"><Link href={`/collections/media/${file.id}`} className="underline-offset-4 hover:underline">{file.title}</Link></TableCell>
+        <TableCell className="pl-4 font-medium"><Link href={`/media/${file.id}`} className="underline-offset-4 hover:underline">{file.title}</Link></TableCell>
         <TableCell className="text-muted-foreground">{file.filename}</TableCell>
         <TableCell className="pr-4 text-right tabular-nums">{addedOn.format(new Date(file.createdAt))}</TableCell>
       </TableRow>)}</TableBody>

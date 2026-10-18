@@ -15,7 +15,7 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
   if (!initPageResult.req.user) redirect('/login')
   const item = structure.find(item => item.key === view)!
   const siteUrl = process.env.SITE_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://new.avgst.ru' : 'http://localhost:3000')
-  if (view === 'blocks' || view === 'forms') redirect(`/collections/${view}`)
+  if (view === 'blocks' || view === 'forms') redirect(`/${view}`)
   const pages = view === 'pages' ? await initPageResult.req.payload.find({ collection: 'pages', limit: 1000, sort: 'route', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
   const projects = view === 'catalog' ? await initPageResult.req.payload.find({ collection: 'projects', limit: 1000, sort: 'name', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
   const submissions = view === 'catalog' ? await initPageResult.req.payload.find({ collection: 'lead-submissions', pagination: false, depth: 0, req: initPageResult.req, overrideAccess: false, select: { status: true, payload: true } }) : null
