@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
-import { Inter, Unbounded } from 'next/font/google'
+import { Inter } from 'next/font/google'
+import localFont from 'next/font/local'
 import { FactoryOpenDayFooter } from '../../components/factory-open-day/footer'
 import { OpenDayTheme } from '../../components/factory-open-day/theme'
 import { FactoryOpenDayForm } from '../../components/factory-open-day/form'
@@ -10,7 +11,7 @@ import { openDayDate } from '../../lib/open-day'
 import './open-day.css'
 
 const inter = Inter({ subsets: ['cyrillic', 'latin'], weight: ['400', '500', '600', '700'], variable: '--font-ags-inter' })
-const unbounded = Unbounded({ subsets: ['cyrillic', 'latin'], weight: ['600', '700'], variable: '--font-ags-display' })
+const unbounded = localFont({ src: '../../../public/fonts/unbounded/Unbounded-Variable.ttf', weight: '600 700', variable: '--font-ags-display', display: 'swap' })
 
 export async function generateMetadata(): Promise<Metadata> {
   const date = await openDayDate()
