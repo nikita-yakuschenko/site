@@ -55,6 +55,7 @@ import { FormsView as FormsView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../c
 import { SectionsView as SectionsView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { IntegrationsView as IntegrationsView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { Dashboard as Dashboard_f0f8d4a7080efd2cd25bb6be37c094c0 } from '../../components/admin/Dashboard'
+import { LeadSubmissionDetails as LeadSubmissionDetails_c8e41a7b0d6f2a19e5b3c4d7a8f90123, LeadSubmissionPayload as LeadSubmissionPayload_c8e41a7b0d6f2a19e5b3c4d7a8f90123 } from '../../components/admin/LeadSubmissionView'
 import { LoginView as LoginView_1732cc817b3048038c3e58a486fc7be7 } from '../../components/admin/LoginView'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
@@ -117,6 +118,8 @@ export const importMap = {
   "./components/admin/StructureView#SectionsView": SectionsView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#IntegrationsView": IntegrationsView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/Dashboard#Dashboard": Dashboard_f0f8d4a7080efd2cd25bb6be37c094c0,
+  "./components/admin/LeadSubmissionView#LeadSubmissionDetails": LeadSubmissionDetails_c8e41a7b0d6f2a19e5b3c4d7a8f90123,
+  "./components/admin/LeadSubmissionView#LeadSubmissionPayload": LeadSubmissionPayload_c8e41a7b0d6f2a19e5b3c4d7a8f90123,
   "./components/admin/LoginView#LoginView": LoginView_1732cc817b3048038c3e58a486fc7be7,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

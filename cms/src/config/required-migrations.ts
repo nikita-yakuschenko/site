@@ -14,4 +14,5 @@ export const requiredMigrations = [
   '20261016_174800_special_dealer_price',
   '20261017_201500_project_views',
   '20261018_090000_roistat_delivery',
+  '20261018_100000_lead_submission_title',
 ]

@@ -686,6 +686,36 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
   :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-wrap { width: 100%; min-width: 0; height: auto; position: static; }
 }
 
+@media (min-width: 1024px) {
+  .collection-edit--lead-submissions .document-fields {
+    display: flex;
+    --main-width: 50%;
+    --doc-sidebar-width: 0px;
+    --sidebar-wrap-width: 50%;
+    --sidebar-gutter-h-left: 0px;
+    --sidebar-gutter-h-right: 24px;
+    --main-gutter-h-left: 24px;
+    --main-gutter-h-right: 24px;
+  }
+  .collection-edit--lead-submissions .document-fields__main { width: 50%; min-width: 0; flex: 0 0 50%; }
+  .collection-edit--lead-submissions .document-fields__sidebar-wrap {
+    width: 50%; min-width: 0; flex: 0 0 50%; position: sticky;
+    top: var(--doc-controls-height);
+    height: calc(100dvh - var(--doc-controls-height) - 24px);
+  }
+  .collection-edit--lead-submissions .document-fields__edit { padding: 24px; }
+  .collection-edit--lead-submissions .document-fields__sidebar { overflow: hidden; }
+  .collection-edit--lead-submissions .document-fields__sidebar-fields { height: 100%; padding: 24px 24px 24px 0; }
+}
+@media (max-width: 1023px) {
+  .collection-edit--lead-submissions .document-fields { display: block; }
+  .collection-edit--lead-submissions .document-fields__main,
+  .collection-edit--lead-submissions .document-fields__sidebar-wrap { width: 100%; min-width: 0; height: auto; position: static; }
+}
+.collection-edit--lead-submissions .field-label { display: none; }
+.collection-edit--lead-submissions .lead-submission-payload,
+.collection-edit--lead-submissions .lead-submission-payload [data-slot="code-block"] { height: 100%; }
+
 
 .project-order-grip { display:flex; align-items:center; justify-content:center; width:28px; height:28px; border:0; border-radius:6px; background:transparent; color:var(--theme-elevation-500); cursor:grab; }
 .project-order-grip:hover { background:var(--theme-elevation-100); }

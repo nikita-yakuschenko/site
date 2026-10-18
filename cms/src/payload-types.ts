@@ -773,6 +773,7 @@ export interface ProjectPrice {
  */
 export interface LeadSubmission {
   id: number;
+  title?: string | null;
   requestId: string;
   formId: string;
   status: 'pending' | 'test' | 'sent' | 'failed';
@@ -1493,6 +1494,7 @@ export interface ProjectPricesSelect<T extends boolean = true> {
  * via the `definition` "lead-submissions_select".
  */
 export interface LeadSubmissionsSelect<T extends boolean = true> {
+  title?: T;
   requestId?: T;
   formId?: T;
   status?: T;

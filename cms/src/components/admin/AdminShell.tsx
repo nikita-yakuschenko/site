@@ -81,7 +81,7 @@ function recordLabel(slug: string, data: Record<string, unknown>) {
     const name = [data.firstName, data.lastName].filter((part): part is string => typeof part === 'string' && Boolean(part.trim())).join(' ')
     return name || (typeof data.email === 'string' ? data.email : 'Пользователь')
   }
-  const key = slug === 'projects' ? 'name' : slug === 'media' ? 'filename' : slug === 'project-prices' ? 'lookupKey' : slug === 'lead-submissions' ? 'requestId' : 'title'
+  const key = slug === 'projects' ? 'name' : slug === 'media' ? 'filename' : slug === 'project-prices' ? 'lookupKey' : 'title'
   const value = data[key]
   return typeof value === 'string' && value.trim() ? value : 'Запись'
 }

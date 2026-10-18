@@ -18,15 +18,26 @@ export const LeadDelivery: GlobalConfig = {
   ],
 }
 
+function storedLeadTitle(doc: { title?: unknown; requestId?: unknown; payload?: unknown }) {
+  if (typeof doc.title === 'string' && doc.title.trim()) return doc.title.trim()
+  const payload = doc.payload && typeof doc.payload === 'object' && !Array.isArray(doc.payload) ? doc.payload as Record<string, unknown> : null
+  const fromPayload = typeof payload?.title === 'string' ? payload.title.trim() : ''
+  return fromPayload || (typeof doc.requestId === 'string' ? doc.requestId : '')
+}
+
 export const LeadSubmissions: CollectionConfig = {
   slug: 'lead-submissions', labels: { singular: 'Отправка формы', plural: 'Отправки форм' },
-  admin: { useAsTitle: 'requestId', defaultColumns: ['requestId', 'formId', 'status', 'createdAt'] },
+  admin: { useAsTitle: 'title', defaultColumns: ['title', 'formId', 'status', 'createdAt'] },
   access: { read: authenticated, create: () => false, update: () => false, delete: contentManager },
+  hooks: { afterRead: [({ doc }) => { doc.title = storedLeadTitle(doc); return doc }] },
   fields: [
-    { name: 'requestId', type: 'text', label: 'Идентификатор отправки', required: true, unique: true },
-    { name: 'formId', type: 'text', label: 'Форма', required: true },
-    { name: 'status', type: 'select', label: 'Состояние', required: true, options: [{ value: 'pending', label: 'Передача' }, { value: 'test', label: 'Принято тестовым обработчиком' }, { value: 'sent', label: 'Передано интеграции' }, { value: 'failed', label: 'Ошибка передачи' }] },
-    { name: 'payload', type: 'json', label: 'Данные и контекст обращения', required: true },
+    { name: 'title', type: 'text', label: 'Название сделки', admin: { hidden: true } },
+    { name: 'requestId', type: 'text', label: 'Идентификатор отправки', required: true, unique: true, admin: { hidden: true } },
+    { name: 'formId', type: 'text', label: 'Форма', required: true, admin: { hidden: true } },
+    { name: 'status', type: 'select', label: 'Состояние', required: true, options: [{ value: 'pending', label: 'Передача' }, { value: 'test', label: 'Принято тестовым обработчиком' }, { value: 'sent', label: 'Передано интеграции' }, { value: 'failed', label: 'Ошибка передачи' }], admin: { hidden: true } },
+    { name: 'payload', type: 'json', label: 'Данные и контекст обращения', required: true, admin: { hidden: true } },
+    { name: 'details', type: 'ui', admin: { components: { Field: './components/admin/LeadSubmissionView#LeadSubmissionDetails' } } },
+    { name: 'preview', type: 'ui', admin: { position: 'sidebar', components: { Field: './components/admin/LeadSubmissionView#LeadSubmissionPayload' } } },
   ],
   endpoints: [{ path: '/submit', method: 'post', handler: async req => {
     const denied = authorizeSiteRequest(req)
@@ -38,7 +49,7 @@ export const LeadSubmissions: CollectionConfig = {
     if (settings.mode === 'disabled') return Response.json({ error: 'Отправка не настроена' }, { status: 503 })
     const form = await req.payload.find({ collection: 'forms', where: { key: { equals: input.data.formId } }, limit: 1, depth: 0, req, overrideAccess: true })
     const title = leadTitle(input.data, form.docs[0]?.title || '')
-    const receipt = await req.payload.create({ collection: 'lead-submissions', data: { requestId: randomUUID(), formId: input.data.formId, status: 'pending', payload: { ...input.data, title } }, req, overrideAccess: true })
+    const receipt = await req.payload.create({ collection: 'lead-submissions', data: { requestId: randomUUID(), formId: input.data.formId, status: 'pending', title, payload: { ...input.data, title } }, req, overrideAccess: true })
     try {
       const result = await deliverLead(settings, input.data, receipt.requestId, fetch, title)
       await req.payload.update({ collection: 'lead-submissions', id: receipt.id, data: result, req, overrideAccess: true })
