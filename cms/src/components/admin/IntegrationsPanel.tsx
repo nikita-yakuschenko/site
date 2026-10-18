@@ -51,22 +51,22 @@ function IntegrationEditor({ id, title, label, value, enabled, busy, onSave, val
     <div className="flex flex-wrap items-center justify-between gap-3">
       <h2 id={`${id}-title`} className="text-base font-semibold">{title}</h2>
       <div className="flex items-center gap-3">
+        {onDelete && <Button type="button" variant="ghost" size="icon" aria-label={`Удалить: ${title}`} title="Удалить" disabled={!editing || busy} onClick={async () => {
+          try { await onDelete() } catch { setError('Не удалось удалить. Повторите попытку.') }
+        }}><IconTrash /></Button>}
         <div className="flex items-center gap-2">
           <Switch id={`${id}-enabled`} checked={active} disabled={!editing || busy} onCheckedChange={setDraftEnabled} />
           <Label className="w-20" htmlFor={`${id}-enabled`}>{active ? 'Включено' : 'Выключено'}</Label>
         </div>
-        <div className="grid w-[108px] shrink-0 grid-cols-3">
-        {editing ? <Button key="save" type="submit" form={`${id}-form`} variant="ghost" size="icon" aria-label={`Сохранить: ${title}`} title="Сохранить" disabled={busy}><IconCheck /></Button> : <Button key="edit" type="button" variant="ghost" size="icon" aria-label={`Изменить: ${title}`} title="Изменить" disabled={busy} onClick={() => {
+        <div className="grid w-18 shrink-0 grid-cols-2">
+        <Button type="submit" form={`${id}-form`} variant="ghost" size="icon" className={editing ? '' : 'invisible'} aria-label={`Сохранить: ${title}`} title="Сохранить" disabled={!editing || busy}><IconCheck /></Button>
+        {editing ? <Button key="cancel" type="button" variant="ghost" size="icon" aria-label={`Отмена: ${title}`} title="Отмена" disabled={busy} onClick={cancel}><IconX /></Button> : <Button key="edit" type="button" variant="ghost" size="icon" aria-label={`Изменить: ${title}`} title="Изменить" disabled={busy} onClick={() => {
           setDraft(value)
           setDraftEnabled(enabled)
           setError('')
           setEditing(true)
           requestAnimationFrame(() => input.current?.focus())
         }}><IconPencil /></Button>}
-        <Button type="button" variant="ghost" size="icon" className={editing ? '' : 'invisible'} aria-label={`Отмена: ${title}`} title="Отмена" disabled={!editing || busy} onClick={cancel}><IconX /></Button>
-        <Button type="button" variant="ghost" size="icon" className={editing && onDelete ? '' : 'invisible'} aria-label={`Удалить: ${title}`} title="Удалить" disabled={!editing || !onDelete || busy} onClick={async () => {
-          try { await onDelete?.() } catch { setError('Не удалось удалить. Повторите попытку.') }
-        }}><IconTrash /></Button>
         </div>
       </div>
     </div>
