@@ -7,6 +7,7 @@ import { CatalogIndex } from './CatalogIndex'
 import { PriceImport } from './PriceImport'
 import { PricesTable, type PriceTableRow } from './PricesTable'
 import { IntegrationsPanel } from './IntegrationsPanel'
+import { roistatWebhookEnv } from '../../config/lead-adapters'
 import { isPriceKind, summaryConfiguration, type PriceKind } from '../../config/price-kinds'
 import { countProjectLeads } from '../../config/catalog-lead-counts'
 
@@ -26,7 +27,7 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
     {view === 'prices' && priceRows && <PricesTable rows={priceRows} />}
     {view === 'registers' && <p className="max-w-2xl text-sm text-muted-foreground">{item.description}</p>}
     {view === 'sampling' && <p className="max-w-2xl text-sm text-muted-foreground">{item.description}</p>}
-    {view === 'integrations' && <Suspense><IntegrationsPanel deliveryMode={deliveryMode} /></Suspense>}
+    {view === 'integrations' && <Suspense><IntegrationsPanel deliveryMode={deliveryMode} roistatReady={Boolean(process.env[roistatWebhookEnv])} /></Suspense>}
     {view === 'pages' && pages && <PagesIndex siteUrl={siteUrl} pages={pages.docs} />}
     {view === 'catalog' && projects && <Suspense><CatalogIndex siteUrl={siteUrl} projects={projects.docs} leads={leads} /></Suspense>}
   </div>
@@ -46,7 +47,7 @@ export function IntegrationsView(props: AdminViewServerProps) { return <Structur
 async function leadDeliveryMode(req: AdminViewServerProps['initPageResult']['req']) {
   try {
     const delivery = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: false })
-    return delivery.mode === 'test' || delivery.mode === 'webhook' || delivery.mode === 'disabled' ? delivery.mode : null
+    return delivery.mode || null
   } catch {
     return null
   }

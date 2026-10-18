@@ -58,6 +58,7 @@ export default function ManufacturePage() {
                 label={copy.factoryTour}
                 heading={copy.factoryTour}
                 submitLabel={copy.factoryTour}
+                formId="factory-tour"
                 pageId="manufacture"
               />
           }

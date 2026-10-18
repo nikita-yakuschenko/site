@@ -53,6 +53,7 @@ export function ReadyHomeOffer({ project }: { project: CatalogProject }) {
             <PanelLeadForm
               label="Получить предложение"
               heading="Получить предложение"
+              formId="ready-home-offer"
               projectExternalId={project.id}
               onOpenChange={setFormOpen}
               meta={{

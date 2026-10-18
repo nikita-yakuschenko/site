@@ -10,7 +10,7 @@ const points = [
   ['Сколько стоит свой дом в 2027?', 'Разберём изменения на рынке ИЖС, условия по ипотеке и ежемесячный платёж.'],
 ]
 
-export function FactoryOpenDayHero() {
+export function FactoryOpenDayHero({ date }: { date: string }) {
   return (
     <section className="ags ags-hero">
       <OpenDayRules />
@@ -31,7 +31,7 @@ export function FactoryOpenDayHero() {
             <h1 className="ags-hero__title">Новый взгляд<br />на загородный дом</h1>
             <p className="ags-hero__subtitle"><span className="ags-hero__subtitle-highlight">Какие дома будут строить в этом сезоне?</span></p>
             <div className="ags-hero__intro">
-              <p className="ags-hero__text">14 ноября разберём архитектурные тренды, цветовые решения, актуальные планировки и проекты, а главное — покажем, как они воплощаются в готовом доме.</p>
+              <p className="ags-hero__text">{date} разберём архитектурные тренды, цветовые решения, актуальные планировки и проекты, а главное — покажем, как они воплощаются в готовом доме.</p>
               <ul className="ags-hero__benefits">
                 {points.map(([title, text]) => (
                   <li key={title}>

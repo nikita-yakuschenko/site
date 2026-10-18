@@ -20,6 +20,7 @@ const partFields: Record<string, { name: 'text' | 'textMore' | 'href'; label: st
   'popularProjects.button': [{ name: 'text', label: 'Текст кнопки', bare: true }],
   'seriesBento.heading': [{ name: 'text', label: 'Заголовок', bare: true }],
   'seriesBento.button': [{ name: 'text', label: 'Текст кнопки', bare: true }],
+  'openDay.date': [{ name: 'text', label: 'Дата, например «12 декабря»' }],
 }
 
 const seriesOptions = [

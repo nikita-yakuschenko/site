@@ -10,7 +10,7 @@ export function OpenDayBookButton({ className, children }: { className: string; 
   return <button type="button" className={className} aria-haspopup="dialog" aria-controls="ags-booking-dialog" onClick={() => window.dispatchEvent(new Event(OPEN_BOOKING))}>{children}</button>
 }
 
-export function FactoryOpenDayForm() {
+export function FactoryOpenDayForm({ date }: { date: string }) {
   const [phone, setPhone] = useState('+7')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -42,14 +42,14 @@ export function FactoryOpenDayForm() {
         body: JSON.stringify({
           name,
           phone: phoneE164(phone),
-          message: `Запись на встречу 14 ноября. Email: ${email}`,
+          message: `Запись на встречу ${date}. Email: ${email}`,
           consent: true,
           siteId: 'corporate',
           pageId: 'factory-open-day',
           formId: 'FactoryOpenDayForm',
           sourceUrl: window.location.href,
           sourcePath: window.location.pathname,
-          meta: { email, event: 'factory-open-day', date: '14 ноября' },
+          meta: { email, event: 'factory-open-day', date },
         }),
       })
       if (!response.ok) throw new Error('lead-failed')
@@ -113,7 +113,7 @@ export function FactoryOpenDayForm() {
     <div className="ags-sheet">
       <div className="ags-book__body">
         <div className="ags-book__col">
-          <h2 className="ags-book__title">До встречи 14 ноября</h2>
+          <h2 className="ags-book__title">До встречи {date}</h2>
           <p className="ags-book__note">Участие бесплатное, по записи. Заполните форму <span className="ags-form-direction--desktop">справа</span><span className="ags-form-direction--compact">ниже</span>, мы пришлём программу мероприятия и напоминание накануне</p>
         </div>
         <div ref={slot} style={{ display: 'contents' }}>{open ? <div className="ags-form-placeholder" style={{ height: hold }} /> : fields}</div>

@@ -83,6 +83,10 @@ const chrome = [
     { key: 'contactsSection.contacts', title: 'Контакты' },
     { key: 'contactsSection.places', title: 'Площадки' },
   ] },
+  // Мероприятие ежемесячное: дата меняется здесь, страница берёт её отсюда.
+  { key: 'FactoryOpenDayHero', title: 'День открытых дверей: первый экран', parts: [
+    { key: 'openDay.date', title: 'Дата мероприятия', text: '14 ноября' },
+  ] },
 ]
 
 export const chromeByKey = new Map<string, { title: string; shared?: boolean; parts: { key: string; title: string; text?: string; textMore?: string; href?: string }[] }>(chrome.map(item => [item.key, { title: item.title, ...('shared' in item ? { shared: true } : {}), parts: item.parts.map(part => ({ ...part })) }]))

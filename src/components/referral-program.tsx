@@ -171,6 +171,7 @@ export function ReferralProgram({
           consent: true,
           siteId: Number(siteId),
           pageId: pageId ? Number(pageId) : undefined,
+          formId: "referral-program",
           sourcePath: `${window.location.pathname}#referral`,
           projectExternalId: `referral:${email}`,
         }),

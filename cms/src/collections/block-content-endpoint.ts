@@ -19,7 +19,7 @@ export const blockContentEndpoint: Endpoint = {
     const denied = authorizeSiteRequest(req)
     if (denied) return denied
     const key = new URL(req.url || '').searchParams.get('key') || ''
-    if (!/^[a-z0-9]+(?:[.-][a-z0-9]+)*$/.test(key)) return Response.json({ error: 'Некорректный ключ' }, { status: 400 })
+    if (!/^[A-Za-z0-9]+(?:[.-][A-Za-z0-9]+)*$/.test(key)) return Response.json({ error: 'Некорректный ключ' }, { status: 400 })
     const result = await req.payload.find({ collection: 'blocks', where: { key: { equals: key } }, limit: 1, depth: 1, overrideAccess: true, req })
     const parts = (result.docs[0]?.parts || []).map(part => ({
       key: part.key,

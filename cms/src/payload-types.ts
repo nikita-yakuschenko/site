@@ -1580,7 +1580,7 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface LeadDelivery {
   id: number;
-  mode: 'disabled' | 'test' | 'webhook';
+  mode: 'disabled' | 'test' | 'webhook' | 'roistat';
   url?: string | null;
   /**
    * Необязательно. Например, CRM_AUTHORIZATION. Значение с токеном задаётся в окружении CMS.

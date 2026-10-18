@@ -10,9 +10,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 const providers = ['roistat', 'bitrix', 'yandex'] as const
 type Provider = (typeof providers)[number]
 
-const deliveryLabel = { disabled: 'Отключена', test: 'Тестовый режим', webhook: 'Вебхук' }
+const deliveryLabel = { disabled: 'Отключена', test: 'Тестовый режим', webhook: 'Вебхук', roistat: 'Через Roistat' }
 
-export function IntegrationsPanel({ deliveryMode }: { deliveryMode: keyof typeof deliveryLabel | null }) {
+function DeliveryLinks() {
+  return <div className="flex flex-wrap gap-3 text-sm">
+    <Link className="underline-offset-4 hover:underline" href="/globals/lead-delivery">Настроить отправку</Link>
+    <Link className="underline-offset-4 hover:underline" href="/collections/lead-submissions">Отправки форм</Link>
+  </div>
+}
+
+export function IntegrationsPanel({ deliveryMode, roistatReady }: { deliveryMode: keyof typeof deliveryLabel | null; roistatReady: boolean }) {
+  const roistatStatus = deliveryMode === 'roistat' ? (roistatReady ? 'Включена' : 'Нет адреса вебхука') : deliveryMode ? 'Выключена' : 'Нет доступа к настройке'
   const params = useSearchParams()
   const asked = params.get('provider')
   const [provider, setProvider] = useState<Provider>(providers.includes(asked as Provider) ? asked as Provider : 'roistat')
@@ -29,14 +37,14 @@ export function IntegrationsPanel({ deliveryMode }: { deliveryMode: keyof typeof
       <TabsTrigger value="yandex">Яндекс</TabsTrigger>
     </TabsList>
     <TabsContent value="roistat" className="grid gap-4 md:grid-cols-2">
-      <ProviderCard title="Сквозная аналитика" status="Не подключено" text="Сводит визиты, источники рекламы и заявки в одну воронку. Пока посещения карточек проектов считаются на самом сайте и видны в обзоре." />
+      <ProviderCard title="Передача заявок" status={roistatStatus} text={`Каждая заявка с сайта уходит в универсальный вебхук Roistat с номером визита и названием сделки. Адрес вебхука в окружении CMS: ${roistatReady ? 'задан' : 'не задан'}.`}>
+        <DeliveryLinks />
+      </ProviderCard>
+      <ProviderCard title="Счётчик на сайте" status="Подключён" text="Счётчик Roistat стоит на сайте с первого захода и связывает визит с рекламным источником. Проект тот же, что у старого сайта." />
     </TabsContent>
     <TabsContent value="bitrix" className="grid gap-4 md:grid-cols-2">
-      <ProviderCard title="Заявки в CRM" status={deliveryMode ? deliveryLabel[deliveryMode] : 'Нет доступа к настройке'} text="Формы сайта передают обращения через общий обработчик. Здесь выбирается тест или отправка в Битрикс24.">
-        <div className="flex flex-wrap gap-3 text-sm">
-          <Link className="underline-offset-4 hover:underline" href="/globals/lead-delivery">Настроить отправку</Link>
-          <Link className="underline-offset-4 hover:underline" href="/collections/lead-submissions">Отправки форм</Link>
-        </div>
+      <ProviderCard title="Сделки в CRM" status={deliveryMode ? deliveryLabel[deliveryMode] : 'Нет доступа к настройке'} text={deliveryMode === 'roistat' ? 'Сделку в Битрикс24 создаёт Roistat через свою интеграцию «Битрикс24 (Сделки)».' : 'Формы сайта передают обращения через общий обработчик. Для сделок в Битрикс24 выберите отправку через Roistat.'}>
+        <DeliveryLinks />
       </ProviderCard>
     </TabsContent>
     <TabsContent value="yandex" className="grid gap-4 md:grid-cols-2">

@@ -1,7 +1,7 @@
 import { OpenDayBookButton } from './form'
 import { OpenDayArrow, OpenDayRules } from './rules'
 
-export function FactoryOpenDayFooter() {
+export function FactoryOpenDayFooter({ date }: { date: string }) {
   return <footer className="ags ags-foot">
     <OpenDayRules />
     <div className="ags-sheet">
@@ -32,7 +32,7 @@ export function FactoryOpenDayFooter() {
           <p className="ags-foot__h"><span className="ags-footer-highlight">Производство</span></p>
           <ul className="ags-list">
             <li className="ags-plain ags-foot__address">город Нижний Новгород,<br />улица Зайцева 31, корпус 1 (проходная),<br />Территория бывшего завода ЗКПД-4</li>
-            <li><OpenDayBookButton className="ags-link ags-link--go">Записаться на <span className="ags-footer-highlight">14 ноября</span><OpenDayArrow size={13} /></OpenDayBookButton></li>
+            <li><OpenDayBookButton className="ags-link ags-link--go">Записаться на <span className="ags-footer-highlight">{date}</span><OpenDayArrow size={13} /></OpenDayBookButton></li>
           </ul>
         </div>
       </div>

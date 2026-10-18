@@ -4,11 +4,12 @@ import { authenticated, contentManager, superAdmin } from '../access/staff'
 import { authorizeSiteRequest } from './project-hero-endpoint'
 import { leadInputSchema } from '../../../src/lib/leads'
 import { deliverLead } from '../config/lead-adapters'
+import { leadTitle } from '../config/lead-title'
 
 export const LeadDelivery: GlobalConfig = {
   slug: 'lead-delivery', label: 'Отправка заявок', access: { read: superAdmin, update: superAdmin },
   fields: [
-    { name: 'mode', label: 'Способ отправки', type: 'select', required: true, defaultValue: 'disabled', options: [{ value: 'disabled', label: 'Отключено' }, { value: 'test', label: 'Тестовый обработчик' }, { value: 'webhook', label: 'API / вебхук' }] },
+    { name: 'mode', label: 'Способ отправки', type: 'select', required: true, defaultValue: 'disabled', options: [{ value: 'disabled', label: 'Отключено' }, { value: 'test', label: 'Тестовый обработчик' }, { value: 'webhook', label: 'API / вебхук' }, { value: 'roistat', label: 'Roistat (универсальный вебхук)' }], admin: { description: 'Roistat: адрес берётся из переменной ROISTAT_UNIVERSAL_WEBHOOK_URL в окружении CMS. Сделку в Битрикс24 создаёт Roistat.' } },
     { name: 'url', label: 'Адрес API / вебхука', type: 'text', admin: { condition: data => data.mode === 'webhook' }, validate: (value: unknown, { siblingData }: { siblingData?: { mode?: string } }) => {
       if (siblingData?.mode !== 'webhook') return true
       try { const url = new URL(String(value)); return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? true : 'Укажите адрес HTTP или HTTPS без логина и пароля' } catch { return 'Укажите адрес HTTP или HTTPS' }
@@ -35,9 +36,11 @@ export const LeadSubmissions: CollectionConfig = {
     if (!input.success || !input.data.formId) return Response.json({ error: 'Некорректные данные формы' }, { status: 400 })
     const settings = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: true })
     if (settings.mode === 'disabled') return Response.json({ error: 'Отправка не настроена' }, { status: 503 })
-    const receipt = await req.payload.create({ collection: 'lead-submissions', data: { requestId: randomUUID(), formId: input.data.formId, status: 'pending', payload: input.data }, req, overrideAccess: true })
+    const form = await req.payload.find({ collection: 'forms', where: { key: { equals: input.data.formId } }, limit: 1, depth: 0, req, overrideAccess: true })
+    const title = leadTitle(input.data, form.docs[0]?.title || '')
+    const receipt = await req.payload.create({ collection: 'lead-submissions', data: { requestId: randomUUID(), formId: input.data.formId, status: 'pending', payload: { ...input.data, title } }, req, overrideAccess: true })
     try {
-      const result = await deliverLead(settings, input.data, receipt.requestId)
+      const result = await deliverLead(settings, input.data, receipt.requestId, fetch, title)
       await req.payload.update({ collection: 'lead-submissions', id: receipt.id, data: result, req, overrideAccess: true })
       return Response.json({ accepted: true, id: receipt.requestId, mode: result.status }, { headers: { 'Cache-Control': 'no-store' } })
     } catch {

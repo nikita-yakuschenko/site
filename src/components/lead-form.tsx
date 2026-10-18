@@ -105,7 +105,7 @@ export function LeadForm({
           formId: resolvedFormId,
           sourceUrl: window.location.href,
           sourcePath: window.location.pathname,
-          meta: { region: readRegionCode(), ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
+          meta: { region: readRegionCode(), formHeading: heading, ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
         }),
       })
       if (!response.ok) throw new Error('lead-failed')

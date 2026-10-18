@@ -23,6 +23,7 @@ export function FinanceLeadCard({
   formLead,
   heading,
   body,
+  programId,
 }: {
   siteId: number | string
   title: string
@@ -34,6 +35,8 @@ export function FinanceLeadCard({
   formLead?: string
   heading: string
   body?: string | null
+  /** Вид ипотеки участка: уходит в название заявки. */
+  programId?: string
 }) {
   const [open, setOpen] = useState(false)
 
@@ -77,6 +80,8 @@ export function FinanceLeadCard({
             siteId={siteId}
             variant="card"
             compact
+            formId="mortgage-consultation"
+            meta={programId ? { program: programId } : undefined}
             heading={heading}
             body={body}
             submitLabel={cta}

@@ -513,7 +513,7 @@ export function SiteChrome({
         </div>
       </footer>
 
-      {askOpen ? <LeadDialog withMessage onClose={() => setAskOpen(false)} /> : null}
+      {askOpen ? <LeadDialog withMessage formId="header-question" meta={{ pageTitle: typeof document === "undefined" ? "" : document.title }} onClose={() => setAskOpen(false)} /> : null}
     </div>
   );
 }
