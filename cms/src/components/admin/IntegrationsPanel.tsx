@@ -3,7 +3,7 @@
 import { useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import { IconChevronRight, IconPencil, IconPlus, IconTrash } from '@tabler/icons-react'
+import { IconCheck, IconChevronRight, IconPencil, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 import { roistatWebhookUrlError } from '../../config/lead-adapters'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
@@ -53,18 +53,24 @@ function IntegrationEditor({ id, title, label, value, enabled, busy, onSave, val
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2">
           <Switch id={`${id}-enabled`} checked={active} disabled={!editing || busy} onCheckedChange={setDraftEnabled} />
-          <Label htmlFor={`${id}-enabled`}>{active ? 'Включено' : 'Выключено'}</Label>
+          <Label className="w-20" htmlFor={`${id}-enabled`}>{active ? 'Включено' : 'Выключено'}</Label>
         </div>
-        <Button type="button" variant="ghost" size="icon" aria-label={`Изменить: ${title}`} title="Изменить" disabled={editing || busy} onClick={() => {
+        <div className="grid w-[108px] shrink-0 grid-cols-3">
+        {editing ? <Button key="save" type="submit" form={`${id}-form`} variant="ghost" size="icon" aria-label={`Сохранить: ${title}`} title="Сохранить" disabled={busy}><IconCheck /></Button> : <Button key="edit" type="button" variant="ghost" size="icon" aria-label={`Изменить: ${title}`} title="Изменить" disabled={busy} onClick={() => {
           setDraft(value)
           setDraftEnabled(enabled)
           setError('')
           setEditing(true)
           requestAnimationFrame(() => input.current?.focus())
-        }}><IconPencil /></Button>
+        }}><IconPencil /></Button>}
+        <Button type="button" variant="ghost" size="icon" className={editing ? '' : 'invisible'} aria-label={`Отмена: ${title}`} title="Отмена" disabled={!editing || busy} onClick={cancel}><IconX /></Button>
+        <Button type="button" variant="ghost" size="icon" className={editing && onDelete ? '' : 'invisible'} aria-label={`Удалить: ${title}`} title="Удалить" disabled={!editing || !onDelete || busy} onClick={async () => {
+          try { await onDelete?.() } catch { setError('Не удалось удалить. Повторите попытку.') }
+        }}><IconTrash /></Button>
+        </div>
       </div>
     </div>
-    <form className="flex min-w-0 flex-col gap-4" onKeyDown={event => {
+    <form id={`${id}-form`} className="flex min-w-0 flex-col gap-4" onKeyDown={event => {
       if (event.key === 'Escape' && editing && !busy) { event.preventDefault(); cancel() }
     }} onSubmit={async event => {
       event.preventDefault()
@@ -82,16 +88,9 @@ function IntegrationEditor({ id, title, label, value, enabled, busy, onSave, val
       {children?.(editing)}
       <Field>
         <FieldLabel htmlFor={id}>{label}</FieldLabel>
-        <Input ref={input} id={id} value={editing ? draft : value} readOnly={!editing} disabled={busy} spellCheck={false} autoComplete="off" aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} className="font-mono text-sm" onChange={event => { setDraft(event.target.value); setError('') }} />
+        <Input ref={input} id={id} value={editing ? draft : value} disabled={!editing || busy} spellCheck={false} autoComplete="off" aria-invalid={Boolean(error)} aria-describedby={error ? `${id}-error` : undefined} className="text-sm" style={{ fontFamily: 'var(--font-geist-mono)' }} onChange={event => { setDraft(event.target.value); setError('') }} />
       </Field>
       {error && <p id={`${id}-error`} role="alert" className="text-sm text-destructive">{error}</p>}
-      {editing && <div className="flex flex-wrap items-center gap-2">
-        <Button type="submit" size="sm" disabled={busy}>{busy ? 'Сохранение…' : 'Сохранить'}</Button>
-        <Button type="button" variant="outline" size="sm" disabled={busy} onClick={cancel}>Отмена</Button>
-        {onDelete && <Button type="button" variant="ghost" size="icon" className="ml-auto" aria-label={`Удалить: ${title}`} title="Удалить" disabled={busy} onClick={async () => {
-          try { await onDelete() } catch { setError('Не удалось удалить. Повторите попытку.') }
-        }}><IconTrash /></Button>}
-      </div>}
     </form>
   </section>
 }
@@ -104,7 +103,7 @@ export function IntegrationsPanel({ delivery, yandex }: { delivery: DeliverySett
   const [draftMode, setDraftMode] = useState(mode)
   const [enabled, setEnabled] = useState(delivery?.enabled ?? false)
   const [webhookUrl, setWebhookUrl] = useState(delivery?.webhookUrl ?? '')
-  const [counters, setCounters] = useState<CounterRow[]>(() => (delivery?.counters ?? []).map(row => ({ ...row, key: crypto.randomUUID() })))
+  const [counters, setCounters] = useState<CounterRow[]>(() => (delivery?.counters ?? []).map((row, index) => ({ ...row, key: `stored-${index}` })))
   const [settings, setSettings] = useState(yandex)
   const [busy, setBusy] = useState(false)
   const saving = useRef(false)
