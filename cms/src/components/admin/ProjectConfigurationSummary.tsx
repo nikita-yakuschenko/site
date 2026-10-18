@@ -27,7 +27,7 @@ export function ProjectConfigurationSummary() {
   const content = sharedConfigurationContent(templates, String(technology || ''))
   return <div className="shadcn-surface flex flex-col gap-3">
     <Link href={blockId ? `/collections/blocks/${blockId}` : '/collections/blocks?where[key][equals]=ProjectConfig'} className="self-start rounded-lg border px-3 py-2 text-sm font-medium">Редактировать блок «Комплектации»</Link>
-    <p className="text-sm text-muted-foreground">Состав и описания общие для всех проектов. Набор определяется технологией дома. Цены загружаются из файла или через API в <Link href="/structure/catalog">региональный прайс</Link>.</p>
+    <p className="text-sm text-muted-foreground">Состав и описания общие для всех проектов. Набор определяется технологией дома. Цены загружаются из файла или через API в <Link href="/catalog">региональный прайс</Link>.</p>
     {error && <p role="alert" className="text-sm">Не удалось загрузить общие описания. Откройте редактор комплектаций или обновите страницу.</p>}
     <Accordion type="multiple" className="flex flex-col gap-2">
       {keys.map(key => {

@@ -36,7 +36,7 @@ export async function Dashboard({ initPageResult }: AdminViewServerProps) {
   return <div className="shadcn-surface flex flex-col gap-6 p-4 lg:p-6">
     <div className="flex flex-wrap items-center justify-between gap-3">
       <h1 className="text-2xl font-semibold tracking-tight">Обзор</h1>
-      <Button asChild variant="outline" size="sm"><Link href="/structure/catalog">Каталог</Link></Button>
+      <Button asChild variant="outline" size="sm"><Link href="/catalog">Каталог</Link></Button>
     </div>
     <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">{cards.map(card => <Card key={card.label} className="shadow-none">
       <CardHeader>

@@ -2,7 +2,7 @@ const catalogQueryKey = 'avgst-catalog-query'
 
 export function catalogHref() {
   const saved = typeof window === 'undefined' ? '' : localStorage.getItem(catalogQueryKey) || ''
-  return saved ? `/structure/catalog?${saved}` : '/structure/catalog'
+  return saved ? `/catalog?${saved}` : '/catalog'
 }
 
 export function rememberCatalogQuery(query: string) {

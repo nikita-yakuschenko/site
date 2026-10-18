@@ -43,7 +43,7 @@ function IntegrationRow({ title, status, tone, text, children }: { title: string
 }
 
 function SubmissionsLink() {
-  return <Button asChild variant="outline" size="sm"><Link href="/collections/lead-submissions">Отправки форм<IconArrowRight /></Link></Button>
+  return <Button asChild variant="outline" size="sm"><Link href="/leads">Заявки<IconArrowRight /></Link></Button>
 }
 
 function DeliveryModeControl({ initialMode }: { initialMode: DeliveryMode | null }) {

@@ -26,8 +26,8 @@ function storedLeadTitle(doc: { title?: unknown; requestId?: unknown; payload?: 
 }
 
 export const LeadSubmissions: CollectionConfig = {
-  slug: 'lead-submissions', labels: { singular: 'Отправка формы', plural: 'Отправки форм' },
-  admin: { useAsTitle: 'title', defaultColumns: ['title', 'formId', 'status', 'createdAt'] },
+  slug: 'lead-submissions', labels: { singular: 'Заявка', plural: 'Заявки' },
+  admin: { useAsTitle: 'title', defaultColumns: ['title', 'formId', 'status', 'createdAt'], components: { views: { list: { Component: './components/admin/LeadsView#LeadsListRedirect' } } } },
   access: { read: authenticated, create: () => false, update: () => false, delete: contentManager },
   hooks: { afterRead: [({ doc }) => { doc.title = storedLeadTitle(doc); return doc }] },
   fields: [

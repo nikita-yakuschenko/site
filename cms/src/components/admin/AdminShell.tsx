@@ -20,7 +20,14 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 export function EmptyNav() { return null }
 
 const structureIcons = { site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, prices: IconCash, registers: IconDatabase, sampling: IconFlask, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
-const collectionPath = (href: string) => href === '/structure/catalog' ? '/collections/projects' : href === '/structure/prices' ? '/collections/project-prices' : href.replace('/structure/', '/collections/')
+const documentsOf: Record<string, string> = { '/pages': '/collections/pages', '/catalog': '/collections/projects', '/prices': '/collections/project-prices' }
+function sectionPaths(href: string) {
+  if (href === '/integrations') return [href, '/leads', '/collections/lead-submissions', '/globals/lead-delivery']
+  return documentsOf[href] ? [href, documentsOf[href]] : [href]
+}
+function sectionActive(pathname: string, href: string) {
+  return sectionPaths(href).some(path => pathname === path || pathname.startsWith(`${path}/`))
+}
 const navigation = [
   { title: 'Сайт', items: [{ title: 'Обзор', href: '/', icon: LayoutDashboard }, ...structure.filter(item => item.key !== 'integrations').map(item => ({ ...item, icon: structureIcons[item.key] }))] },
   { title: 'Обмен данными', items: structure.filter(item => item.key === 'integrations').map(item => ({ ...item, icon: structureIcons[item.key] })) },
@@ -43,8 +50,8 @@ function AppSidebar() {
     </SidebarMenuButton></SidebarMenuItem></SidebarMenu></SidebarHeader>
     <SidebarContent>{navigation.map(group => <SidebarGroup key={group.title}><SidebarGroupLabel>{group.title}</SidebarGroupLabel><SidebarGroupContent><SidebarMenu>
       {group.items.filter(item => !('collection' in item) || permissions?.collections?.[item.collection as 'users' | 'media']?.read).map(item => <SidebarMenuItem key={item.href}>
-        <SidebarMenuButton asChild isActive={item.href === '/' ? pathname === '/' : pathname.startsWith(item.href) || pathname.startsWith(collectionPath(item.href))} tooltip={item.title}>
-          <Link href={item.href} onClick={event => { setOpenMobile(false); if (item.href !== '/structure/catalog') return; const href = catalogHref(); if (href === item.href) return; event.preventDefault(); router.push(href) }}><item.icon /><span>{item.title}</span></Link>
+        <SidebarMenuButton asChild isActive={item.href === '/' ? pathname === '/' : sectionActive(pathname, item.href)} tooltip={item.title}>
+          <Link href={item.href} onClick={event => { setOpenMobile(false); if (item.href !== '/catalog') return; const href = catalogHref(); if (href === item.href) return; event.preventDefault(); router.push(href) }}><item.icon /><span>{item.title}</span></Link>
         </SidebarMenuButton>
       </SidebarMenuItem>)}
     </SidebarMenu></SidebarGroupContent></SidebarGroup>)}
@@ -65,14 +72,13 @@ function AppSidebar() {
 
 const sections = [
   { title: 'Обзор', href: '/', lists: ['/'] },
-  ...structure.map(item => ({ title: item.title, href: item.href, lists: [item.href, collectionPath(item.href)] })),
+  ...structure.map(item => ({ title: item.title, href: item.href, lists: sectionPaths(item.href) })),
   { title: 'Медиафайлы', href: '/collections/media', lists: ['/collections/media'] },
   { title: 'Пользователи', href: '/collections/users', lists: ['/collections/users'] },
   { title: 'Аккаунт', href: '/account', lists: ['/account'] },
 ]
 
 function sectionOf(pathname: string) {
-  if (pathname === '/globals/lead-delivery' || pathname.startsWith('/collections/lead-submissions')) return sections.find(item => item.href === '/structure/integrations')!
   return sections.find(item => item.lists.some(list => list !== '/' && (pathname === list || pathname.startsWith(`${list}/`)))) ?? sections[0]
 }
 
@@ -100,9 +106,10 @@ function HeaderBreadcrumb() {
     return () => controller.abort()
   }, [doc?.slug, doc?.id])
   const tail: { label: string; href?: string }[] = []
-  if (pathname === '/globals/lead-delivery') tail.push({ label: 'Отправка заявок' })
+  if (pathname === '/leads') tail.push({ label: 'Заявки' })
+  else if (pathname === '/globals/lead-delivery') tail.push({ label: 'Отправка заявок' })
   else if (pathname.startsWith('/collections/lead-submissions')) {
-    tail.push({ label: 'Отправки форм', href: pathname === '/collections/lead-submissions' ? undefined : '/collections/lead-submissions' })
+    tail.push({ label: 'Заявки', href: '/leads' })
     if (collection?.[2] === 'create') tail.push({ label: 'Создать' })
     else if (doc && docLabel) tail.push({ label: docLabel, href: collection?.[3] === 'versions' ? `/collections/lead-submissions/${doc.id}` : undefined })
     if (collection?.[3] === 'versions' && docLabel) tail.push({ label: 'Версии' })

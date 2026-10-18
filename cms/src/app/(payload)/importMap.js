@@ -57,6 +57,8 @@ import { IntegrationsView as IntegrationsView_1226fdfc491f100b8cb8d80d236e0a07 }
 import { Dashboard as Dashboard_f0f8d4a7080efd2cd25bb6be37c094c0 } from '../../components/admin/Dashboard'
 import { LeadSubmissionDetails as LeadSubmissionDetails_c8e41a7b0d6f2a19e5b3c4d7a8f90123, LeadSubmissionPayload as LeadSubmissionPayload_c8e41a7b0d6f2a19e5b3c4d7a8f90123 } from '../../components/admin/LeadSubmissionView'
 import { LoginView as LoginView_1732cc817b3048038c3e58a486fc7be7 } from '../../components/admin/LoginView'
+import { LeadsView as LeadsView_4c1e8a0b7d2f49e6a5c3b8d1e0f6a927, LeadsListRedirect as LeadsListRedirect_4c1e8a0b7d2f49e6a5c3b8d1e0f6a927 } from '../../components/admin/LeadsView'
+import { LegacySite as LegacySite_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyPages as LegacyPages_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyCatalog as LegacyCatalog_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyPrices as LegacyPrices_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyRegisters as LegacyRegisters_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacySampling as LegacySampling_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacySections as LegacySections_9b2d6e4a1c8f70e5d3a6b9c2f1e04783, LegacyIntegrations as LegacyIntegrations_9b2d6e4a1c8f70e5d3a6b9c2f1e04783 } from '../../components/admin/LegacyRoutes'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
@@ -118,6 +120,16 @@ export const importMap = {
   "./components/admin/StructureView#SectionsView": SectionsView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#IntegrationsView": IntegrationsView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/Dashboard#Dashboard": Dashboard_f0f8d4a7080efd2cd25bb6be37c094c0,
+  "./components/admin/LeadsView#LeadsView": LeadsView_4c1e8a0b7d2f49e6a5c3b8d1e0f6a927,
+  "./components/admin/LeadsView#LeadsListRedirect": LeadsListRedirect_4c1e8a0b7d2f49e6a5c3b8d1e0f6a927,
+  "./components/admin/LegacyRoutes#LegacySite": LegacySite_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
+  "./components/admin/LegacyRoutes#LegacyPages": LegacyPages_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
+  "./components/admin/LegacyRoutes#LegacyCatalog": LegacyCatalog_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
+  "./components/admin/LegacyRoutes#LegacyPrices": LegacyPrices_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
+  "./components/admin/LegacyRoutes#LegacyRegisters": LegacyRegisters_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
+  "./components/admin/LegacyRoutes#LegacySampling": LegacySampling_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
+  "./components/admin/LegacyRoutes#LegacySections": LegacySections_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
+  "./components/admin/LegacyRoutes#LegacyIntegrations": LegacyIntegrations_9b2d6e4a1c8f70e5d3a6b9c2f1e04783,
   "./components/admin/LeadSubmissionView#LeadSubmissionDetails": LeadSubmissionDetails_c8e41a7b0d6f2a19e5b3c4d7a8f90123,
   "./components/admin/LeadSubmissionView#LeadSubmissionPayload": LeadSubmissionPayload_c8e41a7b0d6f2a19e5b3c4d7a8f90123,
   "./components/admin/LoginView#LoginView": LoginView_1732cc817b3048038c3e58a486fc7be7,
