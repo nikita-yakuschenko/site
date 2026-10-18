@@ -22,14 +22,14 @@ export async function Dashboard({ initPageResult }: AdminViewServerProps) {
     .sort((left, right) => right.views - left.views || right.leads - left.leads || left.name.localeCompare(right.name, 'ru'))
   const totals = {
     views: rows.reduce((sum, row) => sum + row.views, 0),
-    leads: rows.reduce((sum, row) => sum + row.leads, 0),
+    leads: submissions.docs.length,
     likes: projects.docs.reduce((sum, project) => sum + amount(project.likeCount), 0),
     shares: projects.docs.reduce((sum, project) => sum + amount(project.shareCount), 0),
   }
   const chartRows = rows.filter(row => row.views > 0 || row.leads > 0).slice(0, 12)
   const cards = [
     { label: 'Просмотры', value: totals.views, description: 'Открытия карточек проектов' },
-    { label: 'Заявки', value: totals.leads, description: 'Обращения, привязанные к проекту' },
+    { label: 'Заявки', value: totals.leads, description: 'Все обращения с форм' },
     { label: 'Лайки', value: totals.likes, description: 'Отмеченные проекты' },
     { label: 'Шеры', value: totals.shares, description: 'Отправки ссылки на проект' },
   ]
