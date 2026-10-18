@@ -6,15 +6,55 @@ import { useSearchParams } from 'next/navigation'
 import { Badge } from '../ui/badge'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 const providers = ['roistat', 'bitrix', 'yandex'] as const
 type Provider = (typeof providers)[number]
 
-const deliveryLabel = { disabled: 'Отключена', test: 'Тестовый режим', webhook: 'Вебхук', roistat: 'Через Roistat' }
+type DeliveryMode = 'disabled' | 'test' | 'webhook' | 'roistat'
+const deliveryLabel: Record<DeliveryMode, string> = { disabled: 'Отключена', test: 'Тестовый режим', webhook: 'Вебхук', roistat: 'Через Roistat' }
+const modeOptions: { value: DeliveryMode; label: string }[] = [
+  { value: 'disabled', label: 'Отключено' },
+  { value: 'test', label: 'Тестовый обработчик' },
+  { value: 'webhook', label: 'API / вебхук' },
+  { value: 'roistat', label: 'Roistat (универсальный вебхук)' },
+]
 
-function DeliveryLinks() {
-  return <div className="flex flex-wrap gap-3 text-sm">
-    <Link className="underline-offset-4 hover:underline" href="/globals/lead-delivery">Настроить отправку</Link>
+// Inline control that saves the lead-delivery mode via the Payload global REST API
+function DeliveryModeControl({ initialMode }: { initialMode: DeliveryMode | null }) {
+  const [mode, setMode] = useState<DeliveryMode>(initialMode ?? 'disabled')
+  const [state, setState] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle')
+  if (initialMode === null) return <p className="text-sm text-muted-foreground">Нет доступа к настройке отправки.</p>
+  async function save(next: DeliveryMode) {
+    const previous = mode
+    setMode(next)
+    setState('saving')
+    try {
+      const current = await fetch('/api/globals/lead-delivery?depth=0', { credentials: 'include' }).then(response => response.json())
+      const { id: _id, globalType: _globalType, createdAt: _createdAt, updatedAt: _updatedAt, ...data } = current
+      const response = await fetch('/api/globals/lead-delivery', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({ ...data, mode: next }),
+      })
+      if (!response.ok) throw new Error()
+      setState('saved')
+    } catch {
+      setMode(previous)
+      setState('error')
+    }
+  }
+  return <div className="flex flex-col gap-2 text-sm">
+    <span className="font-medium">Способ отправки</span>
+    <Select value={mode} disabled={state === 'saving'} onValueChange={value => save(value as DeliveryMode)}>
+      <SelectTrigger className="w-full"><SelectValue /></SelectTrigger>
+      <SelectContent>{modeOptions.map(option => <SelectItem key={option.value} value={option.value}>{option.label}</SelectItem>)}</SelectContent>
+    </Select>
+    {state === 'saving' && <span className="text-muted-foreground">Сохранение…</span>}
+    {state === 'saved' && <span className="text-muted-foreground">Сохранено</span>}
+    {state === 'error' && <span className="text-destructive">Не удалось сохранить</span>}
+    {mode === 'webhook' && <Link className="underline-offset-4 hover:underline" href="/globals/lead-delivery">Указать адрес вебхука</Link>}
     <Link className="underline-offset-4 hover:underline" href="/collections/lead-submissions">Отправки форм</Link>
   </div>
 }
@@ -38,13 +78,13 @@ export function IntegrationsPanel({ deliveryMode, roistatReady }: { deliveryMode
     </TabsList>
     <TabsContent value="roistat" className="grid gap-4 md:grid-cols-2">
       <ProviderCard title="Передача заявок" status={roistatStatus} text={`Каждая заявка с сайта уходит в универсальный вебхук Roistat с номером визита и названием сделки. Адрес вебхука в окружении CMS: ${roistatReady ? 'задан' : 'не задан'}.`}>
-        <DeliveryLinks />
+        <DeliveryModeControl initialMode={deliveryMode} />
       </ProviderCard>
       <ProviderCard title="Счётчик на сайте" status="Подключён" text="Счётчик Roistat стоит на сайте с первого захода и связывает визит с рекламным источником. Проект тот же, что у старого сайта." />
     </TabsContent>
     <TabsContent value="bitrix" className="grid gap-4 md:grid-cols-2">
-      <ProviderCard title="Сделки в CRM" status={deliveryMode ? deliveryLabel[deliveryMode] : 'Нет доступа к настройке'} text={deliveryMode === 'roistat' ? 'Сделку в Битрикс24 создаёт Roistat через свою интеграцию «Битрикс24 (Сделки)».' : 'Формы сайта передают обращения через общий обработчик. Для сделок в Битрикс24 выберите отправку через Roistat.'}>
-        <DeliveryLinks />
+      <ProviderCard title="Сделки в CRM" status={deliveryMode ? deliveryLabel[deliveryMode] : 'Нет доступа к настройке'} text={deliveryMode === 'roistat' ? 'Сделку в Битрикс24 создаёт Roistat через свою интеграцию «Битрикс24 (Сделки)».' : 'Формы сайта передают обращения через общий обработчик. Для сделок в Битрикс24 выберите отправку через Roistat во вкладке Roistat.'}>
+        <Link className="text-sm underline-offset-4 hover:underline" href="/collections/lead-submissions">Отправки форм</Link>
       </ProviderCard>
     </TabsContent>
     <TabsContent value="yandex" className="grid gap-4 md:grid-cols-2">
