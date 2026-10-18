@@ -1,8 +1,15 @@
 import type { LeadInput } from '../../../src/lib/leads'
-import { MORTGAGE_ROUTES } from '../../../src/lib/mortgage/routes'
 
 const prefix = 'Новая заявка с сайта: '
 const siteSuffix = /\s*\|\s*Авангард Строй\s*$/
+
+// Названия ипотечных программ. Дублируются из src/lib/mortgage/routes, чтобы не тащить в образ CMS цепочку consent.
+const mortgageTitles: Record<string, string> = {
+  family: 'Семейная ипотека',
+  it: 'IT-ипотека',
+  rural: 'Сельская ипотека',
+  market: 'Рыночная ипотека',
+}
 
 function text(value: unknown) {
   if (typeof value === 'number') return String(value)
@@ -15,7 +22,7 @@ function join(...parts: unknown[]) {
 }
 
 function mortgageName(id: unknown) {
-  return MORTGAGE_ROUTES.find(route => route.id === text(id))?.title || ''
+  return mortgageTitles[text(id)] || ''
 }
 
 function pageName(lead: LeadInput, project: string) {
