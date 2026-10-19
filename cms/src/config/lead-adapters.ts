@@ -8,7 +8,8 @@ export type LeadDeliverySettings = {
   url?: string | null
   authorizationEnv?: string | null
   roistatWebhookUrl?: string | null
-  roistatCounters?: RoistatCounter[] | null
+  // Payload stores counters as JSON; runtime still normalizes them to RoistatCounter[].
+  roistatCounters?: RoistatCounter[] | { [k: string]: unknown } | unknown[] | string | number | boolean | null
   deliveryEnabled?: boolean | null
 }
 
