@@ -12858,9 +12858,6 @@ html.is-dialog-open {
   display: grid;
   align-content: start;
   gap: 14px;
-  margin-top: 8px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
   font-size: 14px;
   color: var(--ink-1);
 }
@@ -12876,14 +12873,18 @@ html.is-dialog-open {
   color: var(--avgst-green);
 }
 
-.project-config__tier-list > .project-config__tier-includes-title {
+.project-config__tier-includes-title {
   display: block;
-  margin-bottom: 2px;
+  margin-top: 8px;
+  padding-top: 14px;
+  border-top: 1px solid var(--line);
   color: var(--avgst-ink);
   font-size: 13px;
   font-weight: 600;
   line-height: 1.4;
 }
+.project-config__tier-base { color: var(--avgst-green); }
+.project-config__total .panel-lead__trigger .btn { margin-top: 0; }
 .project-config__tier-included svg { margin-top: 3px; }
 .project-config__tier-gifts { display: grid; align-content: start; gap: 10px; margin-top: 16px; }
 .project-config__tier-band { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; color: var(--ink-1); }
@@ -13253,15 +13254,14 @@ html.is-dialog-open {
   @supports (grid-template-rows: subgrid) {
     .project-config__tiers {
       /* Состав забирает остаток высоты, подарки остаются на общей нижней линии. */
-      grid-template-rows: auto auto auto 1fr auto;
+      grid-template-rows: auto auto auto auto 1fr auto;
       row-gap: 8px;
-      height: 100%;
     }
 
     .project-config__tiers li,
     .project-config__tiers .project-config__tier {
       display: grid;
-      grid-row: span 5;
+      grid-row: span 6;
       grid-template-rows: subgrid;
       gap: 8px;
     }

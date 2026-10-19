@@ -21,11 +21,42 @@ for (const width of [1280, 1024, 390]) {
       expect(await card.locator('.project-config__tier-band').evaluate(element => getComputedStyle(element, '::before').borderTopStyle)).toBe('dashed');
       expect(await card.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
     }
-    await expect(cards.nth(1).locator('.project-config__tier-includes-title')).toContainText('Дополнительно к Стандартной');
-    await expect(cards.nth(2).locator('.project-config__tier-includes-title')).toContainText('Дополнительно к Проектной');
+    await expect(cards.nth(1).locator('.project-config__tier-includes-title')).toContainText('Стандартная комплектация дополняется');
+    await expect(cards.nth(2).locator('.project-config__tier-includes-title')).toContainText('Проектная комплектация дополняется');
+    if (width >= 800) {
+      const positions = await cards.evaluateAll(elements => elements.map(card => card.querySelector('.project-config__tier-included')!.getBoundingClientRect().top));
+      expect(Math.max(...positions) - Math.min(...positions)).toBeLessThan(1);
+    }
+    await expect(cards.nth(1).locator('.project-config__tier-base')).toHaveCSS('color', 'rgb(72, 176, 98)');
     await cards.nth(2).click();
     await expect(cards.nth(2)).toHaveAttribute('aria-pressed', 'true');
     await expect(page.locator('.project-config__total-label strong')).toHaveText('Под ключ');
     await page.locator('.project-config__tiers').screenshot({ path: `test-results/configuration-cards-${width}.png` });
+    if (width === 1280) {
+      await page.evaluate(() => document.fonts.ready);
+      const closedHeight = (await page.locator('.project-config__tiers').boundingBox())!.height;
+      const panel = page.locator('.project-config__total');
+      await panel.getByRole('button', { name: 'Получить расчёт', exact: true }).click();
+      await page.waitForFunction(() => document.querySelector('.project-config__total')!.getAnimations({ subtree: true }).length === 0);
+      const openedHeight = (await page.locator('.project-config__tiers').boundingBox())!.height;
+      const samples = await page.evaluate(async () => {
+        const cards = document.querySelector('.project-config__tiers')!;
+        const heights = [cards.getBoundingClientRect().height];
+        (document.querySelector('.project-config__close') as HTMLButtonElement).click();
+        await new Promise<void>(resolve => {
+          const start = performance.now();
+          const measure = () => {
+            heights.push(cards.getBoundingClientRect().height);
+            if (performance.now() - start < 700) requestAnimationFrame(measure);
+            else resolve();
+          };
+          requestAnimationFrame(measure);
+        });
+        return heights;
+      });
+      expect(Math.max(...samples)).toBeLessThanOrEqual(Math.max(closedHeight, openedHeight) + 1);
+      expect(Math.min(...samples)).toBeGreaterThanOrEqual(Math.min(closedHeight, openedHeight) - 1);
+      expect(samples.at(-1)).toBeCloseTo(closedHeight, 0);
+    }
   });
 }

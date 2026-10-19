@@ -103,12 +103,12 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                   <span className="project-config__tier-price">
                     {item.price > 0 ? formatFromRub(item.price) : 'Цена уточняется'}
                   </span>
+                  <span className="project-config__tier-includes-title">
+                    {item.id === 'project' ? <><span className="project-config__tier-base">Стандартная</span> комплектация дополняется:</>
+                      : item.id === 'turnkey' ? <><span className="project-config__tier-base">Проектная</span> комплектация дополняется:</>
+                      : item.id === 'standard' ? 'Всё необходимое для начала:' : 'В комплект входит:'}
+                  </span>
                   <span className="project-config__tier-list">
-                    <span className="project-config__tier-includes-title">
-                      {item.id === 'project' ? 'Дополнительно к Стандартной комплектации вы получаете:'
-                        : item.id === 'turnkey' ? 'Дополнительно к Проектной комплектации вы получаете:'
-                        : item.id === 'standard' ? 'Всё необходимое для начала:' : 'В комплект входит:'}
-                    </span>
                     {item.includes.map((line) => (
                       <span key={line} className="project-config__tier-included">
                         {item.id === 'project' || item.id === 'turnkey'
@@ -161,6 +161,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                 переворачивается в тёмную — про открытие ей сообщает сам
                 блок. */}
             <PanelLeadForm
+              animateTrigger
               open={formOpen}
               label={copy.getQuote}
               heading={copy.getQuote}
