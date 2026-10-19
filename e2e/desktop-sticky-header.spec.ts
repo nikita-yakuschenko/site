@@ -8,6 +8,8 @@ for (const route of ['/catalog']) {
     await expect.poll(() => page.evaluate(() => Number.parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--site-header-offset')))).toBeGreaterThan(0);
     await page.evaluate(() => document.fonts.ready);
     if (route === '/catalog') {
+      const searchTop = (await page.locator('.catalog-search').boundingBox())!.y;
+      expect((await page.locator('.catalog__results').boundingBox())!.y).toBeCloseTo(searchTop, 0);
       // Keep enough result rows below the sidebar to exercise its sticky position.
       await page.addStyleTag({ content: '.catalog__results { min-height: 2000px; }' });
     }

@@ -131,7 +131,8 @@ export function CatalogBoard({
       10,
     );
     const barTop = bar.current ? Number.parseFloat(getComputedStyle(bar.current).top) || 0 : 0;
-    const target = window.scrollY + node.getBoundingClientRect().top - (barHeight || 0) - barTop;
+    const resultsMargin = Number.parseFloat(getComputedStyle(node).marginTop) || 0;
+    const target = window.scrollY + node.getBoundingClientRect().top - (barHeight || 0) - resultsMargin - barTop;
     if (window.scrollY <= target) return;
     window.scrollTo({ top: target, behavior: "auto" });
   };

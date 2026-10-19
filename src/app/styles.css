@@ -5336,6 +5336,7 @@ a {
     pointer-events: none;
   }
   .site-shell--catalog .catalog__bar::after { content: none; }
+  .site-shell--catalog .catalog__results { margin-top: calc(16px - var(--catalog-bar)); }
   .catalog__bar { background: transparent; pointer-events: none; }
   .catalog__bar::after { right: auto; width: calc(240px + var(--page-gutter) * 2); }
   .catalog__bar::before {
