@@ -36,6 +36,7 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
       photo: fields[`media.${index}.photo`]?.value,
       image: String(fields[`media.${index}.image`]?.value || ''),
       videoUrl: String(fields[`media.${index}.videoUrl`]?.value || ''),
+      videoFile: fields[`media.${index}.videoFile`]?.value,
       duration: String(fields[`media.${index}.duration`]?.value || ''),
       posterUrl: String(fields[`media.${index}.posterUrl`]?.value || ''),
     }))
@@ -62,8 +63,9 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
     async function update() {
       if (!draft) { latest.current = null; return }
       try {
-        const videoRow = draft.media.find(row => row.type === 'video')
-        const primary = draft.media.find(row => row.isPrimary) || draft.media[0]
+        // Только реально привязанное видео: пустая строка с posterUrl не должна тащить кадр.
+        const videoRow = draft.media.find(row => row.type === 'video' && (detectBuiltVideo(row.videoUrl) || mediaId(row.videoFile)))
+        const primary = draft.media.find(row => row.isPrimary && mediaId(row.photo)) || draft.media.find(row => mediaId(row.photo))
         const coverId = mediaId(draft.cover)
         const photoValue = coverId || primary?.photo || null
         const media = photoValue
@@ -73,7 +75,7 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
           : null
         const poster = media?.url
           ? new URL(media.url, window.location.origin).href
-          : videoRow?.posterUrl || primary?.image || ''
+          : (videoRow?.posterUrl || '')
         const video = videoRow ? detectBuiltVideo(videoRow.videoUrl) : null
         let title = draft.heading
         const projectId = mediaId(draft.project)
@@ -93,12 +95,11 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
           kind: draft.kind,
           catalogMark: draft.catalogMark,
           poster,
-          duration: videoRow?.duration || '—',
-          id: video?.provider === 'kinescope' ? video.id : `draft:${draft.slug || 'story'}`,
+          duration: videoRow?.duration || '',
+          id: video?.provider === 'kinescope' ? video.id : video?.provider === 'vk' ? `vk:${video.oid}_${video.id}` : `draft:${draft.slug || 'story'}`,
         }
         latest.current = payload
         frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-story', story: payload }, origin)
-        // Только карточка отзыва, не вся страница /stories.
         frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-block', key: `StoriesEntry-${payload.slug}`, dim: true }, origin)
       } catch { /* Missing files must not interrupt editing. */ }
     }

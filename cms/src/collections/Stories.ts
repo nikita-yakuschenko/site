@@ -84,9 +84,9 @@ export const Stories: CollectionConfig = {
     { name: 'project', label: 'Проект каталога', type: 'relationship', relationTo: 'projects', admin: { condition: data => data.binding === 'catalog', components: { Field: './components/admin/StoryProjectPicker#StoryProjectPicker' } } },
     {
       name: 'relatedCard', label: 'Карточка под отзывом', type: 'group',
-      admin: { condition: data => data.binding === 'individual' || data.binding === 'discontinued', description: 'Можно выключить или задать свои заголовок, текст и фото. Кнопка по умолчанию: для бизнеса — «Решения для бизнеса», для частников — «Смотреть проекты».' },
+      admin: { condition: data => data.binding === 'individual' || data.binding === 'discontinued', description: 'Можно выключить или задать свои заголовок, текст и фото. Кнопка по умолчанию: для бизнеса «Решения для бизнеса», для частников «Смотреть проекты».' },
       fields: [
-        { name: 'enabled', label: 'Показывать карточку', type: 'checkbox', defaultValue: true },
+        { name: 'enabled', label: 'Показывать карточку', type: 'checkbox', defaultValue: true, admin: { components: { Field: './components/admin/CheckboxField#CheckboxField' } } },
         { name: 'title', label: 'Заголовок', type: 'text' },
         { name: 'text', label: 'Текст', type: 'textarea' },
         { name: 'image', label: 'Изображение', type: 'upload', relationTo: 'media', admin: { components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
@@ -94,7 +94,7 @@ export const Stories: CollectionConfig = {
     },
     {
       name: 'cover', label: 'Превью отзыва', type: 'upload', relationTo: 'media',
-      admin: { description: 'Если пусто — берётся кадр из видео. Можно загрузить своё фото.', components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } },
+      admin: { description: 'Если пусто, берётся кадр из видео. Можно загрузить своё фото.', components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } },
     },
     {
       name: 'media', label: 'Фото и видео', labels: { singular: 'запись', plural: 'Записи' }, type: 'array',

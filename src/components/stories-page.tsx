@@ -103,10 +103,10 @@ function StoryEntry({ story, onPlay }: { story: Story; onPlay: (story: Story) =>
   const mark = card?.mark
   return <CMSContentBlock cmsBlockKey={`StoriesEntry-${story.slug}`}>
     <article className={styles.entry} id={`story-${story.slug}`} aria-label={story.heading}>
-      <button type="button" className={styles.poster} onClick={() => onPlay(story)} aria-label={`Смотреть видео: ${story.heading}`} disabled={!story.video}>
+      <button type="button" className={styles.poster} onClick={() => onPlay(story)} aria-label={story.video ? `Смотреть видео: ${story.heading}` : story.heading} disabled={!story.video}>
         {story.poster ? <Image loader={imageLoader} src={story.poster} sizes="(max-width: 800px) calc(100vw - 48px), (max-width: 1200px) 60vw, 760px" alt="" width={744} height={465} loading="lazy" /> : <span className={styles.poster} />}
         {story.duration ? <span className={styles.posterMeta}><span><IconClock aria-hidden="true" />{story.duration}</span></span> : null}
-        <span className={styles.play} aria-hidden="true"><IconPlayerPlayFilled /></span>
+        {story.video ? <span className={styles.play} aria-hidden="true"><IconPlayerPlayFilled /></span> : null}
       </button>
       <div className={styles.side}>
         <span className={styles.kind}>{story.kind === 'business' ? 'Бизнес' : 'Частное лицо'}</span>

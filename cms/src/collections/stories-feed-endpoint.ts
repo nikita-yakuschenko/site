@@ -45,14 +45,14 @@ export const storiesFeedEndpoint: Endpoint = {
     const items: PublicStory[] = result.docs.flatMap(doc => {
       if (!doc.slug || !doc.heading || !doc.place || !doc.year) return []
       const rows = doc.media || []
-      const primary = rows.find(row => row.isPrimary) || rows[0]
-      const videoRow = rows.find(row => row.type === 'video')
+      const primary = rows.find(row => row.isPrimary && row.photo) || rows.find(row => row.photo) || rows[0]
+      const videoRow = rows.find(row => row.type === 'video' && (detectBuiltVideo(row.videoUrl) || row.videoFile))
       const video = videoRow ? detectBuiltVideo(videoRow.videoUrl) : null
       const poster = mediaURL(doc.cover)
-        || absolute(typeof videoRow?.posterUrl === 'string' ? videoRow.posterUrl : '')
+        || (videoRow ? absolute(typeof videoRow.posterUrl === 'string' ? videoRow.posterUrl : '') : '')
         || mediaURL(primary?.photo, primary?.image)
         || mediaURL(videoRow?.photo, videoRow?.image)
-      const duration = typeof videoRow?.duration === 'string' ? videoRow.duration : ''
+      const duration = videoRow && typeof videoRow.duration === 'string' ? videoRow.duration : ''
       const kind = doc.customerKind === 'business' ? 'business' as const : 'family' as const
       const binding = doc.binding === 'individual' || doc.binding === 'discontinued' ? doc.binding : 'catalog' as const
       const fallbackHref = kind === 'business' ? '/business' : '/catalog'

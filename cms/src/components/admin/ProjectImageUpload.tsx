@@ -223,11 +223,12 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
     type: fields[`${target}.${row.index}.type`]?.value === 'video' ? 'video' : 'photo',
     url: typeof fields[`${target}.${row.index}.videoUrl`]?.value === 'string' ? fields[`${target}.${row.index}.videoUrl`]!.value : '',
     file: photoId(fields[`${target}.${row.index}.videoFile`]?.value) ?? '',
+    image: typeof fields[`${target}.${row.index}.image`]?.value === 'string' ? fields[`${target}.${row.index}.image`]!.value : '',
     caption: typeof fields[`${target}.${row.index}.caption`]?.value === 'string' ? fields[`${target}.${row.index}.caption`]!.value : '',
     duration: typeof fields[`${target}.${row.index}.duration`]?.value === 'string' ? fields[`${target}.${row.index}.duration`]!.value : '',
     posterUrl: typeof fields[`${target}.${row.index}.posterUrl`]?.value === 'string' ? fields[`${target}.${row.index}.posterUrl`]!.value : '',
   }))) : '[]')
-  const meta = JSON.parse(builtMeta) as { type: 'photo' | 'video'; url: string; file: string; caption: string; duration: string; posterUrl: string }[]
+  const meta = JSON.parse(builtMeta) as { type: 'photo' | 'video'; url: string; file: string; image: string; caption: string; duration: string; posterUrl: string }[]
   const videoIds = meta.map(item => item.file).filter(Boolean)
   const docs = useMediaDocs([...rows.flatMap(row => row.photo ? [row.photo] : []), ...videoIds])
   const [videoDialog, setVideoDialog] = useState<{ index: number | null; url: string; caption: string } | null>(null)
@@ -277,7 +278,8 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
       }
     }
   }
-  const photos = rows.filter((row, position) => row.photo || meta[position]?.type === 'video')
+  // Строки только с текстовым image (старый seed) иначе невидимы в UI, но остаются в форме и портят превью.
+  const photos = rows.filter((row, position) => row.photo || meta[position]?.type === 'video' || Boolean(meta[position]?.image) || Boolean(meta[position]?.posterUrl && meta[position]?.type === 'video'))
   const metaOf = (row: { index: number }) => meta[rows.indexOf(row as typeof rows[number])]
   const setField = (path: string, value: unknown) => {
     dispatchFields({ type: 'UPDATE', path, value })
@@ -366,13 +368,13 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
           event.dataTransfer.setData('text/plain', 'reorder')
           rememberDrag({ from: visual, insertAt: visual, stride: height + gap, row: height })
         }} onDragEnd={() => rememberDrag(null)}>
-          <FileAttachment name={name} state="done" imageUrl={doc?.thumbnailURL || url || info?.posterUrl || undefined} icon={isVideo ? kind.icon : undefined}
-            description={isVideo ? [info?.duration, info?.file ? fileSummary(fileDoc?.mimeType || local?.type, name, fileDoc?.filesize || local?.size) : (info?.url || 'Ссылка не указана')].filter(Boolean).join(' · ') : fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)}
+          <FileAttachment name={name} state="done" imageUrl={doc?.thumbnailURL || url || info?.posterUrl || info?.image || undefined} icon={isVideo ? kind.icon : undefined}
+            description={isVideo ? [info?.duration, info?.file ? fileSummary(fileDoc?.mimeType || local?.type, name, fileDoc?.filesize || local?.size) : (info?.url || info?.posterUrl || 'Ссылка не указана')].filter(Boolean).join(' · ') : (doc || local ? fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size) : (info?.image || 'Фото'))}
             kind={clips ? kind : undefined}
             caption={clips ? { value: info?.caption || '', onChange: value => setField(`${target}.${row.index}.caption`, value) } : undefined}
             primary={target !== 'interiors' && row.primary} onPrimary={target !== 'interiors' ? () => makePrimary(row) : undefined}
             onRemove={() => removeFieldRow({ path: target, rowIndex: row.index })}
-            onOpen={video ? () => openAssetPreview({ src: builtVideoEmbed(video), title: info?.caption || name, embed: true }) : !isVideo && url ? () => openAssetPreview({ src: url, title: name }) : undefined} />
+            onOpen={video ? () => openAssetPreview({ src: builtVideoEmbed(video), title: info?.caption || name, embed: true }) : !isVideo && (url || info?.image) ? () => openAssetPreview({ src: url || info!.image, title: name }) : undefined} />
         </div>
       })}
     </div>
