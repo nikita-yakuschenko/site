@@ -4,6 +4,7 @@ import { CMSContentBlock } from './cms-content'
 import {
   Fragment,
   useEffect,
+  useRef,
   useState,
   useSyncExternalStore,
   type ReactNode,
@@ -123,6 +124,35 @@ export function SiteChrome({
   /** Ряд под плашкой: крошки и действия со страницей, лежат на кадре. */
   subrow?: ReactNode;
 }) {
+  const headerRef = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const header = headerRef.current;
+    const inner = header?.querySelector<HTMLElement>('.site-header__inner');
+    const plaque = header?.querySelector<HTMLElement>('.site-header__plaque');
+    if (!header || !inner || !plaque) return;
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const root = document.documentElement;
+    const update = () => {
+      const height = plaque.getBoundingClientRect().height;
+      header.style.setProperty('--header-plaque-height', `${height}px`);
+      root.style.setProperty('--site-header-offset', desktop.matches ? `${height + 32}px` : '0px');
+      // The inner stays in the document flow when the plaque becomes fixed.
+      header.classList.toggle('is-stuck', desktop.matches && inner.getBoundingClientRect().top < 0);
+    };
+    const observer = new ResizeObserver(update);
+    observer.observe(plaque);
+    window.addEventListener('scroll', update, { passive: true });
+    window.addEventListener('resize', update);
+    update();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('scroll', update);
+      window.removeEventListener('resize', update);
+      root.style.removeProperty('--site-header-offset');
+    };
+  }, []);
+
   const [menuOpen, setMenuOpen] = useState(false);
   /* Форма из шапки: открывается поверх страницы, а не уводит якорем. */
   const [askOpen, setAskOpen] = useState(false);
@@ -162,6 +192,7 @@ export function SiteChrome({
   return (
     <div className="site-shell">
       <header
+        ref={headerRef}
         className={
           overlay
             ? "site-header site-header--overlay"

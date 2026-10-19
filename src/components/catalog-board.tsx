@@ -85,7 +85,7 @@ export function CatalogBoard({
     const node = bar.current;
     if (!node) return;
     const update = () => {
-      setStuck(node.getBoundingClientRect().top <= 0);
+      setStuck(node.getBoundingClientRect().top <= Number.parseFloat(getComputedStyle(node).top));
     };
     const first = requestAnimationFrame(update);
     window.addEventListener("scroll", update, { passive: true });
@@ -130,7 +130,8 @@ export function CatalogBoard({
       getComputedStyle(document.documentElement).getPropertyValue("--catalog-bar"),
       10,
     );
-    const target = window.scrollY + node.getBoundingClientRect().top - (barHeight || 0);
+    const barTop = bar.current ? Number.parseFloat(getComputedStyle(bar.current).top) || 0 : 0;
+    const target = window.scrollY + node.getBoundingClientRect().top - (barHeight || 0) - barTop;
     if (window.scrollY <= target) return;
     window.scrollTo({ top: target, behavior: "auto" });
   };

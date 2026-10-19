@@ -158,6 +158,7 @@
      Белое поле по обе стороны нужно, чтобы карточки уходили под полосу
      чисто, а само поле не липло к краю экрана. От этой высоты отсчитываются
      все, кто липнет ниже, поэтому число одно и живёт здесь. */
+  --site-header-offset: 0px;
   --catalog-bar: 110px;
 
   /* Длина растворения под полосой. Короткое: на длинном переходе карточки
@@ -670,6 +671,35 @@ a {
 .site-header--solid .site-header__plaque {
   background: var(--avgst-ink);
   box-shadow: var(--header-solid-shadow);
+}
+
+/* На десктопе остаётся только основная плашка; её место сохраняет распорка. */
+@media (min-width: 1024px) {
+  .site-header.is-stuck::before {
+    content: "";
+    position: fixed;
+    inset: 0 0 auto;
+    height: var(--site-header-offset);
+    background: #fff;
+    mask-image: linear-gradient(to bottom, #000 calc(100% - 16px), transparent);
+    pointer-events: none;
+  }
+
+  .site-header.is-stuck .site-header__inner::before {
+    content: "";
+    display: block;
+    height: var(--header-plaque-height);
+  }
+
+  .site-header.is-stuck .site-header__plaque {
+    position: fixed;
+    top: 16px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(var(--page-width), calc(100% - var(--page-gutter) * 2));
+    background: var(--avgst-ink);
+    box-shadow: var(--header-solid-shadow);
+  }
 }
 
 .site-header__brand {
@@ -5236,7 +5266,7 @@ a {
 /* Поиск над фильтрами: на десктопе совпадает с шириной колонки отбора. */
 .catalog__bar {
   position: sticky;
-  top: 0;
+  top: var(--site-header-offset);
   z-index: 6;
   background: #fff;
   padding-block: var(--gap-stack);
@@ -5298,9 +5328,23 @@ a {
 }
 
 @media (min-width: 1024px) {
-  .catalog__bar { background: transparent; pointer-events: none; }
+  :root { --catalog-bar: 70px; }
+  .catalog__bar {
+    top: calc(var(--site-header-offset) - 16px);
+    padding-block: 16px;
+    background: transparent;
+    pointer-events: none;
+  }
   .catalog__bar::after { right: auto; width: calc(240px + var(--page-gutter) * 2); }
-  .catalog__barrow { width: 240px; pointer-events: auto; }
+  .catalog__bar::before {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    left: var(--page-gutter);
+    width: 240px;
+    background: #fff;
+  }
+  .catalog__barrow { position: relative; width: 240px; pointer-events: auto; }
   .catalog__barrow .catalog-search { height: 38px; padding-inline: 12px; border-radius: 8px; color: var(--avgst-ink); }
   .catalog__barrow .catalog-search input { font-size: 14px; }
 }
@@ -5527,8 +5571,7 @@ a {
   }
 }
 
-/* Липкая: отбор должен быть перед глазами всю прокрутку. Шапка каталога не
-   липкая, поэтому отступ сверху нужен небольшой, только на воздух. */
+/* Отбор закрепляется под основной шапкой и поиском. */
 @media (min-width: 1024px) {
   .cfilter__toggle {
     display: none;
@@ -5536,8 +5579,8 @@ a {
 
   .cfilter__sticky {
     position: sticky;
-    top: calc(var(--catalog-bar) + var(--gap-stack));
-    max-height: calc(100svh - var(--catalog-bar) - var(--gap-stack) * 2);
+    top: calc(var(--site-header-offset) - 16px + var(--catalog-bar) + var(--gap-stack));
+    max-height: calc(100svh - var(--site-header-offset) - var(--catalog-bar) - var(--gap-stack) * 2);
     overflow-y: auto;
     overscroll-behavior: contain;
   }
@@ -12257,7 +12300,7 @@ html.is-dialog-open {
 /* Полоса разделов липнет к верху окна. */
 .pp__nav {
   position: sticky;
-  top: 0;
+  top: var(--site-header-offset);
   z-index: 5;
   margin-top: 24px;
   border-bottom: 1px solid var(--line);
@@ -12655,7 +12698,7 @@ html.is-dialog-open {
    оставаться на экране, пока по нему идут. */
 .pp__total {
   position: sticky;
-  top: 76px;
+  top: calc(var(--site-header-offset) + 76px);
   padding: 22px;
   border: 1px solid var(--line);
   border-radius: 16px;
