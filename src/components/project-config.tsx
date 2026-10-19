@@ -162,6 +162,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                 переворачивается в тёмную — про открытие ей сообщает сам
                 блок. */}
             <PanelLeadForm
+              closable
               label={copy.getQuote}
               heading={copy.getQuote}
               projectExternalId={project.id}

@@ -32,6 +32,10 @@ for (const width of [1280, 375]) {
     await configurationPanel.getByRole('button', { name: 'Получить расчёт', exact: true }).click();
     await expect(configurationPanel).toHaveAttribute('data-form', 'true');
     await expect(configurationPanel.getByRole('textbox', { name: 'Имя', exact: true })).toBeVisible();
+    await configurationPanel.getByRole('button', { name: 'Закрыть', exact: true }).click();
+    await expect(configurationPanel).toHaveAttribute('data-form', 'false');
+    await expect(configurationPanel.getByRole('button', { name: 'Получить расчёт', exact: true })).toBeFocused();
+    await expect(configurationPanel.getByRole('textbox', { name: 'Имя', exact: true })).toHaveCount(0);
   });
 }
 
