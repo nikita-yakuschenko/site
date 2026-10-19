@@ -38,7 +38,7 @@ for (const route of ['/catalog']) {
       expect(stickyGaps.headerToSearch).toBeCloseTo(initialGaps.headerToSearch, 0);
       expect(stickyGaps.searchToFilters).toBeCloseTo(initialGaps.searchToFilters, 0);
       expect(stickyGaps.groups).toHaveLength(initialGaps.groups.length);
-      stickyGaps.groups.forEach((position, index) => expect(position).toBeCloseTo(initialGaps.groups[index], 0));
+      expect(stickyGaps.groups).toEqual(initialGaps.groups);
     }
     await page.screenshot({ path: `test-results/sticky-${route === '/manufacture' ? 'manufacture' : 'catalog'}.png` });
     await page.evaluate(() => window.scrollTo(0, 0));
