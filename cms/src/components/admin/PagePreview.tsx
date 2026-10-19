@@ -245,7 +245,10 @@ export function PagePreview({ siteUrl, project = false, story = false, configura
         if (plansDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-plans', variants: plansDraftRef.current }, origin)
         if (builtDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-built', items: builtDraftRef.current }, origin)
         if (nextStepsDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-next-steps', settings: nextStepsDraftRef.current }, origin)
-        if (storyDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-story', story: storyDraftRef.current }, origin)
+        if (storyDraftRef.current) {
+          frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-story', story: storyDraftRef.current }, origin)
+          frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-block', key: `StoriesEntry-${storyDraftRef.current.slug}`, dim: true }, origin)
+        }
       }
       if (event.source === frame.current?.contentWindow && event.origin === origin && event.data?.type === 'avgst:preview-block-status' && event.data.key === previewKey) setMissing(!event.data.found)
     }
@@ -348,9 +351,9 @@ export function PagePreview({ siteUrl, project = false, story = false, configura
   const scale = fit ? Math.min(1, available.width / device.width, available.height / device.height) : 1
   const url = `${siteUrl}${route}`
   const frameURL = `${url}${url.includes('?') ? '&' : '?'}cmsPreview=1`
-  return <section ref={panel} className="shadcn-surface page-preview" aria-label={asset ? 'Просмотр файла' : configuration ? 'Предпросмотр комплектаций' : 'Превью страницы'}>
+  return <section ref={panel} className="shadcn-surface page-preview" aria-label={asset ? 'Просмотр файла' : configuration ? 'Предпросмотр комплектаций' : story ? 'Превью отзыва' : 'Превью страницы'}>
     <div className="flex flex-wrap items-center justify-between gap-3 border-b px-4 py-3">
-      <div className="min-w-0"><h2 className="truncate text-sm font-medium">{asset ? asset.title : configuration ? 'Комплектации' : isolateBlock ? blockTitle || 'Блок' : selected ? selected.title : 'Превью страницы'}</h2><p className="mt-1 text-xs text-muted-foreground">{asset ? 'Загруженный файл' : configuration ? 'Изменения видны до сохранения' : isolateBlock ? 'Только этот блок' : selected ? 'Блок отдельно' : 'Текущая версия сайта'}</p></div>
+      <div className="min-w-0"><h2 className="truncate text-sm font-medium">{asset ? asset.title : configuration ? 'Комплектации' : story ? 'Отзыв' : isolateBlock ? blockTitle || 'Блок' : selected ? selected.title : 'Превью страницы'}</h2><p className="mt-1 text-xs text-muted-foreground">{asset ? 'Загруженный файл' : configuration ? 'Изменения видны до сохранения' : story ? 'Только карточка истории' : isolateBlock ? 'Только этот блок' : selected ? 'Блок отдельно' : 'Текущая версия сайта'}</p></div>
       {asset ? <Button type="button" size="sm" variant="outline" onClick={() => setAsset(null)}>Закрыть</Button> : <div className="flex flex-wrap items-center gap-1" role="group" aria-label="Устройство">
         {devices.map(item => <Button key={item.key} type="button" size="icon" variant={item.key === device.key ? 'secondary' : 'ghost'} title={item.label} aria-label={item.label} aria-pressed={item.key === device.key} onClick={() => setDeviceKey(item.key)}><item.icon className={`size-4 ${item.key === 'tablet-landscape' ? 'rotate-90' : ''}`} /></Button>)}
         <Button type="button" size="icon" variant="ghost" title="Обновить превью" aria-label="Обновить превью" onClick={() => setRevision(value => value + 1)}><IconRefresh className="size-4" /></Button>
@@ -367,7 +370,18 @@ export function PagePreview({ siteUrl, project = false, story = false, configura
       {asset?.embed ? <iframe src={asset.src} title={asset.title} allow="autoplay; fullscreen; picture-in-picture; encrypted-media" /> : asset ? /* eslint-disable-next-line @next/next/no-img-element */ <img src={asset.src} alt={asset.title} /> : null}
       {available.width > 0 && <div className="page-preview__screen" hidden={Boolean(asset)} style={{ width: device.width * scale, height: device.height * scale }}>
         {missing && selected && !isolateBlock && <p className="absolute inset-0 z-10 flex items-center justify-center bg-card p-6 text-sm">Этот компонент ещё не подключён к изолированному превью.</p>}
-        <iframe ref={frame} onLoad={() => frame.current?.contentWindow?.postMessage(configuration ? { type: 'avgst:preview-configurations', templates: getDataByPath<ConfigurationTemplatesData>('configurationTemplates'), ...configuration } : previewMessage, origin)} key={`${url}:${revision}`} title={`Превью ${route}: ${device.label}`} src={frameURL} style={{ position: 'absolute', top: 0, left: 0, width: device.width, height: device.height, transform: `scale(${scale})`, transformOrigin: 'top left', maxWidth: 'none', border: 0, display: 'block', background: '#fff' }} />
+        <iframe ref={frame} onLoad={() => {
+          if (configuration) {
+            frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-configurations', templates: getDataByPath<ConfigurationTemplatesData>('configurationTemplates'), ...configuration }, origin)
+            return
+          }
+          if (story && storyDraftRef.current) {
+            frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-story', story: storyDraftRef.current }, origin)
+            frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-block', key: `StoriesEntry-${storyDraftRef.current.slug}`, dim: true }, origin)
+            return
+          }
+          frame.current?.contentWindow?.postMessage(previewMessage, origin)
+        }} key={`${url}:${revision}`} title={`Превью ${route}: ${device.label}`} src={frameURL} style={{ position: 'absolute', top: 0, left: 0, width: device.width, height: device.height, transform: `scale(${scale})`, transformOrigin: 'top left', maxWidth: 'none', border: 0, display: 'block', background: '#fff' }} />
       </div>}
     </div>
   </section>

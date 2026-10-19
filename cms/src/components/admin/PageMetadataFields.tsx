@@ -87,14 +87,31 @@ const recordTypes = { project: 'Проект дома', 'ready-home': 'Гото�
 const projectFields: RecordFields = { name: 'name', type: 'recordType', types: recordTypes, typeLabel: 'Тип записи', slug: 'slug', slugFrom: projectSlugFromName, placeholder: 'Введите название проекта' }
 
 const storyCustomers = { family: 'Частное лицо', business: 'Бизнес' }
-const storyFields: RecordFields = { name: 'heading', type: 'customerKind', types: storyCustomers, typeLabel: 'Заказчик', slug: 'slug', slugFrom: projectSlugFromName, placeholder: 'Введите заголовок отзыва' }
 
+// Адрес только в базе: пишется из заголовка, в шапке не показываем.
 export function StoryRecordMetadata() {
-  const { id, hasPublishedDoc } = useDocumentInfo()
-  return <RecordMetadata fields={storyFields} badge={<Badge variant={hasPublishedDoc ? 'default' : 'outline'}>{hasPublishedDoc ? 'Опубликован' : 'Черновик'}</Badge>}>
-    {!id && <DraftLeavePrompt />}
+  const { id, hasPublishedDoc, data } = useDocumentInfo()
+  const name = useField<string>({ path: 'heading' })
+  const kind = useField<string>({ path: 'customerKind' })
+  const slug = useField<string>({ path: 'slug' })
+  const format = (value: string) => new Intl.DateTimeFormat('ru-RU', { dateStyle: 'short', timeStyle: 'short', timeZone: 'Europe/Moscow' }).format(new Date(value))
+  return <div className="shadcn-surface page-record-metadata project-record-metadata">
+    <label className="project-record-name-wrap" aria-invalid={name.showError || undefined}>
+      <Input className="project-record-name" autoFocus={!id} placeholder="Введите заголовок отзыва" aria-label="Заголовок" aria-invalid={name.showError || undefined} title={name.showError ? name.errorMessage : undefined} value={name.value || ''} onChange={event => {
+        const previous = name.value || ''
+        if (!slug.value || slug.value === projectSlugFromName(previous)) slug.setValue(projectSlugFromName(event.target.value))
+        name.setValue(event.target.value)
+      }} />
+      <Badge variant={hasPublishedDoc ? 'default' : 'outline'}>{hasPublishedDoc ? 'Опубликован' : 'Черновик'}</Badge>
+    </label>
+    <ChoiceSelect label="Заказчик" className="project-record-type" value={kind.value || 'family'} options={storyCustomers} onChange={kind.setValue} />
+    <div className="story-record-dates">
+      {typeof data?.updatedAt === 'string' && <span>Последнее изменение: {format(data.updatedAt)}</span>}
+      {typeof data?.createdAt === 'string' && <span>Создано: {format(data.createdAt)}</span>}
+    </div>
+    {!id && <DraftLeavePrompt nameField="heading" />}
     <UnpublishedChanges />
-  </RecordMetadata>
+  </div>
 }
 
 export function ProjectRecordMetadata() {

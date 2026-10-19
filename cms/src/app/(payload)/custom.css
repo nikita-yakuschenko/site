@@ -340,17 +340,17 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .page-metadata-field__label { font-size: 12px; color: var(--muted-foreground); }
 .page-record-metadata { display: flex; align-items: center; gap: 10px; min-width: 0; margin-inline-end: auto; }
 .page-record-metadata > span[data-slot='badge'] { flex-shrink: 0; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__controls:has(.page-record-metadata) { flex: 1; min-width: 0; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls { padding-inline: 24px; z-index: 50; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__wrapper { align-items: center; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__controls-wrapper:has(.page-record-metadata) { flex: 1; width: 100%; min-width: 0; padding-inline-start: 0; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls .page-record-metadata { display: flex; align-items: center; gap: 10px; margin-inline-start: 0; margin-inline-end: auto; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__content:not(:has(.doc-controls__meta > :not(.doc-controls__value-wrap))):not(:has(.doc-controls__meta-icons)) { display: none; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__value-wrap { display: none; }
-.template-default__wrap:is(:has(.collection-edit--projects), :has(.collection-edit--pages), :has(.collection-edit--blocks), :has(.collection-edit--forms)) > .doc-header, :is(.collection-edit--projects, .collection-edit--pages, .collection-edit--blocks, .collection-edit--forms) .doc-controls__content { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__controls:has(.page-record-metadata) { flex: 1; min-width: 0; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls { padding-inline: 24px; z-index: 50; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__wrapper { align-items: center; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__controls-wrapper:has(.page-record-metadata) { flex: 1; width: 100%; min-width: 0; padding-inline-start: 0; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls .page-record-metadata { display: flex; align-items: center; gap: 10px; margin-inline-start: 0; margin-inline-end: auto; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__content:not(:has(.doc-controls__meta > :not(.doc-controls__value-wrap))):not(:has(.doc-controls__meta-icons)) { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__value-wrap { display: none; }
+.template-default__wrap:is(:has(.collection-edit--projects), :has(.collection-edit--pages), :has(.collection-edit--stories), :has(.collection-edit--blocks), :has(.collection-edit--forms)) > .doc-header, :is(.collection-edit--projects, .collection-edit--pages, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__content { display: none; }
 .collection-edit--projects :is(.project-details-row, .project-name-field), .collection-edit--pages :is(.page-details-row, .page-metadata-row, #field-metaTitle), .collection-edit--pages .field-type:has(> * > #field-metaTitle, #field-metaTitle) { display: none; }
 .project-record-metadata .project-record-title { flex: 0 1 260px; min-width: 120px; }
-:is(.collection-edit--projects, .collection-edit--pages, .collection-edit--blocks, .collection-edit--forms) .doc-controls .project-record-metadata { flex: 1; gap: 8px; }.project-record-name-wrap { display: flex; flex: 1 1 280px; max-width: 460px; align-items: center; gap: 8px; min-width: 0; border-bottom: 1px solid var(--input); transition: border-color 150ms; }
+:is(.collection-edit--projects, .collection-edit--pages, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls .project-record-metadata { flex: 1; gap: 8px; }.project-record-name-wrap { display: flex; flex: 1 1 280px; max-width: 460px; align-items: center; gap: 8px; min-width: 0; border-bottom: 1px solid var(--input); transition: border-color 150ms; }
 .project-record-name-wrap:focus-within { border-bottom-color: var(--ring); }
 .project-record-name-wrap[aria-invalid] { border-bottom-color: var(--destructive); }
 .project-record-name-wrap > span[data-slot='badge'] { flex-shrink: 0; }
@@ -361,25 +361,25 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .project-record-slug input:disabled { opacity: 1; cursor: default; color: var(--muted-foreground); }
 .project-record-slug button { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); }
 .project-record-code { flex: 0 0 auto; color: var(--muted-foreground); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; letter-spacing: 0.04em; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .doc-controls__meta:not(:has(> :not(.doc-controls__value-wrap))) { display: none; }
-:is(.collection-edit--pages, .collection-edit--projects) .page-details-row .field-type,
-:is(.collection-edit--pages, .collection-edit--projects) .page-metadata-row .field-type { margin-bottom: 0; }
-:is(.collection-edit--pages, .collection-edit--projects) .document-fields__fields { --spacing-field: 12px; }
-:is(.collection-edit--pages, .collection-edit--projects) .document-fields__fields > .page-details-row { margin-bottom: 12px; }
-:is(.collection-edit--pages, .collection-edit--projects) .page-details-row > .row__fields {
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__meta:not(:has(> :not(.doc-controls__value-wrap))) { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .page-details-row .field-type,
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .page-metadata-row .field-type { margin-bottom: 0; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .document-fields__fields { --spacing-field: 12px; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .document-fields__fields > .page-details-row { margin-bottom: 12px; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .page-details-row > .row__fields {
   display: grid;
   grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
   gap: 12px;
   margin: 0;
 }
-:is(.collection-edit--pages, .collection-edit--projects) .page-details-row > .row__fields > * {
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .page-details-row > .row__fields > * {
   width: 100% !important;
   min-width: 0;
   margin-inline: 0;
 }
-:is(.collection-edit--pages, .collection-edit--projects) .document-fields__main .field-label { margin-bottom: 6px; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .document-fields__main .field-label { margin-bottom: 6px; }
 @media (max-width: 639px) {
-  :is(.collection-edit--pages, .collection-edit--projects) .page-details-row > .row__fields { grid-template-columns: minmax(0, 1fr); }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .page-details-row > .row__fields { grid-template-columns: minmax(0, 1fr); }
 }
 .shadcn-surface [data-slot="checkbox"] { display: inline-flex; align-items: center; justify-content: center; width: 16px; height: 16px; min-height: 16px; padding: 0; border: 1px solid var(--input); border-radius: 4px; background: var(--card); color: var(--foreground); }
 .shadcn-surface [data-slot="checkbox"][data-state="checked"] { border-color: var(--primary); background: var(--primary); color: var(--primary-foreground); }
@@ -700,7 +700,7 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .page-preview:fullscreen .page-preview__stage { flex: 1; min-height: 0; height: auto; }
 
 @media (min-width: 1024px) {
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields {
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields {
     display: flex;
     --main-width: var(--page-editor-width, 50%);
     --doc-sidebar-width: 0px;
@@ -710,19 +710,19 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
     --main-gutter-h-left: 24px;
     --main-gutter-h-right: 24px;
   }
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__main { width: var(--page-editor-width, 50%); min-width: 0; flex: 0 0 var(--page-editor-width, 50%); }
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-wrap {
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields__main { width: var(--page-editor-width, 50%); min-width: 0; flex: 0 0 var(--page-editor-width, 50%); }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-wrap {
     width: var(--page-preview-width, 50%); min-width: 0; flex: 0 0 var(--page-preview-width, 50%); position: sticky;
     top: var(--doc-controls-height);
     height: calc(100dvh - var(--doc-controls-height) - 24px);
   }
   /* One 24px inset on every side. The sidebar scrollbar was making the preview's right edge shorter than the header. */
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__edit { padding: 24px; }
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar { overflow: hidden; }
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-fields { padding: 24px 24px 24px 0; }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields__edit { padding: 24px; }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar { overflow: hidden; }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-fields { padding: 24px 24px 24px 0; }
 }
 @media (min-width: 1600px) {
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields {
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields {
     --page-editor-width: 33.333333%;
     --page-preview-width: 66.666667%;
   }
@@ -738,9 +738,9 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
   display: none;
 }
 @media (max-width: 1023px) {
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields { display: block; }
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__main,
-  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-wrap { width: 100%; min-width: 0; height: auto; position: static; }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields { display: block; }
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields__main,
+  :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .document-fields__sidebar-wrap { width: 100%; min-width: 0; height: auto; position: static; }
 }
 
 @media (min-width: 1024px) {
@@ -904,3 +904,9 @@ html[data-theme="dark"] .avgst-shell [data-slot="tabs-trigger"][data-state="acti
   .shimmer { animation: none; color: var(--muted-foreground); background: none; }
   .price-log [data-slot="trace"] > * { animation: none; }
 }
+
+/* Отзывы: шапка как у проектов, адрес только в БД */
+.collection-edit--stories .doc-controls__meta { display: none; }
+.story-record-dates { display: flex; flex-wrap: wrap; gap: 8px 16px; flex: 0 1 auto; min-width: 0; color: var(--muted-foreground); font-size: 12px; }
+.story-project-picker-preview { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--muted); aspect-ratio: 16 / 10; }
+.story-project-picker-preview iframe { width: 1280px; height: 800px; border: 0; transform-origin: top left; pointer-events: none; }

@@ -93,6 +93,8 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
         }
         latest.current = payload
         frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-story', story: payload }, origin)
+        // Только карточка отзыва, не вся страница /stories.
+        frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-block', key: `StoriesEntry-${payload.slug}`, dim: true }, origin)
       } catch { /* Missing files must not interrupt editing. */ }
     }
     void update()

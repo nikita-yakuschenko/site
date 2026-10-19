@@ -1,6 +1,7 @@
 import type { CollectionConfig } from 'payload'
 import { authenticated, contentManager, contentWriter } from '../access/staff'
 import { detectBuiltVideo } from '../config/built-media'
+import { projectSlugFromName } from '../config/project-slug'
 
 const galleryBatch = { path: './components/admin/ProjectImageUpload#GalleryBatchUpload', clientProps: { target: 'media' } }
 
@@ -17,6 +18,7 @@ export const Stories: CollectionConfig = {
   hooks: {
     beforeValidate: [({ data }) => {
       if (!data) return data
+      if (typeof data.heading === 'string' && (!data.slug || typeof data.slug !== 'string')) data.slug = projectSlugFromName(data.heading)
       if (data.binding !== 'catalog') data.project = null
       if (Array.isArray(data.media)) {
         const primary = Math.max(0, data.media.findIndex((row: { isPrimary?: boolean }) => row.isPrimary))
@@ -38,14 +40,14 @@ export const Stories: CollectionConfig = {
   },
   fields: [
     { name: 'preview', type: 'ui', admin: { position: 'sidebar', components: { Field: './components/admin/PagePreviewField#StoryPreviewField' } } },
-    { name: 'heading', label: 'Заголовок', type: 'text', required: true },
-    { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, index: true, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
+    { name: 'heading', label: 'Заголовок', type: 'text', required: true, admin: { hidden: true } },
+    { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, index: true, admin: { hidden: true }, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
     { name: 'subtitle', label: 'Подзаголовок', type: 'text' },
     { name: 'place', label: 'Локация', type: 'text', required: true },
     { name: 'year', label: 'Год', type: 'number', required: true, min: 2014, admin: { step: 1 }, validate: (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 2014 ? true : 'Укажите год' },
-    { name: 'customerKind', label: 'Заказчик', type: 'select', required: true, defaultValue: 'family', options: [{ label: 'Частное лицо', value: 'family' }, { label: 'Бизнес', value: 'business' }] },
+    { name: 'customerKind', label: 'Заказчик', type: 'select', required: true, defaultValue: 'family', options: [{ label: 'Частное лицо', value: 'family' }, { label: 'Бизнес', value: 'business' }], admin: { hidden: true } },
     { name: 'binding', label: 'Проект', type: 'select', required: true, defaultValue: 'catalog', options: [{ label: 'Из каталога', value: 'catalog' }, { label: 'Индивидуальный проект', value: 'individual' }, { label: 'Снят с производства', value: 'discontinued' }] },
-    { name: 'project', label: 'Проект каталога', type: 'relationship', relationTo: 'projects', admin: { condition: data => data.binding === 'catalog' } },
+    { name: 'project', label: 'Проект каталога', type: 'relationship', relationTo: 'projects', admin: { condition: data => data.binding === 'catalog', components: { Field: './components/admin/StoryProjectPicker#StoryProjectPicker' } } },
     {
       name: 'media', label: 'Фото и видео', labels: { singular: 'запись', plural: 'Записи' }, type: 'array',
       admin: { className: 'gallery-attachments', initCollapsed: true, components: { beforeInput: [galleryBatch], RowLabel: './components/admin/BuiltRowLabel#BuiltRowLabel' } },
