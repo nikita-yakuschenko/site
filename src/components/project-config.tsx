@@ -19,12 +19,7 @@ import {
 } from "../lib/catalog/tier-selection";
 import { PanelLeadForm } from "./panel-lead-form";
 import type { CatalogProject } from "../lib/catalog/types";
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from "./ui/accordion";
+import { ConfigurationComparison } from './configuration-comparison/comparison';
 
 /**
  * Комплектация.
@@ -32,7 +27,7 @@ import {
  * Дом продаётся готовыми наборами, поэтому раздел даёт выбрать уровень, а
  * не собирать дом из галочек. Состав перечислен прямо в карточке: разницу
  * между уровнями видно списком, а не описанием. Подробности о материалах
- * — в аккордеоне, тем же, что на страницах ипотеки.
+ * — в отдельном техническом сравнении комплектаций.
  *
  * Итог липнет к верху: список длиннее панели, и цена должна оставаться на
  * экране, пока по нему идут.
@@ -92,7 +87,13 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
     setFormOpen(next);
   };
 
-  const tiers = configurations ? tiersForRegion(configurations, region) : tiersForProject(project);
+  const sourceTiers = configurations ? tiersForRegion(configurations, region) : tiersForProject(project);
+  // Panel houses are supplied without internal finishes, including the Project tier.
+  const tiers = project.technology === 'panel' ? sourceTiers?.map(item => ({
+    ...item,
+    lead: /внутренн|гипсокартон/i.test(item.lead) ? 'Окна и входные двери согласно архитектурному проекту.' : item.lead,
+    includes: item.includes.filter(line => !/внутренн|гипсокартон|отделк[а-яё]*\s+(?:стен|потол|сануз)|чистов/i.test(line)),
+  })) : sourceTiers;
 
   if (!tiers?.length) return null;
   const hasStartingTier = tiers.some(item => item.id === 'start');
@@ -215,58 +216,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
           </aside>
         </div>
 
-        {/* Заголовок называет уровень: иначе список материалов
-              читается как общий для дома, а он у каждой комплектации
-              свой. Ключ по уровню — чтобы при переключении список
-              собрался заново и первый пункт снова был раскрыт. */}
-        {tier.details.length > 0 && <><h3 className="project-config__details-title">
-          {configText(`${copy.configDetails} `)}
-          <span className="project-config__details-mark">
-            {configText(tier.id === 'turnkey' ? 'комплектацию под ключ' : `${tier.nameAcc} ${copy.configTierWordAcc}`)}
-          </span>
-        </h3>
-        {/* Здесь список начинается свёрнутым, хотя обычно первый
-              пункт раскрыт: состав материалов открывают по нужде, а не
-              читают подряд. */}
-        <Accordion
-          key={tier.id}
-          type="multiple"
-          defaultValue={[]}
-          className="ui-accordion"
-        >
-          {tier.details.map((detail) => (
-            <AccordionItem
-              key={detail.title}
-              value={`${tier.id}-${detail.title}`}
-            >
-              <AccordionTrigger>{configText(detail.title)}</AccordionTrigger>
-              <AccordionContent>
-                {detail.lead ? (
-                  <p className="project-config__spec-lead">{configText(detail.lead)}</p>
-                ) : null}
-
-                {detail.items ? (
-                  <ul className="project-config__spec-list">
-                    {detail.items.map((item) => (
-                      <li key={item}>{configText(item)}</li>
-                    ))}
-                  </ul>
-                ) : null}
-
-                {detail.groups?.map((group) => (
-                  <div key={group.title} className="project-config__spec">
-                    <p className="project-config__spec-title">{configText(group.title)}</p>
-                    <ul className="project-config__spec-list">
-                      {group.items.map((item) => (
-                        <li key={item}>{configText(item)}</li>
-                      ))}
-                    </ul>
-                  </div>
-                ))}
-              </AccordionContent>
-            </AccordionItem>
-          ))}
-        </Accordion></>}
+        <ConfigurationComparison project={project} tiers={tiers} selectedTier={tier.id} />
       </div>
     </section>
   );
