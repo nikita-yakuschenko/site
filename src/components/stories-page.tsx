@@ -3,13 +3,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image, { type ImageLoader } from 'next/image'
-import { IconArrowUpRight, IconCalendar, IconClock, IconMapPin, IconPlayerPlayFilled } from '@tabler/icons-react'
+import { IconArrowUpRight, IconBath, IconBed, IconCalendar, IconClock, IconMapPin, IconPlayerPlayFilled, IconRulerMeasure, IconStairs } from '@tabler/icons-react'
 import { CMSContentBlock } from './cms-content'
 import { PageHero } from './page-hero'
 import heroImage from '../../public/img/pages/storieshero.png'
 import { VideoLightbox, reviewEmbedSrc } from './video-lightbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { nbspText } from '../lib/copy'
+import { copy, nbspText } from '../lib/copy'
+import type { StoryProjectDetails } from '../lib/story-project-details'
 import { optimizedSrc } from '../lib/media'
 import type { PublicStory } from '../lib/stories'
 import styles from './stories-page.module.css'
@@ -39,6 +40,8 @@ type PreviewStory = {
     title: string
     text: string
     image: string
+    href?: string
+    project?: StoryProjectDetails
   } | null
 }
 
@@ -89,8 +92,9 @@ function toFeedStory(draft: PreviewStory): Story {
       title: related.title.trim() || draft.heading,
       text: related.text.trim() || draft.subtitle || '',
       image: related.image,
-      href: draft.catalogMark ? href : (related.title ? `/catalog` : '/catalog'),
+      href: draft.catalogMark ? href : related.href || '/catalog',
       label: draft.catalogMark ? label : 'Посмотреть проект',
+      project: draft.catalogMark ? undefined : related.project,
     } : null,
   }
 }
@@ -120,6 +124,27 @@ function StoryVideo({ story, onClose }: { story: Story; onClose: () => void }) {
   return <div ref={container}><VideoLightbox title={story.heading} embedSrc={reviewEmbedSrc(story.video)} onClose={onClose} /></div>
 }
 
+function StoryCatalogCard({ card }: { card: NonNullable<Story['card']> }) {
+  const facts = card.project
+  const specs = [
+    { icon: IconRulerMeasure, value: facts?.area, unit: copy.specArea, name: 'Площадь' },
+    { icon: IconStairs, value: facts?.floors, unit: copy.specFloors, name: 'Этажи' },
+    { icon: IconBed, value: facts?.bedrooms, unit: copy.specBed, name: 'Спальни' },
+    { icon: IconBath, value: facts?.bathrooms, unit: copy.specBath, name: 'Санузлы' },
+  ].filter(spec => typeof spec.value === 'number' && Number.isFinite(spec.value) && spec.value >= 0)
+  return <div className={styles.catalogCard}>
+    {card.image ? <Link href={card.href} className={styles.catalogImage} aria-label={card.title}><Image loader={imageLoader} src={card.image} alt="" fill sizes="168px" /></Link> : null}
+    <div className={styles.catalogBody}>
+      <Link href={card.href}><h3>{card.title}</h3></Link>
+      {specs.length ? <ul className={`specs ${styles.catalogSpecs}`} aria-label="Характеристики проекта">{specs.map(spec => {
+        const Icon = spec.icon
+        return <li key={spec.name} aria-label={`${spec.name}: ${spec.value} ${spec.unit}`}><Icon size={16} stroke={1.75} aria-hidden="true" /><span>{spec.value!.toLocaleString('ru-RU')} {spec.unit}</span></li>
+      })}</ul> : null}
+      <Link className={styles.catalogButton} href={card.href}>Посмотреть проект<IconArrowUpRight size={16} stroke={2} aria-hidden="true" /></Link>
+    </div>
+  </div>
+}
+
 function StoryEntry({ story, onPlay }: { story: Story; onPlay: (story: Story) => void }) {
   const card = story.card
   const mark = card?.mark
@@ -138,7 +163,7 @@ function StoryEntry({ story, onPlay }: { story: Story; onPlay: (story: Story) =>
           <li><IconMapPin size={18} stroke={1.75} aria-hidden="true" /><span>{story.place}</span></li>
           <li><IconCalendar size={18} stroke={1.75} aria-hidden="true" /><span>{story.year} год</span></li>
         </ul>
-        {card ? <div className={styles.project}>
+        {card && story.binding === 'catalog' ? <StoryCatalogCard card={card} /> : card ? <div className={styles.project}>
           {mark ? <span className={styles.mark}>{catalogMarkLabel[mark]}</span> : null}
           <div className={styles.projectTop}>
             <div>

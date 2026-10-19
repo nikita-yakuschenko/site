@@ -3,6 +3,7 @@
 import { useFormFields } from '@payloadcms/ui'
 import { useEffect, useRef, type RefObject } from 'react'
 import { detectBuiltVideo } from '../../config/built-media'
+import { storyProjectDetails, type StoryProjectDetails } from '../../../../src/lib/story-project-details'
 
 export type StoryPreviewDraft = {
   slug: string
@@ -20,6 +21,8 @@ export type StoryPreviewDraft = {
     title: string
     text: string
     image: string
+    href?: string
+    project?: StoryProjectDetails
   } | null
 }
 
@@ -106,6 +109,8 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
               title: typeof project?.name === 'string' ? project.name : '',
               text: draft.subtitle,
               image,
+              href: project?.slug ? `/catalog/${project.slug}` : '/catalog',
+              project: storyProjectDetails(project),
             }
           }
         }

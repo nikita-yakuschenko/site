@@ -22,11 +22,12 @@ type StoryRow = {
   year?: number | null
   customerKind?: 'family' | 'business' | null
   binding?: 'catalog' | 'individual' | 'discontinued' | null
+  project?: number | string | { name?: string | null } | null
   _status?: 'published' | 'draft' | null
 }
 
 const customers = { family: 'Частное лицо', business: 'Бизнес' }
-const bindings = { catalog: 'Каталог', individual: 'Индивидуальный проект', discontinued: 'Снят с производства' }
+const projectName = (story: StoryRow) => story.binding === 'catalog' && story.project && typeof story.project === 'object' ? story.project.name?.trim() || '—' : '—'
 const byName = new Intl.Collator('ru', { numeric: true, sensitivity: 'base' })
 
 export function StoriesIndex({ siteUrl, stories }: { siteUrl: string; stories: StoryRow[] }) {
@@ -46,7 +47,7 @@ export function StoriesIndex({ siteUrl, stories }: { siteUrl: string; stories: S
   }
   const query = search.trim().toLocaleLowerCase('ru')
   const filtered = stories.filter(story => {
-    const text = `${story.heading ?? ''} ${story.subtitle ?? ''} ${story.place ?? ''} ${story.year ?? ''}`.toLocaleLowerCase('ru')
+    const text = `${story.heading ?? ''} ${story.subtitle ?? ''} ${story.place ?? ''} ${story.year ?? ''} ${projectName(story)}`.toLocaleLowerCase('ru')
     return !query || text.includes(query)
   }).sort((left, right) => (right.year ?? 0) - (left.year ?? 0) || byName.compare(left.heading || '', right.heading || ''))
   const table = useDataPage(filtered)
@@ -66,7 +67,7 @@ export function StoriesIndex({ siteUrl, stories }: { siteUrl: string; stories: S
         <TableCell className="text-muted-foreground">{story.customerKind ? customers[story.customerKind] : '—'}</TableCell>
         <TableCell className="tabular-nums">{story.year ?? '—'}</TableCell>
         <TableCell className="text-muted-foreground">{story.place || '—'}</TableCell>
-        <TableCell className="text-muted-foreground">{story.binding ? bindings[story.binding] : '—'}</TableCell>
+        <TableCell className="text-muted-foreground">{projectName(story)}</TableCell>
         <TableCell className="pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8 text-muted-foreground" aria-label={`Действия: ${story.heading || 'без заголовка'}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface w-44">
           <DropdownMenuItem asChild><Link href={`/collections/stories/${story.id}`}><IconPencil />Редактировать</Link></DropdownMenuItem>
           {published && story.slug && <DropdownMenuItem asChild><a href={`${siteUrl}/stories#story-${story.slug}`} target="_blank" rel="noreferrer"><IconExternalLink />Открыть на сайте</a></DropdownMenuItem>}

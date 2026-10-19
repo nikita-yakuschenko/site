@@ -81,7 +81,7 @@ export const Stories: CollectionConfig = {
     { name: 'year', label: 'Год', type: 'number', required: true, min: 2014, admin: { step: 1 }, validate: (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 2014 ? true : 'Укажите год' },
     { name: 'customerKind', label: 'Заказчик', type: 'select', required: true, defaultValue: 'family', options: [{ label: 'Частное лицо', value: 'family' }, { label: 'Бизнес', value: 'business' }], admin: { hidden: true } },
     { name: 'binding', label: 'Проект', type: 'select', required: true, defaultValue: 'catalog', options: [{ label: 'Из каталога', value: 'catalog' }, { label: 'Индивидуальный проект', value: 'individual' }, { label: 'Снят с производства', value: 'discontinued' }] },
-    { name: 'project', label: 'Проект каталога', type: 'relationship', relationTo: 'projects', admin: { condition: data => data.binding === 'catalog', components: { Field: './components/admin/StoryProjectPicker#StoryProjectPicker' } } },
+    { name: 'project', label: 'Проект каталога', type: 'relationship', relationTo: 'projects', admin: { condition: data => data.binding === 'catalog', description: 'В отзыве автоматически показываются фото, название и характеристики проекта: площадь, этажи, спальни и санузлы. Вместо цены — кнопка «Посмотреть проект».', components: { Field: './components/admin/StoryProjectPicker#StoryProjectPicker' } } },
     {
       name: 'relatedCard', label: 'Карточка под отзывом', type: 'group',
       admin: { condition: data => data.binding === 'individual' || data.binding === 'discontinued', description: 'Можно выключить или задать свои заголовок, текст и фото. Кнопка по умолчанию: для бизнеса «Решения для бизнеса», для частников «Смотреть проекты».' },

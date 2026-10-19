@@ -115,14 +115,15 @@ export function VideoTestimonials({
 
         <div className="video-stories__stage">
           <StoryCard
+            data-cms-content-connected
             story={featured}
             featured
-            blockKey="videoTestimonials.story.0"
+            blockKey={`videoTestimonials.story.${featured.slug}`}
             onOpen={setActive}
           />
           <div className="video-stories__side">
-            {side.map((story, index) => (
-              <StoryCard key={story.slug} story={story} blockKey={`videoTestimonials.story.${index + 1}`} onOpen={setActive} />
+            {side.map(story => (
+              <StoryCard data-cms-content-connected key={story.slug} story={story} blockKey={`videoTestimonials.story.${story.slug}`} onOpen={setActive} />
             ))}
           </div>
         </div>

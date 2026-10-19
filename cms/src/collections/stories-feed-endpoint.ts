@@ -1,6 +1,7 @@
 import type { Endpoint } from 'payload'
 import { authorizeSiteRequest } from './project-hero-endpoint'
 import { detectBuiltVideo, type BuiltVideo } from '../config/built-media'
+import { storyProjectDetails, type StoryProjectDetails } from '../../../src/lib/story-project-details'
 
 export type PublicStoryCard = {
   mark: 'individual' | 'discontinued' | null
@@ -9,6 +10,7 @@ export type PublicStoryCard = {
   image: string
   href: string
   label: string
+  project?: StoryProjectDetails
 }
 
 export type PublicStory = {
@@ -30,7 +32,7 @@ export const storiesFeedEndpoint: Endpoint = {
     const denied = authorizeSiteRequest(req)
     if (denied) return denied
     const result = await req.payload.find({
-      collection: 'stories', pagination: false, sort: '-year', depth: 1, req, overrideAccess: true,
+      collection: 'stories', pagination: false, sort: '-year', depth: 2, req, overrideAccess: true,
       where: { _status: { equals: 'published' } },
     })
     const base = process.env.CMS_PUBLIC_URL || 'https://cms.avgst.ru'
@@ -65,9 +67,10 @@ export const storiesFeedEndpoint: Endpoint = {
             mark: null,
             title: linked.name,
             text: doc.subtitle || '',
-            image: mediaURL(linked.desktopImage, linked.imageUrl) || poster,
+            image: mediaURL(linked.desktopImage, linked.imageUrl),
             href: `/catalog/${linked.slug}`,
             label: 'Посмотреть проект',
+            project: storyProjectDetails(linked),
           }
         }
       } else {

@@ -20,7 +20,7 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
   if (view === 'blocks' || view === 'forms') redirect(`/${view}`)
   const pages = view === 'pages' ? await initPageResult.req.payload.find({ collection: 'pages', limit: 1000, sort: 'route', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
   const projects = view === 'catalog' ? await initPageResult.req.payload.find({ collection: 'projects', limit: 1000, sort: 'name', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
-  const stories = view === 'stories' ? await initPageResult.req.payload.find({ collection: 'stories', limit: 1000, sort: '-year', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
+  const stories = view === 'stories' ? await initPageResult.req.payload.find({ collection: 'stories', limit: 1000, sort: '-year', depth: 1, req: initPageResult.req, overrideAccess: false }) : null
   const submissions = view === 'catalog' ? await initPageResult.req.payload.find({ collection: 'lead-submissions', pagination: false, depth: 0, req: initPageResult.req, overrideAccess: false, select: { status: true, payload: true } }) : null
   const leads = projects && submissions ? Object.fromEntries(countProjectLeads(projects.docs, submissions.docs)) : {}
   const delivery = view === 'integrations' ? await leadDelivery(initPageResult.req) : null

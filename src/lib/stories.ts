@@ -2,6 +2,7 @@ import 'server-only'
 import { cache } from 'react'
 import { connection } from 'next/server'
 import { unstable_rethrow } from 'next/navigation'
+import type { StoryProjectDetails } from './story-project-details'
 
 export type StoryVideo = { provider: 'kinescope'; id: string } | { provider: 'vk'; oid: number; id: string }
 
@@ -12,6 +13,7 @@ export type PublicStoryCard = {
   image: string
   href: string
   label: string
+  project?: StoryProjectDetails
 }
 
 export type PublicStory = {

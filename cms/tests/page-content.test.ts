@@ -6,6 +6,22 @@ import { countCollectionProjects } from '../../src/lib/catalog/collection'
 
 function props(node: ReactNode) { return (node as ReactElement<Record<string, unknown>>).props }
 
+test('CMS block copy cannot overwrite records owned by the stories collection after reordering', () => {
+  const card = (story: { slug: string; heading: string; poster: string; place: string }) => createElement('div', { 'data-cms-content-connected': true, story })
+  const family = { slug: 'family', heading: 'Жизнь в доме', poster: '/family.jpg', place: 'Нижегородская область' }
+  const hotel = { slug: 'hotel', heading: 'Модульный отель', poster: '/hotel.jpg', place: 'Дзержинск' }
+  const tree = createElement('section', null, [card(family), card(hotel)])
+  const saved = [
+    { key: 'VideoTestimonials.content.0.children.0.prop.story.heading', text: hotel.heading },
+    { key: 'VideoTestimonials.content.0.children.1.prop.story.heading', text: family.heading },
+  ]
+  const result = bindReactContent('VideoTestimonials', tree, saved)
+  const children = props(result.content).children as ReactNode[]
+  assert.deepEqual(props(children[0]).story, family)
+  assert.deepEqual(props(children[1]).story, hotel)
+  assert.equal(result.fields.some(field => field.key.includes('.story.')), false)
+})
+
 test('collection counts follow current catalog records and distinguish technology from series', () => {
   const items = [{ technology: 'panel', series: 'barn' }, { technology: 'modular', series: 'barn' }, { technology: 'panel', series: 'classic' }]
   assert.equal(countCollectionProjects(items, 'panel'), 2)
