@@ -10940,26 +10940,22 @@ html.is-dialog-open {
    На узком она вынесена над ними отдельной строкой того же размера. */
 .mortgage-calc__tier-picker {
   display: inline-grid;
-  grid-template-columns: auto repeat(var(--mortgage-tier-count, 2), auto);
+  grid-template-columns: auto auto;
   align-items: stretch;
   box-sizing: border-box;
   width: fit-content;
   max-width: 100%;
   height: 28px;
   margin: 0;
-  padding: 2px;
+  padding: 0;
   gap: 2px;
-  border-radius: 8px;
-  background: var(--tint);
 }
 
 .mortgage-calc__tier-picker .mortgage-calc__modes--tiers {
-  display: contents;
-}
-
-.mortgage-calc__modes--tiers {
-  grid-template-columns: auto repeat(var(--mortgage-tier-count, 2), auto);
+  display: grid;
+  grid-template-columns: repeat(var(--mortgage-tier-count, 2), auto);
   width: fit-content;
+  padding: 2px;
 }
 
 .mortgage-calc__tier-label {

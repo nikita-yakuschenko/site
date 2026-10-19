@@ -6,6 +6,7 @@ import {
   useEffect,
   useEffectEvent,
   useMemo,
+  useId,
   useRef,
   useState,
   useSyncExternalStore,
@@ -20,6 +21,8 @@ import {
   subscribeTier,
   writeTier,
 } from "../lib/catalog/tier-selection";
+import { MortgageRegionPicker } from "./mortgage-region-picker";
+import { mortgageRegionGroup } from "./mortgage-regions";
 import { RangeSlider } from "./range-slider";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
 import { formatRub } from "../lib/locale";
@@ -39,7 +42,6 @@ import {
   readRegionCode,
   readServerRegionCode,
   subscribeRegion,
-  type RegionCode,
 } from "../lib/regions";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { LeadReveal } from "./lead-reveal";
@@ -140,9 +142,11 @@ export function MortgageCalculator({
     readRegionCode,
     readServerRegionCode,
   );
-  const [constructionRegion, setConstructionRegion] = useState<RegionCode | null>(null);
-  const region = projectTiers ? siteRegion : constructionRegion ?? siteRegion;
+  const [constructionRegion, setConstructionRegion] = useState<string | null>(null);
+  const constructionRegionName = constructionRegion ?? "Нижегородская область";
+  const region = mortgageRegionGroup(constructionRegionName);
   const [childrenCount, setChildrenCount] = useState(1);
+  const tierLabelId = useId();
   const lead = showMatches
     ? t.lead
     : "Настройте условия и узнайте ежемесячный платёж.";
@@ -151,7 +155,7 @@ export function MortgageCalculator({
     readTier,
     () => DEFAULT_TIER,
   );
-  const mortgageTiers = projectTiers ? tiersForRegion(projectTiers, region).filter((tier) => tier.mortgage) : undefined;
+  const mortgageTiers = projectTiers ? tiersForRegion(projectTiers, siteRegion).filter((tier) => tier.mortgage) : undefined;
   const selectedTier = mortgageTiers?.find((tier) => tier.id === selectedTierId)
     ?? mortgageTiers?.[0];
   /* Форма заявки проявляется на месте карточки результата. */
@@ -171,7 +175,7 @@ export function MortgageCalculator({
     return Math.round(price * program.minDownPaymentPercent);
   });
   const [termYears, setTermYears] = useState(program.maxTermYears);
-  const tierSnapshot = selectedTier ? `${region}:${selectedTier.id}:${selectedTier.price}` : '';
+  const tierSnapshot = selectedTier ? `${siteRegion}:${selectedTier.id}:${selectedTier.price}` : '';
   const [seenTierId, setSeenTierId] = useState(tierSnapshot);
   if (selectedTier && seenTierId !== tierSnapshot) {
     setSeenTierId(tierSnapshot);
@@ -301,7 +305,7 @@ export function MortgageCalculator({
       monthly_payment: Math.round(activeResult.monthlyPayment),
       loan_amount: Math.round(activeResult.loanAmount),
       is_combined: activeResult.isCombined,
-      construction_region: region,
+      construction_region: constructionRegionName,
       children_count: programId === "family" ? childrenCount : undefined,
       subsidy_months: activeResult.subsidyMonths,
       remaining_after_subsidy: activeResult.remainingAfterSubsidy,
@@ -311,7 +315,7 @@ export function MortgageCalculator({
         rate: part.annualRate,
       })),
     }),
-    [mode, programId, budgetPrice, downPayment, termYears, activeResult, region, childrenCount],
+    [mode, programId, budgetPrice, downPayment, termYears, activeResult, constructionRegionName, childrenCount],
   );
 
   const eligible = useMemo(
@@ -401,8 +405,8 @@ export function MortgageCalculator({
   );
   const tierSelector = mortgageTiers ? (
     <div className="mortgage-calc__tier-picker" style={{ '--mortgage-tier-count': mortgageTiers.length } as React.CSSProperties}>
-      <span className="mortgage-calc__tier-label">Комплектация:</span>
-      <div className="mortgage-calc__modes mortgage-calc__modes--tiers" role="tablist" aria-label="Комплектация">
+      <span id={tierLabelId} className="mortgage-calc__tier-label">Комплектация:</span>
+      <div className="mortgage-calc__modes mortgage-calc__modes--tiers" role="tablist" aria-labelledby={tierLabelId}>
         {mortgageTiers.map(tier => (
           <button key={tier.id} type="button" role="tab" aria-selected={tier.id === selectedTier?.id}
             className={tier.id === selectedTier?.id ? 'mortgage-calc__mode is-active' : 'mortgage-calc__mode'}
@@ -498,13 +502,7 @@ export function MortgageCalculator({
                 </Select>
               </span>
               <span className={`mortgage-calc__select-slot mortgage-calc__select-slot--region${programId === "market" || programId === "rural" ? " is-hidden" : ""}`}>
-                <Select value={region} disabled={Boolean(projectTiers) || programId === "market" || programId === "rural"} onValueChange={(value) => { setConstructionRegion(value as RegionCode); scheduleAnalytics(); }}>
-                  <SelectTrigger aria-label="Регион строительства"><SelectValue /></SelectTrigger>
-                  <SelectContent className="mortgage-calc__select-content">
-                    <SelectItem value="nn">Нижегородская обл.</SelectItem>
-                    <SelectItem value="msk">Московская обл.</SelectItem>
-                  </SelectContent>
-                </Select>
+                <MortgageRegionPicker value={constructionRegionName} onChange={value => { setConstructionRegion(value); scheduleAnalytics(); }} />
               </span>
             </div> : null}
             </div>

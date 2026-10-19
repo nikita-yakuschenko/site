@@ -31,6 +31,18 @@
 .mortgage-calc__select-slot { display: block; min-width: 0; }
 .mortgage-calc__select-slot--children { width: 172px; flex-shrink: 0; }
 .mortgage-calc__select-slot--region { width: 208px; flex-shrink: 0; }
+.mortgage-region { position: relative; width: 100%; font-size: 12px; }
+.mortgage-region__field { display: flex; height: 28px; border-radius: 6px; background: var(--tint); }
+.mortgage-region__field:focus-within { outline: 1px solid var(--ink-2); outline-offset: 2px; }
+.mortgage-region__field input { width: 100%; min-width: 0; padding: 0 0 0 12px; border: 0; outline: none; background: transparent; color: var(--ink-1); font: inherit; text-overflow: ellipsis; }
+.mortgage-region__field input::placeholder { color: var(--ink-2); opacity: 1; }
+.mortgage-region__field button { display: grid; place-items: center; flex-shrink: 0; width: 32px; padding: 0; border: 0; background: transparent; color: var(--ink-2); cursor: pointer; }
+.mortgage-region__popup { position: absolute; z-index: 50; top: calc(100% + 4px); right: 0; width: min(340px, calc(100vw - 40px)); min-width: 100%; padding: 4px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--foreground); box-shadow: 0 4px 12px rgb(0 0 0 / .12); }
+.mortgage-region__list { max-height: 240px; overflow-y: auto; overscroll-behavior: contain; }
+.mortgage-region__option { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 8px; border-radius: 3px; cursor: pointer; }
+.mortgage-region__option svg { flex-shrink: 0; }
+.mortgage-region__option.is-active { background: var(--tint); }
+.mortgage-region__empty { margin: 0; padding: 8px; color: var(--ink-2); }
 .mortgage-calc__family-options .ui-select-trigger {
   height: 28px;
   border: 0;
