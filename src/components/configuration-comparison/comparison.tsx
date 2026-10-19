@@ -1,6 +1,12 @@
 "use client";
 
-import { Fragment, useLayoutEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useCallback,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 import {
   IconArrowsMaximize,
   IconArrowsMinimize,
@@ -41,7 +47,12 @@ import { formatFromRub } from "../../lib/locale";
 import { nbspText } from "../../lib/copy";
 import "./comparison.css";
 
-const text = (s: string) => nbspText(nbspText(s));
+const text = (s: string) =>
+  nbspText(
+    nbspText(
+      s.replace(/(?:согласно|по) архитектурному проекту/gi, "согласно проекту"),
+    ),
+  );
 function Explanation({ info }: { info: TechnicalInfo }) {
   return (
     <div className="comparison-explanation">
@@ -174,7 +185,14 @@ function ComparisonBody({
     ),
   }));
   const [differences, setDifferences] = useState(false);
-  const [collapsed, setCollapsed] = useState<Set<string>>(new Set());
+  const [collapsed, setCollapsed] = useState<Set<string>>(
+    () =>
+      new Set(
+        projectSections
+          .filter((section) => section.id !== "structure")
+          .map((section) => section.id),
+      ),
+  );
   const [selected, setSelected] = useState(
     Math.max(
       0,
@@ -186,37 +204,119 @@ function ComparisonBody({
   const swipe = useRef<{ x: number; y: number } | null>(null);
   const tableWrap = useRef<HTMLDivElement>(null);
   const table = useRef<HTMLTableElement>(null);
-  const previousHeight = useRef<number | null>(null);
-  const heightAnimation = useRef<Animation | null>(null);
+  const pendingSlides = useRef(
+    new Map<string, { element: HTMLElement; height: number }>(),
+  );
+  const slideAnimations = useRef<Animation[]>([]);
+  const outgoingSlides = useRef<HTMLElement[]>([]);
+  const slideDirection = useRef(1);
+  const pointerNavigation = useRef(true);
+  const clearSlides = useCallback(() => {
+    for (const animation of slideAnimations.current) animation.cancel();
+    for (const element of outgoingSlides.current) element.remove();
+    slideAnimations.current = [];
+    outgoingSlides.current = [];
+  }, []);
   const changePackage = (index: number) => {
     const next = Math.max(0, Math.min(matrix.packageIds.length - 1, index));
     if (next === selected) return;
-    previousHeight.current =
-      tableWrap.current?.getBoundingClientRect().height ?? null;
-    heightAnimation.current?.cancel();
+    pendingSlides.current.clear();
+    const shouldSlide =
+      pointerNavigation.current &&
+      matchMedia("(max-width: 900px)").matches &&
+      !matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (shouldSlide) {
+      table.current
+        ?.querySelectorAll<HTMLElement>(
+          `[data-package="${selected}"] .comparison-slide-viewport:not(.comparison-slide-outgoing)`,
+        )
+        .forEach((viewport) => {
+          // Freeze the current visual frame, including interrupted layers, before retargeting.
+          const snapshot = viewport.cloneNode(true) as HTMLElement;
+          const originals = viewport.querySelectorAll<HTMLElement>(
+            "[data-comparison-slide-layer]",
+          );
+          const copies = snapshot.querySelectorAll<HTMLElement>(
+            "[data-comparison-slide-layer]",
+          );
+          originals.forEach((element, i) => {
+            if (copies[i])
+              copies[i]!.style.transform = getComputedStyle(element).transform;
+          });
+          snapshot.style.backgroundColor = getComputedStyle(
+            viewport.closest("td, th")!,
+          ).backgroundColor;
+          pendingSlides.current.set(viewport.dataset.slideKey!, {
+            element: snapshot,
+            height: viewport.getBoundingClientRect().height,
+          });
+        });
+    }
+    clearSlides();
+    slideDirection.current = next > selected ? 1 : -1;
     setExpandedInfo(null);
     setSelected(next);
   };
   useLayoutEffect(() => {
-    const from = previousHeight.current;
-    const node = tableWrap.current;
-    const to = table.current?.getBoundingClientRect().height;
-    if (
-      node &&
-      from != null &&
-      to != null &&
-      !matchMedia("(prefers-reduced-motion: reduce)").matches
-    ) {
-      heightAnimation.current = node.animate(
-        [{ height: `${from}px` }, { height: `${to}px` }],
-        { duration: 320, easing: "cubic-bezier(.23,1,.32,1)" },
-      );
-    }
-    previousHeight.current = null;
-    return () => {
-      heightAnimation.current?.cancel();
-    };
-  }, [selected]);
+    const snapshots = pendingSlides.current;
+    pendingSlides.current = new Map();
+    const easing = table.current
+      ? getComputedStyle(table.current).getPropertyValue("--ease-out").trim()
+      : "cubic-bezier(.23,1,.32,1)";
+    const timing = { duration: 280, easing, fill: "both" as const };
+    table.current
+      ?.querySelectorAll<HTMLElement>(
+        `[data-package="${selected}"] .comparison-slide-viewport:not(.comparison-slide-outgoing)`,
+      )
+      .forEach((viewport) => {
+        const snapshot = snapshots.get(viewport.dataset.slideKey!);
+        const current = viewport.querySelector<HTMLElement>(
+          ":scope > .comparison-slide-current",
+        );
+        if (
+          !snapshot ||
+          !current ||
+          viewport.getBoundingClientRect().height === 0
+        )
+          return;
+        const nextHeight = current.getBoundingClientRect().height;
+        const outgoing = snapshot.element;
+        outgoing.classList.add("comparison-slide-outgoing");
+        outgoing.setAttribute("aria-hidden", "true");
+        outgoing.inert = true;
+        outgoing.dataset.comparisonSlideLayer = "";
+        outgoing.style.height = `${snapshot.height}px`;
+        viewport.append(outgoing);
+        outgoingSlides.current.push(outgoing);
+        const direction = slideDirection.current;
+        const enter = current.animate(
+          [
+            { transform: `translateX(${direction * 100}%)` },
+            { transform: "translateX(0%)" },
+          ],
+          timing,
+        );
+        const exit = outgoing.animate(
+          [
+            { transform: "translateX(0%)" },
+            { transform: `translateX(${-direction * 100}%)` },
+          ],
+          timing,
+        );
+        const resize = viewport.animate(
+          [{ height: `${snapshot.height}px` }, { height: `${nextHeight}px` }],
+          timing,
+        );
+        enter.onfinish = () => enter.cancel();
+        exit.onfinish = () => {
+          outgoing.remove();
+          exit.cancel();
+        };
+        resize.onfinish = () => resize.cancel();
+        slideAnimations.current.push(enter, exit, resize);
+      });
+    return clearSlides;
+  }, [selected, clearSlides]);
   const toggleSection = (id: string) =>
     setCollapsed((before) => {
       const next = new Set(before);
@@ -224,10 +324,16 @@ function ComparisonBody({
       else next.add(id);
       return next;
     });
-  const allCollapsed = collapsed.size === projectSections.length;
+  const allExpanded = collapsed.size === 0;
   return (
     <Tabs
       className="comparison-shell"
+      onPointerDownCapture={() => {
+        pointerNavigation.current = true;
+      }}
+      onKeyDownCapture={() => {
+        pointerNavigation.current = false;
+      }}
       ref={setContainer}
       value={matrix.packageIds[selected]}
       onValueChange={(id) =>
@@ -257,19 +363,23 @@ function ComparisonBody({
           type="button"
           onClick={() =>
             setCollapsed(
-              allCollapsed
-                ? new Set()
-                : new Set(projectSections.map((s) => s.id)),
+              allExpanded
+                ? new Set(projectSections.map((s) => s.id))
+                : new Set(),
             )
           }
         >
-          {allCollapsed ? (
+          {!allExpanded ? (
             <IconArrowsMaximize size={18} />
           ) : (
             <IconArrowsMinimize size={18} />
           )}
-          {allCollapsed ? "Развернуть разделы" : "Свернуть разделы"}
+          {allExpanded ? "Свернуть разделы" : "Развернуть разделы"}
         </button>
+        <div className="comparison-legend" aria-label="Обозначения статусов">
+          <span data-status="included">Входит</span>
+          <span data-status="excluded">Не входит</span>
+        </div>
       </div>
       <div className="comparison-mobile-nav">
         <TabsList aria-label="Выбор комплектации">
@@ -359,17 +469,27 @@ function ComparisonBody({
                     const tier = tiers.find((t) => t.id === id);
                     return (
                       <th scope="col" key={id} data-package={index}>
-                        <strong>{tier?.name ?? id}</strong>
-                        {tier?.lead && (
-                          <span className="comparison-tier-lead">
-                            {text(tier.lead)}
-                          </span>
-                        )}
-                        <b className="comparison-price">
-                          {tier && tier.price > 0
-                            ? formatFromRub(tier.price)
-                            : "Цена уточняется"}
-                        </b>
+                        <div
+                          className="comparison-slide-viewport"
+                          data-slide-key="heading"
+                        >
+                          <div
+                            className="comparison-slide-current"
+                            data-comparison-slide-layer
+                          >
+                            <strong>{tier?.name ?? id}</strong>
+                            {tier?.lead && (
+                              <span className="comparison-tier-lead">
+                                {text(tier.lead)}
+                              </span>
+                            )}
+                            <b className="comparison-price">
+                              {tier && tier.price > 0
+                                ? formatFromRub(tier.price)
+                                : "Цена уточняется"}
+                            </b>
+                          </div>
+                        </div>
                       </th>
                     );
                   })}
@@ -457,14 +577,28 @@ function ComparisonBody({
                               </div>
                             </th>
                             {matrix.packageIds.map((id, index) => (
-                              <td key={id} data-package={index}>
+                              <td
+                                key={id}
+                                data-package={index}
+                                data-status={element.values[id]!.status}
+                              >
                                 <div
                                   className="comparison-reveal"
                                   data-open={shown}
                                   inert={!shown}
                                 >
                                   <div>
-                                    <Value value={element.values[id]!} />
+                                    <div
+                                      className="comparison-slide-viewport"
+                                      data-slide-key={element.id}
+                                    >
+                                      <div
+                                        className="comparison-slide-current"
+                                        data-comparison-slide-layer
+                                      >
+                                        <Value value={element.values[id]!} />
+                                      </div>
+                                    </div>
                                   </div>
                                 </div>
                               </td>

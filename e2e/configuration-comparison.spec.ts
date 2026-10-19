@@ -107,6 +107,15 @@ for (const width of [320, 360, 390, 768, 1024, 1440]) {
   }) => {
     await page.setViewportSize({ width, height: 900 });
     const dialog = await openComparison(page);
+    await expect(
+      dialog.locator('.comparison-section button[aria-expanded="true"]'),
+    ).toHaveCount(1);
+    await expect(
+      dialog.getByRole("button", { name: /Силовой \(несущий\) каркас/ }),
+    ).toHaveAttribute("aria-expanded", "true");
+    await dialog
+      .getByRole("button", { name: "Развернуть разделы", exact: true })
+      .click();
     await expect(dialog.locator("thead th:visible")).toHaveCount(
       width <= 900 ? 2 : 4,
     );
@@ -272,6 +281,25 @@ for (const width of [320, 360, 390, 768, 1024, 1440]) {
       content: "nextjs-portal { display:none!important; }",
     });
     await page.waitForTimeout(400);
+    await expect(dialog.locator(".comparison-price").first()).toHaveCSS(
+      "color",
+      "rgb(72, 176, 98)",
+    );
+    const sectionBorders = await dialog
+      .locator(".comparison-section > th")
+      .evaluateAll((cells) =>
+        cells.map((cell) => {
+          const css = getComputedStyle(cell);
+          return [
+            css.borderLeftWidth,
+            css.borderRightWidth,
+            css.borderBottomWidth,
+            css.borderTopWidth,
+          ];
+        }),
+      );
+    for (const borders of sectionBorders)
+      expect(borders).toEqual(["1px", "1px", "1px", "0px"]);
     const rowGeometry = await dialog
       .locator('.comparison-element[data-visible="true"]')
       .evaluateAll((rows) =>
@@ -283,6 +311,14 @@ for (const width of [320, 360, 390, 768, 1024, 1440]) {
             top: cell.getBoundingClientRect().top,
             bottom: cell.getBoundingClientRect().bottom,
             border: getComputedStyle(cell).borderBottomWidth,
+            textCenter: (() => {
+              const rect = cell
+                .querySelector(
+                  ".comparison-label > span:first-child, .comparison-value > span",
+                )!
+                .getBoundingClientRect();
+              return rect.top + rect.height / 2;
+            })(),
             innerBorder: getComputedStyle(
               cell.querySelector(".comparison-label, .comparison-value")!,
             ).borderBottomWidth,
@@ -299,6 +335,9 @@ for (const width of [320, 360, 390, 768, 1024, 1440]) {
           Math.min(...cells.map((cell) => cell.bottom)),
       ).toBeLessThan(1);
       for (const cell of cells) {
+        expect(
+          Math.abs(cell.textCenter - (cell.top + cell.bottom) / 2),
+        ).toBeLessThan(1);
         expect(cell.border).toBe("1px");
         expect(cell.innerBorder).toBe("0px");
       }
@@ -373,4 +412,94 @@ test("reduced motion and sticky header", async ({ page }) => {
   ).toBeLessThan(0.02);
   await dialog.getByRole("button", { name: "Закрыть сравнение" }).click();
   await expect(dialog).not.toBeVisible();
+});
+
+test("mobile packages slide both ways, interrupt cleanly, and respect reduced motion", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  const dialog = await openComparison(page);
+  const standard = dialog.getByRole("tab", {
+    name: "Стандартная",
+    exact: true,
+  });
+  const project = dialog.getByRole("tab", { name: "Проектная", exact: true });
+  const turnkey = dialog.getByRole("tab", { name: "Под ключ", exact: true });
+  await standard.click();
+  await page.waitForTimeout(320);
+  await project.click();
+  const forward = await dialog
+    .locator('thead [data-package="1"] .comparison-slide-viewport')
+    .first()
+    .evaluate(async (viewport) => {
+      const frames: { incoming: number; outgoing: number }[] = [];
+      const start = performance.now();
+      while (performance.now() - start < 130) {
+        const incoming = viewport.querySelector(
+          ":scope > .comparison-slide-current",
+        )!;
+        const outgoing = viewport.querySelector(
+          ":scope > .comparison-slide-outgoing",
+        );
+        if (outgoing)
+          frames.push({
+            incoming:
+              incoming.getBoundingClientRect().x -
+              viewport.getBoundingClientRect().x,
+            outgoing:
+              outgoing.getBoundingClientRect().x -
+              viewport.getBoundingClientRect().x,
+          });
+        await new Promise(requestAnimationFrame);
+      }
+      return frames;
+    });
+  expect(
+    forward.some((frame) => frame.incoming > 1 && frame.outgoing < -1),
+  ).toBe(true);
+  expect(forward.at(-1)!.incoming).toBeLessThan(forward[0]!.incoming);
+  await standard.click();
+  const backwards = await dialog
+    .locator('thead [data-package="0"] .comparison-slide-viewport')
+    .first()
+    .evaluate(async (viewport) => {
+      await new Promise(requestAnimationFrame);
+      await new Promise(requestAnimationFrame);
+      const incoming = viewport.querySelector(
+        ":scope > .comparison-slide-current",
+      )!;
+      const outgoing = viewport.querySelector(
+        ":scope > .comparison-slide-outgoing",
+      )!;
+      return {
+        incoming:
+          incoming.getBoundingClientRect().x -
+          viewport.getBoundingClientRect().x,
+        outgoing:
+          outgoing.getBoundingClientRect().x -
+          viewport.getBoundingClientRect().x,
+      };
+    });
+  expect(backwards.incoming).toBeLessThan(0);
+  expect(backwards.outgoing).toBeGreaterThan(0);
+  await turnkey.click();
+  await project.click();
+  await page.waitForTimeout(350);
+  await expect(dialog.locator(".comparison-slide-outgoing")).toHaveCount(0);
+  await expect(project).toHaveAttribute("aria-selected", "true");
+  expect(
+    await dialog
+      .locator(".comparison-scroll")
+      .evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+  ).toBe(true);
+  await expect(project).toHaveCSS("border-top-width", "0px");
+  await expect(project).toHaveCSS("outline-style", "none");
+  await expect(dialog.locator(".comparison-switch > span")).toHaveCSS(
+    "border-top-width",
+    "0px",
+  );
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await standard.click();
+  await expect(dialog.locator(".comparison-slide-outgoing")).toHaveCount(0);
+  await expect(standard).toHaveAttribute("aria-selected", "true");
 });

@@ -25,7 +25,7 @@ const excluded = (): SpecificationValue => ({
   status: "excluded",
 });
 const architectural = () =>
-  included("Согласно архитектурному проекту", null, null, "architectural");
+  included("Согласно проекту", null, null, "architectural");
 const roughFloor = () =>
   included("Черновое · OSB-3 22 мм", "OSB-3 22 мм", "rough");
 
@@ -124,7 +124,7 @@ const descriptions: Record<string, Row> = {
     "Окна",
     "Окна",
     "window",
-    "В базовом исполнении используются типовые окна; в проектном - размеры и конфигурация по архитектуре.",
+    "В базовом исполнении используются типовые окна; в проектном - размеры и конфигурация согласно проекту.",
     [
       "Профиль Rehau 70 мм",
       "Двухкамерный мультифункциональный стеклопакет",
@@ -137,7 +137,7 @@ const descriptions: Record<string, Row> = {
     "Входные двери",
     "Входные двери",
     "door",
-    "Техническая дверь закрывает входной проём. В проектном исполнении предусмотрены входные двери согласно архитектуре.",
+    "Техническая дверь закрывает входной проём. В проектном исполнении предусмотрены входные двери согласно проекту.",
     [
       "Входная дверь с терморазрывом",
       "Для проектного исполнения доступен выбор из предложенных дизайнов",
@@ -150,9 +150,7 @@ const descriptions: Record<string, Row> = {
     "Облицовка фасада",
     "building",
     "Наружная облицовка формирует внешний вид дома.",
-    [
-      "Планкен, имитация бруса или профилированный лист согласно архитектурному проекту",
-    ],
+    ["Планкен, имитация бруса или профилированный лист согласно проекту"],
     [],
   ],
   facadePaint: [
@@ -254,7 +252,7 @@ const descriptions: Record<string, Row> = {
     "Терраса",
     "Терраса",
     "terrace",
-    "Терраса согласно архитектурному проекту, как на визуализациях дома.",
+    "Терраса согласно проекту, как на визуализациях дома.",
     ["Для проектного исполнения указана палубная доска с машинной покраской"],
     [],
   ],
@@ -395,9 +393,9 @@ const panelValues: Values = {
     included("OSB-3 22 мм, утепление 200 мм", "OSB-3 22 мм", "structural"),
   ],
   partitions: [
-    included("Согласно планировке", null, "structural", "plan"),
-    included("Согласно планировке", null, "structural", "plan"),
-    included("Согласно планировке", null, "structural", "plan"),
+    included("Согласно проекту", null, "structural", "plan"),
+    included("Согласно проекту", null, "structural", "plan"),
+    included("Согласно проекту", null, "structural", "plan"),
   ],
   interfloor: [
     included("Каркас, утепление 200 мм", null, "structural", "insulation200"),
@@ -413,7 +411,7 @@ const panelValues: Values = {
   windows: [
     excluded(),
     included("Базовые, 1×1,2 м", "Rehau 70 мм", null, "basic"),
-    included("По архитектурному проекту", "Rehau 70 мм", null, "architectural"),
+    included("Согласно проекту", "Rehau 70 мм", null, "architectural"),
   ],
   doors: [
     excluded(),
@@ -474,9 +472,9 @@ const modularValues: Values = {
     included("OSB-3 22 мм, утепление 200 мм", "OSB-3 22 мм", "structural"),
   ],
   partitions: [
-    included("Согласно планировке", null, "structural", "plan"),
-    included("Согласно планировке", null, "structural", "plan"),
-    included("Согласно планировке", null, "structural", "plan"),
+    included("Согласно проекту", null, "structural", "plan"),
+    included("Согласно проекту", null, "structural", "plan"),
+    included("Согласно проекту", null, "structural", "plan"),
   ],
   interfloor: [
     included("Каркас, утепление 200 мм", null, "structural", "insulation200"),
@@ -491,8 +489,8 @@ const modularValues: Values = {
   ],
   windows: [
     included("Базовые, 1×1,2 м", "Rehau 70 мм", null, "basic"),
-    included("По архитектурному проекту", "Rehau 70 мм", null, "architectural"),
-    included("По архитектурному проекту", "Rehau 70 мм", null, "architectural"),
+    included("Согласно проекту", "Rehau 70 мм", null, "architectural"),
+    included("Согласно проекту", "Rehau 70 мм", null, "architectural"),
   ],
   doors: [
     included("Техническая входная дверь", null, null, "technical"),

@@ -40,7 +40,7 @@ import { ConfigurationComparison } from './configuration-comparison/comparison';
  * на каждой странице незачем.
  */
 
-const configText = (text: string) => nbspText(nbspText(text));
+const configText = (text: string) => nbspText(nbspText(text.replace(/(?:согласно|по) архитектурному проекту/gi, "согласно проекту")));
 
 export function ProjectConfig({ project, configurations, previewTier, onPreviewTierChange }: { project: CatalogProject; configurations?: PricedTier[]; previewTier?: string; onPreviewTierChange?: (tier: string) => void }) {
   const persistedTierId = useSyncExternalStore(
