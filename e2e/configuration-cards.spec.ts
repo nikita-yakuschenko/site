@@ -11,7 +11,7 @@ for (const width of [1280, 1024, 390]) {
     await expect(cards.nth(0).locator('.project-config__tier-lead')).toHaveText('Готовый снаружи, ваш замысел внутри.');
     for (let index = 0; index < 3; index++) {
       const card = cards.nth(index);
-      await expect(card.locator('.project-config__tier-included')).toHaveCount([4, 2, 4][index]!);
+      await expect(card.locator('.project-config__tier-included')).toHaveCount([4, 3, 4][index]!);
       await expect(card.locator('.project-config__tier-gift')).toHaveCount(1);
       await expect(card.locator('.project-config__tier-gift svg')).toHaveCount(0);
       await expect(card.locator('.project-config__tier-band svg')).toHaveCount(1);
