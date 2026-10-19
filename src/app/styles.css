@@ -5286,6 +5286,7 @@ a {
 }
 
 .catalog-search {
+  position: relative;
   display: flex;
   align-items: center;
   gap: 10px;
@@ -5296,6 +5297,25 @@ a {
   border-radius: 10px;
   background: #fff;
   color: var(--ink-3);
+}
+
+@media (min-width: 1024px) {
+  .catalog__barrow { width: 100%; transition: width 280ms cubic-bezier(.22,.61,.36,1); }
+  .catalog__bar.is-search-compact { background: transparent; pointer-events: none; }
+  .catalog__bar.is-search-compact::after { right: auto; width: calc(240px + var(--page-gutter) * 2); }
+  .catalog__bar.is-search-compact .catalog__barrow { width: 240px; pointer-events: auto; }
+}
+.catalog-search input { transition: opacity 180ms var(--ease-out); }
+.catalog-search.is-compact { background: #fff; }
+.catalog-search.is-compact input { opacity: 0; pointer-events: none; }
+.catalog-search .catalog-search__expand {
+  position: absolute; inset: 0; width: 100%; height: 100%; padding: 0 14px 0 42px;
+  display: flex; align-items: center; justify-content: flex-start; border: 0; border-radius: inherit;
+  background: transparent; color: var(--ink-2); font: inherit; font-size: 14px; cursor: pointer;
+}
+.catalog-search__expand span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+@media (prefers-reduced-motion: reduce) {
+  .catalog__barrow, .catalog-search input { transition: none; }
 }
 
 /* Фокус показывает сама рамка коробки, а не кольцо вокруг неё: зелёное

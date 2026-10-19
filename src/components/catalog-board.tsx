@@ -80,11 +80,23 @@ export function CatalogBoard({
   const bar = useRef<HTMLDivElement>(null);
   const results = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
+  const [searchDesktop, setSearchDesktop] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const searchInput = useRef<HTMLInputElement>(null);
+  const [completedQuery, setCompletedQuery] = useState(filters.q);
+  if (completedQuery !== filters.q) {
+    setCompletedQuery(filters.q);
+    setSearchExpanded(false);
+  }
+  const compactSearch = searchDesktop && Boolean(filters.q) && !searchExpanded;
 
   useEffect(() => {
     const node = bar.current;
     if (!node) return;
-    const update = () => setStuck(node.getBoundingClientRect().top <= 0);
+    const update = () => {
+      setStuck(node.getBoundingClientRect().top <= 0);
+      setSearchDesktop(window.matchMedia('(min-width: 1024px)').matches);
+    };
     const first = requestAnimationFrame(update);
     window.addEventListener("scroll", update, { passive: true });
     window.addEventListener("resize", update);
@@ -150,12 +162,20 @@ export function CatalogBoard({
           "catalog__bar",
           stuck ? "is-stuck" : "",
           open ? "is-sheet" : "",
+          compactSearch ? "is-search-compact" : "",
         ]
           .filter(Boolean)
           .join(" ")}
+        onBlur={event => {
+          if (!event.currentTarget.contains(event.relatedTarget)) setSearchExpanded(false);
+        }}
       >
         <div className="catalog__barrow">
-          <CatalogSearch value={filters.q ?? ""} onChange={search} />
+          <CatalogSearch value={filters.q ?? ""} onChange={search} inputRef={searchInput}
+            compact={compactSearch} onExpand={() => {
+              setSearchExpanded(true);
+              requestAnimationFrame(() => searchInput.current?.focus());
+            }} />
           {/* Видна только на узком экране, на широком её прячет CSS: там
               колонка стоит целиком и прятать нечего. */}
           {/* Одна кнопка в двух состояниях. Отбор пуст, значит она
