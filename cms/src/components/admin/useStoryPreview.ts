@@ -7,9 +7,6 @@ import { detectBuiltVideo } from '../../config/built-media'
 export type StoryPreviewDraft = {
   slug: string
   heading: string
-  title: string
-  detail: string
-  family: string
   place: string
   year: number
   kind: 'family' | 'business'
@@ -17,12 +14,29 @@ export type StoryPreviewDraft = {
   poster: string
   duration: string
   id: string
+  subtitle: string
+  card: {
+    enabled: boolean
+    title: string
+    text: string
+    image: string
+  } | null
 }
 
 function mediaId(value: unknown) {
   if (!value) return null
   if (typeof value === 'object' && value && 'id' in value) return (value as { id: unknown }).id
   return value
+}
+
+async function mediaUrl(value: unknown, signal: AbortSignal) {
+  const id = mediaId(value)
+  if (!id) return ''
+  if (typeof value === 'object' && value && 'url' in value && typeof (value as { url?: unknown }).url === 'string') {
+    return new URL((value as { url: string }).url, window.location.origin).href
+  }
+  const doc = await fetch(`/api/media/${id}?depth=0`, { credentials: 'include', signal }).then(response => response.ok ? response.json() as Promise<{ url?: string }> : null).catch(() => null)
+  return doc?.url ? new URL(doc.url, window.location.origin).href : ''
 }
 
 export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameElement | null>, origin: string) {
@@ -34,7 +48,6 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
       type: String(fields[`media.${index}.type`]?.value || 'photo'),
       isPrimary: fields[`media.${index}.isPrimary`]?.value === true,
       photo: fields[`media.${index}.photo`]?.value,
-      image: String(fields[`media.${index}.image`]?.value || ''),
       videoUrl: String(fields[`media.${index}.videoUrl`]?.value || ''),
       videoFile: fields[`media.${index}.videoFile`]?.value,
       duration: String(fields[`media.${index}.duration`]?.value || ''),
@@ -54,6 +67,10 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
       cover: fields.cover?.value,
       catalogMark,
       media,
+      relatedEnabled: fields['relatedCard.enabled']?.value !== false,
+      relatedTitle: String(fields['relatedCard.title']?.value || ''),
+      relatedText: String(fields['relatedCard.text']?.value || ''),
+      relatedImage: fields['relatedCard.image']?.value,
     }
   })
   const latest = useRef<StoryPreviewDraft | null>(null)
@@ -63,33 +80,41 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
     async function update() {
       if (!draft) { latest.current = null; return }
       try {
-        // Только реально привязанное видео: пустая строка с posterUrl не должна тащить кадр.
         const videoRow = draft.media.find(row => row.type === 'video' && (detectBuiltVideo(row.videoUrl) || mediaId(row.videoFile)))
-        const primary = draft.media.find(row => row.isPrimary && mediaId(row.photo)) || draft.media.find(row => mediaId(row.photo))
-        const coverId = mediaId(draft.cover)
-        const photoValue = coverId || primary?.photo || null
-        const media = photoValue
-          ? typeof photoValue === 'object'
-            ? photoValue as { url?: string }
-            : await fetch(`/api/media/${mediaId(photoValue)}?depth=0`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null)
-          : null
-        const poster = media?.url
-          ? new URL(media.url, window.location.origin).href
-          : (videoRow?.posterUrl || '')
+        const coverUrl = await mediaUrl(draft.cover, controller.signal)
+        const poster = coverUrl || videoRow?.posterUrl || ''
         const video = videoRow ? detectBuiltVideo(videoRow.videoUrl) : null
-        let title = draft.heading
-        const projectId = mediaId(draft.project)
-        if (draft.binding === 'catalog' && projectId) {
-          const project = await fetch(`/api/projects/${projectId}?depth=0`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).catch(() => null)
-          if (project?.name) title = String(project.name)
+
+        let card: StoryPreviewDraft['card'] = null
+        if (draft.catalogMark) {
+          card = {
+            enabled: draft.relatedEnabled,
+            title: draft.relatedTitle,
+            text: draft.relatedText,
+            image: await mediaUrl(draft.relatedImage, controller.signal),
+          }
+        } else {
+          const projectId = mediaId(draft.project)
+          if (projectId) {
+            const project = await fetch(`/api/projects/${projectId}?depth=1`, { credentials: 'include', signal: controller.signal }).then(response => response.ok ? response.json() : null).catch(() => null)
+            const desktop = project?.desktopImage
+            const image = typeof desktop === 'object' && desktop?.url
+              ? new URL(desktop.url, window.location.origin).href
+              : typeof project?.imageUrl === 'string' ? project.imageUrl : ''
+            card = {
+              enabled: true,
+              title: typeof project?.name === 'string' ? project.name : '',
+              text: draft.subtitle,
+              image,
+            }
+          }
         }
+
         if (controller.signal.aborted) return
         const payload: StoryPreviewDraft = {
           slug: draft.slug || 'draft',
           heading: draft.heading || 'Без заголовка',
-          title,
-          detail: draft.subtitle,
-          family: draft.subtitle,
+          subtitle: draft.subtitle,
           place: draft.place || 'Локация',
           year: draft.year,
           kind: draft.kind,
@@ -97,6 +122,7 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
           poster,
           duration: videoRow?.duration || '',
           id: video?.provider === 'kinescope' ? video.id : video?.provider === 'vk' ? `vk:${video.oid}_${video.id}` : `draft:${draft.slug || 'story'}`,
+          card,
         }
         latest.current = payload
         frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-story', story: payload }, origin)

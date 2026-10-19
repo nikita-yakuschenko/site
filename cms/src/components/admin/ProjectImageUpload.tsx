@@ -279,7 +279,10 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
     }
   }
   // Строки только с текстовым image (старый seed) иначе невидимы в UI, но остаются в форме и портят превью.
-  const photos = rows.filter((row, position) => row.photo || meta[position]?.type === 'video' || Boolean(meta[position]?.image) || Boolean(meta[position]?.posterUrl && meta[position]?.type === 'video'))
+  const photos = rows.filter((row, position) => {
+    const item = meta[position]
+    return Boolean(row.photo || item?.type === 'video' || item?.image)
+  })
   const metaOf = (row: { index: number }) => meta[rows.indexOf(row as typeof rows[number])]
   const setField = (path: string, value: unknown) => {
     dispatchFields({ type: 'UPDATE', path, value })

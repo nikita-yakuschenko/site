@@ -89,12 +89,12 @@ export const Stories: CollectionConfig = {
         { name: 'enabled', label: 'Показывать карточку', type: 'checkbox', defaultValue: true, admin: { components: { Field: './components/admin/CheckboxField#CheckboxField' } } },
         { name: 'title', label: 'Заголовок', type: 'text' },
         { name: 'text', label: 'Текст', type: 'textarea' },
-        { name: 'image', label: 'Изображение', type: 'upload', relationTo: 'media', admin: { components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
+        { name: 'image', label: 'Изображение карточки', type: 'upload', relationTo: 'media', admin: { description: 'Только для правой плашки под отзывом. Не связано с превью видео.', components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
       ],
     },
     {
       name: 'cover', label: 'Превью отзыва', type: 'upload', relationTo: 'media',
-      admin: { description: 'Если пусто, берётся кадр из видео. Можно загрузить своё фото.', components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } },
+      admin: { description: 'Кадр слева у видео. Если пусто, берётся из ролика.', components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } },
     },
     {
       name: 'media', label: 'Фото и видео', labels: { singular: 'запись', plural: 'Записи' }, type: 'array',

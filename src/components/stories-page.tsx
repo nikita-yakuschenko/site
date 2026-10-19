@@ -26,9 +26,7 @@ const catalogMarkLabel: Record<CatalogMark, string> = {
 type PreviewStory = {
   slug: string
   heading: string
-  title: string
-  detail: string
-  family: string
+  subtitle: string
   place: string
   year: number
   kind: Exclude<Kind, 'all'>
@@ -36,14 +34,36 @@ type PreviewStory = {
   poster: string
   duration: string
   id: string
+  card: {
+    enabled: boolean
+    title: string
+    text: string
+    image: string
+  } | null
 }
 
 function isPreviewStory(value: unknown): value is PreviewStory {
   if (!value || typeof value !== 'object') return false
   const story = value as PreviewStory
-  return typeof story.slug === 'string' && typeof story.heading === 'string'
+  if (!(typeof story.slug === 'string' && typeof story.heading === 'string'
     && typeof story.place === 'string' && typeof story.year === 'number' && (story.kind === 'family' || story.kind === 'business')
-    && typeof story.poster === 'string' && typeof story.duration === 'string'
+    && typeof story.poster === 'string' && typeof story.duration === 'string')) return false
+  if (story.card == null) return true
+  return typeof story.card === 'object'
+    && typeof story.card.enabled === 'boolean'
+    && typeof story.card.title === 'string'
+    && typeof story.card.text === 'string'
+    && typeof story.card.image === 'string'
+}
+
+function draftVideo(id: string): Story['video'] {
+  if (!id || id.startsWith('draft:')) return null
+  if (id.startsWith('vk:')) {
+    const [oid, videoId] = id.slice(3).split('_')
+    const owner = Number(oid)
+    return Number.isFinite(owner) && videoId ? { provider: 'vk', oid: owner, id: videoId } : null
+  }
+  return { provider: 'kinescope', id }
 }
 
 function toFeedStory(draft: PreviewStory): Story {
@@ -51,25 +71,27 @@ function toFeedStory(draft: PreviewStory): Story {
   const kind = draft.kind
   const href = kind === 'business' ? '/business' : '/catalog'
   const label = kind === 'business' ? 'Решения для бизнеса' : 'Смотреть проекты'
+  const related = draft.card
+  const showCard = draft.catalogMark ? related?.enabled !== false : Boolean(related)
   return {
     slug: draft.slug,
     heading: draft.heading,
-    subtitle: draft.family || draft.detail || '',
+    subtitle: draft.subtitle || '',
     place: draft.place,
     year: draft.year,
     kind,
     binding,
     duration: draft.duration,
     poster: draft.poster,
-    video: draft.id && !draft.id.startsWith('draft:') ? { provider: 'kinescope', id: draft.id } : null,
-    card: {
+    video: draftVideo(draft.id),
+    card: showCard && related ? {
       mark: draft.catalogMark,
-      title: draft.title || draft.heading,
-      text: draft.detail || draft.family || '',
-      image: draft.poster,
-      href: draft.catalogMark ? href : '/catalog',
+      title: related.title.trim() || draft.heading,
+      text: related.text.trim() || draft.subtitle || '',
+      image: related.image,
+      href: draft.catalogMark ? href : (related.title ? `/catalog` : '/catalog'),
       label: draft.catalogMark ? label : 'Посмотреть проект',
-    },
+    } : null,
   }
 }
 

@@ -77,7 +77,8 @@ export const storiesFeedEndpoint: Endpoint = {
             mark: binding,
             title: related?.title?.trim() || doc.heading,
             text: related?.text?.trim() || doc.subtitle || '',
-            image: mediaURL(related?.image) || poster,
+            // Картинка только своя: не подставляем кадр из видео.
+            image: mediaURL(related?.image),
             href: fallbackHref,
             label: fallbackLabel,
           }
