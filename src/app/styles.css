@@ -10951,6 +10951,7 @@ html.is-dialog-open {
 
 .mortgage-calc__tier-picker .mortgage-calc__modes--tiers {
   display: grid;
+  grid-column: auto;
   grid-template-columns: repeat(var(--mortgage-tier-count, 2), auto);
   width: fit-content;
   padding: 2px;
