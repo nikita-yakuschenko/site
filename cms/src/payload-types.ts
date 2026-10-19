@@ -1553,6 +1553,7 @@ export interface StoriesSelect<T extends boolean = true> {
   heading?: T;
   slug?: T;
   subtitle?: T;
+  duration?: T;
   place?: T;
   year?: T;
   customerKind?: T;

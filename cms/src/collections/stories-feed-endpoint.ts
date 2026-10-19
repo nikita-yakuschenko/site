@@ -47,7 +47,7 @@ export const storiesFeedEndpoint: Endpoint = {
         year: Number(doc.year),
         kind: doc.customerKind === 'business' ? 'business' : 'family',
         binding: doc.binding === 'individual' || doc.binding === 'discontinued' ? doc.binding : 'catalog',
-        duration: typeof (doc as { duration?: string }).duration === 'string' ? (doc as { duration?: string }).duration! : '',
+        duration: typeof doc.duration === 'string' ? doc.duration : '',
         poster,
         video,
         project: doc.binding === 'catalog' ? project : null,
