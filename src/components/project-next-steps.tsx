@@ -23,6 +23,7 @@ export function ProjectNextSteps({
   settings?: NextStepsSettings;
 }) {
   const [consultOpen, setConsultOpen] = useState(false);
+  const [visitOpen, setVisitOpen] = useState(false);
   const [draft, setDraft] = useState<NextStepsSettings | null>(null);
   useEffect(() => {
     if (window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return;
@@ -36,12 +37,7 @@ export function ProjectNextSteps({
   const visitIsDefault = visitImage === DEFAULT_VISIT_IMAGE;
   if (!current.enabled || (!current.visitEnabled && !current.secondaryEnabled)) return null;
 
-  const visitCard = current.visitEnabled ? (
-        <Link
-          className="project-next-steps__tile project-next-steps__tile--visit"
-          href="/exposition"
-          data-cms-block="ProjectNextSteps.visit"
-        >
+  const visitContent = <>
           <span className="series-bento__go" aria-hidden="true">
             <IconArrowUpRight size={18} stroke={2} />
           </span>
@@ -61,8 +57,12 @@ export function ProjectNextSteps({
             sizes="(min-width: 720px) 50vw, 100vw"
             quality={visitIsDefault ? 75 : 95}
           />
-        </Link>
-        ) : null;
+        </>;
+  const visitCard = !current.visitEnabled ? null : readyHome ? (
+    <Link className="project-next-steps__tile project-next-steps__tile--visit" href="/exposition" data-cms-block="ProjectNextSteps.visit">{visitContent}</Link>
+  ) : (
+    <button type="button" className="project-next-steps__tile project-next-steps__tile--visit" onClick={() => setVisitOpen(true)} data-cms-block="ProjectNextSteps.visit">{visitContent}</button>
+  );
   const secondaryCard = current.secondaryEnabled ? readyHome && reviewImage ? (
           <Link
             className="project-next-steps__tile project-next-steps__tile--review"
@@ -121,6 +121,17 @@ export function ProjectNextSteps({
       <div className="section__inner project-next-steps__grid" style={current.visitEnabled && current.secondaryEnabled ? undefined : { gridTemplateColumns: '1fr' }}>
         {current.order === 'secondary-first' ? <>{secondaryCard}{visitCard}</> : <>{visitCard}{secondaryCard}</>}
       </div>
+
+      {!readyHome && current.visitEnabled && visitOpen ? (
+        <LeadDialog
+          heading="Хотите посетить выставочный дом?"
+          body="Оставьте имя и телефон — свяжемся с вами, подберём удобное время и расскажем, как добраться. В доме можно оценить планировку, материалы и задать вопросы."
+          submitLabel="Записаться на просмотр"
+          formId="exhibition-visit"
+          meta={{ pageTitle: document.title }}
+          onClose={() => setVisitOpen(false)}
+        />
+      ) : null}
 
       {!readyHome && current.secondaryEnabled && consultOpen ? (
         <LeadDialog
