@@ -22,7 +22,8 @@ export function ManufactureMountingVideos() {
   const [active, setActive] = useState<number | null>(null);
   const selected = active !== null ? episodes[active] : undefined;
 
-  return (<CMSContentBlock cmsBlockKey="ManufactureMountingVideos">{(
+  // mediaBound: обложки только локальные — в CMS лежат протухшие ссылки CDN ВК.
+  return (<CMSContentBlock cmsBlockKey="ManufactureMountingVideos" mediaBound>
     <div className="manufacture-mounting-videos">
       <h3 className="mortgage-rules__title">Посмотрите двухсерийный фильм о&nbsp;том, как перевозится и&nbsp;собирается дом</h3>
       <div className="manufacture-mounting-videos__grid">
@@ -35,9 +36,8 @@ export function ManufactureMountingVideos() {
               aria-label={`Смотреть фильм о перевозке и сборке дома, серия ${index + 1}`}
               onClick={() => setActive(index)}
             >
-              {/* VK supplies the poster; no image proxy or third-party player before click. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={episode.poster} alt="" loading="lazy" referrerPolicy="no-referrer" />
+              <img src={episode.poster} alt="" loading="lazy" />
               <span className="independent-review__play" aria-hidden="true">
                 <svg viewBox="0 0 24 24" width="24" height="24"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg>
               </span>
@@ -53,5 +53,5 @@ export function ManufactureMountingVideos() {
         />
       ) : null}
     </div>
-  )}</CMSContentBlock>);
+  </CMSContentBlock>);
 }
