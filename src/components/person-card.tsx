@@ -28,9 +28,10 @@ export function PersonCard({
   const personKey = `${key}.content.person`
   const audienceKey = `${key}.content.audience`
   const saved = partValue(parts, personKey)
-  const resolvedPhoto = typeof saved?.image === 'string' ? saved.image : photo
-  const resolvedName = typeof saved?.text === 'string' ? saved.text : name
-  const resolvedCaption = typeof saved?.textMore === 'string' ? saved.textMore : caption
+  // Сохранённая часть, даже пустая, важнее запасного текста из кода: очистка в CMS убирает поле со страницы.
+  const resolvedPhoto = saved ? saved.image || '' : photo
+  const resolvedName = saved ? saved.text || '' : name
+  const resolvedCaption = saved ? saved.textMore || '' : caption
   const audiencePart = partValue(parts, audienceKey)
   const resolvedAudience = typeof audiencePart?.text === 'string' ? audiencePart.text : audience
 

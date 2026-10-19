@@ -94,6 +94,14 @@ export default buildConfig({
   typescript: { outputFile: path.resolve(root, 'payload-types.ts') },
   logger: { options: { level: 'warn', redact: ['password', 'token', 'secret', 'connectionString', 'req.headers.authorization', 'req.headers.cookie'] } },
   onInit: async (payload) => {
+    if (process.env.NEXT_PHASE !== 'phase-production-build' && process.env.npm_lifecycle_event !== 'build' && !process.env.DATABASE_URL?.includes('://build:build@')) {
+      try {
+        const { ensureManufacturePerson } = await import('./seed/ensure-manufacture-person')
+        await ensureManufacturePerson(payload)
+      } catch (error) {
+        payload.logger.error({ err: error }, 'Не удалось подготовить блок «Персона» на странице производства')
+      }
+    }
     if (!shouldSeedSite()) return
     try {
       const { ensureSiteStructure } = await import('./seed/ensure-site-structure')

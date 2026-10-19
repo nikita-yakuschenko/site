@@ -59,12 +59,7 @@ export function ManufactureVideoReview() {
             <div className="independent-review__copy">
               <h2 id="manufacture-video-title" data-cms-text={`${key}.content.heading`}>{heading}</h2>
               <p className="independent-review__lead" data-cms-text={`${key}.content.lead`}>{lead}</p>
-              <PersonCard
-                data-cms-content-connected
-                cmsBlockKey="Person"
-                name="Денис Гришаткин"
-                caption="Собственник компании"
-              />
+              <PersonCard data-cms-content-connected cmsBlockKey="Person" />
             </div>
 
             <div id="manufacture-video-panel" role="tabpanel" aria-labelledby={`manufacture-video-tab-${active}`}>
