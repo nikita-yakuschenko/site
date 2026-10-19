@@ -21,6 +21,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { LeadDialog } from "./lead-dialog";
 import { copy } from "../lib/copy";
 import { copyrightYears, FOOTER_SOCIALS, footerSocialHref } from "../lib/site";
@@ -124,9 +125,12 @@ export function SiteChrome({
   /** Ряд под плашкой: крошки и действия со страницей, лежат на кадре. */
   subrow?: ReactNode;
 }) {
+  const pathname = usePathname();
+  const catalogPage = pathname === "/catalog";
   const headerRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    if (!catalogPage) return;
     const header = headerRef.current;
     const inner = header?.querySelector<HTMLElement>('.site-header__inner');
     const plaque = header?.querySelector<HTMLElement>('.site-header__plaque');
@@ -150,8 +154,9 @@ export function SiteChrome({
       window.removeEventListener('scroll', update);
       window.removeEventListener('resize', update);
       root.style.removeProperty('--site-header-offset');
+      header.classList.remove('is-stuck');
     };
-  }, []);
+  }, [catalogPage]);
 
   const [menuOpen, setMenuOpen] = useState(false);
   /* Форма из шапки: открывается поверх страницы, а не уводит якорем. */
@@ -190,7 +195,7 @@ export function SiteChrome({
   }, [menuOpen]);
 
   return (
-    <div className="site-shell">
+    <div className={catalogPage ? "site-shell site-shell--catalog" : "site-shell"}>
       <header
         ref={headerRef}
         className={

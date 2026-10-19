@@ -127,7 +127,7 @@ export function CatalogBoard({
        состоянию соврала бы. Пока страница заблокирована, ехать ей некуда. */
     if (document.documentElement.classList.contains(SHEET_LOCK)) return;
     const barHeight = Number.parseInt(
-      getComputedStyle(document.documentElement).getPropertyValue("--catalog-bar"),
+      getComputedStyle(node).getPropertyValue("--catalog-bar"),
       10,
     );
     const barTop = bar.current ? Number.parseFloat(getComputedStyle(bar.current).top) || 0 : 0;
