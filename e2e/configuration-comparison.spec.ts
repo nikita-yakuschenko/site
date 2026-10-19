@@ -29,7 +29,10 @@ test("independent matrices have complete atomic values and semantic differences"
     expect(new Set(elements.map((e) => e.id)).size).toBe(elements.length);
     for (const element of elements) {
       expect(Object.keys(element.values)).toEqual(matrix.packageIds);
-      expect(element.info.summary.length).toBeGreaterThan(15);
+      expect(element.info.title).toBe(element.label);
+      expect(element.info.summary).not.toMatch(
+        /сравнивается|сравниваются|сравнивается отдельно/i,
+      );
       expect(element.icon).toBeTruthy();
     }
   }
@@ -83,8 +86,15 @@ test("independent matrices have complete atomic values and semantic differences"
     expect(elements.some((e) => e.id === "roofPaint")).toBe(false);
     const delivery = elements.find((e) => e.id === "delivery")!;
     for (const id of matrix.packageIds)
-      expect(delivery.values[id]?.displayValue).toBe("Включена в стоимость");
+      expect(delivery.values[id]?.status).toBe("included");
   }
+  const wallInfo = modularMatrix.sections
+    .flatMap((s) => s.elements)
+    .find((e) => e.id === "wall")!.info;
+  expect(wallInfo.technicalFacts).toContain(
+    "Ветрозащитный лист GTS 9, толщина 12,5 мм",
+  );
+  expect(wallInfo.technicalFacts).toContain("Контрбрус 45×45 мм");
   const floor = modularMatrix.sections
     .flatMap((s) => s.elements)
     .find((e) => e.id === "floor")!;
@@ -144,6 +154,43 @@ for (const width of [320, 360, 390, 768, 1024, 1440]) {
     const wall = dialog.locator('[data-element="wall"]');
     const floor = dialog.locator('[data-element="floor"]');
     await expect(wall).toHaveAttribute("data-visible", "true");
+    await expect(wall.locator(".comparison-value-status")).toHaveText([
+      "Входит",
+      "Входит",
+      "Входит",
+    ]);
+    await expect(wall.locator(".comparison-value-details")).toHaveCount(0);
+    await expect(dialog.locator(".comparison-legend")).toHaveCount(0);
+    expect(
+      await dialog.locator(".comparison-value-status").allTextContents(),
+    ).toEqual(expect.arrayContaining(["Входит", "Не входит"]));
+    for (const status of await dialog
+      .locator(".comparison-value-status")
+      .allTextContents())
+      expect(["Входит", "Не входит"]).toContain(status.trim());
+    await expect(
+      dialog.locator('[data-element="wallsFinish"] button'),
+    ).toHaveCount(0);
+    await expect(dialog.locator('[data-element="floor"] button')).toHaveCount(
+      0,
+    );
+    await expect(
+      dialog.locator('[data-element="electric"] button'),
+    ).toHaveCount(0);
+    await expect(
+      dialog.locator('[data-element="windows"] .comparison-value-status'),
+    ).toHaveText(["Входит", "Входит", "Входит"]);
+    await expect(
+      dialog.locator('[data-element="windows"] .comparison-value-details li'),
+    ).toHaveText(["Базовые, 1,2×1 м", "Согласно проекту", "Согласно проекту"]);
+    await expect(
+      dialog.locator('[data-element="wallsFinish"] .comparison-value-status'),
+    ).toHaveText(["Не входит", "Входит", "Входит"]);
+    await expect(
+      dialog.locator(
+        '[data-element="wallsFinish"] .comparison-value-details li',
+      ),
+    ).toHaveText(["Гипсокартон 15 мм", "Чистовая: имитация бруса"]);
     await dialog.getByRole("switch", { name: "Только различия" }).check();
     await expect(wall).toHaveAttribute("data-visible", "false");
     await expect(floor).toHaveAttribute("data-visible", "true");
@@ -333,7 +380,7 @@ for (const width of [320, 360, 390, 768, 1024, 1440]) {
             textCenter: (() => {
               const rect = cell
                 .querySelector(
-                  ".comparison-label > span:first-child, .comparison-value > span",
+                  ".comparison-label > span:first-child, .comparison-value-content",
                 )!
                 .getBoundingClientRect();
               return rect.top + rect.height / 2;
@@ -531,7 +578,9 @@ test("delivery inclusion stays in the table and the zone follows the selected re
   for (const [index, city] of ["Нижнего Новгорода", "Москвы"].entries()) {
     if (index === 1) {
       await page.locator(".site-region__trigger:visible").first().click();
-      await page.getByRole("option", { name: "Московская область", exact: true }).click();
+      await page
+        .getByRole("option", { name: "Московская область", exact: true })
+        .click();
       await page.getByRole("button", { name: "Сравнить комплектации" }).click();
       dialog = page.getByRole("dialog", { name: "Сравнение комплектаций" });
     }
@@ -540,9 +589,9 @@ test("delivery inclusion stays in the table and the zone follows the selected re
       .click();
     const delivery = dialog.locator('[data-element="delivery"]');
     await expect(delivery.locator("td")).toContainText([
-      "Включена в стоимость",
-      "Включена в стоимость",
-      "Включена в стоимость",
+      "Входит",
+      "Входит",
+      "Входит",
     ]);
     expect(await delivery.innerText()).not.toMatch(/600|50|Моск|Новгор/);
     await dialog
@@ -552,8 +601,105 @@ test("delivery inclusion stays in the table and the zone follows the selected re
       `50 км от ${city}`,
     );
     await page.keyboard.press("Escape");
-    await expect(dialog.locator('[data-slot="popover-content"]')).toHaveCount(0);
+    await expect(dialog.locator('[data-slot="popover-content"]')).toHaveCount(
+      0,
+    );
     await page.keyboard.press("Escape");
     await expect(dialog).not.toBeVisible();
   }
+});
+
+test("drag follows the finger before release and a short drag returns", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 900 });
+  const dialog = await openComparison(page);
+  await dialog.getByRole("tab", { name: "Стандартная", exact: true }).click();
+  await page.waitForTimeout(320);
+  const scroll = dialog.locator(".comparison-scroll");
+  const touch = async (type: string, x: number, y = 250) => {
+    await scroll.evaluate(
+      (element, { type, x, y }) => {
+        const point = new Touch({
+          identifier: 1,
+          target: element,
+          clientX: x,
+          clientY: y,
+        });
+        element.dispatchEvent(
+          new TouchEvent(type, {
+            bubbles: true,
+            touches:
+              type === "touchend" || type === "touchcancel" ? [] : [point],
+            changedTouches: [point],
+          }),
+        );
+      },
+      { type, x, y },
+    );
+  };
+  const offset = () =>
+    dialog
+      .locator('thead [data-package="1"] .comparison-slide-outgoing')
+      .evaluate(
+        (element) =>
+          element.getBoundingClientRect().x -
+          element.parentElement!.getBoundingClientRect().x,
+      );
+  await touch("touchstart", 300);
+  await touch("touchmove", 270);
+  await expect.poll(offset).toBeCloseTo(-30, 0);
+  await page.waitForTimeout(130);
+  expect(await offset()).toBeCloseTo(-30, 0);
+  await touch("touchmove", 230);
+  await expect.poll(offset).toBeCloseTo(-70, 0);
+  await touch("touchend", 230);
+  await page.waitForTimeout(250);
+  await expect(
+    dialog.getByRole("tab", { name: "Проектная", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await expect(dialog.locator(".comparison-slide-outgoing")).toHaveCount(0);
+  await touch("touchstart", 200);
+  await touch("touchmove", 220);
+  await page.waitForTimeout(130);
+  await touch("touchend", 220);
+  await page.waitForTimeout(250);
+  await expect(
+    dialog.getByRole("tab", { name: "Проектная", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await touch("touchstart", 200);
+  await touch("touchmove", 260);
+  await touch("touchcancel", 260);
+  await page.waitForTimeout(250);
+  await expect(
+    dialog.getByRole("tab", { name: "Проектная", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+  await touch("touchstart", 200);
+  await touch("touchmove", 190, 160);
+  await touch("touchend", 180, 100);
+  await expect(
+    dialog.getByRole("tab", { name: "Проектная", exact: true }),
+  ).toHaveAttribute("aria-selected", "true");
+});
+
+test("desktop overlay covers the viewport and restores the root canvas", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  const dialog = await openComparison(page);
+  await page.waitForTimeout(300);
+  const geometry = await page
+    .locator(".comparison-overlay")
+    .evaluate((overlay) => ({
+      right: overlay.getBoundingClientRect().right,
+      viewport: innerWidth,
+      rootBackground: getComputedStyle(document.documentElement)
+        .backgroundColor,
+    }));
+  expect(geometry.right).toBeGreaterThanOrEqual(geometry.viewport);
+  expect(geometry.rootBackground).not.toBe("rgba(0, 0, 0, 0)");
+  expect(geometry.rootBackground).not.toBe("rgb(255, 255, 255)");
+  await page.keyboard.press("Escape");
+  await expect(dialog).not.toBeVisible();
+  await expect(page.locator(".comparison-overlay")).toHaveCount(0);
 });

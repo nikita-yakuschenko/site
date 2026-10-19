@@ -47,6 +47,7 @@
 .comparison-overlay {
   position: fixed;
   inset: 0;
+  width: 100vw;
   background: rgb(var(--avgst-ink-rgb) / 0.65);
   z-index: 140;
 }
@@ -328,7 +329,7 @@
 .comparison-value {
   height: auto;
 }
-.comparison-value > svg {
+.comparison-value-status > svg {
   flex-shrink: 0;
   margin-top: 0;
   color: var(--avgst-green);
@@ -337,11 +338,13 @@
 .comparison-value[data-status="notApplicable"] {
   color: var(--ink-1);
 }
-.comparison-value[data-status="excluded"] > svg,
-.comparison-value[data-status="notApplicable"] > svg {
+.comparison-value[data-status="excluded"] .comparison-value-status > svg,
+.comparison-value[data-status="notApplicable"] .comparison-value-status > svg {
   color: var(--ink-3);
 }
-.comparison-value[data-status="requiresVerification"] > svg {
+.comparison-value[data-status="requiresVerification"]
+  .comparison-value-status
+  > svg {
   color: var(--ink-2);
 }
 .comparison-value small {
@@ -678,7 +681,7 @@
     background: var(--surface-muted);
     padding: 16px;
   }
-  .comparison-value > svg {
+  .comparison-value-status > svg {
     width: 15px;
     height: 15px;
   }
@@ -745,45 +748,18 @@
 }
 
 /* Colour belongs to the entire equal-height cell, not the shorter text block. */
-.comparison-element > td[data-status="included"],
-.comparison-legend > [data-status="included"]::before {
+.comparison-element > td[data-status="included"] {
   background: color-mix(in srgb, var(--avgst-green) 10%, var(--surface));
 }
-.comparison-element > td[data-status="excluded"],
-.comparison-legend > [data-status="excluded"]::before {
+.comparison-element > td[data-status="excluded"] {
   background: color-mix(in srgb, var(--danger) 8%, var(--surface));
 }
-.comparison-value[data-status="excluded"] > svg {
+.comparison-value[data-status="excluded"] .comparison-value-status > svg {
   color: var(--danger);
-}
-.comparison-legend {
-  display: flex;
-  gap: 16px;
-  margin-left: auto;
-  color: var(--ink-1);
-  font-size: 12px;
-}
-.comparison-legend > span {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  white-space: nowrap;
-}
-.comparison-legend > span::before {
-  content: "";
-  width: 14px;
-  height: 14px;
-  border: 1px solid var(--line);
-  border-radius: 3px;
 }
 @media (max-width: 900px) {
   .comparison-toolbar {
     flex-wrap: wrap;
-  }
-  .comparison-legend {
-    flex-basis: 100%;
-    margin: 0;
-    gap: 16px;
   }
 }
 
@@ -838,4 +814,47 @@
   .comparison-price {
     font-size: 12px;
   }
+}
+
+.comparison-value-content {
+  width: 100%;
+}
+.comparison-value-status {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-weight: 500;
+}
+.comparison-value-details {
+  margin: 6px 0 0;
+  padding-left: 28px;
+  list-style: disc;
+  color: var(--ink-1);
+  font-size: 13px;
+}
+.comparison-value-details li {
+  padding-left: 0;
+}
+@media (max-width: 900px) {
+  .comparison-value-status {
+    gap: 6px;
+  }
+  .comparison-value-details {
+    padding-left: 21px;
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 900px) {
+  .comparison-label[data-has-info="false"] {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+/* The root's stable scrollbar gutter is outside the layout viewport. Dim it too. */
+html:has(.comparison-overlay) {
+  transition: background-color 200ms var(--ease-out);
+}
+html:has(.comparison-overlay[data-state="open"]) {
+  background-color: color-mix(in srgb, var(--avgst-ink) 65%, var(--surface));
 }

@@ -7,6 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
+import { flushSync } from "react-dom";
 import {
   IconArrowsMaximize,
   IconArrowsMinimize,
@@ -53,11 +54,24 @@ const text = (s: string) =>
       s.replace(/(?:согласно|по) архитектурному проекту/gi, "согласно проекту"),
     ),
   );
+function scrubSlide(animation: Animation, distance: number) {
+  const target = (animation.effect as KeyframeEffect).target as HTMLElement;
+  const viewport =
+    target.classList.contains("comparison-slide-viewport") &&
+    !target.classList.contains("comparison-slide-outgoing")
+      ? target
+      : target.parentElement!;
+  animation.currentTime =
+    Math.min(
+      1,
+      Math.max(0, distance / viewport.getBoundingClientRect().width),
+    ) * 280;
+}
 function Explanation({ info }: { info: TechnicalInfo }) {
   return (
     <div className="comparison-explanation">
       <strong>{info.title}</strong>
-      <p>{text(info.summary)}</p>
+      {info.summary && <p>{text(info.summary)}</p>}
       {info.technicalFacts.length > 0 && (
         <>
           <b>Технические характеристики</b>
@@ -83,21 +97,33 @@ function Value({ value }: { value: SpecificationValue }) {
       : value.status === "requiresVerification"
         ? IconQuestionMark
         : IconMinus;
+  const statusLabel = {
+    included: "Входит",
+    excluded: "Не входит",
+    notApplicable: "Не применяется",
+    requiresVerification: "Уточняется",
+  }[value.status];
+  const showExplanation =
+    value.status === "included" &&
+    value.completionLevel !== "structural" &&
+    Boolean(value.displayValue);
   return (
     <div className="comparison-value" data-status={value.status}>
-      <StatusIcon size={18} aria-hidden="true" />
-      <span>
-        <span className="comparison-sr-only">
-          {value.status === "included" ? "Включено. " : ""}
+      <div className="comparison-value-content">
+        <span className="comparison-value-status">
+          <StatusIcon size={18} aria-hidden="true" />
+          <span>{statusLabel}</span>
         </span>
-        {text(value.displayValue)}
-        {value.status === "requiresVerification" && (
-          <small>Уточните у специалиста</small>
+        {showExplanation && (
+          <ul className="comparison-value-details">
+            <li>{text(value.displayValue)}</li>
+          </ul>
         )}
-      </span>
+      </div>
     </div>
   );
 }
+
 function InfoButton({
   element,
   container,
@@ -212,7 +238,19 @@ function ComparisonBody({
   );
   const [expandedInfo, setExpandedInfo] = useState<string | null>(null);
   const [container, setContainer] = useState<HTMLDivElement | null>(null);
-  const swipe = useRef<{ x: number; y: number } | null>(null);
+  const swipe = useRef<{
+    x: number;
+    y: number;
+    origin: number;
+    target: number | null;
+    axis: "horizontal" | "vertical" | null;
+    progress: number;
+    width: number;
+    lastX: number;
+    lastTime: number;
+    velocity: number;
+  } | null>(null);
+  const slideEpoch = useRef(0);
   const tableWrap = useRef<HTMLDivElement>(null);
   const table = useRef<HTMLTableElement>(null);
   const pendingSlides = useRef(
@@ -223,6 +261,7 @@ function ComparisonBody({
   const slideDirection = useRef(1);
   const pointerNavigation = useRef(true);
   const clearSlides = useCallback(() => {
+    slideEpoch.current += 1;
     for (const animation of slideAnimations.current) animation.cancel();
     for (const element of outgoingSlides.current) element.remove();
     slideAnimations.current = [];
@@ -235,7 +274,8 @@ function ComparisonBody({
     const shouldSlide =
       pointerNavigation.current &&
       matchMedia("(max-width: 900px)").matches &&
-      !matchMedia("(prefers-reduced-motion: reduce)").matches;
+      (!matchMedia("(prefers-reduced-motion: reduce)").matches ||
+        swipe.current?.axis === "horizontal");
     if (shouldSlide) {
       table.current
         ?.querySelectorAll<HTMLElement>(
@@ -274,7 +314,12 @@ function ComparisonBody({
     const easing = table.current
       ? getComputedStyle(table.current).getPropertyValue("--ease-out").trim()
       : "cubic-bezier(.23,1,.32,1)";
-    const timing = { duration: 280, easing, fill: "both" as const };
+    const dragging = swipe.current?.axis === "horizontal";
+    const timing = {
+      duration: 280,
+      easing: dragging ? "linear" : easing,
+      fill: "both" as const,
+    };
     table.current
       ?.querySelectorAll<HTMLElement>(
         `[data-package="${selected}"] .comparison-slide-viewport:not(.comparison-slide-outgoing)`,
@@ -318,16 +363,68 @@ function ComparisonBody({
           [{ height: `${snapshot.height}px` }, { height: `${nextHeight}px` }],
           timing,
         );
-        enter.onfinish = () => enter.cancel();
-        exit.onfinish = () => {
-          outgoing.remove();
-          exit.cancel();
-        };
-        resize.onfinish = () => resize.cancel();
+        if (dragging) {
+          for (const animation of [enter, exit, resize]) {
+            animation.pause();
+            const gesture = swipe.current!;
+            scrubSlide(
+              animation,
+              (gesture.x - gesture.lastX) * slideDirection.current,
+            );
+          }
+        } else {
+          enter.onfinish = () => enter.cancel();
+          exit.onfinish = () => {
+            outgoing.remove();
+            exit.cancel();
+          };
+          resize.onfinish = () => resize.cancel();
+        }
         slideAnimations.current.push(enter, exit, resize);
       });
     return clearSlides;
   }, [selected, clearSlides]);
+  const settleDrag = (commit: boolean) => {
+    const gesture = swipe.current;
+    swipe.current = null;
+    if (!gesture || gesture.target === null) return;
+    const epoch = slideEpoch.current;
+    const easing = getComputedStyle(table.current!)
+      .getPropertyValue("--ease-out")
+      .trim();
+    const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const duration = reduced ? 0 : 200;
+    const settling = slideAnimations.current.map((animation) => {
+      const effect = animation.effect as KeyframeEffect;
+      const element = effect.target as HTMLElement;
+      const frames = effect.getKeyframes();
+      const target = frames[commit ? frames.length - 1 : 0]!;
+      const height = target.height;
+      const from =
+        height !== undefined
+          ? { height: getComputedStyle(element).height }
+          : { transform: getComputedStyle(element).transform };
+      const to =
+        height !== undefined
+          ? { height: String(height) }
+          : { transform: String(target.transform) };
+      const next = element.animate([from, to], {
+        duration,
+        easing,
+        fill: "both",
+      });
+      animation.cancel();
+      return next;
+    });
+    slideAnimations.current = settling;
+    void Promise.allSettled(
+      settling.map((animation) => animation.finished),
+    ).then(() => {
+      if (slideEpoch.current !== epoch) return;
+      if (!commit) flushSync(() => setSelected(gesture.origin));
+      clearSlides();
+    });
+  };
   const toggleSection = (id: string) =>
     setCollapsed((before) => {
       const next = new Set(before);
@@ -387,10 +484,6 @@ function ComparisonBody({
           )}
           {allExpanded ? "Свернуть разделы" : "Развернуть разделы"}
         </button>
-        <div className="comparison-legend" aria-label="Обозначения статусов">
-          <span data-status="included">Входит</span>
-          <span data-status="excluded">Не входит</span>
-        </div>
       </div>
       <div className="comparison-mobile-nav">
         <TabsList aria-label="Выбор комплектации">
@@ -440,23 +533,96 @@ function ComparisonBody({
               !(e.target as HTMLElement).closest(
                 'button,input,a,[data-slot="popover-content"]',
               )
-            )
-              swipe.current = { x: p.clientX, y: p.clientY };
+            ) {
+              swipe.current = {
+                x: p.clientX,
+                y: p.clientY,
+                origin: selected,
+                target: null,
+                axis: null,
+                progress: 0,
+                width:
+                  table.current
+                    ?.querySelector<HTMLElement>(
+                      `td[data-package="${selected}"]`,
+                    )
+                    ?.getBoundingClientRect().width ?? 160,
+                lastX: p.clientX,
+                lastTime: performance.now(),
+                velocity: 0,
+              };
+            }
+          }}
+          onTouchMove={(e) => {
+            const p = e.touches[0];
+            const gesture = swipe.current;
+            if (!p || !gesture) return;
+            const dx = p.clientX - gesture.x;
+            const dy = p.clientY - gesture.y;
+            if (!gesture.axis && Math.max(Math.abs(dx), Math.abs(dy)) > 8)
+              gesture.axis =
+                Math.abs(dx) > Math.abs(dy) * 1.5 ? "horizontal" : "vertical";
+            if (gesture.axis !== "horizontal") return;
+            const now = performance.now();
+            gesture.velocity =
+              (p.clientX - gesture.lastX) / Math.max(1, now - gesture.lastTime);
+            gesture.lastX = p.clientX;
+            gesture.lastTime = now;
+            if (gesture.target === null) {
+              const target = gesture.origin + (dx < 0 ? 1 : -1);
+              if (target < 0 || target >= matrix.packageIds.length) return;
+              gesture.target = target;
+              pointerNavigation.current = true;
+              gesture.progress = Math.min(
+                1,
+                Math.max(
+                  0,
+                  (-dx * Math.sign(target - gesture.origin)) / gesture.width,
+                ),
+              );
+              flushSync(() => changePackage(target));
+            }
+            gesture.progress = Math.min(
+              1,
+              Math.max(
+                0,
+                (-dx * Math.sign(gesture.target - gesture.origin)) /
+                  gesture.width,
+              ),
+            );
+            for (const animation of slideAnimations.current)
+              scrubSlide(
+                animation,
+                (gesture.x - p.clientX) *
+                  Math.sign(gesture.target - gesture.origin),
+              );
           }}
           onTouchEnd={(e) => {
+            const gesture = swipe.current;
             const p = e.changedTouches[0];
-            const start = swipe.current;
-            swipe.current = null;
-            if (p && start) {
-              const dx = p.clientX - start.x;
-              const dy = p.clientY - start.y;
-              if (Math.abs(dx) > 48 && Math.abs(dx) > Math.abs(dy) * 1.5)
+            if (!gesture || !p) return;
+            if (gesture.target !== null) {
+              const direction = Math.sign(gesture.target - gesture.origin);
+              const velocity =
+                performance.now() - gesture.lastTime < 100
+                  ? -gesture.velocity * direction
+                  : 0;
+              settleDrag(
+                velocity > 0.4 || (gesture.progress > 0.35 && velocity > -0.4),
+              );
+            } else {
+              swipe.current = null;
+              const dx = p.clientX - gesture.x;
+              const dy = p.clientY - gesture.y;
+              if (
+                !gesture.axis &&
+                Math.abs(dx) > 48 &&
+                Math.abs(dx) > Math.abs(dy) * 1.5
+              )
                 changePackage(selected + (dx < 0 ? 1 : -1));
             }
           }}
-          onTouchCancel={() => {
-            swipe.current = null;
-          }}
+          onTouchCancel={() => settleDrag(false)}
         >
           <div className="comparison-table-wrap" ref={tableWrap}>
             <table
@@ -534,6 +700,10 @@ function ComparisonBody({
                         !isCollapsed &&
                         (!differences ||
                           hasDifferences(element, matrix.packageIds));
+                      const hasInfo =
+                        element.id === "delivery" ||
+                        element.info.technicalFacts.length > 0 ||
+                        element.info.qualifiers.length > 0;
                       return (
                         <Fragment key={element.id}>
                           <tr
@@ -550,7 +720,10 @@ function ComparisonBody({
                                 inert={!shown}
                               >
                                 <div>
-                                  <div className="comparison-label">
+                                  <div
+                                    className="comparison-label"
+                                    data-has-info={hasInfo}
+                                  >
                                     <span>
                                       <span className="comparison-full-label">
                                         {text(element.label)}
@@ -559,30 +732,34 @@ function ComparisonBody({
                                         {text(element.mobileLabel)}
                                       </span>
                                     </span>
-                                    <span className="comparison-desktop-info">
-                                      <InfoButton
-                                        element={element}
-                                        container={container}
-                                      />
-                                    </span>
-                                    <button
-                                      type="button"
-                                      className="comparison-info comparison-mobile-info"
-                                      aria-expanded={
-                                        expandedInfo === element.id
-                                      }
-                                      aria-controls={`comparison-info-${element.id}`}
-                                      aria-label={`Подробнее: ${element.label}`}
-                                      onClick={() =>
-                                        setExpandedInfo(
-                                          expandedInfo === element.id
-                                            ? null
-                                            : element.id,
-                                        )
-                                      }
-                                    >
-                                      <IconInfoCircle size={19} />
-                                    </button>
+                                    {hasInfo && (
+                                      <>
+                                        <span className="comparison-desktop-info">
+                                          <InfoButton
+                                            element={element}
+                                            container={container}
+                                          />
+                                        </span>
+                                        <button
+                                          type="button"
+                                          className="comparison-info comparison-mobile-info"
+                                          aria-expanded={
+                                            expandedInfo === element.id
+                                          }
+                                          aria-controls={`comparison-info-${element.id}`}
+                                          aria-label={`Подробнее: ${element.label}`}
+                                          onClick={() =>
+                                            setExpandedInfo(
+                                              expandedInfo === element.id
+                                                ? null
+                                                : element.id,
+                                            )
+                                          }
+                                        >
+                                          <IconInfoCircle size={19} />
+                                        </button>
+                                      </>
+                                    )}
                                   </div>
                                 </div>
                               </div>
@@ -615,23 +792,29 @@ function ComparisonBody({
                               </td>
                             ))}
                           </tr>
-                          <tr
-                            className="comparison-inline-info"
-                            aria-hidden={!shown || expandedInfo !== element.id}
-                          >
-                            <td colSpan={4}>
-                              <div
-                                id={`comparison-info-${element.id}`}
-                                className="comparison-reveal"
-                                data-open={shown && expandedInfo === element.id}
-                                inert={!shown || expandedInfo !== element.id}
-                              >
-                                <div>
-                                  <Explanation info={element.info} />
+                          {hasInfo && (
+                            <tr
+                              className="comparison-inline-info"
+                              aria-hidden={
+                                !shown || expandedInfo !== element.id
+                              }
+                            >
+                              <td colSpan={4}>
+                                <div
+                                  id={`comparison-info-${element.id}`}
+                                  className="comparison-reveal"
+                                  data-open={
+                                    shown && expandedInfo === element.id
+                                  }
+                                  inert={!shown || expandedInfo !== element.id}
+                                >
+                                  <div>
+                                    <Explanation info={element.info} />
+                                  </div>
                                 </div>
-                              </div>
-                            </td>
-                          </tr>
+                              </td>
+                            </tr>
+                          )}
                         </Fragment>
                       );
                     })}

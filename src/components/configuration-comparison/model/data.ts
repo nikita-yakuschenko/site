@@ -8,7 +8,7 @@ import type {
 } from "./types";
 
 const included = (
-  displayValue = "Включено",
+  displayValue = "",
   material: string | null = null,
   completionLevel: SpecificationValue["completionLevel"] = null,
   variant: string | null = null,
@@ -22,13 +22,13 @@ const included = (
   sourceStatus: "confirmed",
 });
 const excluded = (): SpecificationValue => ({
-  ...included("Не входит"),
+  ...included(),
   status: "excluded",
 });
 const architectural = () =>
   included("Согласно проекту", null, null, "architectural");
 const roughFloor = () =>
-  included("Черновое · OSB-3 22 мм", "OSB-3 22 мм", "rough");
+  included("Черновое: OSB-3 22 мм", "OSB-3 22 мм", "rough");
 
 type Row = [
   id: string,
@@ -46,25 +46,28 @@ const descriptions: Record<string, Row> = {
     "Стеновые панели",
     "Стеновые панели",
     "wall",
-    "Утеплённые панели наружных стен, изготовленные на производстве.",
+    "",
     [
       "Стойки из сухой строганой доски 45×140 мм",
       "Утепление 150 мм",
-      "Наружный лист GTS 12,5 мм",
-      "Контрбрус 45 мм для вентиляции фасада",
+      "Ветрозащитный лист GTS 9, толщина 12,5 мм",
+      "Контрбрус 45×45 мм",
     ],
     [],
   ],
   roofFrame: [
     "roofFrame",
-    "Кровельные панели и фермы",
-    "Панели и фермы кровли",
+    "Кровельные панели (фермы)",
+    "Кровельные панели (фермы)",
     "roof",
-    "Несущая утеплённая конструкция крыши. Кровельное покрытие сравнивается отдельно.",
+    "",
     [
-      "Доска 190 мм, утепление 200 мм",
-      "Пароизоляция изнутри, ветрозащита снаружи",
-      "Контробрешётка 45 мм, обрешётка 20 мм",
+      "Доска 190 мм",
+      "Утепление 200 мм",
+      "Пароизоляция изнутри",
+      "Ветрозащита снаружи",
+      "Контробрешётка 45 мм",
+      "Обрешётка 20 мм",
     ],
     [],
   ],
@@ -73,10 +76,12 @@ const descriptions: Record<string, Row> = {
     "Цокольные панели",
     "Цокольные панели",
     "layers",
-    "Утеплённое основание дома с конструктивным настилом пола.",
+    "",
     [
-      "Доска 190 мм, утепление 200 мм",
-      "Ветрозащита снизу, пароизоляция 200 мкм",
+      "Доска 190 мм",
+      "Утепление 200 мм",
+      "Ветрозащита снизу",
+      "Пароизоляция 200 мкм",
       "OSB-3 толщиной 22 мм",
     ],
     [],
@@ -86,7 +91,7 @@ const descriptions: Record<string, Row> = {
     "Внутренние перегородки",
     "Перегородки",
     "layout",
-    "Перегородки разделяют внутреннее пространство дома.",
+    "",
     ["Внутреннее утепление по толщине каркаса"],
     [],
   ],
@@ -95,7 +100,7 @@ const descriptions: Record<string, Row> = {
     "Межэтажные перекрытия",
     "Межэтажные перекрытия",
     "layers",
-    "Каркас межэтажного перекрытия с утеплением 200 мм.",
+    "",
     ["Утепление 200 мм"],
     [],
   ],
@@ -104,7 +109,7 @@ const descriptions: Record<string, Row> = {
     "Материал покрытия",
     "Материал кровли",
     "home",
-    "Наружное покрытие защищает конструкцию крыши от осадков.",
+    "",
     [
       "Профилированный лист или металлочерепица согласно проекту",
       "Толщина металла 0,45 мм",
@@ -116,20 +121,16 @@ const descriptions: Record<string, Row> = {
     "Окна",
     "Окна",
     "window",
-    "В базовом исполнении используются типовые окна; в проектном - размеры и конфигурация согласно проекту.",
-    [
-      "Профиль Rehau 70 мм",
-      "Двухкамерный мультифункциональный стеклопакет",
-      "Базовый размер 1×1,2 м",
-    ],
-    ["Размеры и количество проверяются по проекту."],
+    "",
+    ["Профиль Rehau 70 мм", "Двухкамерный мультифункциональный стеклопакет"],
+    [],
   ],
   doors: [
     "doors",
     "Входные двери",
     "Входные двери",
     "door",
-    "Техническая дверь закрывает входной проём. В проектном исполнении предусмотрены входные двери согласно проекту.",
+    "",
     [
       "Входная дверь с терморазрывом",
       "Для проектного исполнения доступен выбор из предложенных дизайнов",
@@ -141,7 +142,7 @@ const descriptions: Record<string, Row> = {
     "Фасадная отделка",
     "Фасадная отделка",
     "building",
-    "Фасадная отделка формирует внешний вид дома.",
+    "",
     ["Планкен, имитация бруса или профилированный лист согласно проекту"],
     [],
   ],
@@ -150,29 +151,25 @@ const descriptions: Record<string, Row> = {
     "Покраска фасадной отделки",
     "Покраска фасада",
     "paint",
-    "Деревянная фасадная отделка окрашивается на производстве.",
-    ["Машинная покраска деревянной отделки"],
-    [
-      "Для металлической фасадной отделки применяется заводское покрытие. Подарки и условия оплаты показываются отдельно от технического состава.",
-    ],
+    "",
+    [],
+    [],
   ],
   wallsFinish: [
     "wallsFinish",
     "Отделка стен",
     "Отделка стен",
     "brush",
-    "Сравнивается уровень готовности внутренних стен и материал их отделки.",
+    "",
     [],
-    [
-      "Чистовая деревянная отделка выполняется по своей технологии, без предварительного монтажа и демонтажа гипсокартона.",
-    ],
+    [],
   ],
   ceiling: [
     "ceiling",
     "Отделка потолков",
     "Отделка потолков",
     "ceiling",
-    "Самостоятельная отделка потолков, отдельно от конструкции кровли.",
+    "",
     [],
     [],
   ],
@@ -181,8 +178,8 @@ const descriptions: Record<string, Row> = {
     "Напольное покрытие",
     "Напольное покрытие",
     "floor",
-    "Черновой настил и финишный пол - разные уровни готовности, а не отсутствие и наличие пола.",
-    ["Конструктивное основание: OSB-3 22 мм"],
+    "",
+    [],
     [],
   ],
   bathroom: [
@@ -190,82 +187,26 @@ const descriptions: Record<string, Row> = {
     "Отделка санузлов",
     "Отделка санузлов",
     "bath",
-    "Материал внутренней отделки влажных помещений зависит от комплектации.",
+    "",
     [],
     [],
   ],
-  electric: [
-    "electric",
-    "Электрика",
-    "Электрика",
-    "bolt",
-    "Внутренняя электропроводка и автоматика в щите.",
-    [],
-    [],
-  ],
-  water: [
-    "water",
-    "Водоснабжение",
-    "Водоснабжение",
-    "drop",
-    "Внутренняя разводка и подключение к выводам дома.",
-    [],
-    [],
-  ],
-  sewer: [
-    "sewer",
-    "Канализация",
-    "Канализация",
-    "pipe",
-    "Внутренняя канализационная разводка и подключение к выводам дома.",
-    [],
-    [],
-  ],
-  heating: [
-    "heating",
-    "Отопление",
-    "Отопление",
-    "temperature",
-    "Электрические конвекторы с управлением в каждой комнате.",
-    [],
-    [],
-  ],
-  ventilation: [
-    "ventilation",
-    "Вентиляция",
-    "Вентиляция",
-    "wind",
-    "Приточные клапаны обеспечивают подачу наружного воздуха.",
-    [],
-    [],
-  ],
+  electric: ["electric", "Электрика", "Электрика", "bolt", "", [], []],
+  water: ["water", "Водоснабжение", "Водоснабжение", "drop", "", [], []],
+  sewer: ["sewer", "Канализация", "Канализация", "pipe", "", [], []],
+  heating: ["heating", "Отопление", "Отопление", "temperature", "", [], []],
+  ventilation: ["ventilation", "Вентиляция", "Вентиляция", "wind", "", [], []],
   terrace: [
     "terrace",
     "Терраса",
     "Терраса",
     "terrace",
-    "Терраса согласно проекту, как на визуализациях дома.",
+    "",
     ["Для проектного исполнения указана палубная доска с машинной покраской"],
     [],
   ],
-  delivery: [
-    "delivery",
-    "Доставка",
-    "Доставка",
-    "truck",
-    "В стоимость дома включена доставка в указанной для региона и комплектации зоне.",
-    [],
-    [],
-  ],
-  assembly: [
-    "assembly",
-    "Сборка",
-    "Сборка",
-    "tools",
-    "Монтаж дома выполняют специалисты «Авангард Строй».",
-    [],
-    [],
-  ],
+  delivery: ["delivery", "Доставка", "Доставка", "truck", "", [], []],
+  assembly: ["assembly", "Сборка", "Сборка", "tools", "", [], []],
 };
 const sectionDefinitions = [
   [
@@ -300,7 +241,6 @@ type Values = Record<
 function sections(
   ids: readonly PackageId[],
   values: Values,
-  technology: "panel" | "modular",
 ): ComparisonSection[] {
   return sectionDefinitions.map(([id, title, keys]) => ({
     id,
@@ -322,25 +262,6 @@ function sections(
         technicalFacts: [...technicalFacts],
         qualifiers: [...qualifiers],
       };
-      if (
-        technology === "panel" &&
-        [
-          "wallsFinish",
-          "ceiling",
-          "bathroom",
-          "electric",
-          "water",
-          "sewer",
-          "heating",
-          "ventilation",
-        ].includes(key)
-      ) {
-        info.summary = ["wallsFinish", "ceiling", "bathroom"].includes(key)
-          ? "Внутренняя отделка не входит в панельно-каркасные комплектации."
-          : "Инженерные работы не входят в панельно-каркасные комплектации.";
-        info.technicalFacts = [];
-        info.qualifiers = [];
-      }
       return {
         id: elementId,
         label,
@@ -397,7 +318,7 @@ const panelValues: Values = {
   roofing: [excluded(), architectural(), architectural()],
   windows: [
     excluded(),
-    included("Базовые, 1×1,2 м", "Rehau 70 мм", null, "basic"),
+    included("Базовые, 1,2×1 м", "Rehau 70 мм", null, "basic"),
     included("Согласно проекту", "Rehau 70 мм", null, "architectural"),
   ],
   doors: [
@@ -408,8 +329,18 @@ const panelValues: Values = {
   facade: [excluded(), architectural(), architectural()],
   facadePaint: [
     excluded(),
-    included("По материалу фасада", null, null, "facade-material"),
-    included("По материалу фасада", null, null, "facade-material"),
+    included(
+      "Машинная покраска деревянной отделки",
+      null,
+      null,
+      "facade-material",
+    ),
+    included(
+      "Машинная покраска деревянной отделки",
+      null,
+      null,
+      "facade-material",
+    ),
   ],
   wallsFinish: [excluded(), excluded(), excluded()],
   ceiling: [excluded(), excluded(), excluded()],
@@ -422,9 +353,9 @@ const panelValues: Values = {
   ventilation: [excluded(), excluded(), excluded()],
   terrace: [excluded(), excluded(), architectural()],
   delivery: [
-    included("Включена в стоимость", null, null, "delivery50"),
-    included("Включена в стоимость", null, null, "delivery50"),
-    included("Включена в стоимость", null, null, "delivery50"),
+    included("", null, null, "delivery50"),
+    included("", null, null, "delivery50"),
+    included("", null, null, "delivery50"),
   ],
   assembly: [included(), included(), included()],
 };
@@ -470,7 +401,7 @@ const modularValues: Values = {
   ],
   roofing: [architectural(), architectural(), architectural()],
   windows: [
-    included("Базовые, 1×1,2 м", "Rehau 70 мм", null, "basic"),
+    included("Базовые, 1,2×1 м", "Rehau 70 мм", null, "basic"),
     included("Согласно проекту", "Rehau 70 мм", null, "architectural"),
     included("Согласно проекту", "Rehau 70 мм", null, "architectural"),
   ],
@@ -481,15 +412,30 @@ const modularValues: Values = {
   ],
   facade: [architectural(), architectural(), architectural()],
   facadePaint: [
-    included("По материалу фасада", null, null, "facade-material"),
-    included("По материалу фасада", null, null, "facade-material"),
-    included("По материалу фасада", null, null, "facade-material"),
+    included(
+      "Машинная покраска деревянной отделки",
+      null,
+      null,
+      "facade-material",
+    ),
+    included(
+      "Машинная покраска деревянной отделки",
+      null,
+      null,
+      "facade-material",
+    ),
+    included(
+      "Машинная покраска деревянной отделки",
+      null,
+      null,
+      "facade-material",
+    ),
   ],
   wallsFinish: [
     excluded(),
     included("Гипсокартон 15 мм", "Гипсокартон 15 мм", "prepared"),
     included(
-      "Чистовая · имитация бруса",
+      "Чистовая: имитация бруса",
       "Имитация бруса камерной сушки",
       "finish",
     ),
@@ -498,7 +444,7 @@ const modularValues: Values = {
     excluded(),
     excluded(),
     included(
-      "Чистовая · имитация бруса",
+      "Чистовая: имитация бруса",
       "Имитация бруса камерной сушки",
       "finish",
     ),
@@ -506,7 +452,7 @@ const modularValues: Values = {
   floor: [
     roughFloor(),
     roughFloor(),
-    included("Чистовое · ламинат 33 класса", "Ламинат 33 класса", "finish"),
+    included("Чистовое: ламинат 33 класса", "Ламинат 33 класса", "finish"),
   ],
   bathroom: [
     excluded(),
@@ -540,9 +486,9 @@ const modularValues: Values = {
   ],
   terrace: [excluded(), architectural(), architectural()],
   delivery: [
-    included("Включена в стоимость", null, null, "delivery50"),
-    included("Включена в стоимость", null, null, "delivery50"),
-    included("Включена в стоимость", null, null, "delivery50"),
+    included("", null, null, "delivery50"),
+    included("", null, null, "delivery50"),
+    included("", null, null, "delivery50"),
   ],
   assembly: [included(), included(), included()],
 };
@@ -552,13 +498,13 @@ export const panelMatrix: TechnicalMatrix = {
   buildingTechnology: "panel",
   label: "Панельно-каркасные дома",
   packageIds: panelIds,
-  sections: sections(panelIds, panelValues, "panel"),
+  sections: sections(panelIds, panelValues),
 };
 export const modularMatrix: TechnicalMatrix = {
   buildingTechnology: "modular",
   label: "Модульные дома",
   packageIds: modularIds,
-  sections: sections(modularIds, modularValues, "modular"),
+  sections: sections(modularIds, modularValues),
 };
 export const technicalMatrices = {
   panel: panelMatrix,
