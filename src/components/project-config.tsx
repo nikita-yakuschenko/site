@@ -2,7 +2,7 @@
 
 import { IconCheck, IconGiftFilled, IconPlus, IconX } from "@tabler/icons-react";
 import { useState, useSyncExternalStore } from "react";
-import { copy } from "../lib/copy";
+import { copy, nbspText } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
 import { getMortgageProgram, monthlyPaymentForProject } from "../lib/mortgage";
 import {
@@ -45,6 +45,8 @@ import {
  * на каждой странице незачем.
  */
 
+const configText = (text: string) => nbspText(nbspText(text));
+
 export function ProjectConfig({ project, configurations, previewTier, onPreviewTierChange }: { project: CatalogProject; configurations?: PricedTier[]; previewTier?: string; onPreviewTierChange?: (tier: string) => void }) {
   const persistedTierId = useSyncExternalStore(
     subscribeTier,
@@ -61,6 +63,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
   const tiers = configurations ? tiersForRegion(configurations, region) : tiersForProject(project);
 
   if (!tiers?.length) return null;
+  const hasStartingTier = tiers.some(item => item.id === 'start');
   const tier = tiers.find((item) => item.id === tierId) ?? tiers.find(item => item.id === 'standard') ?? tiers[0]!;
 
   /* Та же модель, что и в калькуляторе карточки: льготная часть ограничена
@@ -98,31 +101,32 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                   aria-pressed={item.id === tier.id}
                   onClick={() => onPreviewTierChange ? onPreviewTierChange(item.id) : writeTier(item.id)}
                 >
-                  <span className="project-config__tier-name">{item.name}</span>
-                  <span className="project-config__tier-lead">{item.lead}</span>
+                  <span className="project-config__tier-name">{configText(item.name)}</span>
+                  <span className="project-config__tier-lead">{configText(item.lead)}</span>
                   <span className="project-config__tier-price">
-                    {item.price > 0 ? formatFromRub(item.price) : 'Цена уточняется'}
+                    {item.price > 0 ? configText(formatFromRub(item.price)) : 'Цена уточняется'}
                   </span>
                   <span className="project-config__tier-includes-title">
                     {item.id === 'project' ? <><span className="project-config__tier-base">Стандартная</span> комплектация дополняется:</>
                       : item.id === 'turnkey' ? <><span className="project-config__tier-base">Проектная</span> комплектация дополняется:</>
-                      : item.id === 'standard' ? 'Всё необходимое для начала:' : 'В комплект входит:'}
+                      : item.id === 'standard' && hasStartingTier ? <><span className="project-config__tier-base">Стартовая</span> комплектация дополняется:</>
+                      : item.id === 'standard' ? configText('Всё необходимое для начала:') : configText('Надёжная основа для вашего дома:')}
                   </span>
                   <span className="project-config__tier-list">
                     {item.includes.map((line) => (
                       <span key={line} className="project-config__tier-included">
-                        {item.id === 'project' || item.id === 'turnkey'
+                        {item.id === 'project' || item.id === 'turnkey' || item.id === 'standard' && hasStartingTier
                           ? <IconPlus size={14} stroke={2.4} aria-hidden="true" />
                           : <IconCheck size={14} stroke={2.4} aria-hidden="true" />}
-                        <span>{line}</span>
+                        <span>{configText(line)}</span>
                       </span>
                     ))}
                   </span>
                   {item.gifts?.length ? <span className="project-config__tier-gifts">
                     <span className="project-config__tier-band">
-                      <span><IconGiftFilled size={14} aria-hidden="true" />{copy.configGift}</span>
+                      <span><IconGiftFilled size={14} aria-hidden="true" />{configText(copy.configGift)}</span>
                     </span>
-                    <span className="project-config__tier-gift">{item.gifts.join(', ')}</span>
+                    <span className="project-config__tier-gift">{configText(item.gifts.join(', '))}</span>
                   </span> : null}
                 </button>
               </li>
@@ -138,7 +142,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
           >
             {formOpen ? <button type="button" className="project-config__close" aria-label={copy.close} onClick={() => setFormOpen(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button> : null}
             <p className="project-config__total-label">
-              <span>Комплектация: </span><strong>{tier.name}</strong>
+              <span>Комплектация: </span><strong>{configText(tier.name)}</strong>
             </p>
             <p className="project-config__total-sum">{tier.price > 0 ? formatRub(tier.price) : 'Цена уточняется'}</p>
             {/* Строка под суммой есть всегда: без неё панель у стартовой
@@ -148,12 +152,12 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
             {monthly ? (
               <p className="project-config__total-pay">
                 {formatRub(monthly)} {copy.configPerMonth}
-                <span>{copy.configPayNote}</span>
+                <span>{configText(copy.configPayNote)}</span>
               </p>
             ) : (
               <p className="project-config__total-pay project-config__total-pay--plain">
-                {copy.configDelivery}
-                <span>{copy.configDeliveryNote}</span>
+                {configText(copy.configDelivery)}
+                <span>{configText(copy.configDeliveryNote)}</span>
               </p>
             )}
             {/* Тот же блок, что и в предложении готового дома: кнопка,
@@ -183,9 +187,9 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
               свой. Ключ по уровню — чтобы при переключении список
               собрался заново и первый пункт снова был раскрыт. */}
         {tier.details.length > 0 && <><h3 className="project-config__details-title">
-          {copy.configDetails}{" "}
+          {configText(`${copy.configDetails} `)}
           <span className="project-config__details-mark">
-            {tier.id === 'turnkey' ? 'комплектацию под ключ' : `${tier.nameAcc} ${copy.configTierWordAcc}`}
+            {configText(tier.id === 'turnkey' ? 'комплектацию под ключ' : `${tier.nameAcc} ${copy.configTierWordAcc}`)}
           </span>
         </h3>
         {/* Здесь список начинается свёрнутым, хотя обычно первый
@@ -202,26 +206,26 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
               key={detail.title}
               value={`${tier.id}-${detail.title}`}
             >
-              <AccordionTrigger>{detail.title}</AccordionTrigger>
+              <AccordionTrigger>{configText(detail.title)}</AccordionTrigger>
               <AccordionContent>
                 {detail.lead ? (
-                  <p className="project-config__spec-lead">{detail.lead}</p>
+                  <p className="project-config__spec-lead">{configText(detail.lead)}</p>
                 ) : null}
 
                 {detail.items ? (
                   <ul className="project-config__spec-list">
                     {detail.items.map((item) => (
-                      <li key={item}>{item}</li>
+                      <li key={item}>{configText(item)}</li>
                     ))}
                   </ul>
                 ) : null}
 
                 {detail.groups?.map((group) => (
                   <div key={group.title} className="project-config__spec">
-                    <p className="project-config__spec-title">{group.title}</p>
+                    <p className="project-config__spec-title">{configText(group.title)}</p>
                     <ul className="project-config__spec-list">
                       {group.items.map((item) => (
-                        <li key={item}>{item}</li>
+                        <li key={item}>{configText(item)}</li>
                       ))}
                     </ul>
                   </div>

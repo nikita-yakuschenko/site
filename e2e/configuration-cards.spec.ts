@@ -60,3 +60,22 @@ for (const width of [1280, 1024, 390]) {
     }
   });
 }
+
+for (const width of [1280, 390]) {
+  test(`panel-house configurations build on the starting tier at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/catalog/a-frame-52', { waitUntil: 'domcontentloaded' });
+    const cards = page.locator('.project-config__tier');
+    await expect(cards).toHaveCount(3);
+    await expect(cards.nth(0).locator('.project-config__tier-name')).toHaveText('Стартовая');
+    await expect(cards.nth(0).locator('.project-config__tier-includes-title')).toHaveText('Надёжная основа для вашего дома:');
+    await expect(cards.nth(1).locator('.project-config__tier-includes-title')).toHaveText('Стартовая комплектация дополняется:');
+    await expect(cards.nth(2).locator('.project-config__tier-includes-title')).toHaveText('Стандартная комплектация дополняется:');
+    const texts = await cards.evaluateAll(elements => elements.map(card => card.textContent || ''));
+    for (const text of texts) expect(text).not.toMatch(/(?:^|[ (])(в|во|на|с|со|к|ко|о|об|от|до|по|из|у|за|над|под|при|про|для|без|через|и|а|но|не|ни|или) +/i);
+    if (width >= 800) {
+      const positions = await cards.evaluateAll(elements => elements.map(card => card.querySelector('.project-config__tier-included')!.getBoundingClientRect().top));
+      expect(Math.max(...positions) - Math.min(...positions)).toBeLessThan(1);
+    }
+  });
+}
