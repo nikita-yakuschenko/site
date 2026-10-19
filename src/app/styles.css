@@ -13417,8 +13417,7 @@ html.is-dialog-open {
   color: var(--ink-2);
 }
 
-.project-config__total-label strong { color: var(--avgst-ink); font-weight: 600; }
-.project-config__total[data-form="true"] .project-config__total-label strong { color: #fff; }
+.project-config__total-label strong { display: block; margin-top: 2px; color: var(--avgst-green); font-size: 16px; font-weight: 700; }
 @media (min-width: 900px) {
   .project-config__total-label { font-size: 15px; }
   .project-config__total-label strong { font-size: 18px; font-weight: 700; }
