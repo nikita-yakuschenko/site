@@ -31,6 +31,10 @@ for (const width of [1280, 375]) {
     const configurationPanel = page.locator('.project-config__total');
     await configurationPanel.getByRole('button', { name: 'Получить расчёт', exact: true }).click();
     await expect(configurationPanel).toHaveAttribute('data-form', 'true');
+    const panelRect = await configurationPanel.boundingBox();
+    const closeRect = await configurationPanel.getByRole('button', { name: 'Закрыть', exact: true }).boundingBox();
+    expect(closeRect!.y - panelRect!.y).toBeGreaterThanOrEqual(16);
+    expect(closeRect!.y - panelRect!.y).toBeLessThanOrEqual(18);
     await expect(configurationPanel.getByRole('textbox', { name: 'Имя', exact: true })).toBeVisible();
     await configurationPanel.getByRole('button', { name: 'Закрыть', exact: true }).click();
     await expect(configurationPanel).toHaveAttribute('data-form', 'false');

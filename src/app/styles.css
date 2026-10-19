@@ -13347,6 +13347,7 @@ html.is-dialog-open {
 /* Итог липнет к верху: состав длиннее панели, и цена должна оставаться
    на экране, пока по нему идут. */
 .project-config__total {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-self: start;
@@ -13410,6 +13411,10 @@ html.is-dialog-open {
 .project-config__total[data-form="true"] .lead-form__consent {
   color: var(--on-dark-2);
 }
+
+.project-config__close { position: absolute; top: 16px; right: 16px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--on-dark-2); cursor: pointer; }
+.project-config__close:hover { color: #fff; }
+.project-config__total[data-form="true"] .project-config__total-label { padding-right: 28px; }
 
 .project-config__total-label {
   margin: 0;

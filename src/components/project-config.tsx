@@ -1,6 +1,6 @@
 "use client";
 
-import { IconCheck, IconGiftFilled } from "@tabler/icons-react";
+import { IconCheck, IconGiftFilled, IconX } from "@tabler/icons-react";
 import { useState, useSyncExternalStore } from "react";
 import { copy } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
@@ -138,6 +138,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
             className="project-config__total"
             data-form={formOpen ? "true" : "false"}
           >
+            {formOpen ? <button type="button" className="project-config__close" aria-label={copy.close} onClick={() => setFormOpen(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button> : null}
             <p className="project-config__total-label">
               <span>Комплектация: </span><strong>{tier.name}</strong>
             </p>
@@ -162,7 +163,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                 переворачивается в тёмную — про открытие ей сообщает сам
                 блок. */}
             <PanelLeadForm
-              closable
+              open={formOpen}
               label={copy.getQuote}
               heading={copy.getQuote}
               projectExternalId={project.id}

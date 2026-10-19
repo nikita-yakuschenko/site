@@ -51,6 +51,7 @@ export function PanelLeadForm({
   closable = false,
   siteId = SITE.id,
   animateTrigger = false,
+  open: controlledOpen,
 }: {
   label: string;
   heading: string;
@@ -63,8 +64,10 @@ export function PanelLeadForm({
   closable?: boolean;
   siteId?: number | string;
   animateTrigger?: boolean;
+  open?: boolean;
 }) {
-  const [open, setOpen] = useState(false);
+  const [localOpen, setOpen] = useState(false);
+  const open = controlledOpen ?? localOpen;
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
 
@@ -86,10 +89,15 @@ export function PanelLeadForm({
     return () => cancelAnimationFrame(frame);
   }, [open]);
 
+  const wasOpen = useRef(open);
+  useEffect(() => {
+    if (wasOpen.current && !open) triggerRef.current?.focus({ preventScroll: true });
+    wasOpen.current = open;
+  }, [open]);
+
   const setState = (next: boolean) => {
     setOpen(next);
     onOpenChange?.(next);
-    if (!next) requestAnimationFrame(() => triggerRef.current?.focus({ preventScroll: true }));
   };
 
   return (
