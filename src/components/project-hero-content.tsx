@@ -4,10 +4,12 @@ import { useEffect, useState, type ReactNode } from 'react'
 import { splitProjectName } from '../lib/project-name'
 import { copy } from '../lib/copy'
 import { isProjectHeroData, type ProjectHeroData } from '../lib/catalog/project-hero-data'
+import { LeadDialog } from './lead-dialog'
 
 export function ProjectHeroContent({ data, connected, location, payment }: { data: ProjectHeroData; connected: boolean; location?: string; payment: ReactNode }) {
   const [draft, setDraft] = useState<ProjectHeroData | null>(null)
   const [brokenImage, setBrokenImage] = useState('')
+  const [askOpen, setAskOpen] = useState(false)
   const current = draft || data
   // Unfinished drafts show explicit placeholders instead of blanks
   const hero = { ...current, name: current.name.trim() || 'Без названия', technologyBadge: current.technologyBadge || 'Не выбрана' }
@@ -44,7 +46,11 @@ export function ProjectHeroContent({ data, connected, location, payment }: { dat
         <div className="project-hero__labels"><p className="project-hero__badge">{hero.technologyBadge}</p>{location && <p className="project-hero__location">В {location}</p>}</div>
         <h1>{head}{mark ? <span>{mark}</span> : null}{tail}</h1>
       </div></div>
-      <div className="project-hero__bar" data-cms-block="projectHero.specs"><ul className="project-hero__specs">{specs.map(spec => <li key={spec.label}><p>{spec.label}</p><strong>{spec.value}</strong></li>)}</ul>{payment}</div>
+      <div className="project-hero__bar" data-cms-block="projectHero.specs"><ul className="project-hero__specs">{specs.map(spec => <li key={spec.label}><p>{spec.label}</p><strong>{spec.value}</strong></li>)}</ul>
+        <button type="button" className="btn btn-yellow project-hero__question" onClick={() => setAskOpen(true)}>{copy.askQuestion}</button>
+        {payment}
+      </div>
     </div>
+    {askOpen ? <LeadDialog withMessage formId="header-question" meta={{ pageTitle: document.title, project: hero.name }} onClose={() => setAskOpen(false)} /> : null}
   </>
 }

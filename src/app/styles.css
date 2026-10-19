@@ -8567,6 +8567,22 @@ html.is-dialog-open {
   text-align: right;
 }
 
+.project-hero__question { display: none; }
+
+@media (max-width: 959px) {
+  .project-hero__bar { grid-template-columns: minmax(84px, 1fr) minmax(0, auto); align-items: center; }
+  .project-hero__specs { grid-column: 1 / -1; }
+  .project-hero__question.btn { display: inline-flex; justify-self: start; min-width: 0; max-width: 100%; padding: 10px; font-size: 12px; white-space: normal; }
+  .project-hero__aside { min-width: 0; }
+  .project-hero__aside .project-hero__pay { white-space: normal; }
+}
+
+@media (max-width: 374px) {
+  .project-hero__question.btn { padding-inline: 8px; font-size: 11px; }
+  .project-hero__aside .project-hero__pay { font-size: 1rem; }
+  .project-hero__aside .project-hero__pay-label { font-size: 8px; letter-spacing: .04em; }
+}
+
 .project-hero__pay-label {
   margin: 0;
   font-size: 11px;
