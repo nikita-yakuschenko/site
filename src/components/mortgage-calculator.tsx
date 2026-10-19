@@ -491,7 +491,7 @@ export function MortgageCalculator({
             {showFamilyDetails ? <div className="mortgage-calc__family-options">
               <span className={`mortgage-calc__select-slot mortgage-calc__select-slot--children${programId !== "family" ? " is-hidden" : ""}`}>
                 <Select value={String(childrenCount)} disabled={programId !== "family"} onValueChange={(value) => { setChildrenCount(Number(value)); scheduleAnalytics(); }}>
-                  <SelectTrigger aria-label="Количество детей"><SelectValue /></SelectTrigger>
+                  <SelectTrigger aria-label="Количество детей"><SelectValue>{childrenCount === 1 ? '1 ребёнок' : childrenCount === 2 ? '2 ребёнка' : '3+ детей'}</SelectValue></SelectTrigger>
                   <SelectContent className="mortgage-calc__select-content">
                     <SelectItem value="1">1 ребёнок</SelectItem>
                     <SelectItem value="2">2 ребёнка</SelectItem>
