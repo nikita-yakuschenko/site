@@ -11,7 +11,6 @@ import { LeadDialogButton } from "../../components/lead-dialog";
 import { LeadReveal } from "../../components/lead-reveal";
 import { ManufactureVideoReview } from "../../components/manufacture-video-review";
 import { ManufactureTruckTransition } from "../../components/manufacture-truck-transition";
-import { ManufactureModuleScene } from "../../components/manufacture-module-scene";
 import { ManufactureMountingVideos } from "../../components/manufacture-mounting-videos";
 import { ManufactureFaq, ManufacturePreparationQuestions, ManufactureProjectQuestions } from "../../components/manufacture-faq";
 import { copy, footerAboutFor } from "../../lib/copy";
@@ -139,11 +138,6 @@ export default function ManufacturePage() {
           </div>
         </section></CMSStaticBlock>
         <ManufactureTruckTransition data-cms-content-connected />
-        <CMSStaticBlock cmsBlockKey="PagemanufactureSection3" scope={"/manufacture"}><section className="section manufacture-routes manufacture-module" aria-labelledby="manufacture-routes-title">
-          <div className="section__inner manufacture-module__sticky">
-            <ManufactureModuleScene data-cms-content-connected />
-          </div>
-        </section></CMSStaticBlock>
         <CMSStaticBlock cmsBlockKey="PagemanufactureSection4" scope={"/manufacture"}><section className="section mortgage-mid-cta" aria-labelledby="manufacture-tour-title">
           <div className="section__inner mortgage-mid-cta__inner mortgage-mid-cta__inner--reversed">
             <div className="mortgage-mid-cta__media" aria-hidden="true">
