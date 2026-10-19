@@ -91,6 +91,27 @@ export const MORTGAGE_REGIONS = `Республика Адыгея
 
 const CAPITAL_REGIONS = new Set(['Москва', 'Московская область', 'Санкт-Петербург', 'Ленинградская область']);
 
+const REGION_LABELS: Record<string, string> = {
+  'Кемеровская область — Кузбасс': 'Кемеровская область',
+  'Ненецкий автономный округ': 'Ненецкий АО',
+  'Ханты-Мансийский автономный округ — Югра': 'Ханты-Мансийский АО',
+  'Ямало-Ненецкий автономный округ': 'Ямало-Ненецкий АО',
+  'Чукотский автономный округ': 'Чукотский АО',
+  'Еврейская автономная область': 'Еврейская АО',
+};
+
+const REGION_ALIASES: Record<string, string> = {
+  'Ханты-Мансийский автономный округ — Югра': 'ХМАО ХМАО-Югра',
+  'Ямало-Ненецкий автономный округ': 'ЯНАО',
+  'Ненецкий автономный округ': 'НАО',
+  'Чукотский автономный округ': 'ЧАО',
+  'Еврейская автономная область': 'ЕАО',
+};
+
+export function mortgageRegionLabel(name: string): string {
+  return REGION_LABELS[name] ?? name;
+}
+
 export function mortgageRegionGroup(name: string): 'msk' | 'nn' {
   return CAPITAL_REGIONS.has(name) ? 'msk' : 'nn';
 }
@@ -102,7 +123,7 @@ function words(text: string): string[] {
 export function searchMortgageRegions(query: string): string[] {
   const parts = words(query);
   return MORTGAGE_REGIONS.filter(name => {
-    const tokens = words(name);
+    const tokens = words(`${name} ${mortgageRegionLabel(name)} ${REGION_ALIASES[name] ?? ''}`);
     return parts.every(part => tokens.some(token => token.startsWith(part)));
   });
 }

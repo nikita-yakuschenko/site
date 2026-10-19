@@ -45,7 +45,6 @@ import {
 } from "../lib/regions";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { LeadReveal } from "./lead-reveal";
-import { PanelLeadForm } from "./panel-lead-form";
 import { ProjectCard } from "./project-card";
 import "./mortgage-family.css";
 
@@ -193,7 +192,6 @@ export function MortgageCalculator({
   const [rateInput, setRateInput] = useState(() =>
     formatRateValue(program.rate),
   );
-  const [quoteOpen, setQuoteOpen] = useState(false);
 
   /* Программа сменилась — поле ставки берёт её значение. Сверка идёт в
      рендере, а не эффектом: setState внутри эффекта тянет лишний проход
@@ -614,7 +612,16 @@ export function MortgageCalculator({
             }
           >
             {isProjectCalculator ? (
-              <>
+              <LeadReveal data-cms-content-connected formId="mortgage-calculator" siteId={SITE.id}
+                label={copy.getQuote} heading={copy.getQuote} submitLabel={copy.getQuote}
+                projectExternalId={project?.id}
+                meta={{ ...leadMeta, ...(project ? { project: project.name } : {}), ...(selectedTier ? { tier: selectedTier.name } : {}) }}
+                classes={{ root: 'mortgage-calc__reveal mortgage-calc__reveal--project', copy: 'mortgage-calc__reveal-copy', slot: 'mortgage-calc__reveal-slot', card: 'mortgage-calc__reveal-card' }}
+                formIntro={<div className="mortgage-calc__quote-summary">
+                  {project?.name ? <p className="mortgage-calc__quote-name">{project.name}</p> : null}
+                  <p className="mortgage-calc__quote-rate">{program.label} ипотека под {displayRate}</p>
+                  <p className="mortgage-calc__quote-pay">Платёж от {formatRub(Math.round(paymentResult.monthlyPayment))}/мес</p>
+                </div>}>
                 <div className="mortgage-calc__project-payment">
                   <p className="mortgage-calc__hero-num">
                     {formatRub(Math.round(paymentResult.monthlyPayment))}
@@ -655,7 +662,7 @@ export function MortgageCalculator({
                     <dd>{paymentResult.isCombined ? "Комбо" : displayRate}</dd>
                   </div>
                 </dl>
-              </>
+              </LeadReveal>
             ) : (
               <>
             {/* Тот же приём, что и в баннерах: содержимое и форма лежат
@@ -791,30 +798,6 @@ export function MortgageCalculator({
               </p>
             ) : <p>{t.disclaimer}</p>}
           </div> : null}
-
-          {isProjectCalculator ? (
-            <div className="mortgage-calc__quote" data-form={quoteOpen ? "true" : "false"}>
-              {quoteOpen ? (
-                <div className="mortgage-calc__quote-summary">
-                  {project?.name ? <p className="mortgage-calc__quote-name">{project.name}</p> : null}
-                  <p className="mortgage-calc__quote-rate">в ипотеку под {displayRate}</p>
-                  <p className="mortgage-calc__quote-pay">платёж {formatRub(Math.round(paymentResult.monthlyPayment))}/мес</p>
-                </div>
-              ) : null}
-              <PanelLeadForm
-                formId="mortgage-calculator"
-                label={copy.getQuote}
-                heading={copy.getQuote}
-                projectExternalId={project?.id}
-                onOpenChange={setQuoteOpen}
-                meta={{
-                  ...leadMeta,
-                  ...(project ? { project: project.name } : {}),
-                  ...(selectedTier ? { tier: selectedTier.name } : {}),
-                }}
-              />
-            </div>
-          ) : null}
 
           {/* На ипотечной странице подбор проектов — часть калькулятора. На
               карточке конкретного дома он выключен: цену уже задал проект. */}

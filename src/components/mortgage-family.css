@@ -29,7 +29,7 @@
   min-width: 0;
 }
 .mortgage-calc__select-slot { display: block; min-width: 0; }
-.mortgage-calc__select-slot--children { width: 172px; flex-shrink: 0; }
+.mortgage-calc__select-slot--children { width: 144px; flex-shrink: 0; }
 .mortgage-calc__select-slot--region { width: 208px; flex-shrink: 0; }
 .mortgage-region { position: relative; width: 100%; font-size: 12px; }
 .mortgage-region__field { display: flex; height: 28px; border-radius: 6px; background: var(--tint); }
@@ -80,7 +80,7 @@
   .mortgage-calc__toolbar--family { flex-wrap: wrap; gap: 8px; }
   .mortgage-calc__toolbar--family .mortgage-calc__family-options { width: 100%; flex-wrap: wrap; }
   .mortgage-calc__select-slot { flex: 1; min-width: 0; width: auto; }
-  .mortgage-calc__select-slot--children { min-width: 172px; }
+  .mortgage-calc__select-slot--children { min-width: 144px; }
   .mortgage-calc__select-slot--region { min-width: 208px; }
   .mortgage-calc__program-note { min-height: 180px; }
 }

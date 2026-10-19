@@ -28,6 +28,8 @@ export function LeadReveal({
   classes,
   buttonClassName = 'btn btn-yellow',
   children,
+  formIntro,
+  projectExternalId,
 }: {
   formId?: string
   siteId: number | string
@@ -44,6 +46,8 @@ export function LeadReveal({
   buttonClassName?: string
   /** Содержимое блока, которое гаснет на время показа формы. */
   children?: React.ReactNode
+  formIntro?: React.ReactNode
+  projectExternalId?: string
 }) {
   const [open, setOpen] = useState(false)
 
@@ -57,7 +61,7 @@ export function LeadReveal({
         .filter(Boolean)
         .join(' ')}
     >
-      <div className={['lead-reveal__copy', classes?.copy].filter(Boolean).join(' ')}>
+      <div className={['lead-reveal__copy', classes?.copy].filter(Boolean).join(' ')} inert={open} aria-hidden={open}>
         {children}
         <button
           type="button"
@@ -83,7 +87,9 @@ export function LeadReveal({
           >
             <IconX size={14} stroke={2.4} />
           </button>
+          {formIntro}
           <LeadForm formId={formId}
+            projectExternalId={projectExternalId}
             siteId={siteId}
             variant="card"
             compact

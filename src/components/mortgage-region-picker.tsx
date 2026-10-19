@@ -2,7 +2,7 @@
 
 import { useId, useRef, useState } from 'react';
 import { IconCheck, IconChevronDown } from '@tabler/icons-react';
-import { searchMortgageRegions } from './mortgage-regions';
+import { mortgageRegionLabel, searchMortgageRegions } from './mortgage-regions';
 
 export function MortgageRegionPicker({ value, onChange }: { value: string; onChange: (value: string) => void }) {
   const id = useId();
@@ -28,7 +28,7 @@ export function MortgageRegionPicker({ value, onChange }: { value: string; onCha
     <div className="mortgage-region__field">
       <input ref={input} role="combobox" aria-label="Регион строительства" aria-autocomplete="list"
         aria-expanded={open} aria-controls={`${id}-list`} aria-activedescendant={open && options[active] ? `${id}-${active}` : undefined}
-        autoComplete="off" value={open ? query : value} placeholder={value}
+        autoComplete="off" value={open ? query : mortgageRegionLabel(value)} placeholder={mortgageRegionLabel(value)}
         onFocus={() => { setQuery(''); setActive(0); setOpen(true); }}
         onChange={event => { setQuery(event.target.value); setActive(0); setOpen(true); }}
         onKeyDown={event => {
@@ -51,7 +51,7 @@ export function MortgageRegionPicker({ value, onChange }: { value: string; onCha
         {options.map((name, index) => <div key={name} id={`${id}-${index}`} role="option" aria-selected={name === value}
           className={`mortgage-region__option${index === active ? ' is-active' : ''}`}
           onMouseDown={event => event.preventDefault()} onMouseMove={() => setActive(index)} onClick={() => select(name)}>
-          <span>{name}</span>{name === value ? <IconCheck size={14} aria-hidden="true" /> : null}
+          <span>{mortgageRegionLabel(name)}</span>{name === value ? <IconCheck size={14} aria-hidden="true" /> : null}
         </div>)}
       </div>
       {!options.length ? <p role="status" className="mortgage-region__empty">Регион не найден</p> : null}

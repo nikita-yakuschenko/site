@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { MORTGAGE_REGIONS, mortgageRegionGroup, searchMortgageRegions } from '../src/components/mortgage-regions';
+import { MORTGAGE_REGIONS, mortgageRegionGroup, mortgageRegionLabel, searchMortgageRegions } from '../src/components/mortgage-regions';
 import { getMortgageProgram, subsidizedLimit } from '../src/lib/mortgage/programs';
 
 test('region search uses word prefixes and all four capital regions get capital limits', () => {
@@ -9,6 +9,11 @@ test('region search uses word prefixes and all four capital regions get capital 
   expect(searchMortgageRegions('мос обл')).toEqual(['Московская область']);
   expect(searchMortgageRegions('якут')).toEqual(['Республика Саха (Якутия)']);
   expect(searchMortgageRegions('несуществующий')).toEqual([]);
+  expect(mortgageRegionLabel('Кемеровская область — Кузбасс')).toBe('Кемеровская область');
+  expect(searchMortgageRegions('ХМАО')).toEqual(['Ханты-Мансийский автономный округ — Югра']);
+  expect(searchMortgageRegions('ханты манс')).toEqual(searchMortgageRegions('ХМАО'));
+  expect(searchMortgageRegions('Ямало')).toEqual(searchMortgageRegions('ЯНАО'));
+  expect(mortgageRegionLabel(searchMortgageRegions('ненецкий')[0]!)).toBe('Ненецкий АО');
   const capitals = ['Москва', 'Московская область', 'Санкт-Петербург', 'Ленинградская область'];
   for (const name of MORTGAGE_REGIONS) {
     const group = mortgageRegionGroup(name);
