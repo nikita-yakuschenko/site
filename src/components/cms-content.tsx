@@ -24,6 +24,14 @@ export function CMSContentProvider({ records, children }: { records: ContentReco
   return <Context.Provider value={records.map(record => ({ ...record, parts: drafts[record.key] ?? record.parts }))}>{children}</Context.Provider>
 }
 
+export function useCMSBlock(cmsBlockKey: string) {
+  const records = useContext(Context)
+  const route = usePathname()
+  const matching = records.filter(record => record.key === cmsBlockKey || record.key.startsWith(`${cmsBlockKey}-page-`))
+  const record = matching.find(item => item.scope === route) || matching.find(item => !item.scope)
+  return { key: record?.key || cmsBlockKey, parts: record?.parts || [] }
+}
+
 export function useCMSMedia<T>(key: string, source: T): T {
   const records = useContext(Context)
   const route = usePathname()
