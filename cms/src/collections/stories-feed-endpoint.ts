@@ -2,6 +2,15 @@ import type { Endpoint } from 'payload'
 import { authorizeSiteRequest } from './project-hero-endpoint'
 import { detectBuiltVideo, type BuiltVideo } from '../config/built-media'
 
+export type PublicStoryCard = {
+  mark: 'individual' | 'discontinued' | null
+  title: string
+  text: string
+  image: string
+  href: string
+  label: string
+}
+
 export type PublicStory = {
   slug: string
   heading: string
@@ -13,7 +22,7 @@ export type PublicStory = {
   duration: string
   poster: string
   video: BuiltVideo | null
-  project: { slug: string; name: string; href: string; image: string } | null
+  card: PublicStoryCard | null
 }
 
 export const storiesFeedEndpoint: Endpoint = {
@@ -35,22 +44,48 @@ export const storiesFeedEndpoint: Endpoint = {
       const videoRow = rows.find(row => row.type === 'video')
       const video = videoRow ? detectBuiltVideo(videoRow.videoUrl) : null
       const poster = mediaURL(primary?.photo, primary?.image) || mediaURL(videoRow?.photo, videoRow?.image)
-      const linked = doc.project && typeof doc.project === 'object' ? doc.project as { slug?: string; name?: string; imageUrl?: string | null; desktopImage?: unknown } : null
-      const project = linked?.slug && linked.name
-        ? { slug: linked.slug, name: linked.name, href: `/catalog/${linked.slug}`, image: mediaURL(linked.desktopImage, linked.imageUrl) }
-        : null
+      const kind = doc.customerKind === 'business' ? 'business' as const : 'family' as const
+      const binding = doc.binding === 'individual' || doc.binding === 'discontinued' ? doc.binding : 'catalog' as const
+      const fallbackHref = kind === 'business' ? '/business' : '/catalog'
+      const fallbackLabel = kind === 'business' ? 'Решения для бизнеса' : 'Смотреть проекты'
+      let card: PublicStoryCard | null = null
+      if (binding === 'catalog') {
+        const linked = doc.project && typeof doc.project === 'object' ? doc.project as { slug?: string; name?: string; imageUrl?: string | null; desktopImage?: unknown } : null
+        if (linked?.slug && linked.name) {
+          card = {
+            mark: null,
+            title: linked.name,
+            text: doc.subtitle || '',
+            image: mediaURL(linked.desktopImage, linked.imageUrl) || poster,
+            href: `/catalog/${linked.slug}`,
+            label: 'Посмотреть проект',
+          }
+        }
+      } else {
+        const related = doc.relatedCard
+        if (related?.enabled !== false) {
+          card = {
+            mark: binding,
+            title: related?.title?.trim() || doc.heading,
+            text: related?.text?.trim() || doc.subtitle || '',
+            image: mediaURL(related?.image) || poster,
+            href: fallbackHref,
+            label: fallbackLabel,
+          }
+        }
+      }
       return [{
         slug: doc.slug,
         heading: doc.heading,
         subtitle: doc.subtitle || '',
         place: doc.place,
         year: Number(doc.year),
-        kind: doc.customerKind === 'business' ? 'business' : 'family',
-        binding: doc.binding === 'individual' || doc.binding === 'discontinued' ? doc.binding : 'catalog',
+        kind,
+        binding,
         duration: typeof doc.duration === 'string' ? doc.duration : '',
         poster,
         video,
-        project: doc.binding === 'catalog' ? project : null,
+        card,
       }]
     })
     return Response.json({ items }, { headers: { 'Cache-Control': 'no-store' } })

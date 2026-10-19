@@ -47,18 +47,29 @@ function isPreviewStory(value: unknown): value is PreviewStory {
 }
 
 function toFeedStory(draft: PreviewStory): Story {
+  const binding = draft.catalogMark || 'catalog'
+  const kind = draft.kind
+  const href = kind === 'business' ? '/business' : '/catalog'
+  const label = kind === 'business' ? 'Решения для бизнеса' : 'Смотреть проекты'
   return {
     slug: draft.slug,
     heading: draft.heading,
     subtitle: draft.family || draft.detail || '',
     place: draft.place,
     year: draft.year,
-    kind: draft.kind,
-    binding: draft.catalogMark || 'catalog',
+    kind,
+    binding,
     duration: draft.duration,
     poster: draft.poster,
     video: draft.id && !draft.id.startsWith('draft:') ? { provider: 'kinescope', id: draft.id } : null,
-    project: draft.catalogMark ? null : (draft.title ? { slug: draft.slug, name: draft.title, href: '/catalog', image: draft.poster } : null),
+    card: {
+      mark: draft.catalogMark,
+      title: draft.title || draft.heading,
+      text: draft.detail || draft.family || '',
+      image: draft.poster,
+      href: draft.catalogMark ? href : '/catalog',
+      label: draft.catalogMark ? label : 'Посмотреть проект',
+    },
   }
 }
 
@@ -88,13 +99,8 @@ function StoryVideo({ story, onClose }: { story: Story; onClose: () => void }) {
 }
 
 function StoryEntry({ story, onPlay }: { story: Story; onPlay: (story: Story) => void }) {
-  const mark = story.binding === 'individual' || story.binding === 'discontinued' ? story.binding : null
-  const project = story.project
-  const inCatalog = !mark && Boolean(project)
-  const projectHref = inCatalog && project ? project.href : (story.kind === 'business' ? '/business' : '/catalog?tech=modular')
-  const projectLabel = inCatalog && project ? 'Посмотреть проект' : (story.kind === 'business' ? 'Решения для бизнеса' : 'Модульные проекты')
-  const projectTitle = project?.name || story.heading
-  const projectDetail = story.subtitle
+  const card = story.card
+  const mark = card?.mark
   return <CMSContentBlock cmsBlockKey={`StoriesEntry-${story.slug}`}>
     <article className={styles.entry} id={`story-${story.slug}`} aria-label={story.heading}>
       <button type="button" className={styles.poster} onClick={() => onPlay(story)} aria-label={`Смотреть видео: ${story.heading}`} disabled={!story.video}>
@@ -110,17 +116,17 @@ function StoryEntry({ story, onPlay }: { story: Story; onPlay: (story: Story) =>
           <li><IconMapPin size={18} stroke={1.75} aria-hidden="true" /><span>{story.place}</span></li>
           <li><IconCalendar size={18} stroke={1.75} aria-hidden="true" /><span>{story.year} год</span></li>
         </ul>
-        <div className={styles.project}>
+        {card ? <div className={styles.project}>
           {mark ? <span className={styles.mark}>{catalogMarkLabel[mark]}</span> : null}
           <div className={styles.projectTop}>
             <div>
-              <h3>{projectTitle}</h3>
-              {projectDetail ? <p>{projectDetail}</p> : null}
+              <h3>{card.title}</h3>
+              {card.text ? <p>{card.text}</p> : null}
             </div>
-            {(project?.image || story.poster) ? <Image loader={imageLoader} src={project?.image || story.poster} alt={projectTitle} width={112} height={80} loading="lazy" /> : null}
+            {card.image ? <Image loader={imageLoader} src={card.image} alt={card.title} width={112} height={80} loading="lazy" /> : null}
           </div>
-          <Link className="section__link" href={projectHref}>{projectLabel}<IconArrowUpRight aria-hidden="true" /></Link>
-        </div>
+          <Link className="section__link" href={card.href}>{card.label}<IconArrowUpRight aria-hidden="true" /></Link>
+        </div> : null}
       </div>
     </article>
   </CMSContentBlock>

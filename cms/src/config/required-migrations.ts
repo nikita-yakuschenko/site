@@ -19,4 +19,5 @@ export const requiredMigrations = [
   '20261018_140000_yandex_settings',
   '20261019_130000_stories',
   '20261019_150000_story_duration',
+  '20261019_160000_story_related_card',
 ]

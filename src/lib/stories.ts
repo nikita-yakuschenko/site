@@ -5,6 +5,15 @@ import { unstable_rethrow } from 'next/navigation'
 
 export type StoryVideo = { provider: 'kinescope'; id: string } | { provider: 'vk'; oid: number; id: string }
 
+export type PublicStoryCard = {
+  mark: 'individual' | 'discontinued' | null
+  title: string
+  text: string
+  image: string
+  href: string
+  label: string
+}
+
 export type PublicStory = {
   slug: string
   heading: string
@@ -16,7 +25,7 @@ export type PublicStory = {
   duration: string
   poster: string
   video: StoryVideo | null
-  project: { slug: string; name: string; href: string; image: string } | null
+  card: PublicStoryCard | null
 }
 
 function cmsOrigin() {

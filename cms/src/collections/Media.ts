@@ -50,9 +50,12 @@ async function loadPublicMediaIds(req: PayloadRequest): Promise<number[]> {
   const stories = await req.payload.find({
     collection: 'stories', overrideAccess: true, depth: 0, pagination: false,
     where: { _status: { equals: 'published' } },
-    select: { media: true },
+    select: { media: true, relatedCard: true },
   })
-  const storyMedia = stories.docs.flatMap(story => (story.media || []).flatMap(row => [row.photo, row.videoFile]))
+  const storyMedia = stories.docs.flatMap(story => [
+    ...(story.media || []).flatMap(row => [row.photo, row.videoFile]),
+    story.relatedCard?.image,
+  ])
   const blocks = await req.payload.find({ collection: 'blocks', overrideAccess: true, depth: 0, pagination: false, select: { parts: true } })
   const blockMedia = blocks.docs.flatMap(block => (block.parts || []).flatMap(part => [part.image, part.imageMobile]))
   return [...projectMedia, ...storyMedia, ...blockMedia].filter((id): id is number => typeof id === 'number')

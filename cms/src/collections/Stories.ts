@@ -22,6 +22,7 @@ export const Stories: CollectionConfig = {
       if (!data) return data
       if (typeof data.heading === 'string' && (!data.slug || typeof data.slug !== 'string')) data.slug = projectSlugFromName(data.heading)
       if (data.binding !== 'catalog') data.project = null
+      else data.relatedCard = { enabled: true, title: null, text: null, image: null }
       if (Array.isArray(data.media)) {
         const primary = Math.max(0, data.media.findIndex((row: { isPrimary?: boolean }) => row.isPrimary))
         data.media = data.media.map((row: { type?: string; videoUrl?: string; videoFile?: unknown; photo?: unknown; image?: string }, index: number) => {
@@ -51,6 +52,16 @@ export const Stories: CollectionConfig = {
     { name: 'customerKind', label: 'Заказчик', type: 'select', required: true, defaultValue: 'family', options: [{ label: 'Частное лицо', value: 'family' }, { label: 'Бизнес', value: 'business' }], admin: { hidden: true } },
     { name: 'binding', label: 'Проект', type: 'select', required: true, defaultValue: 'catalog', options: [{ label: 'Из каталога', value: 'catalog' }, { label: 'Индивидуальный проект', value: 'individual' }, { label: 'Снят с производства', value: 'discontinued' }] },
     { name: 'project', label: 'Проект каталога', type: 'relationship', relationTo: 'projects', admin: { condition: data => data.binding === 'catalog', components: { Field: './components/admin/StoryProjectPicker#StoryProjectPicker' } } },
+    {
+      name: 'relatedCard', label: 'Карточка под отзывом', type: 'group',
+      admin: { condition: data => data.binding === 'individual' || data.binding === 'discontinued', description: 'Можно выключить или задать свои заголовок, текст и фото. Кнопка по умолчанию: для бизнеса — «Решения для бизнеса», для частников — «Смотреть проекты».' },
+      fields: [
+        { name: 'enabled', label: 'Показывать карточку', type: 'checkbox', defaultValue: true },
+        { name: 'title', label: 'Заголовок', type: 'text' },
+        { name: 'text', label: 'Текст', type: 'textarea' },
+        { name: 'image', label: 'Изображение', type: 'upload', relationTo: 'media', admin: { components: { Field: './components/admin/ProjectImageUpload#ProjectImageUpload' } } },
+      ],
+    },
     {
       name: 'media', label: 'Фото и видео', labels: { singular: 'запись', plural: 'Записи' }, type: 'array',
       admin: { className: 'gallery-attachments', initCollapsed: true, components: { beforeInput: [galleryBatch], RowLabel: './components/admin/BuiltRowLabel#BuiltRowLabel' } },

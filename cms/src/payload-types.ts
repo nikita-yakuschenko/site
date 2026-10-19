@@ -787,6 +787,12 @@ export interface Story {
   customerKind: 'family' | 'business';
   binding: 'catalog' | 'individual' | 'discontinued';
   project?: (number | null) | Project;
+  relatedCard?: {
+    enabled?: boolean | null;
+    title?: string | null;
+    text?: string | null;
+    image?: (number | null) | Media;
+  };
   media?:
     | {
         type: 'photo' | 'video';
@@ -1554,6 +1560,12 @@ export interface StoriesSelect<T extends boolean = true> {
   slug?: T;
   subtitle?: T;
   duration?: T;
+  relatedCard?: T | {
+    enabled?: T;
+    title?: T;
+    text?: T;
+    image?: T;
+  };
   place?: T;
   year?: T;
   customerKind?: T;

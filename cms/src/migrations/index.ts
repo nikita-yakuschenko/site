@@ -17,6 +17,7 @@ import * as migration_20261018_120000_roistat_settings from './20261018_120000_r
 import * as migration_20261018_140000_yandex_settings from './20261018_140000_yandex_settings';
 import * as migration_20261019_130000_stories from './20261019_130000_stories';
 import * as migration_20261019_150000_story_duration from './20261019_150000_story_duration';
+import * as migration_20261019_160000_story_related_card from './20261019_160000_story_related_card';
 
 export const migrations = [
   {
@@ -113,5 +114,10 @@ export const migrations = [
     up: migration_20261019_150000_story_duration.up,
     down: migration_20261019_150000_story_duration.down,
     name: '20261019_150000_story_duration',
+  },
+  {
+    up: migration_20261019_160000_story_related_card.up,
+    down: migration_20261019_160000_story_related_card.down,
+    name: '20261019_160000_story_related_card',
   },
 ];

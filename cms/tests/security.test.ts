@@ -103,9 +103,9 @@ test('anonymous media access is limited to images referenced by connected public
       if (query.collection === 'blocks') return { docs: [] }
       if (query.collection === 'stories') {
         assert.deepEqual(query.where, { _status: { equals: 'published' } })
-        assert.deepEqual(query.select, { media: true })
+        assert.deepEqual(query.select, { media: true, relatedCard: true })
         assert.equal(query.depth, 0)
-        return { docs: [{ media: [{ photo: 31, videoFile: 32 }, { photo: 33 }] }, { media: [] }] }
+        return { docs: [{ media: [{ photo: 31, videoFile: 32 }, { photo: 33 }], relatedCard: { image: 34 } }, { media: [] }] }
       }
       assert.equal(query.collection, 'projects')
       assert.deepEqual(query.where, { or: [{ heroContentSource: { equals: 'database' } }, { exteriorsContentSource: { equals: 'database' } }, { interiorsContentSource: { equals: 'database' } }, { builtContentSource: { equals: 'database' } }, { plansContentSource: { equals: 'database' } }] })
@@ -115,9 +115,9 @@ test('anonymous media access is limited to images referenced by connected public
     } },
   } as unknown as PayloadRequest
   clearPublicMediaCache()
-  assert.deepEqual(await media.access!.read!({ req }), { id: { in: [5, 9, 12, 14, 16, 17, 21, 22, 31, 32, 33] } })
+  assert.deepEqual(await media.access!.read!({ req }), { id: { in: [5, 9, 12, 14, 16, 17, 21, 22, 31, 32, 33, 34] } })
   req.payload.find = (async () => ({ docs: [] })) as unknown as typeof req.payload.find
-  assert.deepEqual(await media.access!.read!({ req }), { id: { in: [5, 9, 12, 14, 16, 17, 21, 22, 31, 32, 33] } })
+  assert.deepEqual(await media.access!.read!({ req }), { id: { in: [5, 9, 12, 14, 16, 17, 21, 22, 31, 32, 33, 34] } })
   clearPublicMediaCache()
   assert.equal(await media.access!.read!({ req }), false)
 })
