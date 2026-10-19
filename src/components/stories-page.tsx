@@ -7,33 +7,22 @@ import { IconArrowUpRight, IconCalendar, IconClock, IconMapPin, IconPlayerPlayFi
 import { CMSContentBlock } from './cms-content'
 import { PageHero } from './page-hero'
 import heroImage from '../../public/img/pages/storieshero.png'
-import { VideoLightbox, kinescopeEmbed } from './video-lightbox'
+import { VideoLightbox, reviewEmbedSrc } from './video-lightbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { copy, nbspText } from '../lib/copy'
+import { nbspText } from '../lib/copy'
 import { optimizedSrc } from '../lib/media'
+import type { PublicStory } from '../lib/stories'
 import styles from './stories-page.module.css'
 
-type SourceStory = (typeof copy.videoTestimonials.stories)[number]
 type Kind = 'all' | 'family' | 'business'
-export type StoryProject = { href: string; image: string; label: string }
 type CatalogMark = 'discontinued' | 'individual'
+type Story = PublicStory
 
-// Years describe occupancy/opening, as confirmed in copy.ts. The archive's
-// publication years are explicitly provisional and must not become facts.
-const stories = copy.videoTestimonials.stories.map((story, index) => ({
-  ...story,
-  slug: ['simple-57', 'simple-49', 'modular-hotel'][index]!,
-  year: index === 0 ? 2023 : 2024,
-  kind: (index === 2 ? 'business' : 'family') as Exclude<Kind, 'all'>,
-  // Нет карточки в каталоге: снят с производства или индивидуальный объект.
-  catalogMark: (['discontinued', 'discontinued', 'individual'] as const)[index]!,
-  heading: [
-    'Больше всего боялись, что зимой будет холодно',
-    'Собственный дом для молодой семьи',
-    'Модульный отель: от проекта до запуска',
-  ][index]!,
-}))
-type Story = (typeof stories)[number]
+const catalogMarkLabel: Record<CatalogMark, string> = {
+  discontinued: 'Снят с производства',
+  individual: 'Индивидуальный проект',
+}
+
 type PreviewStory = {
   slug: string
   heading: string
@@ -48,42 +37,36 @@ type PreviewStory = {
   duration: string
   id: string
 }
-const catalogMarkLabel: Record<CatalogMark, string> = {
-  discontinued: 'Снят с производства',
-  individual: 'Индивидуальный проект',
-}
+
 function isPreviewStory(value: unknown): value is PreviewStory {
   if (!value || typeof value !== 'object') return false
   const story = value as PreviewStory
-  return typeof story.slug === 'string' && typeof story.heading === 'string' && typeof story.title === 'string'
+  return typeof story.slug === 'string' && typeof story.heading === 'string'
     && typeof story.place === 'string' && typeof story.year === 'number' && (story.kind === 'family' || story.kind === 'business')
-    && typeof story.poster === 'string' && typeof story.duration === 'string' && typeof story.id === 'string'
-    && (story.catalogMark === null || story.catalogMark === 'discontinued' || story.catalogMark === 'individual')
+    && typeof story.poster === 'string' && typeof story.duration === 'string'
 }
+
 function toFeedStory(draft: PreviewStory): Story {
   return {
-    ...stories[0]!,
-    id: draft.id,
-    title: draft.title,
-    place: draft.place,
-    detail: draft.detail,
-    family: draft.family || undefined,
-    duration: draft.duration,
-    poster: draft.poster || stories[0]!.poster,
     slug: draft.slug,
+    heading: draft.heading,
+    subtitle: draft.family || draft.detail || '',
+    place: draft.place,
     year: draft.year,
     kind: draft.kind,
-    catalogMark: draft.catalogMark ?? undefined,
-    heading: draft.heading,
-  } as Story
+    binding: draft.catalogMark || 'catalog',
+    duration: draft.duration,
+    poster: draft.poster,
+    video: draft.id && !draft.id.startsWith('draft:') ? { provider: 'kinescope', id: draft.id } : null,
+    project: draft.catalogMark ? null : (draft.title ? { slug: draft.slug, name: draft.title, href: '/catalog', image: draft.poster } : null),
+  }
 }
+
 const years = Array.from({ length: 2026 - 2014 + 1 }, (_, index) => 2026 - index)
-const defaultYear = Math.max(...stories.map(story => story.year))
 const pageSize = 3
-// Preserve the site's CMS media handling while letting Image generate srcsets.
 const imageLoader: ImageLoader = ({ src, width, quality }) => optimizedSrc(src, width, quality ?? 75)
 
-function StoryVideo({ story, onClose }: { story: SourceStory; onClose: () => void }) {
+function StoryVideo({ story, onClose }: { story: Story; onClose: () => void }) {
   const container = useRef<HTMLDivElement>(null)
   useEffect(() => {
     const previous = document.activeElement as HTMLElement | null
@@ -100,26 +83,29 @@ function StoryVideo({ story, onClose }: { story: SourceStory; onClose: () => voi
     document.addEventListener('keydown', trap)
     return () => { document.removeEventListener('keydown', trap); previous?.focus() }
   }, [])
-  return <div ref={container}><VideoLightbox title={story.title} embedSrc={kinescopeEmbed(story.id)} onClose={onClose} /></div>
+  if (!story.video) return null
+  return <div ref={container}><VideoLightbox title={story.heading} embedSrc={reviewEmbedSrc(story.video)} onClose={onClose} /></div>
 }
 
-function StoryEntry({ story, project, onPlay }: { story: Story; project?: StoryProject; onPlay: (story: Story) => void }) {
-  const mark = story.catalogMark
+function StoryEntry({ story, onPlay }: { story: Story; onPlay: (story: Story) => void }) {
+  const mark = story.binding === 'individual' || story.binding === 'discontinued' ? story.binding : null
+  const project = story.project
   const inCatalog = !mark && Boolean(project)
   const projectHref = inCatalog && project ? project.href : (story.kind === 'business' ? '/business' : '/catalog?tech=modular')
-  const projectLabel = inCatalog && project ? project.label : (story.kind === 'business' ? 'Решения для бизнеса' : 'Модульные проекты')
-  const family = 'family' in story ? story.family : null
+  const projectLabel = inCatalog && project ? 'Посмотреть проект' : (story.kind === 'business' ? 'Решения для бизнеса' : 'Модульные проекты')
+  const projectTitle = project?.name || story.heading
+  const projectDetail = story.subtitle
   return <CMSContentBlock cmsBlockKey={`StoriesEntry-${story.slug}`}>
-    <article className={styles.entry} id={`story-${story.slug}`} aria-label={story.title}>
-      <button type="button" className={styles.poster} onClick={() => onPlay(story)} aria-label={`Смотреть видео: ${story.title}`}>
-        <Image loader={imageLoader} src={story.poster} sizes="(max-width: 800px) calc(100vw - 48px), (max-width: 1200px) 60vw, 760px" alt="" width={744} height={465} loading={story.slug === 'simple-49' ? 'eager' : 'lazy'} />
-        <span className={styles.posterMeta}><span><IconClock aria-hidden="true" />{story.duration}</span></span>
+    <article className={styles.entry} id={`story-${story.slug}`} aria-label={story.heading}>
+      <button type="button" className={styles.poster} onClick={() => onPlay(story)} aria-label={`Смотреть видео: ${story.heading}`} disabled={!story.video}>
+        {story.poster ? <Image loader={imageLoader} src={story.poster} sizes="(max-width: 800px) calc(100vw - 48px), (max-width: 1200px) 60vw, 760px" alt="" width={744} height={465} loading="lazy" /> : <span className={styles.poster} />}
+        {story.duration ? <span className={styles.posterMeta}><span><IconClock aria-hidden="true" />{story.duration}</span></span> : null}
         <span className={styles.play} aria-hidden="true"><IconPlayerPlayFilled /></span>
       </button>
       <div className={styles.side}>
         <span className={styles.kind}>{story.kind === 'business' ? 'Бизнес' : 'Частное лицо'}</span>
         <h3>{nbspText(story.heading)}</h3>
-        {family ? <p className={styles.lead}>{nbspText(family)}</p> : null}
+        {story.subtitle ? <p className={styles.lead}>{nbspText(story.subtitle)}</p> : null}
         <ul className={styles.facts}>
           <li><IconMapPin size={18} stroke={1.75} aria-hidden="true" /><span>{story.place}</span></li>
           <li><IconCalendar size={18} stroke={1.75} aria-hidden="true" /><span>{story.year} год</span></li>
@@ -128,10 +114,10 @@ function StoryEntry({ story, project, onPlay }: { story: Story; project?: StoryP
           {mark ? <span className={styles.mark}>{catalogMarkLabel[mark]}</span> : null}
           <div className={styles.projectTop}>
             <div>
-              <h3>{story.title}</h3>
-              <p>{story.detail}</p>
+              <h3>{projectTitle}</h3>
+              {projectDetail ? <p>{projectDetail}</p> : null}
             </div>
-            <Image loader={imageLoader} src={project?.image ?? story.poster} alt={story.title} width={112} height={80} loading="lazy" />
+            {(project?.image || story.poster) ? <Image loader={imageLoader} src={project?.image || story.poster} alt={projectTitle} width={112} height={80} loading="lazy" /> : null}
           </div>
           <Link className="section__link" href={projectHref}>{projectLabel}<IconArrowUpRight aria-hidden="true" /></Link>
         </div>
@@ -140,8 +126,9 @@ function StoryEntry({ story, project, onPlay }: { story: Story; project?: StoryP
   </CMSContentBlock>
 }
 
-export function StoriesContent({ projects = {} }: { projects?: Record<string, StoryProject> }) {
+export function StoriesContent({ stories }: { stories: Story[] }) {
   const [kind, setKind] = useState<Kind>('all')
+  const defaultYear = stories.length ? Math.max(...stories.map(story => story.year)) : years[0]!
   const [activeYear, setActiveYear] = useState(defaultYear)
   const [limit, setLimit] = useState(pageSize)
   const [activeVideo, setActiveVideo] = useState<Story | null>(null)
@@ -165,7 +152,6 @@ export function StoriesContent({ projects = {} }: { projects?: Record<string, St
     if (fallback) setActiveYear(fallback)
   }
 
-  // Прямая ссылка открывает нужный год и историю; переключение года само по себе не скроллит.
   useEffect(() => {
     const reveal = () => {
       const list = draft ? [draft, ...stories.filter(story => story.slug !== draft.slug)] : stories
@@ -180,9 +166,8 @@ export function StoriesContent({ projects = {} }: { projects?: Record<string, St
     reveal()
     window.addEventListener('hashchange', reveal)
     return () => window.removeEventListener('hashchange', reveal)
-  }, [draft])
+  }, [draft, stories])
 
-  // Черновик из CMS: подменяем карточку и сразу показываем её год.
   useEffect(() => {
     if (window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return
     const allowed = new Set(['http://localhost:3001', 'http://127.0.0.1:3001', 'https://cms.avgst.ru'])
@@ -222,8 +207,9 @@ export function StoriesContent({ projects = {} }: { projects?: Record<string, St
         })}
       </nav>
       <div className={styles.visuallyHidden} role="status">Показано: {visible.length} из {feed.length}</div>
-      <div className={styles.feed}>{visible.map(story => <StoryEntry key={story.slug} story={story} project={projects[story.title]} onPlay={setActiveVideo} />)}</div>
+      <div className={styles.feed}>{visible.map(story => <StoryEntry key={story.slug} story={story} onPlay={setActiveVideo} />)}</div>
       {hasMore ? <button type="button" className={styles.more} onClick={() => setLimit(current => current + pageSize)}>Показать больше историй</button> : null}
+      {!feed.length ? <p className={styles.lead}>Пока нет опубликованных отзывов.</p> : null}
     </div></section>
     <section className={`section ${styles.nextSection}`} aria-labelledby="stories-next-title"><CMSContentBlock cmsBlockKey="StoriesNextStep"><div className={`section__inner ${styles.next}`}><div className={styles.nextCopy}><h2 id="stories-next-title">{nbspText('За каждой историей - дом, который когда-то был мечтой')}</h2><p>{nbspText('Посмотрите проекты, выберите планировку и приезжайте на выставочную площадку. Увидеть будущий дом своими глазами - хороший следующий шаг.')}</p><div className={styles.nextActions}><Link className="btn btn-yellow" href="/catalog">Посмотреть проекты<IconArrowUpRight aria-hidden="true" /></Link><Link className={styles.secondaryLink} href="/exposition">Выставочные площадки</Link></div></div><div className={styles.nextMedia}><Image src={heroImage} alt="Кресло с жёлтым пледом, столик с книгой и чашкой и комнатное растение" sizes="(max-width: 800px) calc(100vw - 96px), 40vw" /></div></div></CMSContentBlock></section>
     {activeVideo && <StoryVideo story={activeVideo} onClose={closeVideo} />}

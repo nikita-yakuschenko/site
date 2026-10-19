@@ -781,6 +781,7 @@ export interface Story {
   heading: string;
   slug: string;
   subtitle?: string | null;
+  duration?: string | null;
   place: string;
   year: number;
   customerKind: 'family' | 'business';

@@ -11,6 +11,7 @@ import { BlockRenderer } from '../../components/block-renderer'
 import { HOME_LAYOUT } from '../../lib/home-layout'
 import { footerAboutFor } from '../../lib/copy'
 import { SITE } from '../../lib/site'
+import { listStories } from '../../lib/stories'
 import paintShop2020 from '../../../public/img/about/paint-shop-2020.png'
 
 export const metadata: Metadata = {
@@ -18,7 +19,8 @@ export const metadata: Metadata = {
   description: 'Строим загородные дома с 2014 года. Собственное производство и история Авангард Строй.',
 }
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const stories = await listStories()
   const history: HistoryEntry[] = [
     { year: '2014', events: [['Начало пути', 'Создали компанию «Авангард Строй»,\nзапустили свои первые проекты каркасных дач и бань']], logo: true },
     { year: '2015', stacked: true, events: [['Новый склад', 'Перевезли склад в новое помещение площадью 1700 м²\nчтобы обеспечить больший объём и быстрый темп строительства'], ['Расширение штата', 'Ввели на постоянной основе более 30 строительных бригад']] },
@@ -55,7 +57,7 @@ export default function AboutPage() {
         <AboutCompanyBento data-cms-content-connected />
         <CMSStaticBlock cmsBlockKey="PageaboutSection1" scope={"/about"}><section className="section about-tinted" aria-labelledby="about-history"><div className="section__inner"><AboutTimeline data-cms-content-connected entries={history} /></div></section></CMSStaticBlock>
         <BlockRenderer blocks={HOME_LAYOUT.filter(block => block.blockType === 'productionSection')} projects={[]} contacts={SITE.contacts} siteId={SITE.id} pageId="about" />
-        <VideoTestimonials data-cms-content-connected showEyebrow={false} />
+        <VideoTestimonials data-cms-content-connected stories={stories} showEyebrow={false} />
         <BlockRenderer blocks={HOME_LAYOUT.filter(block => block.blockType === 'contactsSection' || block.blockType === 'leadForm')} projects={[]} contacts={SITE.contacts} siteId={SITE.id} pageId="about" />
       </main>
     </SiteChrome>

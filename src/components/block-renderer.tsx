@@ -11,6 +11,7 @@ import { copy, nbspText } from "../lib/copy";
 import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
 import type { CatalogProject } from "../lib/catalog/types";
+import type { PublicStory } from "../lib/stories";
 import { BankStrip } from "./bank-strip";
 import { ContactsPlace } from "./contacts-place";
 import { CopyButton } from "./copy-button";
@@ -466,12 +467,14 @@ function UnknownBlock({ type }: { type: string }) {
 export function BlockRenderer({
   blocks,
   projects,
+  stories = [],
   contacts,
   siteId,
   pageId,
 }: {
   blocks: LayoutBlock[] | null | undefined;
   projects: CatalogProject[];
+  stories?: PublicStory[];
   contacts?: SiteContacts | null;
   siteId: number | string;
   pageId?: number | string;
@@ -526,6 +529,7 @@ export function BlockRenderer({
           return (
             <VideoTestimonials data-cms-content-connected
               key={index}
+              stories={stories}
               showEyebrow={block.showEyebrow !== false}
             />
           );

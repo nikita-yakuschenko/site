@@ -2,6 +2,7 @@ import type { CollectionConfig } from 'payload'
 import { authenticated, contentManager, contentWriter } from '../access/staff'
 import { detectBuiltVideo } from '../config/built-media'
 import { projectSlugFromName } from '../config/project-slug'
+import { storiesFeedEndpoint } from './stories-feed-endpoint'
 
 const galleryBatch = { path: './components/admin/ProjectImageUpload#GalleryBatchUpload', clientProps: { target: 'media' } }
 
@@ -15,6 +16,7 @@ export const Stories: CollectionConfig = {
   },
   versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
+  endpoints: [storiesFeedEndpoint],
   hooks: {
     beforeValidate: [({ data }) => {
       if (!data) return data
@@ -43,6 +45,7 @@ export const Stories: CollectionConfig = {
     { name: 'heading', label: 'Заголовок', type: 'text', required: true, admin: { hidden: true } },
     { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, index: true, admin: { hidden: true }, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
     { name: 'subtitle', label: 'Подзаголовок', type: 'text' },
+    { name: 'duration', label: 'Длительность', type: 'text', admin: { description: 'Например 4:46 — показывается на карточке и на главной.' } },
     { name: 'place', label: 'Локация', type: 'text', required: true },
     { name: 'year', label: 'Год', type: 'number', required: true, min: 2014, admin: { step: 1 }, validate: (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 2014 ? true : 'Укажите год' },
     { name: 'customerKind', label: 'Заказчик', type: 'select', required: true, defaultValue: 'family', options: [{ label: 'Частное лицо', value: 'family' }, { label: 'Бизнес', value: 'business' }], admin: { hidden: true } },

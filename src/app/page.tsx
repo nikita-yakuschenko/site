@@ -7,11 +7,13 @@ import { applyPopularProjects } from '../lib/popular-content'
 import { applySeriesBento } from '../lib/series-content'
 import { HOME_LAYOUT } from '../lib/home-layout'
 import { SITE } from '../lib/site'
+import { listStories } from '../lib/stories'
 
 export default async function HomePage() {
   const catalog = new CmsCatalogProvider()
   const popular = await applyPopularProjects(await withHeroContent(HOME_LAYOUT.filter((block) => block.blockType !== 'advantagesBar')), catalog, SITE.code)
   const blocks = await applySeriesBento(popular.blocks, catalog, SITE.code)
+  const stories = await listStories()
 
   const hasHero = HOME_LAYOUT.some((block) => block.blockType === 'hero')
 
@@ -30,6 +32,7 @@ export default async function HomePage() {
         <BlockRenderer
           blocks={blocks}
           projects={popular.projects}
+          stories={stories}
           contacts={SITE.contacts}
           siteId={SITE.id}
         />

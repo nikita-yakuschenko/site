@@ -43,6 +43,7 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
       slug: String(fields.slug?.value || ''),
       heading: String(fields.heading?.value || ''),
       subtitle: String(fields.subtitle?.value || ''),
+      duration: String(fields.duration?.value || ''),
       place: String(fields.place?.value || ''),
       year: Number(fields.year?.value) || new Date().getFullYear(),
       kind: fields.customerKind?.value === 'business' ? 'business' as const : 'family' as const,
@@ -88,7 +89,7 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
           kind: draft.kind,
           catalogMark: draft.catalogMark,
           poster,
-          duration: '—',
+          duration: draft.duration || '—',
           id: video?.provider === 'kinescope' ? video.id : `draft:${draft.slug || 'story'}`,
         }
         latest.current = payload
