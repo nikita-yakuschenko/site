@@ -5233,9 +5233,7 @@ a {
   padding-top: 0;
 }
 
-/* Поиск по названию. Наверху и во всю ширину: он не сужает выдачу по
-   свойствам дома, а ищет конкретный проект, который человек уже знает по
-   имени. Поэтому стоит над колонкой отбора, а не внутри неё. */
+/* Поиск над фильтрами: на десктопе совпадает с шириной колонки отбора. */
 .catalog__bar {
   position: sticky;
   top: 0;
@@ -5300,22 +5298,11 @@ a {
 }
 
 @media (min-width: 1024px) {
-  .catalog__barrow { width: 100%; transition: width 280ms cubic-bezier(.22,.61,.36,1); }
-  .catalog__bar.is-search-compact { background: transparent; pointer-events: none; }
-  .catalog__bar.is-search-compact::after { right: auto; width: calc(240px + var(--page-gutter) * 2); }
-  .catalog__bar.is-search-compact .catalog__barrow { width: 240px; pointer-events: auto; }
-}
-.catalog-search input { transition: opacity 180ms var(--ease-out); }
-.catalog-search.is-compact { background: #fff; }
-.catalog-search.is-compact input { opacity: 0; pointer-events: none; }
-.catalog-search .catalog-search__expand {
-  position: absolute; inset: 0; width: 100%; height: 100%; padding: 0 14px 0 42px;
-  display: flex; align-items: center; justify-content: flex-start; border: 0; border-radius: inherit;
-  background: transparent; color: var(--ink-2); font: inherit; font-size: 14px; cursor: pointer;
-}
-.catalog-search__expand span { overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-@media (prefers-reduced-motion: reduce) {
-  .catalog__barrow, .catalog-search input { transition: none; }
+  .catalog__bar { background: transparent; pointer-events: none; }
+  .catalog__bar::after { right: auto; width: calc(240px + var(--page-gutter) * 2); }
+  .catalog__barrow { width: 240px; pointer-events: auto; }
+  .catalog__barrow .catalog-search { height: 38px; padding-inline: 12px; border-radius: 8px; color: var(--avgst-ink); }
+  .catalog__barrow .catalog-search input { font-size: 14px; }
 }
 
 /* Фокус показывает сама рамка коробки, а не кольцо вокруг неё: зелёное

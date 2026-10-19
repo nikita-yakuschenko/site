@@ -169,7 +169,7 @@ export function CatalogFilters({
   const chips: { label: string; clear: CatalogFilters }[] = [];
   if (filters.status === "ready") {
     chips.push({
-      label: copy.readyOnly,
+      label: "Готовый дом в продаже",
       clear: { ...filters, status: undefined },
     });
   }
@@ -220,24 +220,7 @@ export function CatalogFilters({
             подвалом за её пределами и потому ничего не перекрывает. */}
         <div className="cfilter__scroll">
 
-        <fieldset className="cfilter__group">
-          <legend className="cfilter__legend">Статус</legend>
-          <div className="cfilter__checks">
-            <label className="cfilter__check">
-              <input
-                type="checkbox"
-                checked={filters.status === "ready"}
-                onChange={() =>
-                  go({
-                    ...filters,
-                    status: filters.status === "ready" ? undefined : "ready",
-                  })
-                }
-              />
-              {copy.readyOnly}
-            </label>
-          </div>
-        </fieldset>
+
 
         {facets.area.max > facets.area.min && <fieldset className="cfilter__group">
           <legend className="cfilter__legend">
@@ -347,6 +330,25 @@ export function CatalogFilters({
             <span>{favoritesCount}</span>
           </button>
         </div>
+
+        <fieldset className="cfilter__group">
+          <legend className="visually-hidden">Статус</legend>
+          <div className="cfilter__checks">
+            <label className="cfilter__check">
+              <input
+                type="checkbox"
+                checked={filters.status === "ready"}
+                onChange={() =>
+                  go({
+                    ...filters,
+                    status: filters.status === "ready" ? undefined : "ready",
+                  })
+                }
+              />
+              Готовый дом в продаже
+            </label>
+          </div>
+        </fieldset>
 
         {chips.length ? (
           <div className="cfilter__active">

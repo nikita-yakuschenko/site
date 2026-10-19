@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type Ref } from "react";
+import { useEffect, useRef, useState } from "react";
 import { IconSearch, IconX } from "@tabler/icons-react";
 import { copy } from "../lib/copy";
 
@@ -19,15 +19,9 @@ const TYPING_DELAY = 350;
 export function CatalogSearch({
   value,
   onChange,
-  compact = false,
-  onExpand,
-  inputRef,
 }: {
   value: string;
   onChange: (next: string) => void;
-  compact?: boolean;
-  onExpand?: () => void;
-  inputRef?: Ref<HTMLInputElement>;
 }) {
   const [draft, setDraft] = useState(value);
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -61,12 +55,9 @@ export function CatalogSearch({
   };
 
   return (
-    <div className={`catalog-search${compact ? ' is-compact' : ''}`}>
+    <div className="catalog-search">
       <IconSearch size={18} stroke={2} aria-hidden="true" />
       <input
-        ref={inputRef}
-        inert={compact}
-        aria-hidden={compact}
         type="search"
         value={draft}
         placeholder={copy.searchPlaceholder}
@@ -78,14 +69,12 @@ export function CatalogSearch({
           if (event.key === "Escape") commitNow("");
         }}
       />
-      {draft && !compact ? (
+      {draft ? (
         <button type="button" aria-label={copy.searchClear} onClick={() => commitNow("")}>
           <IconX size={16} stroke={2} aria-hidden="true" />
         </button>
       ) : null}
-      {compact ? <button type="button" className="catalog-search__expand" onClick={onExpand} aria-label="Развернуть поиск по проектам" aria-expanded={false}>
-        <span>{draft || 'Поиск по проектам'}</span>
-      </button> : null}
+
     </div>
   );
 }
