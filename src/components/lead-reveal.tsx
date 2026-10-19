@@ -5,6 +5,7 @@ import { IconArrowUpRight, IconX } from '@tabler/icons-react'
 import { useState } from 'react'
 import { copy } from '../lib/copy'
 import { LeadForm } from './lead-form'
+import { PanelLeadForm } from './panel-lead-form'
 
 /**
  * Кнопка и форма в одной ячейке: по нажатию текст блока гаснет, форма
@@ -30,6 +31,7 @@ export function LeadReveal({
   children,
   formIntro,
   projectExternalId,
+  variant = 'crossfade',
 }: {
   formId?: string
   siteId: number | string
@@ -47,9 +49,21 @@ export function LeadReveal({
   /** Содержимое блока, которое гаснет на время показа формы. */
   children?: React.ReactNode
   formIntro?: React.ReactNode
+  variant?: 'crossfade' | 'panel'
   projectExternalId?: string
 }) {
   const [open, setOpen] = useState(false)
+
+  if (variant === 'panel') return (
+    <CMSContentBlock cmsBlockKey={`LeadReveal-instance-${formId.replace(/[^a-zA-Z0-9]+/g, "-")}`}><div className={[classes?.root, 'mortgage-request', open ? 'is-open' : ''].filter(Boolean).join(' ')}>
+      <div className="mortgage-request__summary" inert={open} aria-hidden={open}>
+        <div>{children}</div>
+      </div>
+      <PanelLeadForm formId={formId} siteId={siteId} projectExternalId={projectExternalId}
+        label={label} heading={heading} submitLabel={submitLabel ?? label} meta={meta}
+        formIntro={formIntro} closable animateTrigger onOpenChange={setOpen} />
+    </div></CMSContentBlock>
+  )
 
   return (<CMSContentBlock cmsBlockKey={`LeadReveal-instance-${formId.replace(/[^a-zA-Z0-9]+/g, "-")}`}>{(
     <div

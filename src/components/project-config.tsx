@@ -139,7 +139,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
             data-form={formOpen ? "true" : "false"}
           >
             <p className="project-config__total-label">
-              {tier.name} {copy.configTierWord}
+              <span>Комплектация: </span><strong>{tier.name}</strong>
             </p>
             <p className="project-config__total-sum">{tier.price > 0 ? formatRub(tier.price) : 'Цена уточняется'}</p>
             {/* Строка под суммой есть всегда: без неё панель у стартовой

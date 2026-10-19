@@ -1,9 +1,10 @@
 "use client";
 
-import { IconArrowUpRight } from "@tabler/icons-react";
-import { useEffect, useRef, useState } from "react";
+import { IconArrowUpRight, IconX } from "@tabler/icons-react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { LeadForm } from "./lead-form";
 import { SITE } from "../lib/site";
+import { copy } from "../lib/copy";
 
 const REVEAL_MS = 600;
 const REVEAL_MARGIN = 24;
@@ -46,6 +47,10 @@ export function PanelLeadForm({
   projectExternalId,
   meta,
   onOpenChange,
+  formIntro,
+  closable = false,
+  siteId = SITE.id,
+  animateTrigger = false,
 }: {
   label: string;
   heading: string;
@@ -54,9 +59,14 @@ export function PanelLeadForm({
   projectExternalId?: string;
   meta?: Record<string, unknown>;
   onOpenChange?: (open: boolean) => void;
+  formIntro?: ReactNode;
+  closable?: boolean;
+  siteId?: number | string;
+  animateTrigger?: boolean;
 }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     if (!open || !rootRef.current) return;
@@ -79,26 +89,30 @@ export function PanelLeadForm({
   const setState = (next: boolean) => {
     setOpen(next);
     onOpenChange?.(next);
+    if (!next) requestAnimationFrame(() => triggerRef.current?.focus({ preventScroll: true }));
   };
 
   return (
     /* Кнопка и форма — одна группа: между ними ничего не распахивается. */
     <div className="panel-lead" ref={rootRef}>
-      {open ? null : (
-        <button
-          type="button"
-          className="btn btn-yellow"
-          onClick={() => setState(true)}
-        >
-          {label}
-          <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
+      {animateTrigger ? (
+        <div className="panel-lead__trigger" data-open={!open} inert={open} aria-hidden={open}>
+          <div><button ref={triggerRef} type="button" className="btn btn-yellow" aria-expanded={open} onClick={() => setState(true)}>
+            {label}<IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
+          </button></div>
+        </div>
+      ) : open ? null : (
+        <button ref={triggerRef} type="button" className="btn btn-yellow" aria-expanded={false} onClick={() => setState(true)}>
+          {label}<IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
         </button>
       )}
 
-      <div className="panel-lead__form" data-open={open ? "true" : "false"}>
+      <div className="panel-lead__form" data-open={open ? "true" : "false"} inert={!open} aria-hidden={!open}>
         <div>
+          {closable ? <button type="button" className="panel-lead__close" aria-label={copy.close} onClick={() => setState(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button> : null}
+          {formIntro}
           <LeadForm formId={formId}
-            siteId={SITE.id}
+            siteId={siteId}
             projectExternalId={projectExternalId}
             variant="card"
             compact

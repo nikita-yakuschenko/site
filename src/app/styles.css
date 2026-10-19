@@ -13417,6 +13417,13 @@ html.is-dialog-open {
   color: var(--ink-2);
 }
 
+.project-config__total-label strong { color: var(--avgst-ink); font-weight: 600; }
+.project-config__total[data-form="true"] .project-config__total-label strong { color: #fff; }
+@media (min-width: 900px) {
+  .project-config__total-label { font-size: 15px; }
+  .project-config__total-label strong { font-size: 18px; font-weight: 700; }
+}
+
 .project-config__total-sum {
   margin: 4px 0 0;
   font-size: 30px;
@@ -13558,28 +13565,39 @@ html.is-dialog-open {
   }
 }
 
-/* Расчёт и заявка занимают одну клетку: мягкая подмена без роста вниз. */
-.mortgage-calc__reveal--project .mortgage-calc__reveal-copy {
-  grid-template-rows: auto 1fr auto;
-  align-content: start;
+/* Та же механика, что у комплектаций: расчёт сворачивается, форма растёт по содержимому. */
+.mortgage-calc__reveal.mortgage-request { display: flex; flex-direction: column; height: auto; min-width: 0; }
+.mortgage-request__summary {
+  display: grid;
+  grid-template-rows: 1fr;
+  opacity: 1;
+  transition: grid-template-rows .55s cubic-bezier(.22,.61,.36,1), opacity .3s var(--ease-out);
 }
-.mortgage-calc__reveal--project .mortgage-calc__reveal-card {
-  display: flex;
-  flex-direction: column;
-  height: auto;
-  box-sizing: border-box;
-  padding: 22px;
-  border-radius: 16px;
-  background: var(--avgst-ink);
-  color: #fff;
-  --lead-ink: 255 255 255;
+.mortgage-request__summary > div { display: grid; gap: 12px; min-height: 0; overflow: hidden; }
+.mortgage-request.is-open .mortgage-request__summary { grid-template-rows: 0fr; opacity: 0; }
+.panel-lead__trigger { display: grid; grid-template-rows: 1fr; opacity: 1; transition: grid-template-rows .55s cubic-bezier(.22,.61,.36,1), opacity .3s var(--ease-out); }
+.panel-lead__trigger[data-open="false"] { grid-template-rows: 0fr; opacity: 0; }
+.panel-lead__trigger > div { min-height: 0; overflow: hidden; }
+.panel-lead__trigger .btn { margin-top: 12px; width: 100%; }
+.mortgage-request .panel-lead__form > div { padding-inline: 3px; }
+.mortgage-request .panel-lead__form .lead-card { height: auto; gap: 16px; padding-top: 16px; }
+.mortgage-request .lead-card button[type="submit"] { width: 100%; align-self: stretch; }
+.mortgage-calc__result:has(.mortgage-request) {
+  display: block;
+  transition: background .42s var(--ease-out), color .42s var(--ease-out);
 }
-.mortgage-calc__reveal--project .lead-reveal__close { top: 10px; right: 10px; color: var(--on-dark-2); }
-.mortgage-calc__reveal--project .lead-reveal__close:hover { color: #fff; }
-.mortgage-calc__reveal--project .lead-card { flex: 1; height: auto; padding-top: 16px; }
-.mortgage-calc__reveal--project .lead-card input { border-color: var(--on-dark-4); background: var(--tint-on-dark); color: #fff; }
-.mortgage-calc__reveal--project .lead-card input::placeholder { color: var(--on-dark-4); }
-.mortgage-calc__reveal--project .lead-form__consent { color: var(--on-dark-2); }
+.mortgage-calc__result--project:has(.mortgage-request) { min-height: 0; padding: 16px; border-radius: 16px; }
+.mortgage-calc__result:has(.mortgage-request.is-open) { background: var(--avgst-ink); color: #fff; }
+.mortgage-request.is-open .lead-card { --lead-ink: 255 255 255; }
+.mortgage-request.is-open .lead-card input { border-color: var(--on-dark-4); background: var(--tint-on-dark); color: #fff; }
+.mortgage-request.is-open .lead-card input::placeholder { color: var(--on-dark-4); }
+.mortgage-request.is-open .lead-form__consent { color: var(--on-dark-2); }
+.panel-lead__close { position: absolute; z-index: 1; top: 12px; right: 6px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--on-dark-2); cursor: pointer; }
+.panel-lead__close:hover { color: #fff; }
+.mortgage-request .mortgage-calc__quote-summary { padding: 10px 32px 0 6px; }
+@media (prefers-reduced-motion: reduce) {
+  .panel-lead__trigger, .mortgage-request__summary, .mortgage-calc__result:has(.mortgage-request) { transition: none; }
+}
 .mortgage-calc__quote-summary { display: grid; gap: 4px; }
 .mortgage-calc__quote-name { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.03em; line-height: 1.15; }
 .mortgage-calc__quote-rate { margin: 0; font-size: 13px; line-height: 1.3; color: var(--on-dark-3); }

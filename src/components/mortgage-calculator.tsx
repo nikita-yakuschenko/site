@@ -608,7 +608,7 @@ export function MortgageCalculator({
             }
           >
             {isProjectCalculator ? (
-              <LeadReveal data-cms-content-connected formId="mortgage-calculator" siteId={SITE.id}
+              <LeadReveal variant="panel" data-cms-content-connected formId="mortgage-calculator" siteId={SITE.id}
                 label={copy.getQuote} heading={copy.getQuote} submitLabel={copy.getQuote}
                 projectExternalId={project?.id}
                 meta={{ ...leadMeta, ...(project ? { project: project.name } : {}), ...(selectedTier ? { tier: selectedTier.name } : {}) }}
@@ -661,11 +661,8 @@ export function MortgageCalculator({
               </LeadReveal>
             ) : (
               <>
-            {/* Тот же приём, что и в баннерах: содержимое и форма лежат
-                в одной клетке и перекрещиваются прозрачностью. Раньше он
-                был здесь переписан заново — теперь это общий LeadReveal,
-                которому переданы местные классы раскладки. */}
-            <LeadReveal data-cms-content-connected
+            {/* Форма раскрывается по своей высоте тем же блоком, что и в комплектациях. */}
+            <LeadReveal variant="panel" data-cms-content-connected
               formId="mortgage-calculator"
               siteId={SITE.id}
               label={t.resultCta}
@@ -673,6 +670,10 @@ export function MortgageCalculator({
               submitLabel={t.resultCta}
               meta={leadMeta}
               buttonClassName="btn btn-yellow mortgage-calc__result-cta"
+              formIntro={<div className="mortgage-calc__quote-summary">
+                <p className="mortgage-calc__quote-rate">{program.label} ипотека под {displayRate}</p>
+                <p className="mortgage-calc__quote-pay">{mode === 'payment' ? `Платёж от ${formatRub(Math.round(activeResult.monthlyPayment))}/мес` : `Стоимость дома до ${formatRub(Math.round(budgetPack.maxPropertyPrice))}`}</p>
+              </div>}
               classes={{
                 root: "mortgage-calc__reveal",
                 copy: "mortgage-calc__reveal-copy",
