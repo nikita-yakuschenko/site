@@ -5579,8 +5579,8 @@ a {
 
   .cfilter__sticky {
     position: sticky;
-    top: calc(var(--site-header-offset) - 16px + var(--catalog-bar) + var(--gap-stack));
-    max-height: calc(100svh - var(--site-header-offset) - var(--catalog-bar) - var(--gap-stack) * 2);
+    top: calc(var(--site-header-offset) - 16px + var(--catalog-bar));
+    max-height: calc(100svh - var(--site-header-offset) + 16px - var(--catalog-bar) - var(--gap-stack));
     overflow-y: auto;
     overscroll-behavior: contain;
   }
