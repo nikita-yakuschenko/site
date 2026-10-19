@@ -1,7 +1,7 @@
 "use client";
 
 import { IconCheck, IconGiftFilled, IconPlus, IconX } from "@tabler/icons-react";
-import { useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { copy, nbspText } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
 import { getMortgageProgram, monthlyPaymentForProject } from "../lib/mortgage";
@@ -60,6 +60,38 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
     readServerRegionCode,
   );
   const [formOpen, setFormOpen] = useState(false);
+  const totalRef = useRef<HTMLElement>(null);
+  const panelAnimation = useRef<Animation | null>(null);
+  useEffect(() => () => panelAnimation.current?.cancel(), []);
+
+  const changeFormOpen = (next: boolean) => {
+    const panel = totalRef.current;
+    if (!panel) return;
+    const from = panel.getBoundingClientRect().height;
+    panelAnimation.current?.cancel();
+    panelAnimation.current = null;
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // Measure the final intrinsic height without interrupting the visible form transition.
+      const target = panel.cloneNode(true) as HTMLElement;
+      target.dataset.form = String(next);
+      Object.assign(target.style, { position: 'fixed', top: '0', left: '0', width: `${panel.getBoundingClientRect().width}px`, height: 'auto', visibility: 'hidden', pointerEvents: 'none', margin: '0' });
+      target.querySelectorAll<HTMLElement>('*').forEach(node => { node.style.transition = 'none'; node.style.animation = 'none'; });
+      const form = target.querySelector<HTMLElement>('.panel-lead__form');
+      const trigger = target.querySelector<HTMLElement>('.panel-lead__trigger');
+      if (form) { form.dataset.open = String(next); form.style.gridTemplateRows = next ? '1fr' : '0fr'; }
+      if (trigger) { trigger.dataset.open = String(!next); trigger.style.gridTemplateRows = next ? '0fr' : '1fr'; }
+      panel.parentElement!.appendChild(target);
+      let to = target.getBoundingClientRect().height;
+      target.remove();
+      const columns = getComputedStyle(panel.parentElement!).gridTemplateColumns.split(' ');
+      if (next && columns.length > 1) to = Math.max(to, panel.parentElement!.querySelector('.project-config__tiers')!.getBoundingClientRect().height);
+      const animation = panel.animate([{ height: `${from}px` }, { height: `${to}px` }], { duration: 550, easing: 'cubic-bezier(.22,.61,.36,1)', fill: 'both' });
+      panelAnimation.current = animation;
+      animation.onfinish = () => { animation.cancel(); if (panelAnimation.current === animation) panelAnimation.current = null; };
+    }
+    setFormOpen(next);
+  };
+
   const tiers = configurations ? tiersForRegion(configurations, region) : tiersForProject(project);
 
   if (!tiers?.length) return null;
@@ -138,9 +170,10 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
               это без единого слова. */}
           <aside
             className="project-config__total"
+            ref={totalRef}
             data-form={formOpen ? "true" : "false"}
           >
-            {formOpen ? <button type="button" className="project-config__close" aria-label={copy.close} onClick={() => setFormOpen(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button> : null}
+            {formOpen ? <button type="button" className="project-config__close" aria-label={copy.close} onClick={() => changeFormOpen(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button> : null}
             <p className="project-config__total-label">
               <span>Комплектация: </span><strong>{configText(tier.name)}</strong>
             </p>
@@ -170,7 +203,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
               label={copy.getQuote}
               heading={copy.getQuote}
               projectExternalId={project.id}
-              onOpenChange={setFormOpen}
+              onOpenChange={changeFormOpen}
               /* Заявка уходит с выбранным уровнем и его ценой: иначе
                  разговор начинается с «а что вы смотрели?». */
               meta={{

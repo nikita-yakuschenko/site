@@ -13326,6 +13326,7 @@ html.is-dialog-open {
 /* Итог липнет к верху: состав длиннее панели, и цена должна оставаться
    на экране, пока по нему идут. */
 .project-config__total {
+  box-sizing: border-box;
   position: relative;
   display: flex;
   flex-direction: column;

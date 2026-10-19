@@ -39,24 +39,35 @@ for (const width of [1280, 1024, 390]) {
       await panel.getByRole('button', { name: 'Получить расчёт', exact: true }).click();
       await page.waitForFunction(() => document.querySelector('.project-config__total')!.getAnimations({ subtree: true }).length === 0);
       const openedHeight = (await page.locator('.project-config__tiers').boundingBox())!.height;
+      const openedPanelHeight = (await panel.boundingBox())!.height;
       const samples = await page.evaluate(async () => {
         const cards = document.querySelector('.project-config__tiers')!;
+        const panel = document.querySelector('.project-config__total')!;
         const heights = [cards.getBoundingClientRect().height];
+        const panelHeights = [panel.getBoundingClientRect().height];
         (document.querySelector('.project-config__close') as HTMLButtonElement).click();
         await new Promise<void>(resolve => {
           const start = performance.now();
           const measure = () => {
             heights.push(cards.getBoundingClientRect().height);
+            panelHeights.push(panel.getBoundingClientRect().height);
             if (performance.now() - start < 700) requestAnimationFrame(measure);
             else resolve();
           };
           requestAnimationFrame(measure);
         });
-        return heights;
+        return { heights, panelHeights };
       });
-      expect(Math.max(...samples)).toBeLessThanOrEqual(Math.max(closedHeight, openedHeight) + 1);
-      expect(Math.min(...samples)).toBeGreaterThanOrEqual(Math.min(closedHeight, openedHeight) - 1);
-      expect(samples.at(-1)).toBeCloseTo(closedHeight, 0);
+      expect(Math.max(...samples.heights)).toBeLessThanOrEqual(Math.max(closedHeight, openedHeight) + 1);
+      expect(Math.min(...samples.heights)).toBeGreaterThanOrEqual(Math.min(closedHeight, openedHeight) - 1);
+      expect(samples.heights.at(-1)).toBeCloseTo(closedHeight, 0);
+      const finalPanelHeight = samples.panelHeights.at(-1)!;
+      const distance = openedPanelHeight - finalPanelHeight;
+      expect(distance).toBeGreaterThan(40);
+      expect(samples.panelHeights.some(height => height > finalPanelHeight + 2 && height < openedPanelHeight - 2)).toBe(true);
+      const steps = samples.panelHeights.slice(1).map((height, index) => Math.abs(height - samples.panelHeights[index]!));
+      expect(Math.max(...steps)).toBeLessThan(distance * .4);
+
     }
   });
 }
