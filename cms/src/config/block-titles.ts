@@ -16,7 +16,7 @@ export const blockTitles: Record<string, string> = {
   ExpositionLocations: 'Как добраться', ExpositionVideoTile: 'Выставочная площадка: видео', PhotoTile: 'Выставочная площадка: фотография',
   ManufactureProjectQuestions: 'Вопросы о проекте', ManufacturePreparationQuestions: 'Подготовка к строительству', ManufactureVideoReview: 'Обзор производства',
   ManufactureTruckTransition: 'Производство: перевозка модулей', ManufactureModuleScene: 'Производство: изготовление и сборка модулей',
-  LeadReveal: 'Заявка на консультацию', ManufactureMountingVideos: 'Видео монтажа', ManufactureFaq: 'Вопросы о производстве',
+  LeadReveal: 'Заявка на консультацию', Person: 'Персона', ManufactureMountingVideos: 'Видео монтажа', ManufactureFaq: 'Вопросы о производстве',
   ProjectPreview: 'Макет страницы проекта', ReferralRules: 'Правила реферальной программы',
   hero: 'Главный экран', advantagesBar: 'Преимущества', popularProjects: 'Популярные проекты', seriesBento: 'Подборки проектов',
   mortgageShowcase: 'Ипотека', independentReview: 'Независимый обзор', videoTestimonials: 'Видеоотзывы', referralProgram: 'Реферальная программа',

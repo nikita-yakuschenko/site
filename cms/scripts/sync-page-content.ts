@@ -9,7 +9,7 @@ process.env.CMS_SEED = '0'
 const { default: config } = await import('../src/payload.config')
 const apply = process.argv.includes('--apply')
 const input = process.argv.find(value => value.startsWith('--input='))?.slice(8) || 'data/page-content-baseline.json'
-type Field = { key: string; kind: 'text' | 'image' | 'link'; title: string; text?: string; image?: string; href?: string }
+type Field = { key: string; kind: 'text' | 'image' | 'link' | 'person'; title: string; text?: string; textMore?: string; image?: string; href?: string }
 type Snapshot = { route: string; status?: number | string; blocks?: { key: string; fields: Field[] }[]; errors?: string[] }
 const snapshots = JSON.parse(await readFile(input, 'utf8')) as Snapshot[]
 if (snapshots.some(page => page.status !== 'redirect' && (page.status !== 200 || page.errors?.length))) throw new Error('Индекс содержит ошибки рендера; синхронизация запрещена')
@@ -141,6 +141,11 @@ try {
         const previous = current.get(partKey)
         if (previous) { parts.push(previous); continue }
         if ((existing?.defaults as { contentKeys?: string[] } | null)?.contentKeys?.includes(partKey)) continue
+        if (field.kind === 'person') {
+          const image = field.image ? await imageID(field.image, field.title) : null
+          parts.push({ key: partKey, title: field.title, text: field.text ?? '', textMore: field.textMore ?? '', ...(image && 'id' in image ? { image: image.id } : {}) })
+          continue
+        }
         const detail = field.kind === 'text' ? field.text?.trim().replace(/\s+/g, ' ').slice(0, 72) : ''
         const partTitle = detail ? `${field.title}: ${detail}` : field.title
         const image = field.kind === 'image' && field.image ? await imageID(field.image, partTitle) : null

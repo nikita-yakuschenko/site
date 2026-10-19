@@ -1,7 +1,7 @@
 import { cloneElement, createElement, isValidElement, type ReactElement, type ReactNode } from 'react'
 
 export type ContentPart = { key: string; title?: string; text?: string; textMore?: string; href?: string; image?: string; originalImage?: string }
-export type ContentField = ContentPart & { kind: 'text' | 'image' | 'link' }
+export type ContentField = ContentPart & { kind: 'text' | 'image' | 'link' | 'person' }
 export type ContentRecord = { key: string; scope?: string; gallery?: boolean; parts: ContentPart[] }
 const textProps = new Set(['title', 'heading', 'description', 'label', 'body', 'text', 'cta', 'submitLabel', 'successText', 'imageAlt'])
 const labels: Record<string, string> = { title: 'Заголовок', heading: 'Заголовок', description: 'Описание', label: 'Надпись', body: 'Текст', text: 'Текст', cta: 'Кнопка', submitLabel: 'Кнопка отправки', successText: 'Сообщение после отправки', imageAlt: 'Описание изображения' }

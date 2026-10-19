@@ -2,6 +2,7 @@
 import { CMSContentBlock } from './cms-content'
 
 import { Fragment, useState } from "react";
+import { PersonCard } from "./person-card";
 import { PhotoLocationBadge } from "./photo-tile";
 import { copy, nbspText } from "../lib/copy";
 import { optimizedSrc } from "../lib/media";
@@ -45,23 +46,15 @@ export function IndependentReview({
             </div>
             <p className="independent-review__lead" data-cms-block="independentReview.lead">{nbspText(data.lead)}</p>
 
-            <div className="independent-review__channel" data-cms-block="independentReview.channel">
-              <img
-                className="independent-review__mark"
-                src={optimizedSrc(data.channelPhoto, 256)}
-                alt=""
-                width={80}
-                height={80}
-                loading="lazy"
-              />
-              <span>
-                <strong>{data.channelName}</strong>
-                <em>{data.channelTagline}</em>
-                <em className="independent-review__audience">
-                  {data.channelAudience}
-                </em>
-              </span>
-            </div>
+            <PersonCard
+              data-cms-content-connected
+              cmsBlockKey="Person"
+              photo={data.channelPhoto}
+              name={data.channelName}
+              caption={data.channelTagline}
+              audience={data.channelAudience}
+              withAudience
+            />
           </div>
 
           <button

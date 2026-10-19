@@ -51,7 +51,10 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
     for (let index = 0; index < count; index++) {
       const row = `parts.${index}`
       const key = String(fields[`${row}.key`]?.value || '')
-      if (key.includes('.content.')) parts.push({ key, text: String(fields[`${row}.text`]?.value ?? ''), href: String(fields[`${row}.href`]?.value ?? ''), imageId: fields[`${row}.image`]?.value, image: String(fields[`${row}.textMore`]?.value || ''), originalImage: String(fields[`${row}.textMore`]?.value || '') })
+      if (key.includes('.content.')) {
+        const person = key.endsWith('.person')
+        parts.push({ key, text: String(fields[`${row}.text`]?.value ?? ''), textMore: String(fields[`${row}.textMore`]?.value ?? ''), href: String(fields[`${row}.href`]?.value ?? ''), imageId: fields[`${row}.image`]?.value, image: person ? '' : String(fields[`${row}.textMore`]?.value || ''), originalImage: person ? '' : String(fields[`${row}.textMore`]?.value || '') })
+      }
     }
     return JSON.stringify(parts)
   })

@@ -26,7 +26,10 @@ export const blockContentEndpoint: Endpoint = {
         key: block.key,
         scope: (block.defaults as { contentScope?: string } | null)?.contentScope || '',
         gallery: (block.defaults as { contentGallery?: boolean } | null)?.contentGallery === true,
-        parts: (block.parts || []).filter(part => part.key.includes('.content.')).map(part => ({ key: part.key, title: part.title || '', text: part.text ?? '', href: part.href ?? '', image: mediaURL(part.image) || part.textMore || '', originalImage: part.textMore || '' })),
+        parts: (block.parts || []).filter(part => part.key.includes('.content.')).map(part => {
+          const person = part.key.endsWith('.person')
+          return { key: part.key, title: part.title || '', text: part.text ?? '', textMore: part.textMore ?? '', href: part.href ?? '', image: mediaURL(part.image) || (person ? '' : part.textMore) || '', originalImage: person ? '' : (part.textMore || '') }
+        }),
       })) }, { headers: { 'Cache-Control': 'no-store' } })
     }
     const key = params.get('key') || ''

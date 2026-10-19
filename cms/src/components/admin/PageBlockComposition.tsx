@@ -362,6 +362,31 @@ function HeroBackgroundFields({ row }: { row: string }) {
   </div>
 }
 
+function PersonPartFields({ row, partKey }: { row: string; partKey: string }) {
+  const name = useField<string>({ path: `${row}.text` })
+  const caption = useField<string>({ path: `${row}.textMore` })
+  const image = useField<string | null>({ path: `${row}.image` })
+  const [imageUrl, setImageUrl] = useState('')
+  useEffect(() => {
+    let cancelled = false
+    const id = mediaId(image.value)
+    if (!id) { setImageUrl(''); return }
+    fetch(`/api/media/${id}?depth=0`, { credentials: 'include' }).then(response => response.ok ? response.json() : null).then(doc => {
+      const url = typeof doc?.url === 'string' ? doc.url : ''
+      if (!cancelled) setImageUrl(url ? new URL(url, window.location.origin).href : '')
+    })
+    return () => { cancelled = true }
+  }, [image.value])
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent('avgst:part-draft', { detail: { key: partKey, text: name.value || '', textMore: caption.value || '', image: imageUrl } }))
+  }, [partKey, name.value, caption.value, imageUrl])
+  return <div className="flex flex-col gap-4">
+    <ProjectImageUpload path={`${row}.image`} field={{ name: 'image', label: 'Фото', type: 'upload', relationTo: 'media' } as UploadFieldClientProps['field']} />
+    <div className="field-type text"><label className="field-label" htmlFor={`${row}-person-name`}>Имя и фамилия</label><input id={`${row}-person-name`} type="text" value={name.value || ''} onChange={event => name.setValue(event.target.value)} /></div>
+    <div className="field-type text"><label className="field-label" htmlFor={`${row}-person-caption`}>Подпись</label><input id={`${row}-person-caption`} type="text" value={caption.value || ''} onChange={event => caption.setValue(event.target.value)} /></div>
+  </div>
+}
+
 export function PartContentFields({ path }: TextareaFieldClientProps) {
   const row = path.replace(/\.text$/, '')
   const key = useFormFields(([fields]) => String(fields[`${row}.key`]?.value || ''))
@@ -387,6 +412,7 @@ export function PartContentFields({ path }: TextareaFieldClientProps) {
   if (/^seriesBento\.slot\.\d+$/.test(key) || key === 'seriesBento.cards') return key === 'seriesBento.cards' ? <SeriesSlots /> : null
   if (/^hero\.promo\.\d+$/.test(key)) return null
   if (key === 'hero.promos') return <HeroPromoSlots />
+  if (key.endsWith('.person')) return <PersonPartFields row={row} partKey={key} />
   if (key.includes('.content.')) return <div className="flex flex-col gap-4">
     {key.endsWith('.image') ? <>
       <ProjectImageUpload path={`${row}.image`} fallbackImageUrl={more.value || ''} batchPaths={galleryPaths ? JSON.parse(galleryPaths) as string[] : undefined} galleryPrefix={/^(.*\.content\.gallery)\.\d+\.image$/.exec(key)?.[1]} field={{ name: 'image', label: 'Изображение', type: 'upload', relationTo: 'media' } as UploadFieldClientProps['field']} />
