@@ -10,10 +10,11 @@ for (const width of [1280, 375]) {
     const calc = page.locator('#mortgage-calc');
     const reveal = calc.locator('.mortgage-calc__reveal--project');
     await expect(reveal).toBeVisible();
+    await expect(reveal.locator('.mortgage-calc__receipt dt')).toHaveText(['Стоимость дома', 'Первый взнос']);
     const before = await reveal.boundingBox();
     const hiddenName = reveal.getByRole('textbox', { name: 'Имя', exact: true });
     await expect(hiddenName).toHaveCount(0);
-    await reveal.getByRole('button', { name: 'Получить расчёт', exact: true }).click();
+    await reveal.getByRole('button', { name: 'Получить консультацию', exact: true }).click();
     await expect(reveal).toHaveClass(/is-open/);
     await expect(reveal.locator('.mortgage-calc__quote-name')).not.toBeEmpty();
     await expect(reveal.locator('.mortgage-calc__quote-rate')).toHaveText('Семейная ипотека под 6%');
@@ -27,7 +28,7 @@ for (const width of [1280, 375]) {
     await page.screenshot({ path: `test-results/mortgage-request-${width}.png` });
     await reveal.getByRole('button', { name: 'Закрыть', exact: true }).click();
     await expect(reveal).not.toHaveClass(/is-open/);
-    await expect(reveal.getByRole('button', { name: 'Получить расчёт', exact: true })).toBeVisible();
+    await expect(reveal.getByRole('button', { name: 'Получить консультацию', exact: true })).toBeVisible();
     const configurationPanel = page.locator('.project-config__total');
     await configurationPanel.getByRole('button', { name: 'Получить расчёт', exact: true }).click();
     await expect(configurationPanel).toHaveAttribute('data-form', 'true');

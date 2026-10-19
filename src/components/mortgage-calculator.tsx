@@ -609,7 +609,7 @@ export function MortgageCalculator({
           >
             {isProjectCalculator ? (
               <LeadReveal variant="panel" data-cms-content-connected formId="mortgage-calculator" siteId={SITE.id}
-                label={copy.getQuote} heading={copy.getQuote} submitLabel={copy.getQuote}
+                label={t.resultCta} heading={t.resultCta} submitLabel={t.resultCta}
                 projectExternalId={project?.id}
                 meta={{ ...leadMeta, ...(project ? { project: project.name } : {}), ...(selectedTier ? { tier: selectedTier.name } : {}) }}
                 classes={{ root: 'mortgage-calc__reveal mortgage-calc__reveal--project', copy: 'mortgage-calc__reveal-copy', slot: 'mortgage-calc__reveal-slot', card: 'mortgage-calc__reveal-card' }}
@@ -635,28 +635,7 @@ export function MortgageCalculator({
                     <span aria-hidden="true" />
                     <dd>{formatRub(Math.round(downPayment))}</dd>
                   </div>
-                  {paymentResult.isCombined ? (
-                    paymentResult.parts.map((part) => (
-                      <div key={part.kind}>
-                        <dt>
-                          Сумма кредита под {part.kind === "market" ? "ставку от " : ""}{formatRate(part.annualRate)}
-                        </dt>
-                        <span aria-hidden="true" />
-                        <dd>{formatRub(Math.round(part.principal))}</dd>
-                      </div>
-                    ))
-                  ) : (
-                    <div>
-                      <dt>Сумма кредита</dt>
-                      <span aria-hidden="true" />
-                      <dd>{formatRub(Math.round(paymentResult.loanAmount))}</dd>
-                    </div>
-                  )}
-                  <div>
-                    <dt>Ставка</dt>
-                    <span aria-hidden="true" />
-                    <dd>{paymentResult.isCombined ? "Комбо" : displayRate}</dd>
-                  </div>
+
                 </dl>
               </LeadReveal>
             ) : (
