@@ -36,6 +36,8 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
       photo: fields[`media.${index}.photo`]?.value,
       image: String(fields[`media.${index}.image`]?.value || ''),
       videoUrl: String(fields[`media.${index}.videoUrl`]?.value || ''),
+      duration: String(fields[`media.${index}.duration`]?.value || ''),
+      posterUrl: String(fields[`media.${index}.posterUrl`]?.value || ''),
     }))
     const binding = String(fields.binding?.value || 'catalog')
     const catalogMark = binding === 'individual' || binding === 'discontinued' ? binding as 'individual' | 'discontinued' : null
@@ -43,12 +45,12 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
       slug: String(fields.slug?.value || ''),
       heading: String(fields.heading?.value || ''),
       subtitle: String(fields.subtitle?.value || ''),
-      duration: String(fields.duration?.value || ''),
       place: String(fields.place?.value || ''),
       year: Number(fields.year?.value) || new Date().getFullYear(),
       kind: fields.customerKind?.value === 'business' ? 'business' as const : 'family' as const,
       binding,
       project: fields.project?.value,
+      cover: fields.cover?.value,
       catalogMark,
       media,
     }
@@ -60,8 +62,10 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
     async function update() {
       if (!draft) { latest.current = null; return }
       try {
+        const videoRow = draft.media.find(row => row.type === 'video')
         const primary = draft.media.find(row => row.isPrimary) || draft.media[0]
-        const photoValue = primary?.photo || null
+        const coverId = mediaId(draft.cover)
+        const photoValue = coverId || primary?.photo || null
         const media = photoValue
           ? typeof photoValue === 'object'
             ? photoValue as { url?: string }
@@ -69,8 +73,8 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
           : null
         const poster = media?.url
           ? new URL(media.url, window.location.origin).href
-          : primary?.image || ''
-        const video = primary?.type === 'video' ? detectBuiltVideo(primary.videoUrl) : null
+          : videoRow?.posterUrl || primary?.image || ''
+        const video = videoRow ? detectBuiltVideo(videoRow.videoUrl) : null
         let title = draft.heading
         const projectId = mediaId(draft.project)
         if (draft.binding === 'catalog' && projectId) {
@@ -89,7 +93,7 @@ export function useStoryPreview(story: boolean, frame: RefObject<HTMLIFrameEleme
           kind: draft.kind,
           catalogMark: draft.catalogMark,
           poster,
-          duration: draft.duration || '—',
+          duration: videoRow?.duration || '—',
           id: video?.provider === 'kinescope' ? video.id : `draft:${draft.slug || 'story'}`,
         }
         latest.current = payload

@@ -224,11 +224,14 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
     url: typeof fields[`${target}.${row.index}.videoUrl`]?.value === 'string' ? fields[`${target}.${row.index}.videoUrl`]!.value : '',
     file: photoId(fields[`${target}.${row.index}.videoFile`]?.value) ?? '',
     caption: typeof fields[`${target}.${row.index}.caption`]?.value === 'string' ? fields[`${target}.${row.index}.caption`]!.value : '',
+    duration: typeof fields[`${target}.${row.index}.duration`]?.value === 'string' ? fields[`${target}.${row.index}.duration`]!.value : '',
+    posterUrl: typeof fields[`${target}.${row.index}.posterUrl`]?.value === 'string' ? fields[`${target}.${row.index}.posterUrl`]!.value : '',
   }))) : '[]')
-  const meta = JSON.parse(builtMeta) as { type: 'photo' | 'video'; url: string; file: string; caption: string }[]
+  const meta = JSON.parse(builtMeta) as { type: 'photo' | 'video'; url: string; file: string; caption: string; duration: string; posterUrl: string }[]
   const videoIds = meta.map(item => item.file).filter(Boolean)
   const docs = useMediaDocs([...rows.flatMap(row => row.photo ? [row.photo] : []), ...videoIds])
   const [videoDialog, setVideoDialog] = useState<{ index: number | null; url: string; caption: string } | null>(null)
+  const [videoBusy, setVideoBusy] = useState(false)
   const known = useRef(new Map<string, { name: string; size: number; type: string }>())
   const fileInput = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<PendingFile[]>([])
@@ -363,8 +366,8 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
           event.dataTransfer.setData('text/plain', 'reorder')
           rememberDrag({ from: visual, insertAt: visual, stride: height + gap, row: height })
         }} onDragEnd={() => rememberDrag(null)}>
-          <FileAttachment name={name} state="done" imageUrl={doc?.thumbnailURL || url || undefined} icon={isVideo ? kind.icon : undefined}
-            description={isVideo ? (info?.file ? fileSummary(fileDoc?.mimeType || local?.type, name, fileDoc?.filesize || local?.size) : (info?.url || 'Ссылка не указана')) : fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)}
+          <FileAttachment name={name} state="done" imageUrl={doc?.thumbnailURL || url || info?.posterUrl || undefined} icon={isVideo ? kind.icon : undefined}
+            description={isVideo ? [info?.duration, info?.file ? fileSummary(fileDoc?.mimeType || local?.type, name, fileDoc?.filesize || local?.size) : (info?.url || 'Ссылка не указана')].filter(Boolean).join(' · ') : fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)}
             kind={clips ? kind : undefined}
             caption={clips ? { value: info?.caption || '', onChange: value => setField(`${target}.${row.index}.caption`, value) } : undefined}
             primary={target !== 'interiors' && row.primary} onPrimary={target !== 'interiors' ? () => makePrimary(row) : undefined}
@@ -373,8 +376,20 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
         </div>
       })}
     </div>
-    {clips ? <BuiltVideoDialog state={videoDialog} onClose={() => setVideoDialog(null)} onSave={({ index, url, caption }) => {
+    {clips ? <BuiltVideoDialog state={videoDialog} busy={videoBusy} onClose={() => { if (!videoBusy) setVideoDialog(null) }} onSave={async ({ index, url, caption }) => {
       const video = detectBuiltVideo(url)
+      let duration = ''
+      let posterUrl = ''
+      if (target === 'media' && video) {
+        setVideoBusy(true)
+        try {
+          const meta = await fetch(`/api/stories/video-meta?url=${encodeURIComponent(url)}`, { credentials: 'include' }).then(response => response.ok ? response.json() as Promise<{ duration?: string; poster?: string }> : null).catch(() => null)
+          duration = typeof meta?.duration === 'string' ? meta.duration : ''
+          posterUrl = typeof meta?.poster === 'string' ? meta.poster : ''
+        } finally {
+          setVideoBusy(false)
+        }
+      }
       if (index == null) {
         addFieldRow({ path: target, schemaPath: target, rowIndex: rows.length, subFieldState: {
           type: { initialValue: 'video', valid: true, value: 'video' },
@@ -382,12 +397,20 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
           videoUrl: { initialValue: url, valid: true, value: url },
           caption: { initialValue: caption, valid: true, value: caption },
           isPrimary: { initialValue: false, valid: true, value: false },
+          ...(target === 'media' ? {
+            duration: { initialValue: duration, valid: true, value: duration },
+            posterUrl: { initialValue: posterUrl, valid: true, value: posterUrl },
+          } : {}),
         } })
       } else {
         setField(`${target}.${index}.videoUrl`, url)
         setField(`${target}.${index}.provider`, video?.provider ?? null)
         setField(`${target}.${index}.videoFile`, null)
         setField(`${target}.${index}.caption`, caption)
+        if (target === 'media') {
+          setField(`${target}.${index}.duration`, duration)
+          setField(`${target}.${index}.posterUrl`, posterUrl)
+        }
       }
       setVideoDialog(null)
     }} /> : null}
@@ -397,7 +420,7 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
 
 type VideoDraft = { index: number | null; url: string; caption: string }
 
-function BuiltVideoDialog({ state, onClose, onSave }: { state: VideoDraft | null; onClose: () => void; onSave: (draft: VideoDraft) => void }) {
+function BuiltVideoDialog({ state, busy, onClose, onSave }: { state: VideoDraft | null; busy?: boolean; onClose: () => void; onSave: (draft: VideoDraft) => void | Promise<void> }) {
   const [url, setUrl] = useState('')
   const [caption, setCaption] = useState('')
   const [touched, setTouched] = useState(false)
@@ -411,35 +434,35 @@ function BuiltVideoDialog({ state, onClose, onSave }: { state: VideoDraft | null
   const invalid = touched && url.trim() !== '' && !video
   const save = () => {
     setTouched(true)
-    if (video && state) onSave({ index: state.index, url: url.trim(), caption: caption.trim() })
+    if (video && state && !busy) void onSave({ index: state.index, url: url.trim(), caption: caption.trim() })
   }
-  return <Dialog open={Boolean(state)} onOpenChange={open => { if (!open) onClose() }}>
+  return <Dialog open={Boolean(state)} onOpenChange={open => { if (!open && !busy) onClose() }}>
     <DialogContent className="shadcn-surface sm:max-w-md">
       <DialogHeader>
         <DialogTitle>{state?.index == null ? 'Добавить видео' : 'Видео'}</DialogTitle>
-        <DialogDescription>Вставьте ссылку на ролик в VK Видео или Kinescope. Платформа определится сама.</DialogDescription>
+        <DialogDescription>Вставьте ссылку на ролик в VK Видео или Kinescope. Длительность и кадр подставятся сами.</DialogDescription>
       </DialogHeader>
       <form className="grid gap-4" onSubmit={event => { event.preventDefault(); event.stopPropagation(); save() }}>
         <div className="grid gap-2">
           <label htmlFor="built-video-url" className="text-sm font-medium">Ссылка</label>
           <div className="relative">
             <span className="pointer-events-none absolute top-1/2 left-2.5 flex size-5 -translate-y-1/2 items-center justify-center text-muted-foreground">
-              {video?.provider === 'vk' ? <VkLogo className="size-5" /> : video ? <IconPlayerPlay className="size-4" /> : <IconLink className="size-4" />}
+              {busy ? <IconLoader2 className="size-4 animate-spin" /> : video?.provider === 'vk' ? <VkLogo className="size-5" /> : video ? <IconPlayerPlay className="size-4" /> : <IconLink className="size-4" />}
             </span>
-            <Input id="built-video-url" autoFocus className="pl-9" placeholder="https://vk.com/video-… или https://kinescope.io/…" value={url} aria-invalid={invalid || undefined}
+            <Input id="built-video-url" autoFocus className="pl-9" placeholder="https://vk.com/video-… или https://kinescope.io/…" value={url} aria-invalid={invalid || undefined} disabled={busy}
               onChange={event => setUrl(event.target.value)} onBlur={() => setTouched(true)} />
           </div>
           <p className={invalid ? 'text-xs text-destructive' : 'text-xs text-muted-foreground'}>
-            {invalid ? 'Не похоже на ссылку VK Видео или Kinescope' : video ? (video.provider === 'vk' ? 'VK Видео' : 'Kinescope') : 'Поддерживаются VK Видео и Kinescope'}
+            {busy ? 'Читаю длительность и превью…' : invalid ? 'Не похоже на ссылку VK Видео или Kinescope' : video ? (video.provider === 'vk' ? 'VK Видео' : 'Kinescope') : 'Поддерживаются VK Видео и Kinescope'}
           </p>
         </div>
         <div className="grid gap-2">
           <label htmlFor="built-video-caption" className="text-sm font-medium">Подпись</label>
-          <Input id="built-video-caption" placeholder="Необязательно" value={caption} onChange={event => setCaption(event.target.value)} />
+          <Input id="built-video-caption" placeholder="Необязательно" value={caption} disabled={busy} onChange={event => setCaption(event.target.value)} />
         </div>
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={onClose}>Отмена</Button>
-          <Button type="submit" disabled={!video}>{state?.index == null ? 'Добавить' : 'Сохранить'}</Button>
+          <Button type="button" variant="outline" onClick={onClose} disabled={busy}>Отмена</Button>
+          <Button type="submit" disabled={!video || busy}>{busy ? 'Читаю…' : state?.index == null ? 'Добавить' : 'Сохранить'}</Button>
         </DialogFooter>
       </form>
     </DialogContent>

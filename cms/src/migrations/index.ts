@@ -18,6 +18,7 @@ import * as migration_20261018_140000_yandex_settings from './20261018_140000_ya
 import * as migration_20261019_130000_stories from './20261019_130000_stories';
 import * as migration_20261019_150000_story_duration from './20261019_150000_story_duration';
 import * as migration_20261019_160000_story_related_card from './20261019_160000_story_related_card';
+import * as migration_20261019_170000_story_video_meta from './20261019_170000_story_video_meta';
 
 export const migrations = [
   {
@@ -119,5 +120,10 @@ export const migrations = [
     up: migration_20261019_160000_story_related_card.up,
     down: migration_20261019_160000_story_related_card.down,
     name: '20261019_160000_story_related_card',
+  },
+  {
+    up: migration_20261019_170000_story_video_meta.up,
+    down: migration_20261019_170000_story_video_meta.down,
+    name: '20261019_170000_story_video_meta',
   },
 ];

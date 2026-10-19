@@ -33,9 +33,14 @@ export const storiesFeedEndpoint: Endpoint = {
       collection: 'stories', pagination: false, sort: '-year', depth: 1, req, overrideAccess: true,
       where: { _status: { equals: 'published' } },
     })
+    const base = process.env.CMS_PUBLIC_URL || 'https://cms.avgst.ru'
+    const absolute = (value?: string | null) => {
+      if (!value) return ''
+      try { return new URL(value, base).href } catch { return value }
+    }
     const mediaURL = (photo: unknown, fallback?: string | null) => {
       const url = typeof photo === 'object' && photo && 'url' in photo && typeof photo.url === 'string' ? photo.url : fallback
-      return url ? new URL(url, process.env.CMS_PUBLIC_URL || 'https://cms.avgst.ru').href : ''
+      return absolute(url)
     }
     const items: PublicStory[] = result.docs.flatMap(doc => {
       if (!doc.slug || !doc.heading || !doc.place || !doc.year) return []
@@ -43,7 +48,11 @@ export const storiesFeedEndpoint: Endpoint = {
       const primary = rows.find(row => row.isPrimary) || rows[0]
       const videoRow = rows.find(row => row.type === 'video')
       const video = videoRow ? detectBuiltVideo(videoRow.videoUrl) : null
-      const poster = mediaURL(primary?.photo, primary?.image) || mediaURL(videoRow?.photo, videoRow?.image)
+      const poster = mediaURL(doc.cover)
+        || absolute(typeof videoRow?.posterUrl === 'string' ? videoRow.posterUrl : '')
+        || mediaURL(primary?.photo, primary?.image)
+        || mediaURL(videoRow?.photo, videoRow?.image)
+      const duration = typeof videoRow?.duration === 'string' ? videoRow.duration : ''
       const kind = doc.customerKind === 'business' ? 'business' as const : 'family' as const
       const binding = doc.binding === 'individual' || doc.binding === 'discontinued' ? doc.binding : 'catalog' as const
       const fallbackHref = kind === 'business' ? '/business' : '/catalog'
@@ -82,7 +91,7 @@ export const storiesFeedEndpoint: Endpoint = {
         year: Number(doc.year),
         kind,
         binding,
-        duration: typeof doc.duration === 'string' ? doc.duration : '',
+        duration,
         poster,
         video,
         card,

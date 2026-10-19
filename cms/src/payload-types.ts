@@ -781,7 +781,6 @@ export interface Story {
   heading: string;
   slug: string;
   subtitle?: string | null;
-  duration?: string | null;
   place: string;
   year: number;
   customerKind: 'family' | 'business';
@@ -793,6 +792,7 @@ export interface Story {
     text?: string | null;
     image?: (number | null) | Media;
   };
+  cover?: (number | null) | Media;
   media?:
     | {
         type: 'photo' | 'video';
@@ -800,6 +800,8 @@ export interface Story {
         provider?: ('kinescope' | 'vk') | null;
         videoUrl?: string | null;
         videoFile?: (number | null) | Media;
+        duration?: string | null;
+        posterUrl?: string | null;
         photo?: (number | null) | Media;
         image?: string | null;
         caption?: string | null;
@@ -1559,13 +1561,13 @@ export interface StoriesSelect<T extends boolean = true> {
   heading?: T;
   slug?: T;
   subtitle?: T;
-  duration?: T;
   relatedCard?: T | {
     enabled?: T;
     title?: T;
     text?: T;
     image?: T;
   };
+  cover?: T;
   place?: T;
   year?: T;
   customerKind?: T;
@@ -1579,6 +1581,8 @@ export interface StoriesSelect<T extends boolean = true> {
         provider?: T;
         videoUrl?: T;
         videoFile?: T;
+        duration?: T;
+        posterUrl?: T;
         photo?: T;
         image?: T;
         caption?: T;

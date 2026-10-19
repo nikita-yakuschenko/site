@@ -6,6 +6,7 @@ import { CATALOG_PROJECTS } from '../../../src/lib/catalog/projects'
 import type { CatalogProject } from '../../../src/lib/catalog/types'
 import { priceKinds } from '../config/price-kinds'
 import { normalizeConfigurations } from '../config/project-configurations'
+import { fetchVideoMetaFromUrl } from '../config/video-meta'
 import { chromeByKey, heroParts, siteIndex, sitePages, type SiteDefinition } from './standard-site'
 
 const sampleFlag = 'sampleSeeded'
@@ -66,8 +67,9 @@ async function run(payload: Payload) {
   }
   const samples = await ensureSampleProjects(payload)
   const storyNote = await ensureStories(payload)
+  const storyMetaNote = await enrichStoryVideoMeta(payload)
   await attachContentPhotos(payload)
-  console.log(`Структура сайта: страниц +${createdPages}, блоков +${createdBlocks}. ${samples} ${storyNote}`)
+  console.log(`Структура сайта: страниц +${createdPages}, блоков +${createdBlocks}. ${samples} ${storyNote} ${storyMetaNote}`)
 }
 
 function isUniqueValue(error: unknown) {
@@ -115,25 +117,60 @@ async function ensureStories(payload: Payload) {
   const existing = await payload.find({ collection: 'stories', limit: 1, depth: 0, overrideAccess: true })
   if (existing.docs.length) return 'Отзывы уже есть.'
   const rows = [
-    { slug: 'simple-57', heading: 'Больше всего боялись, что зимой будет холодно', subtitle: 'семья из 3 человек', duration: '4:46', place: 'Нижегородская область', year: 2023, customerKind: 'family' as const, binding: 'discontinued' as const, poster: '/media/reviews/story-57.jpg', video: 'https://kinescope.io/4rTpK3PfrgRDbkmTuf1qq5' },
-    { slug: 'simple-49', heading: 'Собственный дом для молодой семьи', subtitle: 'молодая семья', duration: '4:15', place: 'Московская область', year: 2024, customerKind: 'family' as const, binding: 'discontinued' as const, poster: '/media/reviews/story-49.jpg', video: 'https://kinescope.io/58vnKUGFRJvNYGAMapNVWE' },
-    { slug: 'modular-hotel', heading: 'Модульный отель: от проекта до запуска', subtitle: '10 номеров', duration: '2:45', place: 'Дзержинск', year: 2024, customerKind: 'business' as const, binding: 'individual' as const, poster: '/media/reviews/story-hotel.jpg', video: 'https://kinescope.io/4DX3wVnp3xmtzTVSaNfg3g' },
+    { slug: 'simple-57', heading: 'Больше всего боялись, что зимой будет холодно', subtitle: 'семья из 3 человек', place: 'Нижегородская область', year: 2023, customerKind: 'family' as const, binding: 'discontinued' as const, poster: '/media/reviews/story-57.jpg', video: 'https://kinescope.io/4rTpK3PfrgRDbkmTuf1qq5' },
+    { slug: 'simple-49', heading: 'Собственный дом для молодой семьи', subtitle: 'молодая семья', place: 'Московская область', year: 2024, customerKind: 'family' as const, binding: 'discontinued' as const, poster: '/media/reviews/story-49.jpg', video: 'https://kinescope.io/58vnKUGFRJvNYGAMapNVWE' },
+    { slug: 'modular-hotel', heading: 'Модульный отель: от проекта до запуска', subtitle: '10 номеров', place: 'Дзержинск', year: 2024, customerKind: 'business' as const, binding: 'individual' as const, poster: '/media/reviews/story-hotel.jpg', video: 'https://kinescope.io/4DX3wVnp3xmtzTVSaNfg3g' },
   ]
   for (const row of rows) {
     const poster = await uploadRepoImage(payload, row.poster)
     await payload.create({
       collection: 'stories', draft: false, overrideAccess: true,
       data: {
-        slug: row.slug, heading: row.heading, subtitle: row.subtitle, duration: row.duration, place: row.place, year: row.year,
+        slug: row.slug, heading: row.heading, subtitle: row.subtitle, place: row.place, year: row.year,
         customerKind: row.customerKind, binding: row.binding, _status: 'published',
+        ...(poster ? { cover: poster.id } : {}),
         media: [
-          poster ? { type: 'photo', isPrimary: true, photo: poster.id, caption: row.heading } : { type: 'photo', isPrimary: true, image: row.poster, caption: row.heading },
-          { type: 'video', isPrimary: false, videoUrl: row.video, provider: 'kinescope' },
+          { type: 'video', isPrimary: true, videoUrl: row.video, provider: 'kinescope' },
         ],
       },
     })
   }
   return `Отзывов +${rows.length}.`
+}
+
+// Старые отзывы: длительность и кадр с Kinescope/VK, своё превью — из прежнего primary-фото.
+async function enrichStoryVideoMeta(payload: Payload) {
+  const stories = await payload.find({ collection: 'stories', pagination: false, depth: 0, overrideAccess: true })
+  let updated = 0
+  for (const doc of stories.docs) {
+    const rows = doc.media || []
+    let changed = false
+    const media = await Promise.all(rows.map(async row => {
+      if (row.type !== 'video' || !row.videoUrl || row.videoFile) return row
+      if (row.duration && row.posterUrl) return row
+      const meta = await fetchVideoMetaFromUrl(row.videoUrl)
+      if (!meta) return row
+      changed = true
+      return {
+        ...row,
+        duration: row.duration || meta.duration || null,
+        posterUrl: row.posterUrl || meta.poster || null,
+      }
+    }))
+    const patch: { media?: typeof media; cover?: number } = {}
+    if (changed) patch.media = media
+    if (!doc.cover) {
+      const photo = rows.find(row => row.type === 'photo' && typeof row.photo === 'number')
+      if (typeof photo?.photo === 'number') {
+        patch.cover = photo.photo
+        changed = true
+      }
+    }
+    if (!changed) continue
+    await payload.update({ collection: 'stories', id: doc.id, data: patch, draft: false, overrideAccess: true })
+    updated += 1
+  }
+  return updated ? `Мета видео у ${updated} отзывов.` : 'Мета видео актуальна.'
 }
 
 function publicDirectory() {
