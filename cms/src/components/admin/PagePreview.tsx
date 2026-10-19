@@ -8,6 +8,7 @@ import { type PreviewImage } from './ImagePreviewOverlay'
 import { useGalleryPreview } from './useGalleryPreview'
 import { usePlansPreview } from './usePlansPreview'
 import { useBuiltPreview } from './useBuiltPreview'
+import { useStoryPreview } from './useStoryPreview'
 import { normalizeNextStepsSettings, type NextStepsSettings } from '../../config/next-steps-settings'
 import type { ConfigurationTemplatesData } from '../../../../src/lib/catalog/configuration-content'
 import type { ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
@@ -39,7 +40,7 @@ function seriesPreview(parts: { key: string; text: string; href: string; image: 
   }
 }
 
-export function PagePreview({ siteUrl, project = false, configuration, isolateBlock = false }: { siteUrl: string; project?: boolean; configuration?: { variant: 'panel' | 'modular'; tier: ConfigurationKey }; isolateBlock?: boolean }) {
+export function PagePreview({ siteUrl, project = false, story = false, configuration, isolateBlock = false }: { siteUrl: string; project?: boolean; story?: boolean; configuration?: { variant: 'panel' | 'modular'; tier: ConfigurationKey }; isolateBlock?: boolean }) {
   const { data, hasPublishedDoc } = useDocumentInfo()
   const blockKey = useFormFields(([fields]) => isolateBlock ? String(fields.key?.value || '') : '')
   const blockTitle = useFormFields(([fields]) => isolateBlock ? String(fields.title?.value || '') : '')
@@ -114,7 +115,7 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
   const seriesCounts = useRef(new Map<string, number>())
   const seriesImages = useRef(new Map<string, string>())
   const [catalogSlug, setCatalogSlug] = useState<string | null>(null)
-  const template = !project && !isolateBlock && data?.route === '/catalog/[slug]'
+  const template = !project && !story && !isolateBlock && data?.route === '/catalog/[slug]'
   // A project block is previewed on the first published project page
   useEffect(() => {
     if (!catalogBlocks.has(blockKey) && !template) return
@@ -159,6 +160,7 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
   const interiorDraftRef = useGalleryPreview('interiors', project, frame, origin)
   const plansDraftRef = usePlansPreview(project, frame, origin)
   const builtDraftRef = useBuiltPreview(project, frame, origin)
+  const storyDraftRef = useStoryPreview(story, frame, origin)
   const nextStepsDraftRef = useRef<NextStepsSettings | null>(null)
   useEffect(() => {
     nextStepsDraftRef.current = nextStepsDraft
@@ -243,12 +245,13 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
         if (plansDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-plans', variants: plansDraftRef.current }, origin)
         if (builtDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-built', items: builtDraftRef.current }, origin)
         if (nextStepsDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-next-steps', settings: nextStepsDraftRef.current }, origin)
+        if (storyDraftRef.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-story', story: storyDraftRef.current }, origin)
       }
       if (event.source === frame.current?.contentWindow && event.origin === origin && event.data?.type === 'avgst:preview-block-status' && event.data.key === previewKey) setMissing(!event.data.found)
     }
     window.addEventListener('message', receive)
     return () => window.removeEventListener('message', receive)
-  }, [selected, previewKey, isolateBlock, origin, exteriorDraftRef, interiorDraftRef, builtDraftRef, plansDraftRef])
+  }, [selected, previewKey, isolateBlock, origin, exteriorDraftRef, interiorDraftRef, builtDraftRef, plansDraftRef, storyDraftRef])
   useEffect(() => {
     const receive = (event: Event) => {
       const detail = (event as CustomEvent).detail as { key: string }
@@ -319,7 +322,7 @@ export function PagePreview({ siteUrl, project = false, configuration, isolateBl
     return () => clearTimeout(timer)
   }, [heroParts, origin, revision])
   const blockRoute = contentScope || (homeBlocks.has(blockKey) ? '/' : catalogBlocks.has(blockKey) && catalogSlug ? `/catalog/${catalogSlug}` : null)
-  const route = configuration ? '/cms-preview/configurations' : isolateBlock ? blockRoute : project ? (projectDraft ? '/catalog/__draft' : `/catalog/${data?.slug}`) : template ? catalogSlug ? `/catalog/${catalogSlug}` : null : typeof data?.route === 'string' ? data.route : null
+  const route = configuration ? '/cms-preview/configurations' : story ? '/stories' : isolateBlock ? blockRoute : project ? (projectDraft ? '/catalog/__draft' : `/catalog/${data?.slug}`) : template ? catalogSlug ? `/catalog/${catalogSlug}` : null : typeof data?.route === 'string' ? data.route : null
   const validRoute = Boolean(route && !route.includes('['))
   useEffect(() => {
     if (!configuration) return

@@ -37,6 +37,7 @@ export const Stories: CollectionConfig = {
     }],
   },
   fields: [
+    { name: 'preview', type: 'ui', admin: { position: 'sidebar', components: { Field: './components/admin/PagePreviewField#StoryPreviewField' } } },
     { name: 'heading', label: 'Заголовок', type: 'text', required: true },
     { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, index: true, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
     { name: 'subtitle', label: 'Подзаголовок', type: 'text' },

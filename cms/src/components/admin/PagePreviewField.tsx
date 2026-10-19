@@ -16,3 +16,7 @@ export function ProjectPreviewField() {
   const siteUrl = process.env.SITE_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://new.avgst.ru' : 'http://localhost:3000')
   return <PagePreview siteUrl={siteUrl} project />
 }
+export function StoryPreviewField() {
+  const siteUrl = process.env.SITE_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://new.avgst.ru' : 'http://localhost:3000')
+  return <PagePreview siteUrl={siteUrl} story />
+}

@@ -34,9 +34,48 @@ const stories = copy.videoTestimonials.stories.map((story, index) => ({
   ][index]!,
 }))
 type Story = (typeof stories)[number]
+type PreviewStory = {
+  slug: string
+  heading: string
+  title: string
+  detail: string
+  family: string
+  place: string
+  year: number
+  kind: Exclude<Kind, 'all'>
+  catalogMark: CatalogMark | null
+  poster: string
+  duration: string
+  id: string
+}
 const catalogMarkLabel: Record<CatalogMark, string> = {
   discontinued: 'Снят с производства',
   individual: 'Индивидуальный проект',
+}
+function isPreviewStory(value: unknown): value is PreviewStory {
+  if (!value || typeof value !== 'object') return false
+  const story = value as PreviewStory
+  return typeof story.slug === 'string' && typeof story.heading === 'string' && typeof story.title === 'string'
+    && typeof story.place === 'string' && typeof story.year === 'number' && (story.kind === 'family' || story.kind === 'business')
+    && typeof story.poster === 'string' && typeof story.duration === 'string' && typeof story.id === 'string'
+    && (story.catalogMark === null || story.catalogMark === 'discontinued' || story.catalogMark === 'individual')
+}
+function toFeedStory(draft: PreviewStory): Story {
+  return {
+    ...stories[0]!,
+    id: draft.id,
+    title: draft.title,
+    place: draft.place,
+    detail: draft.detail,
+    family: draft.family || undefined,
+    duration: draft.duration,
+    poster: draft.poster || stories[0]!.poster,
+    slug: draft.slug,
+    year: draft.year,
+    kind: draft.kind,
+    catalogMark: draft.catalogMark ?? undefined,
+    heading: draft.heading,
+  } as Story
 }
 const years = Array.from({ length: 2026 - 2014 + 1 }, (_, index) => 2026 - index)
 const defaultYear = Math.max(...stories.map(story => story.year))
@@ -106,8 +145,10 @@ export function StoriesContent({ projects = {} }: { projects?: Record<string, St
   const [activeYear, setActiveYear] = useState(defaultYear)
   const [limit, setLimit] = useState(pageSize)
   const [activeVideo, setActiveVideo] = useState<Story | null>(null)
+  const [draft, setDraft] = useState<Story | null>(null)
   const closeVideo = useCallback(() => setActiveVideo(null), [])
-  const byKind = stories.filter(story => kind === 'all' || story.kind === kind)
+  const feed = draft ? [draft, ...stories.filter(story => story.slug !== draft.slug)] : stories
+  const byKind = feed.filter(story => kind === 'all' || story.kind === kind)
   const inYear = byKind.filter(story => story.year === activeYear)
   const visible = inYear.slice(0, limit)
   const hasMore = inYear.length > limit
@@ -118,7 +159,7 @@ export function StoriesContent({ projects = {} }: { projects?: Record<string, St
   const selectKind = (next: Kind) => {
     setKind(next)
     setLimit(pageSize)
-    const nextStories = stories.filter(story => next === 'all' || story.kind === next)
+    const nextStories = feed.filter(story => next === 'all' || story.kind === next)
     if (nextStories.some(story => story.year === activeYear)) return
     const fallback = years.find(year => nextStories.some(story => story.year === year))
     if (fallback) setActiveYear(fallback)
@@ -127,17 +168,35 @@ export function StoriesContent({ projects = {} }: { projects?: Record<string, St
   // Прямая ссылка открывает нужный год и историю; переключение года само по себе не скроллит.
   useEffect(() => {
     const reveal = () => {
-      const story = stories.find(item => window.location.hash === `#story-${item.slug}`)
+      const list = draft ? [draft, ...stories.filter(story => story.slug !== draft.slug)] : stories
+      const story = list.find(item => window.location.hash === `#story-${item.slug}`)
       if (!story) return
       setKind('all')
       setActiveYear(story.year)
-      const index = stories.filter(item => item.year === story.year).findIndex(item => item.slug === story.slug)
+      const index = list.filter(item => item.year === story.year).findIndex(item => item.slug === story.slug)
       setLimit(Math.max(pageSize, index + 1))
       requestAnimationFrame(() => document.getElementById(`story-${story.slug}`)?.scrollIntoView({ block: 'start' }))
     }
     reveal()
     window.addEventListener('hashchange', reveal)
     return () => window.removeEventListener('hashchange', reveal)
+  }, [draft])
+
+  // Черновик из CMS: подменяем карточку и сразу показываем её год.
+  useEffect(() => {
+    if (window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return
+    const allowed = new Set(['http://localhost:3001', 'http://127.0.0.1:3001', 'https://cms.avgst.ru'])
+    const receive = (event: MessageEvent) => {
+      if (event.source !== window.parent || !allowed.has(event.origin) || event.data?.type !== 'avgst:preview-story' || !isPreviewStory(event.data.story)) return
+      const next = toFeedStory(event.data.story)
+      setDraft(next)
+      setKind('all')
+      setActiveYear(next.year)
+      setLimit(pageSize)
+      requestAnimationFrame(() => document.getElementById(`story-${next.slug}`)?.scrollIntoView({ block: 'start' }))
+    }
+    window.addEventListener('message', receive)
+    return () => window.removeEventListener('message', receive)
   }, [])
 
   return <>
@@ -162,8 +221,8 @@ export function StoriesContent({ projects = {} }: { projects?: Record<string, St
           return <button key={year} type="button" disabled={empty} aria-current={activeYear === year ? 'date' : undefined} onClick={() => selectYear(year)}><span className="about-timeline__tick" aria-hidden /><span>{year}</span></button>
         })}
       </nav>
-      <div className={styles.visuallyHidden} role="status">Показано: {visible.length} из {stories.length}</div>
-      <div className={styles.feed}>{visible.map(story => <StoryEntry key={story.id} story={story} project={projects[story.title]} onPlay={setActiveVideo} />)}</div>
+      <div className={styles.visuallyHidden} role="status">Показано: {visible.length} из {feed.length}</div>
+      <div className={styles.feed}>{visible.map(story => <StoryEntry key={story.slug} story={story} project={projects[story.title]} onPlay={setActiveVideo} />)}</div>
       {hasMore ? <button type="button" className={styles.more} onClick={() => setLimit(current => current + pageSize)}>Показать больше историй</button> : null}
     </div></section>
     <section className={`section ${styles.nextSection}`} aria-labelledby="stories-next-title"><CMSContentBlock cmsBlockKey="StoriesNextStep"><div className={`section__inner ${styles.next}`}><div className={styles.nextCopy}><h2 id="stories-next-title">{nbspText('За каждой историей - дом, который когда-то был мечтой')}</h2><p>{nbspText('Посмотрите проекты, выберите планировку и приезжайте на выставочную площадку. Увидеть будущий дом своими глазами - хороший следующий шаг.')}</p><div className={styles.nextActions}><Link className="btn btn-yellow" href="/catalog">Посмотреть проекты<IconArrowUpRight aria-hidden="true" /></Link><Link className={styles.secondaryLink} href="/exposition">Выставочные площадки</Link></div></div><div className={styles.nextMedia}><Image src={heroImage} alt="Кресло с жёлтым пледом, столик с книгой и чашкой и комнатное растение" sizes="(max-width: 800px) calc(100vw - 96px), 40vw" /></div></div></CMSContentBlock></section>
