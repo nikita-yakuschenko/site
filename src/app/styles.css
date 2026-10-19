@@ -11501,9 +11501,6 @@ html.is-dialog-open {
     min-height: 0;
   }
 
-  .mortgage-calc--project .mortgage-calc__program-note {
-    min-height: 0;
-  }
 }
 
 .mortgage-calc__project-payment {

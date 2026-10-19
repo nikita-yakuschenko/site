@@ -35,7 +35,6 @@ import {
   getEligibleProjects,
   getMortgageProgram,
   MORTGAGE_PROGRAMS,
-  subsidizedLimit,
   type MortgageProgramId,
 } from "../lib/mortgage";
 import {
@@ -100,9 +99,6 @@ function displayMoney(value: number): string {
   return Math.round(value).toLocaleString("ru-RU");
 }
 
-function sentenceMoney(value: number): string {
-  return formatRub(Math.round(value)).replace(/\.$/, "");
-}
 
 function maxDigits(max: number): number {
   return String(Math.floor(Math.max(0, max))).length;
@@ -789,15 +785,6 @@ export function MortgageCalculator({
               </>
             )}
           </aside>
-
-          {showFamilyDetails || programId === "family" ? <div className="mortgage-calc__program-note">
-            {programId === "family" ? (
-              <p>
-                Льготный лимит: {sentenceMoney(subsidizedLimit(program, region, childrenCount)!)}. Лимит зависит от количества детей в семье, ставка 6%.
-                {" Льготная ставка действует до 15 лет. После 15 лет ставка и платёж могут измениться. Сверх лимита применяется указанная в расчёте рыночная ставка; условия комбо определяет банк."}
-              </p>
-            ) : <p>{t.disclaimer}</p>}
-          </div> : null}
 
           {/* На ипотечной странице подбор проектов — часть калькулятора. На
               карточке конкретного дома он выключен: цену уже задал проект. */}

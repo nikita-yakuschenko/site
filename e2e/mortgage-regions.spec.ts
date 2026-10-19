@@ -34,6 +34,7 @@ test(`region selection works without changing house price: ${route}`, async ({ p
   await expect(region).toBeEnabled();
   const price = calc.getByRole('textbox', { name: 'Стоимость дома' });
   const initialPrice = await price.inputValue();
+  const initialPayment = await calc.locator(".mortgage-calc__hero-num").innerText();
   await region.click();
   await expect(region).toHaveAttribute('aria-expanded', 'true');
   await region.fill('Ар');
@@ -44,7 +45,7 @@ test(`region selection works without changing house price: ${route}`, async ({ p
   await region.fill('Лен');
   await region.press('Enter');
   await expect(region).toHaveValue('Ленинградская область');
-  await expect(calc.locator('.mortgage-calc__program-note')).toContainText('12 000 000');
+  await expect(calc.locator(".mortgage-calc__hero-num")).not.toHaveText(initialPayment);
   await expect(price).toHaveValue(initialPrice);
   await region.fill('неттакогорегиона');
   await expect(page.getByRole('status').filter({ hasText: 'Регион не найден' })).toBeVisible();
