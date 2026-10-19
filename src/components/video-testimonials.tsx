@@ -70,11 +70,7 @@ function StoryCard({
       <span className="video-story__duration">{story.duration}</span>
       <StoryPlace place={story.place} />
       <span className="video-story__play" aria-hidden="true">
-        <svg
-          viewBox="0 0 24 24"
-          width={featured ? 28 : 22}
-          height={featured ? 28 : 22}
-        >
+        <svg viewBox="0 0 24 24" width={24} height={24}>
           <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
         </svg>
       </span>

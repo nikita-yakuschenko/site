@@ -8,6 +8,7 @@ import sharp from 'sharp'
 import { Users } from './collections/Users'
 import { Pages, Blocks, Forms } from './collections/Structure'
 import { Projects } from './collections/Projects'
+import { Stories } from './collections/Stories'
 import { ProjectPrices } from './collections/ProjectPrices'
 import { LeadDelivery, LeadSubmissions } from './collections/LeadSubmissions'
 import { createMedia } from './collections/Media'
@@ -43,6 +44,7 @@ export default buildConfig({
         site: { Component: './components/admin/StructureView#SiteView', path: '/site', exact: true },
         pages: { Component: './components/admin/StructureView#PagesView', path: '/pages', exact: true },
         catalog: { Component: './components/admin/StructureView#CatalogView', path: '/catalog', exact: true },
+        stories: { Component: './components/admin/StructureView#StoriesView', path: '/stories', exact: true },
         prices: { Component: './components/admin/StructureView#PricesView', path: '/prices', exact: true },
         registers: { Component: './components/admin/StructureView#RegistersView', path: '/registers', exact: true },
         sampling: { Component: './components/admin/StructureView#SamplingView', path: '/sampling', exact: true },
@@ -79,11 +81,11 @@ export default buildConfig({
   debug: false,
   defaultDepth: 0,
   maxDepth: 3,
-  collections: [Users, Pages, Blocks, Forms, Projects, ProjectPrices, LeadSubmissions, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
+  collections: [Users, Pages, Blocks, Forms, Projects, Stories, ProjectPrices, LeadSubmissions, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
   globals: [LeadDelivery],
   editor: lexicalEditor(),
   sharp,
-  upload: { limits: { fileSize: 10 * 1024 * 1024 } },
+  upload: { limits: { fileSize: 100 * 1024 * 1024 } },
   db: postgresAdapter({
     pool: { connectionString: environment.databaseURL, connectionTimeoutMillis: 5000, max: 10 },
     push: !environment.production && process.env.PAYLOAD_DB_PUSH === 'true',

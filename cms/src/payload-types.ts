@@ -25,6 +25,7 @@ export interface Config {
     blocks: Block;
     forms: Form;
     projects: Project;
+    stories: Story;
     'project-prices': ProjectPrice;
     'lead-submissions': LeadSubmission;
     media: Media;
@@ -40,6 +41,7 @@ export interface Config {
     blocks: BlocksSelect<false> | BlocksSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     projects: ProjectsSelect<false> | ProjectsSelect<true>;
+    stories: StoriesSelect<false> | StoriesSelect<true>;
     'project-prices': ProjectPricesSelect<false> | ProjectPricesSelect<true>;
     'lead-submissions': LeadSubmissionsSelect<false> | LeadSubmissionsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
@@ -570,8 +572,8 @@ export interface Project {
         image?: string | null;
         rooms?:
           | {
-              name: string;
-              area: string;
+              name?: string | null;
+              area?: string | null;
               id?: string | null;
             }[]
           | null;
@@ -580,8 +582,8 @@ export interface Project {
           photo?: (number | null) | Media;
           image?: string | null;
           rooms: {
-            name: string;
-            area: string;
+            name?: string | null;
+            area?: string | null;
             id?: string | null;
           }[];
           id?: string | null;
@@ -748,6 +750,55 @@ export interface Project {
   likeCount?: number | null;
   shareCount?: number | null;
   viewCount?: number | null;
+  likeVoters?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  shareVoters?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+  _status?: ('draft' | 'published') | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stories".
+ */
+export interface Story {
+  id: number;
+  heading: string;
+  slug: string;
+  subtitle?: string | null;
+  place: string;
+  year: number;
+  customerKind: 'family' | 'business';
+  binding: 'catalog' | 'individual' | 'discontinued';
+  project?: (number | null) | Project;
+  media?:
+    | {
+        type: 'photo' | 'video';
+        isPrimary?: boolean | null;
+        provider?: ('kinescope' | 'vk') | null;
+        videoUrl?: string | null;
+        videoFile?: (number | null) | Media;
+        photo?: (number | null) | Media;
+        image?: string | null;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -763,7 +814,15 @@ export interface ProjectPrice {
   configuration: 'start' | 'standard' | 'project' | 'turnkey';
   region: 'msk' | 'nn' | 'special' | 'special-msk' | 'dealer' | 'special-dealer';
   price: number;
-  history?: { date: string; amount: number }[] | null;
+  history?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -832,6 +891,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'projects';
         value: number | Project;
+      } | null)
+    | ({
+        relationTo: 'stories';
+        value: number | Story;
       } | null)
     | ({
         relationTo: 'project-prices';
@@ -1472,6 +1535,41 @@ export interface ProjectsSelect<T extends boolean = true> {
   contentImported?: T;
   configurationsImported?: T;
   legacyConfigurations?: T;
+  likeCount?: T;
+  shareCount?: T;
+  viewCount?: T;
+  likeVoters?: T;
+  shareVoters?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  _status?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "stories_select".
+ */
+export interface StoriesSelect<T extends boolean = true> {
+  heading?: T;
+  slug?: T;
+  subtitle?: T;
+  place?: T;
+  year?: T;
+  customerKind?: T;
+  binding?: T;
+  project?: T;
+  media?:
+    | T
+    | {
+        type?: T;
+        isPrimary?: T;
+        provider?: T;
+        videoUrl?: T;
+        videoFile?: T;
+        photo?: T;
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1486,6 +1584,7 @@ export interface ProjectPricesSelect<T extends boolean = true> {
   configuration?: T;
   region?: T;
   price?: T;
+  history?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1582,15 +1681,20 @@ export interface PayloadMigrationsSelect<T extends boolean = true> {
  */
 export interface LeadDelivery {
   id: number;
+  /**
+   * Сделку в Битрикс24 создаёт Roistat. Адрес вебхука и счётчики задаются в интеграциях.
+   */
   mode: 'disabled' | 'test' | 'webhook' | 'roistat';
   deliveryEnabled?: boolean | null;
   roistatWebhookUrl?: string | null;
   roistatCounters?:
     | {
-        projectId?: string | null;
-        connectedAt?: string | null;
-        enabled?: boolean | null;
-      }[]
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
     | null;
   metricaEnabled?: boolean | null;
   metricaCounterId?: string | null;

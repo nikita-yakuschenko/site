@@ -65,8 +65,9 @@ async function run(payload: Payload) {
     createdPages += 1
   }
   const samples = await ensureSampleProjects(payload)
+  const storyNote = await ensureStories(payload)
   await attachContentPhotos(payload)
-  console.log(`Структура сайта: страниц +${createdPages}, блоков +${createdBlocks}. ${samples}`)
+  console.log(`Структура сайта: страниц +${createdPages}, блоков +${createdBlocks}. ${samples} ${storyNote}`)
 }
 
 function isUniqueValue(error: unknown) {
@@ -108,6 +109,31 @@ function blockData(definition: SiteDefinition, refs: Map<string, { relationTo: '
     ...(parts.length && definition.key !== 'ProjectConfig' ? { parts } : {}),
     ...(chrome?.shared ? { defaults: { shared: true } } : {}),
   }
+}
+
+async function ensureStories(payload: Payload) {
+  const existing = await payload.find({ collection: 'stories', limit: 1, depth: 0, overrideAccess: true })
+  if (existing.docs.length) return 'Отзывы уже есть.'
+  const rows = [
+    { slug: 'simple-57', heading: 'Больше всего боялись, что зимой будет холодно', subtitle: 'семья из 3 человек', place: 'Нижегородская область', year: 2023, customerKind: 'family' as const, binding: 'discontinued' as const, poster: '/media/reviews/story-57.jpg', video: 'https://kinescope.io/4rTpK3PfrgRDbkmTuf1qq5' },
+    { slug: 'simple-49', heading: 'Собственный дом для молодой семьи', subtitle: 'молодая семья', place: 'Московская область', year: 2024, customerKind: 'family' as const, binding: 'discontinued' as const, poster: '/media/reviews/story-49.jpg', video: 'https://kinescope.io/58vnKUGFRJvNYGAMapNVWE' },
+    { slug: 'modular-hotel', heading: 'Модульный отель: от проекта до запуска', subtitle: '10 номеров', place: 'Дзержинск', year: 2024, customerKind: 'business' as const, binding: 'individual' as const, poster: '/media/reviews/story-hotel.jpg', video: 'https://kinescope.io/4DX3wVnp3xmtzTVSaNfg3g' },
+  ]
+  for (const row of rows) {
+    const poster = await uploadRepoImage(payload, row.poster)
+    await payload.create({
+      collection: 'stories', draft: false, overrideAccess: true,
+      data: {
+        slug: row.slug, heading: row.heading, subtitle: row.subtitle, place: row.place, year: row.year,
+        customerKind: row.customerKind, binding: row.binding, _status: 'published',
+        media: [
+          poster ? { type: 'photo', isPrimary: true, photo: poster.id, caption: row.heading } : { type: 'photo', isPrimary: true, image: row.poster, caption: row.heading },
+          { type: 'video', isPrimary: false, videoUrl: row.video, provider: 'kinescope' },
+        ],
+      },
+    })
+  }
+  return `Отзывов +${rows.length}.`
 }
 
 function publicDirectory() {

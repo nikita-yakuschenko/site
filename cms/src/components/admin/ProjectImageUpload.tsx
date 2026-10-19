@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 import { Attachment, AttachmentAction, AttachmentActions, AttachmentContent, AttachmentDescription, AttachmentMedia, AttachmentTitle, AttachmentTrigger } from '@/components/ui/attachment'
 import { openAssetPreview } from './ImagePreviewOverlay'
 
-type GalleryTarget = 'exteriors' | 'interiors' | 'built'
+type GalleryTarget = 'exteriors' | 'interiors' | 'built' | 'media'
 type GalleryRow = { photo?: unknown; type?: string; isPrimary?: boolean }
 type PendingFile = { key: string; name: string; progress: number; error?: string; mediaId?: string }
 type MediaDoc = { id: string; filename?: string; mimeType?: string; filesize?: number; url?: string; thumbnailURL?: string | null }
@@ -23,6 +23,10 @@ const imageTypes = new Set(['image/jpeg', 'image/png', 'image/webp', 'image/avif
 
 function isImage(file: File) {
   return imageTypes.has(file.type) || /\.(jpe?g|png|webp|avif)$/i.test(file.name)
+}
+
+function isVideo(file: File) {
+  return file.type.startsWith('video/') || /\.(mp4|webm|mov)$/i.test(file.name)
 }
 
 function photoId(value: unknown): string | null {
@@ -36,7 +40,7 @@ function photoSlot(path: string) {
 
 function rowAcceptsPhoto(row: GalleryRow | undefined, arrayPath: string) {
   if (photoId(row?.photo)) return false
-  return !(arrayPath === 'built' && row?.type === 'video')
+  return !((arrayPath === 'built' || arrayPath === 'media') && row?.type === 'video')
 }
 
 function kindLabel(mime?: string, name?: string) {
@@ -197,9 +201,9 @@ function rowShift(index: number, drag: RowDrag | null) {
 function gallerySignature(target: string, fields: Record<string, { value?: unknown } | undefined>) {
   const parts: string[] = []
   for (let index = 0; index < 300; index += 1) {
-    const row = fields[`${target}.${index}.id`] || fields[`${target}.${index}.photo`] || fields[`${target}.${index}.image`]
+    const row = fields[`${target}.${index}.id`] || fields[`${target}.${index}.photo`] || fields[`${target}.${index}.image`] || fields[`${target}.${index}.videoFile`]
     if (!row && index > 0 && !fields[`${target}.${index - 1}.id`]) break
-    if (!fields[`${target}.${index}.id`] && !fields[`${target}.${index}.photo`] && !fields[`${target}.${index}.image`]) break
+    if (!fields[`${target}.${index}.id`] && !fields[`${target}.${index}.photo`] && !fields[`${target}.${index}.image`] && !fields[`${target}.${index}.videoFile`] && fields[`${target}.${index}.type`]?.value !== 'video') break
     parts.push([index, photoId(fields[`${target}.${index}.photo`]?.value) ?? '', fields[`${target}.${index}.isPrimary`]?.value ? 1 : 0].join(':'))
   }
   return parts.join('|')
@@ -213,15 +217,17 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
     const [index, photo, primary] = part.split(':')
     return { index: Number(index), photo: photo || null, primary: primary === '1' }
   }) : []
-  const docs = useMediaDocs(rows.flatMap(row => row.photo ? [row.photo] : []))
-  const built = target === 'built'
-  // Built rows also carry a type, video link and caption; serialised so unrelated edits do not re-render.
-  const builtMeta = useFormFields(([fields]) => built ? JSON.stringify(rows.map(row => ({
-    type: fields[`built.${row.index}.type`]?.value === 'video' ? 'video' : 'photo',
-    url: typeof fields[`built.${row.index}.videoUrl`]?.value === 'string' ? fields[`built.${row.index}.videoUrl`]!.value : '',
-    caption: typeof fields[`built.${row.index}.caption`]?.value === 'string' ? fields[`built.${row.index}.caption`]!.value : '',
+  const clips = target === 'built' || target === 'media'
+  // Video rows also carry a type, link or file, and caption; serialised so unrelated edits do not re-render.
+  const builtMeta = useFormFields(([fields]) => clips ? JSON.stringify(rows.map(row => ({
+    type: fields[`${target}.${row.index}.type`]?.value === 'video' ? 'video' : 'photo',
+    url: typeof fields[`${target}.${row.index}.videoUrl`]?.value === 'string' ? fields[`${target}.${row.index}.videoUrl`]!.value : '',
+    file: photoId(fields[`${target}.${row.index}.videoFile`]?.value) ?? '',
+    caption: typeof fields[`${target}.${row.index}.caption`]?.value === 'string' ? fields[`${target}.${row.index}.caption`]!.value : '',
   }))) : '[]')
-  const meta = JSON.parse(builtMeta) as { type: 'photo' | 'video'; url: string; caption: string }[]
+  const meta = JSON.parse(builtMeta) as { type: 'photo' | 'video'; url: string; file: string; caption: string }[]
+  const videoIds = meta.map(item => item.file).filter(Boolean)
+  const docs = useMediaDocs([...rows.flatMap(row => row.photo ? [row.photo] : []), ...videoIds])
   const [videoDialog, setVideoDialog] = useState<{ index: number | null; url: string; caption: string } | null>(null)
   const known = useRef(new Map<string, { name: string; size: number; type: string }>())
   const fileInput = useRef<HTMLInputElement>(null)
@@ -232,8 +238,28 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
   const sortRef = useRef<HTMLDivElement>(null)
   const run = async (files: File[]) => {
     const images = files.filter(isImage)
-    if (files.some(file => file.type.startsWith('video/'))) toast.error('Видео загрузите в Kinescope или VK Видео и вставьте ссылку на ролик')
-    else if (images.length !== files.length) toast.error('Можно загружать только JPG, PNG, WebP и AVIF')
+    const videos = files.filter(isVideo)
+    if (target === 'media' && videos.length + images.length !== files.length) toast.error('Можно загружать фото JPG, PNG, WebP, AVIF и видео MP4, WebM, MOV')
+    else if (target !== 'media' && videos.length) toast.error('Видео загрузите в Kinescope или VK Видео и вставьте ссылку на ролик')
+    else if (target !== 'media' && images.length !== files.length) toast.error('Можно загружать только JPG, PNG, WebP и AVIF')
+    if (target === 'media') for (const file of videos) {
+      const key = `${file.name}-${crypto.randomUUID()}`
+      setPending(current => [...current, { key, name: file.name, progress: 0 }])
+      try {
+        const id = await uploadMedia(file, progress => setPending(current => current.map(item => item.key === key ? { ...item, progress } : item)))
+        known.current.set(id, { name: file.name, size: file.size, type: file.type })
+        addFieldRow({ path: target, schemaPath: target, rowIndex: rows.length, subFieldState: {
+          type: { initialValue: 'video', valid: true, value: 'video' },
+          videoFile: { initialValue: Number(id), valid: true, value: Number(id) },
+          isPrimary: { initialValue: false, valid: true, value: false },
+        } })
+        setModified(true)
+        setPending(current => current.map(item => item.key === key ? { ...item, mediaId: id, progress: 100 } : item))
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Не удалось загрузить видео'
+        setPending(current => current.map(item => item.key === key ? { ...item, error: message, progress: 0 } : item))
+      }
+    }
     for (const file of images) {
       const key = `${file.name}-${crypto.randomUUID()}`
       setPending(current => [...current, { key, name: file.name, progress: 0 }])
@@ -301,32 +327,33 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
     setFileDrag(false)
     void run(files)
   }}>
-    <input ref={fileInput} type="file" accept="image/jpeg,image/png,image/webp,image/avif" multiple hidden onChange={event => {
+    <input ref={fileInput} type="file" accept={target === 'media' ? 'image/jpeg,image/png,image/webp,image/avif,video/mp4,video/webm,video/quicktime' : 'image/jpeg,image/png,image/webp,image/avif'} multiple hidden onChange={event => {
       const files = [...(event.target.files || [])]
       event.target.value = ''
       void run(files)
     }} />
     <div className="flex items-stretch gap-2">
       <div className="min-w-0 flex-1">
-        <FileAttachment name="Перетащите фото сюда" description="JPG, PNG, WebP или AVIF. Можно сразу несколько." state="idle" drop={fileDrag} onOpen={() => fileInput.current?.click()} />
+        <FileAttachment name={target === 'media' ? 'Перетащите фото или видео сюда' : 'Перетащите фото сюда'} description={target === 'media' ? 'Фото JPG, PNG, WebP, AVIF или видео MP4, WebM, MOV. Можно сразу несколько.' : 'JPG, PNG, WebP или AVIF. Можно сразу несколько.'} state="idle" drop={fileDrag} onOpen={() => fileInput.current?.click()} />
       </div>
-      {built ? <Button type="button" variant="outline" className="h-auto shrink-0 rounded-xl border-dashed px-4" onClick={() => setVideoDialog({ index: null, url: '', caption: '' })}>
+      {clips ? <Button type="button" variant="outline" className="h-auto shrink-0 rounded-xl border-dashed px-4" onClick={() => setVideoDialog({ index: null, url: '', caption: '' })}>
         <IconPlayerPlay /> Добавить видео
       </Button> : null}
     </div>
     <div ref={sortRef} className="gallery-sort" onDragOver={trackRow} onDrop={dropRow}>
       {gapOpen && rowDrag ? <div className="gallery-insert" style={{ top: (rowDrag.insertAt > rowDrag.from ? rowDrag.insertAt - 1 : rowDrag.insertAt) * rowDrag.stride, height: rowDrag.row }} /> : null}
       {photos.map((row, visual) => {
-        const doc = row.photo ? docs[row.photo] : undefined
-        const local = row.photo ? known.current.get(row.photo) : undefined
-        const info = built ? metaOf(row) : undefined
-        const video = info?.type === 'video' ? detectBuiltVideo(info.url) : null
+        const info = clips ? metaOf(row) : undefined
+        const fileDoc = info?.file ? docs[info.file] : undefined
+        const doc = row.photo ? docs[row.photo] : fileDoc
+        const local = (row.photo ? known.current.get(row.photo) : undefined) || (info?.file ? known.current.get(info.file) : undefined)
+        const video = info?.type === 'video' && !info.file ? detectBuiltVideo(info.url) : null
         const isVideo = info?.type === 'video'
-        const name = isVideo ? (video?.provider === 'vk' ? 'VK Видео' : video ? 'Kinescope' : 'Видео') : doc?.filename || local?.name || 'Фото'
+        const name = isVideo ? (fileDoc?.filename || local?.name || (video?.provider === 'vk' ? 'VK Видео' : video ? 'Kinescope' : 'Видео')) : doc?.filename || local?.name || 'Фото'
         const url = doc?.url || ''
         const shift = rowShift(visual, rowDrag)
         const kind = isVideo
-          ? { icon: video?.provider === 'vk' ? <VkLogo /> : video ? <IconPlayerPlay /> : <IconLink />, label: video?.provider === 'vk' ? 'Видео VK' : video ? 'Видео Kinescope' : 'Видео по ссылке' }
+          ? { icon: info?.file ? <IconPlayerPlay /> : video?.provider === 'vk' ? <VkLogo /> : video ? <IconPlayerPlay /> : <IconLink />, label: info?.file ? 'Видеофайл' : video?.provider === 'vk' ? 'Видео VK' : video ? 'Видео Kinescope' : 'Видео по ссылке' }
           : { icon: <IconPhoto />, label: 'Фото' }
         return <div key={`${row.index}-${row.photo ?? 'video'}`} className={rowDrag?.from === visual ? 'gallery-sort__item is-dragging' : 'gallery-sort__item'} style={shift ? { transform: `translateY(${shift}px)` } : undefined} draggable onDragStart={event => {
           const item = event.currentTarget
@@ -337,19 +364,19 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
           rememberDrag({ from: visual, insertAt: visual, stride: height + gap, row: height })
         }} onDragEnd={() => rememberDrag(null)}>
           <FileAttachment name={name} state="done" imageUrl={doc?.thumbnailURL || url || undefined} icon={isVideo ? kind.icon : undefined}
-            description={isVideo ? (info?.url || 'Ссылка не указана') : fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)}
-            kind={built ? kind : undefined}
-            caption={built ? { value: info?.caption || '', onChange: value => setField(`built.${row.index}.caption`, value) } : undefined}
+            description={isVideo ? (info?.file ? fileSummary(fileDoc?.mimeType || local?.type, name, fileDoc?.filesize || local?.size) : (info?.url || 'Ссылка не указана')) : fileSummary(doc?.mimeType || local?.type, name, doc?.filesize || local?.size)}
+            kind={clips ? kind : undefined}
+            caption={clips ? { value: info?.caption || '', onChange: value => setField(`${target}.${row.index}.caption`, value) } : undefined}
             primary={target !== 'interiors' && row.primary} onPrimary={target !== 'interiors' ? () => makePrimary(row) : undefined}
             onRemove={() => removeFieldRow({ path: target, rowIndex: row.index })}
             onOpen={video ? () => openAssetPreview({ src: builtVideoEmbed(video), title: info?.caption || name, embed: true }) : !isVideo && url ? () => openAssetPreview({ src: url, title: name }) : undefined} />
         </div>
       })}
     </div>
-    {built ? <BuiltVideoDialog state={videoDialog} onClose={() => setVideoDialog(null)} onSave={({ index, url, caption }) => {
+    {clips ? <BuiltVideoDialog state={videoDialog} onClose={() => setVideoDialog(null)} onSave={({ index, url, caption }) => {
       const video = detectBuiltVideo(url)
       if (index == null) {
-        addFieldRow({ path: 'built', schemaPath: 'built', rowIndex: rows.length, subFieldState: {
+        addFieldRow({ path: target, schemaPath: target, rowIndex: rows.length, subFieldState: {
           type: { initialValue: 'video', valid: true, value: 'video' },
           provider: { initialValue: video?.provider ?? null, valid: true, value: video?.provider ?? null },
           videoUrl: { initialValue: url, valid: true, value: url },
@@ -357,9 +384,10 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
           isPrimary: { initialValue: false, valid: true, value: false },
         } })
       } else {
-        setField(`built.${index}.videoUrl`, url)
-        setField(`built.${index}.provider`, video?.provider ?? null)
-        setField(`built.${index}.caption`, caption)
+        setField(`${target}.${index}.videoUrl`, url)
+        setField(`${target}.${index}.provider`, video?.provider ?? null)
+        setField(`${target}.${index}.videoFile`, null)
+        setField(`${target}.${index}.caption`, caption)
       }
       setVideoDialog(null)
     }} /> : null}

@@ -77,7 +77,7 @@ export function IndependentReview({
             />
             <PhotoLocationBadge address={current.place} factory={current.placeKind === 'factory'} />
             <span className="independent-review__play" aria-hidden="true">
-              <svg viewBox="0 0 24 24" width="28" height="28">
+              <svg viewBox="0 0 24 24" width="24" height="24">
                 <path d="M8 5.5v13l11-6.5z" fill="currentColor" />
               </svg>
             </span>

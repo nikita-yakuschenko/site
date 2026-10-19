@@ -47,9 +47,15 @@ async function loadPublicMediaIds(req: PayloadRequest): Promise<number[]> {
     ...(project.plansContentSource === 'database' ? (project.plans || []).flatMap(variant => (variant.floors || []).map(floor => floor.photo)) : []),
     ...(project.builtContentSource === 'database' ? (project.built || []).map(row => row.photo) : []),
   ])
+  const stories = await req.payload.find({
+    collection: 'stories', overrideAccess: true, depth: 0, pagination: false,
+    where: { _status: { equals: 'published' } },
+    select: { media: true },
+  })
+  const storyMedia = stories.docs.flatMap(story => (story.media || []).flatMap(row => [row.photo, row.videoFile]))
   const blocks = await req.payload.find({ collection: 'blocks', overrideAccess: true, depth: 0, pagination: false, select: { parts: true } })
   const blockMedia = blocks.docs.flatMap(block => (block.parts || []).flatMap(part => [part.image, part.imageMobile]))
-  return [...projectMedia, ...blockMedia].filter((id): id is number => typeof id === 'number')
+  return [...projectMedia, ...storyMedia, ...blockMedia].filter((id): id is number => typeof id === 'number')
 }
 
 export function createMedia({ directory, uploadsEnabled }: { directory: string; uploadsEnabled: boolean }): CollectionConfig {
@@ -66,7 +72,7 @@ export function createMedia({ directory, uploadsEnabled }: { directory: string; 
     },
     upload: {
       staticDir: directory,
-      mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif'],
+      mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'video/mp4', 'video/webm', 'video/quicktime'],
       formatOptions: { format: 'webp', options: { quality: 80 } },
       imageSizes: [{ name: 'thumbnail', width: 320, height: 320, position: 'centre', formatOptions: { format: 'webp', options: { quality: 80 } } }],
       adminThumbnail: 'thumbnail',

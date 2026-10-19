@@ -67,7 +67,7 @@ export function ManufactureVideoReview() {
                 <button type="button" className="independent-review__player" onClick={() => setOpen(true)} aria-label="Смотреть обзор производства">
                   <img src={poster} alt="" data-cms-image={`${key}.content.poster.image`} />
                   <span className="independent-review__place"><IconBuildingFactory2 size={15} stroke={1.75} aria-hidden="true" /><span data-cms-text={`${key}.content.place`}>{place}</span></span>
-                  <span className="independent-review__play" aria-hidden="true"><svg viewBox="0 0 24 24" width="28" height="28"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg></span>
+                  <span className="independent-review__play" aria-hidden="true"><svg viewBox="0 0 24 24" width="24" height="24"><path d="M8 5.5v13l11-6.5z" fill="currentColor" /></svg></span>
                 </button>
               ) : (
                 <div className="independent-review__player manufacture-video-review__pending">

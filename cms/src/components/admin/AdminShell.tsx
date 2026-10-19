@@ -8,7 +8,7 @@ import { IconExternalLink as ExternalLink, IconPhoto as Images, IconLayoutDashbo
 import { Fragment, useEffect, useState, type CSSProperties, type ReactNode } from 'react'
 import type { User } from '../../payload-types'
 import { structure } from '../../config/structure'
-import { IconWorld, IconFiles, IconBuildingCommunity, IconCash, IconDatabase, IconFlask, IconBlocks, IconForms, IconSitemap, IconPlugConnected } from '@tabler/icons-react'
+import { IconWorld, IconFiles, IconBuildingCommunity, IconCash, IconDatabase, IconFlask, IconBlocks, IconForms, IconSitemap, IconPlugConnected, IconMessage } from '@tabler/icons-react'
 import { Avatar, AvatarFallback } from '../ui/avatar'
 import { Button } from '../ui/button'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
@@ -19,8 +19,8 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 
 export function EmptyNav() { return null }
 
-const structureIcons = { site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, prices: IconCash, registers: IconDatabase, sampling: IconFlask, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
-const aliases: Record<string, string> = { '/pages': '/collections/pages', '/catalog': '/collections/projects', '/prices': '/collections/project-prices', '/blocks': '/collections/blocks', '/forms': '/collections/forms', '/media': '/collections/media', '/users': '/collections/users' }
+const structureIcons = { site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, stories: IconMessage, prices: IconCash, registers: IconDatabase, sampling: IconFlask, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
+const aliases: Record<string, string> = { '/pages': '/collections/pages', '/catalog': '/collections/projects', '/stories': '/collections/stories', '/prices': '/collections/project-prices', '/blocks': '/collections/blocks', '/forms': '/collections/forms', '/media': '/collections/media', '/users': '/collections/users' }
 function sectionPaths(href: string) {
   if (href === '/integrations') return [href, '/leads', '/collections/lead-submissions', '/globals/lead-delivery']
   return aliases[href] ? [href, aliases[href]] : [href]
@@ -87,7 +87,7 @@ function recordLabel(slug: string, data: Record<string, unknown>) {
     const name = [data.firstName, data.lastName].filter((part): part is string => typeof part === 'string' && Boolean(part.trim())).join(' ')
     return name || (typeof data.email === 'string' ? data.email : 'Пользователь')
   }
-  const key = slug === 'projects' ? 'name' : slug === 'media' ? 'filename' : slug === 'project-prices' ? 'lookupKey' : 'title'
+  const key = slug === 'projects' ? 'name' : slug === 'stories' ? 'heading' : slug === 'media' ? 'filename' : slug === 'project-prices' ? 'lookupKey' : 'title'
   const value = data[key]
   return typeof value === 'string' && value.trim() ? value : 'Запись'
 }
@@ -96,7 +96,7 @@ function HeaderBreadcrumb() {
   const pathname = usePathname()
   const section = sectionOf(pathname)
   const collection = pathname.match(/^\/(?:collections\/)?([^/]+)(?:\/([^/]+))?(?:\/([^/]+))?$/)
-  const ownSection = collection && ['blocks', 'forms', 'media', 'users', 'pages', 'projects', 'project-prices', 'lead-submissions'].includes(collection[1])
+  const ownSection = collection && ['blocks', 'forms', 'media', 'users', 'pages', 'projects', 'stories', 'project-prices', 'lead-submissions'].includes(collection[1])
   const doc = ownSection && collection?.[2] && collection[2] !== 'create' ? { slug: collection[1], id: collection[2] } : null
   const [docLabel, setDocLabel] = useState('')
   useEffect(() => {

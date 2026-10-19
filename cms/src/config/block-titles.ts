@@ -5,7 +5,7 @@ export const blockTitles: Record<string, string> = {
   PagestoriesSection0: 'Заголовок страницы историй', PageexpositionSection0: 'Главный экран выставочных площадок',
   PageexpositionSection1: 'Выставочные площадки', PageexpositionSection2: 'Проекты в экспозиции',
   'Pageexposition--slug-Section0': 'Главный экран выставочной площадки', 'Pageexposition--slug-Section1': 'Проекты в экспозиции', 'Pageexposition--slug-Section2': 'Как проходит экскурсия',
-  AboutCompanyBento: 'О компании', AboutTimeline: 'История компании', VideoTestimonials: 'Видеоотзывы',
+  AboutCompanyBento: 'О компании', AboutTimeline: 'История компании', VideoTestimonials: 'Видеоотзывы', StoriesContent: 'Лента историй', StoriesNextStep: 'Следующий шаг',
   MortgageProgramPage: 'Ипотечная программа', LeadDialogButton: 'Кнопка заявки', PageHero: 'Главный экран',
   BusinessProductBento: 'Продукты для бизнеса', BusinessTechnologyComparison: 'Сравнение технологий', BusinessBenefitsBento: 'Преимущества для бизнеса',
   ContactsSection: 'Контакты', ProjectLeadProvider: 'Данные заявки проекта', DraftPreviewGate: 'Предпросмотр черновика', ProjectSectionTones: 'Оформление разделов проекта',

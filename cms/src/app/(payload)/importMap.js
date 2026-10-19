@@ -36,7 +36,7 @@ import { ConfigurationRowLabel as ConfigurationRowLabel_7a3843c074f1a6e82f8f3284
 import { ProjectPricesEditor as ProjectPricesEditor_0fdbba1ad069907ced6a80052cc362a9 } from '../../components/admin/ProjectPricesEditor'
 import { ProjectNextStepsContent as ProjectNextStepsContent_627cea68a237482f6a707b9cd631985e } from '../../components/admin/ProjectNextStepsContent'
 import { ProjectSearchDescription as ProjectSearchDescription_812b033a5d3e11f57c89523bf45101b5 } from '../../components/admin/ProjectSearchDescription'
-import { ProjectRecordMetadata as ProjectRecordMetadata_39c824816878a36ded3bfc43acf44e05 } from '../../components/admin/PageMetadataFields'
+import { ProjectRecordMetadata as ProjectRecordMetadata_39c824816878a36ded3bfc43acf44e05, StoryRecordMetadata as StoryRecordMetadata_39c824816878a36ded3bfc43acf44e05 } from '../../components/admin/PageMetadataFields'
 import { LeadSubmissionDetails as LeadSubmissionDetails_104c0e96c9b5dcfae77c460f4ed9e458 } from '../../components/admin/LeadSubmissionView'
 import { LeadSubmissionPayload as LeadSubmissionPayload_104c0e96c9b5dcfae77c460f4ed9e458 } from '../../components/admin/LeadSubmissionView'
 import { LeadsListRedirect as LeadsListRedirect_e85e6671bf049c3011d2f667f456a2e6 } from '../../components/admin/LeadsView'
@@ -48,7 +48,7 @@ import { AdminShellRoot as AdminShellRoot_e024f5d68acb191c51ad1e3b9f2df952 } fro
 import { AdminToasts as AdminToasts_c50bb2264ce0fa960ba738ec7a026948 } from '../../components/admin/AdminToasts'
 import { SiteView as SiteView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { PagesView as PagesView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
-import { CatalogView as CatalogView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
+import { CatalogView as CatalogView_1226fdfc491f100b8cb8d80d236e0a07, StoriesView as StoriesView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { PricesView as PricesView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { RegistersView as RegistersView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { SamplingView as SamplingView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
@@ -110,6 +110,7 @@ export const importMap = {
   "./components/admin/ProjectNextStepsContent#ProjectNextStepsContent": ProjectNextStepsContent_627cea68a237482f6a707b9cd631985e,
   "./components/admin/ProjectSearchDescription#ProjectSearchDescription": ProjectSearchDescription_812b033a5d3e11f57c89523bf45101b5,
   "./components/admin/PageMetadataFields#ProjectRecordMetadata": ProjectRecordMetadata_39c824816878a36ded3bfc43acf44e05,
+  "./components/admin/PageMetadataFields#StoryRecordMetadata": StoryRecordMetadata_39c824816878a36ded3bfc43acf44e05,
   "./components/admin/LeadSubmissionView#LeadSubmissionDetails": LeadSubmissionDetails_104c0e96c9b5dcfae77c460f4ed9e458,
   "./components/admin/LeadSubmissionView#LeadSubmissionPayload": LeadSubmissionPayload_104c0e96c9b5dcfae77c460f4ed9e458,
   "./components/admin/LeadsView#LeadsListRedirect": LeadsListRedirect_e85e6671bf049c3011d2f667f456a2e6,
@@ -122,6 +123,7 @@ export const importMap = {
   "./components/admin/StructureView#SiteView": SiteView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#PagesView": PagesView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#CatalogView": CatalogView_1226fdfc491f100b8cb8d80d236e0a07,
+  "./components/admin/StructureView#StoriesView": StoriesView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#PricesView": PricesView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#RegistersView": RegistersView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#SamplingView": SamplingView_1226fdfc491f100b8cb8d80d236e0a07,

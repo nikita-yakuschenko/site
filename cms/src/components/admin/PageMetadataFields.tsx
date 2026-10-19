@@ -86,6 +86,17 @@ export function BlockRecordMetadata() {
 const recordTypes = { project: 'Проект дома', 'ready-home': 'Готовый дом' }
 const projectFields: RecordFields = { name: 'name', type: 'recordType', types: recordTypes, typeLabel: 'Тип записи', slug: 'slug', slugFrom: projectSlugFromName, placeholder: 'Введите название проекта' }
 
+const storyCustomers = { family: 'Частное лицо', business: 'Бизнес' }
+const storyFields: RecordFields = { name: 'heading', type: 'customerKind', types: storyCustomers, typeLabel: 'Заказчик', slug: 'slug', slugFrom: projectSlugFromName, placeholder: 'Введите заголовок отзыва' }
+
+export function StoryRecordMetadata() {
+  const { id, hasPublishedDoc } = useDocumentInfo()
+  return <RecordMetadata fields={storyFields} badge={<Badge variant={hasPublishedDoc ? 'default' : 'outline'}>{hasPublishedDoc ? 'Опубликован' : 'Черновик'}</Badge>}>
+    {!id && <DraftLeavePrompt />}
+    <UnpublishedChanges />
+  </RecordMetadata>
+}
+
 export function ProjectRecordMetadata() {
   const { id, hasPublishedDoc, data } = useDocumentInfo()
   const code = typeof data?.code === 'string' ? data.code : ''

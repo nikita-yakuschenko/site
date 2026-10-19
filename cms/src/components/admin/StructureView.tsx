@@ -4,6 +4,7 @@ import type { AdminViewServerProps } from 'payload'
 import { structure } from '../../config/structure'
 import { PagesIndex } from './PagesIndex'
 import { CatalogIndex } from './CatalogIndex'
+import { StoriesIndex } from './StoriesIndex'
 import { PriceImport } from './PriceImport'
 import { PricesTable, type PriceTableRow } from './PricesTable'
 import { IntegrationsPanel } from './IntegrationsPanel'
@@ -19,6 +20,7 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
   if (view === 'blocks' || view === 'forms') redirect(`/${view}`)
   const pages = view === 'pages' ? await initPageResult.req.payload.find({ collection: 'pages', limit: 1000, sort: 'route', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
   const projects = view === 'catalog' ? await initPageResult.req.payload.find({ collection: 'projects', limit: 1000, sort: 'name', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
+  const stories = view === 'stories' ? await initPageResult.req.payload.find({ collection: 'stories', limit: 1000, sort: '-year', depth: 0, req: initPageResult.req, overrideAccess: false }) : null
   const submissions = view === 'catalog' ? await initPageResult.req.payload.find({ collection: 'lead-submissions', pagination: false, depth: 0, req: initPageResult.req, overrideAccess: false, select: { status: true, payload: true } }) : null
   const leads = projects && submissions ? Object.fromEntries(countProjectLeads(projects.docs, submissions.docs)) : {}
   const delivery = view === 'integrations' ? await leadDelivery(initPageResult.req) : null
@@ -32,12 +34,14 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
     {view === 'integrations' && <Suspense><IntegrationsPanel delivery={delivery} yandex={yandex} /></Suspense>}
     {view === 'pages' && pages && <PagesIndex siteUrl={siteUrl} pages={pages.docs} />}
     {view === 'catalog' && projects && <Suspense><CatalogIndex siteUrl={siteUrl} projects={projects.docs} leads={leads} /></Suspense>}
+    {view === 'stories' && stories && <StoriesIndex siteUrl={siteUrl} stories={stories.docs} />}
   </div>
 }
 
 export function SiteView(props: AdminViewServerProps) { return <StructureView {...props} view="site" /> }
 export function PagesView(props: AdminViewServerProps) { return <StructureView {...props} view="pages" /> }
 export function CatalogView(props: AdminViewServerProps) { return <StructureView {...props} view="catalog" /> }
+export function StoriesView(props: AdminViewServerProps) { return <StructureView {...props} view="stories" /> }
 export function PricesView(props: AdminViewServerProps) { return <StructureView {...props} view="prices" /> }
 export function RegistersView(props: AdminViewServerProps) { return <StructureView {...props} view="registers" /> }
 export function SamplingView(props: AdminViewServerProps) { return <StructureView {...props} view="sampling" /> }
