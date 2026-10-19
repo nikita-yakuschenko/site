@@ -6,6 +6,7 @@
   gap: 12px;
   min-width: 0;
 }
+.mortgage-calc__toolbar--family { flex-wrap: wrap; }
 .mortgage-calc__mode--soon {
   position: relative;
   color: var(--ink-3);
