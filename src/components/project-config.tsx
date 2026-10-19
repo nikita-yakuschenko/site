@@ -1,6 +1,6 @@
 "use client";
 
-import { IconCheck, IconGiftFilled, IconX } from "@tabler/icons-react";
+import { IconCheck, IconGiftFilled, IconPlus, IconX } from "@tabler/icons-react";
 import { useState, useSyncExternalStore } from "react";
 import { copy } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
@@ -104,28 +104,26 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                     {item.price > 0 ? formatFromRub(item.price) : 'Цена уточняется'}
                   </span>
                   <span className="project-config__tier-list">
+                    <span className="project-config__tier-includes-title">
+                      {item.id === 'project' ? 'Дополнительно к Стандартной комплектации вы получаете:'
+                        : item.id === 'turnkey' ? 'Дополнительно к Проектной комплектации вы получаете:'
+                        : item.id === 'standard' ? 'Всё необходимое для начала:' : 'В комплект входит:'}
+                    </span>
                     {item.includes.map((line) => (
-                      <span key={line}>
-                        <IconCheck size={14} stroke={2.4} aria-hidden="true" />
-                        {line}
-                      </span>
-                    ))}
-                    {/* Подарки отделены сегментом — подписью между двумя
-                          линиями, как хвост каталога: это не продолжение
-                          состава, а другая его часть. Плашки у каждой
-                          строки не нужны, подпись сказана один раз. */}
-                    {item.gifts?.length ? (
-                      <span className="project-config__tier-band">
-                        <span>{copy.configGift}</span>
-                      </span>
-                    ) : null}
-                    {item.gifts?.map((line) => (
-                      <span key={line} className="project-config__tier-gift">
-                        <IconGiftFilled size={14} aria-hidden="true" />
-                        {line}
+                      <span key={line} className="project-config__tier-included">
+                        {item.id === 'project' || item.id === 'turnkey'
+                          ? <IconPlus size={14} stroke={2.4} aria-hidden="true" />
+                          : <IconCheck size={14} stroke={2.4} aria-hidden="true" />}
+                        <span>{line}</span>
                       </span>
                     ))}
                   </span>
+                  {item.gifts?.length ? <span className="project-config__tier-gifts">
+                    <span className="project-config__tier-band">
+                      <span><IconGiftFilled size={14} aria-hidden="true" />{copy.configGift}</span>
+                    </span>
+                    <span className="project-config__tier-gift">{item.gifts.join(', ')}</span>
+                  </span> : null}
                 </button>
               </li>
             ))}

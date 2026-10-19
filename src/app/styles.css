@@ -12769,7 +12769,7 @@ html.is-dialog-open {
   margin-top: var(--gap-stack);
 }
 
-@media (min-width: 900px) {
+@media (min-width: 1200px) {
   .project-config {
     grid-template-columns: minmax(0, 1fr) 340px;
     gap: 32px;
@@ -12788,7 +12788,7 @@ html.is-dialog-open {
   list-style: none;
 }
 
-@media (min-width: 720px) {
+@media (min-width: 800px) {
   .project-config__tiers {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
@@ -12847,7 +12847,8 @@ html.is-dialog-open {
 
 .project-config__tier-price {
   margin-top: 4px;
-  font-size: 22px;
+  font-size: clamp(18px, 1.6vw, 20px);
+  white-space: nowrap;
   font-weight: 700;
   letter-spacing: -0.03em;
   color: var(--avgst-green);
@@ -12856,7 +12857,7 @@ html.is-dialog-open {
 .project-config__tier-list {
   display: grid;
   align-content: start;
-  gap: 6px;
+  gap: 14px;
   margin-top: 8px;
   padding-top: 14px;
   border-top: 1px solid var(--line);
@@ -12864,9 +12865,9 @@ html.is-dialog-open {
   color: var(--ink-1);
 }
 
-.project-config__tier-list > span {
+.project-config__tier-included {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 8px;
 }
 
@@ -12875,42 +12876,22 @@ html.is-dialog-open {
   color: var(--avgst-green);
 }
 
-/* Подарки отделены сегментом: подпись между двумя линиями — тем же
-   приёмом, что делит каталог на избранное и остальное. */
-.project-config__tier-list .project-config__tier-band {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin: 6px 0 2px;
-  font-size: 11px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-/* Пунктир, а не сплошная: отбивка внутри списка легче сплошных линий
-   карточки и не спорит с ними. */
-.project-config__tier-band::before,
-.project-config__tier-band::after {
-  content: "";
-  flex: 1;
-  height: 0;
-  border-top: 1px dashed var(--line-2);
-}
-
-.project-config__tier-band > span {
-  flex: none;
-}
-
-.project-config__tier-gift {
+.project-config__tier-list > .project-config__tier-includes-title {
+  display: block;
+  margin-bottom: 2px;
   color: var(--avgst-ink);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.4;
 }
-
-/* Чистый брендовый жёлтый, а не притемнённый: затемнение уводило его
-   в горчичный, и строка выглядела грязной. */
-.project-config__tier-list .project-config__tier-gift svg {
-  color: var(--brand-yellow);
-}
+.project-config__tier-included svg { margin-top: 3px; }
+.project-config__tier-gifts { display: grid; align-content: start; gap: 10px; margin-top: 16px; }
+.project-config__tier-band { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; color: var(--ink-1); }
+.project-config__tier-band::before,
+.project-config__tier-band::after { content: ""; flex: 1; height: 0; border-top: 1px dashed var(--line-2); }
+.project-config__tier-band > span { display: inline-flex; align-items: center; gap: 6px; flex: none; }
+.project-config__tier-band svg { color: var(--brand-yellow); }
+.project-config__tier-gift { display: block; font-size: 14px; line-height: 1.45; color: var(--avgst-ink); }
 
 /* Интерьеры: ровная сетка одинаковых кадров. Бенто с крупной плиткой
    занято фасадами; здесь ни один кадр не главный — это варианты отделки,
@@ -13268,13 +13249,11 @@ html.is-dialog-open {
    сравниваться взглядом. Строки задаёт список, карточки наследуют их
    через subgrid; правило идёт после раскладки карточки, чтобы не быть
    перебитым её собственным display. */
-@media (min-width: 720px) {
+@media (min-width: 800px) {
   @supports (grid-template-rows: subgrid) {
     .project-config__tiers {
-      /* Последняя строка забирает остаток высоты: колонка растёт, когда
-         в панели раскрывается форма, и карточки должны расти с ней, а не
-         висеть коротышками в высоком ряду. */
-      grid-template-rows: auto auto auto 1fr;
+      /* Состав забирает остаток высоты, подарки остаются на общей нижней линии. */
+      grid-template-rows: auto auto auto 1fr auto;
       row-gap: 8px;
       height: 100%;
     }
@@ -13282,7 +13261,7 @@ html.is-dialog-open {
     .project-config__tiers li,
     .project-config__tiers .project-config__tier {
       display: grid;
-      grid-row: span 4;
+      grid-row: span 5;
       grid-template-rows: subgrid;
       gap: 8px;
     }
