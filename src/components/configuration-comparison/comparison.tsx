@@ -34,7 +34,7 @@ import {
   PopoverTrigger,
 } from "../ui/popover";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
-import { technicalMatrices } from "./model/data";
+import { technicalMatrices, deliveryInfoForRegion } from "./model/data";
 import {
   hasDifferences,
   type SpecificationValue,
@@ -135,10 +135,12 @@ export function ConfigurationComparison({
   project,
   tiers,
   selectedTier,
+  region,
 }: {
   project: CatalogProject;
   tiers: readonly PricedTier[];
   selectedTier: string;
+  region: "nn" | "msk";
 }) {
   const [open, setOpen] = useState(false);
   return (
@@ -163,6 +165,7 @@ export function ConfigurationComparison({
           project={project}
           tiers={tiers}
           selectedTier={selectedTier}
+          region={region}
         />
       </DialogContent>
     </Dialog>
@@ -172,17 +175,25 @@ function ComparisonBody({
   project,
   tiers,
   selectedTier,
+  region,
 }: {
   project: CatalogProject;
   tiers: readonly PricedTier[];
   selectedTier: string;
+  region: "nn" | "msk";
 }) {
   const matrix = technicalMatrices[project.technology];
   const projectSections = matrix.sections.map((section) => ({
     ...section,
-    elements: section.elements.filter(
-      (element) => element.id !== "interfloor" || project.floorsValue !== 1,
-    ),
+    elements: section.elements
+      .filter(
+        (element) => element.id !== "interfloor" || project.floorsValue !== 1,
+      )
+      .map((element) =>
+        element.id === "delivery"
+          ? { ...element, info: deliveryInfoForRegion(region) }
+          : element,
+      ),
   }));
   const [differences, setDifferences] = useState(false);
   const [collapsed, setCollapsed] = useState<Set<string>>(

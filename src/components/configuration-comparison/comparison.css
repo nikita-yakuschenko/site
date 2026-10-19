@@ -830,3 +830,12 @@
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
 }
+
+@media (max-width: 360px) {
+  .comparison-table thead th[data-package] {
+    padding-inline: 8px;
+  }
+  .comparison-price {
+    font-size: 12px;
+  }
+}

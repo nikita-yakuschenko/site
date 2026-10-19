@@ -2,6 +2,7 @@ import { test, expect, type Page } from "@playwright/test";
 import {
   modularMatrix,
   panelMatrix,
+  deliveryInfoForRegion,
 } from "../src/components/configuration-comparison/model/data";
 import { hasDifferences } from "../src/components/configuration-comparison/model/types";
 
@@ -24,7 +25,7 @@ test("independent matrices have complete atomic values and semantic differences"
   expect(modularMatrix.packageIds).toEqual(["standard", "project", "turnkey"]);
   for (const matrix of [panelMatrix, modularMatrix]) {
     const elements = matrix.sections.flatMap((s) => s.elements);
-    expect(elements).toHaveLength(23);
+    expect(elements).toHaveLength(22);
     expect(new Set(elements.map((e) => e.id)).size).toBe(elements.length);
     for (const element of elements) {
       expect(Object.keys(element.values)).toEqual(matrix.packageIds);
@@ -72,6 +73,17 @@ test("independent matrices have complete atomic values and semantic differences"
         /взлом|гидроизоляц|мощност|не подтвержд|не заявлен/i,
       );
     }
+  }
+  expect(deliveryInfoForRegion("nn").summary).toContain(
+    "50 км от Нижнего Новгорода",
+  );
+  expect(deliveryInfoForRegion("msk").summary).toContain("50 км от Москвы");
+  for (const matrix of [panelMatrix, modularMatrix]) {
+    const elements = matrix.sections.flatMap((s) => s.elements);
+    expect(elements.some((e) => e.id === "roofPaint")).toBe(false);
+    const delivery = elements.find((e) => e.id === "delivery")!;
+    for (const id of matrix.packageIds)
+      expect(delivery.values[id]?.displayValue).toBe("Включена в стоимость");
   }
   const floor = modularMatrix.sections
     .flatMap((s) => s.elements)
@@ -142,6 +154,13 @@ for (const width of [320, 360, 390, 768, 1024, 1440]) {
     await dialog.getByRole("button", { name: "Развернуть разделы" }).click();
     await expect(wall).toHaveAttribute("data-visible", "true");
     if (width <= 900) {
+      expect(
+        await dialog
+          .locator(
+            ".comparison-table thead [data-package]:visible .comparison-price",
+          )
+          .evaluate((el) => el.scrollWidth <= el.clientWidth + 1),
+      ).toBe(true);
       await expect(
         dialog.getByRole("tablist", { name: "Выбор комплектации" }),
       ).toHaveCount(1);
@@ -502,4 +521,39 @@ test("mobile packages slide both ways, interrupt cleanly, and respect reduced mo
   await standard.click();
   await expect(dialog.locator(".comparison-slide-outgoing")).toHaveCount(0);
   await expect(standard).toHaveAttribute("aria-selected", "true");
+});
+
+test("delivery inclusion stays in the table and the zone follows the selected region", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  let dialog = await openComparison(page);
+  for (const [index, city] of ["Нижнего Новгорода", "Москвы"].entries()) {
+    if (index === 1) {
+      await page.locator(".site-region__trigger:visible").first().click();
+      await page.getByRole("option", { name: "Московская область", exact: true }).click();
+      await page.getByRole("button", { name: "Сравнить комплектации" }).click();
+      dialog = page.getByRole("dialog", { name: "Сравнение комплектаций" });
+    }
+    await dialog
+      .getByRole("button", { name: /Дополнительные конструкции и работы/ })
+      .click();
+    const delivery = dialog.locator('[data-element="delivery"]');
+    await expect(delivery.locator("td")).toContainText([
+      "Включена в стоимость",
+      "Включена в стоимость",
+      "Включена в стоимость",
+    ]);
+    expect(await delivery.innerText()).not.toMatch(/600|50|Моск|Новгор/);
+    await dialog
+      .getByRole("button", { name: "Подробнее: Доставка", exact: true })
+      .click();
+    await expect(dialog.locator('[data-slot="popover-content"]')).toContainText(
+      `50 км от ${city}`,
+    );
+    await page.keyboard.press("Escape");
+    await expect(dialog.locator('[data-slot="popover-content"]')).toHaveCount(0);
+    await page.keyboard.press("Escape");
+    await expect(dialog).not.toBeVisible();
+  }
 });

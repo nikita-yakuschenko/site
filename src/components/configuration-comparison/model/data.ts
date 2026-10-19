@@ -4,6 +4,7 @@ import type {
   SpecificationValue,
   TechnicalElement,
   TechnicalMatrix,
+  TechnicalInfo,
 } from "./types";
 
 const included = (
@@ -108,15 +109,6 @@ const descriptions: Record<string, Row> = {
       "Профилированный лист или металлочерепица согласно проекту",
       "Толщина металла 0,45 мм",
     ],
-    [],
-  ],
-  roofPaint: [
-    "roofPaint",
-    "Защитно-декоративное покрытие",
-    "Покрытие металла",
-    "shield",
-    "Заводской защитный и декоративный слой кровельного металла.",
-    ["Заводское покрытие"],
     [],
   ],
   windows: [
@@ -281,7 +273,7 @@ const sectionDefinitions = [
     "Силовой (несущий) каркас",
     ["wall", "roofFrame", "base", "partitions", "interfloor"],
   ],
-  ["roof", "Кровельное покрытие", ["roofing", "roofPaint"]],
+  ["roof", "Кровельное покрытие", ["roofing"]],
   ["openings", "Окна и входные двери", ["windows", "doors"]],
   ["facade", "Фасадная отделка", ["facade", "facadePaint"]],
   [
@@ -403,11 +395,6 @@ const panelValues: Values = {
     included("Каркас, утепление 200 мм", null, "structural", "insulation200"),
   ],
   roofing: [excluded(), architectural(), architectural()],
-  roofPaint: [
-    excluded(),
-    included("Заводское покрытие", null, null, "factory"),
-    included("Заводское покрытие", null, null, "factory"),
-  ],
   windows: [
     excluded(),
     included("Базовые, 1×1,2 м", "Rehau 70 мм", null, "basic"),
@@ -435,9 +422,9 @@ const panelValues: Values = {
   ventilation: [excluded(), excluded(), excluded()],
   terrace: [excluded(), excluded(), architectural()],
   delivery: [
-    included("Нижний Новгород и Москва: до 50 км", null, null, "nn50-msk50"),
-    included("Нижний Новгород и Москва: до 50 км", null, null, "nn50-msk50"),
-    included("Нижний Новгород и Москва: до 50 км", null, null, "nn50-msk50"),
+    included("Включена в стоимость", null, null, "delivery50"),
+    included("Включена в стоимость", null, null, "delivery50"),
+    included("Включена в стоимость", null, null, "delivery50"),
   ],
   assembly: [included(), included(), included()],
 };
@@ -482,11 +469,6 @@ const modularValues: Values = {
     included("Каркас, утепление 200 мм", null, "structural", "insulation200"),
   ],
   roofing: [architectural(), architectural(), architectural()],
-  roofPaint: [
-    included("Заводское покрытие", null, null, "factory"),
-    included("Заводское покрытие", null, null, "factory"),
-    included("Заводское покрытие", null, null, "factory"),
-  ],
   windows: [
     included("Базовые, 1×1,2 м", "Rehau 70 мм", null, "basic"),
     included("Согласно проекту", "Rehau 70 мм", null, "architectural"),
@@ -558,14 +540,9 @@ const modularValues: Values = {
   ],
   terrace: [excluded(), architectural(), architectural()],
   delivery: [
-    included("Нижний Новгород и Москва: до 50 км", null, null, "nn50-msk50"),
-    included("Нижний Новгород и Москва: до 50 км", null, null, "nn50-msk50"),
-    included(
-      "Нижний Новгород: до 50 км; Москва: до 600 км",
-      null,
-      null,
-      "nn50-msk600",
-    ),
+    included("Включена в стоимость", null, null, "delivery50"),
+    included("Включена в стоимость", null, null, "delivery50"),
+    included("Включена в стоимость", null, null, "delivery50"),
   ],
   assembly: [included(), included(), included()],
 };
@@ -587,3 +564,20 @@ export const technicalMatrices = {
   panel: panelMatrix,
   modular: modularMatrix,
 } as const;
+
+export const includedDeliveryZones = {
+  nn: { origin: "Нижнего Новгорода", distanceKm: 50 },
+  msk: { origin: "Москвы", distanceKm: 50 },
+} as const;
+
+export function deliveryInfoForRegion(
+  region: keyof typeof includedDeliveryZones,
+): TechnicalInfo {
+  const zone = includedDeliveryZones[region];
+  return {
+    title: "Доставка",
+    summary: `Доставка включена в стоимость для объекта на удалении до ${zone.distanceKm} км от ${zone.origin}.`,
+    technicalFacts: [],
+    qualifiers: [],
+  };
+}

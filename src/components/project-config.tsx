@@ -216,7 +216,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
           </aside>
         </div>
 
-        <ConfigurationComparison project={project} tiers={tiers} selectedTier={tier.id} />
+        <ConfigurationComparison project={project} tiers={tiers} selectedTier={tier.id} region={region} />
       </div>
     </section>
   );
