@@ -781,6 +781,7 @@ export interface Story {
   heading: string;
   slug: string;
   subtitle?: string | null;
+  duration?: string | null;
   place: string;
   year: number;
   customerKind: 'family' | 'business';
@@ -1561,6 +1562,7 @@ export interface StoriesSelect<T extends boolean = true> {
   heading?: T;
   slug?: T;
   subtitle?: T;
+  duration?: T;
   relatedCard?: T | {
     enabled?: T;
     title?: T;

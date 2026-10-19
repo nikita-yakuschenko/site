@@ -75,6 +75,8 @@ export const Stories: CollectionConfig = {
     { name: 'heading', label: 'Заголовок', type: 'text', required: true, admin: { hidden: true } },
     { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, index: true, admin: { hidden: true }, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
     { name: 'subtitle', label: 'Подзаголовок', type: 'text' },
+    // Колонка осталась в БД после ручного поля; не показываем — длительность берётся с видео.
+    { name: 'duration', type: 'text', admin: { hidden: true } },
     { name: 'place', label: 'Локация', type: 'text', required: true },
     { name: 'year', label: 'Год', type: 'number', required: true, min: 2014, admin: { step: 1 }, validate: (value: unknown) => typeof value === 'number' && Number.isInteger(value) && value >= 2014 ? true : 'Укажите год' },
     { name: 'customerKind', label: 'Заказчик', type: 'select', required: true, defaultValue: 'family', options: [{ label: 'Частное лицо', value: 'family' }, { label: 'Бизнес', value: 'business' }], admin: { hidden: true } },
