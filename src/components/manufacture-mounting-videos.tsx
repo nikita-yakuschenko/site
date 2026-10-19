@@ -8,12 +8,13 @@ const episodes = [
   {
     id: "456242307",
     hash: "325f30cd4c6157ff94",
-    poster: "https://sun9-29.userapi.com/impg/ksRmpFSE5LBvpoq2YwbMOsfemP-4Qnp31SwQJw/_WXhIWn4Oek.jpg?size=800x450&quality=95&keep_aspect_ratio=1&background=000000&sign=bfb1412a4555790f9193100e0e1ce5c0&c_uniq_tag=gbklewjN9L7SQqejSlKne3z0wNi_uwxbnpijxwvCkWM&type=video_thumb",
+    // Обложки лежат у нас: ссылки CDN ВК с подписью со временем отваливаются.
+    poster: "/production/mounting-series-1.jpg",
   },
   {
     id: "456242321",
     hash: "13aaf495b1fa7f418a",
-    poster: "https://sun9-70.userapi.com/impg/U6EC0oC3vLSz4OPatT8CnId2kUL9CBu-8QSSxA/eq3-ZLM92nk.jpg?size=800x450&quality=95&keep_aspect_ratio=1&background=000000&sign=4ff27f8e25c9fa9b0384a3b3bce1bd76&c_uniq_tag=x-n9PMqaTQ1ATMPO1ryqMkMxub5-qtp5ULdBktJHXW4&type=video_thumb",
+    poster: "/production/mounting-series-2.jpg",
   },
 ];
 
