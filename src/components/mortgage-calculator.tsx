@@ -495,7 +495,7 @@ export function MortgageCalculator({
 
             <fieldset className="mortgage-calc__programs" aria-label={t.programLabel}>
               <div className="mortgage-calc__program-list">
-                {MORTGAGE_PROGRAMS.map((p) => (
+                {MORTGAGE_PROGRAMS.filter((p) => p.id !== "rural").map((p) => (
                   <button
                     key={p.id}
                     type="button"

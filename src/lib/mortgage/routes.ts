@@ -11,7 +11,6 @@ import type { MortgageProgramId } from "./programs";
 export const MORTGAGE_ROUTES = [
   { id: "family", slug: "family-mortgage", title: "Семейная ипотека" },
   { id: "it", slug: "it-mortgage", title: "IT-ипотека" },
-  { id: "rural", slug: "agro-mortgage", title: "Сельская ипотека" },
   { id: "market", slug: "basic-mortgage", title: "Рыночная ипотека" },
 ] as const satisfies readonly {
   id: MortgageProgramId;

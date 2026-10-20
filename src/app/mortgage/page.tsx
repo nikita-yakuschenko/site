@@ -16,7 +16,6 @@ import type { MortgageProgramId } from "../../lib/mortgage";
 const PROGRAM_IDS: readonly MortgageProgramId[] = [
   "family",
   "it",
-  "rural",
   "market",
 ];
 

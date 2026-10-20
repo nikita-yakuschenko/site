@@ -197,18 +197,7 @@ function MortgageShowcase({ block }: { block: LayoutBlock }) {
               <IconArrowUpRight size={18} stroke={2} />
             </span>
           </a>
-          <a className="mortgage-program mortgage-program--agro" href="/agro-mortgage">
-            <span>Сельская ипотека</span><strong>от 3%</strong>
-            <small>
-              {nbspText("Для работников АПК")}
-              <br />
-              {nbspText("и соц. сферы на селе")}
-            </small>
-            <Image className="mortgage-program__art" src="/img/cards/wheat.png" alt="" width={919} height={1100} sizes="190px" quality={90} />
-            <span className="series-bento__go" aria-hidden="true">
-              <IconArrowUpRight size={18} stroke={2} />
-            </span>
-          </a>
+          {null /* Слот скрытой сельской программы сохраняет ключи CMS остальных карточек. */}
           <a className="mortgage-program mortgage-program--bank" href="/basic-mortgage">
             <span>Базовые программы</span><strong>от 16%</strong>
             <small>

@@ -112,7 +112,7 @@ export function MortgageOtherPrograms({
         </h2>
         <p className="mortgage-page__lead">{copy.mortgageOtherPrograms.lead}</p>
         <div className="mortgage-showcase__programs">
-          {cards.map((card) => (
+          {cards.map((card) => card.id === "rural" ? null : (
             <Link
               key={card.id}
               className={`mortgage-program ${card.className}`}
