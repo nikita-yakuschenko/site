@@ -11,7 +11,7 @@ import {
   isEmpty,
   parseFilters,
 } from '../../lib/catalog/filters'
-import { copy, footerAboutFor, seriesTitle } from '../../lib/copy'
+import { copy, footerAboutFor } from '../../lib/copy'
 import { SITE } from '../../lib/site'
 
 const catalog = new CmsCatalogProvider()
@@ -36,13 +36,8 @@ export async function generateMetadata({
   searchParams: Search
 }): Promise<Metadata> {
   const filters = parseFilters(await searchParams)
-  const title = filters.status === 'ready'
-    ? copy.readyHousesTitle
-    : filters.series
-      ? seriesTitle(filters.series)
-      : copy.catalogTitle
   return {
-    title,
+    title: copy.catalogProjects,
     description: copy.catalogLead,
     /* Отобранная выдача это тот же каталог под другим углом, а не
        самостоятельная страница. Без canonical поиск индексирует каждую
@@ -79,7 +74,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
   }
 
   const { items, rest } = await catalog.list({ siteCode: SITE.code, filters })
-  const heading = filters.status === 'ready' ? copy.readyHousesTitle : copy.catalogTitle
+  const heading = copy.catalogProjects
   const toBoard = (list: typeof items): BoardItem[] =>
     list.map((project) => ({ id: project.id, card: <ProjectCard project={project} /> }))
 
