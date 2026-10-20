@@ -2,6 +2,7 @@
 
 import { IconArrowUpRight } from "@tabler/icons-react";
 import Image from "next/image";
+import { optimizableMedia } from '../lib/media';
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LeadDialog } from "./lead-dialog";
@@ -85,7 +86,7 @@ export function ProjectNextSteps({
               alt=""
               fill
               sizes="(min-width: 720px) 50vw, 100vw"
-              unoptimized={/^https?:\/\//.test(reviewImage)}
+              unoptimized={!optimizableMedia(reviewImage)}
             />
           </Link>
         ) : (

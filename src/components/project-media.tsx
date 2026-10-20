@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { optimizableMedia } from '../lib/media';
 import { useEffect, useState } from "react";
 import { isHeroImage } from "../lib/catalog/project-hero-data";
 import { copy } from "../lib/copy";
@@ -86,7 +87,7 @@ export function ProjectExteriors({ project, images, connected = false }: { proje
               >
                 <Image
                   src={src}
-                  unoptimized={/^https?:\/\//.test(src)}
+                  unoptimized={!optimizableMedia(src)}
                   alt=""
                   width={1600}
                   height={1000}
@@ -153,7 +154,7 @@ export function ProjectInteriors({ project, images, connected = false }: { proje
                   src={src}
                   alt=""
                   width={1400}
-                  unoptimized={/^https?:\/\//.test(src)}
+                  unoptimized={!optimizableMedia(src)}
                   height={900}
                   sizes="(min-width: 900px) 33vw, 50vw"
                 />
