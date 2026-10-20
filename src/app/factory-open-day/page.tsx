@@ -9,8 +9,8 @@ import { FactoryOpenDayProgram } from '../../components/factory-open-day/program
 import { openDayDate } from '../../lib/open-day'
 import './open-day.css'
 
-const inter = localFont({ src: '../../../public/fonts/inter/Inter-Variable.ttf', weight: '400 700', variable: '--font-ags-inter', display: 'swap' })
-const unbounded = localFont({ src: '../../../public/fonts/unbounded/Unbounded-Variable.ttf', weight: '600 700', variable: '--font-ags-display', display: 'swap' })
+const inter = localFont({ src: '../../../public/fonts/inter/Inter-Variable.ttf', weight: '400 700', variable: '--font-ags-inter', display: 'swap', preload: false })
+const unbounded = localFont({ src: '../../../public/fonts/unbounded/Unbounded-Variable.ttf', weight: '600 700', variable: '--font-ags-display', display: 'swap', preload: false })
 
 export async function generateMetadata(): Promise<Metadata> {
   const date = await openDayDate()

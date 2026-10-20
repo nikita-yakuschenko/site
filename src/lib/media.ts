@@ -5,15 +5,23 @@ export function mediaUrl(media: MediaLike): string {
   return ''
 }
 
-// Локальные файлы из public уменьшаем. Файлы, загруженные в CMS, отдаём как есть:
-// серверный оптимизатор на них рвёт отрисовку главного кадра.
+// Уменьшаем локальные изображения и разрешённые изображения CMS.
+// Прочие внешние адреса оставляем без изменений.
+export function optimizableMedia(src: string): boolean {
+  if (!/^https?:\/\//.test(src)) return true
+  try {
+    const url = new URL(src)
+    return url.pathname.startsWith('/api/media/file/') && (url.origin === 'https://cms.avgst.ru' || url.origin === 'http://localhost:3001')
+  } catch { return false }
+}
+
 export function optimizedSrc(src: string, width: number, quality = 75): string {
-  if (!src || src.startsWith('data:') || src.startsWith('/_next/image') || /^https?:\/\//.test(src)) return src
+  if (!src || src.startsWith('data:') || src.startsWith('/_next/image') || !optimizableMedia(src)) return src
   return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality}`
 }
 
 export function optimizedSrcSet(src: string, widths: number[], quality = 75): string {
-  if (/^https?:\/\//.test(src)) return ''
+  if (!optimizableMedia(src)) return ''
   return widths.map((width) => `${optimizedSrc(src, width, quality)} ${width}w`).join(', ')
 }
 

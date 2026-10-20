@@ -449,7 +449,7 @@ export function HeroCarousel({
       ]
     : slots.map((promo) => ({ promo, key: promo.heading, clone: false }));
 
-  const desktopSet = shown.image.startsWith('http') ? shown.image : optimizedSrcSet(shown.image, [1080, 1920])
+  const desktopSet = optimizedSrcSet(shown.image, [1080, 1920])
   const mobileSet = shown.imageMobile ? optimizedSrcSet(shown.imageMobile, [384, 828], 60) : ''
 
   return (
@@ -468,13 +468,13 @@ export function HeroCarousel({
       {shown.imageMobile ? (
         <picture className="hero__frame" data-cms-block="hero.background">
           {/* Пустой srcSet браузер выбрасывает и тогда вертикальный кадр
-              начинает задавать высоту экрана. Для файла из CMS набор ширин
-              не строится — атрибут просто не ставим. */}
+              начинает задавать высоту экрана. Для разрешённых файлов CMS используем
+              тот же адаптивный набор, что и для локальных изображений. */}
           <source media="(min-width: 900px)" srcSet={desktopSet} />
-          <img src={optimizedSrc(shown.imageMobile, 828, 60)} alt="" decoding="async" {...(mobileSet ? { srcSet: mobileSet, sizes: '100vw' } : {})} />
+          <img src={optimizedSrc(shown.imageMobile, 828, 60)} alt="" decoding="async" fetchPriority="high" {...(mobileSet ? { srcSet: mobileSet, sizes: '100vw' } : {})} />
         </picture>
       ) : (
-        <img className="hero__frame" src={optimizedSrc(shown.image, 1920)} alt="" decoding="async" data-cms-block="hero.background" {...(desktopSet ? { srcSet: desktopSet, sizes: '100vw' } : {})} />
+        <img className="hero__frame" src={optimizedSrc(shown.image, 1920)} alt="" decoding="async" fetchPriority="high" data-cms-block="hero.background" {...(desktopSet ? { srcSet: desktopSet, sizes: '100vw' } : {})} />
       )}
 
       {/* Ровный тон по кадру: без градиента и без формы, одна плотность во

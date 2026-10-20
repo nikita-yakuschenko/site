@@ -50,7 +50,7 @@ export default async function NotFound() {
                   </div>
                 </nav>
               </div>
-              <img className="not-found-art" src="/img/404.png" alt="" width={1774} height={887} fetchPriority="high" />
+              <img className="not-found-art" src="/img/404.png" alt="" width={1774} height={887} loading="lazy" decoding="async" />
             </div>
             {projects.length > 0 ? <section className="not-found-popular" aria-labelledby="not-found-popular-title">
               <div className="not-found-popular__head">
