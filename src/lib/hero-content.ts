@@ -68,10 +68,10 @@ const heroPreview = unstable_cache(async (source: string) => {
   try {
     const response = await fetch(url, { signal: AbortSignal.timeout(2000) })
     if (!response.ok) return undefined
-    const image = await sharp(Buffer.from(await response.arrayBuffer())).resize({ width: 32 }).webp({ quality: 35 }).toBuffer()
+    const image = await sharp(Buffer.from(await response.arrayBuffer())).resize({ width: 128 }).webp({ quality: 55 }).toBuffer()
     return `data:image/webp;base64,${image.toString('base64')}`
   } catch { return undefined }
-}, ['hero-inline-preview'], { revalidate: 86400 })
+}, ['hero-inline-preview-v2'], { revalidate: 86400 })
 
 export async function withHeroPreviews(blocks: LayoutBlock[]): Promise<LayoutBlock[]> {
   return Promise.all(blocks.map(async block => {

@@ -276,7 +276,7 @@ export function SiteChrome({
 
             <div className="site-header__aside" data-cms-block="mainHeader.contacts">
               {phone ? (
-                <a className="site-header__phone" href={telHref(phone)}>
+                <a className="site-header__phone" href={telHref(phone)} suppressHydrationWarning>
                   {phone}
                 </a>
               ) : null}
@@ -369,7 +369,7 @@ export function SiteChrome({
             {phone ? (
               <a
                 className="site-menu__phone"
-                href={telHref(phone)}
+                href={telHref(phone)} suppressHydrationWarning
                 onClick={() => setMenuOpen(false)}
               >
                 {phone}
@@ -522,10 +522,10 @@ export function SiteChrome({
               {phone ? (
                 <a
                   className="footer-contacts__row footer-contacts__row--link"
-                  href={telHref(phone)}
+                  href={telHref(phone)} suppressHydrationWarning
                 >
                   <IconPhone size={18} stroke={1.75} aria-hidden="true" />
-                  <span>{phone}</span>
+                  <span suppressHydrationWarning>{phone}</span>
                 </a>
               ) : null}
               {email ? (

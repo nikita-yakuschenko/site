@@ -377,7 +377,7 @@ export function ContactsSection({
                 <div>
                   <p>{copy.phoneLabel}</p>
                   <div className="contact-list__value">
-                    <a href={telHref(phone)}>{phone}</a>
+                    <a href={telHref(phone)} suppressHydrationWarning>{phone}</a>
                     <CopyButton value={phone} />
                   </div>
                 </div>
