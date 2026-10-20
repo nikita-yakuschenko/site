@@ -17,6 +17,8 @@ import {
   sanitizeName,
 } from '../lib/phone'
 import { noAutofillFieldProps, noAutofillFormProps } from '../lib/no-autofill'
+import { LeadSubmitFeedback } from './lead-submit-feedback'
+import { submitLead, type LeadAttempt } from '../lib/submit-lead'
 
 export function LeadForm({
   siteId,
@@ -74,9 +76,12 @@ export function LeadForm({
     consent?: boolean
   }>({})
   const phoneRef = useRef<HTMLInputElement>(null)
+  const attempt = useRef<LeadAttempt['current']>(null)
+  const submitting = useRef(false)
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (submitting.current || status === 'ok') return
     const form = event.currentTarget
     const data = new FormData(form)
     const name = sanitizeName(String(data.get('name') || '')).trim()
@@ -88,27 +93,23 @@ export function LeadForm({
     setInvalid(next)
     if (Object.keys(next).length) return
 
+    submitting.current = true
     setStatus('sending')
     try {
-      const response = await fetch('/next/leads', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          phone: phoneE164(phone),
-          message: String(data.get('message') || '').trim(),
-          consent: agreed,
-          siteId,
-          pageId: pageId ?? project?.slug,
-          projectExternalId: projectExternalId ?? project?.id,
-          projectId: projectId ?? project?.cmsId,
-          formId: resolvedFormId,
-          sourceUrl: window.location.href,
-          sourcePath: window.location.pathname,
-          meta: { region: readRegionCode(), formHeading: heading, ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
-        }),
-      })
-      if (!response.ok) throw new Error('lead-failed')
+      await submitLead({
+        name,
+        phone: phoneE164(phone),
+        message: String(data.get('message') || '').trim(),
+        consent: agreed,
+        siteId,
+        pageId: pageId ?? project?.slug,
+        projectExternalId: projectExternalId ?? project?.id,
+        projectId: projectId ?? project?.cmsId,
+        formId: resolvedFormId,
+        sourceUrl: window.location.href,
+        sourcePath: window.location.pathname,
+        meta: { region: readRegionCode(), formHeading: heading, ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
+      }, attempt)
       setStatus('ok')
       form.reset()
       setPhone('+7')
@@ -117,7 +118,7 @@ export function LeadForm({
     } catch (error) {
       console.error(error)
       setStatus('error')
-    }
+    } finally { submitting.current = false }
   }
 
   return (
@@ -126,6 +127,7 @@ export function LeadForm({
       data-form-id={resolvedFormId}
       className={`${variant === 'card' ? 'lead-card' : 'lead-form'} ym-disable-submit`}
       onSubmit={onSubmit}
+      aria-busy={status === 'sending'}
       noValidate
       {...noAutofillFormProps}
     >
@@ -267,8 +269,8 @@ export function LeadForm({
           <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
         ) : null}
       </button>
-      {status === 'ok' ? <p role="status">{successText || copy.leadOk}</p> : null}
-      {status === 'error' ? <p role="alert">{copy.leadError}</p> : null}
+      {status === 'sending' || status === 'ok' ? <LeadSubmitFeedback status={status} text={successText || copy.leadOk} /> : null}
+      {status === 'error' ? <p role="alert">Не удалось получить подтверждение. Повторите отправку — повторная попытка не создаст дубль заявки.</p> : null}
     </form>
   )
 }

@@ -1,4 +1,4 @@
-import { randomUUID } from 'node:crypto'
+import { after } from 'next/server'
 import type { CollectionConfig, GlobalConfig } from 'payload'
 import { authenticated, contentManager, superAdmin } from '../access/staff'
 import { authorizeSiteRequest } from './project-hero-endpoint'
@@ -6,6 +6,7 @@ import { leadInputSchema } from '../../../src/lib/leads'
 import { activeRoistatProjectId, deliverLead, deliveryIsEnabled, roistatWebhookUrlError } from '../config/lead-adapters'
 import { leadTitle } from '../config/lead-title'
 import { normalizeMapsApiKey, normalizeMetricaCounterId, publicMapsKey, publicMetrica } from '../config/yandex'
+import { acceptLead } from '../config/lead-intake'
 
 export const LeadDelivery: GlobalConfig = {
   slug: 'lead-delivery', label: 'Отправка заявок', access: { read: superAdmin, update: superAdmin },
@@ -78,14 +79,15 @@ export const LeadSubmissions: CollectionConfig = {
     if (!deliveryIsEnabled(settings)) return Response.json({ error: 'Отправка не настроена' }, { status: 503 })
     const form = await req.payload.find({ collection: 'forms', where: { key: { equals: input.data.formId } }, limit: 1, depth: 0, req, overrideAccess: true })
     const title = leadTitle(input.data, form.docs[0]?.title || '')
-    const receipt = await req.payload.create({ collection: 'lead-submissions', data: { requestId: randomUUID(), formId: input.data.formId, status: 'pending', title, payload: { ...input.data, title } }, req, overrideAccess: true })
-    try {
-      const result = await deliverLead(settings, input.data, receipt.requestId, fetch, title)
-      await req.payload.update({ collection: 'lead-submissions', id: receipt.id, data: result, req, overrideAccess: true })
-      return Response.json({ accepted: true, id: receipt.requestId, mode: result.status }, { headers: { 'Cache-Control': 'no-store' } })
-    } catch {
-      await req.payload.update({ collection: 'lead-submissions', id: receipt.id, data: { status: 'failed' }, req, overrideAccess: true })
-      return Response.json({ error: 'Не удалось передать данные интеграции' }, { status: 502 })
-    }
+    const lead = input.data
+    const result = await acceptLead(lead, {
+      find: async requestId => (await req.payload.find({ collection: 'lead-submissions', where: { requestId: { equals: requestId } }, limit: 1, depth: 0, overrideAccess: true })).docs[0],
+      save: requestId => req.payload.create({ collection: 'lead-submissions', data: { requestId, formId: lead.formId!, status: 'pending', title, payload: { ...lead, title } }, overrideAccess: true }),
+      defer: work => after(work),
+      deliver: requestId => deliverLead(settings, lead, requestId, fetch, title),
+      update: (id, data) => req.payload.update({ collection: 'lead-submissions', id, data, overrideAccess: true }),
+      report: error => req.payload.logger.error({ failure: error instanceof Error ? error.name : 'Error', requestId: lead.requestId, msg: 'Lead integration delivery failed; receipt retained in CMS' }),
+    })
+    return Response.json(result, { status: 202, headers: { 'Cache-Control': 'no-store' } })
   } }],
 }

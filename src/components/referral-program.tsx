@@ -1,4 +1,5 @@
 "use client";
+import { submitLead, type LeadAttempt } from '../lib/submit-lead'
 import { CMSContentBlock } from './cms-content'
 
 import Image from "next/image";
@@ -68,6 +69,7 @@ export function ReferralProgram({
 }) {
   const data = copy.referralProgram;
   const [status, setStatus] = useState<Status>("idle");
+  const attempt = useRef<LeadAttempt['current']>(null)
   const [phone, setPhone] = useState("+7");
   const [rules, setRules] = useState(true);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
@@ -163,21 +165,16 @@ export function ReferralProgram({
 
     setStatus("sending");
     try {
-      const response = await fetch("/next/leads", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        body: JSON.stringify({
-          name,
-          phone: `+${phoneDigits}`,
-          consent: true,
-          siteId: Number(siteId),
-          pageId: pageId ? Number(pageId) : undefined,
-          formId: "referral-program",
-          sourcePath: `${window.location.pathname}#referral`,
-          projectExternalId: `referral:${email}`,
-        }),
-      });
-      if (!response.ok) throw new Error("lead-failed");
+      await submitLead({
+        name,
+        phone: `+${phoneDigits}`,
+        consent: true,
+        siteId: Number(siteId),
+        pageId: pageId ? Number(pageId) : undefined,
+        formId: "referral-program",
+        sourcePath: `${window.location.pathname}#referral`,
+        projectExternalId: `referral:${email}`,
+      }, attempt);
       setStatus("ok");
       window.setTimeout(playOk, 30);
     } catch {

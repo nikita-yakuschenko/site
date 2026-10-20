@@ -1,4 +1,5 @@
 'use client'
+import { submitLead, type LeadAttempt } from '../../lib/submit-lead'
 import { CMSContentBlock } from '../cms-content'
 
 import { useEffect, useRef, useState } from 'react'
@@ -12,6 +13,7 @@ export function OpenDayBookButton({ className, children }: { className: string; 
 }
 
 export function FactoryOpenDayForm({ date }: { date: string }) {
+  const attempt = useRef<LeadAttempt['current']>(null)
   const [phone, setPhone] = useState('+7')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -37,23 +39,18 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
     if (Object.values(next).some(Boolean)) return
     setStatus('sending')
     try {
-      const response = await fetch('/next/leads', {
-        method: 'POST',
-        headers: { 'content-type': 'application/json' },
-        body: JSON.stringify({
-          name,
-          phone: phoneE164(phone),
-          message: `Запись на встречу ${date}. Email: ${email}`,
-          consent: true,
-          siteId: 'corporate',
-          pageId: 'factory-open-day',
-          formId: 'FactoryOpenDayForm',
-          sourceUrl: window.location.href,
-          sourcePath: window.location.pathname,
-          meta: { email, event: 'factory-open-day', date },
-        }),
-      })
-      if (!response.ok) throw new Error('lead-failed')
+      await submitLead({
+        name,
+        phone: phoneE164(phone),
+        message: `Запись на встречу ${date}. Email: ${email}`,
+        consent: true,
+        siteId: 'corporate',
+        pageId: 'factory-open-day',
+        formId: 'FactoryOpenDayForm',
+        sourceUrl: window.location.href,
+        sourcePath: window.location.pathname,
+        meta: { email, event: 'factory-open-day', date },
+      }, attempt);
       setStatus('ok')
     } catch {
       setStatus('error')

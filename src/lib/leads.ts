@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { recordIdPattern } from './record-id'
 
 export const leadInputSchema = z.object({
+  requestId: z.string().uuid().optional(),
   name: z.string().trim().min(2).max(120),
   phone: z
     .string()
