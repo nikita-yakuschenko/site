@@ -81,3 +81,12 @@ test('collections follow offers and link only exported published projects', () =
   assert.doesNotMatch(onlyModular.xml, /frame-houses/)
   assert.doesNotMatch(catalogYml([], []).xml, /<collection id=/)
 })
+
+
+test('offer description uses CMS text, escapes XML and falls back to actual specifications', () => {
+  assert.match(catalogYml([p({ searchDescription: 'Описание & <тест>', description: 'Старое' })], []).xml, /<description>Описание &amp; &lt;тест&gt;<\/description>/)
+  assert.match(catalogYml([p({ description: 'Описание из CMS' })], []).xml, /<description>Описание из CMS<\/description>/)
+  const fallback = catalogYml([p({ bathrooms: null })], []).xml
+  assert.match(fallback, /Площадь: 42 м²\. Этажей: 1\. Спален: 0\./)
+  assert.doesNotMatch(fallback, /Санузлов:/)
+})

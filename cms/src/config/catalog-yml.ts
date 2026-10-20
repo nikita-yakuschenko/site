@@ -26,6 +26,13 @@ export function catalogYml(projects: Project[], prices: ProjectPrice[], now = ne
       skipped++
       return []
     }
+    const description = project.searchDescription?.trim() || project.description?.trim() || [
+      `${category === 1 ? 'Модульный' : 'Каркасный'} дом «${project.name}».`,
+      project.areaValue != null ? `Площадь: ${project.areaValue} м².` : '',
+      project.floorsValue != null ? `Этажей: ${project.floorsValue}.` : '',
+      project.bedrooms != null ? `Спален: ${project.bedrooms}.` : '',
+      project.bathrooms != null ? `Санузлов: ${project.bathrooms}.` : '',
+    ].filter(Boolean).join(' ')
     const id = String(project.id)
     if (ids.has(id)) throw new Error('Повторяющийся идентификатор проекта')
     ids.add(id)
@@ -34,7 +41,7 @@ export function catalogYml(projects: Project[], prices: ProjectPrice[], now = ne
       if (!collectionPictures.has(collectionId)) collectionPictures.set(collectionId, picture.href)
     }
     const param = (name: string, value: unknown, unit = '') => value == null || value === '' ? '' : `      <param name="${name}"${unit ? ` unit="${unit}"` : ''}>${xml(value)}</param>\n`
-    return [`    <offer id="${xml(id)}" available="true">\n      <url>${origin}/catalog/${xml(project.slug)}</url>\n      <price>${price}</price>\n      <currencyId>RUR</currencyId>\n      <categoryId>${category}</categoryId>\n      <picture>${xml(picture.href)}</picture>\n      <name>${xml(project.name)}</name>\n${param('Площадь', project.areaValue, 'м²')}${param('Количество спален', project.bedrooms)}${param('Количество санузлов', project.bathrooms)}${param('Количество этажей', project.floorsValue)}${param('Тип дома', category === 1 ? 'Модульный' : 'Каркасный')}${collectionIds.map(collectionId => `      <collectionId>${collectionId}</collectionId>\n`).join('')}    </offer>`]
+    return [`    <offer id="${xml(id)}" available="true">\n      <url>${origin}/catalog/${xml(project.slug)}</url>\n      <price>${price}</price>\n      <currencyId>RUR</currencyId>\n      <categoryId>${category}</categoryId>\n      <picture>${xml(picture.href)}</picture>\n      <name>${xml(project.name)}</name>\n      <description>${xml(description)}</description>\n${param('Площадь', project.areaValue, 'м²')}${param('Количество спален', project.bedrooms)}${param('Количество санузлов', project.bathrooms)}${param('Количество этажей', project.floorsValue)}${param('Тип дома', category === 1 ? 'Модульный' : 'Каркасный')}${collectionIds.map(collectionId => `      <collectionId>${collectionId}</collectionId>\n`).join('')}    </offer>`]
   })
   const collectionXml = collections.filter(collection => collectionPictures.has(collection.id)).map(collection =>
     `      <collection id="${collection.id}">\n        <url>${xml(new URL(collection.href, origin).href)}</url>\n        <picture>${xml(collectionPictures.get(collection.id))}</picture>\n        <name>${xml(collection.name)}</name>\n        <description>${xml(collection.description)}</description>\n      </collection>`
