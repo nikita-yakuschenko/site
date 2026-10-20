@@ -5573,10 +5573,20 @@ a {
   }
 }
 
-/* На десктопе фильтры идут вместе со страницей без вложенной прокрутки. */
+/* Колонка фильтров остаётся под закреплённым поиском. */
 @media (min-width: 1024px) {
   .cfilter__toggle {
     display: none;
+  }
+
+  .cfilter {
+    position: sticky;
+    top: calc(var(--site-header-offset) + var(--catalog-bar));
+    align-self: start;
+    max-height: calc(100dvh - var(--site-header-offset) - var(--catalog-bar) - 16px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
   }
 
   .cfilter__sticky {
