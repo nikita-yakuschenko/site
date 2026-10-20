@@ -6,7 +6,7 @@ export const CLEANUP_KEYS: Record<
   { cookies: string[]; prefixes: string[]; localStorage: string[]; sessionStorage: string[] }
 > = {
   functional: {
-    cookies: ["avgst_voter"],
+    cookies: ["avgst_voter", "avgst_region"],
     prefixes: [],
     localStorage: [
       "avgst:region",

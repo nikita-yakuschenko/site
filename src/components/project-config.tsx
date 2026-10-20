@@ -1,15 +1,11 @@
 "use client";
+import { useRegionCode } from "./region-bootstrap";
 
 import { IconCheck, IconGiftFilled, IconPlus, IconX } from "@tabler/icons-react";
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { copy, nbspText } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
 import { getMortgageProgram, monthlyPaymentForProject } from "../lib/mortgage";
-import {
-  readRegionCode,
-  readServerRegionCode,
-  subscribeRegion,
-} from "../lib/regions";
 import { tiersForProject, tiersForRegion, type PricedTier } from "../lib/catalog/tiers";
 import {
   DEFAULT_TIER,
@@ -49,11 +45,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
     () => DEFAULT_TIER,
   );
   const tierId = previewTier ?? persistedTierId;
-  const region = useSyncExternalStore(
-    subscribeRegion,
-    readRegionCode,
-    readServerRegionCode,
-  );
+  const region = useRegionCode();
   const [formOpen, setFormOpen] = useState(false);
   const totalRef = useRef<HTMLElement>(null);
   const panelAnimation = useRef<Animation | null>(null);

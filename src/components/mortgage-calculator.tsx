@@ -1,4 +1,5 @@
 "use client";
+import { useRegionCode } from "./region-bootstrap";
 
 import Link from "next/link";
 import { IconPencil } from "@tabler/icons-react";
@@ -37,11 +38,6 @@ import {
   MORTGAGE_PROGRAMS,
   type MortgageProgramId,
 } from "../lib/mortgage";
-import {
-  readRegionCode,
-  readServerRegionCode,
-  subscribeRegion,
-} from "../lib/regions";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { LeadReveal } from "./lead-reveal";
 import { ProjectCard } from "./project-card";
@@ -132,13 +128,9 @@ export function MortgageCalculator({
   /** Дом, к которому относится расчёт. Нужен заявке с мобильной кнопки. */
   project?: { id: string; name: string };
 }) {
-  const siteRegion = useSyncExternalStore(
-    subscribeRegion,
-    readRegionCode,
-    readServerRegionCode,
-  );
+  const siteRegion = useRegionCode();
   const [constructionRegion, setConstructionRegion] = useState<string | null>(null);
-  const constructionRegionName = constructionRegion ?? "Нижегородская область";
+  const constructionRegionName = constructionRegion ?? (siteRegion === "msk" ? "Московская область" : "Нижегородская область");
   const region = mortgageRegionGroup(constructionRegionName);
   const [childrenCount, setChildrenCount] = useState(1);
   const tierLabelId = useId();

@@ -1,12 +1,10 @@
 'use client'
+import { useRegionCode } from './region-bootstrap'
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { copy } from '../lib/copy'
 import {
-  readRegionCode,
-  readServerRegionCode,
   REGIONS,
-  subscribeRegion,
   writeRegionCode,
   type RegionCode,
 } from '../lib/regions'
@@ -14,7 +12,7 @@ import {
 export function RegionSwitch() {
   const root = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
-  const code = useSyncExternalStore(subscribeRegion, readRegionCode, readServerRegionCode)
+  const code = useRegionCode()
   const current = REGIONS.find((region) => region.code === code) || REGIONS[0]
 
   useEffect(() => {

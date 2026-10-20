@@ -1,6 +1,6 @@
 import { Suspense, type ReactNode } from 'react'
 import type { Metadata, Viewport } from 'next'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { GeistSans } from 'geist/font/sans'
 import { ConsentShell } from '../consent/ConsentShell'
 import { YandexMetrica } from '../components/yandex-metrica'
@@ -14,8 +14,10 @@ import {
   CONSENT_VERSION,
   isConsentDecided,
 } from '../consent/types'
+import { RegionBootstrap } from '../components/region-bootstrap'
 import { copy } from '../lib/copy'
 import { OG_LOCALE } from '../lib/locale'
+import { regionByCode, REGION_COOKIE } from '../lib/regions'
 import { activeRoistatProjectId } from '../lib/roistat'
 import { activeMetricaCounterId } from '../lib/yandex'
 import './styles.css'
@@ -41,6 +43,8 @@ export const viewport: Viewport = {
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
   const jar = await cookies()
+  const requestHeaders = await headers()
+  const region = regionByCode(requestHeaders.get('x-avgst-region') ?? jar.get(REGION_COOKIE)?.value).code
   const raw = jar.get(CONSENT_COOKIE)?.value
   const parsed = parseConsent(raw)
   /* Версия проверяется здесь, а не на клиенте. Устаревшее согласие
@@ -58,7 +62,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
       <body suppressHydrationWarning>
-        <Suspense><CMSContentProvider records={content}><ConsentShell initialState={initialState}>{children}</ConsentShell></CMSContentProvider></Suspense>
+        <Suspense><CMSContentProvider records={content}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CMSContentProvider></Suspense>
         <CMSPreviewBridge />
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
         {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в

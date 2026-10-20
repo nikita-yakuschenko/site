@@ -1,9 +1,9 @@
 'use client'
+import { useRegionCode } from './region-bootstrap'
 
 import { useState, useSyncExternalStore } from 'react'
 import { IconBath, IconBed, IconHeart, IconRulerMeasure, IconShare3, IconStairs } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
-import { readRegionCode, readServerRegionCode, subscribeRegion } from '../lib/regions'
 import {
   readFavorites,
   readServerFavorites,
@@ -16,7 +16,7 @@ import { optimizedSrc } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
 
 export function ProjectCard({ project, showPrice = true, locationLabel }: { project: CatalogProject; showPrice?: boolean; locationLabel?: string }) {
-  const region = useSyncExternalStore(subscribeRegion, readRegionCode, readServerRegionCode)
+  const region = useRegionCode()
   const price = project.regionalPrices?.[region]
   const priceLabel = project.regionalPrices && !project.readyHome ? (price && price > 0 ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется') : project.priceLabel
   // Подписка на внешнее хранилище вместо синхронизации через эффект.

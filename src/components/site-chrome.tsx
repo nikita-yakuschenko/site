@@ -1,4 +1,5 @@
 "use client";
+import { useRegionCode } from "./region-bootstrap";
 import { CMSContentBlock } from './cms-content'
 
 import {
@@ -27,11 +28,6 @@ import { copy } from "../lib/copy";
 import { copyrightYears, FOOTER_SOCIALS, footerSocialHref } from "../lib/site";
 import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
-import {
-  readRegionCode,
-  readServerRegionCode,
-  subscribeRegion,
-} from "../lib/regions";
 import { OfficeStatusIndicator } from "./office-status";
 import { RegionSwitch } from "./region-switch";
 
@@ -167,11 +163,7 @@ export function SiteChrome({
     readTechBarTheme,
     () => "light" as TechBarTheme,
   );
-  const regionCode = useSyncExternalStore(
-    subscribeRegion,
-    readRegionCode,
-    readServerRegionCode,
-  );
+  const regionCode = useRegionCode();
 
   function toggleTechBarTheme() {
     writeTechBarTheme(techBarTheme === "light" ? "dark" : "light");
