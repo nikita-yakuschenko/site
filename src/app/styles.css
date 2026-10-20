@@ -2226,6 +2226,8 @@ a {
    кадру нужен запас. Поля растят область обрезки, отрицательные отступы
    возвращают ленту на место: по горизонтали обрезка остаётся ровно по краю
    содержимого страницы. */
+/* The mobile carousel must have its final geometry before hydration. */
+@media (min-width: 600px) {
 .is-rail .hero__promos-view {
   margin: -16px 0 -32px;
   padding: 16px 0 32px;
@@ -2534,6 +2536,8 @@ a {
   .is-rail .hero__promo:hover {
     transform: none;
   }
+}
+
 }
 
 /* Ниже 1100px правая колонка не помещается: текстовая колонка и слот
