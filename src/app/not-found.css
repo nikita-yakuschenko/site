@@ -13,10 +13,14 @@
 .not-found-links > div { display: flex; flex-wrap: wrap; gap: 8px; }
 .not-found-links a { display: inline-flex; align-items: center; gap: 8px; padding: 7px 10px; border: 1px solid var(--line-2); border-radius: 8px; font-size: 12px; transition: background 160ms; }
 .not-found-links a:hover { background: var(--surface-muted); }
-.not-found-popular.mortgage-calc__matches { --calc-radius-tile: 10px; border-top: 0; padding-top: 0; }
+.not-found-popular { margin-top: 24px; }
 .not-found-popular__head { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 0; }
 .not-found-popular__head h2 { margin: 0; }
-.not-found-popular__head > a { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; }
+.not-found-popular__head > a { gap: 8px; }
+.not-found-popular .grid-3 { margin-top: 20px; }
+.not-found-popular .card__title-link::after { content: ""; position: absolute; inset: 0; z-index: 1; cursor: pointer; }
+.not-found-popular .card__title-link:focus-visible::after { outline: 2px solid var(--avgst-green); outline-offset: -2px; border-radius: 16px; }
+.not-found-popular .card__cta { position: relative; z-index: 2; }
 @media (min-width: 1024px) {
   .not-found-hero { flex: 0 0 auto; }
 }

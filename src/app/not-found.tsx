@@ -52,13 +52,13 @@ export default async function NotFound() {
               </div>
               <img className="not-found-art" src="/img/404.png" alt="" width={1774} height={887} fetchPriority="high" />
             </div>
-            {projects.length > 0 ? <section className="not-found-popular mortgage-calc__matches" aria-labelledby="not-found-popular-title">
+            {projects.length > 0 ? <section className="not-found-popular" aria-labelledby="not-found-popular-title">
               <div className="not-found-popular__head">
                 <h2 id="not-found-popular-title">{copy.popularHeading}</h2>
-                <Link href="/catalog">Все проекты<IconArrowUpRight size={16} stroke={2} aria-hidden="true" /></Link>
+                <Link className="btn btn-yellow" href="/catalog">Все проекты<IconArrowUpRight size={18} stroke={2} aria-hidden="true" /></Link>
               </div>
-              <div className="mortgage-calc__matches-grid">
-                {projects.slice(0, 3).map(project => <div key={project.id}><ProjectCard project={project} /></div>)}
+              <div className="grid-3">
+                {projects.slice(0, 3).map(project => <ProjectCard key={project.id} project={project} />)}
               </div>
             </section> : null}
           </div>
