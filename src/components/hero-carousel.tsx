@@ -454,6 +454,8 @@ export function HeroCarousel({
 
   return (
     <>
+    {shown.imageMobile && <link rel="preload" as="image" imageSrcSet={mobileSet || undefined} imageSizes="100vw" href={mobileSet ? undefined : shown.imageMobile} media="(max-width: 899px)" fetchPriority="high" />}
+    <link rel="preload" as="image" imageSrcSet={desktopSet || undefined} imageSizes="100vw" href={desktopSet ? undefined : shown.image} media={shown.imageMobile ? '(min-width: 900px)' : undefined} fetchPriority="high" />
     <section
       className="hero"
       style={
