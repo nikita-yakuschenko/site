@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
 import localFont from 'next/font/local'
 import { FactoryOpenDayFooter } from '../../components/factory-open-day/footer'
 import { OpenDayTheme } from '../../components/factory-open-day/theme'
@@ -10,7 +9,7 @@ import { FactoryOpenDayProgram } from '../../components/factory-open-day/program
 import { openDayDate } from '../../lib/open-day'
 import './open-day.css'
 
-const inter = Inter({ subsets: ['cyrillic', 'latin'], weight: ['400', '500', '600', '700'], variable: '--font-ags-inter' })
+const inter = localFont({ src: '../../../public/fonts/inter/Inter-Variable.ttf', weight: '400 700', variable: '--font-ags-inter', display: 'swap' })
 const unbounded = localFont({ src: '../../../public/fonts/unbounded/Unbounded-Variable.ttf', weight: '600 700', variable: '--font-ags-display', display: 'swap' })
 
 export async function generateMetadata(): Promise<Metadata> {
