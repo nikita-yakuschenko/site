@@ -24,6 +24,14 @@ test("independent matrices have complete atomic values and semantic differences"
   expect(panelMatrix.packageIds).toEqual(["start", "standard", "project"]);
   expect(modularMatrix.packageIds).toEqual(["standard", "project", "turnkey"]);
   for (const matrix of [panelMatrix, modularMatrix]) {
+    const doors = matrix.sections.flatMap(section => section.elements).find(element => element.id === 'doors')!;
+    for (const id of matrix.packageIds) {
+      const value = doors.values[id]!;
+      if (value.status === 'included') expect(value.displayValue).toBe('Металлическая дверь с терморазрывом');
+    }
+    expect(hasDifferences(doors, matrix.packageIds)).toBe(matrix.buildingTechnology === 'panel');
+  }
+  for (const matrix of [panelMatrix, modularMatrix]) {
     const elements = matrix.sections.flatMap((s) => s.elements);
     expect(elements).toHaveLength(22);
     expect(new Set(elements.map((e) => e.id)).size).toBe(elements.length);

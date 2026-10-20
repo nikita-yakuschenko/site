@@ -27,6 +27,7 @@ const excluded = (): SpecificationValue => ({
 });
 const architectural = () =>
   included("Согласно проекту", null, null, "architectural");
+const metalDoor = () => included("Металлическая дверь с терморазрывом", "Металлическая дверь с терморазрывом", null, "thermal-break");
 const roughFloor = () =>
   included("Черновое: OSB-3 22 мм", "OSB-3 22 мм", "rough");
 
@@ -131,10 +132,7 @@ const descriptions: Record<string, Row> = {
     "Входные двери",
     "door",
     "",
-    [
-      "Входная дверь с терморазрывом",
-      "Для проектного исполнения доступен выбор из предложенных дизайнов",
-    ],
+    [],
     [],
   ],
   facade: [
@@ -323,8 +321,8 @@ const panelValues: Values = {
   ],
   doors: [
     excluded(),
-    included("Техническая входная дверь", null, null, "technical"),
-    architectural(),
+    metalDoor(),
+    metalDoor(),
   ],
   facade: [excluded(), architectural(), architectural()],
   facadePaint: [
@@ -406,9 +404,9 @@ const modularValues: Values = {
     included("Согласно проекту", "Rehau 70 мм", null, "architectural"),
   ],
   doors: [
-    included("Техническая входная дверь", null, null, "technical"),
-    architectural(),
-    architectural(),
+    metalDoor(),
+    metalDoor(),
+    metalDoor(),
   ],
   facade: [architectural(), architectural(), architectural()],
   facadePaint: [

@@ -40,7 +40,7 @@ import { ConfigurationComparison } from './configuration-comparison/comparison';
  * на каждой странице незачем.
  */
 
-const configText = (text: string) => nbspText(nbspText(text.replace(/(?:согласно|по) архитектурному проекту/gi, "согласно проекту")));
+const configText = (text: string) => nbspText(nbspText(text.replace(/(?:согласно|по) архитектурному проекту/gi, "согласно проекту").replace(/окнами согласно проекту/gi, "Окнами согласно архитектурному проекту")));
 
 export function ProjectConfig({ project, configurations, previewTier, onPreviewTierChange }: { project: CatalogProject; configurations?: PricedTier[]; previewTier?: string; onPreviewTierChange?: (tier: string) => void }) {
   const persistedTierId = useSyncExternalStore(
@@ -89,11 +89,14 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
 
   const sourceTiers = configurations ? tiersForRegion(configurations, region) : tiersForProject(project);
   // Panel houses are supplied without internal finishes, including the Project tier.
-  const tiers = project.technology === 'panel' ? sourceTiers?.map(item => ({
+  const tiers = sourceTiers?.map(item => ({
     ...item,
-    lead: /внутренн|гипсокартон/i.test(item.lead) ? 'Окна и входные двери согласно архитектурному проекту.' : item.lead,
-    includes: item.includes.filter(line => !/внутренн|гипсокартон|отделк[а-яё]*\s+(?:стен|потол|сануз)|чистов/i.test(line)),
-  })) : sourceTiers;
+    lead: project.technology === 'panel' && /внутренн|гипсокартон/i.test(item.lead) ? 'Окна согласно архитектурному проекту.' : item.lead,
+    includes: item.includes.filter(line =>
+      !(item.id === 'project' && /двер/i.test(line)) &&
+      !(project.technology === 'panel' && /внутренн|гипсокартон|отделк[а-яё]*\s+(?:стен|потол|сануз)|чистов/i.test(line)),
+    ),
+  }));
 
   if (!tiers?.length) return null;
   const hasStartingTier = tiers.some(item => item.id === 'start');

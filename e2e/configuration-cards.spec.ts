@@ -11,7 +11,7 @@ for (const width of [1280, 1024, 390]) {
     await expect(cards.nth(0).locator('.project-config__tier-lead')).toHaveText('Готовый снаружи, ваш замысел внутри.');
     for (let index = 0; index < 3; index++) {
       const card = cards.nth(index);
-      await expect(card.locator('.project-config__tier-included')).toHaveCount([5, 3, 4][index]!);
+      await expect(card.locator('.project-config__tier-included')).toHaveCount([5, 2, 4][index]!);
       await expect(card.locator('.project-config__tier-gift')).toHaveCount(1);
       await expect(card.locator('.project-config__tier-gift svg')).toHaveCount(0);
       await expect(card.locator('.project-config__tier-band svg')).toHaveCount(1);
@@ -22,6 +22,8 @@ for (const width of [1280, 1024, 390]) {
       expect(await card.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
     }
     await expect(cards.nth(1).locator('.project-config__tier-includes-title')).toContainText('Стандартная комплектация дополняется');
+    await expect(cards.nth(1).locator('.project-config__tier-list')).not.toContainText(/двер/i);
+    await expect(cards.nth(1).locator('.project-config__tier-list')).toContainText('Окнами согласно архитектурному проекту');
     await expect(cards.nth(2).locator('.project-config__tier-includes-title')).toContainText('Проектная комплектация дополняется');
     if (width >= 800) {
       const positions = await cards.evaluateAll(elements => elements.map(card => card.querySelector('.project-config__tier-included')!.getBoundingClientRect().top));
