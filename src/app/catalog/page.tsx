@@ -19,6 +19,17 @@ const catalog = new CmsCatalogProvider()
 
 type Search = Promise<Record<string, string | string[] | undefined>>
 
+function shuffled<T>(items: readonly T[]): T[] {
+  const result = [...items]
+  for (let index = result.length - 1; index > 0; index--) {
+    const other = Math.floor(Math.random() * (index + 1))
+    const current = result[index]!
+    result[index] = result[other]!
+    result[other] = current
+  }
+  return result
+}
+
 export async function generateMetadata({
   searchParams,
 }: {
@@ -93,7 +104,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
             <CatalogBoard
               filters={filters}
               facets={facets}
-              matched={toBoard(items)}
+              matched={toBoard(shuffled(items))}
               rest={filters.status === 'ready' ? [] : toBoard(rest)}
               picked={!isEmpty(filters)}
             />
