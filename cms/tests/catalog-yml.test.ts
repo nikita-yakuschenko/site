@@ -72,3 +72,12 @@ test('empty feed and database errors return understandable errors', async () => 
   assert.equal(response.status, 500)
   assert.doesNotMatch(await response.text(), /private database details/)
 })
+
+
+test('collections follow offers and link only exported published projects', () => {
+  const result = catalogYml([p(), p({ id: 2, technologyBadge: 'Панельно-каркасный' })], [])
+  execFileSync('python', ['-c', `import sys,xml.etree.ElementTree as E; s=E.fromstring(sys.stdin.read()).find('shop'); c=s.find('collections'); assert list(s).index(c)>list(s).index(s.find('offers')); ids={x.attrib['id'] for x in c}; assert ids=={'all-houses','modular-houses','frame-houses'}; assert all(x.findtext('name') and x.findtext('description') and x.findtext('picture') and x.findtext('url').startswith('https://avgst.ru/catalog') for x in c); o=s.findall('./offers/offer'); assert [x.text for x in o[0].findall('collectionId')]==['all-houses','modular-houses']; assert [x.text for x in o[1].findall('collectionId')]==['all-houses','frame-houses']; assert all(x.text in ids for v in o for x in v.findall('collectionId')); assert c[1].findtext('url')=='https://avgst.ru/catalog?tech=modular'; assert c[2].findtext('url')=='https://avgst.ru/catalog?tech=panel'; assert c[0].findtext('picture').endswith('?a=1&b=2')`], { input: result.xml, env: { ...process.env, PYTHONIOENCODING: 'utf-8' } })
+  const onlyModular = catalogYml([p(), p({ id: 2, technologyBadge: 'Панельно-каркасный', _status: 'draft' }), p({ id: 3, technologyBadge: 'Панельно-каркасный', priceAmount: 0 })], [])
+  assert.doesNotMatch(onlyModular.xml, /frame-houses/)
+  assert.doesNotMatch(catalogYml([], []).xml, /<collection id=/)
+})
