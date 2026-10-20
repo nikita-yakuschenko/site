@@ -1,4 +1,5 @@
 import type { Endpoint } from 'payload'
+import { catalogPrice } from '../config/catalog-price'
 import { authorizeSiteRequest } from './project-hero-endpoint'
 import { isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
 import type { CatalogProject } from '../../../src/lib/catalog/types'
@@ -22,7 +23,7 @@ export const projectCatalogEndpoint: Endpoint = {
       const modular = isModularTechnology(record.technologyBadge)
       const projectId = (project: number | { id: number }) => typeof project === 'number' ? project : project.id
       const importedPrice = prices.docs.find(row => projectId(row.project) === record.id && row.configuration === 'standard' && row.region === 'nn')?.price
-      const price = record.recordType === 'ready-home' ? record.readyHome?.salePrice : importedPrice ?? record.configurations?.find(row => row.key === 'standard')?.price ?? record.priceAmount
+      const price = catalogPrice(record, importedPrice)
       const regionalPrices = Object.fromEntries(prices.docs.filter(row => projectId(row.project) === record.id && row.configuration === 'standard' && isPublicPriceKind(row.region)).map(row => [row.region, row.price]))
       if (!('nn' in regionalPrices) && price && price > 0) regionalPrices.nn = price
       return {

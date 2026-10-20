@@ -97,6 +97,36 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
   const [facets, setFacets] = useState<typeof emptyFacets>(() => facetsFrom(initial))
   const [removing, setRemoving] = useState<Project | null>(null)
   const [busy, setBusy] = useState(false)
+  const [exporting, setExporting] = useState(false)
+  const exportLock = useRef(false)
+  const exportYml = async () => {
+    if (exportLock.current) return
+    exportLock.current = true
+    setExporting(true)
+    try {
+      const response = await fetch('/api/projects/export-yml', { method: 'POST', credentials: 'include' })
+      if (!response.ok) {
+        const body = await response.json().catch(() => null)
+        throw new Error(body?.error || 'Не удалось выгрузить каталог')
+      }
+      const url = URL.createObjectURL(await response.blob())
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'avgst-catalog.yml'
+      document.body.append(link)
+      link.click()
+      link.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+      toast.success(`Выгружено проектов: ${response.headers.get('X-Export-Count') || '—'}`)
+      const skipped = Number(response.headers.get('X-Export-Skipped'))
+      if (skipped) toast.warning(`Пропущено проектов без корректной цены, технологии или изображения: ${skipped}`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : 'Не удалось выгрузить каталог')
+    } finally {
+      exportLock.current = false
+      setExporting(false)
+    }
+  }
   const router = useRouter()
   const remove = async () => {
     if (!removing) return
@@ -182,6 +212,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
           <IconSearch className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input aria-label="Поиск проектов" placeholder="Поиск проектов" className="pl-9" value={search} onChange={event => { setSearch(event.target.value); table.setPage(0) }} />
         </div>
+        <Button type="button" variant="outline" disabled={exporting} aria-busy={exporting} onClick={exportYml}>{exporting ? 'Формирование…' : 'Выгрузить YML'}</Button>
         <Button asChild><Link href="/collections/projects/create">Создать</Link></Button>
       </div>
     </div>

@@ -1,0 +1,31 @@
+import type { Project, ProjectPrice } from '../payload-types'
+import { catalogPrice } from './catalog-price'
+
+const origin = 'https://avgst.ru'
+const xml = (value: unknown) => String(value).replace(/[^\u0009\u000A\u000D\u0020-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/gu, '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char]!)
+
+export function catalogYml(projects: Project[], prices: ProjectPrice[], now = new Date(), mediaOrigin = origin) {
+  const priceMap = new Map(prices.filter(row => row.configuration === 'standard' && row.region === 'nn').map(row => [typeof row.project === 'number' ? row.project : row.project.id, row.price]))
+  const ids = new Set<string>()
+  let skipped = 0
+  const offers = projects.flatMap(project => {
+    if (project._status !== 'published') return []
+    const price = catalogPrice(project, priceMap.get(project.id))
+    const category = project.technologyBadge === 'Модульный' ? 1 : project.technologyBadge === 'Панельно-каркасный' ? 2 : null
+    const image = typeof project.desktopImage === 'object' && project.desktopImage ? project.desktopImage.url : project.imageUrl
+    let picture: URL | undefined
+    try { if (image) picture = new URL(image, mediaOrigin) } catch { /* Invalid image excludes the offer. */ }
+    if (!project.name?.trim() || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(project.slug) || !category || !price || !Number.isFinite(price) || price <= 0 || !picture || !['https:', 'http:'].includes(picture.protocol) || picture.username || picture.password) {
+      skipped++
+      return []
+    }
+    const id = String(project.id)
+    if (ids.has(id)) throw new Error('Повторяющийся идентификатор проекта')
+    ids.add(id)
+    const param = (name: string, value: unknown, unit = '') => value == null || value === '' ? '' : `      <param name="${name}"${unit ? ` unit="${unit}"` : ''}>${xml(value)}</param>\n`
+    return [`    <offer id="${xml(id)}" available="true">\n      <url>${origin}/catalog/${xml(project.slug)}</url>\n      <price>${price}</price>\n      <currencyId>RUR</currencyId>\n      <categoryId>${category}</categoryId>\n      <picture>${xml(picture.href)}</picture>\n      <name>${xml(project.name)}</name>\n${param('Площадь', project.areaValue, 'м²')}${param('Количество спален', project.bedrooms)}${param('Количество санузлов', project.bathrooms)}${param('Количество этажей', project.floorsValue)}${param('Тип дома', category === 1 ? 'Модульный' : 'Каркасный')}    </offer>`]
+  })
+  // Explicit Moscow time makes generation independent of the server timezone.
+  const parts = new Intl.DateTimeFormat('sv-SE', { timeZone: 'Europe/Moscow', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(now)
+  return { count: offers.length, skipped, xml: `<?xml version="1.0" encoding="UTF-8"?>\n<yml_catalog date="${parts}">\n  <shop>\n    <name>Авангард Строй</name>\n    <company>Авангард Строй</company>\n    <url>${origin}</url>\n    <currencies><currency id="RUR" rate="1"/></currencies>\n    <categories>\n      <category id="1">Модульные дома</category>\n      <category id="2">Каркасные дома</category>\n    </categories>\n    <offers>\n${offers.join('\n')}\n    </offers>\n  </shop>\n</yml_catalog>\n` }
+}
