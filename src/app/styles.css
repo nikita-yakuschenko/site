@@ -13128,6 +13128,7 @@ html.is-dialog-open {
   overscroll-behavior-inline: contain;
   scroll-behavior: smooth;
   scroll-snap-type: inline mandatory;
+  scroll-padding-inline: 1px;
   scrollbar-width: none;
 }
 
