@@ -3,7 +3,8 @@ import { submitLead, type LeadAttempt } from '../lib/submit-lead'
 import { CMSContentBlock } from './cms-content'
 
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import { FormSuccessAnimation } from "./form-success-animation";
+import { useRef, useState } from "react";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
 import { noAutofillFieldProps, noAutofillFormProps } from "../lib/no-autofill";
@@ -69,14 +70,13 @@ export function ReferralProgram({
 }) {
   const data = copy.referralProgram;
   const [status, setStatus] = useState<Status>("idle");
+  const submitting = useRef(false);
   const attempt = useRef<LeadAttempt['current']>(null)
   const [phone, setPhone] = useState("+7");
   const [rules, setRules] = useState(true);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const nameRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
-  const okRef = useRef<HTMLDivElement>(null);
-  const timers = useRef<number[]>([]);
 
   const open =
     status === "open" ||
@@ -84,13 +84,6 @@ export function ReferralProgram({
     status === "ok" ||
     status === "error";
   const done = status === "ok";
-
-  function clearTimers() {
-    timers.current.forEach((id) => window.clearTimeout(id));
-    timers.current = [];
-  }
-
-  useEffect(() => () => clearTimers(), []);
 
   function openForm() {
     setInvalid({});
@@ -101,52 +94,13 @@ export function ReferralProgram({
 
   function closeForm() {
     if (status === "sending") return;
-    clearTimers();
     setInvalid({});
     setStatus("idle");
   }
 
-  function playOk() {
-    const el = okRef.current;
-    if (!el) return;
-    clearTimers();
-    el.classList.remove("is-anim", "is-morph", "is-settle");
-    const paths = el.querySelectorAll<SVGPathElement>(
-      ".referral__ok-circle, .referral__ok-tick",
-    );
-    paths.forEach((path) => {
-      path.style.transition = "none";
-      path.style.strokeDasharray = "0";
-      path.style.strokeDashoffset = "0";
-    });
-    el.getBoundingClientRect();
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-      el.classList.add("is-anim", "is-morph", "is-settle");
-      return;
-    }
-    el.classList.add("is-anim");
-    timers.current.push(
-      window.setTimeout(() => {
-        el.classList.add("is-morph");
-        paths.forEach((path, i) => {
-          const len = path.getTotalLength();
-          path.style.transition = "none";
-          path.style.strokeDasharray = String(len);
-          path.style.strokeDashoffset = String(len);
-          path.getBoundingClientRect();
-          path.style.transition = `stroke-dashoffset .5s var(--ease-out) ${i * 0.22}s`;
-          path.style.strokeDashoffset = "0";
-        });
-      }, 950),
-    );
-    timers.current.push(
-      window.setTimeout(() => el.classList.add("is-settle"), 2100),
-    );
-  }
-
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (status === "sending" || status === "ok") return;
+    if (submitting.current || status === "sending" || status === "ok") return;
 
     const form = event.currentTarget;
     const name = stripNameDigits(
@@ -163,6 +117,7 @@ export function ReferralProgram({
     setInvalid(next);
     if (Object.keys(next).length) return;
 
+    submitting.current = true;
     setStatus("sending");
     try {
       await submitLead({
@@ -176,9 +131,10 @@ export function ReferralProgram({
         projectExternalId: `referral:${email}`,
       }, attempt);
       setStatus("ok");
-      window.setTimeout(playOk, 30);
     } catch {
       setStatus("error");
+    } finally {
+      submitting.current = false;
     }
   }
 
@@ -267,7 +223,7 @@ export function ReferralProgram({
                     noValidate
                     {...noAutofillFormProps}
                   >
-                    <div className="referral__fields">
+                    <div className="referral__fields" inert={done}>
                       <p className="referral__lead" id="referral-lead">
                         {nbspText(data.formLead)}
                       </p>
@@ -437,56 +393,7 @@ export function ReferralProgram({
                       ) : null}
                     </div>
 
-                    <div className="referral__ok" ref={okRef} aria-live="polite">
-                      <div className="referral__ok-inner">
-                        <div className="referral__ok-stage">
-                          <div className="referral__ok-glow" aria-hidden="true" />
-                          <svg
-                            className="referral__ok-logo"
-                            viewBox="0 0 588 555"
-                            fill="none"
-                            aria-hidden="true"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M181.345 20.3661C122.956 12.3067 68.5903 52.8764 59.9143 110.981L20.6437 373.979C11.9677 432.085 52.2666 485.721 110.656 493.781L406.624 534.634C465.012 542.693 519.379 502.123 528.055 444.018L567.325 181.019C576.001 122.915 535.703 69.2782 477.313 61.2188L181.345 20.3661ZM40.6597 108.323C50.9158 39.637 115.184 -8.321 184.206 1.20597L480.174 42.0588C549.196 51.5858 596.834 114.991 586.578 183.677L547.308 446.675C537.051 515.363 472.785 563.321 403.763 553.794L107.795 512.94C38.7733 503.413 -8.86698 440.009 1.38912 371.323L40.6597 108.323Z"
-                            />
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M324.185 194.485L373.341 217.143L373.04 424.549L423.763 424.622L424.114 183.943L324.185 133.507V194.485Z"
-                            />
-                            <path
-                              fillRule="evenodd"
-                              clipRule="evenodd"
-                              d="M324.185 78.6493L166.925 156.958L166.536 424.257L220.498 424.334L220.649 321.185L273.531 321.262L273.381 424.41L324.106 424.484L324.185 370.529V78.6493ZM271.451 265.782L219.648 265.707L219.766 184.742L271.605 159.306L271.451 265.782Z"
-                            />
-                          </svg>
-                          <svg
-                            className="referral__ok-check"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            aria-hidden="true"
-                          >
-                            <path
-                              className="referral__ok-circle"
-                              d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0"
-                            />
-                            <path
-                              className="referral__ok-tick"
-                              d="M9 12l2 2l4 -4"
-                            />
-                          </svg>
-                        </div>
-                        <div className="referral__ok-copy">
-                          <p className="referral__ok-title">{data.successTitle}</p>
-                          <p className="referral__ok-text">
-                            {nbspText(data.successBody)}
-                          </p>
-                        </div>
-                      </div>
-                    </div>
+                    {done ? <div className="referral__ok"><FormSuccessAnimation active={done} title={data.successTitle} description={nbspText(data.successBody)} /></div> : null}
                   </form>
                 </div>
               </div>

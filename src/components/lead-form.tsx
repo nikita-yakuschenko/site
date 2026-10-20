@@ -269,7 +269,7 @@ export function LeadForm({
           <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
         ) : null}
       </button>
-      {status === 'sending' || status === 'ok' ? <LeadSubmitFeedback status={status} text={successText || copy.leadOk} /> : null}
+      {status === 'sending' || status === 'ok' ? <LeadSubmitFeedback status={status} text={successText} formId={resolvedFormId} /> : null}
       {status === 'error' ? <p role="alert">Не удалось получить подтверждение. Повторите отправку — повторная попытка не создаст дубль заявки.</p> : null}
     </form>
   )

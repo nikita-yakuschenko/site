@@ -1,5 +1,6 @@
 'use client'
 import { submitLead, type LeadAttempt } from '../../lib/submit-lead'
+import { FormSuccessAnimation } from '../form-success-animation'
 import { CMSContentBlock } from '../cms-content'
 
 import { useEffect, useRef, useState } from 'react'
@@ -13,6 +14,7 @@ export function OpenDayBookButton({ className, children }: { className: string; 
 }
 
 export function FactoryOpenDayForm({ date }: { date: string }) {
+  const submitting = useRef(false)
   const attempt = useRef<LeadAttempt['current']>(null)
   const [phone, setPhone] = useState('+7')
   const [name, setName] = useState('')
@@ -26,6 +28,7 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (submitting.current || status === 'ok') return
     const data = new FormData(event.currentTarget)
     const name = sanitizeName(String(data.get('name') || '')).trim()
     const email = String(data.get('email') || '').trim()
@@ -37,6 +40,7 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
     }
     setInvalid(next)
     if (Object.values(next).some(Boolean)) return
+    submitting.current = true
     setStatus('sending')
     try {
       await submitLead({
@@ -54,6 +58,8 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
       setStatus('ok')
     } catch {
       setStatus('error')
+    } finally {
+      submitting.current = false
     }
   }
 
@@ -78,10 +84,7 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
     } else if (node.open) node.close()
   }, [open])
 
-  const fields = status === 'ok' ? <div className="ags-form ags-form--success" role="status">
-    <h3>Спасибо за регистрацию!</h3>
-    <p className="ags-form__status">Программу мероприятия и напоминание накануне пришлём на почту, указанную при регистрации.</p>
-  </div> : <form className="ags-form" onSubmit={onSubmit} noValidate>
+  const fields = status === 'ok' ? <FormSuccessAnimation active title="Вы записаны на день открытых дверей!" description="Программу мероприятия и напоминание накануне пришлём на почту, указанную при регистрации." className="ags-form ags-form--success" /> : <form className="ags-form" onSubmit={onSubmit} noValidate>
     <div className="ags-field">
       <label className="ags-field__label" htmlFor="ags-name">Имя</label>
       <input className="ags-field__input" id="ags-name" name="name" type="text" autoComplete="name" placeholder="Иван Иванов" value={name} aria-invalid={invalid.name || undefined} onChange={event => setName(event.target.value)} required />
