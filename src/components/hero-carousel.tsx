@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { preload } from "react-dom";
 import {
   IconArrowUpRight,
   IconChevronLeft,
@@ -450,12 +451,14 @@ export function HeroCarousel({
     : slots.map((promo) => ({ promo, key: promo.heading, clone: false }));
 
   const desktopSet = optimizedSrcSet(shown.image, [1080, 1920])
-  const mobileSet = shown.imageMobile ? optimizedSrcSet(shown.imageMobile, [384, 828], 60) : ''
+  const mobileSet = shown.imageMobile ? optimizedSrcSet(shown.imageMobile, [384, 828], 45) : ''
+
+  // React resource hints are hoisted into the document head during SSR.
+  if (shown.imageMobile) preload(optimizedSrc(shown.imageMobile, 828, 45), { as: 'image', imageSrcSet: mobileSet || undefined, imageSizes: '100vw', media: '(max-width: 899px)', fetchPriority: 'high' })
+  preload(optimizedSrc(shown.image, 1920), { as: 'image', imageSrcSet: desktopSet || undefined, imageSizes: '100vw', media: shown.imageMobile ? '(min-width: 900px)' : undefined, fetchPriority: 'high' })
 
   return (
     <>
-    {shown.imageMobile && <link rel="preload" as="image" imageSrcSet={mobileSet || undefined} imageSizes="100vw" href={mobileSet ? undefined : shown.imageMobile} media="(max-width: 899px)" fetchPriority="high" />}
-    <link rel="preload" as="image" imageSrcSet={desktopSet || undefined} imageSizes="100vw" href={desktopSet ? undefined : shown.image} media={shown.imageMobile ? '(min-width: 900px)' : undefined} fetchPriority="high" />
     <section
       className="hero"
       style={
@@ -473,7 +476,7 @@ export function HeroCarousel({
               начинает задавать высоту экрана. Для разрешённых файлов CMS используем
               тот же адаптивный набор, что и для локальных изображений. */}
           <source media="(min-width: 900px)" srcSet={desktopSet} />
-          <img src={optimizedSrc(shown.imageMobile, 828, 60)} alt="" decoding="async" fetchPriority="high" {...(mobileSet ? { srcSet: mobileSet, sizes: '100vw' } : {})} />
+          <img src={optimizedSrc(shown.imageMobile, 828, 45)} alt="" decoding="async" fetchPriority="high" {...(mobileSet ? { srcSet: mobileSet, sizes: '100vw' } : {})} />
         </picture>
       ) : (
         <img className="hero__frame" src={optimizedSrc(shown.image, 1920)} alt="" decoding="async" fetchPriority="high" data-cms-block="hero.background" {...(desktopSet ? { srcSet: desktopSet, sizes: '100vw' } : {})} />

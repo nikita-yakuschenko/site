@@ -25,7 +25,8 @@ const nextConfig: NextConfig = {
   images: {
     // Локальный CMS на localhost:3001. Оптимизатор иначе отказывается скачивать картинки с частного адреса.
     dangerouslyAllowLocalIP: true,
-    qualities: [60, 75, 90],
+    formats: ['image/avif', 'image/webp'],
+    qualities: [45, 60, 75, 90],
     remotePatterns: [
       { protocol: 'https', hostname: 'new.avgst.ru', pathname: '/**' },
       { protocol: 'https', hostname: 'cms.avgst.ru', pathname: '/api/media/file/**' },
