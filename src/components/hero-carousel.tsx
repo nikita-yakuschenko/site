@@ -25,6 +25,8 @@ export type HeroMessage = {
   href: string;
   image: string;
   imageMobile?: string;
+  imagePreview?: string;
+  mobilePreview?: string;
 };
 
 /**
@@ -471,7 +473,7 @@ export function HeroCarousel({
       {/* Кадр один: он часть постоянного сообщения и вместе со слотами не
           меняется. */}
       {shown.imageMobile ? (
-        <picture className="hero__frame" data-cms-block="hero.background">
+        <picture className="hero__frame" data-cms-block="hero.background" style={{ '--hero-preview': shown.imagePreview ? `url("${shown.imagePreview}")` : undefined, '--hero-preview-mobile': shown.mobilePreview ? `url("${shown.mobilePreview}")` : undefined } as React.CSSProperties}>
           {/* Пустой srcSet браузер выбрасывает и тогда вертикальный кадр
               начинает задавать высоту экрана. Для разрешённых файлов CMS используем
               тот же адаптивный набор, что и для локальных изображений. */}

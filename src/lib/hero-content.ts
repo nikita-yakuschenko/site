@@ -1,5 +1,7 @@
 import 'server-only'
 import { cache } from 'react'
+import { unstable_cache } from 'next/cache'
+import sharp from 'sharp'
 import { connection } from 'next/server'
 import type { LayoutBlock } from '../components/block-renderer'
 import type { HeroMessage, HeroPromo } from '../components/hero-carousel'
@@ -56,4 +58,26 @@ export async function withHeroContent(blocks: readonly LayoutBlock[]): Promise<L
     }
     return { ...block, message, promos }
   })
+}
+
+
+// A tiny inline preview avoids an empty hero while the responsive image loads.
+const heroPreview = unstable_cache(async (source: string) => {
+  const url = new URL(source, 'https://avgst.ru')
+  if (url.origin !== 'https://cms.avgst.ru' || !url.pathname.startsWith('/api/media/file/')) return undefined
+  try {
+    const response = await fetch(url, { signal: AbortSignal.timeout(2000) })
+    if (!response.ok) return undefined
+    const image = await sharp(Buffer.from(await response.arrayBuffer())).resize({ width: 32 }).webp({ quality: 35 }).toBuffer()
+    return `data:image/webp;base64,${image.toString('base64')}`
+  } catch { return undefined }
+}, ['hero-inline-preview'], { revalidate: 86400 })
+
+export async function withHeroPreviews(blocks: LayoutBlock[]): Promise<LayoutBlock[]> {
+  return Promise.all(blocks.map(async block => {
+    if (block.blockType !== 'hero') return block
+    const message = block.message as HeroMessage
+    const [imagePreview, mobilePreview] = await Promise.all([heroPreview(message.image), message.imageMobile ? heroPreview(message.imageMobile) : undefined])
+    return { ...block, message: { ...message, imagePreview, mobilePreview } }
+  }))
 }

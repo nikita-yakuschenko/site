@@ -14816,3 +14816,14 @@ html.is-dialog-open {
 
 [data-project-sections] > [data-section-tone="plain"] > .section { background:var(--surface); }
 [data-project-sections] > [data-section-tone="muted"] > .section { background:var(--page); }
+
+
+/* Inline previews show the same hero image before the full resource arrives. */
+picture.hero__frame {
+  background-image: var(--hero-preview);
+  background-size: cover;
+  background-position: center;
+}
+@media (max-width: 899px) {
+  picture.hero__frame { background-image: var(--hero-preview-mobile, var(--hero-preview)); }
+}
