@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { IconArrowRight } from '@tabler/icons-react'
+import { IconArrowUpRight } from '@tabler/icons-react'
 import { SiteChrome } from '../components/site-chrome'
 import { ProjectCard } from '../components/project-card'
 import { CmsCatalogProvider } from '../lib/catalog/cms-provider'
@@ -35,7 +35,7 @@ export default async function NotFound() {
                 <h1 id="not-found-title">Страница<br />не найдена</h1>
                 <p>Возможно, адрес набран с ошибкой или страница переехала. Посмотрите проекты домов или вернитесь на главную.</p>
                 <div className="not-found-actions">
-                  <Link className="btn btn-yellow" href="/catalog">{copy.catalogProjects}<IconArrowRight size={18} aria-hidden="true" /></Link>
+                  <Link className="btn btn-yellow" href="/catalog">{copy.catalogProjects}<IconArrowUpRight size={18} stroke={2} aria-hidden="true" /></Link>
                   <Link className="btn btn-outline-dark" href="/">{copy.notFoundHome}</Link>
                 </div>
                 <nav className="not-found-links" aria-label="Возможно, вы искали">
@@ -46,7 +46,7 @@ export default async function NotFound() {
                       ['Модульные дома', '/catalog?tech=modular'],
                       ['Панельно-каркасные дома', '/catalog?tech=panel'],
                       ['Ипотека', '/mortgage'],
-                    ].map(([label, href]) => <Link key={href} href={href!}>{label}<IconArrowRight size={14} aria-hidden="true" /></Link>)}
+                    ].map(([label, href]) => <Link key={href} href={href!}>{label}<IconArrowUpRight size={14} stroke={2} aria-hidden="true" /></Link>)}
                   </div>
                 </nav>
               </div>
@@ -55,7 +55,7 @@ export default async function NotFound() {
             {projects.length > 0 ? <section className="not-found-popular mortgage-calc__matches" aria-labelledby="not-found-popular-title">
               <div className="not-found-popular__head">
                 <h2 id="not-found-popular-title">{copy.popularHeading}</h2>
-                <Link href="/catalog">Все проекты<IconArrowRight size={16} aria-hidden="true" /></Link>
+                <Link href="/catalog">Все проекты<IconArrowUpRight size={16} stroke={2} aria-hidden="true" /></Link>
               </div>
               <div className="mortgage-calc__matches-grid">
                 {projects.slice(0, 3).map(project => <div key={project.id}><ProjectCard project={project} /></div>)}
