@@ -1,21 +1,21 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
+import { IconArrowRight } from '@tabler/icons-react'
 import { SiteChrome } from '../components/site-chrome'
+import { CmsCatalogProvider } from '../lib/catalog/cms-provider'
+import { applyPopularProjects } from '../lib/popular-content'
+import { optimizedSrc } from '../lib/media'
 import { copy, footerAboutFor } from '../lib/copy'
 import { SITE } from '../lib/site'
+import './not-found.css'
 
 export const metadata: Metadata = {
   title: copy.notFound,
 }
 
-/**
- * Своя страница 404.
- *
- * Без неё Next показывает встроенную: английский текст и чёрный фон, если
- * у посетителя тёмная тема системы. Шапка и подвал здесь важнее текста —
- * с несуществующего адреса человек должен уйти в навигацию, а не назад.
- */
-export default function NotFound() {
+/** Первый экран возвращает посетителя в каталог; проекты берём из блока главной. */
+export default async function NotFound() {
+  const { projects } = await applyPopularProjects([], new CmsCatalogProvider(), SITE.code)
   return (
     <SiteChrome
       name={SITE.name}
@@ -27,20 +27,44 @@ export default function NotFound() {
       footer={SITE.footer.legal}
       about={footerAboutFor(SITE.name)}
     >
-      <main>
-        <section className="section">
-          <div className="section__inner">
-            <p className="eyebrow">404</p>
-            <h1>{copy.notFound}</h1>
-            <p className="info-page__lead">{copy.notFoundLead}</p>
-            <div className="info-page__actions">
-              <Link className="btn btn-yellow" href="/catalog">
-                {copy.catalogProjects}
-              </Link>
-              <Link className="btn btn-outline-dark" href="/">
-                {copy.notFoundHome}
-              </Link>
+      <main className="not-found-page">
+        <section className="section not-found-screen" aria-labelledby="not-found-title">
+          <div className="section__inner not-found-screen__inner">
+            <div className="not-found-hero">
+              <div className="not-found-copy">
+                <h1 id="not-found-title">Страница<br />не найдена</h1>
+                <p>Возможно, адрес набран с ошибкой или страница переехала. Посмотрите проекты домов или вернитесь на главную.</p>
+                <div className="not-found-actions">
+                  <Link className="btn btn-yellow" href="/catalog">{copy.catalogProjects}<IconArrowRight size={18} aria-hidden="true" /></Link>
+                  <Link className="btn btn-outline-dark" href="/">{copy.notFoundHome}</Link>
+                </div>
+                <nav className="not-found-links" aria-label="Возможно, вы искали">
+                  <p>Возможно, вы искали:</p>
+                  <div>
+                    {[
+                      ['Готовые дома', '/catalog?status=ready'],
+                      ['Модульные дома', '/catalog?tech=modular'],
+                      ['Панельно-каркасные дома', '/catalog?tech=panel'],
+                      ['Ипотека', '/mortgage'],
+                    ].map(([label, href]) => <Link key={href} href={href!}>{label}<IconArrowRight size={14} aria-hidden="true" /></Link>)}
+                  </div>
+                </nav>
+              </div>
+              <img className="not-found-art" src="/img/404.png" alt="" width={1774} height={887} fetchPriority="high" />
             </div>
+            {projects.length > 0 ? <section className="not-found-popular" aria-labelledby="not-found-popular-title">
+              <div className="not-found-popular__head">
+                <h2 id="not-found-popular-title">{copy.popularHeading}</h2>
+                <Link href="/catalog">Все проекты<IconArrowRight size={16} aria-hidden="true" /></Link>
+              </div>
+              <div className="not-found-popular__grid">
+                {projects.slice(0, 3).map(project => <Link className="not-found-project" key={project.id} href={project.href}>
+                  <img src={optimizedSrc(project.imageUrl, 384)} alt="" width={160} height={100} />
+                  <span><strong>{project.name}</strong><span>{project.area}</span></span>
+                  <IconArrowRight size={18} aria-hidden="true" />
+                </Link>)}
+              </div>
+            </section> : null}
           </div>
         </section>
       </main>
