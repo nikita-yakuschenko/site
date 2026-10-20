@@ -5582,6 +5582,7 @@ a {
 
   .cfilter__sticky {
     position: sticky;
+    padding-right: 8px;
     top: calc(var(--catalog-bar) + var(--gap-stack));
     max-height: calc(100svh - var(--catalog-bar) - var(--gap-stack) * 2);
     overflow-y: auto;
@@ -5606,6 +5607,7 @@ a {
 }
 
 .cfilter__group {
+  min-inline-size: 0;
   margin: 0 0 20px;
   padding: 0;
   border: 0;
@@ -5766,17 +5768,20 @@ a {
 }
 
 .cfilter__fav {
-  display: flex;
+  display: grid;
+  grid-template-columns: 17px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   width: 100%;
-  height: 38px;
-  padding: 0 12px;
+  min-width: 0;
+  min-height: 38px;
+  padding: 8px 12px;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #fff;
   color: var(--avgst-ink);
   font-size: 14px;
+  text-align: left;
   cursor: pointer;
 }
 
@@ -11952,6 +11957,20 @@ html.is-dialog-open {
   display: flex;
   align-items: stretch;
   border-radius: var(--calc-radius-tile);
+}
+
+.mortgage-calc__matches .card__title-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+  border-radius: inherit;
+}
+
+.mortgage-calc__matches .card__title-link:focus-visible::after {
+  outline: 2px solid var(--avgst-green);
+  outline-offset: -2px;
 }
 
 .mortgage-calc__matches .card__top {

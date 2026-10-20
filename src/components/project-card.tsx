@@ -82,9 +82,9 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
       <div className="card__body">
         <div className="card__line">
           {locationLabel ? <div className="card__heading">
-            <a href={project.href}><h3>{project.name}</h3></a>
+            <a className="card__title-link" href={project.href}><h3>{project.name}</h3></a>
             <span className="card__location-badge" aria-label={`Выставочная площадка: ${locationLabel}`}>{locationLabel}</span>
-          </div> : <a href={project.href}>
+          </div> : <a className="card__title-link" href={project.href}>
             <h3>{project.name}</h3>
           </a>}
           <ul className="specs">
