@@ -182,6 +182,7 @@
 .comparison-scroll {
   overflow: auto;
   overscroll-behavior: contain;
+  scrollbar-gutter: stable;
   scrollbar-width: thin;
   scrollbar-color: var(--ink-4) transparent;
   min-height: 0;
@@ -200,11 +201,12 @@
   font-size: 14px;
   line-height: 1.45;
 }
-.comparison-table col:first-child {
-  width: 22%;
+/* Fixed shares — body content must not reflow column widths. */
+.comparison-table .comparison-col-label {
+  width: 24%;
 }
-.comparison-table col:not(:first-child) {
-  width: 26%;
+.comparison-table .comparison-col-package {
+  width: calc((100% - 24%) / 3);
 }
 .comparison-table th,
 .comparison-table td {
@@ -212,6 +214,14 @@
   vertical-align: top;
   font-weight: 400;
   padding: 0;
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+.comparison-table thead th:first-child {
+  width: 24%;
+}
+.comparison-table thead th:not(:first-child) {
+  width: calc((100% - 24%) / 3);
 }
 .comparison-table thead {
   position: sticky;
@@ -312,6 +322,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  min-width: 0;
 }
 .comparison-element[data-visible="true"] > :is(th, td) {
   border-bottom: 1px solid var(--line);
@@ -378,14 +389,34 @@
   width: 360px;
   max-width: calc(100vw - 32px);
   max-height: var(--radix-popover-content-available-height);
-  overflow: auto;
-  padding: 20px;
+  overflow: visible;
+  padding: 0;
   border: 1px solid var(--line-2);
   border-radius: 12px;
   background: var(--surface);
   color: var(--foreground);
-  box-shadow: 0 12px 32px rgb(var(--avgst-ink-rgb) / 0.16);
+  box-shadow: none;
+  filter: drop-shadow(0 6px 18px rgb(var(--avgst-ink-rgb) / 0.12));
   transform-origin: var(--radix-popover-content-transform-origin);
+}
+.comparison-popover > span:has(.comparison-popover-arrow) {
+  z-index: 0;
+}
+.comparison-popover-body {
+  position: relative;
+  z-index: 1;
+  max-height: inherit;
+  overflow: auto;
+  padding: 20px;
+  border-radius: inherit;
+  background: var(--surface);
+}
+.comparison-popover-arrow {
+  display: block;
+  fill: var(--surface);
+  stroke: var(--line-2);
+  stroke-width: 1;
+  stroke-linejoin: round;
 }
 .comparison-popover[data-state="open"] {
   animation: comparison-pop-in 180ms var(--ease-out);
@@ -397,6 +428,7 @@
   position: absolute;
   top: 8px;
   right: 8px;
+  z-index: 2;
   border: 0;
   background: var(--surface);
   color: var(--ink-1);
@@ -612,10 +644,12 @@
   .comparison-table {
     font-size: 12px;
   }
-  .comparison-table col:first-child {
+  .comparison-table .comparison-col-label,
+  .comparison-table thead th:first-child {
     width: 52%;
   }
-  .comparison-table col:not(:first-child) {
+  .comparison-table .comparison-col-package,
+  .comparison-table thead th:not(:first-child) {
     width: 48%;
   }
   .comparison-table [data-package] {

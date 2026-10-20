@@ -30,6 +30,7 @@ import {
 } from "../ui/dialog";
 import {
   Popover,
+  PopoverArrow,
   PopoverClose,
   PopoverContent,
   PopoverTrigger,
@@ -140,13 +141,26 @@ function InfoButton({
         <IconInfoCircle size={19} />
       </PopoverTrigger>
       <PopoverContent
-        container={container}
         collisionBoundary={container}
         side="right"
-        align="start"
+        align="center"
+        sideOffset={8}
         aria-label={element.label}
       >
-        <Explanation info={element.info} />
+        <PopoverArrow width={18} height={6} asChild>
+          <svg
+            className="comparison-popover-arrow"
+            width={18}
+            height={6}
+            viewBox="0 0 30 10"
+            aria-hidden="true"
+          >
+            <path d="M0 0H30L17.4 7.6Q15 10.2 12.6 7.6Z" />
+          </svg>
+        </PopoverArrow>
+        <div className="comparison-popover-body">
+          <Explanation info={element.info} />
+        </div>
         <PopoverClose
           className="comparison-info-close"
           aria-label="Закрыть пояснение"
@@ -634,9 +648,9 @@ function ComparisonBody({
                 Технический состав комплектаций дома {project.name}
               </caption>
               <colgroup>
-                <col />
+                <col className="comparison-col-label" />
                 {matrix.packageIds.map((id) => (
-                  <col key={id} />
+                  <col key={id} className="comparison-col-package" />
                 ))}
               </colgroup>
               <thead>

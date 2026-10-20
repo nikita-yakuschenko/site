@@ -51,7 +51,7 @@ test("independent matrices have complete atomic values and semantic differences"
     for (const id of matrix.packageIds) {
       expect(interfloor.values[id]?.status).toBe("included");
       expect(interfloor.values[id]?.displayValue).toBe(
-        "Каркас, утепление 200 мм",
+        "Каркас, утепление по каркасу",
       );
     }
     const base = matrix.sections
@@ -100,9 +100,18 @@ test("independent matrices have complete atomic values and semantic differences"
     .flatMap((s) => s.elements)
     .find((e) => e.id === "wall")!.info;
   expect(wallInfo.technicalFacts).toContain(
-    "Ветрозащитный лист GTS 9, толщина 12,5 мм",
+    "Ветрозащитный лист GTS9, толщиной 12,5 мм",
   );
-  expect(wallInfo.technicalFacts).toContain("Контрбрус 45×45 мм");
+  expect(wallInfo.technicalFacts).toContain(
+    "Контрбрус 45×45 мм, сухой, строганый",
+  );
+  expect(wallInfo.technicalFacts).toContain(
+    "Доска 45×140 мм, сухая, строганная",
+  );
+  expect(wallInfo.technicalFacts).toContain("Утепление по каркасу");
+  expect(wallInfo.technicalFacts).toContain(
+    "Пароизоляция (ПВХ-плёнка, 200 мкм)",
+  );
   const floor = modularMatrix.sections
     .flatMap((s) => s.elements)
     .find((e) => e.id === "floor")!;
