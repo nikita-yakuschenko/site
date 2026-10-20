@@ -5429,11 +5429,6 @@ a {
   .catalog__layout {
     grid-template-columns: 240px minmax(0, 1fr);
     gap: var(--gap-split);
-    /* align-items здесь не ставим. При start колонка становится ростом со
-       своё содержимое, а липкий блок ездит только в границах родителя, и
-       ехать ему оказывается некуда: панель уходит вверх вместе с выдачей.
-       Растянутая на всю высоту доски колонка это и есть та дорожка, по
-       которой блок едет. */
   }
 }
 
@@ -5574,26 +5569,14 @@ a {
   }
 }
 
-/* Отбор закрепляется под основной шапкой и поиском. */
+/* На десктопе фильтры идут вместе со страницей без вложенной прокрутки. */
 @media (min-width: 1024px) {
   .cfilter__toggle {
     display: none;
   }
 
   .cfilter__sticky {
-    position: sticky;
-    padding-right: 8px;
-    top: calc(var(--catalog-bar) + var(--gap-stack));
-    max-height: calc(100svh - var(--catalog-bar) - var(--gap-stack) * 2);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-  }
-}
-
-@media (min-width: 1024px) {
-  .site-shell--catalog .cfilter__sticky {
-    top: calc(var(--site-header-offset) - 16px + var(--catalog-bar));
-    max-height: calc(100svh - var(--site-header-offset) + 16px - var(--catalog-bar) - var(--gap-stack));
+    position: static;
   }
 }
 
