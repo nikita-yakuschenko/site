@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { IconArrowRight } from '@tabler/icons-react'
 import { SiteChrome } from '../components/site-chrome'
+import { ProjectCard } from '../components/project-card'
 import { CmsCatalogProvider } from '../lib/catalog/cms-provider'
 import { applyPopularProjects } from '../lib/popular-content'
-import { optimizedSrc } from '../lib/media'
 import { copy, footerAboutFor } from '../lib/copy'
 import { SITE } from '../lib/site'
 import './not-found.css'
@@ -52,17 +52,13 @@ export default async function NotFound() {
               </div>
               <img className="not-found-art" src="/img/404.png" alt="" width={1774} height={887} fetchPriority="high" />
             </div>
-            {projects.length > 0 ? <section className="not-found-popular" aria-labelledby="not-found-popular-title">
+            {projects.length > 0 ? <section className="not-found-popular mortgage-calc__matches" aria-labelledby="not-found-popular-title">
               <div className="not-found-popular__head">
                 <h2 id="not-found-popular-title">{copy.popularHeading}</h2>
                 <Link href="/catalog">Все проекты<IconArrowRight size={16} aria-hidden="true" /></Link>
               </div>
-              <div className="not-found-popular__grid">
-                {projects.slice(0, 3).map(project => <Link className="not-found-project" key={project.id} href={project.href}>
-                  <img src={optimizedSrc(project.imageUrl, 384)} alt="" width={160} height={100} />
-                  <span><strong>{project.name}</strong><span>{project.area}</span></span>
-                  <IconArrowRight size={18} aria-hidden="true" />
-                </Link>)}
+              <div className="mortgage-calc__matches-grid">
+                {projects.slice(0, 3).map(project => <div key={project.id}><ProjectCard project={project} /></div>)}
               </div>
             </section> : null}
           </div>
