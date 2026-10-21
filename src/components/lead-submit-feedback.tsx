@@ -18,9 +18,6 @@ export function LeadSubmitFeedback({ status, text, formId }: { status: 'sending'
   const [loading, title, description] = messages[formId || ''] || ['Отправляем заявку', 'Спасибо! Заявка принята', 'Мы свяжемся с вами в ближайшее время.']
   if (status === 'ok') return <FormSuccessAnimation active title={title} description={text || description} className="lead-submit-feedback" />
   return <div className="lead-submit-feedback lead-submit-feedback--sending" role="status" aria-live="polite" aria-atomic="true">
-    <div className="lead-submit-feedback__symbol" aria-hidden="true">
-      <img src="/logo-success.svg" width={72} height={72} alt="" />
-    </div>
     <div className="lead-submit-feedback__copy">
       <p className="lead-submit-feedback__title">{loading}</p>
       <p>Сохраняем ваши контактные данные…</p>

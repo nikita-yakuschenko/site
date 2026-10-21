@@ -393,7 +393,7 @@ export function ReferralProgram({
                       ) : null}
                     </div>
 
-                    {done ? <div className="referral__ok"><FormSuccessAnimation active={done} title={data.successTitle} description={nbspText(data.successBody)} /></div> : null}
+                    {done ? <FormSuccessAnimation active={done} title={data.successTitle} description={nbspText(data.successBody)} className="referral__success" /> : null}
                   </form>
                 </div>
               </div>
