@@ -88,7 +88,7 @@ export function webhookBody(lead: LeadInput, id: string, title: string) {
     email: text(meta.email),
     comment,
     roistat: text(meta.roistatVisit),
-    page: lead.sourceUrl || '',
+    page: lead.sourceUrl ? new URL(lead.sourceUrl).origin + new URL(lead.sourceUrl).pathname : '',
     form: lead.formId || '',
     project,
     ...attribution,

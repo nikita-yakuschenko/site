@@ -34,6 +34,14 @@ test('комментарий и плоские поля содержат атр�
   const sourceUrl = 'https://avgst.ru/catalog?utm_source=yandex&utm_campaign=test'
   const body = webhookBody({ name: 'Тест', phone: '+79990000000', siteId: 'corporate', consent: true, sourceUrl, meta: { landing_page: sourceUrl, utm_source: 'yandex' } }, 'test', 'Заявка')
   assert.equal(body.comment.includes('utm_'), false)
-  assert.equal(body.page, sourceUrl)
+  assert.equal(body.page, 'https://avgst.ru/catalog')
+  assert.equal(body.lead.sourceUrl, sourceUrl)
   assert.equal(body.utm_source, 'yandex')
+})
+
+test('адрес страницы для CRM не содержит query и фрагмента, атрибуция сохранена', () => {
+  const body = webhookBody({ name: 'Тест', phone: '+79990000000', siteId: 'corporate', consent: true, sourceUrl: 'https://avgst.ru/catalog/norway-115?yclid=123&utm_source=yandex&foo=bar#form', meta: { utm_source: 'yandex', yclid: '123' } }, 'test', 'Заявка')
+  assert.equal(body.page, 'https://avgst.ru/catalog/norway-115')
+  assert.equal(body.utm_source, 'yandex')
+  assert.equal(body.yclid, '123')
 })
