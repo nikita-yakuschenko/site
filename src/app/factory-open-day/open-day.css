@@ -1022,3 +1022,14 @@ html body .ags.ags-hero .ags-hero__photo img {
 
 html body .ags.ags-hero .ags-hero__format { margin:0 0 8px; font-size:clamp(16px,1.3vw,18px); line-height:1.35; font-weight:500; color:var(--t-1); max-width:38ch; }
 html body .ags.ags-hero .ags-hero__format:empty { display:none; }
+
+/* Confirmation follows the event palette in both inline and dialog forms. */
+html body .ags .ags-form--success {
+  --form-success-background:transparent;
+  --form-success-text:var(--t-1);
+  --form-success-description:var(--t-2);
+}
+html:not([data-ags-theme="dark"]) body .ags .ags-form--success {
+  --form-success-logo-filter:brightness(0);
+  --form-success-check:#187640;
+}
