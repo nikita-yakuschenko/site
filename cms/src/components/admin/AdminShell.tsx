@@ -107,7 +107,8 @@ function HeaderBreadcrumb() {
     return () => controller.abort()
   }, [doc?.slug, doc?.id])
   const tail: { label: string; href?: string }[] = []
-  if (pathname === '/leads') tail.push({ label: 'Заявки' })
+  if (pathname === '/catalog/redirects') tail.push({ label: 'Редиректы' })
+  else if (pathname === '/leads') tail.push({ label: 'Заявки' })
   else if (pathname === '/globals/lead-delivery') tail.push({ label: 'Отправка заявок' })
   else if (pathname.startsWith('/collections/lead-submissions')) {
     tail.push({ label: 'Заявки', href: '/leads' })

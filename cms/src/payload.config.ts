@@ -43,6 +43,7 @@ export default buildConfig({
       views: {
         site: { Component: './components/admin/StructureView#SiteView', path: '/site', exact: true },
         pages: { Component: './components/admin/StructureView#PagesView', path: '/pages', exact: true },
+        redirects: { Component: './components/admin/RedirectsView#RedirectsView', path: '/catalog/redirects', exact: true },
         catalog: { Component: './components/admin/StructureView#CatalogView', path: '/catalog', exact: true },
         stories: { Component: './components/admin/StructureView#StoriesView', path: '/stories', exact: true },
         prices: { Component: './components/admin/StructureView#PricesView', path: '/prices', exact: true },

@@ -212,6 +212,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
           <IconSearch className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input aria-label="Поиск проектов" placeholder="Поиск проектов" className="pl-9" value={search} onChange={event => { setSearch(event.target.value); table.setPage(0) }} />
         </div>
+        <Button asChild variant="outline"><Link href="/catalog/redirects">Редиректы</Link></Button>
         <Button type="button" variant="outline" disabled={exporting} aria-busy={exporting} onClick={exportYml}>{exporting ? 'Формирование…' : 'Выгрузить YML'}</Button>
         <Button asChild><Link href="/collections/projects/create">Создать</Link></Button>
       </div>

@@ -1,4 +1,6 @@
-import type { CollectionConfig } from 'payload'
+import { redirectPath, redirectTarget } from '../../../src/lib/redirect-rules'
+import { pageRedirectsEndpoint } from './page-redirects-endpoint'
+import { APIError, type CollectionConfig } from 'payload'
 import { authenticated, contentManager, contentWriter } from '../access/staff'
 import { blockContentEndpoint } from './block-content-endpoint'
 import { clearPublicMediaCache } from './Media'
@@ -49,12 +51,22 @@ function registry(slug: 'blocks' | 'forms', singular: string, plural: string): C
 export const Blocks = registry('blocks', 'Блок', 'Блоки')
 export const Forms = registry('forms', 'Форма', 'Формы')
 export const Pages: CollectionConfig = {
+  endpoints: [pageRedirectsEndpoint],
   slug: 'pages', labels: { singular: 'Страница', plural: 'Страницы' }, access,
   versions: { drafts: true, maxPerDoc: 20 },
   hooks: { beforeDelete: [async ({ id, req }) => {
     const doc = await req.payload.findByID({ collection: 'pages', id, depth: 0, overrideAccess: true, req })
     if (isStandardRecord('pages', doc)) throw new Error('Штатная страница входит в структуру сайта и не удаляется.')
   }], beforeChange: [async ({ data, operation, originalDoc, req }) => {
+    if ((data.kind ?? originalDoc?.kind) === 'redirect') {
+      try {
+        data.route = redirectPath(data.route ?? originalDoc?.route ?? '', true)
+        data.redirect = redirectPath(data.redirect ?? originalDoc?.redirect ?? '')
+        const existing = await req.payload.find({ collection: 'pages', pagination: false, depth: 0, overrideAccess: true, req, where: { kind: { equals: 'redirect' } } })
+        const rules = existing.docs.filter(row => row.id !== originalDoc?.id && row.route && row.redirect).map(row => ({ source: row.route!, target: row.redirect! }))
+        redirectTarget(data.route, [...rules, { source: data.route, target: data.redirect }])
+      } catch (error) { throw new APIError(error instanceof Error ? error.message : 'Некорректное соответствие', 400) }
+    }
     // Unnamed drafts get a recognizable name with their record ID
     if (operation === 'create' && !data.title?.trim() && data.id) data.title = `Черновик #${data.id}`
     // Shared and hero blocks stay pinned: leading ones at the top, the rest at the bottom

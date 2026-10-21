@@ -70,7 +70,10 @@ import { LoginView as LoginView_1732cc817b3048038c3e58a486fc7be7 } from '../../c
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 /** @type import('payload').ImportMap */
+import { RedirectsView as RedirectsView_748188b2c19d87073961306254117b4f } from '../../components/admin/RedirectsView'
+
 export const importMap = {
+  "./components/admin/RedirectsView#RedirectsView": RedirectsView_748188b2c19d87073961306254117b4f,
   "./components/admin/BlockedCell#BlockedCell": BlockedCell_b32a788ac704cc26ef4283a3336d0c04,
   "./components/admin/CollectionEmptyState#UsersEmptyState": UsersEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466,
   "./components/admin/PageMetadataFields#PageKindField": PageKindField_39c824816878a36ded3bfc43acf44e05,

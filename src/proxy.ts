@@ -1,15 +1,17 @@
+import { managedRedirect } from './lib/managed-redirects'
 import { NextResponse, type NextRequest } from 'next/server'
 import { legacyRedirect } from '../config/legacy-redirects'
 import { REGION_COOKIE, regionFromSearch } from './lib/region-traffic'
 import { attributionFromUrl, LEAD_ATTRIBUTION_COOKIE } from './lib/lead-attribution'
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers)
   headers.set('x-cms-page-route', request.nextUrl.pathname)
   const marked = regionFromSearch(request.nextUrl.search)
   const saved = request.cookies.get(REGION_COOKIE)?.value
   headers.set('x-avgst-region', marked ?? (saved === 'msk' ? 'msk' : 'nn'))
-  const legacy = legacyRedirect(new URL(request.url))
+  const managed = await managedRedirect(new URL(request.url))
+  const legacy = managed ? { url: managed, status: 308 as const } : legacyRedirect(new URL(request.url))
   const response = legacy ? NextResponse.redirect(legacy.url, legacy.status) : NextResponse.next({ request: { headers } })
   if (marked) response.cookies.set(REGION_COOKIE, marked, { path: '/', sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
   const attribution = attributionFromUrl(request.url)
