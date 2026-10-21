@@ -7,6 +7,7 @@ export function legacyRedirect(source: URL): { url: URL; status: 307 | 308 } | n
   if (path === '/articles' || path.startsWith('/articles/')) {
     url.protocol = 'https:'
     url.host = 'old.avgst.ru'
+    url.port = ''
     return { url, status: 307 }
   }
   const section = /^\/catalog\/(modulnye-doma|panelno-karkasnye-doma)(?:\/(.*))?$/.exec(path)
