@@ -95,7 +95,7 @@ export async function deliverLead(settings: LeadDeliverySettings, lead: LeadInpu
   if (!['https:', 'http:'].includes(url.protocol) || url.username || url.password) throw new Error('integration-url-invalid')
   const authorization = !roistat && settings.authorizationEnv ? process.env[settings.authorizationEnv] : undefined
   if (!roistat && settings.authorizationEnv && !authorization) throw new Error('integration-secret-missing')
-  const response = await request(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Request-ID': id, ...(authorization ? { Authorization: authorization } : {}) }, body: JSON.stringify(webhookBody(lead, id, title)), redirect: 'error', signal: AbortSignal.timeout(10000) })
+  const response = await request(url, { method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Request-ID': id, ...(authorization ? { Authorization: authorization } : {}) }, body: JSON.stringify(webhookBody(lead, id, title)), redirect: 'error', signal: AbortSignal.timeout(20000) })
   if (!response.ok) throw new Error('integration-delivery-failed')
   return { status: 'sent' as const }
 }
