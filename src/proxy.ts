@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { REGION_COOKIE, regionFromSearch } from './lib/region-traffic'
+import { attributionFromUrl, LEAD_ATTRIBUTION_COOKIE } from './lib/lead-attribution'
 
 export function proxy(request: NextRequest) {
   const headers = new Headers(request.headers)
@@ -9,6 +10,10 @@ export function proxy(request: NextRequest) {
   headers.set('x-avgst-region', marked ?? (saved === 'msk' ? 'msk' : 'nn'))
   const response = NextResponse.next({ request: { headers } })
   if (marked) response.cookies.set(REGION_COOKIE, marked, { path: '/', sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
+  const attribution = attributionFromUrl(request.url)
+  if (Object.keys(attribution).length && !request.headers.has('next-router-prefetch')) {
+    response.cookies.set(LEAD_ATTRIBUTION_COOKIE, encodeURIComponent(JSON.stringify({ ...attribution, landing_page: `${request.nextUrl.origin}${request.nextUrl.pathname}`.slice(0, 1000) })), { path: '/', httpOnly: true, sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
+  }
   return response
 }
 

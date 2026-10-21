@@ -1,5 +1,6 @@
 import type { LeadInput } from '../../../src/lib/leads'
 import { leadTitle } from './lead-title'
+import { attributionKeys, type Attribution } from '../../../src/lib/lead-attribution'
 
 export type RoistatCounter = { projectId?: string | null; connectedAt?: string | null; enabled?: boolean | null }
 
@@ -67,7 +68,10 @@ function text(value: unknown) {
 export function webhookBody(lead: LeadInput, id: string, title: string) {
   const meta = lead.meta || {}
   const project = text(meta.projectName) || text(meta.project)
-  const comment = [text(lead.message), lead.sourceUrl ? `Страница: ${lead.sourceUrl}` : ''].filter(Boolean).join('\n')
+  const attribution: Attribution = Object.fromEntries(attributionKeys.flatMap(key => text(meta[key]) ? [[key, text(meta[key])]] : []))
+  const excluded: readonly string[] = [...attributionKeys, 'roistatVisit', 'formHeading', 'email']
+  const context = Object.entries(meta).filter(([key, value]) => !excluded.includes(key) && value !== null && value !== undefined && value !== '').map(([key, value]) => `${key}: ${typeof value === 'object' ? JSON.stringify(value) : String(value)}`)
+  const comment = [text(lead.message), lead.sourceUrl ? `Страница: ${lead.sourceUrl}` : '', `formname: ${text(meta.formHeading) || title.replace(/^Новая заявка с сайта: /, '')}`, `Согласие на обработку персональных данных: ${lead.consent ? 'да' : 'нет'}`, ...context, ...Object.entries(attribution).map(([key, value]) => `${key}: ${value}`), text(meta.roistatVisit) ? `roistat: ${text(meta.roistatVisit)}` : ''].filter(Boolean).join('\n')
   return {
     id,
     title,
@@ -79,6 +83,7 @@ export function webhookBody(lead: LeadInput, id: string, title: string) {
     page: lead.sourceUrl || '',
     form: lead.formId || '',
     project,
+    ...attribution,
     lead,
   }
 }
