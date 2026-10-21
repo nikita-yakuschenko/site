@@ -45,13 +45,24 @@ export function bindReactContent(block: string, children: ReactNode, parts: read
       const value = item.saved && typeof item.saved.text === 'string' ? item.saved.text : node
       return markText ? createElement('cms-text', { key: item.key, 'data-cms-text': item.key, 'data-cms-block': item.key, style: { display: 'contents' } }, value) : value
     }
-    if (Array.isArray(node)) return node.map((child, index) => {
-      const next = walk(child, `${path}.${index}`, label)
-      return isValidElement(next) && next.key == null ? cloneElement(next, { key: `${path}.${index}` }) : next
-    })
+    if (Array.isArray(node)) {
+      let position = 0
+      return node.map(child => {
+        // Named fields can be inserted without renumbering existing saved content.
+        const named = isValidElement(child) && (child.props as Record<string, unknown>)['data-cms-content-field']
+        const childPath = named ? `${path}.named.${named}` : `${path}.${position++}`
+        const next = walk(child, childPath, label)
+        return isValidElement(next) && next.key == null ? cloneElement(next, { key: childPath }) : next
+      })
+    }
     if (!isValidElement(node)) return node
     const element = node as ReactElement<Record<string, unknown>>
     const original = element.props
+    const named = original['data-cms-content-field']
+    if (typeof named === 'string' && /^[A-Za-z][A-Za-z0-9]*$/.test(named)) {
+      const item = field(named, 'text', String(original['data-cms-content-label'] || 'Текст'), typeof original.children === 'string' ? original.children : '')
+      return cloneElement(element, { children: item.saved?.text ?? original.children, 'data-cms-block': item.key })
+    }
     if (typeof original.className === 'string' && original.className.split(/\s+/).includes('site-header__subrow')) return node
     // Another connected block owns its own fields and paths.
     if (original.cmsBlockKey || original['data-cms-content-root'] || original['data-cms-content-connected']) return node

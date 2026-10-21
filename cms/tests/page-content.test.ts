@@ -85,3 +85,19 @@ test('static server copy keeps stable field markers for the same preview updates
   const next = bindMarkedContent(initial.content, [{ key, text: 'Изменённый абзац' }])
   assert.equal(props(props(next).children as ReactNode).children, 'Изменённый абзац')
 })
+
+
+test('adding a named event format preserves existing positional bindings and supports clearing', () => {
+  const heading = createElement('h1', null, 'Старый заголовок')
+  const original = bindReactContent('Event', createElement('section', null, [heading]))
+  const format = createElement('p', { 'data-cms-content-field': 'eventFormat', 'data-cms-content-label': 'Формат мероприятия' }, 'День открытых дверей')
+  const tree = createElement('section', null, [format, heading])
+  const result = bindReactContent('Event', tree, [{ key: original.fields[0].key, text: 'Сохранённый заголовок' }, { key: 'Event.content.eventFormat', text: 'Экскурсия' }])
+  assert.equal(result.fields[1].key, original.fields[0].key)
+  assert.equal(result.fields[0].title, 'Формат мероприятия')
+  const children = props(result.content).children as ReactNode[]
+  assert.equal(props(children[0]).children, 'Экскурсия')
+  assert.equal(props(children[1]).children, 'Сохранённый заголовок')
+  const cleared = bindReactContent('Event', tree, [{ key: 'Event.content.eventFormat', text: '' }])
+  assert.equal(props((props(cleared.content).children as ReactNode[])[0]).children, '')
+})

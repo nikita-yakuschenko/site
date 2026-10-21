@@ -1019,3 +1019,6 @@ html body .ags.ags-hero .ags-hero__photo img {
   .ags-foot__body{ grid-template-columns:1fr; gap:28px; }
   .ags-foot__col,.ags-foot__col--last{ grid-column:1 / -1; }
 }
+
+html body .ags.ags-hero .ags-hero__format { margin:0 0 14px; font-size:14px; line-height:1.4; font-weight:500; color:var(--t-2); }
+html body .ags.ags-hero .ags-hero__format:empty { display:none; }

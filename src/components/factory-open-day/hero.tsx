@@ -30,6 +30,7 @@ export function FactoryOpenDayHero({ date }: { date: string }) {
         </header>
         <div className="ags-hero__body">
           <div className="ags-hero__lead">
+            <p className="ags-hero__format" data-cms-content-field="eventFormat" data-cms-content-label="Формат мероприятия">День открытых дверей</p>
             <h1 className="ags-hero__title">Новый взгляд<br />на загородный дом</h1>
             <p className="ags-hero__subtitle"><span className="ags-hero__subtitle-highlight">Какие дома будут строить в этом сезоне?</span></p>
             <div className="ags-hero__intro">
