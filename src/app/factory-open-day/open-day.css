@@ -1020,5 +1020,5 @@ html body .ags.ags-hero .ags-hero__photo img {
   .ags-foot__col,.ags-foot__col--last{ grid-column:1 / -1; }
 }
 
-html body .ags.ags-hero .ags-hero__format { margin:0 0 18px; font-size:clamp(20px,1.8vw,24px); line-height:1.35; font-weight:500; color:var(--t-1); max-width:38ch; }
+html body .ags.ags-hero .ags-hero__format { margin:0 0 8px; font-size:clamp(16px,1.3vw,18px); line-height:1.35; font-weight:500; color:var(--t-1); max-width:38ch; }
 html body .ags.ags-hero .ags-hero__format:empty { display:none; }
