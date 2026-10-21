@@ -329,10 +329,10 @@ const panelValues: Values = {
       "facade-material",
     ),
   ],
-  wallsFinish: [excluded(), excluded(), excluded()],
+  wallsFinish: [excluded(), excluded(), included("ГСП Vetonit Стронг, 15 мм", "ГСП Vetonit Стронг, 15 мм", "prepared")],
   ceiling: [excluded(), excluded(), excluded()],
   floor: [roughFloor(), roughFloor(), roughFloor()],
-  bathroom: [excluded(), excluded(), excluded()],
+  bathroom: [excluded(), excluded(), included("ГСП Vetonit Аква Стронг, 15 мм", "ГСП Vetonit Аква Стронг, 15 мм", "prepared")],
   electric: [excluded(), excluded(), excluded()],
   water: [excluded(), excluded(), excluded()],
   sewer: [excluded(), excluded(), excluded()],
@@ -408,7 +408,7 @@ const modularValues: Values = {
   ],
   wallsFinish: [
     excluded(),
-    included("Гипсокартон 15 мм", "Гипсокартон 15 мм", "prepared"),
+    included("ГСП Vetonit Стронг, 15 мм", "ГСП Vetonit Стронг, 15 мм", "prepared"),
     included(
       "Чистовая: имитация бруса",
       "Имитация бруса камерной сушки",
@@ -431,7 +431,7 @@ const modularValues: Values = {
   ],
   bathroom: [
     excluded(),
-    included("Имитация бруса", "Имитация бруса", "finish"),
+    included("ГСП Vetonit Аква Стронг, 15 мм", "ГСП Vetonit Аква Стронг, 15 мм", "prepared"),
     included("Керамогранит", "Керамогранит", "finish"),
   ],
   electric: [
