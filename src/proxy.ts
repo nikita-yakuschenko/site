@@ -12,7 +12,7 @@ export function proxy(request: NextRequest) {
   if (marked) response.cookies.set(REGION_COOKIE, marked, { path: '/', sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
   const attribution = attributionFromUrl(request.url)
   if (Object.keys(attribution).length && !request.headers.has('next-router-prefetch')) {
-    response.cookies.set(LEAD_ATTRIBUTION_COOKIE, JSON.stringify({ ...attribution, landing_page: `${request.nextUrl.protocol}//${request.headers.get('x-forwarded-host')?.split(',')[0].trim() || request.headers.get('host') || request.nextUrl.host}${request.nextUrl.pathname}`.slice(0, 1000) }), { path: '/', httpOnly: true, sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
+    response.cookies.set(LEAD_ATTRIBUTION_COOKIE, JSON.stringify({ ...attribution, landing_page: `${request.nextUrl.protocol}//${request.headers.get('x-forwarded-host')?.split(',')[0]?.trim() || request.headers.get('host') || request.nextUrl.host}${request.nextUrl.pathname}`.slice(0, 1000) }), { path: '/', httpOnly: true, sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
   }
   return response
 }
