@@ -108,7 +108,7 @@ function PromoSlot({ row, partKey }: { row: string; partKey: string }) {
   const [open, setOpen] = useState(false)
   return <div className="promo-slot" data-open={open ? '' : undefined}>
     <button type="button" className="promo-slot__toggle" aria-expanded={open} onClick={() => setOpen(value => { const next = !value; window.dispatchEvent(new CustomEvent('avgst:preview-selection', { detail: next ? { path: row, key: partKey, title: title || partKey } : { path: row, closed: true } })); return next })}>{title || 'Слот'}</button>
-    {open ? <div className="promo-slot__body"><HeroPromoFields row={row} partKey={partKey} /></div> : null}
+    {open ? <div className="promo-slot__body" onFocusCapture={() => window.dispatchEvent(new CustomEvent('avgst:preview-selection', { detail: { path: row, key: partKey, title: title || partKey } }))}><HeroPromoFields row={row} partKey={partKey} /></div> : null}
   </div>
 }
 

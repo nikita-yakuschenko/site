@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { preload } from "react-dom";
 import {
   IconArrowUpRight,
@@ -117,6 +117,10 @@ function shiftFor(
     : `translate3d(calc(${base} + ${dx}px), 0, 0)`;
 }
 
+const subscribePreview = () => () => {};
+const readPreview = () => window.parent !== window && new URLSearchParams(window.location.search).has("cmsPreview");
+const serverPreview = () => false;
+
 function usePreviewHeroCopy(message: HeroMessage): HeroMessage {
   const [draft, setDraft] = useState<Partial<HeroMessage> | null>(null);
   useEffect(() => {
@@ -129,15 +133,16 @@ function usePreviewHeroCopy(message: HeroMessage): HeroMessage {
       const subtitle = parts.find((part) => part.key === "hero.subtitle");
       const button = parts.find((part) => part.key === "hero.button");
       const background = parts.find((part) => part.key === "hero.background");
-      setDraft({
-        heading: heading?.text || message.heading,
-        headingMore: heading?.textMore || "",
-        text: subtitle?.text ?? message.text,
-        cta: button?.text || message.cta,
-        href: button?.href || message.href,
-        image: background?.image || message.image,
-        imageMobile: background?.imageMobile || message.imageMobile,
-      });
+      setDraft(current => ({
+        ...current,
+        heading: heading?.text ?? current?.heading ?? message.heading,
+        headingMore: heading?.textMore ?? current?.headingMore ?? message.headingMore,
+        text: subtitle?.text ?? current?.text ?? message.text,
+        cta: button?.text ?? current?.cta ?? message.cta,
+        href: button?.href ?? current?.href ?? message.href,
+        image: background?.image ?? current?.image ?? message.image,
+        imageMobile: background?.imageMobile ?? current?.imageMobile ?? message.imageMobile,
+      }));
     };
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);
@@ -152,22 +157,24 @@ function usePreviewHeroPromos(promos: readonly HeroPromo[]): readonly HeroPromo[
     const allowed = new Set(["http://localhost:3001", "https://cms.avgst.ru"]);
     const receive = (event: MessageEvent) => {
       if (event.source !== window.parent || !allowed.has(event.origin) || event.data?.type !== "avgst:preview-hero-copy" || !Array.isArray(event.data.parts)) return;
-      const next: HeroPromo[] = promos.map((promo) => ({ ...promo }));
-      for (const part of event.data.parts as { key?: string; title?: string; text?: string; textMore?: string; href?: string; image?: string; action?: string; url?: string; formKey?: string }[]) {
-        const match = /^hero\.promo\.(\d+)$/.exec(part.key || "");
-        if (!match) continue;
-        const promo = next[Number(match[1])];
-        if (!promo) continue;
-        if (part.title) promo.heading = part.title;
-        if (part.text) promo.text = part.text;
-        promo.eyebrow = part.textMore || "";
-        if (part.href) promo.cta = part.href;
-        if (part.image) promo.image = part.image;
-        promo.action = part.action === "link" ? "link" : "form";
-        promo.url = part.url || "";
-        promo.formKey = part.formKey || "";
-      }
-      setDraft(next);
+      setDraft(current => {
+        const next: HeroPromo[] = (current ?? promos).map((promo) => ({ ...promo }));
+        for (const part of event.data.parts as { key?: string; title?: string; text?: string; textMore?: string; href?: string; image?: string; action?: string; url?: string; formKey?: string }[]) {
+          const match = /^hero\.promo\.(\d+)$/.exec(part.key || "");
+          if (!match) continue;
+          const promo = next[Number(match[1])];
+          if (!promo) continue;
+          if (part.title !== undefined) promo.heading = part.title;
+          if (part.text !== undefined) promo.text = part.text;
+          if (part.textMore !== undefined) promo.eyebrow = part.textMore;
+          if (part.href !== undefined) promo.cta = part.href;
+          if (part.image !== undefined) { promo.image = part.image; promo.video = undefined; promo.cutout = false; }
+          if (part.action !== undefined) promo.action = part.action === "link" ? "link" : "form";
+          if (part.url !== undefined) promo.url = part.url;
+          if (part.formKey !== undefined) promo.formKey = part.formKey;
+        }
+        return next;
+      });
     };
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);
@@ -223,6 +230,20 @@ export function HeroCarousel({
 
   const [pos, setPos] = useState(0);
   const [playId, setPlayId] = useState(0);
+  const preview = useSyncExternalStore(subscribePreview, readPreview, serverPreview);
+  useEffect(() => {
+    if (window.parent === window || !new URLSearchParams(window.location.search).has("cmsPreview")) return;
+    const allowed = new Set(["http://localhost:3001", "https://cms.avgst.ru"]);
+    const receive = (event: MessageEvent) => {
+      if (event.source !== window.parent || !allowed.has(event.origin) || event.data?.type !== "avgst:preview-promo") return;
+      const next = event.data.index;
+      if (!Number.isInteger(next) || next < 0 || next >= count) return;
+      setPos(next);
+      setPlayId(value => value + 1);
+    };
+    window.addEventListener("message", receive);
+    return () => window.removeEventListener("message", receive);
+  }, [count]);
   // Индекс настоящего слота: pos приводится в границы списка.
   const index = count ? ((pos % count) + count) % count : 0;
 
@@ -357,7 +378,7 @@ export function HeroCarousel({
   }
 
   function onPointerDown(event: React.PointerEvent<HTMLElement>) {
-    if (!rotating || event.button !== 0) return;
+    if (preview || !rotating || event.button !== 0) return;
     // Карточка сама кнопка. Пропускать любой button значит не пускать жест
     // по ней вообще. В стороне остаются только стрелки и полоса прогресса.
     const target = event.target;
@@ -512,7 +533,7 @@ export function HeroCarousel({
             rail ? "is-rail" : null,
             // Подсказка о жесте нужна там, где слот занимает кадр целиком
             // и соседний из-за края не выглядывает, — в узком режиме.
-            !rail && !hinted ? "is-hint" : null,
+            !preview && !rail && !hinted ? "is-hint" : null,
           ]
             .filter(Boolean)
             .join(" ")}
@@ -638,7 +659,7 @@ export function HeroCarousel({
           {/* Полоса прогресса, она же переключатель, у нижней границы
               карточки. Слоем по той же причине, что шевроны. */}
           {rotating ? (
-            <CarouselProgress labels={slots.map(item => item.heading)} index={index} playId={playId} paused={paused} onSelect={goTo} onComplete={() => step(1)} />
+            <CarouselProgress labels={slots.map(item => item.heading)} index={index} playId={playId} paused={preview || paused} onSelect={goTo} onComplete={() => { if (!preview) step(1); }} />
           ) : null}
         </div>
       </div>

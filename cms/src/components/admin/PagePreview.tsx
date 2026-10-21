@@ -82,11 +82,15 @@ export function PagePreview({ siteUrl, project = false, story = false, configura
     const rows = (fields.parts as { rows?: unknown[] } | undefined)?.rows
     const count = Array.isArray(rows) ? rows.length : 0
     const parts = []
-    for (let index = 0; index < count; index++) parts.push({ key: String(fields[`parts.${index}.key`]?.value || ''), text: String(fields[`parts.${index}.text`]?.value || ''), textMore: String(fields[`parts.${index}.textMore`]?.value || ''), href: String(fields[`parts.${index}.href`]?.value || '') })
+    for (let index = 0; index < count; index++) parts.push({ key: String(fields[`parts.${index}.key`]?.value || ''), title: String(fields[`parts.${index}.title`]?.value ?? ''), text: String(fields[`parts.${index}.text`]?.value ?? ''), textMore: String(fields[`parts.${index}.textMore`]?.value ?? ''), href: String(fields[`parts.${index}.href`]?.value ?? ''), action: String(fields[`parts.${index}.action`]?.value || ''), url: String(fields[`parts.${index}.link`]?.value || '') })
     return JSON.stringify(parts)
   })
   const heroPartsRef = useRef(heroParts)
-  heroPartsRef.current = heroParts
+  // Keep resolved media/form keys from field events when Payload updates its scalar snapshot.
+  useEffect(() => {
+    const previous = heroPartsRef.current ? JSON.parse(heroPartsRef.current) as { key: string }[] : []
+    heroPartsRef.current = heroParts ? JSON.stringify((JSON.parse(heroParts) as { key: string }[]).map(part => ({ ...previous.find(item => item.key === part.key), ...part }))) : ''
+  }, [heroParts])
   const popularParts = useFormFields(([fields]) => {
     if (String(fields.key?.value || '') !== 'popularProjects') return ''
     const rows = (fields.parts as { rows?: unknown[] } | undefined)?.rows
@@ -199,10 +203,12 @@ export function PagePreview({ siteUrl, project = false, story = false, configura
     const receive = (event: Event) => {
       const detail = (event as CustomEvent).detail
       setSelected(current => detail.closed ? current?.path === detail.path ? isolatedRef.current : current : detail)
+      const promo = !detail.closed && /^hero\.promo\.(\d+)$/.exec(detail.key || '')
+      if (promo) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-promo', index: Number(promo[1]) }, origin)
     }
     window.addEventListener('avgst:preview-selection', receive)
     return () => window.removeEventListener('avgst:preview-selection', receive)
-  }, [])
+  }, [origin])
   useEffect(() => {
     const receive = (event: Event) => {
       const detail = (event as CustomEvent<PreviewImage | null>).detail
@@ -224,12 +230,20 @@ export function PagePreview({ siteUrl, project = false, story = false, configura
     card?.setAttribute('data-preview-active', '')
     return () => card?.removeAttribute('data-preview-active')
   }, [project, isolateBlock, selected])
+  const promoSelection = /^hero\.promo\.(\d+)$/.exec(selected?.key || '')
+  const selectedPromo = promoSelection ? Number(promoSelection[1]) : null
+  const selectedPromoRef = useRef(selectedPromo)
+  useEffect(() => {
+    selectedPromoRef.current = selectedPromo
+    if (selectedPromo !== null) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-promo', index: selectedPromo }, origin)
+  }, [selectedPromo, origin, revision])
   const previewKey = isolateBlock ? blockKey || null : selected?.key ?? null
   const previewMessage = { type: 'avgst:preview-block' as const, key: previewKey, dim: Boolean(isolateBlock && previewKey) }
   useEffect(() => {
     frame.current?.contentWindow?.postMessage(previewMessage, origin)
     const receive = (event: MessageEvent) => {
       if (event.source === frame.current?.contentWindow && event.origin === origin && event.data?.type === 'avgst:preview-ready') {
+        if (selectedPromoRef.current !== null) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-promo', index: selectedPromoRef.current }, origin)
         if (contentDraftRef.current.length) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-content', key: blockKey, parts: contentDraftRef.current }, origin)
         frame.current?.contentWindow?.postMessage(previewMessage, origin)
         if (currentOrder.current) frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-order', order: currentOrder.current }, origin)
@@ -320,7 +334,7 @@ export function PagePreview({ siteUrl, project = false, story = false, configura
   }, [popularParts, origin, revision])
   useEffect(() => {
     if (!heroParts) return
-    const send = () => frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-hero-copy', parts: JSON.parse(heroParts) }, origin)
+    const send = () => frame.current?.contentWindow?.postMessage({ type: 'avgst:preview-hero-copy', parts: JSON.parse(heroPartsRef.current) }, origin)
     const timer = setTimeout(send, 80)
     return () => clearTimeout(timer)
   }, [heroParts, origin, revision])
