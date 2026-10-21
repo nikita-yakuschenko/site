@@ -65,12 +65,12 @@ export function RedirectsIndex({ rows: initial, targets }: { rows: Row[]; target
       <Button onClick={() => open({ source: '', target: '' })}>Создать</Button>
     </div>
     <DataTableFrame page={table.page} pageCount={table.pageCount} pageSize={table.pageSize} onPage={table.setPage} onPageSize={table.setPageSize}>
-      <Table><TableHeader><TableRow><TableHead className="pl-4">Исходный адрес</TableHead><TableHead>Целевая страница</TableHead><TableHead>Статус</TableHead><TableHead className="w-12"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
+      <Table><TableHeader><TableRow><TableHead className="pl-4">Исходный адрес</TableHead><TableHead>Целевая страница</TableHead><TableHead>Статус</TableHead><TableHead className="w-16"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
         <TableBody>{table.rows.map(row => <TableRow key={row.id}>
           <TableCell className="h-14 pl-4"><button type="button" className="text-left font-medium underline-offset-4 hover:underline" onClick={() => open(row)}>{row.source}</button></TableCell>
           <TableCell><span className="block font-medium">{targetLabel(row.target)}</span><span className="text-sm text-muted-foreground">{row.target}</span></TableCell>
           <TableCell><Badge variant="outline">{row.published ? '308 · Постоянный' : 'Черновик'}</Badge></TableCell>
-          <TableCell className="pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Действия: ${row.source}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface"><DropdownMenuItem onSelect={() => open(row)}><IconPencil />Редактировать</DropdownMenuItem><DropdownMenuItem variant="destructive" onSelect={() => setRemoving(row)}><IconTrash />Удалить</DropdownMenuItem></DropdownMenuContent></DropdownMenu></TableCell>
+          <TableCell className="catalog-actions pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Действия: ${row.source}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface"><DropdownMenuItem onSelect={() => open(row)}><IconPencil />Редактировать</DropdownMenuItem><DropdownMenuItem variant="destructive" onSelect={() => setRemoving(row)}><IconTrash />Удалить</DropdownMenuItem></DropdownMenuContent></DropdownMenu></TableCell>
         </TableRow>)}{!table.rows.length && <TableRow><TableCell colSpan={4} className="h-24 text-center text-muted-foreground">Соответствия не найдены</TableCell></TableRow>}</TableBody>
       </Table>
     </DataTableFrame>
