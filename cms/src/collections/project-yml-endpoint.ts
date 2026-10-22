@@ -34,7 +34,8 @@ export const projectYmlEndpoint: Endpoint = {
       const prices = await req.payload.find({ collection: 'project-prices', pagination: false, depth: 0, req, overrideAccess: false, where: { and: [{ region: { equals: priceKind } }, { configuration: { equals: summaryConfiguration(priceKind) } }] } })
       const result = catalogYml(projects.docs, prices.docs, new Date(), process.env.CMS_PUBLIC_URL, priceKind)
       if (!result.count) return Response.json({ error: 'Нет опубликованных проектов с корректной ценой, технологией и изображением' }, { status: 422 })
-      return new Response(result.xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Content-Disposition': `attachment; filename="avgst-catalog-${priceKind}.yml"`, 'Cache-Control': 'no-store', 'X-Export-Count': String(result.count), 'X-Export-Skipped': String(result.skipped) } })
+      const filename = priceKind === 'nn' ? 'avgst-catalog.yml' : `avgst-catalog-${priceKind}.yml`
+      return new Response(result.xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Content-Disposition': `attachment; filename="${filename}"`, 'Cache-Control': 'no-store', 'X-Export-Count': String(result.count), 'X-Export-Skipped': String(result.skipped) } })
     } catch (error) {
       req.payload.logger.error({ err: error, msg: 'Catalog YML export failed' })
       return Response.json({ error: 'Не удалось сформировать YML. Попробуйте ещё раз.' }, { status: 500 })
