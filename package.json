@@ -18,6 +18,8 @@
     "typecheck": "tsc --noEmit",
     "frames:build": "node scripts/build-manufacture-frames.mjs",
     "test:e2e": "playwright test",
+    "diagnostics:release": "node scripts/run-browser-diagnostics.mjs local release",
+    "diagnostics:production": "node scripts/run-browser-diagnostics.mjs production",
     "test:e2e:cookie": "playwright test e2e/cookie-consent.spec.ts"
   },
   "dependencies": {

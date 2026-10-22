@@ -3,9 +3,15 @@ import { cache } from 'react'
 import { connection } from 'next/server'
 import { unstable_rethrow } from 'next/navigation'
 import { FixtureCatalogProvider } from './fixture-provider'
+import { CATALOG_PROJECTS } from './projects'
 import type { CatalogProject, ProjectCatalogProvider, ProjectQuery, SiteCatalogContext } from './types'
 
 const readCatalog = cache(async (slug?: string): Promise<CatalogProject[]> => {
+  // CI's production-build browser gate uses published-shape fixtures without
+  // granting untrusted pull-request code access to the production CMS token.
+  if (process.env.BROWSER_DIAGNOSTICS_FIXTURE_CATALOG === '1') {
+    return slug ? CATALOG_PROJECTS.filter(project => project.slug === slug) : CATALOG_PROJECTS
+  }
   // CMS records are added after deployment; always read them at request time.
   await connection()
   const key = process.env.CMS_SITE_API_KEY

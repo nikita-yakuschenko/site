@@ -1,0 +1,35 @@
+name: Production browser health audit
+
+on:
+  schedule:
+    - cron: '17 4 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CI: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - run: npm run diagnostics:production
+      - name: Add diagnostic summary
+        if: always()
+        run: if test -f diagnostics-results/summary.md; then cat diagnostics-results/summary.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-production-diagnostics
+          path: diagnostics-results/
+          if-no-files-found: warn
+          retention-days: 14

@@ -1,0 +1,39 @@
+name: Browser release quality gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  browser-release:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    env:
+      CI: '1'
+      BROWSER_DIAGNOSTICS_FIXTURE_CATALOG: '1'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - run: npx playwright install --with-deps chromium firefox webkit
+      - name: Read the public captcha site key for the test server
+        run: |
+          node -e "fetch('https://avgst.ru/api/smartcaptcha-config').then(r => r.json()).then(d => { if (!d.configured || !d.siteKey) throw Error('Public captcha key unavailable'); require('fs').appendFileSync(process.env.GITHUB_ENV, 'YANDEX_SMARTCAPTCHA_SITE_KEY=' + d.siteKey + '\\n') }).catch(e => { console.error(e.message); process.exitCode = 1 })"
+      - run: npm run build
+      - run: npm run diagnostics:release
+      - name: Add diagnostic summary
+        if: always()
+        run: if test -f diagnostics-results/summary.md; then cat diagnostics-results/summary.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-release-diagnostics
+          path: diagnostics-results/
+          if-no-files-found: warn
+          retention-days: 14
