@@ -3,7 +3,7 @@ import { recordIdPattern } from './record-id'
 
 export const leadInputSchema = z.object({
   requestId: z.string().uuid().optional(),
-  captchaToken: z.string().trim().min(1).max(4096),
+  captchaToken: z.string().trim().min(1).max(4096).optional(),
   name: z.string().trim().min(2).max(120),
   phone: z
     .string()
