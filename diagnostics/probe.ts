@@ -10,7 +10,7 @@ export type Finding = {
   message: string
   stack: string
   severity: 'critical' | 'warning' | 'info'
-  source: 'application' | 'third-party'
+  source: 'application' | 'third-party' | 'unknown'
   component: string
   cause: 'confirmed' | 'unconfirmed'
   fingerprint: string
@@ -36,9 +36,10 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   const findings: Finding[] = []
   const origin = new URL(info.project.use.baseURL || 'https://avgst.ru').origin
   const add = (category: string, message: string, stack = '', location = page.url()) => {
-    const source = location.startsWith(origin) || !/^https?:/.test(location) ? 'application' : 'third-party'
+    const source = !/^https?:/.test(location) ? 'unknown'
+      : location.startsWith(origin) ? 'application' : 'third-party'
     const severity = reactHydration(message + stack) || (source === 'application' && ['exception', 'console-error', 'script-failure', 'http-5xx'].includes(category))
-      ? 'critical' : category === 'console-warning' || source === 'third-party' ? 'warning' : 'info'
+      ? 'critical' : category === 'console-warning' || category === 'console-error' || source === 'third-party' ? 'warning' : 'info'
     const cleanMessage = scrub(message)
     findings.push({
       url: safeUrl(page.url()), scenario, browser: info.project.name.split('-')[0]!,
