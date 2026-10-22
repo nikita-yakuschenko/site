@@ -1,7 +1,7 @@
 "use client";
 
 import { IconArrowUpRight, IconX } from "@tabler/icons-react";
-import { useEffect, useRef, useState, type ReactNode } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "react";
 import { LeadForm } from "./lead-form";
 import { SITE } from "../lib/site";
 import { copy } from "../lib/copy";
@@ -70,6 +70,16 @@ export function PanelLeadForm({
   const open = controlledOpen ?? localOpen;
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
+  const wasOpen = useRef(open);
+
+  useLayoutEffect(() => {
+    if (open) {
+      rootRef.current?.querySelector<HTMLInputElement>('.panel-lead__form input:not([type="hidden"])')?.focus({ preventScroll: true });
+    } else if (wasOpen.current) {
+      triggerRef.current?.focus({ preventScroll: true });
+    }
+    wasOpen.current = open;
+  }, [open]);
 
   useEffect(() => {
     if (!open || !rootRef.current) return;
@@ -89,13 +99,9 @@ export function PanelLeadForm({
     return () => cancelAnimationFrame(frame);
   }, [open]);
 
-  const wasOpen = useRef(open);
-  useEffect(() => {
-    if (wasOpen.current && !open) triggerRef.current?.focus({ preventScroll: true });
-    wasOpen.current = open;
-  }, [open]);
-
   const setState = (next: boolean) => {
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement && rootRef.current?.contains(focused)) focused.blur();
     setOpen(next);
     onOpenChange?.(next);
   };

@@ -325,6 +325,7 @@ function ComparisonBody({
   useLayoutEffect(() => {
     const snapshots = pendingSlides.current;
     pendingSlides.current = new Map();
+    if (snapshots.size === 0) return clearSlides;
     const easing = table.current
       ? getComputedStyle(table.current).getPropertyValue("--ease-out").trim()
       : "cubic-bezier(.23,1,.32,1)";
