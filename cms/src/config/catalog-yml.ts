@@ -1,12 +1,13 @@
 import type { Project, ProjectPrice } from '../payload-types'
 import { catalogPrice } from './catalog-price'
+import { summaryConfiguration, type PriceKind } from './price-kinds'
 import { collectionHref } from '../../../src/lib/catalog/collection'
 
 const origin = 'https://avgst.ru'
 const xml = (value: unknown) => String(value).replace(/[^\u0009\u000A\u000D\u0020-\uD7FF\uE000-\uFFFD\u{10000}-\u{10FFFF}]/gu, '').replace(/[&<>"']/g, char => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' })[char]!)
 
-export function catalogYml(projects: Project[], prices: ProjectPrice[], now = new Date(), mediaOrigin = origin) {
-  const priceMap = new Map(prices.filter(row => row.configuration === 'standard' && row.region === 'nn').map(row => [typeof row.project === 'number' ? row.project : row.project.id, row.price]))
+export function catalogYml(projects: Project[], prices: ProjectPrice[], now = new Date(), mediaOrigin = origin, priceKind: PriceKind = 'nn') {
+  const priceMap = new Map(prices.filter(row => row.configuration === summaryConfiguration(priceKind) && row.region === priceKind).map(row => [typeof row.project === 'number' ? row.project : row.project.id, row.price]))
   const ids = new Set<string>()
   const collections = [
     { id: 'all-houses', name: 'Проекты домов', href: '/catalog', description: 'Проекты модульных и каркасных домов от Авангард Строй.' },
@@ -17,7 +18,8 @@ export function catalogYml(projects: Project[], prices: ProjectPrice[], now = ne
   let skipped = 0
   const offers = projects.flatMap(project => {
     if (project._status !== 'published') return []
-    const price = catalogPrice(project, priceMap.get(project.id))
+    // Only the NN feed has a legacy project price and ready-home sale price.
+    const price = priceKind === 'nn' ? catalogPrice(project, priceMap.get(project.id)) : project.recordType === 'ready-home' ? null : priceMap.get(project.id)
     const category = project.technologyBadge === 'Модульный' ? 1 : project.technologyBadge === 'Панельно-каркасный' ? 2 : null
     const image = typeof project.desktopImage === 'object' && project.desktopImage ? project.desktopImage.url : project.imageUrl
     let picture: URL | undefined

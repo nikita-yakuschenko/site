@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { Project } from '../../payload-types'
+import type { PriceKind } from '../../config/price-kinds'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { IconExternalLink, IconSearch, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus } from '@tabler/icons-react'
@@ -98,13 +99,37 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
   const [removing, setRemoving] = useState<Project | null>(null)
   const [busy, setBusy] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [exportDialogOpen, setExportDialogOpen] = useState(false)
+  const [priceOptions, setPriceOptions] = useState<{ value: PriceKind; label: string; count: number }[]>([])
+  const [selectedPriceKind, setSelectedPriceKind] = useState<PriceKind | null>(null)
+  const [loadingPriceOptions, setLoadingPriceOptions] = useState(false)
+  const [priceOptionsError, setPriceOptionsError] = useState('')
   const exportLock = useRef(false)
+  const openExportDialog = async () => {
+    setExportDialogOpen(true)
+    setLoadingPriceOptions(true)
+    setPriceOptionsError('')
+    setPriceOptions([])
+    setSelectedPriceKind(null)
+    try {
+      const response = await fetch('/api/projects/export-yml/options', { credentials: 'include', cache: 'no-store' })
+      const body = await response.json()
+      if (!response.ok) throw new Error(body?.error || 'Не удалось получить типы цен')
+      const options = body.options as { value: PriceKind; label: string; count: number }[]
+      setPriceOptions(options)
+      setSelectedPriceKind(options.find(option => option.value === 'nn')?.value ?? options[0]?.value ?? null)
+    } catch (error) {
+      setPriceOptionsError(error instanceof Error ? error.message : 'Не удалось получить типы цен')
+    } finally {
+      setLoadingPriceOptions(false)
+    }
+  }
   const exportYml = async () => {
-    if (exportLock.current) return
+    if (exportLock.current || !selectedPriceKind) return
     exportLock.current = true
     setExporting(true)
     try {
-      const response = await fetch('/api/projects/export-yml', { method: 'POST', credentials: 'include' })
+      const response = await fetch('/api/projects/export-yml', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ priceKind: selectedPriceKind }) })
       if (!response.ok) {
         const body = await response.json().catch(() => null)
         throw new Error(body?.error || 'Не удалось выгрузить каталог')
@@ -112,7 +137,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       const url = URL.createObjectURL(await response.blob())
       const link = document.createElement('a')
       link.href = url
-      link.download = 'avgst-catalog.yml'
+      link.download = `avgst-catalog-${selectedPriceKind}.yml`
       document.body.append(link)
       link.click()
       link.remove()
@@ -120,6 +145,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       toast.success(`Выгружено проектов: ${response.headers.get('X-Export-Count') || '—'}`)
       const skipped = Number(response.headers.get('X-Export-Skipped'))
       if (skipped) toast.warning(`Пропущено проектов без корректной цены, технологии или изображения: ${skipped}`)
+      setExportDialogOpen(false)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Не удалось выгрузить каталог')
     } finally {
@@ -213,7 +239,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
           <Input aria-label="Поиск проектов" placeholder="Поиск проектов" className="pl-9" value={search} onChange={event => { setSearch(event.target.value); table.setPage(0) }} />
         </div>
         <Button asChild variant="outline"><Link href="/catalog/redirects">Редиректы</Link></Button>
-        <Button type="button" variant="outline" disabled={exporting} aria-busy={exporting} onClick={exportYml}>{exporting ? 'Формирование…' : 'Выгрузить YML'}</Button>
+        <Button type="button" variant="outline" onClick={openExportDialog}>Выгрузить YML</Button>
         <Button asChild><Link href="/collections/projects/create">Создать</Link></Button>
       </div>
     </div>
@@ -246,6 +272,17 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
         </DropdownMenuContent></DropdownMenu></TableCell>
       </TableRow> })}{table.rows.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={11} className="h-24 text-center text-muted-foreground">Записи не найдены</TableCell></TableRow>}</TableBody>
     </Table></DataTableFrame>
+    <Dialog open={exportDialogOpen} onOpenChange={open => { if (!exporting) setExportDialogOpen(open) }}><DialogContent className="shadcn-surface">
+      <DialogHeader><DialogTitle>Выгрузить каталог в YML</DialogTitle><DialogDescription>Выберите тип цены для предложений в файле.</DialogDescription></DialogHeader>
+      {loadingPriceOptions ? <p className="text-sm text-muted-foreground">Загрузка типов цен…</p> : priceOptionsError ? <p role="alert" className="text-sm text-destructive">{priceOptionsError}</p> : priceOptions.length === 0 ? <p className="text-sm text-muted-foreground">Нет опубликованных проектов с ценой и данными для выгрузки.</p> : <fieldset className="grid gap-2" disabled={exporting}>
+        <legend className="sr-only">Тип цены</legend>
+        {priceOptions.map(option => <label key={option.value} className="flex cursor-pointer items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm has-checked:border-primary has-checked:bg-muted">
+          <span className="flex items-center gap-2"><input type="radio" name="yml-price-kind" value={option.value} checked={selectedPriceKind === option.value} onChange={() => setSelectedPriceKind(option.value)} />{option.label}</span>
+          <span className="text-muted-foreground">{option.count} проектов</span>
+        </label>)}
+      </fieldset>}
+      <DialogFooter><Button type="button" variant="outline" disabled={exporting} onClick={() => setExportDialogOpen(false)}>Отмена</Button><Button type="button" disabled={!selectedPriceKind || loadingPriceOptions || exporting} aria-busy={exporting} onClick={exportYml}>{exporting ? 'Формирование…' : 'Скачать YML'}</Button></DialogFooter>
+    </DialogContent></Dialog>
     <Dialog open={!!removing} onOpenChange={open => { if (!open && !busy) setRemoving(null) }}><DialogContent className="shadcn-surface">
       <DialogHeader><DialogTitle>Удалить «{removing?.name || '[Без названия]'}»?</DialogTitle><DialogDescription>Запись пропадёт из каталога и с сайта вместе с её ценами. Отменить удаление нельзя.</DialogDescription></DialogHeader>
       <DialogFooter><DialogClose asChild><Button variant="outline" disabled={busy}>Отмена</Button></DialogClose><Button variant="destructive" disabled={busy} onClick={remove}>{busy ? 'Удаление…' : 'Удалить'}</Button></DialogFooter>
