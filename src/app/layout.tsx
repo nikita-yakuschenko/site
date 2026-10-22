@@ -61,6 +61,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
 
   return (
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
+      <head>
+        <script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
+      </head>
       <body suppressHydrationWarning>
         <Suspense><CMSContentProvider records={content}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CMSContentProvider></Suspense>
         <CMSPreviewBridge />
