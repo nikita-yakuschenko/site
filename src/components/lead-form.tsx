@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import { useProjectLeadContext } from './project-lead-context'
 import { readRegionCode } from '../lib/regions'
@@ -20,8 +20,6 @@ import { noAutofillFieldProps, noAutofillFormProps } from '../lib/no-autofill'
 import { LeadSubmitFeedback } from './lead-submit-feedback'
 import { submitLead, type LeadAttempt } from '../lib/submit-lead'
 import { SmartCaptcha } from '@yandex/smart-captcha'
-
-const SMARTCAPTCHA_SITEKEY = process.env.NEXT_PUBLIC_YANDEX_CAPCHA_KEY || ''
 
 export function LeadForm({
   siteId,
@@ -74,6 +72,8 @@ export function LeadForm({
   const [phone, setPhone] = useState('+7')
   const [consent, setConsent] = useState(true)
   const [captchaToken, setCaptchaToken] = useState('')
+  const [captchaSiteKey, setCaptchaSiteKey] = useState<string | null>(null)
+  const [captchaReady, setCaptchaReady] = useState(false)
   const [invalid, setInvalid] = useState<{
     name?: boolean
     phone?: boolean
@@ -82,6 +82,15 @@ export function LeadForm({
   const phoneRef = useRef<HTMLInputElement>(null)
   const attempt = useRef<LeadAttempt['current']>(null)
   const submitting = useRef(false)
+
+  useEffect(() => {
+    let active = true
+    fetch('/api/smartcaptcha-config', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => { if (active) { setCaptchaSiteKey(typeof data?.siteKey === 'string' ? data.siteKey : null); setCaptchaReady(true) } })
+      .catch(() => { if (active) setCaptchaReady(true) })
+    return () => { active = false }
+  }, [])
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -94,7 +103,7 @@ export function LeadForm({
     if (!isValidName(name)) next.name = true
     if (!isValidRuMobile(phone)) next.phone = true
     if (!agreed) next.consent = true
-    if (SMARTCAPTCHA_SITEKEY && !captchaToken) return setStatus('error')
+    if (!captchaReady || !captchaSiteKey || !captchaToken) return setStatus('error')
     setInvalid(next)
     if (Object.keys(next).length) return
 
@@ -111,9 +120,10 @@ export function LeadForm({
         projectExternalId: projectExternalId ?? project?.id,
         projectId: projectId ?? project?.cmsId,
         formId: resolvedFormId,
+        captchaToken,
         sourceUrl: window.location.href,
         sourcePath: window.location.pathname,
-        meta: { region: readRegionCode(), formHeading: heading, captchaToken, ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
+        meta: { region: readRegionCode(), formHeading: heading, ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
       }, attempt)
       setStatus('ok')
       form.reset()
@@ -269,8 +279,8 @@ export function LeadForm({
           </Link>
         </span>
       </label>
-      {SMARTCAPTCHA_SITEKEY ? <div className="lead-form__captcha" aria-label="Проверка безопасности">
-        <SmartCaptcha sitekey={SMARTCAPTCHA_SITEKEY} onSuccess={setCaptchaToken} onTokenExpired={() => setCaptchaToken('')} language="ru" />
+      {captchaSiteKey ? <div className="lead-form__captcha" aria-label="Проверка безопасности">
+        <SmartCaptcha sitekey={captchaSiteKey} onSuccess={setCaptchaToken} onTokenExpired={() => setCaptchaToken('')} language="ru" />
       </div> : null}
       <button className="btn btn-yellow lead-card__submit" type="submit" disabled={status === 'sending'}>
         {status === 'sending' ? copy.sending : submitLabel || copy.sendLead}
