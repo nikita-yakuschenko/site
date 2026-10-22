@@ -10,6 +10,7 @@ permissions:
 jobs:
   browser-release:
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
     timeout-minutes: 35
     env:
       CI: '1'
@@ -21,7 +22,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium firefox webkit
       - name: Read the public captcha site key for the test server
         run: |
           node -e "fetch('https://avgst.ru/api/smartcaptcha-config').then(r => r.json()).then(d => { if (!d.configured || !d.siteKey) throw Error('Public captcha key unavailable'); require('fs').appendFileSync(process.env.GITHUB_ENV, 'YANDEX_SMARTCAPTCHA_SITE_KEY=' + d.siteKey + '\\n') }).catch(e => { console.error(e.message); process.exitCode = 1 })"

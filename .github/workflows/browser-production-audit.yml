@@ -11,6 +11,7 @@ permissions:
 jobs:
   browser-audit:
     runs-on: ubuntu-latest
+    container: mcr.microsoft.com/playwright:v1.63.0-noble
     timeout-minutes: 35
     env:
       CI: '1'
@@ -21,7 +22,6 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - run: npx playwright install --with-deps chromium firefox webkit
       - run: npm run diagnostics:production
       - name: Add diagnostic summary
         if: always()

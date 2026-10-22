@@ -11,6 +11,8 @@ Each run writes `diagnostics-results/diagnostics.json`, `summary.md`, `results.j
 
 The release workflow runs on pull requests and manual dispatch. It uses catalog fixtures so PR code never receives a production CMS token. It reads the public captcha site key from the site's configuration endpoint at runtime. The production audit runs daily and on manual dispatch. Both upload the result directory as a GitHub Actions artifact. A confirmed React hydration error, including #418, fails the run even if the page later recovers.
 
+Both workflows run in the official Playwright `v1.63.0-noble` container, matching the locked package version. This avoids a separate browser installation step on each runner.
+
 ## First production audit, 2026-10-22
 
 The initial five-profile matrix ran 30 synthetic scenarios (5 passed, 19 failed, 6 timed out). The first version of the mobile selectors caused several timeouts; these were corrected and a focused rerun confirmed that mobile filters and favorites pass in Chromium. The form flow opens and validates on mobile, but still reports the React error below. The first matrix totals should not be treated as site failure rates.
