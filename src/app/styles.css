@@ -14759,3 +14759,6 @@ picture.hero__frame {
   .project-config__tier-front,
   .project-config__tier-card .project-config__mobile-form { transition: none; transform: none; }
 }
+
+.lead-form__captcha { margin-top: 12px; min-height: 72px; }
+.lead-form__captcha iframe { max-width: 100%; }

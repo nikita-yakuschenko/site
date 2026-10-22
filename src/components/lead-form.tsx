@@ -19,6 +19,9 @@ import {
 import { noAutofillFieldProps, noAutofillFormProps } from '../lib/no-autofill'
 import { LeadSubmitFeedback } from './lead-submit-feedback'
 import { submitLead, type LeadAttempt } from '../lib/submit-lead'
+import { SmartCaptcha } from '@yandex/smart-captcha'
+
+const SMARTCAPTCHA_SITEKEY = process.env.NEXT_PUBLIC_YANDEX_CAPCHA_KEY || ''
 
 export function LeadForm({
   siteId,
@@ -70,6 +73,7 @@ export function LeadForm({
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
   const [phone, setPhone] = useState('+7')
   const [consent, setConsent] = useState(true)
+  const [captchaToken, setCaptchaToken] = useState('')
   const [invalid, setInvalid] = useState<{
     name?: boolean
     phone?: boolean
@@ -90,6 +94,7 @@ export function LeadForm({
     if (!isValidName(name)) next.name = true
     if (!isValidRuMobile(phone)) next.phone = true
     if (!agreed) next.consent = true
+    if (SMARTCAPTCHA_SITEKEY && !captchaToken) return setStatus('error')
     setInvalid(next)
     if (Object.keys(next).length) return
 
@@ -108,12 +113,13 @@ export function LeadForm({
         formId: resolvedFormId,
         sourceUrl: window.location.href,
         sourcePath: window.location.pathname,
-        meta: { region: readRegionCode(), formHeading: heading, ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
+        meta: { region: readRegionCode(), formHeading: heading, captchaToken, ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
       }, attempt)
       setStatus('ok')
       form.reset()
       setPhone('+7')
       setConsent(true)
+      setCaptchaToken('')
       setInvalid({})
     } catch (error) {
       console.error(error)
@@ -263,6 +269,9 @@ export function LeadForm({
           </Link>
         </span>
       </label>
+      {SMARTCAPTCHA_SITEKEY ? <div className="lead-form__captcha" aria-label="Проверка безопасности">
+        <SmartCaptcha sitekey={SMARTCAPTCHA_SITEKEY} onSuccess={setCaptchaToken} onTokenExpired={() => setCaptchaToken('')} language="ru" />
+      </div> : null}
       <button className="btn btn-yellow lead-card__submit" type="submit" disabled={status === 'sending'}>
         {status === 'sending' ? copy.sending : submitLabel || copy.sendLead}
         {status !== 'sending' ? (

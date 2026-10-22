@@ -28,6 +28,7 @@
     "@radix-ui/react-slider": "^1.4.7",
     "@radix-ui/react-tabs": "^1.2.0",
     "@tabler/icons-react": "3.34.1",
+    "@yandex/smart-captcha": "^2.9.1",
     "geist": "1.4.2",
     "next": "16.3.0",
     "react": "19.2.6",
