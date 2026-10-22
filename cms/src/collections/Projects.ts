@@ -12,7 +12,7 @@ import { projectPlansEndpoint } from './project-plans-endpoint'
 import { blankRoom, normalizePlans, validRoomArea } from '../config/project-plans'
 import { projectNextStepsEndpoint } from './project-next-steps-endpoint'
 import { projectConfigurationsEndpoint } from './project-configurations-endpoint'
-import { projectYmlEndpoint } from './project-yml-endpoint'
+import { projectYmlEndpoint, projectYmlOptionsEndpoint } from './project-yml-endpoint'
 import { projectCatalogEndpoint } from './project-catalog-endpoint'
 import { projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint } from './project-reactions-endpoint'
 import { normalizeConfigurations } from '../config/project-configurations'
@@ -39,7 +39,7 @@ export const Projects: CollectionConfig = {
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'recordType', 'technologyBadge', 'areaValue', 'priceAmount', '_status'], components: { edit: { beforeDocumentControls: ['./components/admin/PageMetadataFields#ProjectRecordMetadata'] } } },
   versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
-  endpoints: [...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
+  endpoints: [...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectYmlOptionsEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
   hooks: { beforeDelete: [async ({ id, req }) => {
     // Price rows require a project, so they go first
     await req.payload.delete({ collection: 'project-prices', where: { project: { equals: id } }, req, overrideAccess: true })
