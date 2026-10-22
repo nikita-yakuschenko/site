@@ -70,9 +70,9 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
       </head>
       <body suppressHydrationWarning>
+        {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
         <Suspense><CMSContentProvider records={content}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></CMSContentProvider></Suspense>
         <CMSPreviewBridge />
-        {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
         {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в
             клиентский код на сборке, и если переменную задать только в
             окружении контейнера, в бандле окажется undefined. Здесь она
