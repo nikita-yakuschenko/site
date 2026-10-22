@@ -179,8 +179,10 @@ export function SiteChrome({
     writeTechBarTheme(techBarTheme === "light" ? "dark" : "light");
   }
   const src = mediaUrl(logo) || "/logo_lg.svg";
+  // CMS привязывает содержимое к позиции ссылки. Условный пункт скрываем
+  // при рендере, сохраняя позиции остальных ссылок для привязки CMS.
   const items = (navigation?.filter(
-    (item) => item.label && item.href && item.href !== "/" && (item.href !== '/catalog?status=ready' || hasReadyHouses !== false),
+    (item) => item.label && item.href && item.href !== "/",
   ) || [
     { label: copy.catalogProjects, href: "/catalog" },
     { label: copy.contacts, href: "/#contacts" },
@@ -278,7 +280,10 @@ export function SiteChrome({
 
             <nav className="site-header__nav" aria-label={copy.navAria} data-cms-block="mainHeader.navigation">
               {items.map((item) => (
-                <Link key={`${item.href}-${item.label}`} href={item.href}>
+                <Link key={`${item.href}-${item.label}`} href={item.href}
+                  hidden={item.href === '/catalog?status=ready' && hasReadyHouses === false}
+                  style={item.href === '/catalog?status=ready' && hasReadyHouses === false ? { display: 'none' } : undefined}
+                >
                   {item.label}
                 </Link>
               ))}
@@ -351,6 +356,8 @@ export function SiteChrome({
                 <Link
                   key={`m-${item.href}`}
                   href={item.href}
+                  hidden={item.href === '/catalog?status=ready' && hasReadyHouses === false}
+                  style={item.href === '/catalog?status=ready' && hasReadyHouses === false ? { display: 'none' } : undefined}
                   onClick={() => setMenuOpen(false)}
                 >
                   {item.label}
