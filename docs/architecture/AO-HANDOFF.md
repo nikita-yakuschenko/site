@@ -35,6 +35,8 @@ npx next typegen
 
 ## Проверки и команды
 
+При сохранении checkpoint 22.10.2026 повторно прошли TypeScript сайта и CMS и **128/128 CMS unit tests**. Это не включает integration suite: известная проблема AO-04 остаётся открытой. Ветка объединена со свежим origin/main со скриптом One2Click; незавершённые AO изменения в main не отправлялись.
+
 Исторические результаты AO-03: 125 CMS tests, 5 Chromium tests и typecheck обоих приложений проходили **до незавершённой AO-04**. Не переносить эти цифры на текущий WIP без нового прогона.
 
 Дополнительная проверка возврата нового посетителя AO-02/03 прошла через настоящий Payload REST и одноразовую PostgreSQL: Chromium закрыт и запущен снова только с persistent cookies, без localStorage; server like/favorite восстановился, одна canonical row/count=1, replay не увеличил счётчик, import не понадобился. `avgst_voter` — 16 random bytes, HttpOnly cookie, 365 дней с обновлением API; signed `avgst_preferences` сессионная и восстанавливается на том же voter. Четыре дня моделировались проверкой expiry и удалением session cookies, без календарного ожидания. Код идентификации менять не понадобилось.
