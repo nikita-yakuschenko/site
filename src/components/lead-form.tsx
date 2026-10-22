@@ -302,12 +302,6 @@ export function LeadForm({
           >
             {copy.consentLinkLabel}
           </Link>
-          {captchaSiteKey ? <span data-cms-content-field="smartcaptcha-notice">
-            {' '}Форма защищена Yandex SmartCaptcha.{' '}
-            <Link className="lead-form__consent-link" href={copy.cookiePolicyHref} onClick={event => event.stopPropagation()}>
-              Обработка данных
-            </Link>
-          </span> : null}
         </span>
       </label>
       {captchaSiteKey ? <InvisibleSmartCaptcha
