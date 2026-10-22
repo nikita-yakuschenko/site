@@ -19,6 +19,6 @@ export async function RedirectsView({ initPageResult }: AdminViewServerProps) {
   ]
   return <div className="shadcn-surface flex flex-col gap-6 p-4 lg:p-6">
     <h1 className="text-2xl font-semibold tracking-tight">Редиректы</h1>
-    <RedirectsIndex rows={rules.docs.filter(rule => !isStandardRecord('pages', rule)).map(rule => ({ id: rule.id, source: rule.route || '', target: rule.redirect || '', published: rule._status === 'published' }))} targets={targets} />
+    <RedirectsIndex rows={rules.docs.map(rule => ({ id: rule.id, source: rule.route || '', target: rule.redirect || '', published: rule._status === 'published', locked: isStandardRecord('pages', rule) }))} targets={targets} />
   </div>
 }

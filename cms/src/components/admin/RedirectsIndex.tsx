@@ -14,7 +14,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { DataTableFrame, useDataPage } from './DataTable'
 import { redirectPath } from '../../../../src/lib/redirect-rules'
 
-type Row = { id: number; source: string; target: string; published: boolean }
+type Row = { id: number; source: string; target: string; published: boolean; locked?: boolean }
 type Target = { title: string; path: string }
 
 export function RedirectsIndex({ rows: initial, targets }: { rows: Row[]; targets: Target[] }) {
@@ -67,10 +67,10 @@ export function RedirectsIndex({ rows: initial, targets }: { rows: Row[]; target
     <DataTableFrame page={table.page} pageCount={table.pageCount} pageSize={table.pageSize} onPage={table.setPage} onPageSize={table.setPageSize}>
       <Table><TableHeader><TableRow><TableHead className="pl-4">Исходный адрес</TableHead><TableHead>Целевая страница</TableHead><TableHead>Статус</TableHead><TableHead className="w-16"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
         <TableBody>{table.rows.map(row => <TableRow key={row.id}>
-          <TableCell className="h-14 pl-4"><button type="button" className="text-left font-medium underline-offset-4 hover:underline" onClick={() => open(row)}>{row.source}</button></TableCell>
+          <TableCell className="h-14 pl-4">{row.locked ? <span className="font-medium">{row.source}</span> : <button type="button" className="text-left font-medium underline-offset-4 hover:underline" onClick={() => open(row)}>{row.source}</button>}</TableCell>
           <TableCell><span className="block font-medium">{targetLabel(row.target)}</span><span className="text-sm text-muted-foreground">{row.target}</span></TableCell>
           <TableCell><Badge variant="outline">{row.published ? '308 · Постоянный' : 'Черновик'}</Badge></TableCell>
-          <TableCell className="catalog-actions pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Действия: ${row.source}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface"><DropdownMenuItem onSelect={() => open(row)}><IconPencil />Редактировать</DropdownMenuItem><DropdownMenuItem variant="destructive" onSelect={() => setRemoving(row)}><IconTrash />Удалить</DropdownMenuItem></DropdownMenuContent></DropdownMenu></TableCell>
+          <TableCell className="catalog-actions pr-4">{!row.locked && <DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" aria-label={`Действия: ${row.source}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface"><DropdownMenuItem onSelect={() => open(row)}><IconPencil />Редактировать</DropdownMenuItem><DropdownMenuItem variant="destructive" onSelect={() => setRemoving(row)}><IconTrash />Удалить</DropdownMenuItem></DropdownMenuContent></DropdownMenu>}</TableCell>
         </TableRow>)}{!table.rows.length && <TableRow><TableCell colSpan={4} className="h-24 text-center text-muted-foreground">Соответствия не найдены</TableCell></TableRow>}</TableBody>
       </Table>
     </DataTableFrame>
@@ -79,7 +79,7 @@ export function RedirectsIndex({ rows: initial, targets }: { rows: Row[]; target
         <div className="grid gap-2"><Label htmlFor="redirect-target-search">Найти целевую страницу</Label><Input id="redirect-target-search" placeholder="Название проекта или страницы" value={targetSearch} onChange={event => setTargetSearch(event.target.value)} />
           {(targetSearch || !editing?.target) && <div className="max-h-48 overflow-auto rounded-md border">{matches.map((target, index) => <button key={`${target.path}-${index}`} type="button" className="flex w-full flex-col gap-1 px-3 py-2 text-left hover:bg-muted" onClick={() => { setEditing(current => ({ ...current, target: target.path })); setTargetSearch('') }}><span className="text-sm font-medium">{target.title}</span><span className="text-xs text-muted-foreground">{target.path}</span></button>)}{!matches.length && <p className="p-3 text-sm text-muted-foreground">Страницы не найдены</p>}</div>}
         </div>
-        <div className="grid gap-2"><Label htmlFor="redirect-target">Целевой адрес</Label><Input id="redirect-target" required value={editing?.target || ''} onChange={event => setEditing(current => ({ ...current, target: event.target.value }))} placeholder="/catalog/sweden-135" /></div>
+        <div className="grid gap-2"><Label htmlFor="redirect-target">Целевой адрес</Label><Input id="redirect-target" required value={editing?.target || ''} onChange={event => setEditing(current => ({ ...current, target: event.target.value }))} placeholder="/catalog/sweden-135 или https://old.avgst.ru/tpost/..." /></div>
         <div className="grid gap-2"><Label htmlFor="redirect-source">Исходный адрес</Label><Input id="redirect-source" required value={editing?.source || ''} onChange={event => setEditing(current => ({ ...current, source: event.target.value }))} placeholder="/catalog/swened-135" /><p className="text-sm text-muted-foreground">Путь или ссылка на avgst.ru без меток. Параметры посетителя сохраняются.</p></div>
         <DialogFooter><Button type="button" variant="outline" disabled={busy} onClick={() => setEditing(null)}>Отмена</Button><Button type="submit" disabled={busy}>{busy ? 'Сохранение…' : 'Сохранить'}</Button></DialogFooter>
       </form>

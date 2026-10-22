@@ -23,14 +23,18 @@ export async function managedRedirect(source: URL): Promise<URL | null> {
   }
   const nested = /^\/catalog\/(?:modulnye-doma|panelno-karkasnye-doma)\/product\/([^/]+)\/?$/.exec(source.pathname)
   try {
-    const exact = redirectTarget(source.pathname.replace(/\/+$/, '') + source.search, cached)
+    const pathname = source.pathname.replace(/\/+$/, '') || '/'
+    const exact = redirectTarget(pathname + source.search, cached)
     const target = exact ?? (nested ? redirectTarget(`/catalog/${nested[1]}${source.search}`, cached) : null)
     if (!target) return null
-    const result = new URL(source)
-    const path = new URL(target, 'https://avgst.ru')
-    result.pathname = path.pathname
-    result.search = path.search
-    result.hash = path.hash
+    const result = new URL(target, 'https://avgst.ru')
+    if (pathname === '/catalog/doma') {
+      const query = [...source.searchParams].find(([name]) => /^tfc_query\[/.test(name))?.[1]
+      if (query && !result.searchParams.has('q')) result.searchParams.set('q', query)
+    }
+    if (/^\/catalog\/dachi(?:\/page\/\d+)?$/.test(pathname)) {
+      for (const name of ['param1', 'param2', 'other']) result.searchParams.delete(name)
+    }
     return result
   } catch { return null } // A malformed legacy registry cannot take the site down.
 }

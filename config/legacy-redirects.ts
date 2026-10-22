@@ -1,39 +1,9 @@
 // Existing project addresses at the time of the site migration.
 const projects = new Set(['barhhouse-73', 'barnhouse-115', 'barnhouse-129', 'barnhouse-134', 'barnhouse-138', 'barnhouse-76', 'barnhouse-86', 'barnhouse-90', 'barnhouse-96', 'barnhouse-98', 'barnhuose-82', 'barnouse-122', 'cube-100', 'duplex-173', 'ekohouse-120', 'ekohouse-128', 'ekohouse-132', 'ekohouse-184', 'finlyandiya-149', 'frame-59', 'frame-60', 'kamelot-101', 'kamelot-124', 'norvegiya-115', 'norvegiya-132', 'norvegiya-132-gremyachki', 'norvegiya-92', 'scandi-90', 'shvedskii-121', 'shvedskii-124', 'shvedskii-130', 'shvedskii-135', 'shvedskii-142', 'shvedskii-150', 'shvedskii-161', 'uzorye-115', 'uzorye-122', 'uzorye-132'])
 
-// Published CMS slugs for old project names and addresses.
-const projectDestinations = new Map<string, string>([
-  ['barhhouse-73', 'barnhouse-73'],
-  ['barnhouse-71', 'barnhouse-71'],
-  ['barnhuose-82', 'barnhouse-82'],
-  ['barnouse-122', 'barnhouse-122'],
-  ['ekohouse-120', 'ecohouse-120'],
-  ['ekohouse-128', 'ecohouse-128'],
-  ['ekohouse-132', 'ecohouse-132'],
-  ['finlyandiya-149', 'finland-149'],
-  ['kamelot-101', 'camelot-101'],
-  ['kamelot-124', 'camelot-124'],
-  ['modulnyi-dom-85', 'scandy-85'],
-  ['norvegiya-92', 'norway-92'],
-  ['norvegiya-115', 'norway-115'],
-  ['norvegiya-132', 'norway-132'],
-  ['scandi-78', 'scandy-78'],
-  ['scandi-89', 'scandy-89'],
-  ['scandi-90', 'scandy-90'],
-  ['shvedskii-121', 'sweden-121'],
-  ['shvedskii-124', 'sweden-124'],
-  ['shvedskii-130', 'sweden-130'],
-  ['shvedskii-135', 'sweden-135'],
-  ['shvedskii-142', 'sweden-142'],
-  ['shvedskii-150', 'sweden-150'],
-  ['shvedskii-161', 'sweden-161'],
-])
-
 export function legacyRedirect(source: URL): { url: URL; status: 307 | 308 } | null {
   const path = source.pathname.replace(/\/+$/, '')
   const url = new URL(source)
-  const directSlug = /^\/catalog\/([^/]+)$/.exec(path)?.[1]
-  const directTarget = directSlug ? projectDestinations.get(directSlug) : undefined
   if (path === '/articles' || path.startsWith('/articles/') || path === '/tpost' || path.startsWith('/tpost/')) {
     url.protocol = 'https:'
     url.host = 'old.avgst.ru'
@@ -44,7 +14,7 @@ export function legacyRedirect(source: URL): { url: URL; status: 307 | 308 } | n
   if (section) {
     const product = /^product\/([^/]+)$/.exec(section[2] || '')
     const slug = product?.[1]
-    const target = slug && (projectDestinations.get(slug) || (projects.has(slug) ? slug : null))
+    const target = slug && (projects.has(slug) ? slug : null)
     if (target) url.pathname = `/catalog/${target}`
     else {
       url.pathname = '/catalog'
@@ -63,8 +33,6 @@ export function legacyRedirect(source: URL): { url: URL; status: 307 | 308 } | n
   } else if (path === '/catalog/barnkhaus') {
     url.pathname = '/catalog'
     url.searchParams.set('series', 'barn')
-  } else if (directTarget && directTarget !== directSlug) {
-    url.pathname = `/catalog/${directTarget}`
   } else if (path === '/catalog/karkasnye-doma' || path.startsWith('/catalog/karkasnye-doma/')) {
     url.pathname = '/catalog'
     url.searchParams.set('tech', 'panel')
