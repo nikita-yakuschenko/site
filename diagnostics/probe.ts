@@ -52,8 +52,9 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   await page.route(/(?:mc\.yandex\.ru|roistat\.com|one2click\.ru|\/api\/(?:views|reactions)(?:\?|$))/, route =>
     route.fulfill({ status: 204, body: '' }))
   page.on('pageerror', error => {
-    const firstUrl = error.stack?.match(/https?:\/\/[^\s)]+/)?.[0]
-    add('exception', error.message, error.stack || '', firstUrl || page.url())
+    const frameUrl = error.stack?.match(/\bat\s+[^\n]*?\((https?:\/\/[^)]+)\)/)?.[1]
+      || error.stack?.match(/\bat\s+(https?:\/\/[^\s)]+)/)?.[1]
+    add('exception', error.message, error.stack || '', frameUrl || page.url())
   })
   page.on('console', message => {
     if (message.type() !== 'error' && message.type() !== 'warning') return
