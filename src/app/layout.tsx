@@ -5,6 +5,7 @@ import { GeistSans } from 'geist/font/sans'
 import { ConsentShell } from '../consent/ConsentShell'
 import { YandexMetrica } from '../components/yandex-metrica'
 import { RoistatCounter } from '../components/roistat-counter'
+import { RoistatPhoneProvider } from '../components/tracked-phone'
 import { CMSPreviewBridge } from '../components/cms-preview-bridge'
 import { CMSContentProvider } from '../components/cms-content'
 import { CatalogAvailabilityProvider } from '../components/catalog-availability'
@@ -67,11 +68,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
       <head>
+        <link rel="preconnect" href="https://cloud.roistat.com" />
         <script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
       </head>
       <body suppressHydrationWarning>
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
-        <Suspense><CMSContentProvider records={content}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></CMSContentProvider></Suspense>
+        <Suspense><CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider></Suspense>
         <CMSPreviewBridge />
         {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в
             клиентский код на сборке, и если переменную задать только в

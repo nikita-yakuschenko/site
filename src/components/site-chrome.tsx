@@ -2,6 +2,7 @@
 import { useRegionCode } from "./region-bootstrap";
 import { CMSContentBlock } from './cms-content'
 import { useReadyHouses } from './catalog-availability'
+import { TrackedPhone } from './tracked-phone'
 
 import {
   Fragment,
@@ -286,9 +287,9 @@ export function SiteChrome({
 
             <div className="site-header__aside" data-cms-block="mainHeader.contacts">
               {phone ? (
-                <a className="site-header__phone" href={telHref(phone)} suppressHydrationWarning>
+                <TrackedPhone className="site-header__phone" href={telHref(phone)}>
                   {phone}
-                </a>
+                </TrackedPhone>
               ) : null}
               <button
                 type="button"
@@ -378,13 +379,13 @@ export function SiteChrome({
               ))}
             </nav>
             {phone ? (
-              <a
+              <TrackedPhone
                 className="site-menu__phone"
                 href={telHref(phone)} suppressHydrationWarning
                 onClick={() => setMenuOpen(false)}
               >
                 {phone}
-              </a>
+              </TrackedPhone>
             ) : null}
             <button
               type="button"
@@ -531,13 +532,13 @@ export function SiteChrome({
                 </p>
               </div>
               {phone ? (
-                <a
+                <TrackedPhone
                   className="footer-contacts__row footer-contacts__row--link"
                   href={telHref(phone)} suppressHydrationWarning
                 >
                   <IconPhone size={18} stroke={1.75} aria-hidden="true" />
                   <span suppressHydrationWarning>{phone}</span>
-                </a>
+                </TrackedPhone>
               ) : null}
               {email ? (
                 <a
