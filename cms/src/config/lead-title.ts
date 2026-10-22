@@ -39,8 +39,8 @@ export function leadTitle(lead: LeadInput, formTitle = '') {
     case 'project-configuration': return prefix + join('Расчёт стоимости', project, meta.tier)
     case 'ready-home-offer': return prefix + join('Готовый дом', project, meta.location)
     case 'architect-consultation': return prefix + join('Консультация архитектора', project)
-    case 'mortgage-calculator': return prefix + join('Калькулятор', project, mortgageName(meta.program))
-    case 'mortgage-consultation': return prefix + join('Консультация', mortgageName(meta.program))
+    case 'mortgage-calculator': return join('Консультация по ипотеке', project, mortgageName(meta.program))
+    case 'mortgage-consultation': return join('Консультация по ипотеке', project, mortgageName(meta.program))
     case 'factory-tour': return prefix + 'Экскурсия на производство'
     case 'FactoryOpenDayForm': return prefix + `Регистрация на день открытых дверей ${text(meta.date)}`.trim()
     case 'contacts-question':
