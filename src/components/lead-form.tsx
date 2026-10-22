@@ -19,7 +19,7 @@ import {
 import { noAutofillFieldProps, noAutofillFormProps } from '../lib/no-autofill'
 import { LeadSubmitFeedback } from './lead-submit-feedback'
 import { submitLead, type LeadAttempt } from '../lib/submit-lead'
-import { SmartCaptcha } from '@yandex/smart-captcha'
+import { InvisibleSmartCaptcha } from '@yandex/smart-captcha'
 
 export function LeadForm({
   siteId,
@@ -71,7 +71,8 @@ export function LeadForm({
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
   const [phone, setPhone] = useState('+7')
   const [consent, setConsent] = useState(true)
-  const [captchaToken, setCaptchaToken] = useState('')
+  const [captchaVisible, setCaptchaVisible] = useState(false)
+  const [captchaReset, setCaptchaReset] = useState(0)
   const [captchaSiteKey, setCaptchaSiteKey] = useState<string | null>(null)
   const [captchaReady, setCaptchaReady] = useState(false)
   const [invalid, setInvalid] = useState<{
@@ -82,6 +83,18 @@ export function LeadForm({
   const phoneRef = useRef<HTMLInputElement>(null)
   const attempt = useRef<LeadAttempt['current']>(null)
   const submitting = useRef(false)
+  const captchaPending = useRef<{ resolve: (token: string) => void; reject: (error: Error) => void } | null>(null)
+
+  function failCaptcha() {
+    captchaPending.current?.reject(new Error('Не удалось пройти проверку безопасности'))
+    captchaPending.current = null
+    setCaptchaVisible(false)
+  }
+
+  useEffect(() => () => {
+    captchaPending.current?.reject(new Error('Форма закрыта'))
+    captchaPending.current = null
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -103,13 +116,20 @@ export function LeadForm({
     if (!isValidName(name)) next.name = true
     if (!isValidRuMobile(phone)) next.phone = true
     if (!agreed) next.consent = true
-    if (!captchaReady || !captchaSiteKey || !captchaToken) return setStatus('error')
     setInvalid(next)
     if (Object.keys(next).length) return
+    if (!captchaReady || !captchaSiteKey) return setStatus('error')
 
     submitting.current = true
     setStatus('sending')
+    let captchaTimeout: ReturnType<typeof setTimeout> | undefined
     try {
+      const captchaToken = await new Promise<string>((resolve, reject) => {
+        captchaPending.current = { resolve, reject }
+        captchaTimeout = setTimeout(failCaptcha, 120_000)
+        setCaptchaVisible(true)
+      })
+      clearTimeout(captchaTimeout)
       await submitLead({
         name,
         phone: phoneE164(phone),
@@ -129,12 +149,17 @@ export function LeadForm({
       form.reset()
       setPhone('+7')
       setConsent(true)
-      setCaptchaToken('')
       setInvalid({})
     } catch (error) {
       console.error(error)
       setStatus('error')
-    } finally { submitting.current = false }
+    } finally {
+      clearTimeout(captchaTimeout)
+      captchaPending.current = null
+      setCaptchaVisible(false)
+      setCaptchaReset(value => value + 1)
+      submitting.current = false
+    }
   }
 
   return (
@@ -279,9 +304,27 @@ export function LeadForm({
           </Link>
         </span>
       </label>
-      {captchaSiteKey ? <div className="lead-form__captcha" aria-label="Проверка безопасности">
-        <SmartCaptcha sitekey={captchaSiteKey} onSuccess={setCaptchaToken} onTokenExpired={() => setCaptchaToken('')} language="ru" />
-      </div> : null}
+      {captchaSiteKey ? <InvisibleSmartCaptcha
+        key={captchaReset}
+        sitekey={captchaSiteKey}
+        visible={captchaVisible}
+        onSuccess={token => {
+          captchaPending.current?.resolve(token)
+          captchaPending.current = null
+          setCaptchaVisible(false)
+        }}
+        onChallengeHidden={() => {
+          setCaptchaVisible(false)
+          // Успех может прийти вместе с закрытием задания: сначала даём
+          // обработчику onSuccess принять токен, затем обрабатываем отмену.
+          window.setTimeout(() => {
+            if (captchaPending.current) failCaptcha()
+          }, 0)
+        }}
+        onNetworkError={failCaptcha}
+        onJavascriptError={failCaptcha}
+        language="ru"
+      /> : null}
       <button className="btn btn-yellow lead-card__submit" type="submit" disabled={status === 'sending'}>
         {status === 'sending' ? copy.sending : submitLabel || copy.sendLead}
         {status !== 'sending' ? (
