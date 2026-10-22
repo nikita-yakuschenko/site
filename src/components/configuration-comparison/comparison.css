@@ -5,18 +5,13 @@
   gap: 24px;
   margin-top: 32px;
   padding: 24px;
-  border: 1px solid var(--line-2);
+  border: 1px solid transparent;
   border-radius: 16px;
-  background: var(--surface);
+  background: var(--avgst-ink);
+  color: #fff;
 }
 .comparison-invitation > div {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-.comparison-invitation > div > svg {
-  color: var(--avgst-green);
-  flex-shrink: 0;
+  min-width: 0;
 }
 .comparison-invitation h3 {
   font-size: 18px;
@@ -25,24 +20,13 @@
 }
 .comparison-invitation p {
   font-size: 14px;
-  color: var(--ink-1);
+  color: var(--on-dark-2);
   margin: 0;
   max-width: 52ch;
 }
 .comparison-launch {
   flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
   gap: 8px;
-  min-height: 44px;
-  padding: 12px 18px;
-  border: 0;
-  border-radius: var(--radius);
-  background: var(--brand-yellow);
-  color: var(--foreground);
-  font: inherit;
-  font-weight: 600;
-  cursor: pointer;
 }
 .comparison-overlay {
   position: fixed;

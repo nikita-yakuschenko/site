@@ -18,7 +18,7 @@ import {
   IconInfoCircle,
   IconMinus,
   IconQuestionMark,
-  IconTable,
+  IconArrowUpRight,
   IconX,
 } from "@tabler/icons-react";
 import {
@@ -187,17 +187,14 @@ export function ConfigurationComparison({
     <Dialog open={open} onOpenChange={setOpen}>
       <div className="comparison-invitation">
         <div>
-          <IconTable size={26} aria-hidden="true" />
-          <div>
-            <h3>Что входит в каждую комплектацию</h3>
+            <h3>Подробное сравнение комплектаций</h3>
             <p>
               Материалы, конструкции и инженерные системы - сравните все
               подробности.
             </p>
-          </div>
         </div>
-        <DialogTrigger className="btn btn--primary comparison-launch">
-          Сравнить комплектации <IconChevronRight size={20} />
+        <DialogTrigger className="btn btn-yellow comparison-launch">
+          Сравнить комплектации <IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
         </DialogTrigger>
       </div>
       <DialogContent>

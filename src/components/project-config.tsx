@@ -1,8 +1,8 @@
 "use client";
 import { useRegionCode } from "./region-bootstrap";
 
-import { IconCheck, IconGiftFilled, IconPlus, IconX } from "@tabler/icons-react";
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { IconArrowUpRight, IconCheck, IconGiftFilled, IconPlus, IconX } from "@tabler/icons-react";
+import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { copy, nbspText } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
 import { getMortgageProgram, monthlyPaymentForProject } from "../lib/mortgage";
@@ -13,6 +13,8 @@ import {
   subscribeTier,
   writeTier,
 } from "../lib/catalog/tier-selection";
+import { LeadForm } from "./lead-form";
+import { SITE } from "../lib/site";
 import { PanelLeadForm } from "./panel-lead-form";
 import type { CatalogProject } from "../lib/catalog/types";
 import { ConfigurationComparison } from './configuration-comparison/comparison';
@@ -119,15 +121,12 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
           <ul className="project-config__tiers">
             {tiers.map((item) => (
               <li key={item.id}>
-                <button
-                  type="button"
-                  className={
-                    item.id === tier.id
-                      ? "project-config__tier project-config__tier--on"
-                      : "project-config__tier"
-                  }
-                  aria-pressed={item.id === tier.id}
-                  onClick={() => onPreviewTierChange ? onPreviewTierChange(item.id) : writeTier(item.id)}
+                <ConfigurationTierCard
+                  item={item}
+                  project={project}
+                  region={region}
+                  selected={item.id === tier.id}
+                  onSelect={() => onPreviewTierChange ? onPreviewTierChange(item.id) : writeTier(item.id)}
                 >
                   <span className="project-config__tier-name">{configText(item.name)}</span>
                   <span className="project-config__tier-lead">{configText(item.lead)}</span>
@@ -156,7 +155,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                     </span>
                     <span className="project-config__tier-gift">{configText(item.gifts.join(', '))}</span>
                   </span> : null}
-                </button>
+                </ConfigurationTierCard>
               </li>
             ))}
           </ul>
@@ -215,4 +214,77 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
       </div>
     </section>
   );
+}
+
+
+function ConfigurationTierCard({ item, project, region, selected, onSelect, children }: {
+  item: PricedTier;
+  project: CatalogProject;
+  region: "nn" | "msk";
+  selected: boolean;
+  onSelect: () => void;
+  children: ReactNode;
+}) {
+  const [open, setOpen] = useState(false);
+  const [visited, setVisited] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const quoteRef = useRef<HTMLButtonElement>(null);
+  const previousHeight = useRef<number | null>(null);
+  const animationRef = useRef<Animation | null>(null);
+  const monthly = item.mortgage && item.price > 0 ? monthlyPaymentForProject({
+    propertyPrice: item.price, region, combinedMarketRateOverride: getMortgageProgram("market").rate,
+  }) : null;
+
+  useEffect(() => {
+    const desktop = window.matchMedia('(min-width: 800px)');
+    const closeOnDesktop = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener('change', closeOnDesktop);
+    return () => desktop.removeEventListener('change', closeOnDesktop);
+  }, []);
+
+  function changeOpen(next: boolean) {
+    previousHeight.current = rootRef.current?.getBoundingClientRect().height ?? null;
+    const focused = document.activeElement;
+    if (focused instanceof HTMLElement && rootRef.current?.contains(focused)) focused.blur();
+    if (next) { onSelect(); setVisited(true); }
+    setOpen(next);
+  }
+
+  useLayoutEffect(() => {
+    const root = rootRef.current;
+    const from = previousHeight.current;
+    if (!root || from === null) return;
+    animationRef.current?.cancel();
+    const to = root.getBoundingClientRect().height;
+    if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const animation = root.animate([{ height: `${from}px` }, { height: `${to}px` }], {
+        duration: 280, easing: 'cubic-bezier(.22,.61,.36,1)',
+      });
+      animationRef.current = animation;
+    }
+    if (open) root.querySelector<HTMLInputElement>('.project-config__mobile-form input:not([type="hidden"])')?.focus({ preventScroll: true });
+    else quoteRef.current?.focus({ preventScroll: true });
+    previousHeight.current = null;
+    return () => animationRef.current?.cancel();
+  }, [open]);
+
+  return <div ref={rootRef} className="project-config__tier-card" data-form={open} data-selected={selected}>
+    <div className="project-config__tier-front" inert={open} aria-hidden={open}>
+      <button type="button" className={`project-config__tier${selected ? ' project-config__tier--on' : ''}`} aria-pressed={selected} onClick={onSelect}>
+        {children}
+      </button>
+      <button ref={quoteRef} type="button" className="btn btn-yellow project-config__mobile-quote" aria-expanded={open} onClick={() => changeOpen(true)}>
+        {copy.getQuote}<IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
+      </button>
+    </div>
+    {visited && <div className="project-config__total project-config__mobile-form" data-form="true" inert={!open} aria-hidden={!open}>
+      <button type="button" className="project-config__close" aria-label={copy.close} onClick={() => changeOpen(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button>
+      <p className="project-config__total-label"><span>Комплектация: </span><strong>{configText(item.name)}</strong></p>
+      <p className="project-config__total-sum">{item.price > 0 ? formatRub(item.price) : 'Цена уточняется'}</p>
+      {monthly ? <p className="project-config__total-pay">{formatRub(monthly)} {copy.configPerMonth}<span>{configText(copy.configPayNote)}</span></p>
+        : <p className="project-config__total-pay project-config__total-pay--plain">{configText(copy.configDelivery)}<span>{configText(copy.configDeliveryNote)}</span></p>}
+      <LeadForm siteId={SITE.id} formId="project-configuration" projectExternalId={project.id} variant="card" compact heading={copy.getQuote} submitLabel={copy.getQuote}
+        meta={{ project: project.name, tier: item.name, price: item.price }} />
+    </div>}
+  </div>;
 }

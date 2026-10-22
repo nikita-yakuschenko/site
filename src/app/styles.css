@@ -14655,3 +14655,107 @@ picture.hero__frame {
 @media (max-width: 899px) {
   picture.hero__frame { background-image: var(--hero-preview-mobile, var(--hero-preview)); }
 }
+
+
+/* На телефоне заявка заменяет выбранную карточку комплектации. */
+.project-config__tier-card,
+.project-config__tier-front { display: contents; }
+.project-config__mobile-quote,
+.project-config__mobile-form { display: none; }
+
+@media (max-width: 799px) {
+  .project-config > .project-config__total { display: none; }
+  .project-config__tier-card {
+    display: block;
+    position: relative;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    background: #fff;
+    transition: background-color 220ms var(--ease-out), border-color 220ms var(--ease-out);
+  }
+  .project-config__tier-card[data-selected="true"] {
+    border-color: var(--avgst-ink);
+    box-shadow: 0 10px 30px -20px var(--ink-2);
+  }
+  .project-config__tier-card[data-form="true"] {
+    background: var(--avgst-ink);
+    border-color: var(--avgst-ink);
+  }
+  .project-config__tier-front {
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transform: none;
+    transition: opacity 180ms var(--ease-out), transform 220ms var(--ease-out), visibility 220ms;
+  }
+  .project-config__tier-front .project-config__tier {
+    width: 100%;
+    padding-bottom: 0;
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+  }
+  .project-config__mobile-quote {
+    display: inline-flex;
+    flex: none;
+    gap: 8px;
+    margin: 20px;
+  }
+  .project-config__tier-card .project-config__mobile-form {
+    display: flex;
+    width: 100%;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 220ms var(--ease-out), transform 260ms var(--ease-out), visibility 220ms;
+  }
+  .project-config__tier-card[data-form="false"] .project-config__mobile-form,
+  .project-config__tier-card[data-form="true"] .project-config__tier-front {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+  .project-config__tier-card[data-form="true"] .project-config__tier-front {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  .project-config__tier-card[data-form="true"] .project-config__mobile-form {
+    opacity: 1;
+    transform: none;
+  }
+  .project-config__mobile-form .lead-card {
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+  .project-config__mobile-form .lead-card label,
+  .project-config__mobile-form .lead-card input { min-width: 0; max-width: 100%; }
+  .project-config__mobile-form .lead-card input:focus-visible {
+    outline: none;
+    border-color: var(--on-dark-2);
+    box-shadow: 0 0 0 3px var(--tint-on-dark);
+  }
+  .project-config__mobile-form .lead-form__consent { align-items: start; line-height: 1.35; }
+  @starting-style {
+    .project-config__tier-card[data-form="true"] .project-config__mobile-form {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .project-config__tier-card,
+  .project-config__tier-front,
+  .project-config__tier-card .project-config__mobile-form { transition: none; transform: none; }
+}
