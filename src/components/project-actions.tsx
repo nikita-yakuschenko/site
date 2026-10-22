@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState, useSyncExternalStore } from 'react'
+import { useCanonicalPreferences, useProjectPreference } from './project-preferences-provider'
 import { IconHeart, IconShare3 } from '@tabler/icons-react'
 import { useConsent } from '../consent/ConsentProvider'
 import { canPersistFunctional } from '../consent/functional-persist'
@@ -39,7 +40,7 @@ async function sendReaction(slug: string, action: 'like' | 'unlike' | 'share') {
   return response.json() as Promise<ProjectStats & { already?: boolean; liked?: boolean }>
 }
 
-export function ProjectActions({
+function LegacyProjectActions({
   project,
   stats,
   liked = false,
@@ -122,4 +123,35 @@ export function ProjectActions({
       </button>
     </div>
   )
+}
+
+type ActionsProps = { project: CatalogProject; stats: ProjectStats; liked?: boolean }
+export function ProjectActions(props: ActionsProps) {
+  return useCanonicalPreferences() ? <CanonicalProjectActions {...props} /> : <LegacyProjectActions {...props} />
+}
+
+function CanonicalProjectActions({ project, stats }: ActionsProps) {
+  const preference = useProjectPreference(project.cmsId ?? project.id, 'project_actions')
+  const [shares, setShares] = useState(stats.shares)
+  useEffect(() => { void recordSessionView(project.slug) }, [project.slug])
+  async function onShare() {
+    if (!await shareProject(project)) return
+    setShares(value => value + 1)
+    try {
+      const result = await sendReaction(project.slug, 'share')
+      if (result) setShares(result.shares)
+      else setShares(value => Math.max(0, value - 1))
+    } catch { setShares(value => Math.max(0, value - 1)) }
+  }
+  return <div className="project-actions">
+    <button type="button" className="project-actions__btn" aria-label={preference.liked ? copy.favoriteRemove : copy.favoriteAdd}
+      aria-pressed={preference.liked} aria-busy={preference.pending} disabled={preference.unavailable} onClick={preference.toggle}>
+      <IconHeart size={26} stroke={1.6} fill={preference.liked ? 'currentColor' : 'none'} aria-hidden="true" />
+      <span>{preference.count ?? stats.likes}</span>
+    </button>
+    {preference.error && <button type="button" className="project-actions__btn" onClick={preference.retry}>Повторить сохранение избранного</button>}
+    <button type="button" className="project-actions__btn" aria-label={copy.share} onClick={() => void onShare()}>
+      <IconShare3 size={26} stroke={1.6} aria-hidden="true" /><span>{shares}</span>
+    </button>
+  </div>
 }

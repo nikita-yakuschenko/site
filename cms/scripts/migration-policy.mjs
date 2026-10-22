@@ -100,8 +100,16 @@ function sqlTexts(source) {
 
 export function rollbackViolations(upSql) {
   const added = new Map()
+  const createdTables = new Set()
   const problems = []
   for (const statement of sqlTexts(upSql).flatMap((text) => splitSql(text))) {
+    // An unguarded CREATE cannot overwrite an existing table. Only subsequent
+    // constraints/indexes on this exact new table are safe for an old CMS image.
+    const newTable = statement.match(/^create table\s+(\S+)\s*\(/i)
+    if (newTable) {
+      createdTables.add(ident(newTable[1]))
+      continue
+    }
     if (/^create type\s+\S+\s+as\s+enum\s*\(/i.test(statement)) continue
     if (/^alter type\s+\S+\s+add value\s+/i.test(statement)) continue
     if (/^comment on\b/i.test(statement)) continue
@@ -114,10 +122,16 @@ export function rollbackViolations(upSql) {
     const constraint = statement.match(/^alter table\s+(\S+)\s+add constraint\s+\S+\s+foreign key\s*\(([^)]+)\)\s+references\b/i)
     if (constraint) {
       const table = ident(constraint[1])
+      if (createdTables.has(table)) continue
       const columns = constraint[2].split(',').map((item) => ident(item.trim()))
       const created = added.get(table) ?? new Set()
       const existing = columns.filter((name) => !created.has(name))
       if (existing.length) problems.push(`${table}: внешний ключ на существующую колонку ${existing.join(', ')}`)
+      continue
+    }
+    if (/^create unique index\b/i.test(statement)) {
+      const target = statement.match(/\bon\s+(\S+)\s/i)
+      if (!target || !createdTables.has(ident(target[1]))) problems.push('уникальный индекс может отвергнуть существующие записи')
       continue
     }
     if (/^create index\b/i.test(statement)) {

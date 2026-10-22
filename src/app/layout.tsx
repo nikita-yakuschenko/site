@@ -14,6 +14,8 @@ import {
   CONSENT_VERSION,
   isConsentDecided,
 } from '../consent/types'
+import { ProjectPreferencesProvider } from '../components/project-preferences-provider'
+import { optimizationFlags } from '../lib/optimization/flags'
 import { RegionBootstrap } from '../components/region-bootstrap'
 import { copy } from '../lib/copy'
 import { OG_LOCALE } from '../lib/locale'
@@ -52,17 +54,20 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
      провайдера, и ему приходилось переписывать состояние уже после
      отрисовки, хотя кука прочитана прямо тут. */
   /* Номер счётчика — из CMS (интеграции → Яндекс), с запасным ENV/фолбэком. */
-  const counter = await activeMetricaCounterId()
-  const roistatProjectId = await activeRoistatProjectId()
-  const content = await readCMSContent()
+  const [counter, roistatProjectId, content] = await Promise.all([
+    activeMetricaCounterId(), activeRoistatProjectId(), readCMSContent(),
+  ])
 
   const fresh = parsed && parsed.version === CONSENT_VERSION ? parsed : null
   const initialState = fresh && isConsentDecided(fresh) ? fresh : null
 
   return (
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
+      <head>
+        <script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
+      </head>
       <body suppressHydrationWarning>
-        <Suspense><CMSContentProvider records={content}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CMSContentProvider></Suspense>
+        <Suspense><CMSContentProvider records={content}><ConsentShell initialState={initialState}><ProjectPreferencesProvider enabled={optimizationFlags().preferences}><RegionBootstrap region={region}>{children}</RegionBootstrap></ProjectPreferencesProvider></ConsentShell></CMSContentProvider></Suspense>
         <CMSPreviewBridge />
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
         {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в

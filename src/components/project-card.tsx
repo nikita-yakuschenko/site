@@ -1,5 +1,8 @@
 'use client'
 import { useRegionCode } from './region-bootstrap'
+import { useConsent } from '../consent/ConsentProvider'
+import { canPersistFunctional } from '../consent/functional-persist'
+import { useCanonicalPreferences, useProjectPreference } from './project-preferences-provider'
 
 import { useState, useSyncExternalStore } from 'react'
 import { IconBath, IconBed, IconHeart, IconRulerMeasure, IconShare3, IconStairs } from '@tabler/icons-react'
@@ -19,9 +22,6 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
   const region = useRegionCode()
   const price = project.regionalPrices?.[region]
   const priceLabel = project.regionalPrices && !project.readyHome ? (price && price > 0 ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется') : project.priceLabel
-  // Подписка на внешнее хранилище вместо синхронизации через эффект.
-  const favorites = useSyncExternalStore(subscribeFavorites, readFavorites, readServerFavorites)
-  const favorite = favorites.includes(project.id)
 
   // Состояние загрузки привязано к конкретному адресу картинки, поэтому при
   // смене проекта сбрасывается само, без эффекта.
@@ -68,15 +68,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
           <button type="button" className="icon-btn" aria-label={copy.share} onClick={() => void shareProject(project).then(shared => { if (shared) return recordCardShare(project.slug) })}>
             <IconShare3 size={16} stroke={1.75} />
           </button>
-          <button
-            type="button"
-            className="icon-btn"
-            aria-label={favorite ? copy.favoriteRemove : copy.favoriteAdd}
-            aria-pressed={favorite}
-            onClick={() => { const next = toggleFavorite(project.id); if (!favorite && next.includes(project.id)) void recordSessionView(project.slug) }}
-          >
-            <IconHeart size={16} fill={favorite ? 'currentColor' : 'none'} className={favorite ? 'is-fav' : undefined} />
-          </button>
+          <CardHeart project={project} />
         </div>
       </div>
       <div className="card__body">
@@ -108,4 +100,33 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
       </div>
     </article>
   )
+}
+
+function CardHeart({ project }: { project: CatalogProject }) {
+  return useCanonicalPreferences() ? <CanonicalCardHeart project={project} /> : <LegacyCardHeart project={project} />
+}
+
+function CanonicalCardHeart({ project }: { project: CatalogProject }) {
+  const preference = useProjectPreference(project.cmsId ?? project.id, 'project_card')
+  return <>
+    <button type="button" className="icon-btn" aria-label={preference.liked ? copy.favoriteRemove : copy.favoriteAdd}
+      aria-pressed={preference.liked} aria-busy={preference.pending} disabled={preference.unavailable} onClick={preference.toggle}>
+      <IconHeart size={16} fill={preference.liked ? 'currentColor' : 'none'} className={preference.liked ? 'is-fav' : undefined} />
+    </button>
+    {preference.error && <button type="button" className="icon-btn" aria-label="Повторить сохранение избранного" title="Не удалось обновить избранное. Повторить" onClick={preference.retry}>↻</button>}
+  </>
+}
+
+function LegacyCardHeart({ project }: { project: CatalogProject }) {
+  const { openConsentSettings } = useConsent()
+  const favorites = useSyncExternalStore(subscribeFavorites, readFavorites, readServerFavorites)
+  const favorite = favorites.includes(project.id)
+  return <button type="button" className="icon-btn" aria-label={favorite ? copy.favoriteRemove : copy.favoriteAdd} aria-pressed={favorite}
+    onClick={() => {
+      if (!canPersistFunctional()) { openConsentSettings(); return }
+      const next = toggleFavorite(project.id)
+      if (!favorite && next.includes(project.id)) void recordSessionView(project.slug)
+    }}>
+    <IconHeart size={16} fill={favorite ? 'currentColor' : 'none'} className={favorite ? 'is-fav' : undefined} />
+  </button>
 }

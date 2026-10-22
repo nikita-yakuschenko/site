@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CatalogFilters } from "./catalog-filters";
 import { CatalogSearch } from "./catalog-search";
@@ -11,11 +11,7 @@ import {
   type CatalogFacets,
 } from "../lib/catalog/filters";
 import type { CatalogFilters as Filters } from "../lib/catalog/types";
-import {
-  readFavorites,
-  readServerFavorites,
-  subscribeFavorites,
-} from "../lib/favorites";
+import { useCanonicalPreferences, useProjectFavorites } from "./project-preferences-provider";
 import { IconFilter, IconFilterX } from "@tabler/icons-react";
 import { copy } from "../lib/copy";
 
@@ -39,7 +35,7 @@ import { copy } from "../lib/copy";
 /* Класс блокировки прокрутки под раскрытым листом отбора. */
 const SHEET_LOCK = "is-catalog-sheet";
 
-export type BoardItem = { id: string; card: ReactNode };
+export type BoardItem = { id: string; projectCode?: string; card: ReactNode };
 
 export function CatalogBoard({
   filters,
@@ -60,14 +56,10 @@ export function CatalogBoard({
   /* Раскрытие колонки на узком экране. Живёт здесь, потому что кнопка стоит
      в полосе поиска, а сама колонка ниже. */
   const [open, setOpen] = useState(false);
-  const favorites = useSyncExternalStore(
-    subscribeFavorites,
-    readFavorites,
-    readServerFavorites,
-  );
-
+  const favorites = useProjectFavorites();
+  const canonical = useCanonicalPreferences();
   const keep = (items: BoardItem[]) =>
-    onlyFavorites ? items.filter((item) => favorites.includes(item.id)) : items;
+    onlyFavorites ? items.filter((item) => favorites.includes(canonical ? item.projectCode ?? item.id : item.id)) : items;
 
   const shownMatched = keep(matched);
   const shownRest = keep(rest);

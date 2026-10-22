@@ -1,6 +1,8 @@
 import { sql } from '@payloadcms/db-postgres'
 import type { Endpoint, PayloadRequest } from 'payload'
 import { authorizeSiteRequest } from './project-hero-endpoint'
+import { legacyPreferenceRead, legacyPreferenceWrite } from '../optimization/likes-endpoints'
+import type { PreferenceDatabase } from '../optimization/likes'
 
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
@@ -36,6 +38,8 @@ export const projectReactionsEndpoint: Endpoint = {
     const slug = url.searchParams.get('slug') || ''
     const key = url.searchParams.get('key') || ''
     if (!slugPattern.test(slug)) return Response.json({ error: 'Некорректный адрес' }, { status: 400 })
+    const canonical = await legacyPreferenceRead(req, slug, key)
+    if (canonical) return canonical
     const counts = await readCounts(req, slug, /^c:[a-z0-9]{16,64}$/.test(key) ? key : '')
     if (!counts) return Response.json({ error: 'Проект не найден' }, { status: 404 })
     return Response.json(counts, { headers: { 'Cache-Control': 'no-store' } })
@@ -48,7 +52,7 @@ export const projectReactionsWriteEndpoint: Endpoint = {
   handler: async (req) => {
     const denied = authorizeSiteRequest(req)
     if (denied) return denied
-    let body: { slug?: unknown; action?: unknown; keys?: unknown }
+    let body: { slug?: unknown; action?: unknown; keys?: unknown; operation_id?: string; expected_revision?: number }
     try { body = await req.json!() } catch { return Response.json({ error: 'Некорректные данные' }, { status: 400 }) }
     const slug = typeof body.slug === 'string' ? body.slug : ''
     const action = body.action
@@ -63,7 +67,20 @@ export const projectReactionsWriteEndpoint: Endpoint = {
     }
     const keys = Array.isArray(body.keys) ? body.keys.filter((key): key is string => typeof key === 'string' && /^[acf]:[a-z0-9]{16,64}$/.test(key)).slice(0, 3) : []
     if (!keys.length) return Response.json({ error: 'Некорректные данные' }, { status: 400 })
-    const counts = await changeCount(db, slug, action === 'unlike' ? -1 : 1, keys)
+    if (body.expected_revision !== undefined && (!Number.isSafeInteger(body.expected_revision) || body.expected_revision < 0)) return Response.json({ error: 'revision' }, { status: 400 })
+    const canonical = await legacyPreferenceWrite(req, slug, action, keys, body.operation_id, body.expected_revision)
+    if (canonical) return canonical
+    // Baseline capture can start after the initial compatibility lookup. Lock
+    // first, then recheck ownership in a fresh statement before any old write.
+    const transactional = (req.payload.db as unknown as { drizzle: PreferenceDatabase }).drizzle
+    const counts = await transactional.transaction(async tx => {
+      const project = (await tx.execute(sql`SELECT id FROM projects WHERE slug=${slug} OR import_key=${`catalog:${slug}`} ORDER BY id LIMIT 1 FOR UPDATE`)).rows[0]
+      if (!project) return null
+      const owner = await tx.execute(sql`SELECT project_id FROM project_like_baselines WHERE project_id=${project.id}`)
+      if (owner.rows.length) return 'canonical_owner' as const
+      return changeCount({ drizzle: tx } as unknown as Adapter, slug, action === 'unlike' ? -1 : 1, keys)
+    })
+    if (counts === 'canonical_owner') return Response.json({ error: 'preferences_disabled' }, { status: 503, headers: { 'Cache-Control': 'no-store' } })
     if (!counts) return Response.json({ error: 'Проект не найден' }, { status: 404 })
     return Response.json(counts, { headers: { 'Cache-Control': 'no-store' } })
   },

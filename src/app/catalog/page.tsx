@@ -76,7 +76,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
   const { items, rest } = await catalog.list({ siteCode: SITE.code, filters })
   const heading = copy.catalogProjects
   const toBoard = (list: typeof items): BoardItem[] =>
-    list.map((project) => ({ id: project.id, card: <ProjectCard project={project} /> }))
+    list.map((project) => ({ id: project.id, projectCode: project.cmsId, card: <ProjectCard project={project} /> }))
 
   return (
     <SiteChrome

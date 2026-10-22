@@ -18,6 +18,7 @@
     "migrate": "payload migrate",
     "migrate:status": "payload migrate:status",
     "migrate:create": "payload migrate:create",
+    "optimization:likes:prepare": "tsx scripts/optimization-prepare-likes.ts",
     "bootstrap": "tsx scripts/bootstrap.ts",
     "import:site": "tsx scripts/import-site.ts",
     "structure:complete": "tsx scripts/complete-page-structure.ts",

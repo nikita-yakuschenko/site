@@ -11,6 +11,9 @@ export const CLEANUP_KEYS: Record<
     localStorage: [
       "avgst:region",
       "avgst:favorites",
+      "avgst:preferences:migration:v1",
+      "avgst:preferences:imported:v1",
+      "avgst:preferences:changed",
       "avgst:tech-bar-theme",
       "avgst-dev-notice",
     ],

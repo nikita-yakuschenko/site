@@ -18,7 +18,8 @@
     "typecheck": "tsc --noEmit",
     "frames:build": "node scripts/build-manufacture-frames.mjs",
     "test:e2e": "playwright test",
-    "test:e2e:cookie": "playwright test e2e/cookie-consent.spec.ts"
+    "test:e2e:cookie": "playwright test e2e/cookie-consent.spec.ts",
+    "test:e2e:preferences": "playwright test --config playwright.preferences.config.ts"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.20",

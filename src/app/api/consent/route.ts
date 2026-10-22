@@ -3,6 +3,8 @@ import { appendFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
 import { randomUUID } from "node:crypto";
 import { CONSENT_VERSION, type ConsentAction } from "../../../consent/types";
+import { PREFERENCE_COOKIE, PREFERENCE_VOTER_COOKIE } from '../../../lib/optimization/preference-identity';
+import { OPTIMIZATION_CONTEXT_COOKIE } from '../../../lib/optimization/server-context';
 
 /**
  * Audit trail согласий. БД в контуре ещё нет — пишем JSONL в data/.
@@ -66,5 +68,15 @@ export async function POST(request: Request) {
     console.info("[consent-audit]", event.id, event.action);
   }
 
-  return NextResponse.json({ ok: true, id: event.id });
+  const response = NextResponse.json({ ok: true, id: event.id });
+  if (body.analytics === false && request.headers.get('origin') === new URL(request.url).origin) {
+    response.cookies.set(OPTIMIZATION_CONTEXT_COOKIE, '', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 0 });
+  }
+  // HttpOnly preference identifiers can only be cleared by a server response.
+  if (body.functional === false && request.headers.get('origin') === new URL(request.url).origin) {
+    for (const name of [PREFERENCE_COOKIE, PREFERENCE_VOTER_COOKIE]) {
+      response.cookies.set(name, '', { httpOnly: true, secure: process.env.NODE_ENV === 'production', sameSite: 'lax', path: '/', maxAge: 0 });
+    }
+  }
+  return response;
 }

@@ -21,4 +21,6 @@ export const requiredMigrations = [
   '20261019_150000_story_duration',
   '20261019_160000_story_related_card',
   '20261019_170000_story_video_meta',
+  '20261021_120000_optimization_foundation',
+  '20261021_130000_project_preferences',
 ]

@@ -26,11 +26,22 @@ test('constraint, type and existing-column changes are rejected', () => {
   assert.ok(rollbackViolations('ALTER TABLE "blocks_parts" ADD COLUMN "action" varchar NOT NULL').length > 0)
   assert.ok(rollbackViolations('ALTER TABLE "projects" ALTER COLUMN "code" SET DEFAULT \'x\'').length > 0)
   assert.ok(rollbackViolations('CREATE UNIQUE INDEX "projects_code_idx" ON "projects" ("code")').length > 0)
-  assert.ok(rollbackViolations('CREATE TABLE "audit" ("id" serial PRIMARY KEY)').length > 0)
+  assert.deepEqual(rollbackViolations('CREATE TABLE "audit" ("id" serial PRIMARY KEY)'), [])
+  assert.ok(rollbackViolations('CREATE TABLE IF NOT EXISTS "audit" ("id" serial PRIMARY KEY)').length > 0)
   assert.ok(rollbackViolations('UPDATE "pages" SET "title" = \'x\' WHERE "title" IS NULL').length > 0)
   assert.ok(rollbackViolations('ALTER TABLE "blocks_parts" DROP COLUMN "action"').length > 0)
   assert.deepEqual(rollbackViolations(`ALTER TYPE "public"."enum_project_prices_region" ADD VALUE 'special-msk' BEFORE 'dealer'`), [])
   assert.ok(rollbackViolations(`ALTER TYPE "public"."enum_project_prices_region" RENAME VALUE 'special' TO 'other'`).length > 0)
+})
+
+test('new-table keys are additive, but never relax constraints on existing tables', () => {
+  assert.deepEqual(rollbackViolations(`
+    CREATE TABLE "ao_test" ("id" uuid PRIMARY KEY, "project_id" integer);
+    CREATE UNIQUE INDEX "ao_test_project_idx" ON "ao_test" USING btree ("project_id");
+    ALTER TABLE "ao_test" ADD CONSTRAINT "ao_test_project_fk" FOREIGN KEY ("project_id") REFERENCES "projects"("id") ON DELETE set null;
+  `), [])
+  assert.ok(rollbackViolations('CREATE TABLE "ao_test" ("id" uuid); CREATE UNIQUE INDEX "projects_x" ON "projects" USING btree ("code")').length > 0)
+  assert.ok(rollbackViolations('CREATE TABLE "ao_test" ("id" uuid); ALTER TABLE "projects" ADD CONSTRAINT "x" FOREIGN KEY ("id") REFERENCES "ao_test"("id")').length > 0)
 })
 
 test('a nullable column with a default can be rolled back to the previous CMS', () => {

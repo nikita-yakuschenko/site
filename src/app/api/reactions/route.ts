@@ -1,6 +1,8 @@
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { deviceKey, newVoterId, VOTER_COOKIE, VOTER_MAX_AGE, writeProjectReaction, type DeviceSignals } from '../../../lib/reactions'
+import { optimizationFlags } from '../../../lib/optimization/flags'
+import { handlePreferenceRequest, readPreferenceJson } from '../../../lib/optimization/preferences-server'
 
 export const dynamic = 'force-dynamic'
 
@@ -17,13 +19,15 @@ function cookieOptions() {
 }
 
 export async function POST(request: Request) {
-  let body: { slug?: unknown; action?: unknown; signals?: DeviceSignals }
-  try { body = await request.json() } catch { return NextResponse.json({ error: 'bad-json' }, { status: 400 }) }
+  let body: { slug?: unknown; action?: unknown; signals?: DeviceSignals; operation_id?: string; expected_revision?: number }
+  try { body = optimizationFlags().preferences ? await readPreferenceJson(request) as typeof body : await request.json() } catch { return NextResponse.json({ error: 'bad-json' }, { status: 400 }) }
+  if (!body || typeof body !== 'object') return NextResponse.json({ error: 'bad-input' }, { status: 400 })
   const slug = typeof body.slug === 'string' ? body.slug : ''
   const action = body.action
   if (!slugPattern.test(slug) || (action !== 'like' && action !== 'unlike' && action !== 'share')) {
     return NextResponse.json({ error: 'bad-input' }, { status: 400 })
   }
+  if (optimizationFlags().preferences && action !== 'share') return handlePreferenceRequest(request, 'legacy', undefined, body)
   const secret = process.env.CMS_SITE_API_KEY
   if (!secret) return NextResponse.json({ error: 'not-configured' }, { status: 503 })
   const jar = await cookies()

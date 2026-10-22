@@ -15,11 +15,15 @@ import { createMedia } from './collections/Media'
 import { readEnvironment } from './config/environment'
 import { migrations } from './migrations'
 import { shouldSeedSite } from './seed/standard-site'
+import { registerOptimizationSchema } from './optimization/schema'
+import { preferenceEndpoints } from './optimization/likes-endpoints'
+import { optimizationEndpoints } from './optimization/endpoints'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const environment = readEnvironment()
 
 export default buildConfig({
+  endpoints: [...preferenceEndpoints, ...optimizationEndpoints],
   secret: environment.secret,
   serverURL: environment.publicURL,
   routes: { admin: '/', api: '/api' },
@@ -88,6 +92,7 @@ export default buildConfig({
   sharp,
   upload: { limits: { fileSize: 100 * 1024 * 1024 } },
   db: postgresAdapter({
+    afterSchemaInit: [registerOptimizationSchema],
     pool: { connectionString: environment.databaseURL, connectionTimeoutMillis: 5000, max: 10 },
     push: !environment.production && process.env.PAYLOAD_DB_PUSH === 'true',
     disableCreateDatabase: true,

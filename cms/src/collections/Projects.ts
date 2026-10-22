@@ -18,6 +18,7 @@ import { projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEn
 import { normalizeConfigurations } from '../config/project-configurations'
 import { configurationKeys, isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
 import { claimProductCode } from './record-id'
+import { canonicalReactionSnapshot } from '../optimization/project-reaction-snapshot'
 
 const imageFields: Field[] = [
   { name: 'image', label: 'Изображение', type: 'text', required: true },
@@ -89,10 +90,19 @@ export const Projects: CollectionConfig = {
     for (const field of ['exteriors', 'interiors', 'built'] as const) if (Array.isArray(data[field]) && data[field].some((row: { photo?: unknown }) => row.photo)) data[`${field}ContentSource`] = 'database'
     if (Array.isArray(data.plans) && data.plans.length > 0) data.plansContentSource = 'database'
     return data
-  }, ({ data, originalDoc }) => {
+  }, async ({ data, originalDoc, req }) => {
     // Счётчики меняет только SQL-приращение. Сохранение карточки не должно
     // затирать лайки и репосты числом из открытой формы.
     if (data && originalDoc) {
+      const canonical = await canonicalReactionSnapshot(req, originalDoc.id)
+      if (canonical) {
+        data.likeCount = Number(canonical.like_count)
+        data.shareCount = Number(canonical.share_count ?? 0)
+        data.viewCount = Number(canonical.view_count ?? 0)
+        data.likeVoters = canonical.like_voters ?? []
+        data.shareVoters = canonical.share_voters ?? []
+        return data
+      }
       data.likeCount = originalDoc.likeCount ?? 0
       data.shareCount = originalDoc.shareCount ?? 0
       data.viewCount = originalDoc.viewCount ?? 0

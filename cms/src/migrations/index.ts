@@ -19,6 +19,8 @@ import * as migration_20261019_130000_stories from './20261019_130000_stories';
 import * as migration_20261019_150000_story_duration from './20261019_150000_story_duration';
 import * as migration_20261019_160000_story_related_card from './20261019_160000_story_related_card';
 import * as migration_20261019_170000_story_video_meta from './20261019_170000_story_video_meta';
+import * as migration_20261021_120000_optimization_foundation from './20261021_120000_optimization_foundation';
+import * as migration_20261021_130000_project_preferences from './20261021_130000_project_preferences';
 
 export const migrations = [
   {
@@ -125,5 +127,15 @@ export const migrations = [
     up: migration_20261019_170000_story_video_meta.up,
     down: migration_20261019_170000_story_video_meta.down,
     name: '20261019_170000_story_video_meta',
+  },
+  {
+    up: migration_20261021_120000_optimization_foundation.up,
+    down: migration_20261021_120000_optimization_foundation.down,
+    name: '20261021_120000_optimization_foundation',
+  },
+  {
+    up: migration_20261021_130000_project_preferences.up,
+    down: migration_20261021_130000_project_preferences.down,
+    name: '20261021_130000_project_preferences',
   },
 ];

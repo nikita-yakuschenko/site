@@ -36,7 +36,9 @@ function notify(): void {
 
 export function readFavorites(): string[] {
   if (typeof window === 'undefined') return EMPTY
-  const raw = window.localStorage.getItem(FAVORITES_KEY)
+  if (!canPersistFunctional()) return EMPTY
+  let raw: string | null = null
+  try { raw = window.localStorage.getItem(FAVORITES_KEY) } catch { return snapshot }
   if (raw !== snapshotRaw) {
     snapshotRaw = raw
     snapshot = parse(raw)
@@ -68,7 +70,7 @@ export function writeFavorites(ids: string[]): void {
     notify()
     return
   }
-  window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids))
+  try { window.localStorage.setItem(FAVORITES_KEY, JSON.stringify(ids)) } catch { return }
   notify()
 }
 
