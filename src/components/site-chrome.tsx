@@ -155,6 +155,7 @@ export function SiteChrome({
   }, [catalogPage]);
 
   const [menuOpen, setMenuOpen] = useState(false);
+  const [hasReadyHouses, setHasReadyHouses] = useState<boolean | null>(null);
   /* Форма из шапки: открывается поверх страницы, а не уводит якорем. */
   const [askOpen, setAskOpen] = useState(false);
 
@@ -165,12 +166,21 @@ export function SiteChrome({
   );
   const regionCode = useRegionCode();
 
+  useEffect(() => {
+    let active = true
+    fetch('/api/catalog/availability', { cache: 'no-store' })
+      .then(response => response.ok ? response.json() : null)
+      .then(data => { if (active && typeof data?.readyHouses === 'boolean') setHasReadyHouses(data.readyHouses) })
+      .catch(() => {})
+    return () => { active = false }
+  }, []);
+
   function toggleTechBarTheme() {
     writeTechBarTheme(techBarTheme === "light" ? "dark" : "light");
   }
   const src = mediaUrl(logo) || "/logo_lg.svg";
   const items = (navigation?.filter(
-    (item) => item.label && item.href && item.href !== "/",
+    (item) => item.label && item.href && item.href !== "/" && (item.href !== '/catalog?status=ready' || hasReadyHouses !== false),
   ) || [
     { label: copy.catalogProjects, href: "/catalog" },
     { label: copy.contacts, href: "/#contacts" },
