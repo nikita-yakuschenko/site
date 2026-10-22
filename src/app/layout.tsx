@@ -7,6 +7,9 @@ import { YandexMetrica } from '../components/yandex-metrica'
 import { RoistatCounter } from '../components/roistat-counter'
 import { CMSPreviewBridge } from '../components/cms-preview-bridge'
 import { CMSContentProvider } from '../components/cms-content'
+import { CatalogAvailabilityProvider } from '../components/catalog-availability'
+import { CmsCatalogProvider } from '../lib/catalog/cms-provider'
+import { SITE } from '../lib/site'
 import { readCMSContent } from '../lib/cms/content'
 import { parseConsent } from '../consent/storage'
 import {
@@ -55,6 +58,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   const counter = await activeMetricaCounterId()
   const roistatProjectId = await activeRoistatProjectId()
   const content = await readCMSContent()
+  const { items: catalogItems } = await new CmsCatalogProvider().list({ siteCode: SITE.code })
+  const readyHouses = catalogItems.some(item => Boolean(item.readyHome))
 
   const fresh = parsed && parsed.version === CONSENT_VERSION ? parsed : null
   const initialState = fresh && isConsentDecided(fresh) ? fresh : null
@@ -65,7 +70,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
       </head>
       <body suppressHydrationWarning>
-        <Suspense><CMSContentProvider records={content}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CMSContentProvider></Suspense>
+        <Suspense><CMSContentProvider records={content}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></CMSContentProvider></Suspense>
         <CMSPreviewBridge />
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
         {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в

@@ -1,6 +1,7 @@
 "use client";
 import { useRegionCode } from "./region-bootstrap";
 import { CMSContentBlock } from './cms-content'
+import { useReadyHouses } from './catalog-availability'
 
 import {
   Fragment,
@@ -9,6 +10,7 @@ import {
   useState,
   useSyncExternalStore,
   type ReactNode,
+  type ComponentProps,
 } from "react";
 import {
   IconBuilding,
@@ -68,6 +70,9 @@ function writeTechBarTheme(theme: TechBarTheme) {
 }
 
 type NavItem = { label?: string | null; href?: string | null };
+function HeaderNavLink({ available, ...props }: ComponentProps<typeof Link> & { available: boolean }) {
+  return available ? <Link {...props} /> : null
+}
 type MediaLike = { url?: string | null } | number | string | null | undefined;
 
 /**
@@ -155,7 +160,7 @@ export function SiteChrome({
   }, [catalogPage]);
 
   const [menuOpen, setMenuOpen] = useState(false);
-  const [hasReadyHouses, setHasReadyHouses] = useState<boolean | null>(null);
+  const hasReadyHouses = useReadyHouses();
   /* Форма из шапки: открывается поверх страницы, а не уводит якорем. */
   const [askOpen, setAskOpen] = useState(false);
 
@@ -166,21 +171,12 @@ export function SiteChrome({
   );
   const regionCode = useRegionCode();
 
-  useEffect(() => {
-    let active = true
-    fetch('/api/catalog/availability', { cache: 'no-store' })
-      .then(response => response.ok ? response.json() : null)
-      .then(data => { if (active && typeof data?.readyHouses === 'boolean') setHasReadyHouses(data.readyHouses) })
-      .catch(() => {})
-    return () => { active = false }
-  }, []);
-
   function toggleTechBarTheme() {
     writeTechBarTheme(techBarTheme === "light" ? "dark" : "light");
   }
   const src = mediaUrl(logo) || "/logo_lg.svg";
-  // CMS привязывает содержимое к позиции ссылки. Условный пункт скрываем
-  // при рендере, сохраняя позиции остальных ссылок для привязки CMS.
+  // CMS привязывает содержимое к позиции ссылки. HeaderNavLink сохраняет
+  // позиции при привязке CMS, но не выводит недоступную ссылку в HTML.
   const items = (navigation?.filter(
     (item) => item.label && item.href && item.href !== "/",
   ) || [
@@ -280,12 +276,11 @@ export function SiteChrome({
 
             <nav className="site-header__nav" aria-label={copy.navAria} data-cms-block="mainHeader.navigation">
               {items.map((item) => (
-                <Link key={`${item.href}-${item.label}`} href={item.href}
-                  hidden={item.href === '/catalog?status=ready' && hasReadyHouses === false}
-                  style={item.href === '/catalog?status=ready' && hasReadyHouses === false ? { display: 'none' } : undefined}
+                <HeaderNavLink key={`${item.href}-${item.label}`} href={item.href}
+                  available={item.href !== '/catalog?status=ready' || hasReadyHouses}
                 >
                   {item.label}
-                </Link>
+                </HeaderNavLink>
               ))}
             </nav>
 
@@ -353,15 +348,14 @@ export function SiteChrome({
                 {copy.breadcrumbsHome}
               </Link>
               {items.map((item) => (
-                <Link
+                <HeaderNavLink
                   key={`m-${item.href}`}
                   href={item.href}
-                  hidden={item.href === '/catalog?status=ready' && hasReadyHouses === false}
-                  style={item.href === '/catalog?status=ready' && hasReadyHouses === false ? { display: 'none' } : undefined}
+                  available={item.href !== '/catalog?status=ready' || hasReadyHouses}
                   onClick={() => setMenuOpen(false)}
                 >
                   {item.label}
-                </Link>
+                </HeaderNavLink>
               ))}
               {/* Служебные разделы: в узкой шапке ряд со ссылками скрыт,
                   и без этого списка они были бы недостижимы. Группы
