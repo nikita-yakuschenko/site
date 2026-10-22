@@ -137,7 +137,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       const url = URL.createObjectURL(await response.blob())
       const link = document.createElement('a')
       link.href = url
-      link.download = `avgst-catalog-${selectedPriceKind}.yml`
+      link.download = selectedPriceKind === 'nn' ? 'avgst-catalog.yml' : `avgst-catalog-${selectedPriceKind}.yml`
       document.body.append(link)
       link.click()
       link.remove()
