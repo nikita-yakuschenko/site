@@ -2,16 +2,17 @@ import { expect, test } from '@playwright/test'
 import { diagnose } from './probe'
 import { CONSENT_COOKIE, CONSENT_VERSION } from '../src/consent/types'
 
-async function functionalConsent(page: Parameters<typeof diagnose>[0], baseURL: string) {
+async function browserConsent(page: Parameters<typeof diagnose>[0], baseURL: string, functional: boolean) {
   await page.context().addCookies([{
     name: CONSENT_COOKIE,
     value: encodeURIComponent(JSON.stringify({
       version: CONSENT_VERSION, decidedAt: new Date().toISOString(),
-      necessary: true, functional: true, analytics: false, marketing: false,
+      necessary: true, functional, analytics: false, marketing: false,
     })),
     url: baseURL,
   }])
 }
+const functionalConsent = (page: Parameters<typeof diagnose>[0], baseURL: string) => browserConsent(page, baseURL, true)
 
 async function open(page: Parameters<typeof diagnose>[0], path: string) {
   const response = await page.goto(path, { waitUntil: 'domcontentloaded' })
@@ -88,6 +89,7 @@ test('region change and project prices @critical', async ({ page }, info) => dia
 }))
 
 test('form open, client validation and invisible captcha @critical', async ({ page }, info) => diagnose(page, info, 'form open, client validation and invisible captcha', async () => {
+  await browserConsent(page, String(info.project.use.baseURL), false)
   await open(page, '/')
   if (info.project.name.includes('mobile')) {
     await page.locator('.site-header__burger').click()

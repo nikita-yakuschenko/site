@@ -1,3 +1,4 @@
+import { existsSync } from 'node:fs'
 import type { Page, TestInfo } from '@playwright/test'
 
 export type Finding = {
@@ -88,8 +89,11 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   if (findings.some(item => item.severity === 'critical') || actionError) {
     const screenshot = info.outputPath('diagnostic-failure.png')
     try { await page.screenshot({ path: screenshot, fullPage: true, timeout: 10_000 }) }
-    catch { await page.screenshot({ path: screenshot, fullPage: false, timeout: 10_000 }) }
-    await info.attach('failure-screenshot', { path: screenshot, contentType: 'image/png' })
+    catch {
+      try { await page.screenshot({ path: screenshot, fullPage: false, timeout: 5_000 }) }
+      catch { /* Keep the original browser finding; Playwright also captures failure screenshots. */ }
+    }
+    if (existsSync(screenshot)) await info.attach('failure-screenshot', { path: screenshot, contentType: 'image/png' })
   }
   if (actionError) throw actionError
   const critical = findings.filter(item => item.severity === 'critical')
