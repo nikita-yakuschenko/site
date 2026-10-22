@@ -37,6 +37,8 @@ export const CLEANUP_KEYS: Record<
 };
 
 function deleteCookie(name: string): void {
+  // Номер обращения сохраняется независимо от выбора необязательных cookie.
+  if (name === 'roistat_visit') return;
   document.cookie = `${name}=; Path=/; Max-Age=0; SameSite=Lax`;
 }
 

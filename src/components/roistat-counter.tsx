@@ -1,36 +1,25 @@
-'use client'
+import Script from 'next/script'
 
-import { useEffect } from 'react'
-
-/**
- * Счётчик Roistat. Грузится сразу, до баннера, как Метрика: номер визита
- * в cookie roistat_visit нужен с первого захода, иначе заявка не свяжется
- * с рекламным источником. Номер визита сервер прикладывает к заявке.
- *
- * Номер проекта приходит с сервера из настроек CMS.
- */
-const host = 'cloud.roistat.com'
-
-type RoistatWindow = Window & { roistatProjectId?: string; roistatHost?: string; roistatPage?: string; roistatReferrer?: string }
-
+/** Запуск до гидратации страницы, независимо от состояния cookie-баннера. */
 export function RoistatCounter({ projectId }: { projectId: string }) {
-  useEffect(() => {
-    const w = window as RoistatWindow
-    if (w.roistatProjectId) return
-    // Параметры и адрес скрипта — как в сниппете из кабинета Roistat.
-    w.roistatProjectId = projectId
-    w.roistatHost = host
-    w.roistatPage = location.href
-    w.roistatReferrer = document.referrer
-    const path = /^.*roistat_visit=[^;]+(.*)?$/.test(document.cookie)
-      ? '/dist/module.js'
-      : `/api/site/1.0/${projectId}/init?referrer=${encodeURIComponent(location.href)}`
-    const script = document.createElement('script')
-    script.charset = 'UTF-8'
-    script.async = true
-    script.src = `https://${host}${path}`
-    document.head.appendChild(script)
-  }, [projectId])
-
-  return null
+  if (!/^[a-zA-Z0-9]{8,64}$/.test(projectId)) return null
+  // Компонент подключён только в корневом app/layout.tsx, как требует App Router.
+  // eslint-disable-next-line @next/next/no-before-interactive-script-outside-document
+  return <Script id="roistat-counter" strategy="beforeInteractive">{`
+    (function(w, d) {
+      if (w.roistatProjectId) return;
+      w.roistatProjectId = ${JSON.stringify(projectId)};
+      w.roistatHost = 'cloud.roistat.com';
+      w.roistatPage = location.href;
+      w.roistatReferrer = d.referrer;
+      var path = /(^|;\\s*)roistat_visit=[^;]+/.test(d.cookie)
+        ? '/dist/module.js'
+        : '/api/site/1.0/' + w.roistatProjectId + '/init?referrer=' + encodeURIComponent(location.href);
+      var script = d.createElement('script');
+      script.charset = 'UTF-8';
+      script.async = true;
+      script.src = 'https://cloud.roistat.com' + path;
+      d.head.appendChild(script);
+    })(window, document);
+  `}</Script>
 }

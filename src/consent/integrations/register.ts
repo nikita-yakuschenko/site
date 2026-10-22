@@ -41,7 +41,7 @@ registerIntegration({
   id: "roistat",
   category: "analytics",
   /* Счётчик грузится сразу компонентом RoistatCounter в layout, как Метрика.
-     Запись нужна очистке при отзыве согласия: ключи roistat* в cleanup.ts. */
+     Очистка необязательных cookie сохраняет roistat_visit для связи заявки. */
 });
 
 registerIntegration({
