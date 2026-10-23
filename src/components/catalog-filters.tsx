@@ -314,10 +314,10 @@ export function CatalogFilters({
         />
 
         {/* Тише остальных: дом выбирают не по технологии. */}
-        <fieldset className="cfilter__group cfilter__group--quiet">
+        {facets.technologies.length ? <fieldset className="cfilter__group cfilter__group--quiet">
           <legend className="cfilter__legend">{copy.technologyLegend}</legend>
           <div className="cfilter__checks">
-            {(["modular", "panel", "frame"] as const).map((value) => {
+            {facets.technologies.map((value) => {
               const on = filters.tech?.includes(value) ?? false;
               return (
                 <label key={value} className="cfilter__check">
@@ -337,7 +337,7 @@ export function CatalogFilters({
               );
             })}
           </div>
-        </fieldset>
+        </fieldset> : null}
 
         </div>
 
