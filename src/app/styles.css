@@ -4327,7 +4327,7 @@ a {
 
 .referral__field input:focus {
   outline: none;
-  border-color: rgb(252 201 12 / 0.7);
+  border-color: var(--on-dark-2);
 }
 
 .referral__field input.is-invalid {
@@ -7486,10 +7486,7 @@ a {
   white-space: nowrap;
 }
 
-/* Сигнал об ошибке — краснеющая подпись и знак в поле. Своих обводок
-   тут нет: поле и так получает зелёное кольцо фокуса от глобального
-   input:focus-visible, и вместе с красной рамкой и тенью на одном
-   инпуте горели три кольца разом. */
+/* Сигнал об ошибке — краснеющая подпись и знак в поле. */
 .lead-card label:has(.lead-field__error.is-quiet),
 .lead-form label:has(.lead-field__error.is-quiet) {
   position: relative;
@@ -7872,6 +7869,13 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+/* Text fields use their existing one-pixel edge as the focus indicator. */
+:is(.lead-form, .lead-card) :is(input:not([type="checkbox"]), textarea):focus {
+  outline: none;
+  border-color: var(--ink-2);
+  box-shadow: none;
+}
+
 .specs--on-dark {
   color: var(--on-dark-0);
 }
@@ -8015,10 +8019,10 @@ html.is-dialog-open {
 
 /* Поле в фокусе отмечается своей гранью: зелёная рамка общего правила
    ложилась поверх скруглённого поля вторым контуром. */
-.ask-dialog__card :is(input, textarea):focus-visible {
+.ask-dialog__card :is(input:not([type="checkbox"]), textarea):focus {
   outline: none;
   border-color: var(--ink-2);
-  box-shadow: 0 0 0 3px var(--tint);
+  box-shadow: none;
 }
 
 .ask-dialog__close {
@@ -13185,9 +13189,9 @@ html.is-dialog-open {
   color: var(--on-dark-4);
 }
 
-.project-config__total[data-form="true"] .lead-card input:focus-visible {
+.project-config__total[data-form="true"] .lead-card input:focus {
   border-color: var(--on-dark-2);
-  box-shadow: 0 0 0 3px var(--tint-on-dark);
+  box-shadow: none;
 }
 
 .project-config__total[data-form="true"] .lead-form__consent {
@@ -13316,10 +13320,10 @@ html.is-dialog-open {
 
 /* Поле в фокусе отмечается своей гранью, а не зелёной рамкой общего
    правила: та рисовалась поверх скруглённого поля вторым контуром. */
-.panel-lead__form .lead-card input:focus-visible {
+.panel-lead__form .lead-card input:focus {
   outline: none;
   border-color: var(--ink-2);
-  box-shadow: 0 0 0 3px var(--tint);
+  box-shadow: none;
 }
 
 /* Согласие в узкой колонке переносится по словам: неразрывная строка из
@@ -13377,6 +13381,7 @@ html.is-dialog-open {
 .mortgage-request.is-open .lead-card { --lead-ink: 255 255 255; }
 .mortgage-request.is-open .lead-card input { border-color: var(--on-dark-4); background: var(--tint-on-dark); color: #fff; }
 .mortgage-request.is-open .lead-card input::placeholder { color: var(--on-dark-4); }
+.mortgage-request.is-open .lead-card input:focus { border-color: var(--on-dark-2); }
 .mortgage-request.is-open .lead-form__consent { color: var(--on-dark-2); }
 .panel-lead__close { position: absolute; z-index: 1; top: 12px; right: 6px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--on-dark-2); cursor: pointer; }
 .panel-lead__close:hover { color: #fff; }
@@ -13580,6 +13585,10 @@ html.is-dialog-open {
   border-color: var(--on-dark-4);
   background: var(--tint-on-dark);
   color: #fff;
+}
+
+.ready-home-offer__total .lead-card input:focus {
+  border-color: var(--on-dark-2);
 }
 
 .ready-home-offer__total .lead-form__consent {
@@ -14699,10 +14708,10 @@ picture.hero__frame {
   }
   .project-config__mobile-form .lead-card label,
   .project-config__mobile-form .lead-card input { min-width: 0; max-width: 100%; }
-  .project-config__mobile-form .lead-card input:focus-visible {
+  .project-config__mobile-form .lead-card input:focus {
     outline: none;
     border-color: var(--on-dark-2);
-    box-shadow: 0 0 0 3px var(--tint-on-dark);
+    box-shadow: none;
   }
   .project-config__mobile-form .lead-form__consent { align-items: start; line-height: 1.35; }
   @starting-style {

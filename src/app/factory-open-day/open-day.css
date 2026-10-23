@@ -1033,3 +1033,11 @@ html:not([data-ags-theme="dark"]) body .ags .ags-form--success {
   --form-success-logo-filter:brightness(0);
   --form-success-check:#187640;
 }
+
+/* Keep focus on the field's existing underline, including native dialogs. */
+html body .ags .ags-field__input:focus:not([aria-invalid="true"]) {
+  outline:none;
+  box-shadow:none;
+  border-bottom-color:var(--t-2);
+  border-radius:0;
+}
