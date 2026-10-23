@@ -229,10 +229,11 @@ export function CatalogFilters({
             подвалом за её пределами и потому ничего не перекрывает. */}
         <div className="cfilter__scroll">
         <div className="cfilter__group">
+          <label className="cfilter__legend" htmlFor="catalog-sort">Сортировка</label>
           <Select value={filters.sort ?? 'default'} onValueChange={value =>
             go({ ...filters, sort: value === 'default' ? undefined : value as CatalogFilters['sort'] })
           }>
-            <SelectTrigger className="catalog__sort" aria-label="Сортировка проектов">
+            <SelectTrigger id="catalog-sort" className="catalog__sort" aria-label="Сортировка проектов">
               <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
               <SelectValue />
             </SelectTrigger>
