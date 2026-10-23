@@ -16,7 +16,7 @@ import {
   readServerFavorites,
   subscribeFavorites,
 } from "../lib/favorites";
-import { IconFilter, IconFilterX } from "@tabler/icons-react";
+import { IconFilter } from "@tabler/icons-react";
 import { sortCatalog, type SortableProject } from "../lib/catalog/order";
 import { useRegionCode } from "./region-bootstrap";
 import { copy } from "../lib/copy";
@@ -186,10 +186,9 @@ export function CatalogBoard({
             <IconFilter size={20} stroke={2} aria-hidden="true" />
           </button>
         </div>
-        {active ? <button type="button" className="cfilter__reset catalog__reset" onClick={reset}>
-          <IconFilterX size={14} stroke={1.75} aria-hidden="true" />
+        <button type="button" className="cfilter__reset catalog__reset" disabled={!active} onClick={reset}>
           {copy.resetAll}
-        </button> : null}
+        </button>
       </div>
       <div className="catalog__layout">
       <CatalogFilters
