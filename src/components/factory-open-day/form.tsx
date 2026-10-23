@@ -4,7 +4,8 @@ import { FormSuccessAnimation } from '../form-success-animation'
 import { CMSContentBlock } from '../cms-content'
 
 import { useEffect, useRef, useState } from 'react'
-import { isValidName, isValidRuMobile, maskPhone, phoneE164, sanitizeName } from '../../lib/phone'
+import { isValidName, isValidRuMobile, phoneE164, sanitizeName } from '../../lib/phone'
+import { PhoneInput } from '../phone-input'
 import { OpenDayArrow, OpenDayRules } from './rules'
 
 const OPEN_BOOKING = 'ags-open-booking'
@@ -91,7 +92,7 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
     </div>
     <div className="ags-field">
       <label className="ags-field__label" htmlFor="ags-phone">Телефон</label>
-      <input className="ags-field__input" id="ags-phone" name="phone" type="tel" autoComplete="tel" placeholder="+7 9XX XXX XX XX" inputMode="tel" value={phone} aria-invalid={invalid.phone || undefined} onChange={event => setPhone(maskPhone(event.target.value))} required />
+      <PhoneInput className="ags-field__input" id="ags-phone" name="phone" type="tel" autoComplete="tel" placeholder="+7 9XX XXX XX XX" inputMode="tel" value={phone} aria-invalid={invalid.phone || undefined} onValueChange={setPhone} onEdited={() => setInvalid(prev => ({ ...prev, phone: false }))} required />
     </div>
     <div className="ags-field">
       <label className="ags-field__label" htmlFor="ags-email">Email</label>

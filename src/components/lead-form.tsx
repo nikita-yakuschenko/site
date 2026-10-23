@@ -7,18 +7,15 @@ import { readRegionCode } from '../lib/regions'
 import { IconArrowUpRight } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
-  caretAfterNationalDigits,
   isValidName,
   isValidRuMobile,
-  maskPhone,
-  nationalDigitsBeforeCaret,
-  nationalPhoneDigits,
   phoneE164,
   sanitizeName,
 } from '../lib/phone'
 import { noAutofillFieldProps, noAutofillFormProps } from '../lib/no-autofill'
 import { LeadSubmitFeedback } from './lead-submit-feedback'
 import { submitLead, type LeadAttempt } from '../lib/submit-lead'
+import { PhoneInput } from './phone-input'
 import { InvisibleSmartCaptcha } from '@yandex/smart-captcha'
 
 export function LeadForm({
@@ -207,7 +204,7 @@ export function LeadForm({
       </label>
       <label>
         {copy.phone}
-        <input
+        <PhoneInput
           ref={phoneRef}
           name="phone"
           type="tel"
@@ -219,45 +216,8 @@ export function LeadForm({
           className={['ym-disable-keys', 'ym-hide-content', invalid.phone ? 'is-invalid' : '']
             .filter(Boolean)
             .join(' ') || undefined}
-          onFocus={() => {
-            if (!nationalPhoneDigits(phone)) {
-              setPhone('+7')
-              window.setTimeout(() => {
-                phoneRef.current?.setSelectionRange(2, 2)
-              }, 0)
-            }
-          }}
-          onKeyDown={(e) => {
-            const el = e.currentTarget
-            const start = el.selectionStart || 0
-            const end = el.selectionEnd || 0
-            // Префикс +7 не стираем.
-            if (e.key === 'Backspace' && start === end && start <= 2) {
-              e.preventDefault()
-            }
-            if (e.key === 'Delete' && start === end && start < 2) {
-              e.preventDefault()
-            }
-            // Пустое поле: 7/8/+ не дублируют код страны.
-            if (
-              !nationalPhoneDigits(phone) &&
-              (e.key === '+' || e.key === '7' || e.key === '8')
-            ) {
-              e.preventDefault()
-            }
-          }}
-          onChange={(e) => {
-            const el = e.currentTarget
-            const pos = el.selectionStart || 0
-            const before = nationalDigitsBeforeCaret(el.value, pos)
-            const masked = maskPhone(el.value)
-            setPhone(masked)
-            setInvalid((prev) => ({ ...prev, phone: false }))
-            window.requestAnimationFrame(() => {
-              const next = caretAfterNationalDigits(masked, before)
-              el.setSelectionRange(next, next)
-            })
-          }}
+          onValueChange={setPhone}
+          onEdited={() => setInvalid(prev => ({ ...prev, phone: false }))}
         />
         {invalid.phone ? (
           <span className="lead-field__error is-quiet" role="alert">
