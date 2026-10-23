@@ -370,7 +370,7 @@ export function CatalogFilters({
           </div>
         </fieldset>
 
-        {chips.length ? (
+        {chips.length || filters.sort ? (
           <div className="cfilter__active">
             {chips.map((chip) => (
               <button
@@ -383,7 +383,11 @@ export function CatalogFilters({
                 <IconX size={14} stroke={2} aria-hidden="true" />
               </button>
             ))}
-            <button type="button" className="cfilter__reset" onClick={() => go({ sort: filters.sort })}>
+            {filters.sort ? <button type="button" className="cfilter__chip" onClick={() => go({ ...filters, sort: undefined })}>
+              {sortOptions.find(([value]) => value === filters.sort)?.[1]}
+              <IconX size={14} stroke={2} aria-hidden="true" />
+            </button> : null}
+            <button type="button" className="cfilter__reset" onClick={() => go({})}>
               <IconFilterX size={14} stroke={2} aria-hidden="true" />
               {copy.resetAll}
             </button>

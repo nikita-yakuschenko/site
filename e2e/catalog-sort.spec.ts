@@ -23,6 +23,12 @@ test('compact catalog sort supports keyboard, links, filter reset and mobile', a
     await expect(sort).toContainText(label)
   }
   const input = page.getByRole('searchbox')
+  await page.locator('.cfilter__reset').click()
+  await expect(page).toHaveURL(/catalog$/)
+  await expect(sort).toContainText('По умолчанию')
+  await sort.click()
+  await page.getByRole('option', { name: 'Сначала просторнее' }).click()
+  await expect(page).toHaveURL(/sort=area-desc/)
   await input.fill('Барнхаус')
   await input.press('Enter')
   await expect(page).toHaveURL(/q=.*&sort=area-desc/)

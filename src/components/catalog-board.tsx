@@ -103,7 +103,7 @@ export function CatalogBoard({
 
   /* Избранное считается наравне с условиями отбора: для человека это такое
      же сужение выдачи, просто хранится не в адресе. */
-  const active = countActive(filters) + (onlyFavorites ? 1 : 0);
+  const active = countActive(filters) + (filters.sort ? 1 : 0) + (onlyFavorites ? 1 : 0);
 
   /* Раскрытая на телефоне панель это лист поверх страницы, и страница под
      ним стоять должна неподвижно: иначе прокрутка уводит фон, а лист
