@@ -16,8 +16,7 @@ import {
   readServerFavorites,
   subscribeFavorites,
 } from "../lib/favorites";
-import { IconArrowsSort, IconFilter, IconFilterX } from "@tabler/icons-react";
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
+import { IconFilter } from "@tabler/icons-react";
 import { sortCatalog, type SortableProject } from "../lib/catalog/order";
 import { useRegionCode } from "./region-bootstrap";
 import { copy } from "../lib/copy";
@@ -44,13 +43,6 @@ const SHEET_LOCK = "is-catalog-sheet";
 
 export type BoardItem = SortableProject & { card: ReactNode };
 
-const sortOptions = [
-  ['default', 'По умолчанию'],
-  ['price-asc', 'Сначала дешевле'],
-  ['price-desc', 'Сначала дороже'],
-  ['area-asc', 'Сначала компактнее'],
-  ['area-desc', 'Сначала просторнее'],
-] as const;
 
 export function CatalogBoard({
   filters,
@@ -175,30 +167,15 @@ export function CatalogBoard({
           <CatalogSearch value={filters.q ?? ""} onChange={search} />
           {/* Видна только на узком экране, на широком её прячет CSS: там
               колонка стоит целиком и прятать нечего. */}
-          {/* Одна кнопка в двух состояниях. Отбор пуст, значит она
-              раскрывает лист отбора; отбор задан, значит сбрасывает его.
-              Закрывает лист кнопка «Показать проекты» в самом листе. */}
+          {/* Панель доступна и с активными фильтрами: внутри также сортировка. */}
           <button
             type="button"
-            className={active ? "cfilter__toggle is-reset" : "cfilter__toggle"}
-            aria-expanded={active ? undefined : open}
-            aria-label={active ? copy.resetAll : copy.filtersLabel}
-            onClick={() => {
-              if (!active) {
-                setOpen((value) => !value);
-                return;
-              }
-              setOnlyFavorites(false);
-              setOpen(false);
-              router.replace(filtersToHref({ sort: filters.sort }, pathname), { scroll: false });
-              backToStart();
-            }}
+            className="cfilter__toggle"
+            aria-expanded={open}
+            aria-label={active ? `${copy.filtersLabel}: ${active}` : copy.filtersLabel}
+            onClick={() => setOpen((value) => !value)}
           >
-            {active ? (
-              <IconFilterX size={20} stroke={2} aria-hidden="true" />
-            ) : (
-              <IconFilter size={20} stroke={2} aria-hidden="true" />
-            )}
+            <IconFilter size={20} stroke={2} aria-hidden="true" />
           </button>
         </div>
       </div>
@@ -223,20 +200,6 @@ export function CatalogBoard({
       />
 
       <div ref={results} className="catalog__results">
-        <div className="catalog__tools">
-          <Select value={filters.sort ?? 'default'} onValueChange={(value) => {
-            router.replace(filtersToHref({ ...filters, sort: value === 'default' ? undefined : value as Filters['sort'] }, pathname), { scroll: false });
-            backToStart();
-          }}>
-            <SelectTrigger className="catalog__sort" aria-label="Сортировка проектов">
-              <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="catalog__sort-menu" align="end" sideOffset={6}>
-              {sortOptions.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
-            </SelectContent>
-          </Select>
-        </div>
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку
             не важно, сколько вариантов он отбросил и насколько велик каталог.
             Важно одно, есть ли в нём то, что он искал. Поэтому говорим только

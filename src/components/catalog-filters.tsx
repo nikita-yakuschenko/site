@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { IconFilterX, IconHeart, IconX } from "@tabler/icons-react";
+import { IconArrowsSort, IconFilterX, IconHeart, IconX } from "@tabler/icons-react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
 import { RangeSlider } from "./range-slider";
 import { filtersToHref, type CatalogFacets } from "../lib/catalog/filters";
 import type { CatalogFilters, Range } from "../lib/catalog/types";
@@ -25,6 +26,13 @@ import { copy, seriesTitle } from "../lib/copy";
  */
 
 const SLIDER_DELAY = 350;
+const sortOptions = [
+  ['default', 'По умолчанию'],
+  ['price-asc', 'Сначала дешевле'],
+  ['price-desc', 'Сначала дороже'],
+  ['area-asc', 'Сначала компактнее'],
+  ['area-desc', 'Сначала просторнее'],
+] as const;
 
 /* Radix отдаёт number[] без обещания длины. Приводим к паре явно, а не
    утверждением типа: пустой массив тогда даст края каталога, а не NaN. */
@@ -220,9 +228,19 @@ export function CatalogFilters({
         {/* Прокручивается только эта часть: кнопка возврата к выдаче лежит
             подвалом за её пределами и потому ничего не перекрывает. */}
         <div className="cfilter__scroll">
-
-
-
+        <div className="cfilter__group">
+          <Select value={filters.sort ?? 'default'} onValueChange={value =>
+            go({ ...filters, sort: value === 'default' ? undefined : value as CatalogFilters['sort'] })
+          }>
+            <SelectTrigger className="catalog__sort" aria-label="Сортировка проектов">
+              <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="catalog__sort-menu" align="start" sideOffset={6}>
+              {sortOptions.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
         {facets.area.max > facets.area.min && <fieldset className="cfilter__group">
           <legend className="cfilter__legend">
             {copy.areaLegend}
