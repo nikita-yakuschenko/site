@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { IconChevronRight } from "@tabler/icons-react";
 import Link from "next/link";
 import Image from "next/image";
-import mountingImage from "../../../public/img/pages/mounting.png";
+import mountingImage from "../../../public/generated/imports/img/pages/mounting.png.webp";
 import { SiteChrome } from "../../components/site-chrome";
 import { PageHero } from "../../components/page-hero";
 import { ContactsSection } from "../../components/block-renderer";

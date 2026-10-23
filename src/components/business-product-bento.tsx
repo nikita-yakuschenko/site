@@ -6,10 +6,10 @@ import {
   IconBuildingWarehouse,
   IconHome,
 } from "@tabler/icons-react";
-import materialImage from "../../public/img/cards/imitation2.png";
-import trussImage from "../../public/img/pages/b2b_ferm.png";
-import roofPanelImage from "../../public/img/pages/b2b_top_panel.png";
-import modularImage from "../../public/img/pages/b2b_modular.png";
+import materialImage from "../../public/generated/imports/img/cards/imitation2.png.webp";
+import trussImage from "../../public/generated/imports/img/pages/b2b_ferm.png.webp";
+import roofPanelImage from "../../public/generated/imports/img/pages/b2b_top_panel.png.webp";
+import modularImage from "../../public/generated/imports/img/pages/b2b_modular.png.webp";
 import { BUSINESS } from "../lib/business-content";
 
 const ORDER = [

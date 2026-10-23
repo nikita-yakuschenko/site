@@ -12,7 +12,7 @@ import { HOME_LAYOUT } from '../../lib/home-layout'
 import { footerAboutFor } from '../../lib/copy'
 import { SITE } from '../../lib/site'
 import { listStories } from '../../lib/stories'
-import paintShop2020 from '../../../public/img/about/paint-shop-2020.png'
+import paintShop2020 from '../../../public/generated/imports/img/about/paint-shop-2020.png.webp'
 
 export const metadata: Metadata = {
   title: 'О компании - Авангард Строй',

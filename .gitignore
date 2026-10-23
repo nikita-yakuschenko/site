@@ -28,4 +28,5 @@ playwright-report/
 playwright/.cache/
 diagnostics-results/
 public/generated/webp/
+public/generated/imports/
 public-runtime/

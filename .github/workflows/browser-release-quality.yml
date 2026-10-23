@@ -55,6 +55,12 @@ jobs:
         run: node --experimental-strip-types --test diagnostics/tests/*.test.mjs
       - name: Test stored WebP preparation
         run: node --test scripts/tests/webp-assets.test.mjs
+      - name: Reuse files already encoded before serving
+        uses: actions/cache@v4
+        with:
+          path: public/generated/webp
+          key: ${{ runner.os }}-stored-webp-v1-${{ hashFiles('public/**', 'scripts/prepare-webp-assets.mjs') }}
+          restore-keys: ${{ runner.os }}-stored-webp-v1-
       - run: npm run build
       - run: npm run diagnostics:release
       - name: Add diagnostic summary

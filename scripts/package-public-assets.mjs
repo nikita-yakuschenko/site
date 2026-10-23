@@ -14,6 +14,6 @@ for (const stored of Object.values(manifest)) {
 await mkdir(target) // Fail instead of overwriting an existing directory.
 await cp(source, target, {
   recursive: true,
-  filter: file => !Object.hasOwn(manifest, '/' + path.relative(source, file).split(path.sep).join('/')),
+  filter: file => file !== path.join(source, 'generated', 'imports') && !Object.hasOwn(manifest, '/' + path.relative(source, file).split(path.sep).join('/')),
 })
 console.log(`Packaged public assets; ${Object.keys(manifest).length} converted source files omitted from runtime`)

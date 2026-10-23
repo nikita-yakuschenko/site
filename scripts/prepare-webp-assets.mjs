@@ -10,6 +10,23 @@ export async function prepareWebpAssets(root = process.cwd()) {
   const manifest = {}
   await mkdir(generated, { recursive: true })
   let before = 0, after = 0
+  const imported = new Set()
+  async function scanImports(folder) {
+    let entries
+    try { entries = await readdir(folder, { withFileTypes: true }) } catch (error) {
+      if (error.code === 'ENOENT') return
+      throw error
+    }
+    for (const entry of entries) {
+      const file = path.join(folder, entry.name)
+      if (entry.isDirectory()) await scanImports(file)
+      else if (/\.tsx?$/.test(entry.name)) {
+        const source = await readFile(file, 'utf8')
+        for (const match of source.matchAll(/['"](?:\.\.\/)+public\/generated\/imports\/([^'"]+\.(?:jpe?g|png|avif))\.webp['"]/gi)) imported.add(match[1])
+      }
+    }
+  }
+  await scanImports(path.join(root, 'src'))
   async function visit(folder) {
     for (const entry of await readdir(folder, { withFileTypes: true })) {
       if (entry.isDirectory()) {
@@ -38,6 +55,11 @@ export async function prepareWebpAssets(root = process.cwd()) {
         await rename(temporary, destination)
       }
       manifest[`/${relative}`] = `/generated/webp/${output.split('/').map(encodeURIComponent).join('/')}`
+      if (imported.has(relative)) {
+        const alias = path.join(directory, 'generated', 'imports', relative + '.webp')
+        await mkdir(path.dirname(alias), { recursive: true })
+        await writeFile(alias, encoded)
+      }
       before += original.length; after += encoded.length
     }
   }
