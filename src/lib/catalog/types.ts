@@ -7,13 +7,25 @@ export function isCatalogSeries(value: string): value is CatalogSeries {
 }
 
 /**
- * Технология. Обе разновидности каркасной и отличаются только глубиной
- * заводской готовности: модульная собирает модули из панелей на заводе,
- * панельно-каркасная везёт те же панели на участок.
+ * Технология строительства: панельно-каркасная, модульная или каркасная.
  */
-export const CATALOG_TECHNOLOGIES = ['panel', 'modular'] as const
+export const CATALOG_TECHNOLOGIES = ['panel', 'modular', 'frame'] as const
 
 export type CatalogTechnology = (typeof CATALOG_TECHNOLOGIES)[number]
+
+export const TECHNOLOGY_OPTIONS = [
+  { label: 'Панельно-каркасная', value: 'Панельно-каркасный', technology: 'panel' },
+  { label: 'Модульная', value: 'Модульный', technology: 'modular' },
+  { label: 'Каркасная', value: 'Каркасный', technology: 'frame' },
+] as const
+
+export function technologyFromBadge(badge: unknown): CatalogTechnology {
+  return TECHNOLOGY_OPTIONS.find(option => option.value === badge)?.technology ?? 'panel'
+}
+
+export function technologyLabel(badge: unknown): string {
+  return TECHNOLOGY_OPTIONS.find(option => option.value === badge)?.label ?? '—'
+}
 
 export function isCatalogTechnology(value: string): value is CatalogTechnology {
   return (CATALOG_TECHNOLOGIES as readonly string[]).includes(value)

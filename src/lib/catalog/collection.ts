@@ -1,10 +1,10 @@
-import { isCatalogSeries } from './types'
+import { isCatalogSeries, isCatalogTechnology, type CatalogTechnology } from './types'
 
 /** Подборка — не свойство дома, а признак отбора.
  *  Панельные и модульные собраны по технологии: один дом может быть
  *  одновременно классическим и модульным. Остальные плитки пока смотрят на серию. */
-export function isTechnologyCollection(token: string): token is 'panel' | 'modular' {
-  return token === 'panel' || token === 'modular'
+export function isTechnologyCollection(token: string): token is CatalogTechnology {
+  return isCatalogTechnology(token)
 }
 
 export function countCollectionProjects(items: readonly { technology: string; series: string }[], collection: string): number {

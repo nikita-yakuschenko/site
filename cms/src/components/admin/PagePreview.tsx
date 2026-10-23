@@ -12,7 +12,7 @@ import { useStoryPreview } from './useStoryPreview'
 import { normalizeNextStepsSettings, type NextStepsSettings } from '../../config/next-steps-settings'
 import type { ConfigurationTemplatesData } from '../../../../src/lib/catalog/configuration-content'
 import type { ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
-import { isCatalogSeries, type CatalogProject } from '../../../../src/lib/catalog/types'
+import { isCatalogSeries, technologyFromBadge, type CatalogProject } from '../../../../src/lib/catalog/types'
 import { isTechnologyCollection } from '../../../../src/lib/catalog/collection'
 const devices = [
   { key: 'desktop', label: 'Десктоп', width: 1920, height: 1080, icon: IconDeviceDesktop },
@@ -28,7 +28,7 @@ function previewCard(doc: { id?: string; slug?: string | null; name?: string | n
   const price = doc.priceAmount && doc.priceAmount > 0 ? doc.priceAmount : null
   const seriesName = doc.series || ''
   const series = isCatalogSeries(seriesName) ? seriesName : 'panel'
-  return { id: doc.importKey?.replace(/^catalog:/, '') || `cms:${doc.id}`, cmsId: doc.id, slug: doc.slug, name: doc.name, href: `/catalog/${doc.slug}`, area: String(doc.areaValue ?? ''), areaValue: doc.areaValue ?? 0, floors: String(doc.floorsValue ?? ''), floorsValue: doc.floorsValue ?? 0, bedrooms: String(doc.bedrooms ?? ''), bathrooms: String(doc.bathrooms ?? ''), technology: series === 'modular' ? 'modular' : 'panel', technologyBadge: doc.technologyBadge || '', series, imageUrl, priceAmount: price, priceLabel: price ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется', description: doc.name, about: [], exteriors: [], interiors: [], floorPlans: [], options: [] }
+  return { id: doc.importKey?.replace(/^catalog:/, '') || `cms:${doc.id}`, cmsId: doc.id, slug: doc.slug, name: doc.name, href: `/catalog/${doc.slug}`, area: String(doc.areaValue ?? ''), areaValue: doc.areaValue ?? 0, floors: String(doc.floorsValue ?? ''), floorsValue: doc.floorsValue ?? 0, bedrooms: String(doc.bedrooms ?? ''), bathrooms: String(doc.bathrooms ?? ''), technology: technologyFromBadge(doc.technologyBadge), technologyBadge: doc.technologyBadge || '', series, imageUrl, priceAmount: price, priceLabel: price ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется', description: doc.name, about: [], exteriors: [], interiors: [], floorPlans: [], options: [] }
 }
 const catalogBlocks = new Set(['projectHero', 'ProjectHeroContent', 'ProjectHeroPayment', 'ReadyHomeOffer', 'ContactsSection', 'ProjectExteriors', 'ProjectInteriors', 'ProjectPlans', 'ProjectBuilt', 'ProjectConfig', 'ProjectSimilar', 'MortgageCalculator', 'ProjectNextSteps'])
 function seriesPreview(parts: { key: string; text: string; href: string; image: string }[], counts: Map<string, number>, images: Map<string, string>) {

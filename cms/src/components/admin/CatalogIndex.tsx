@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { Project } from '../../payload-types'
+import { TECHNOLOGY_OPTIONS, technologyLabel } from '../../../../src/lib/catalog/types'
 import type { PriceKind } from '../../config/price-kinds'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
@@ -30,7 +31,7 @@ function facetsFrom(params: { get(name: string): string | null }) {
   const numbers = (key: string) => paramList(params, key).map(Number).filter(value => Number.isInteger(value))
   return {
     status: paramList(params, 'status').filter(value => value === 'published' || value === 'draft'),
-    tech: paramList(params, 'tech').filter(value => value === 'Панельно-каркасный' || value === 'Модульный'),
+    tech: paramList(params, 'tech').filter(value => TECHNOLOGY_OPTIONS.some(option => option.value === value)),
     series: paramList(params, 'series'),
     floors: numbers('floors'),
     bedrooms: numbers('bedrooms'),
@@ -245,7 +246,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
     </div>
     <div className="flex flex-wrap items-center gap-2">
       <FacetFilter title="Статус" options={[{ value: 'published', label: 'Опубликован' }, { value: 'draft', label: 'Черновик' }]} selected={facets.status} onChange={status => tune({ status })} />
-      <FacetFilter title="Технология" options={[{ value: 'Панельно-каркасный', label: 'Панельно-каркасная' }, { value: 'Модульный', label: 'Модульная' }]} selected={facets.tech} onChange={tech => tune({ tech })} />
+      <FacetFilter title="Технология" options={[...TECHNOLOGY_OPTIONS]} selected={facets.tech} onChange={tech => tune({ tech })} />
       <FacetFilter title="Серия" options={seriesOptions} selected={facets.series} onChange={series => tune({ series })} />
       <RangeFilter title="Площадь, м²" min={facets.areaMin} max={facets.areaMax} onMin={areaMin => tune({ areaMin })} onMax={areaMax => tune({ areaMax })} />
       <FacetFilter title="Этажи" options={numbers(project => project.floorsValue).map(value => ({ value, label: String(value) }))} selected={facets.floors} onChange={floors => tune({ floors })} />
@@ -263,7 +264,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       <TableBody>{table.rows.map(project => { const published = project._status === 'published'; return <TableRow key={project.id}>
         <TableCell className="h-12 pl-4"><Link className="font-medium underline-offset-4 hover:underline" href={`/collections/projects/${project.id}`}>{project.name || '[Без названия]'}</Link></TableCell>
         <TableCell><Badge variant="outline" className="text-foreground">{published ? <IconCircleCheckFilled className="text-(--avgst-green)" /> : <IconCircleDashed className="text-muted-foreground" />}{published ? 'Опубликован' : 'Черновик'}</Badge></TableCell>
-        <TableCell className="text-muted-foreground">{project.technologyBadge === 'Модульный' ? 'Модульная' : 'Панельно-каркасная'}</TableCell><TableCell className="text-right tabular-nums">{project.areaValue?.toLocaleString('ru-RU') ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.floorsValue ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.bedrooms ?? '—'}</TableCell>
+        <TableCell className="text-muted-foreground">{technologyLabel(project.technologyBadge)}</TableCell><TableCell className="text-right tabular-nums">{project.areaValue?.toLocaleString('ru-RU') ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.floorsValue ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.bedrooms ?? '—'}</TableCell>
         <TableCell className="text-right tabular-nums">{stat(project.viewCount)}</TableCell><TableCell className="text-right tabular-nums">{stat(project.likeCount)}</TableCell><TableCell className="text-right tabular-nums">{stat(project.shareCount)}</TableCell><TableCell className="text-right tabular-nums">{leads[project.id] ?? 0}</TableCell>
         <TableCell className="catalog-actions pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8 text-muted-foreground data-[state=open]:bg-muted" aria-label={`Действия: ${project.name || 'без названия'}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface w-44">
           <DropdownMenuItem asChild><Link href={`/collections/projects/${project.id}`}><IconPencil />Редактировать</Link></DropdownMenuItem>

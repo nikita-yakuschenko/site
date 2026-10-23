@@ -6,6 +6,7 @@ import { IconFilterX, IconHeart, IconX } from "@tabler/icons-react";
 import { RangeSlider } from "./range-slider";
 import { filtersToHref, type CatalogFacets } from "../lib/catalog/filters";
 import type { CatalogFilters, Range } from "../lib/catalog/types";
+import { TECHNOLOGY_OPTIONS, type CatalogTechnology } from "../lib/catalog/types";
 import { copy, seriesTitle } from "../lib/copy";
 
 /**
@@ -163,8 +164,8 @@ export function CatalogFilters({
   const mlnRange = (lo: number, hi: number) =>
     mln(lo) + "-" + mln(hi) + " " + copy.millionShort;
 
-  const techLabel = (value: "modular" | "panel") =>
-    value === "modular" ? copy.techModularShort : copy.techPanelShort;
+  const techLabel = (value: CatalogTechnology) =>
+    TECHNOLOGY_OPTIONS.find(option => option.technology === value)!.label;
 
   const chips: { label: string; clear: CatalogFilters }[] = [];
   if (filters.status === "ready") {
@@ -286,7 +287,7 @@ export function CatalogFilters({
         <fieldset className="cfilter__group cfilter__group--quiet">
           <legend className="cfilter__legend">{copy.technologyLegend}</legend>
           <div className="cfilter__checks">
-            {(["modular", "panel"] as const).map((value) => {
+            {(["modular", "panel", "frame"] as const).map((value) => {
               const on = filters.tech?.includes(value) ?? false;
               return (
                 <label key={value} className="cfilter__check">

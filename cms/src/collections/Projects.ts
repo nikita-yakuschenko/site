@@ -1,4 +1,5 @@
 import type { CollectionConfig, Field } from 'payload'
+import { TECHNOLOGY_OPTIONS } from '../../../src/lib/catalog/types'
 import { authenticated, contentManager, contentWriter, privilegedField } from '../access/staff'
 import { projectOrderEndpoints } from './project-order-endpoints'
 import { validProjectOrder, completeProjectOrder, normalizeProjectOrder } from '../config/project-order'
@@ -119,7 +120,7 @@ export const Projects: CollectionConfig = {
       { name: 'mobileImageUrl', type: 'text', admin: { hidden: true } },
       { name: 'mobileHeroThumbnail', type: 'ui', admin: { components: { Field: './components/admin/ProjectImageField#ProjectMobileHeroImage' } } },
       { type: 'row', admin: { className: 'project-choice-row' }, fields: [
-        { name: 'technologyBadge', label: 'Технология', type: 'select', required: true, options: [{ label: 'Панельно-каркасная', value: 'Панельно-каркасный' }, { label: 'Модульная', value: 'Модульный' }] },
+        { name: 'technologyBadge', label: 'Технология', type: 'select', required: true, options: TECHNOLOGY_OPTIONS.map(({ label, value }) => ({ label, value })) },
         { name: 'series', label: 'Серия', type: 'select', options: [{ label: 'Панельные', value: 'panel' }, { label: 'Барнхаусы', value: 'barn' }, { label: 'Классические', value: 'classic' }, { label: 'Модульные', value: 'modular' }, { label: 'А-фрейм', value: 'aframe' }] },
       ] },
       { type: 'row', admin: { className: 'project-specs-row' }, fields: [
