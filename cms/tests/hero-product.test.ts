@@ -8,7 +8,7 @@ import { FixtureCatalogProvider } from '../../src/lib/catalog/fixture-provider'
 import { projectCatalogEndpoint } from '../src/collections/project-catalog-endpoint'
 import type { CatalogProject } from '../../src/lib/catalog/types'
 
-test('четыре сортировки сохраняют закрепление, учитывают регион, неизвестные цены всегда в конце', () => {
+test('четыре сортировки включают локомотивы в общий порядок, учитывают регион, неизвестные цены всегда в конце', () => {
   const items = [
     { id: 'first', hero_product: 1, areaValue: 300, priceAmount: 9 },
     { id: 'second', hero_product: 2, areaValue: 400, priceAmount: 10 },
@@ -18,11 +18,11 @@ test('четыре сортировки сохраняют закреплени�
   ]
   const ids = (sort: CatalogProjectSort, region: 'nn' | 'msk' = 'nn') => sortCatalog(items, sort, region).map(item => item.id)
   type CatalogProjectSort = Parameters<typeof sortCatalog>[1]
-  assert.deepEqual(ids('price-asc'), ['first', 'second', 'a', 'b', 'unknown'])
-  assert.deepEqual(ids('price-desc'), ['first', 'second', 'b', 'a', 'unknown'])
-  assert.deepEqual(ids('price-asc', 'msk'), ['first', 'second', 'b', 'a', 'unknown'])
-  assert.deepEqual(ids('area-asc'), ['first', 'second', 'unknown', 'a', 'b'])
-  assert.deepEqual(ids('area-desc'), ['first', 'second', 'b', 'a', 'unknown'])
+  assert.deepEqual(ids('price-asc'), ['a', 'b', 'first', 'second', 'unknown'])
+  assert.deepEqual(ids('price-desc'), ['second', 'first', 'b', 'a', 'unknown'])
+  assert.deepEqual(ids('price-asc', 'msk'), ['b', 'a', 'first', 'second', 'unknown'])
+  assert.deepEqual(ids('area-asc'), ['unknown', 'a', 'b', 'first', 'second'])
+  assert.deepEqual(ids('area-desc'), ['second', 'first', 'b', 'a', 'unknown'])
   assert.deepEqual(sortCatalog(items, undefined, 'nn'), items)
 })
 
@@ -77,6 +77,7 @@ test('CMS передаёт позицию проекта; готовый дом 
     assert.equal(ordered[0].name, 'Первый')
     assert.equal(ordered.some(item => item.name === 'Второй'), false)
     assert.equal(filtered.rest.some(item => item.name === 'Второй'), true)
+    assert.deepEqual(sortCatalog(ordered, 'area-asc', 'nn').map(item => item.name), ['Готовый', 'Первый', 'Обычный'])
   } finally {
     if (key === undefined) delete process.env.CMS_SITE_API_KEY; else process.env.CMS_SITE_API_KEY = key
     if (origin === undefined) delete process.env.CMS_PUBLIC_URL; else process.env.CMS_PUBLIC_URL = origin
