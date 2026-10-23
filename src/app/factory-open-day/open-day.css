@@ -163,7 +163,7 @@ html:not([data-ags-theme="dark"]) body .ags .ags-success__logo { filter:brightne
 html body .ags .ags-form__status { font-size:14px; line-height:1.5; margin:16px 0 0; color:var(--t-1); }
 html body .ags .ags-form__status:empty { display:none; }
 html body .ags .ags-form__status[data-error="true"] { color:var(--bad, #FF8A6B); }
-html body .ags .ags-agree__box:invalid[aria-invalid="true"] + .ags-agree__tick { outline:1px solid #FF8A6B; }
+html body .ags .ags-agree__box[aria-invalid="true"] + .ags-agree__tick { outline:1px solid #FF8A6B; }
 html body .ags.ags-foot .ags-foot__copyright-mobile { display:none; }
 @media (max-width:600px) {
   html body .ags.ags-foot .ags-foot__legal > p + p { display:none; }
@@ -234,7 +234,7 @@ html body .ags .ags-form-direction--compact { display:none; }
   html body .ags .ags-form-direction--compact { display:inline; }
 }
 html body .ags.ags .ags-field__input { padding-left:12px; padding-right:12px; box-sizing:border-box; }
-html body .ags.ags .ags-field__input[aria-invalid="false"] { outline:none; border-bottom-color:var(--rule-strong); }
+html body .ags.ags .ags-field__input[aria-invalid="false"] { outline:none; box-shadow:none; border-bottom-color:var(--rule-strong); }
 @media (min-width:1001px) {
   html body .ags.ags-loc .ags-loc__body > .ags-loc__col { align-self:stretch; display:flex; flex-direction:column; }
   html body .ags.ags-loc .ags-loc__col .ags-ref--routes { margin-top:auto; padding-top:24px; width:100%; }
@@ -892,7 +892,7 @@ html body .ags.ags-hero .ags-hero__photo img {
 .ags-field__input::placeholder{ color:rgba(255,255,255,.52); }
 .ags-field__input:hover{ border-bottom-color:rgba(255,255,255,.34); }
 .ags-field__input:focus{ outline:0; border-bottom-color:var(--signal); }
-.ags-field__input:user-invalid{ border-bottom-color:var(--bad); }
+.ags-field__input[aria-invalid="true"]{ border-bottom-color:var(--bad); }
 .ags-field__hint{ display:block; margin-top:9px; font-size:.75rem; color:var(--t-3); }
 
 .ags-agree{ display:flex; align-items:flex-start; gap:11px; margin:4px 0 30px; cursor:pointer; }

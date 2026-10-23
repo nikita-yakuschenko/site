@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test'
 
 test('country code starts as a placeholder and the caret follows + then 7', async ({ page }) => {
-  await page.goto('/factory-open-day')
+  await page.goto('/factory-open-day', { waitUntil: 'domcontentloaded' })
   const phone = page.locator('#ags-phone')
   await expect(phone).toHaveValue('')
   await expect(phone).toHaveAttribute('placeholder', /\+7/)
@@ -25,7 +25,7 @@ test('country code starts as a placeholder and the caret follows + then 7', asyn
 
 for (const start of ['7', '8', '9']) {
   test(`normalizes a number starting with ${start} without losing fast input or resizing`, async ({ page }) => {
-    await page.goto('/factory-open-day')
+    await page.goto('/factory-open-day', { waitUntil: 'domcontentloaded' })
     const phone = page.locator('#ags-phone')
     await phone.scrollIntoViewIfNeeded()
     const before = await phone.boundingBox()
