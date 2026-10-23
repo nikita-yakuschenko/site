@@ -393,7 +393,7 @@ export function PhotoLightbox({
       ) : null}
 
       <figure
-        className="photo-lightbox__frame"
+        className={variantLabels && variantLabels.length > 1 ? 'photo-lightbox__frame photo-lightbox__frame--variants' : 'photo-lightbox__frame'}
         onClick={(event) => event.stopPropagation()}
       >
         {variantLabels && variantLabels.length > 1 ? (
