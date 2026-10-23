@@ -5295,6 +5295,10 @@ a {
 .cfilter__toggle.is-reset {
   color: var(--danger);
 }
+.cfilter__reset-top { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--danger); cursor: pointer; }
+.cfilter__reset-top:hover { background: var(--tint); }
+.cfilter__reset-top:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: -2px; }
+@media (max-width: 1023px) { .cfilter__reset-top { width: 44px; height: 44px; } }
 
 /* В самый узкий экран подпись рядом с полем поиска не встаёт: остаётся
    значок, смысл которого понятен и без слова. */
@@ -5400,21 +5404,28 @@ a {
   }
 }
 
-/* На десктопе фильтры прокручиваются вместе со страницей. */
+/* Высокая колонка сначала прокручивается страницей, затем прилипает нижним
+   краем. Короткая сразу прилипает под поиском. Внутреннего скролла нет. */
 @media (min-width: 1024px) {
   .cfilter__toggle {
     display: none;
   }
 
   .cfilter {
-    position: static;
+    position: sticky;
+    top: min(calc(var(--site-header-offset) + var(--catalog-bar)), calc(100dvh - var(--catalog-filter-height, 0px) - 16px));
     align-self: start;
   }
 
   .cfilter__sticky {
     position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
   }
 }
+
+.cfilter__scroll { display: flex; flex-direction: column; gap: 24px; }
 
 .cfilter__count {
   margin: 0 0 16px;
@@ -5427,26 +5438,9 @@ a {
 
 .cfilter__group {
   min-inline-size: 0;
-  margin: 0 0 20px;
+  margin: 0;
   padding: 0;
   border: 0;
-}
-
-/* Разделительная линия и воздух над ней. padding-top на самом fieldset
-   давать нельзя: legend лежит в его верхней грани, и padding ложится между
-   подписью и содержимым, а не над подписью, отчего разрыв внутри группы
-   становился вдвое больше, чем у соседей. Поэтому воздух уходит в legend. */
-.cfilter__group--quiet {
-  margin-top: 20px;
-  border-top: 1px solid var(--line);
-}
-
-.cfilter__group--quiet .cfilter__legend {
-  padding-top: 16px;
-}
-
-.cfilter__group--fav {
-  margin-bottom: 20px;
 }
 
 .cfilter__legend {
@@ -5627,8 +5621,7 @@ a {
   flex-wrap: wrap;
   gap: 6px;
   align-items: center;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
+  padding: 0;
 }
 
 .cfilter__chip {
@@ -5670,7 +5663,7 @@ a {
      подписями, сами элементы управления остаются прежнего размера, иначе по
      ним станет труднее попадать пальцем. */
   .cfilter__sticky.is-open .cfilter__group {
-    margin-bottom: 12px;
+    margin: 0;
   }
 
   .cfilter__sticky.is-open .cfilter__group:last-of-type {
@@ -5681,19 +5674,12 @@ a {
     margin-bottom: 6px;
   }
 
-  .cfilter__sticky.is-open .cfilter__group--quiet {
-    margin-top: 14px;
-  }
-
-  .cfilter__sticky.is-open .cfilter__group--quiet .cfilter__legend {
-    padding-top: 12px;
-  }
-
   .cfilter__sticky.is-open .cfilter__check {
     min-height: 28px;
   }
 
   .cfilter__sticky.is-open .cfilter__scroll {
+    gap: 16px;
     padding-bottom: 12px;
     mask-image: linear-gradient(to bottom, #000 calc(100% - 12px), transparent);
   }

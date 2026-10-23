@@ -16,7 +16,7 @@ import {
   readServerFavorites,
   subscribeFavorites,
 } from "../lib/favorites";
-import { IconFilter } from "@tabler/icons-react";
+import { IconFilter, IconFilterX } from "@tabler/icons-react";
 import { sortCatalog, type SortableProject } from "../lib/catalog/order";
 import { useRegionCode } from "./region-bootstrap";
 import { copy } from "../lib/copy";
@@ -59,6 +59,7 @@ export function CatalogBoard({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const changeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   /* Раскрытие колонки на узком экране. Живёт здесь, потому что кнопка стоит
      в полосе поиска, а сама колонка ниже. */
@@ -147,6 +148,13 @@ export function CatalogBoard({
     backToStart();
   };
 
+  const reset = () => {
+    if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
+    setOnlyFavorites(false);
+    router.replace(pathname, { scroll: false });
+    backToStart();
+  };
+
   return (
     <>
       {/* Поиск липнет вместе с отбором: искать по названию и смотреть
@@ -165,6 +173,9 @@ export function CatalogBoard({
       >
         <div className="catalog__barrow">
           <CatalogSearch value={filters.q ?? ""} onChange={search} />
+          {active ? <button type="button" className="cfilter__reset-top" aria-label={copy.resetAll} title={copy.resetAll} onClick={reset}>
+            <IconFilterX size={18} stroke={1.75} aria-hidden="true" />
+          </button> : null}
           {/* Видна только на узком экране, на широком её прячет CSS: там
               колонка стоит целиком и прятать нечего. */}
           {/* Панель доступна и с активными фильтрами: внутри также сортировка. */}
@@ -197,6 +208,8 @@ export function CatalogBoard({
           setTimeout(backToStart, 150);
         }}
         onChanged={backToStart}
+        onReset={reset}
+        changeTimerRef={changeTimerRef}
       />
 
       <div ref={results} className="catalog__results">

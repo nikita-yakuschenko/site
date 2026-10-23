@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { IconArrowsSort, IconFilterX, IconHeart, IconX } from "@tabler/icons-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
@@ -15,8 +15,8 @@ import { copy, seriesTitle } from "../lib/copy";
  *
  * Колонка, а не верхняя полоса: набор условий будет расти (стиль и всё, что
  * заведут в админке), и полоса шириной в страницу однажды кончится, а
- * колонка растёт вниз сколько нужно. На десктопе прокручивается вместе
- * со страницей, без отдельной области прокрутки.
+ * колонка растёт вниз сколько нужно. Высокая колонка прокручивается
+ * вместе со страницей и прилипает нижним краем, без внутреннего скроллбара.
  *
  * Состояние живёт в адресе, а не здесь: ссылку на отобранную выдачу можно
  * переслать, кнопка «назад» отменяет последнее условие. Ползунки при
@@ -84,6 +84,8 @@ export function CatalogFilters({
   open,
   onApply,
   onChanged,
+  onReset,
+  changeTimerRef,
 }: {
   filters: CatalogFilters;
   facets: CatalogFacets;
@@ -96,15 +98,28 @@ export function CatalogFilters({
   onApply: () => void;
   /* Условия поменялись: выдача стала другой, и надо вернуться к её началу. */
   onChanged: () => void;
+  onReset: () => void;
+  changeTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const sidebar = useRef<HTMLElement>(null);
+
+  useEffect(() => {
+    const node = sidebar.current;
+    if (!node) return;
+    const measure = () => node.style.setProperty('--catalog-filter-height', `${node.offsetHeight}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   /* Пока человек тянет ползунок, показываем его же черновое значение:
      адрес отстаёт на паузу, и без этого ручка дёргалась бы назад. */
   const [draftArea, setDraftArea] = useState<[number, number] | null>(null);
   const [draftPrice, setDraftPrice] = useState<[number, number] | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = changeTimerRef;
 
   /* Адрес сменился, значит черновик ползунка устарел. Сверяем прямо в
      рендере, а не эффектом: setState внутри эффекта тянет лишний проход
@@ -120,19 +135,19 @@ export function CatalogFilters({
 
   useEffect(
     () => () => {
-      if (timer.current) clearTimeout(timer.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     },
-    [],
+    [timerRef],
   );
 
   const go = (next: CatalogFilters, delay = 0) => {
-    if (timer.current) clearTimeout(timer.current);
+    if (timerRef.current) clearTimeout(timerRef.current);
     const href = filtersToHref(next, pathname);
     const push = () => {
       router.replace(href, { scroll: false });
       onChanged();
     };
-    if (delay) timer.current = setTimeout(push, delay);
+    if (delay) timerRef.current = setTimeout(push, delay);
     else push();
   };
 
@@ -222,7 +237,7 @@ export function CatalogFilters({
   }
 
   return (
-    <aside className="cfilter" aria-label={copy.catalogFiltersAria}>
+    <aside ref={sidebar} className="cfilter" aria-label={copy.catalogFiltersAria}>
       <div className={open ? "cfilter__sticky is-open" : "cfilter__sticky"}>
         {/* Прокручивается только эта часть: кнопка возврата к выдаче лежит
             подвалом за её пределами и потому ничего не перекрывает. */}
@@ -386,7 +401,10 @@ export function CatalogFilters({
               {sortOptions.find(([value]) => value === filters.sort)?.[1]}
               <IconX size={14} stroke={2} aria-hidden="true" />
             </button> : null}
-            <button type="button" className="cfilter__reset" onClick={() => go({})}>
+            <button type="button" className="cfilter__reset" onClick={() => {
+              if (timerRef.current) clearTimeout(timerRef.current);
+              onReset();
+            }}>
               <IconFilterX size={14} stroke={2} aria-hidden="true" />
               {copy.resetAll}
             </button>
