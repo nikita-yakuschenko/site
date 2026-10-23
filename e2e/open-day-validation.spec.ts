@@ -5,8 +5,9 @@ for (const viewport of [{ width: 390, height: 844 }, { width: 1366, height: 900 
     for (const modal of [false, true]) {
       test(`${viewport.width}px ${theme} ${modal ? 'dialog' : 'inline'}: errors only after submission`, async ({ page }) => {
         await page.setViewportSize(viewport)
+        await page.addInitScript(value => localStorage.setItem('ags-theme', value), theme)
         await page.goto('/factory-open-day', { waitUntil: 'domcontentloaded' })
-        await page.evaluate(value => document.documentElement.setAttribute('data-ags-theme', value), theme)
+        await expect(page.locator('html')).toHaveAttribute('data-ags-theme', theme)
         if (modal) await expect(async () => {
           await page.locator('[aria-controls="ags-booking-dialog"]').first().click()
           await expect(page.locator('dialog[open]')).toBeVisible({ timeout: 1000 })
