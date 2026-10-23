@@ -40,6 +40,7 @@ export type Range = { min?: number; max?: number }
  * чтобы схема не разъехалась по трём местам.
  */
 export type CatalogFilters = {
+  sort?: 'price-asc' | 'price-desc' | 'area-asc' | 'area-desc'
   /** Поиск по названию проекта. */
   q?: string
   /** Конкретные дома, которые уже построены и выставлены на продажу. */
@@ -111,6 +112,8 @@ export type ReadyHomeSection = {
 
 export type CatalogProject = {
   id: string
+  /** Место проекта-локомотива в начале каталога: 1 или 2. */
+  hero_product?: number | null
   cmsId?: string
   mobileImageUrl?: string | null
   slug: string

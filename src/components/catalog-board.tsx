@@ -16,7 +16,10 @@ import {
   readServerFavorites,
   subscribeFavorites,
 } from "../lib/favorites";
-import { IconFilter, IconFilterX } from "@tabler/icons-react";
+import { IconArrowsSort, IconFilter, IconFilterX } from "@tabler/icons-react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
+import { sortCatalog, type SortableProject } from "../lib/catalog/order";
+import { useRegionCode } from "./region-bootstrap";
 import { copy } from "../lib/copy";
 
 /**
@@ -39,7 +42,15 @@ import { copy } from "../lib/copy";
 /* Класс блокировки прокрутки под раскрытым листом отбора. */
 const SHEET_LOCK = "is-catalog-sheet";
 
-export type BoardItem = { id: string; card: ReactNode };
+export type BoardItem = SortableProject & { card: ReactNode };
+
+const sortOptions = [
+  ['default', 'По умолчанию'],
+  ['price-asc', 'Сначала дешевле'],
+  ['price-desc', 'Сначала дороже'],
+  ['area-asc', 'Сначала компактнее'],
+  ['area-desc', 'Сначала просторнее'],
+] as const;
 
 export function CatalogBoard({
   filters,
@@ -69,7 +80,8 @@ export function CatalogBoard({
   const keep = (items: BoardItem[]) =>
     onlyFavorites ? items.filter((item) => favorites.includes(item.id)) : items;
 
-  const shownMatched = keep(matched);
+  const region = useRegionCode();
+  const shownMatched = sortCatalog(keep(matched), filters.sort, region);
   const shownRest = keep(rest);
   const narrowed = picked || onlyFavorites;
 
@@ -178,7 +190,7 @@ export function CatalogBoard({
               }
               setOnlyFavorites(false);
               setOpen(false);
-              router.replace(pathname, { scroll: false });
+              router.replace(filtersToHref({ sort: filters.sort }, pathname), { scroll: false });
               backToStart();
             }}
           >
@@ -211,6 +223,20 @@ export function CatalogBoard({
       />
 
       <div ref={results} className="catalog__results">
+        <div className="catalog__tools">
+          <Select value={filters.sort ?? 'default'} onValueChange={(value) => {
+            router.replace(filtersToHref({ ...filters, sort: value === 'default' ? undefined : value as Filters['sort'] }, pathname), { scroll: false });
+            backToStart();
+          }}>
+            <SelectTrigger className="catalog__sort" aria-label="Сортировка проектов">
+              <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="catalog__sort-menu" align="end" sideOffset={6}>
+              {sortOptions.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку
             не важно, сколько вариантов он отбросил и насколько велик каталог.
             Важно одно, есть ли в нём то, что он искал. Поэтому говорим только

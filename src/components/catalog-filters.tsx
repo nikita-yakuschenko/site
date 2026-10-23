@@ -364,7 +364,7 @@ export function CatalogFilters({
                 <IconX size={14} stroke={2} aria-hidden="true" />
               </button>
             ))}
-            <button type="button" className="cfilter__reset" onClick={() => go({})}>
+            <button type="button" className="cfilter__reset" onClick={() => go({ sort: filters.sort })}>
               <IconFilterX size={14} stroke={2} aria-hidden="true" />
               {copy.resetAll}
             </button>

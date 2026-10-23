@@ -20,6 +20,7 @@ import * as migration_20261019_150000_story_duration from './20261019_150000_sto
 import * as migration_20261019_160000_story_related_card from './20261019_160000_story_related_card';
 import * as migration_20261019_170000_story_video_meta from './20261019_170000_story_video_meta';
 import * as migration_20261023_160000_frame_technology from './20261023_160000_frame_technology';
+import * as migration_20261023_180000_hero_product from './20261023_180000_hero_product';
 
 export const migrations = [
   {
@@ -131,5 +132,10 @@ export const migrations = [
     up: migration_20261023_160000_frame_technology.up,
     down: migration_20261023_160000_frame_technology.down,
     name: '20261023_160000_frame_technology',
+  },
+  {
+    up: migration_20261023_180000_hero_product.up,
+    down: migration_20261023_180000_hero_product.down,
+    name: '20261023_180000_hero_product',
   },
 ];

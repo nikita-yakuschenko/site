@@ -72,7 +72,10 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 /** @type import('payload').ImportMap */
 import { RedirectsView as RedirectsView_748188b2c19d87073961306254117b4f } from '../../components/admin/RedirectsView'
 
+import { HeroProductField as HeroProductField_58a0bea62f190a5c911e32f97e4525f7 } from '../../components/admin/HeroProductField'
+
 export const importMap = {
+  "./components/admin/HeroProductField#HeroProductField": HeroProductField_58a0bea62f190a5c911e32f97e4525f7,
   "./components/admin/RedirectsView#RedirectsView": RedirectsView_748188b2c19d87073961306254117b4f,
   "./components/admin/BlockedCell#BlockedCell": BlockedCell_b32a788ac704cc26ef4283a3336d0c04,
   "./components/admin/CollectionEmptyState#UsersEmptyState": UsersEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466,

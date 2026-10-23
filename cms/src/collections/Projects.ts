@@ -50,6 +50,7 @@ export const Projects: CollectionConfig = {
     if (operation === 'update' && data) delete data.code
     return data
   }, ({ data, originalDoc }) => {
+    if (data && (data.recordType ?? originalDoc?.recordType) === 'ready-home') data.hero_product = null
     if (Array.isArray(data?.plans)) data.plans = normalizePlans(data.plans)
     if (data && completeProjectOrder(data.blockOrder)) data.blockOrder = normalizeProjectOrder(data.blockOrder)
     if (Array.isArray(data?.interiors)) data.interiors = data.interiors.map((row: { photo?: unknown; image?: string }) => ({ ...row, image: row.photo ? null : row.image }))
@@ -108,6 +109,11 @@ export const Projects: CollectionConfig = {
       { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
     ] },
     { name: 'code', label: 'Код', type: 'text', unique: true, index: true, admin: { hidden: true } },
+    { type: 'collapsible', label: 'Настройки каталога', admin: { initCollapsed: true, condition: data => data.recordType !== 'ready-home' }, fields: [
+      { name: 'hero_product', label: 'Закрепление в каталоге', type: 'number', unique: true, min: 1, max: 2,
+        validate: (value: unknown) => value == null || value === 1 || value === 2 ? true : 'Выберите первое или второе место',
+        admin: { components: { Field: './components/admin/HeroProductField#HeroProductField' } } },
+    ] },
     { name: 'preview', type: 'ui', admin: { position: 'sidebar', components: { Field: './components/admin/PagePreviewField#ProjectPreviewField' } } },
     { name: 'blockOrder', label: 'Порядок блоков', type: 'json', validate: (value: unknown) => value == null || validProjectOrder(value) ? true : 'Порядок должен содержать все блоки без повторений', admin: { components: { Field: './components/admin/ProjectBlockOrder#ProjectBlockOrder' } } },
     { type: 'collapsible', label: 'Главный экран', fields: [

@@ -33,7 +33,7 @@ import {
  */
 
 /** Порядок параметров в адресе. Правило 6. */
-const ORDER = ['q', 'status', 'series', 'tech', 'area', 'price', 'bedrooms', 'bathrooms', 'floors'] as const
+const ORDER = ['q', 'status', 'series', 'tech', 'area', 'price', 'bedrooms', 'bathrooms', 'floors', 'sort'] as const
 
 export type RawParams = Record<string, string | string[] | undefined>
 
@@ -105,6 +105,7 @@ export function parseFilters(params: RawParams): CatalogFilters {
   const q = first(params.q)
   const query = q ? normalizeQuery(q) : ''
   return {
+    sort: ['price-asc', 'price-desc', 'area-asc', 'area-desc'].includes(first(params.sort) ?? '') ? first(params.sort) as CatalogFilters['sort'] : undefined,
     q: query || undefined,
     status: first(params.status) === 'ready' ? 'ready' : undefined,
     series: series && isCatalogSeries(series) ? series : undefined,
@@ -127,6 +128,7 @@ function encodeValue(value: string): string {
 
 export function filtersToHref(filters: CatalogFilters, pathname = '/catalog'): string {
   const value: Record<(typeof ORDER)[number], string | undefined> = {
+    sort: filters.sort,
     q: filters.q,
     status: filters.status,
     series: filters.series,
@@ -144,7 +146,7 @@ export function filtersToHref(filters: CatalogFilters, pathname = '/catalog'): s
 }
 
 export function isEmpty(filters: CatalogFilters): boolean {
-  return filtersToHref(filters) === '/catalog'
+  return countActive(filters) === 0
 }
 
 /**

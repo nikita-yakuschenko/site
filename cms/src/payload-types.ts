@@ -529,6 +529,7 @@ export interface Project {
   recordType: 'project' | 'ready-home';
   slug: string;
   code?: string | null;
+  hero_product?: number | null;
   blockOrder?:
     | {
         [k: string]: unknown;
@@ -1340,6 +1341,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   recordType?: T;
   slug?: T;
   code?: T;
+  hero_product?: T;
   blockOrder?: T;
   name?: T;
   desktopImage?: T;

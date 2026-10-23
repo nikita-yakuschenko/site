@@ -90,7 +90,7 @@ function addedColumn(statement, added) {
   const columns = added.get(table) ?? new Set()
   columns.add(column)
   added.set(table, columns)
-  return { table, column }
+  return { table, column, uniqueSafe: !hasDefault && !notNull && !/\bif not exists\b/i.test(statement) }
 }
 
 function sqlTexts(source) {
@@ -100,6 +100,7 @@ function sqlTexts(source) {
 
 export function rollbackViolations(upSql) {
   const added = new Map()
+  const uniqueSafe = new Set()
   const problems = []
   for (const statement of sqlTexts(upSql).flatMap((text) => splitSql(text))) {
     if (/^create type\s+\S+\s+as\s+enum\s*\(/i.test(statement)) continue
@@ -110,7 +111,10 @@ export function rollbackViolations(upSql) {
       problems.push(column.error)
       continue
     }
-    if (column) continue
+    if (column) {
+      if (column.uniqueSafe) uniqueSafe.add(`${column.table}.${column.column}`)
+      continue
+    }
     const constraint = statement.match(/^alter table\s+(\S+)\s+add constraint\s+\S+\s+foreign key\s*\(([^)]+)\)\s+references\b/i)
     if (constraint) {
       const table = ident(constraint[1])
@@ -120,8 +124,13 @@ export function rollbackViolations(upSql) {
       if (existing.length) problems.push(`${table}: внешний ключ на существующую колонку ${existing.join(', ')}`)
       continue
     }
+    const uniqueIndex = statement.match(/^create unique index\s+\S+\s+on\s+(\S+)\s+(?:using btree\s*)?\(("?[\w]+"?)\)$/i)
+    if (uniqueIndex && uniqueSafe.has(`${ident(uniqueIndex[1])}.${ident(uniqueIndex[2])}`)) {
+      // Новая nullable-колонка заполнена NULL: старые записи и старая CMS не конфликтуют.
+      // Разрешаем только простой индекс без выражений и NULLS NOT DISTINCT.
+      continue
+    }
     if (/^create index\b/i.test(statement)) {
-      if (/\bunique\b/i.test(statement)) problems.push('уникальный индекс может отвергнуть существующие записи')
       continue
     }
     const update = statement.match(/^update\s+(\S+)\s+set\s+(.+?)\s+where\s+(.+)$/i)

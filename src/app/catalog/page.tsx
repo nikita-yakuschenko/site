@@ -13,22 +13,13 @@ import {
 } from '../../lib/catalog/filters'
 import { copy, footerAboutFor } from '../../lib/copy'
 import { SITE } from '../../lib/site'
+import { catalogOrder } from '../../lib/catalog/order'
 
 const catalog = new CmsCatalogProvider()
 
 
 type Search = Promise<Record<string, string | string[] | undefined>>
 
-function shuffled<T>(items: readonly T[]): T[] {
-  const result = [...items]
-  for (let index = result.length - 1; index > 0; index--) {
-    const other = Math.floor(Math.random() * (index + 1))
-    const current = result[index]!
-    result[index] = result[other]!
-    result[other] = current
-  }
-  return result
-}
 
 export async function generateMetadata({
   searchParams,
@@ -44,7 +35,7 @@ export async function generateMetadata({
        комбинацию условий как отдельный документ, и они начинают
        конкурировать между собой. */
     alternates: { canonical: '/catalog' },
-    robots: isEmpty(filters) ? undefined : { index: false, follow: true },
+    robots: isEmpty(filters) && !filters.sort ? undefined : { index: false, follow: true },
   }
 }
 
@@ -76,7 +67,10 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
   const { items, rest } = await catalog.list({ siteCode: SITE.code, filters })
   const heading = copy.catalogProjects
   const toBoard = (list: typeof items): BoardItem[] =>
-    list.map((project) => ({ id: project.id, card: <ProjectCard project={project} /> }))
+    list.map((project) => ({ id: project.id, hero_product: project.hero_product, areaValue: project.areaValue,
+      priceAmount: project.readyHome?.salePrice ?? project.priceAmount,
+      regionalPrices: project.readyHome ? undefined : project.regionalPrices,
+      card: <ProjectCard project={project} /> }))
 
   return (
     <SiteChrome
@@ -99,7 +93,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
             <CatalogBoard
               filters={filters}
               facets={facets}
-              matched={toBoard(shuffled(items))}
+              matched={toBoard(catalogOrder(items))}
               rest={filters.status === 'ready' ? [] : toBoard(rest)}
               picked={!isEmpty(filters)}
             />

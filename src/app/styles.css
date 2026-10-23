@@ -14759,3 +14759,10 @@ picture.hero__frame {
   .project-config__tier-front,
   .project-config__tier-card .project-config__mobile-form { transition: none; transform: none; }
 }
+.catalog__tools { display: flex; justify-content: flex-end; align-items: center; min-height: 38px; margin-bottom: 16px; }
+.ui-select-trigger.catalog__sort { width: auto; height: 38px; padding: 0 6px; border: 0; border-radius: 6px; gap: 8px; color: var(--foreground); font-size: 13px; }
+.catalog__sort:hover, .catalog__sort[data-state="open"] { background: var(--tint); }
+.catalog__sort > span { min-width: 0; }
+.ui-select-content.catalog__sort-menu { width: 224px; border-radius: 10px; background: var(--surface, #fff); }
+.catalog__sort-menu .ui-select-item { min-height: 40px; border-radius: 6px; padding-left: 12px; }
+@media (max-width: 1023px) { .catalog__tools { min-height: 44px; margin-bottom: 12px; } .ui-select-trigger.catalog__sort { height: 44px; } }
