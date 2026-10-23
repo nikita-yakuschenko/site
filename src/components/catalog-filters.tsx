@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { IconArrowsSort, IconFilterX, IconHeart, IconX } from "@tabler/icons-react";
+import { IconArrowsSort, IconHeart, IconX } from "@tabler/icons-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
 import { RangeSlider } from "./range-slider";
 import { filtersToHref, type CatalogFacets } from "../lib/catalog/filters";
@@ -84,7 +84,6 @@ export function CatalogFilters({
   open,
   onApply,
   onChanged,
-  onReset,
   changeTimerRef,
 }: {
   filters: CatalogFilters;
@@ -98,7 +97,6 @@ export function CatalogFilters({
   onApply: () => void;
   /* Условия поменялись: выдача стала другой, и надо вернуться к её началу. */
   onChanged: () => void;
-  onReset: () => void;
   changeTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
 }) {
   const router = useRouter();
@@ -401,13 +399,6 @@ export function CatalogFilters({
               {sortOptions.find(([value]) => value === filters.sort)?.[1]}
               <IconX size={14} stroke={2} aria-hidden="true" />
             </button> : null}
-            <button type="button" className="cfilter__reset" onClick={() => {
-              if (timerRef.current) clearTimeout(timerRef.current);
-              onReset();
-            }}>
-              <IconFilterX size={14} stroke={2} aria-hidden="true" />
-              {copy.resetAll}
-            </button>
           </div>
         ) : null}
 

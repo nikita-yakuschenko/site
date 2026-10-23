@@ -173,9 +173,6 @@ export function CatalogBoard({
       >
         <div className="catalog__barrow">
           <CatalogSearch value={filters.q ?? ""} onChange={search} />
-          {active ? <button type="button" className="cfilter__reset-top" aria-label={copy.resetAll} title={copy.resetAll} onClick={reset}>
-            <IconFilterX size={18} stroke={1.75} aria-hidden="true" />
-          </button> : null}
           {/* Видна только на узком экране, на широком её прячет CSS: там
               колонка стоит целиком и прятать нечего. */}
           {/* Панель доступна и с активными фильтрами: внутри также сортировка. */}
@@ -189,6 +186,10 @@ export function CatalogBoard({
             <IconFilter size={20} stroke={2} aria-hidden="true" />
           </button>
         </div>
+        {active ? <button type="button" className="cfilter__reset catalog__reset" onClick={reset}>
+          <IconFilterX size={14} stroke={1.75} aria-hidden="true" />
+          {copy.resetAll}
+        </button> : null}
       </div>
       <div className="catalog__layout">
       <CatalogFilters
@@ -208,7 +209,6 @@ export function CatalogBoard({
           setTimeout(backToStart, 150);
         }}
         onChanged={backToStart}
-        onReset={reset}
         changeTimerRef={changeTimerRef}
       />
 

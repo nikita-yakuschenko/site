@@ -5295,10 +5295,11 @@ a {
 .cfilter__toggle.is-reset {
   color: var(--danger);
 }
-.cfilter__reset-top { display: inline-flex; flex: none; align-items: center; justify-content: center; width: 38px; height: 38px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--danger); cursor: pointer; }
-.cfilter__reset-top:hover { background: var(--tint); }
-.cfilter__reset-top:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: -2px; }
-@media (max-width: 1023px) { .cfilter__reset-top { width: 44px; height: 44px; } }
+.cfilter__reset.catalog__reset { position: relative; display: flex; width: max-content; min-height: 24px; margin-top: 8px; color: var(--foreground); pointer-events: auto; }
+.catalog__reset:hover { text-decoration: underline; text-underline-offset: 3px; }
+.catalog__reset:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: 2px; }
+.site-shell--catalog:has(.catalog__reset) { --catalog-bar: 110px; }
+@media (min-width: 1024px) { .site-shell--catalog:has(.catalog__reset) { --catalog-bar: 102px; } }
 
 /* В самый узкий экран подпись рядом с полем поиска не встаёт: остаётся
    значок, смысл которого понятен и без слова. */
