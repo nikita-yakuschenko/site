@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type RefObject } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { IconArrowsSort, IconHeart } from "@tabler/icons-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
@@ -105,17 +105,6 @@ export function CatalogFilters({
 }) {
   const router = useRouter();
   const pathname = usePathname();
-  const sidebar = useRef<HTMLElement>(null);
-
-  useEffect(() => {
-    const node = sidebar.current;
-    if (!node) return;
-    const measure = () => node.style.setProperty('--catalog-filter-height', `${node.offsetHeight}px`);
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, []);
 
   /* Пока человек тянет ползунок, показываем его же черновое значение:
      адрес отстаёт на паузу, и без этого ручка дёргалась бы назад. */
@@ -192,7 +181,7 @@ export function CatalogFilters({
     TECHNOLOGY_OPTIONS.find(option => option.technology === value)!.label;
 
   return (
-    <aside ref={sidebar} className="cfilter" aria-label={copy.catalogFiltersAria}>
+    <aside className="cfilter" aria-label={copy.catalogFiltersAria}>
       <div className={open ? "cfilter__sticky is-open" : "cfilter__sticky"}>
         {/* Прокручивается только эта часть: кнопка возврата к выдаче лежит
             подвалом за её пределами и потому ничего не перекрывает. */}

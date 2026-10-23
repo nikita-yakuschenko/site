@@ -83,8 +83,19 @@ export function CatalogBoard({
      Прилипание считаем по самой полосе: её верх упёрся в край экрана,
      значит она встала. */
   const bar = useRef<HTMLDivElement>(null);
+  const sidebar = useRef<HTMLDivElement>(null);
   const results = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
+
+  useEffect(() => {
+    const node = sidebar.current;
+    if (!node) return;
+    const measure = () => node.style.setProperty('--catalog-filter-height', `${node.offsetHeight}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const node = bar.current;
@@ -157,6 +168,8 @@ export function CatalogBoard({
 
   return (
     <>
+      <div className="catalog__layout">
+      <div ref={sidebar} className="catalog__sidebar">
       {/* Поиск липнет вместе с отбором: искать по названию и смотреть
           выдачу приходится одновременно, и уезжающее вверх поле заставляло
           бы возвращаться к началу страницы на каждый запрос. */}
@@ -187,7 +200,6 @@ export function CatalogBoard({
           </button>
         </div>
       </div>
-      <div className="catalog__layout">
       <CatalogFilters
         onReset={reset}
         hasActiveFilters={!!active}
@@ -209,6 +221,7 @@ export function CatalogBoard({
         onChanged={backToStart}
         changeTimerRef={changeTimerRef}
       />
+      </div>
 
       <div ref={results} className="catalog__results">
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку

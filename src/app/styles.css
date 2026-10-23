@@ -5161,23 +5161,15 @@ a {
 @media (min-width: 1024px) {
   .site-shell--catalog { --catalog-bar: 70px; }
   .site-shell--catalog .catalog__bar {
-    top: calc(var(--site-header-offset) - 16px);
+    position: static;
     padding-block: 16px;
     background: transparent;
     pointer-events: none;
   }
   .site-shell--catalog .catalog__bar::after { content: none; }
-  .site-shell--catalog .catalog__results { margin-top: calc(16px - var(--catalog-bar)); }
+  .site-shell--catalog .catalog__results { margin-top: 16px; }
   .catalog__bar { background: transparent; pointer-events: none; }
   .catalog__bar::after { right: auto; width: calc(240px + var(--page-gutter) * 2); }
-  .catalog__bar::before {
-    content: "";
-    position: absolute;
-    inset-block: 0;
-    left: var(--page-gutter);
-    width: 240px;
-    background: #fff;
-  }
   .catalog__barrow { position: relative; width: 240px; pointer-events: auto; }
   .catalog__barrow .catalog-search { height: 38px; padding-inline: 12px; border-radius: 8px; color: var(--avgst-ink); }
   .catalog__barrow .catalog-search input { font-size: 14px; }
@@ -5261,6 +5253,14 @@ a {
     grid-template-columns: 240px minmax(0, 1fr);
     gap: var(--gap-split);
   }
+
+  .catalog__sidebar {
+    position: sticky;
+    top: min(var(--site-header-offset), calc(100dvh - var(--catalog-filter-height, 0px) - 16px));
+    align-self: start;
+    min-width: 0;
+    padding-bottom: 16px;
+  }
 }
 
 .cfilter {
@@ -5322,6 +5322,14 @@ a {
     display: block;
   }
 
+  .catalog__sidebar {
+    position: sticky;
+    top: var(--site-header-offset);
+    z-index: 5;
+  }
+
+  .catalog__sidebar:has(.cfilter__sticky.is-open) { z-index: 40; }
+
   /* На телефоне закреплённое сверху стоит дорого: 110 пикселей полосы плюс
      кнопка отбора это пятая часть экрана, которая не показывает ни одного
      дома. Поле дышит вдвое скромнее, высота полосы падает со 110 до 78. */
@@ -5330,7 +5338,7 @@ a {
   }
 
   .cfilter {
-    position: sticky;
+    position: static;
     /* Плюс растворяющийся край полосы, иначе он ложился бы на кнопку. */
     top: calc(var(--catalog-bar) + var(--catalog-fade));
     z-index: 5;
@@ -5414,9 +5422,7 @@ a {
   }
 
   .cfilter {
-    position: sticky;
-    top: min(calc(var(--site-header-offset) + var(--catalog-bar)), calc(100dvh - var(--catalog-filter-height, 0px) - 16px));
-    align-self: start;
+    position: static;
   }
 
   .cfilter__sticky {
