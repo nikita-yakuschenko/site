@@ -111,7 +111,7 @@ export const Projects: CollectionConfig = {
     { name: 'code', label: 'Код', type: 'text', unique: true, index: true, admin: { hidden: true } },
     { type: 'collapsible', label: 'Настройки каталога', admin: { initCollapsed: true, condition: data => data.recordType !== 'ready-home' }, fields: [
       { name: 'hero_product', label: 'Закрепление в каталоге', type: 'number', unique: true, min: 1, max: 2,
-        validate: (value: unknown) => value == null || value === 1 || value === 2 ? true : 'Выберите первое или второе место',
+        validate: (value: unknown) => value == null || value === 1 || value === 2 ? true : 'Выберите слот №1 или №2',
         admin: { components: { Field: './components/admin/HeroProductField#HeroProductField' } } },
     ] },
     { name: 'preview', type: 'ui', admin: { position: 'sidebar', components: { Field: './components/admin/PagePreviewField#ProjectPreviewField' } } },
