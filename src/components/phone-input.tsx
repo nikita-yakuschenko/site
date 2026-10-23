@@ -53,34 +53,44 @@ export function PhoneInput({ value, onValueChange, onEdited, ref, ...props }: Pr
       pointerEvents: 'none', whiteSpace: 'pre', zIndex: '2147483647',
     })
     const next = document.createElement('span')
-    next.textContent = text
     next.style.gridArea = '1 / 1'
     layer.append(next)
     // A native dialog is in the top layer, above even the highest body z-index.
     ;(input.closest('dialog[open]') || document.body).append(layer)
     const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-    const duration = reduced ? 80 : 140
+    const duration = reduced ? 120 : 280
     const easing = getComputedStyle(document.documentElement).getPropertyValue('--ease-out').trim() || 'cubic-bezier(0.23, 1, 0.32, 1)'
     const animations: Animation[] = []
-    if (typed === '8' || typed === '7') {
+    const converting = typed === '8' || typed === '7'
+    if (converting) {
       const previous = document.createElement('span')
       previous.textContent = typed
       previous.style.gridArea = '1 / 1'
       layer.append(previous)
-      animations.push(previous.animate([{ opacity: 1 }, { opacity: 0 }], { duration, easing, fill: 'forwards' }))
-      animations.push(next.animate([{ opacity: 0 }, { opacity: 1 }], { duration, easing, fill: 'forwards' }))
-    } else {
-      let target = next
-      if (typed === '+' || typed === 'confirmed7') {
-        next.textContent = ''
-        const plus = document.createElement('span')
-        plus.textContent = '+'
-        const seven = document.createElement('span')
-        seven.textContent = '7'
-        next.append(plus, seven)
-        target = typed === '+' ? plus : seven
-      }
-      animations.push(target.animate([{ opacity: 0.45 }, { opacity: 1 }], { duration, easing, fill: 'forwards' }))
+      animations.push(previous.animate([
+        { opacity: 1, offset: 0 },
+        { opacity: 1, offset: 0.24 },
+        { opacity: 0, offset: 0.4 },
+        { opacity: 0, offset: 1 },
+      ], { duration, fill: 'forwards' }))
+    }
+    // Clear the old glyph first, then print the new glyphs. There is never
+    // a crossfade of two different characters in the same position.
+    let order = 0
+    for (const [index, character] of [...text].entries()) {
+      const glyph = document.createElement('span')
+      glyph.textContent = character
+      glyph.style.display = 'inline-block'
+      next.append(glyph)
+      const active = character !== ' ' && (typed === '+' ? index === 0 : typed === 'confirmed7' ? index === 1 : true)
+      if (!active) continue
+      const start = (converting ? 0.48 : 0.25) + order++ * 0.07
+      const lifted = reduced ? 'none' : 'translateY(0.18em)'
+      animations.push(glyph.animate([
+        { opacity: 0, transform: lifted, offset: 0 },
+        { opacity: 0, transform: lifted, offset: start, easing },
+        { opacity: 1, transform: 'none', offset: 1 },
+      ], { duration, fill: 'forwards' }))
     }
     const current = { node: layer, animations, input, color: input.style.color, caretColor: input.style.caretColor }
     input.style.caretColor = style.color
