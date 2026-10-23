@@ -17,6 +17,8 @@ WebKit can emit same-origin `Fetch API cannot load … due to access control che
 
 Request cancellation also tracks the document that initiated each request: a delayed cancellation from an earlier document is not a failure of the newly loaded document. Unknown `Load failed` exceptions remain critical.
 
+Firefox can log `Image corrupt or truncated` after an aborted image download. These messages remain warnings only when the same image (including its redirect chain) has a normal browser cancellation within 500 ms of the console event. Decode errors without that matching cancellation remain critical. The captured trace showed an aborted download followed by a complete HTTP 200 response for the same stored WebP. Six targeted repeats passed after adding this correlation.
+
 Navigation waits for DOMContentLoaded and scenario-specific visible UI assertions. The local release gate additionally requires the application's client initialization marker; the form scenario separately requires the SmartCaptcha browser API. It does not wait for every image to finish loading: the first repaired CI trace stalled on Next image optimization for `/catalog/norvegiya-92/02.jpg` while application requests already returned 200. These scenarios do not establish an image performance budget.
 
 The final implementation removes runtime image optimization from the site itself. Files are stored as WebP before serving; see `stored-webp-media.md`. The release gate rejects `/_next/image` requests and uses real file responses without intercepting images. Production audit checks the currently deployed version, which may still use the old pipeline until this change is published.

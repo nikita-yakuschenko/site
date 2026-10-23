@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import type { Page, Request, TestInfo } from '@playwright/test'
-import { navigationCancellation, scenarioKey, webkitNavigationFetch, type Finding } from './model'
+import { cancelledImageConsole, navigationCancellation, scenarioKey, webkitNavigationFetch, type Finding } from './model'
 
 export type { Finding } from './model'
 
@@ -26,6 +26,8 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   let navigating = false
   let documentGeneration = 0
   const requestDocuments = new WeakMap<Request, number>()
+  const cancelledImages = new Map<string, number[]>()
+  const imageMessages: { finding: Finding; url: string; at: number }[] = []
   page.on('request', request => {
     if (request.isNavigationRequest() && request.frame() === page.mainFrame()) {
       navigating = true
@@ -44,14 +46,16 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
     const severity = ['origin-escape', 'runtime-image-optimizer'].includes(category) || reactHydration(message + stack) || (source === 'application' && ['exception', 'console-error', 'script-failure', 'http-5xx'].includes(category))
       ? 'critical' : ['console-warning', 'console-error', 'navigation-fetch-cancelled'].includes(category) || source === 'third-party' ? 'warning' : 'info'
     const cleanMessage = scrub(message)
-    findings.push({
+    const finding: Finding = {
       url: safeUrl(page.url()), scenario: scenarioKey(scenario), browser: info.project.name,
       device: info.project.name.includes('mobile') ? 'mobile' : 'desktop',
       category: reactHydration(message + stack) ? 'react-hydration' : category,
       message: cleanMessage, stack: scrub(stack), severity, source,
       component: location.includes('smartcaptcha.cloud.yandex.ru') ? 'Yandex SmartCaptcha iframe' : 'unconfirmed',
       cause: 'unconfirmed', fingerprint: fingerprint(category, cleanMessage),
-    })
+    }
+    findings.push(finding)
+    return finding
   }
   // Analytics requests are answered locally: the audit does not create real visits, views or clicks.
   await page.route(/(?:mc\.yandex\.ru|roistat\.com|one2click\.ru|top-fwz1\.mail\.ru|vk\.com\/rtrg|\/api\/(?:views|reactions|consent)(?:\?|$))/, route =>
@@ -78,12 +82,21 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   page.on('console', message => {
     if (message.type() !== 'error' && message.type() !== 'warning') return
     const location = message.location()
-    add(message.type() === 'error' ? 'console-error' : 'console-warning', message.text(), '', location.url)
+    const finding = add(message.type() === 'error' ? 'console-error' : 'console-warning', message.text(), '', location.url)
+    if (message.text().includes('Image corrupt or truncated.')) imageMessages.push({ finding, url: location.url, at: Date.now() })
   })
   page.on('requestfailed', request => {
     if (/^(?:data|blob):/.test(request.url())) return
     const previousDocument = (requestDocuments.get(request) ?? documentGeneration) < documentGeneration
-    if (navigationCancellation(request.failure()?.errorText || '', navigating || previousDocument)) return
+    const cancelled = navigationCancellation(request.failure()?.errorText || '', true)
+    if (cancelled && request.resourceType() === 'image') {
+        for (let part: Request | null = request; part; part = part.redirectedFrom()) {
+          const times = cancelledImages.get(part.url()) || []
+          times.push(Date.now())
+          cancelledImages.set(part.url(), times)
+        }
+    }
+    if (cancelled && (navigating || previousDocument)) return
     add(/\.(?:js|css)(?:\?|$)/.test(request.url()) ? 'script-failure' : 'network-failure',
       `${request.method()} ${safeUrl(request.url())}: ${request.failure()?.errorText || 'failed'}`, '', request.url())
   })
@@ -101,6 +114,21 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
       error instanceof Error ? error.stack || '' : '')
   }
   await page.waitForTimeout(800)
+  for (const item of imageMessages) {
+    if ((cancelledImages.get(item.url) || []).some(at => cancelledImageConsole(info.project.name, item.finding.message, item.at - at))) {
+      item.finding.category = 'image-request-cancelled'
+      item.finding.severity = 'warning'
+      item.finding.cause = 'confirmed'
+      item.finding.component = 'browser image cancellation'
+      item.finding.fingerprint = fingerprint(item.finding.category, item.finding.message)
+    }
+  }
+  if (imageMessages.length) await info.attach('image-cancellation-correlation', {
+    body: Buffer.from(JSON.stringify({
+      messages: imageMessages.map(item => ({ url: safeUrl(item.url), at: item.at, severity: item.finding.severity })),
+      cancellations: [...cancelledImages].map(([url, times]) => ({ url: safeUrl(url), times })),
+    })), contentType: 'application/json',
+  })
   await info.attach('browser-diagnostics', {
     body: Buffer.from(JSON.stringify(findings, null, 2)),
     contentType: 'application/json',

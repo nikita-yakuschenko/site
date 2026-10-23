@@ -12,6 +12,10 @@ export const scenarioKey = (title: string) => title.replace(/\s+@\S+/g, '').trim
 export const navigationCancellation = (message: string, navigating: boolean) =>
   navigating && /^(?:net::ERR_ABORTED|NS_BINDING_ABORTED|Load request cancelled)$/.test(message)
 
+export const cancelledImageConsole = (browser: string, message: string, elapsedSinceCancellation?: number) =>
+  browser.startsWith('firefox') && message.includes('Image corrupt or truncated.') &&
+  elapsedSinceCancellation !== undefined && Math.abs(elapsedSinceCancellation) <= 500
+
 export function webkitNavigationFetch(message: string, stack: string, browser: string, navigating: boolean, origin: string) {
   if (!navigating || !browser.startsWith('webkit') || !/due to access control checks\.$/.test(message)) return false
   const url = stack.match(/^Fetch API cannot load (https?:\/\/\S+) due to access control checks\./)?.[1]

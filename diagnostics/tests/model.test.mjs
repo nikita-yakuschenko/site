@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { groupFindings, navigationCancellation, scenarioKey, webkitNavigationFetch } from '../model.ts'
+import { cancelledImageConsole, groupFindings, navigationCancellation, scenarioKey, webkitNavigationFetch } from '../model.ts'
 
 test('frequency counts scenario runs, preserves browser/device profiles and repeated events', () => {
   const finding = { scenario: 'form', browser: 'webkit', fingerprint: 'same', severity: 'critical' }
@@ -33,4 +33,12 @@ test('WebKit cancellation is ignored only during document navigation', () => {
   assert.equal(navigationCancellation('Load request cancelled', false), false)
   assert.equal(navigationCancellation('net::ERR_CONNECTION_REFUSED', true), false)
   assert.equal(navigationCancellation('NS_BINDING_ABORTED', true), true)
+})
+
+test('a Firefox decode message requires a matching recent image cancellation', () => {
+  assert.equal(cancelledImageConsole('firefox-desktop', 'Image corrupt or truncated.', 20), true)
+  assert.equal(cancelledImageConsole('firefox-desktop', 'Image corrupt or truncated.', -20), true)
+  assert.equal(cancelledImageConsole('firefox-desktop', 'Image corrupt or truncated.'), false)
+  assert.equal(cancelledImageConsole('firefox-desktop', 'Image corrupt or truncated.', 1000), false)
+  assert.equal(cancelledImageConsole('chromium-desktop', 'Image corrupt or truncated.', 20), false)
 })
