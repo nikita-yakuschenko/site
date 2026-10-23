@@ -5299,8 +5299,9 @@ a {
 .catalog__reset:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
 .catalog__reset:disabled { color: var(--ink-3); cursor: default; }
 .catalog__reset:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: 2px; }
-.site-shell--catalog:has(.catalog__reset) { --catalog-bar: 110px; }
-@media (min-width: 1024px) { .site-shell--catalog:has(.catalog__reset) { --catalog-bar: 102px; } }
+.site-shell--catalog .catalog__bar { padding-bottom: 8px; }
+.site-shell--catalog:has(.catalog__reset) { --catalog-bar: 102px; }
+@media (min-width: 1024px) { .site-shell--catalog:has(.catalog__reset) { --catalog-bar: 94px; } }
 
 /* В самый узкий экран подпись рядом с полем поиска не встаёт: остаётся
    значок, смысл которого понятен и без слова. */
@@ -5387,7 +5388,7 @@ a {
        внутри прокрутки накрывала собой последние условия. */
     display: flex;
     flex-direction: column;
-    padding: 12px var(--page-gutter);
+    padding: 0 var(--page-gutter) 12px;
     background: #fff;
     overflow: hidden;
   }
