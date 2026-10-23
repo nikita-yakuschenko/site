@@ -14,11 +14,23 @@ async function browserConsent(page: Parameters<typeof diagnose>[0], baseURL: str
 }
 const functionalConsent = (page: Parameters<typeof diagnose>[0], baseURL: string) => browserConsent(page, baseURL, true)
 
+async function applicationReady(page: Parameters<typeof diagnose>[0]) {
+  await expect(page.locator('body')).toBeVisible()
+  await expect.poll(() => page.evaluate(() => typeof (window as Window & { smartCaptcha?: { render?: unknown } }).smartCaptcha?.render), {
+    message: 'Hydrated application must initialize the SmartCaptcha browser API',
+  }).toBe('function')
+}
+
+async function reload(page: Parameters<typeof diagnose>[0]) {
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await applicationReady(page)
+}
+
 async function open(page: Parameters<typeof diagnose>[0], path: string) {
-  const response = await page.goto(path, { waitUntil: 'load' })
+  const response = await page.goto(path, { waitUntil: 'domcontentloaded' })
   expect(response?.status(), path).toBeLessThan(400)
   expect(new URL(page.url()).origin, 'Scenario must remain on its target origin').toBe(new URL(String(test.info().project.use.baseURL)).origin)
-  await page.locator('body').waitFor()
+  await applicationReady(page)
 }
 
 async function publishedProjects(page: Parameters<typeof diagnose>[0]) {
@@ -37,7 +49,7 @@ async function publishedProjects(page: Parameters<typeof diagnose>[0]) {
 
 test('home direct, reload and repeat navigation @critical', async ({ page }, info) => diagnose(page, info, 'home direct, reload and repeat navigation', async () => {
   await open(page, '/')
-  await page.reload({ waitUntil: 'load' })
+  await reload(page)
   await open(page, '/catalog')
   await open(page, '/')
 }))
@@ -48,7 +60,7 @@ test('catalog and published technologies @critical', async ({ page }, info) => d
   for (const href of projects) {
     await open(page, href)
     await expect(page.locator('h1').first()).toBeVisible()
-    await page.reload({ waitUntil: 'load' })
+    await reload(page)
   }
 }))
 
@@ -131,5 +143,5 @@ test('mobile menu and state variants', async ({ page, context }, info) => diagno
     await expect(page.locator('.site-menu__panel')).toBeHidden()
   }
   await context.clearCookies()
-  await page.reload({ waitUntil: 'load' })
+  await reload(page)
 }))

@@ -33,7 +33,7 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
     }
     requestDocuments.set(request, documentGeneration)
   })
-  page.on('load', () => { navigating = false })
+  page.on('domcontentloaded', () => { navigating = false })
   page.on('framenavigated', frame => {
     if (frame === page.mainFrame() && /^https?:/.test(frame.url()) && new URL(frame.url()).origin !== origin)
       add('origin-escape', `Scenario left ${origin}: ${safeUrl(frame.url())}`, '', origin)

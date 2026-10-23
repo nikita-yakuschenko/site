@@ -17,6 +17,8 @@ WebKit can emit same-origin `Fetch API cannot load … due to access control che
 
 Request cancellation also tracks the document that initiated each request: a delayed cancellation from an earlier document is not a failure of the newly loaded document. Unknown `Load failed` exceptions remain critical.
 
+Navigation waits for DOMContentLoaded and explicit hydration readiness (the SmartCaptcha browser API), followed by scenario-specific visible UI assertions. It does not wait for every image to finish loading: the first repaired CI trace stalled on Next image optimization for `/catalog/norvegiya-92/02.jpg` while application requests already returned 200. These scenarios do not establish an image performance budget.
+
 ## First production audit, 2026-10-22
 
 The initial five-profile matrix ran 30 synthetic scenarios (5 passed, 19 failed, 6 timed out). The first version of the mobile selectors caused several timeouts; these were corrected and a focused rerun confirmed that mobile filters and favorites pass in Chromium. The form flow opens and validates on mobile, but still reports the React error below. The first matrix totals should not be treated as site failure rates.
