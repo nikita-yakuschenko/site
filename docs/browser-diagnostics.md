@@ -19,6 +19,8 @@ Request cancellation also tracks the document that initiated each request: a del
 
 Navigation waits for DOMContentLoaded and scenario-specific visible UI assertions. The local release gate additionally requires the application's client initialization marker; the form scenario separately requires the SmartCaptcha browser API. It does not wait for every image to finish loading: the first repaired CI trace stalled on Next image optimization for `/catalog/norvegiya-92/02.jpg` while application requests already returned 200. These scenarios do not establish an image performance budget.
 
+The final implementation removes runtime image optimization from the site itself. Files are stored as WebP before serving; see `stored-webp-media.md`. The release gate rejects `/_next/image` requests and uses real file responses without intercepting images. Production audit checks the currently deployed version, which may still use the old pipeline until this change is published.
+
 ## First production audit, 2026-10-22
 
 The initial five-profile matrix ran 30 synthetic scenarios (5 passed, 19 failed, 6 timed out). The first version of the mobile selectors caused several timeouts; these were corrected and a focused rerun confirmed that mobile filters and favorites pass in Chromium. The form flow opens and validates on mobile, but still reports the React error below. The first matrix totals should not be treated as site failure rates.

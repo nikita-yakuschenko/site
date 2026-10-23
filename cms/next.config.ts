@@ -9,6 +9,7 @@ const config: NextConfig = {
   outputFileTracingRoot: path.resolve(root, '..'),
   turbopack: { root: path.resolve(root, '..') },
   poweredByHeader: false,
+  images: { unoptimized: true },
   reactStrictMode: true,
   async headers() {
     return [

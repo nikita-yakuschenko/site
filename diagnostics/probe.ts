@@ -41,7 +41,7 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   const add = (category: string, message: string, stack = '', location = page.url()) => {
     const source = !/^https?:/.test(location) ? 'unknown'
       : new URL(location).origin === origin ? 'application' : 'third-party'
-    const severity = category === 'origin-escape' || reactHydration(message + stack) || (source === 'application' && ['exception', 'console-error', 'script-failure', 'http-5xx'].includes(category))
+    const severity = ['origin-escape', 'runtime-image-optimizer'].includes(category) || reactHydration(message + stack) || (source === 'application' && ['exception', 'console-error', 'script-failure', 'http-5xx'].includes(category))
       ? 'critical' : ['console-warning', 'console-error', 'navigation-fetch-cancelled'].includes(category) || source === 'third-party' ? 'warning' : 'info'
     const cleanMessage = scrub(message)
     findings.push({
@@ -58,6 +58,9 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
     route.fulfill({ status: 204, body: '' }))
   await page.route('**/next/leads', route => route.abort('blockedbyclient'))
   if (process.env.DIAG_TARGET !== 'production') {
+    page.on('request', request => {
+      if (new URL(request.url()).pathname === '/_next/image') add('runtime-image-optimizer', 'Image requested runtime optimization: ' + safeUrl(request.url()), '', origin)
+    })
     await page.route('https://smartcaptcha.cloud.yandex.ru/**', async route => {
       if (!new URL(route.request().url()).pathname.endsWith('/captcha.js')) return route.fulfill({ status: 204, body: '' })
       const { captchaFixtureScript } = await import('./third-party-fixtures')

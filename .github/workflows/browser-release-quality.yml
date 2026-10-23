@@ -8,6 +8,30 @@ permissions:
   contents: read
 
 jobs:
+  cms-media:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: cms/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
+        working-directory: cms
+      - run: npm run typecheck
+        working-directory: cms
+      - run: npm test
+        working-directory: cms
+      - run: npm run build
+        working-directory: cms
+        env:
+          DATABASE_URL: postgresql://build:build@127.0.0.1:5432/build
+          PAYLOAD_SECRET: ci-disposable-build-secret-at-least-32-characters
+          CMS_PUBLIC_URL: https://cms.example.test
+          CMS_SEED: '0'
   browser-release:
     runs-on: ubuntu-24.04
     timeout-minutes: 35
@@ -29,6 +53,8 @@ jobs:
         run: node scripts/check-diagnostic-browsers.mjs
       - name: Test diagnostic classification and reporting
         run: node --experimental-strip-types --test diagnostics/tests/*.test.mjs
+      - name: Test stored WebP preparation
+        run: node --test scripts/tests/webp-assets.test.mjs
       - run: npm run build
       - run: npm run diagnostics:release
       - name: Add diagnostic summary

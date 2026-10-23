@@ -16,6 +16,7 @@ ENV APP_VERSION=$APP_VERSION APP_COMMIT=$APP_COMMIT
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 RUN npm run build
+RUN node scripts/package-public-assets.mjs
 
 # --- рантайм -----------------------------------------------------------------
 FROM base AS runner
@@ -24,7 +25,7 @@ ENV NODE_ENV=production PORT=3000 HOSTNAME=0.0.0.0
 # Процесс не должен работать от root.
 RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 
-COPY --from=builder /app/public ./public
+COPY --from=builder /app/public-runtime ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
