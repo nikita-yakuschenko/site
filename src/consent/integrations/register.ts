@@ -1,4 +1,5 @@
 import { registerIntegration } from "../registry";
+import { trackVkPageView, revokeVkPixel } from "../../lib/vk-pixel";
 
 /**
  * Реестр интеграций. Реальные сторонние скрипты подключаются только
@@ -63,7 +64,6 @@ registerIntegration({
 registerIntegration({
   id: "vk-ads",
   category: "marketing",
-  init: async () => {
-    // Pixel ID отсутствует в проекте — placeholder.
-  },
+  init: trackVkPageView,
+  revoke: revokeVkPixel,
 });

@@ -96,7 +96,7 @@ npx playwright test e2e/cookie-consent.spec.ts
 | roistat | analytics | placeholder (`NEXT_PUBLIC_ROISTAT_ID`) |
 | avgst-analytics | analytics | placeholder API |
 | yandex-ads | marketing | placeholder — **MANUAL ACCOUNT CONFIGURATION REQUIRED** |
-| vk-ads | marketing | placeholder (нет pixel ID) |
+| vk-ads | marketing | Top.Mail.Ru / VK, счётчик `3807543`, после marketing consent |
 | smartcaptcha | necessary | ещё не подключена в UI форм |
 
 ## ENV
@@ -105,7 +105,6 @@ npx playwright test e2e/cookie-consent.spec.ts
 NEXT_PUBLIC_YM_ID=
 NEXT_PUBLIC_ROISTAT_ID=
 NEXT_PUBLIC_YANDEX_ADS_ID=
-NEXT_PUBLIC_VK_PIXEL_ID=
 # SmartCaptcha — позже
 # YANDEX_SMARTCAPTCHA_SITE_KEY=
 # YANDEX_SMARTCAPTCHA_SERVER_KEY=
@@ -122,7 +121,11 @@ NEXT_PUBLIC_VK_PIXEL_ID=
 - project code, calltracking numbers, attribution period, CRM visit ID only (без PII в Roistat)
 
 ### VK
-- pixel/tag, conversions, retargeting audiences
+- Счётчик `3807543`, скрипт `https://top-fwz1.mail.ru/js/code.js`.
+- Цель `GOAL_NAME`: буквальное имя подтверждено маркетологами, оно должно совпадать с идентификатором события в рекламном кабинете VK. Константа находится в `src/lib/vk-pixel.ts`.
+- Событие отправляется общей функцией `submitLead` только после `accepted: true` при успешном HTTP-ответе. Повтор той же попытки не создаёт вторую конверсию; поля формы в VK не передаются.
+- Просмотры учитывают клиентские переходы. Скрипт загружается один раз после согласия на marketing; noscript-пиксель выводится только при ранее сохранённом согласии.
+- После отзыва новые события приложения блокируются, first-party ключи `_tmr_*` очищаются. Уже исполненный сторонний код остаётся в памяти до перезагрузки страницы.
 
 ### SmartCaptcha
 - site/server keys, allowed domains

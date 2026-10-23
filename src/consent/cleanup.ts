@@ -30,7 +30,7 @@ export const CLEANUP_KEYS: Record<
   },
   marketing: {
     cookies: [],
-    prefixes: ["_ym_uid"], // аудитории могут делить; чистим маркетинговые по revoke callback
+    prefixes: ["_ym_uid", "_tmr_"],
     localStorage: [],
     sessionStorage: [],
   },
