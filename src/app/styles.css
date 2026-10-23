@@ -5628,30 +5628,6 @@ a {
   background: var(--tint);
 }
 
-/* Снимаемые условия. Дублируют состояние панели нарочно: снять условие
-   надо там же, где видишь результат. */
-.cfilter__active {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  padding: 0;
-}
-
-.cfilter__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 27px;
-  padding: 0 10px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: #fff;
-  color: var(--avgst-ink);
-  font-size: 12px;
-  cursor: pointer;
-}
-
 .cfilter__reset {
   display: inline-flex;
   align-items: center;
@@ -5698,17 +5674,11 @@ a {
     mask-image: linear-gradient(to bottom, #000 calc(100% - 12px), transparent);
   }
 
-  /* Неподвижный низ листа: избранное, снятые условия и кнопка возврата. */
-  .cfilter__sticky.is-open > .cfilter__group--fav,
-  .cfilter__sticky.is-open > .cfilter__active {
+  /* Неподвижный низ листа: избранное и кнопка возврата. */
+  .cfilter__sticky.is-open > .cfilter__group--fav {
     flex: none;
     margin-bottom: 0;
     padding-top: 10px;
-  }
-
-  .cfilter__sticky.is-open > .cfilter__active {
-    max-height: 30vh;
-    overflow-y: auto;
   }
 
   .cfilter__apply {

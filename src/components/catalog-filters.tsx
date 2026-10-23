@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, useState, type RefObject } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { IconArrowsSort, IconHeart, IconX } from "@tabler/icons-react";
+import { IconArrowsSort, IconHeart } from "@tabler/icons-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
 import { RangeSlider } from "./range-slider";
 import { filtersToHref, type CatalogFacets } from "../lib/catalog/filters";
 import type { CatalogFilters, Range } from "../lib/catalog/types";
 import { TECHNOLOGY_OPTIONS, type CatalogTechnology } from "../lib/catalog/types";
-import { copy, seriesTitle } from "../lib/copy";
+import { copy } from "../lib/copy";
 
 /**
  * Боковая колонка отбора.
@@ -187,53 +187,6 @@ export function CatalogFilters({
   const techLabel = (value: CatalogTechnology) =>
     TECHNOLOGY_OPTIONS.find(option => option.technology === value)!.label;
 
-  const chips: { label: string; clear: CatalogFilters }[] = [];
-  if (filters.status === "ready") {
-    chips.push({
-      label: "Готовый дом в продаже",
-      clear: { ...filters, status: undefined },
-    });
-  }
-  if (filters.series) {
-    chips.push({ label: seriesTitle(filters.series), clear: { ...filters, series: undefined } });
-  }
-  if (filters.tech?.length) {
-    chips.push({
-      label: filters.tech.map(techLabel).join(", "),
-      clear: { ...filters, tech: undefined },
-    });
-  }
-  if (filters.area) {
-    const lo = filters.area.min ?? facets.area.min;
-    const hi = filters.area.max ?? facets.area.max;
-    chips.push({
-      label: lo + "-" + hi + " " + copy.areaUnit,
-      clear: { ...filters, area: undefined },
-    });
-  }
-  if (filters.price) {
-    const lo = filters.price.min ?? facets.price.min;
-    const hi = filters.price.max ?? facets.price.max;
-    chips.push({
-      label: mlnRange(lo, hi),
-      clear: { ...filters, price: undefined },
-    });
-  }
-  const units = [
-    ["bedrooms", copy.bedroomsUnit],
-    ["bathrooms", copy.bathroomsUnit],
-    ["floors", copy.floorsUnit],
-  ] as const;
-  for (const [key, unit] of units) {
-    const list = filters[key];
-    if (list?.length) {
-      chips.push({
-        label: list.join(", ") + " " + unit,
-        clear: { ...filters, [key]: undefined },
-      });
-    }
-  }
-
   return (
     <aside ref={sidebar} className="cfilter" aria-label={copy.catalogFiltersAria}>
       <div className={open ? "cfilter__sticky is-open" : "cfilter__sticky"}>
@@ -380,26 +333,6 @@ export function CatalogFilters({
             </label>
           </div>
         </fieldset>
-
-        {chips.length || filters.sort ? (
-          <div className="cfilter__active">
-            {chips.map((chip) => (
-              <button
-                key={chip.label}
-                type="button"
-                className="cfilter__chip"
-                onClick={() => go(chip.clear)}
-              >
-                {chip.label}
-                <IconX size={14} stroke={2} aria-hidden="true" />
-              </button>
-            ))}
-            {filters.sort ? <button type="button" className="cfilter__chip" onClick={() => go({ ...filters, sort: undefined })}>
-              {sortOptions.find(([value]) => value === filters.sort)?.[1]}
-              <IconX size={14} stroke={2} aria-hidden="true" />
-            </button> : null}
-          </div>
-        ) : null}
 
         {/* Только на узком экране, где панель закрывает собой выдачу.
             Условия применяются сразу, по нажатию, поэтому кнопка ничего не
