@@ -1,3 +1,5 @@
+import webpAssets from '../data/webp-assets.json'
+
 type MediaLike = { url?: string | null } | number | string | null | undefined
 
 export function mediaUrl(media: MediaLike): string {
@@ -5,24 +7,20 @@ export function mediaUrl(media: MediaLike): string {
   return ''
 }
 
-// Уменьшаем локальные изображения и разрешённые изображения CMS.
-// Прочие внешние адреса оставляем без изменений.
-export function optimizableMedia(src: string): boolean {
-  if (!/^https?:\/\//.test(src)) return true
-  try {
-    const url = new URL(src)
-    return url.pathname.startsWith('/api/media/file/') && (url.origin === 'https://cms.avgst.ru' || url.origin === 'http://localhost:3001')
-  } catch { return false }
+// Legacy call signature retained for content components; all files are prepared before serving.
+export function optimizedSrc(src: string, _width?: number, _quality?: number): string {
+  if (!src || !src.startsWith('/')) return src
+  if (src.startsWith('/_next/image?')) {
+    const original = new URLSearchParams(src.split('?')[1]).get('url')
+    return original && !original.startsWith('/_next/image') ? optimizedSrc(original) : src
+  }
+  const [pathname] = src.split(/[?#]/)
+  try { return (webpAssets as Record<string, string>)[decodeURIComponent(pathname || '')] || src }
+  catch { return src }
 }
 
-export function optimizedSrc(src: string, width: number, quality = 75): string {
-  if (!src || src.startsWith('data:') || src.startsWith('/_next/image') || !optimizableMedia(src)) return src
-  return `/_next/image?url=${encodeURIComponent(src)}&w=${width}&q=${quality}`
-}
-
-export function optimizedSrcSet(src: string, widths: number[], quality = 75): string {
-  if (!optimizableMedia(src)) return ''
-  return widths.map((width) => `${optimizedSrc(src, width, quality)} ${width}w`).join(', ')
+export function optimizedSrcSet(src: string, _widths: number[], _quality?: number): string {
+  return optimizedSrc(src)
 }
 
 export function splitHeadline(text: string): [string, string] {

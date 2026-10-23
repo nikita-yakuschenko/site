@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { optimizableMedia } from '../lib/media';
 import { useEffect, useState } from "react";
 import { PhotoLightbox } from "./photo-lightbox";
 import { copy } from "../lib/copy";
@@ -159,7 +158,7 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
             <Image
               key={current.image}
               src={current.image}
-              unoptimized={!optimizableMedia(current.image)}
+              unoptimized
               alt={`${copy.plansHeading}: ${currentVariant.label}, ${current.label}`}
               width={1680}
               height={1188}

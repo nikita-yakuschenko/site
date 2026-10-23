@@ -4,6 +4,7 @@ let expires = 0
 let pending: Promise<void> | null = null
 
 export async function managedRedirect(source: URL): Promise<URL | null> {
+  if (process.env.BROWSER_DIAGNOSTICS_FIXTURE_CATALOG === '1') return null
   if (Date.now() > expires) {
     pending ??= (async () => {
       try {

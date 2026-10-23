@@ -1,4 +1,5 @@
 import type { NextConfig } from 'next'
+import webpAssets from './src/data/webp-assets.json'
 
 const nextConfig: NextConfig = {
   // Сборка в самодостаточный сервер: в образ едет только то, что нужно рантайму.
@@ -19,14 +20,9 @@ const nextConfig: NextConfig = {
     APP_VERSION: process.env.APP_VERSION ?? '0.1.0',
     APP_COMMIT: process.env.APP_COMMIT ?? 'unknown',
   },
-  // Предметная графика — 3D-рендеры с мягкими градиентами: дефолтные 75
-  // оставляют на них мыло. Значения качества в Next 16 нужно объявлять
-  // заранее, иначе quality={90} у <Image> отбрасывается.
+  // Files are encoded at upload/build time and served directly.
   images: {
-    // Локальный CMS на localhost:3001. Оптимизатор иначе отказывается скачивать картинки с частного адреса.
-    dangerouslyAllowLocalIP: true,
-    formats: ['image/avif', 'image/webp'],
-    qualities: [45, 60, 75, 90],
+    unoptimized: true,
     remotePatterns: [
       { protocol: 'https', hostname: 'new.avgst.ru', pathname: '/**' },
       { protocol: 'https', hostname: 'cms.avgst.ru', pathname: '/api/media/file/**' },
@@ -34,8 +30,14 @@ const nextConfig: NextConfig = {
     ],
   },
   // Политики и правила в корне; старые /legal/* и /personal-data → редирект.
+  async headers() {
+    return [{ source: '/generated/webp/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] }]
+  },
   async redirects() {
     return [
+      ...Object.entries(webpAssets as Record<string, string>).map(([source, destination]) => ({
+        source: source.replace(/[()+*?:{}\\]/g, '\\$&'), destination, permanent: true,
+      })),
       {
         source: '/legal/cookies',
         destination: '/cookies',

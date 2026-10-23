@@ -10,8 +10,8 @@ import {
   IconHome as IconRoof,
   IconChevronRight,
 } from "@tabler/icons-react";
-import heroImage from "../../../public/img/pages/b2b_hero.png";
-import machineImage from "../../../public/production/manufacture-hero-board.png";
+import heroImage from "../../../public/generated/imports/img/pages/b2b_hero.png.webp";
+import machineImage from "../../../public/generated/imports/production/manufacture-hero-board.png.webp";
 import { BusinessTechnologyComparison } from "../../components/business-technology-comparison";
 import { BusinessProductBento } from "../../components/business-product-bento";
 import { BusinessBenefitsBento } from "../../components/business-benefits-bento";

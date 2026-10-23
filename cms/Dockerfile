@@ -11,6 +11,7 @@ FROM dependencies AS builder
 WORKDIR /app/cms
 COPY cms/ ./
 COPY src/lib/ /app/src/lib/
+COPY src/data/webp-assets.json /app/src/data/webp-assets.json
 # Disposable build-only values: dynamic routes never connect to this database.
 # Runtime secrets are required separately; none are persisted as image ENV.
 RUN --mount=type=cache,id=avgst-cms-next,target=/app/.next/cache,sharing=locked \
@@ -31,6 +32,7 @@ COPY --chown=node:node cms /opt/release/cms
 COPY --from=dependencies --chown=node:node /app/node_modules /opt/release/cms/node_modules
 COPY --chown=node:node package.json /opt/release/package.json
 COPY --chown=node:node src/lib /opt/release/src/lib
+COPY --chown=node:node src/data/webp-assets.json /opt/release/src/data/webp-assets.json
 RUN ln -s /opt/release/cms/node_modules /opt/release/node_modules \
  && mkdir -p /app/media \
  && chown node:node /app/media \

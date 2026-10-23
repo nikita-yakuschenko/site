@@ -1,0 +1,75 @@
+name: Browser release quality gate
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cms-media:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: cms/package-lock.json
+      - run: npm ci --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
+        working-directory: cms
+      - run: npm run typecheck
+        working-directory: cms
+      - run: npm test
+        working-directory: cms
+      - run: npm run build
+        working-directory: cms
+        env:
+          DATABASE_URL: postgresql://build:build@127.0.0.1:5432/build
+          PAYLOAD_SECRET: ci-disposable-build-secret-at-least-32-characters
+          CMS_PUBLIC_URL: https://cms.example.test
+          CMS_SEED: '0'
+  browser-release:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    env:
+      CI: '1'
+      BROWSER_DIAGNOSTICS_FIXTURE_CATALOG: '1'
+      CMS_PUBLIC_URL: http://127.0.0.1:9
+      YANDEX_SMARTCAPTCHA_SITE_KEY: diagnostic-browser-fixture-key
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Install browsers matching package-lock on the supported host
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Check browser launch independently of the site
+        run: node scripts/check-diagnostic-browsers.mjs
+      - name: Test diagnostic classification and reporting
+        run: node --experimental-strip-types --test diagnostics/tests/*.test.mjs
+      - name: Test stored WebP preparation
+        run: node --test scripts/tests/webp-assets.test.mjs
+      - name: Reuse files already encoded before serving
+        uses: actions/cache@v4
+        with:
+          path: public/generated/webp
+          key: ${{ runner.os }}-stored-webp-v1-${{ hashFiles('public/**', 'scripts/prepare-webp-assets.mjs') }}
+          restore-keys: ${{ runner.os }}-stored-webp-v1-
+      - run: npm run build
+      - run: npm run diagnostics:release
+      - name: Add diagnostic summary
+        if: always()
+        run: if test -f diagnostics-results/summary.md; then cat diagnostics-results/summary.md >> "$GITHUB_STEP_SUMMARY"; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: browser-release-diagnostics
+          path: diagnostics-results/
+          if-no-files-found: warn
+          retention-days: 14

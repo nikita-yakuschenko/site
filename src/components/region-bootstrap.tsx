@@ -16,6 +16,11 @@ function RegionTrafficSync() {
   return null;
 }
 export function RegionBootstrap({ region, children }: { region: RegionCode; children: ReactNode }) {
+  useEffect(() => {
+    // Browser diagnostics wait for client initialization, independently of image loading.
+    document.documentElement.dataset.appHydrated = 'true';
+    return () => { delete document.documentElement.dataset.appHydrated; };
+  }, []);
   return <InitialRegion.Provider value={region}>
     <Suspense fallback={null}><RegionTrafficSync /></Suspense>
     {children}
