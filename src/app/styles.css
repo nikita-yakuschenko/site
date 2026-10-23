@@ -5295,7 +5295,13 @@ a {
 .cfilter__toggle.is-reset {
   color: var(--danger);
 }
-.cfilter__reset.catalog__reset { position: relative; display: flex; width: max-content; min-height: 24px; margin-top: 8px; color: var(--foreground); pointer-events: auto; }
+.catalog__filter-heading { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 240px; max-width: 100%; min-height: 24px; margin-top: 8px; }
+.catalog__filter-heading .cfilter__legend { width: auto; margin: 0; }
+.cfilter__reset.catalog__reset { position: relative; display: flex; flex: none; width: max-content; min-height: 24px; margin: 0; color: var(--foreground); pointer-events: auto; }
+@media (max-width: 1023px) {
+  .catalog__filter-heading { width: 100%; }
+  .catalog__bar:not(.is-sheet) .catalog__filter-heading .cfilter__legend { visibility: hidden; }
+}
 .catalog__reset:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
 .catalog__reset:disabled { color: var(--ink-3); cursor: default; }
 .catalog__reset:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: 2px; }
