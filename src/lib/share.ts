@@ -8,7 +8,9 @@ import type { CatalogProject } from './catalog/types'
  * молча, а на прочие сбои всё равно пробуем буфер.
  */
 export async function shareProject(project: CatalogProject): Promise<boolean> {
-  const url = new URL(project.href, window.location.origin).href
+  const sharedUrl = new URL(project.href, window.location.origin)
+  sharedUrl.searchParams.set('share', '1')
+  const url = sharedUrl.href
   const payload = { title: project.name, text: `Проект «${project.name}»`, url }
   try {
     if (typeof navigator.share === 'function') {

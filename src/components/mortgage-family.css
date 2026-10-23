@@ -32,7 +32,7 @@
 .mortgage-calc__select-slot { display: block; min-width: 0; }
 .mortgage-calc__select-slot--children { width: 112px; flex-shrink: 0; }
 .mortgage-calc__select-slot--region { width: 188px; flex-shrink: 0; }
-.mortgage-region { position: relative; width: 100%; font-size: 12px; }
+.mortgage-region { position: relative; width: 100%; font-size: 12px; line-height: 16px; }
 .mortgage-region__field { display: flex; height: 28px; border-radius: 6px; background: var(--tint); }
 .mortgage-region__field:focus-within { outline: 1px solid var(--ink-2); outline-offset: 2px; }
 .mortgage-region__field input { width: 100%; min-width: 0; padding: 0 0 0 12px; border: 0; outline: none; background: transparent; color: var(--ink-1); font: inherit; text-overflow: ellipsis; }
@@ -63,6 +63,7 @@
   color: var(--ink-1);
   font: inherit;
   font-size: 12px;
+  line-height: 16px;
   outline: none;
   box-shadow: none;
 }
@@ -74,6 +75,11 @@
 }
 .mortgage-calc__family-options .ui-select-trigger:focus-visible { background: var(--tint); }
 .mortgage-calc__select-content .ui-select-item { padding: 8px 32px 8px 12px; font-size: 12px; white-space: nowrap; }
+.ui-select-content.mortgage-calc__select-content {
+  width: max-content;
+  min-width: max(180px, var(--radix-select-trigger-width));
+  max-width: calc(100vw - 32px);
+}
 .mortgage-calc__family-options .is-hidden { visibility: hidden; }
 @media (max-width: 719px) {
   .mortgage-calc__toolbar--family { flex-wrap: wrap; gap: 8px; }
@@ -81,4 +87,22 @@
   .mortgage-calc__select-slot { flex: 1; min-width: 0; width: auto; }
   .mortgage-calc__select-slot--children { min-width: 144px; }
   .mortgage-calc__select-slot--region { min-width: 208px; }
+}
+
+@media (pointer: coarse) {
+  .mortgage-calc__family-options .ui-select-trigger,
+  .mortgage-region,
+  .mortgage-region__field input,
+  .mortgage-calc__select-content .ui-select-item {
+    font-size: 16px;
+    line-height: 20px;
+  }
+}
+
+/* The empty preset row only aligns the two-column desktop fields. */
+@media (max-width: 959px) {
+  .mortgage-calc--project .mortgage-calc__controls { gap: 16px; }
+  .mortgage-calc--project .mortgage-calc__tile { padding-block: 0; }
+  .mortgage-calc--project .mortgage-calc__pills:empty { display: none; }
+  .mortgage-calc--project .mortgage-calc__result { padding-top: 0; }
 }

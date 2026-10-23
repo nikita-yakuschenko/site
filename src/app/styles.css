@@ -13982,26 +13982,42 @@ html.is-dialog-open {
   text-align: center;
 }
 
-/* Переключатель вариантов — над кадром, а не в потоке вьюпорта: планы
-   сравнивают в одной и той же области и не должны прыгать по высоте. */
+/* Plans reserve a row for variants so white drawings cannot cover controls. */
+.photo-lightbox__frame--variants {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.photo-lightbox__frame--variants .photo-lightbox__shot {
+  flex: 1 1 0;
+  height: auto;
+}
+
+.photo-lightbox__frame--variants .photo-lightbox__slide { align-items: center; }
+.photo-lightbox__frame--variants .photo-lightbox__slide img {
+  width: auto;
+  height: auto;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
 .photo-lightbox__variants {
-  position: absolute;
-  top: 12px;
-  left: 50%;
-  z-index: 3;
+  position: relative;
+  flex: none;
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  width: max-content;
-  max-width: calc(100% - 32px);
+  width: 100%;
+  padding-inline: 48px;
   gap: 8px;
   overflow: visible;
-  transform: translateX(-50%);
 }
 
 .photo-lightbox__variants button:not(.is-active) {
   border: 1px solid rgb(255 255 255 / 0.72);
-  background: transparent;
+  background: rgb(255 255 255 / 0.08);
   color: #fff;
 }
 

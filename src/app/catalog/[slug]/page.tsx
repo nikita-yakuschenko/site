@@ -66,7 +66,28 @@ export async function generateMetadata({
   if (slug === DRAFT_SLUG) return { title: 'Без названия', robots: { index: false, follow: false } }
   const result = await resolveProjectHero(slug)
   if (!result) return { title: copy.notFound }
-  return { title: result.hero.name, description: result.project.description }
+  const { hero } = result
+  const title = `${hero.name} от Авангард Строй`
+  const plural = (count: number, forms: [string, string, string]) => {
+    const value = Math.abs(count)
+    return `${count} ${forms[value % 100 >= 11 && value % 100 <= 14 ? 2 : value % 10 === 1 ? 0 : value % 10 >= 2 && value % 10 <= 4 ? 1 : 2]}`
+  }
+  const description = [
+    `${hero.technologyBadge ? `${hero.technologyBadge} дом` : 'Дом'}${hero.areaValue > 0 ? ` площадью ${hero.areaValue.toLocaleString('ru-RU')} м²` : ''}`,
+    ...(hero.floorsValue > 0 ? [plural(hero.floorsValue, ['этаж', 'этажа', 'этажей'])] : []),
+    ...(hero.bedrooms > 0 ? [plural(hero.bedrooms, ['спальня', 'спальни', 'спален'])] : []),
+    ...(hero.bathrooms > 0 ? [plural(hero.bathrooms, ['санузел', 'санузла', 'санузлов'])] : []),
+  ].join(', ') + '.'
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || (process.env.NODE_ENV === 'production' ? 'https://avgst.ru' : 'http://localhost:3000')
+  const url = new URL(`/catalog/${hero.slug}`, origin).href
+  const images = hero.imageUrl ? [{ url: new URL(hero.imageUrl, origin).href, alt: hero.name }] : []
+  return {
+    title: { absolute: title },
+    description,
+    alternates: { canonical: url },
+    openGraph: { title, description, url, type: 'website', siteName: SITE.name, locale: 'ru_RU', images },
+    twitter: { card: 'summary_large_image', title, description, images },
+  }
 }
 
 /** Карточка проекта из CMS с общими и системными блоками. */

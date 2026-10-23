@@ -7,7 +7,7 @@ import { TECHNOLOGY_OPTIONS, technologyLabel } from '../../../../src/lib/catalog
 import type { PriceKind } from '../../config/price-kinds'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { IconExternalLink, IconSearch, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus } from '@tabler/icons-react'
+import { IconExternalLink, IconSearch, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus, IconArrowsSort, IconArrowUp, IconArrowDown } from '@tabler/icons-react'
 import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Input } from '../ui/input'
@@ -16,13 +16,11 @@ import { Badge } from '../ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
 import { DataTableFrame, useDataPage } from './DataTable'
+import { compareCatalogRows, sortingFrom, stat, type CatalogSort } from './catalog-sorting'
 import { rememberCatalogQuery, savedCatalogQuery } from './catalog-query'
 
 const seriesLabels = { panel: 'Панельные', barn: 'Барнхаусы', classic: 'Классические', modular: 'Модульные', aframe: 'А-фрейм' } as const
-// Числа в названии сравниваются как числа: «46» раньше «113», а не как текст.
-const byName = new Intl.Collator('ru', { numeric: true, sensitivity: 'base' })
 const emptyFacets = { status: [] as string[], tech: [] as string[], series: [] as string[], floors: [] as number[], bedrooms: [] as number[], bathrooms: [] as number[], areaMin: '', areaMax: '' }
-
 function paramList(params: { get(name: string): string | null }, key: string) {
   return params.get(key)?.split(',').map(item => item.trim()).filter(Boolean) ?? []
 }
@@ -87,13 +85,9 @@ function RangeFilter({ title, min, max, onMin, onMax }: { title: string; min: st
   </DropdownMenu>
 }
 
-function stat(value: unknown) {
-  const number = Number(value)
-  return Number.isFinite(number) ? Math.max(0, Math.round(number)) : 0
-}
-
 export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; projects: Project[]; leads: Record<string, number> }) {
   const initial = useSearchParams()
+  const [sorting, setSorting] = useState(() => sortingFrom(initial))
   const [search, setSearch] = useState(initial.get('q') ?? '')
   const [recordType, setRecordType] = useState<'project' | 'ready-home'>(initial.get('tab') === 'ready' ? 'ready-home' : 'project')
   const [facets, setFacets] = useState<typeof emptyFacets>(() => facetsFrom(initial))
@@ -180,7 +174,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
     if (facets.bedrooms.length && !facets.bedrooms.includes(project.bedrooms)) return false
     if (facets.bathrooms.length && !facets.bathrooms.includes(project.bathrooms)) return false
     return inRange(project.areaValue, facets.areaMin, facets.areaMax)
-  }).sort((left, right) => byName.compare(left.name || '', right.name || ''))
+  }).sort((left, right) => compareCatalogRows(left, right, sorting, leads))
   const table = useDataPage(filtered, {
     page: Math.max(0, (Number(initial.get('page')) || 1) - 1),
     pageSize: Number(initial.get('size')) || undefined,
@@ -193,16 +187,21 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
     if (!saved) return
     const params = new URLSearchParams(saved)
     restored.current = saved
-    setSearch(params.get('q') ?? '')
-    setRecordType(params.get('tab') === 'ready' ? 'ready-home' : 'project')
-    setFacets(facetsFrom(params))
-    const size = Number(params.get('size'))
-    if ([15, 20, 30, 40, 50].includes(size)) table.setPageSize(size)
-    table.setPage(Math.max(0, (Number(params.get('page')) || 1) - 1))
-    window.history.replaceState(window.history.state, '', `${window.location.pathname}?${saved}${window.location.hash}`)
+    const frame = window.requestAnimationFrame(() => {
+      setSearch(params.get('q') ?? '')
+      setRecordType(params.get('tab') === 'ready' ? 'ready-home' : 'project')
+      setFacets(facetsFrom(params))
+      setSorting(sortingFrom(params))
+      const size = Number(params.get('size'))
+      if ([15, 20, 30, 40, 50].includes(size)) table.setPageSize(size)
+      table.setPage(Math.max(0, (Number(params.get('page')) || 1) - 1))
+      window.history.replaceState(window.history.state, '', `${window.location.pathname}?${saved}${window.location.hash}`)
+    })
+    return () => window.cancelAnimationFrame(frame)
   }, [])
   useEffect(() => {
     const params = new URLSearchParams()
+    if (sorting) { params.set('sort', sorting.key); params.set('direction', sorting.direction) }
     if (recordType === 'ready-home') params.set('tab', 'ready')
     if (search.trim()) params.set('q', search.trim())
     const put = (key: string, values: Array<string | number>) => { if (values.length) params.set(key, values.join(',')) }
@@ -222,7 +221,17 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
     rememberCatalogQuery(next)
     if (next === window.location.search.replace(/^\?/, '')) return
     window.history.replaceState(window.history.state, '', `${window.location.pathname}${next ? `?${next}` : ''}${window.location.hash}`)
-  }, [recordType, search, facets, table.page, table.pageSize])
+  }, [recordType, search, facets, sorting, table.page, table.pageSize])
+  const sortHeading = (key: CatalogSort['key'], label: string) => {
+    const active = sorting?.key === key
+    const Icon = active ? sorting.direction === 'asc' ? IconArrowUp : IconArrowDown : IconArrowsSort
+    const next = active && sorting.direction === 'asc' ? 'desc' : 'asc'
+    return <TableHead className="text-right" aria-sort={active ? sorting.direction === 'asc' ? 'ascending' : 'descending' : 'none'}>
+      <button type="button" className="inline-flex w-full cursor-pointer items-center justify-end gap-1 whitespace-nowrap bg-transparent p-0 text-inherit hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" aria-label={`${label}: сортировать ${next === 'asc' ? 'по возрастанию' : 'по убыванию'}`} onClick={() => { setSorting({ key, direction: next }); table.setPage(0) }}>
+        {label}<Icon className="size-3 shrink-0" aria-hidden="true" />
+      </button>
+    </TableHead>
+  }
   const filtersOn = facets.status.length + facets.tech.length + facets.series.length + facets.floors.length + facets.bedrooms.length + facets.bathrooms.length > 0 || [facets.areaMin, facets.areaMax].some(Boolean)
   const seriesOrder = ['panel', 'barn', 'classic', 'modular', 'aframe', 'none']
   const seriesOptions = [...new Set(inTab.map(project => project.series || 'none'))].sort((a, b) => seriesOrder.indexOf(a) - seriesOrder.indexOf(b)).map(value => ({ value, label: value === 'none' ? 'Без серии' : seriesLabels[value as keyof typeof seriesLabels] }))
@@ -260,7 +269,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
         <col style={{ width: '19%' }} /><col style={{ width: '12%' }} /><col style={{ width: '14%' }} />
         <col style={{ width: '9%' }} /><col style={{ width: '6%' }} /><col style={{ width: '7%' }} /><col style={{ width: '10%' }} /><col style={{ width: '6%' }} /><col style={{ width: '5%' }} /><col style={{ width: '7%' }} /><col style={{ width: '5%' }} />
       </colgroup>
-      <TableHeader><TableRow className="hover:bg-transparent [&>th]:text-muted-foreground"><TableHead className="pl-4">Название</TableHead><TableHead>Статус</TableHead><TableHead>Технология</TableHead><TableHead className="text-right">Площадь, м²</TableHead><TableHead className="text-right">Этажи</TableHead><TableHead className="text-right">Спальни</TableHead><TableHead className="text-right">Просмотры</TableHead><TableHead className="text-right">Лайки</TableHead><TableHead className="text-right">Шеры</TableHead><TableHead className="text-right">Заявки</TableHead><TableHead className="pr-4"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
+      <TableHeader><TableRow className="hover:bg-transparent [&>th]:text-muted-foreground"><TableHead className="pl-4">Название</TableHead><TableHead>Статус</TableHead><TableHead>Технология</TableHead><TableHead className="text-right">Площадь, м²</TableHead><TableHead className="text-right">Этажи</TableHead><TableHead className="text-right">Спальни</TableHead>{sortHeading('views', 'Просмотры')}{sortHeading('likes', 'Лайки')}{sortHeading('shares', 'Шеры')}{sortHeading('leads', 'Заявки')}<TableHead className="pr-4"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
       <TableBody>{table.rows.map(project => { const published = project._status === 'published'; return <TableRow key={project.id}>
         <TableCell className="h-12 pl-4"><Link className="font-medium underline-offset-4 hover:underline" href={`/collections/projects/${project.id}`}>{project.name || '[Без названия]'}</Link>{(project.hero_product === 1 || project.hero_product === 2) && <Badge variant="secondary" className="mt-1 w-fit">Слот №{project.hero_product}</Badge>}</TableCell>
         <TableCell><Badge variant="outline" className="text-foreground">{published ? <IconCircleCheckFilled className="text-(--avgst-green)" /> : <IconCircleDashed className="text-muted-foreground" />}{published ? 'Опубликован' : 'Черновик'}</Badge></TableCell>
