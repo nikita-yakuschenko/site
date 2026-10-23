@@ -66,7 +66,7 @@ export function LeadForm({
   const project = useProjectLeadContext()
   const resolvedFormId = formId || 'lead-form'
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
-  const [phone, setPhone] = useState('+7')
+  const [phone, setPhone] = useState('')
   const [consent, setConsent] = useState(true)
   const [captchaVisible, setCaptchaVisible] = useState(false)
   const [captchaReset, setCaptchaReset] = useState(0)
@@ -144,7 +144,7 @@ export function LeadForm({
       }, attempt)
       setStatus('ok')
       form.reset()
-      setPhone('+7')
+      setPhone('')
       setConsent(true)
       setInvalid({})
     } catch (error) {

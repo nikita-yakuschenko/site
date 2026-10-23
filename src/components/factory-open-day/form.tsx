@@ -17,7 +17,7 @@ export function OpenDayBookButton({ className, children }: { className: string; 
 export function FactoryOpenDayForm({ date }: { date: string }) {
   const submitting = useRef(false)
   const attempt = useRef<LeadAttempt['current']>(null)
-  const [phone, setPhone] = useState('+7')
+  const [phone, setPhone] = useState('')
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')

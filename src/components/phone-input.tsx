@@ -103,12 +103,6 @@ export function PhoneInput({ value, onValueChange, onEdited, ref, ...props }: Pr
 
   return <input {...props} ref={ref} type="tel" inputMode="tel" value={value}
     onBlur={event => { typedPlus.current = false; clearFeedback(); props.onBlur?.(event) }}
-    onKeyDown={event => {
-      const input = event.currentTarget
-      const start = input.selectionStart ?? 0
-      const end = input.selectionEnd ?? 0
-      if (start === end && ((event.key === 'Backspace' && start <= 2) || (event.key === 'Delete' && start < 2))) event.preventDefault()
-    }}
     onChange={event => {
       const input = event.currentTarget
       const raw = input.value
@@ -116,16 +110,17 @@ export function PhoneInput({ value, onValueChange, onEdited, ref, ...props }: Pr
       const inserted = native.data ?? (raw.length > value.length ? raw.slice(input.selectionStart! - (raw.length - value.length), input.selectionStart!) : '')
       const starting = !nationalPhoneDigits(value)
       const prefix = starting && /^[+78]$/.test(inserted)
-      const masked = prefix ? '+7' : maskPhone(raw)
+      const masked = !raw ? '' : raw === '+' || (prefix && inserted === '+') ? '+' : prefix ? '+7' : maskPhone(raw)
       const digits = prefix ? 0 : nationalDigitsBeforeCaret(raw, input.selectionStart ?? raw.length)
       clearFeedback()
       onValueChange(masked)
       onEdited?.()
       // Restore immediately even when React's state value remains '+7'.
       input.value = masked
-      input.setSelectionRange(caretAfterNationalDigits(masked, digits), caretAfterNationalDigits(masked, digits))
+      const caret = masked.length < 2 ? masked.length : caretAfterNationalDigits(masked, digits)
+      input.setSelectionRange(caret, caret)
       if (starting && /^[+789]$/.test(inserted)) {
-        respond(input, inserted === '7' && typedPlus.current ? 'confirmed7' : inserted, masked === '+7' ? '+7' : '+7 9')
+        respond(input, inserted === '7' && typedPlus.current ? 'confirmed7' : inserted, masked)
       }
       typedPlus.current = starting && inserted === '+'
     }}

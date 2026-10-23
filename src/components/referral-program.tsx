@@ -41,7 +41,7 @@ export function ReferralProgram({
   const [status, setStatus] = useState<Status>("idle");
   const submitting = useRef(false);
   const attempt = useRef<LeadAttempt['current']>(null)
-  const [phone, setPhone] = useState("+7");
+  const [phone, setPhone] = useState("");
   const [rules, setRules] = useState(true);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const nameRef = useRef<HTMLInputElement>(null);
@@ -230,6 +230,7 @@ export function ReferralProgram({
                         <span>{data.phoneLabel}</span>
                         <PhoneInput
                           ref={phoneRef}
+                          placeholder={copy.phonePlaceholder}
                           name="phone"
                           type="tel"
                           inputMode="tel"
