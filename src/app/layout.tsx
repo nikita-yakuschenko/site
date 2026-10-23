@@ -6,6 +6,7 @@ import { ConsentShell } from '../consent/ConsentShell'
 import { YandexMetrica } from '../components/yandex-metrica'
 import { RoistatCounter } from '../components/roistat-counter'
 import { VK_PIXEL_ID } from '../lib/vk-pixel'
+import { VkPixel } from '../components/vk-pixel'
 import { RoistatPhoneProvider } from '../components/tracked-phone'
 import { CMSPreviewBridge } from '../components/cms-preview-bridge'
 import { CMSContentProvider } from '../components/cms-content'
@@ -73,12 +74,11 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
         <script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
       </head>
       <body suppressHydrationWarning>
-        {initialState?.marketing ? (
-          <noscript><div>
+        <Suspense fallback={null}><VkPixel /></Suspense>
+        <noscript><div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`https://top-fwz1.mail.ru/counter?id=${VK_PIXEL_ID};js=na`} style={{ position: 'absolute', left: '-9999px' }} alt="Top.Mail.Ru" />
-          </div></noscript>
-        ) : null}
+        </div></noscript>
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
         <Suspense><CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider></Suspense>
         <CMSPreviewBridge />

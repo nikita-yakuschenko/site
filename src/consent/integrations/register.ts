@@ -1,9 +1,8 @@
 import { registerIntegration } from "../registry";
-import { trackVkPageView, revokeVkPixel } from "../../lib/vk-pixel";
 
 /**
- * Реестр интеграций. Реальные сторонние скрипты подключаются только
- * через init после consent; до согласия в layout их нет.
+ * Реестр интеграций. Метрика, Roistat и VK подключаются независимо
+ * от cookie consent; остальные сервисы — через init после согласия.
  */
 
 registerIntegration({
@@ -64,6 +63,5 @@ registerIntegration({
 registerIntegration({
   id: "vk-ads",
   category: "marketing",
-  init: trackVkPageView,
-  revoke: revokeVkPixel,
+  // Счётчик грузится компонентом VkPixel независимо от cookie consent.
 });

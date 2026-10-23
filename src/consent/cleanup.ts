@@ -30,7 +30,7 @@ export const CLEANUP_KEYS: Record<
   },
   marketing: {
     cookies: [],
-    prefixes: ["_ym_uid", "_tmr_"],
+    prefixes: ["_ym_uid"],
     localStorage: [],
     sessionStorage: [],
   },

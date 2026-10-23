@@ -1,13 +1,13 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { submitLead } from '../../src/lib/submit-lead'
-import { revokeVkPixel, trackVkPageView } from '../../src/lib/vk-pixel'
+import { trackVkPageView } from '../../src/lib/vk-pixel'
 import { CONSENT_VERSION } from '../../src/consent/types'
 
-test('VK: согласие, один загрузчик, подтверждение заявки, повторы и ошибки', async () => {
+test('VK: без согласия, один загрузчик, подтверждение заявки, повторы и ошибки', async () => {
   const previousDocument = Object.getOwnPropertyDescriptor(globalThis, 'document')
   const previousWindow = Object.getOwnPropertyDescriptor(globalThis, 'window')
-  let marketing = false
+  let consentCookie = ''
   let url = 'https://avgst.ru/'
   const events: unknown[] = []
   const scripts: unknown[] = []
@@ -15,7 +15,7 @@ test('VK: согласие, один загрузчик, подтвержден�
   Object.defineProperty(globalThis, 'window', { configurable: true, value: browser })
   Object.defineProperty(globalThis, 'document', { configurable: true, value: {
     get cookie() {
-      return `roistat_visit=123; avgst_cookie_consent=${encodeURIComponent(JSON.stringify({ version: CONSENT_VERSION, decidedAt: new Date().toISOString(), necessary: true, functional: false, analytics: false, marketing }))}`
+      return `roistat_visit=123${consentCookie}`
     },
     getElementById: () => scripts[0],
     createElement: () => ({}),
@@ -24,13 +24,6 @@ test('VK: согласие, один загрузчик, подтвержден�
   const accepted: typeof fetch = async () => Response.json({ accepted: true, id: 'lead' })
   const goals = () => events.filter(event => (event as { type: string }).type === 'reachGoal')
   try {
-    revokeVkPixel()
-    trackVkPageView()
-    await submitLead({}, { current: null }, accepted)
-    assert.equal(events.length, 0)
-    assert.equal(scripts.length, 0)
-
-    marketing = true
     trackVkPageView()
     trackVkPageView()
     assert.equal(events.length, 1)
@@ -52,19 +45,17 @@ test('VK: согласие, один загрузчик, подтвержден�
     assert.equal(goals().length, 2)
     assert.equal(JSON.stringify(events).includes('private'), false)
 
-    marketing = false
-    revokeVkPixel()
+    consentCookie = `; avgst_cookie_consent=${encodeURIComponent(JSON.stringify({ version: CONSENT_VERSION, decidedAt: new Date().toISOString(), necessary: true, functional: false, analytics: false, marketing: false }))}`
     const count = events.length
     url = 'https://avgst.ru/contacts'
     trackVkPageView()
     await submitLead({}, { current: null }, accepted)
-    assert.equal(events.length, count)
+    assert.equal(events.length, count + 2)
+    assert.equal(goals().length, 3)
 
-    marketing = true
     Object.defineProperty(browser, '_tmr', { value: { push: () => { throw new Error('blocked') } } })
     assert.equal((await submitLead({}, { current: null }, accepted)).accepted, true)
   } finally {
-    revokeVkPixel()
     if (previousDocument) Object.defineProperty(globalThis, 'document', previousDocument)
     else Reflect.deleteProperty(globalThis, 'document')
     if (previousWindow) Object.defineProperty(globalThis, 'window', previousWindow)
