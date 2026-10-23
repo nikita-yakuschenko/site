@@ -76,6 +76,8 @@ function Segment({
 }
 
 export function CatalogFilters({
+  onReset,
+  hasActiveFilters,
   filters,
   facets,
   onlyFavorites,
@@ -86,6 +88,8 @@ export function CatalogFilters({
   onChanged,
   changeTimerRef,
 }: {
+  onReset: () => void;
+  hasActiveFilters: boolean;
   filters: CatalogFilters;
   facets: CatalogFacets;
   onlyFavorites: boolean;
@@ -194,6 +198,12 @@ export function CatalogFilters({
             подвалом за её пределами и потому ничего не перекрывает. */}
         <div className="cfilter__scroll">
         <div className="cfilter__group">
+          <div className="catalog__filter-heading">
+            <label className="cfilter__legend" htmlFor="catalog-sort">Сортировка</label>
+            <button type="button" className="cfilter__reset catalog__reset" disabled={!hasActiveFilters} onClick={onReset}>
+              {copy.resetAll}
+            </button>
+          </div>
           <Select value={filters.sort ?? 'default'} onValueChange={value =>
             go({ ...filters, sort: value === 'default' ? undefined : value as CatalogFilters['sort'] })
           }>

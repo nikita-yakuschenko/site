@@ -186,15 +186,11 @@ export function CatalogBoard({
             <IconFilter size={20} stroke={2} aria-hidden="true" />
           </button>
         </div>
-        <div className="catalog__filter-heading">
-          <label className="cfilter__legend" htmlFor="catalog-sort">Сортировка</label>
-          <button type="button" className="cfilter__reset catalog__reset" disabled={!active} onClick={reset}>
-            {copy.resetAll}
-          </button>
-        </div>
       </div>
       <div className="catalog__layout">
       <CatalogFilters
+        onReset={reset}
+        hasActiveFilters={!!active}
         filters={filters}
         facets={facets}
         onlyFavorites={onlyFavorites}

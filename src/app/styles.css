@@ -5295,19 +5295,12 @@ a {
 .cfilter__toggle.is-reset {
   color: var(--danger);
 }
-.catalog__filter-heading { position: relative; display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 240px; max-width: 100%; min-height: 24px; margin-top: 8px; }
+.catalog__filter-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 24px; margin-bottom: 10px; }
 .catalog__filter-heading .cfilter__legend { width: auto; margin: 0; }
 .cfilter__reset.catalog__reset { position: relative; display: flex; flex: none; width: max-content; min-height: 24px; margin: 0; color: var(--foreground); pointer-events: auto; }
-@media (max-width: 1023px) {
-  .catalog__filter-heading { width: 100%; }
-  .catalog__bar:not(.is-sheet) .catalog__filter-heading .cfilter__legend { visibility: hidden; }
-}
 .catalog__reset:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
 .catalog__reset:disabled { color: var(--ink-3); cursor: default; }
 .catalog__reset:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: 2px; }
-.site-shell--catalog .catalog__bar { padding-bottom: 8px; }
-.site-shell--catalog:has(.catalog__reset) { --catalog-bar: 102px; }
-@media (min-width: 1024px) { .site-shell--catalog:has(.catalog__reset) { --catalog-bar: 94px; } }
 
 /* В самый узкий экран подпись рядом с полем поиска не встаёт: остаётся
    значок, смысл которого понятен и без слова. */
@@ -5663,6 +5656,9 @@ a {
   .cfilter__sticky.is-open .cfilter__legend {
     margin-bottom: 6px;
   }
+
+  .cfilter__sticky.is-open .catalog__filter-heading { margin-bottom: 6px; }
+  .cfilter__sticky.is-open .catalog__filter-heading .cfilter__legend { margin-bottom: 0; }
 
   .cfilter__sticky.is-open .cfilter__check {
     min-height: 28px;
@@ -12091,15 +12087,6 @@ html.is-dialog-open {
   outline: none;
 }
 
-/* Сброс живёт в полосе поиска, второй такой же кнопке в панели делать
-   нечего. Снимаемые условия рядом остаются: они убирают по одному.
-   Правило стоит в конце файла: базовое описание .cfilter__reset идёт ниже
-   блока узкого экрана, и раньше оно перебивало это скрытие. */
-@media (max-width: 1023px) {
-  .cfilter__reset {
-    display: none;
-  }
-}
 
 /* ───────── Макет страницы проекта (/preview/project) ─────────
    Отдельный префикс pp-: макет не должен задевать боевые страницы, пока
