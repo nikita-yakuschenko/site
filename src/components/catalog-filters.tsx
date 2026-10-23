@@ -1,21 +1,22 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState, type RefObject } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { IconFilterX, IconHeart, IconX } from "@tabler/icons-react";
+import { IconArrowsSort, IconHeart } from "@tabler/icons-react";
+import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
 import { RangeSlider } from "./range-slider";
 import { filtersToHref, type CatalogFacets } from "../lib/catalog/filters";
 import type { CatalogFilters, Range } from "../lib/catalog/types";
-import { copy, seriesTitle } from "../lib/copy";
+import { TECHNOLOGY_OPTIONS, type CatalogTechnology } from "../lib/catalog/types";
+import { copy } from "../lib/copy";
 
 /**
  * Боковая колонка отбора.
  *
  * Колонка, а не верхняя полоса: набор условий будет расти (стиль и всё, что
  * заведут в админке), и полоса шириной в страницу однажды кончится, а
- * колонка растёт вниз сколько нужно. Липкая, потому что отбор должен быть
- * перед глазами всю прокрутку, и по вертикали колонка при этом не стоит
- * ничего.
+ * колонка растёт вниз сколько нужно. Высокая колонка прокручивается
+ * вместе со страницей и прилипает нижним краем, без внутреннего скроллбара.
  *
  * Состояние живёт в адресе, а не здесь: ссылку на отобранную выдачу можно
  * переслать, кнопка «назад» отменяет последнее условие. Ползунки при
@@ -24,6 +25,13 @@ import { copy, seriesTitle } from "../lib/copy";
  */
 
 const SLIDER_DELAY = 350;
+const sortOptions = [
+  ['default', 'По умолчанию'],
+  ['price-asc', 'Сначала дешевле'],
+  ['price-desc', 'Сначала дороже'],
+  ['area-asc', 'Сначала компактнее'],
+  ['area-desc', 'Сначала просторнее'],
+] as const;
 
 /* Radix отдаёт number[] без обещания длины. Приводим к паре явно, а не
    утверждением типа: пустой массив тогда даст края каталога, а не NaN. */
@@ -68,6 +76,8 @@ function Segment({
 }
 
 export function CatalogFilters({
+  onReset,
+  hasActiveFilters,
   filters,
   facets,
   onlyFavorites,
@@ -76,7 +86,10 @@ export function CatalogFilters({
   open,
   onApply,
   onChanged,
+  changeTimerRef,
 }: {
+  onReset: () => void;
+  hasActiveFilters: boolean;
   filters: CatalogFilters;
   facets: CatalogFacets;
   onlyFavorites: boolean;
@@ -88,6 +101,7 @@ export function CatalogFilters({
   onApply: () => void;
   /* Условия поменялись: выдача стала другой, и надо вернуться к её началу. */
   onChanged: () => void;
+  changeTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -96,7 +110,7 @@ export function CatalogFilters({
      адрес отстаёт на паузу, и без этого ручка дёргалась бы назад. */
   const [draftArea, setDraftArea] = useState<[number, number] | null>(null);
   const [draftPrice, setDraftPrice] = useState<[number, number] | null>(null);
-  const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const timerRef = changeTimerRef;
 
   /* Адрес сменился, значит черновик ползунка устарел. Сверяем прямо в
      рендере, а не эффектом: setState внутри эффекта тянет лишний проход
@@ -112,19 +126,19 @@ export function CatalogFilters({
 
   useEffect(
     () => () => {
-      if (timer.current) clearTimeout(timer.current);
+      if (timerRef.current) clearTimeout(timerRef.current);
     },
-    [],
+    [timerRef],
   );
 
   const go = (next: CatalogFilters, delay = 0) => {
-    if (timer.current) clearTimeout(timer.current);
+    if (timerRef.current) clearTimeout(timerRef.current);
     const href = filtersToHref(next, pathname);
     const push = () => {
       router.replace(href, { scroll: false });
       onChanged();
     };
-    if (delay) timer.current = setTimeout(push, delay);
+    if (delay) timerRef.current = setTimeout(push, delay);
     else push();
   };
 
@@ -163,55 +177,8 @@ export function CatalogFilters({
   const mlnRange = (lo: number, hi: number) =>
     mln(lo) + "-" + mln(hi) + " " + copy.millionShort;
 
-  const techLabel = (value: "modular" | "panel") =>
-    value === "modular" ? copy.techModularShort : copy.techPanelShort;
-
-  const chips: { label: string; clear: CatalogFilters }[] = [];
-  if (filters.status === "ready") {
-    chips.push({
-      label: "Готовый дом в продаже",
-      clear: { ...filters, status: undefined },
-    });
-  }
-  if (filters.series) {
-    chips.push({ label: seriesTitle(filters.series), clear: { ...filters, series: undefined } });
-  }
-  if (filters.tech?.length) {
-    chips.push({
-      label: filters.tech.map(techLabel).join(", "),
-      clear: { ...filters, tech: undefined },
-    });
-  }
-  if (filters.area) {
-    const lo = filters.area.min ?? facets.area.min;
-    const hi = filters.area.max ?? facets.area.max;
-    chips.push({
-      label: lo + "-" + hi + " " + copy.areaUnit,
-      clear: { ...filters, area: undefined },
-    });
-  }
-  if (filters.price) {
-    const lo = filters.price.min ?? facets.price.min;
-    const hi = filters.price.max ?? facets.price.max;
-    chips.push({
-      label: mlnRange(lo, hi),
-      clear: { ...filters, price: undefined },
-    });
-  }
-  const units = [
-    ["bedrooms", copy.bedroomsUnit],
-    ["bathrooms", copy.bathroomsUnit],
-    ["floors", copy.floorsUnit],
-  ] as const;
-  for (const [key, unit] of units) {
-    const list = filters[key];
-    if (list?.length) {
-      chips.push({
-        label: list.join(", ") + " " + unit,
-        clear: { ...filters, [key]: undefined },
-      });
-    }
-  }
+  const techLabel = (value: CatalogTechnology) =>
+    TECHNOLOGY_OPTIONS.find(option => option.technology === value)!.label;
 
   return (
     <aside className="cfilter" aria-label={copy.catalogFiltersAria}>
@@ -219,9 +186,25 @@ export function CatalogFilters({
         {/* Прокручивается только эта часть: кнопка возврата к выдаче лежит
             подвалом за её пределами и потому ничего не перекрывает. */}
         <div className="cfilter__scroll">
-
-
-
+        <div className="cfilter__group">
+          <div className="catalog__filter-heading">
+            <label className="cfilter__legend" htmlFor="catalog-sort">Сортировка</label>
+            <button type="button" className="cfilter__reset catalog__reset" disabled={!hasActiveFilters} onClick={onReset}>
+              {copy.resetAll}
+            </button>
+          </div>
+          <Select value={filters.sort ?? 'default'} onValueChange={value =>
+            go({ ...filters, sort: value === 'default' ? undefined : value as CatalogFilters['sort'] })
+          }>
+            <SelectTrigger id="catalog-sort" className="catalog__sort" aria-label="Сортировка проектов">
+              <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent className="catalog__sort-menu" align="start" sideOffset={6}>
+              {sortOptions.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
+            </SelectContent>
+          </Select>
+        </div>
         {facets.area.max > facets.area.min && <fieldset className="cfilter__group">
           <legend className="cfilter__legend">
             {copy.areaLegend}
@@ -283,10 +266,10 @@ export function CatalogFilters({
         />
 
         {/* Тише остальных: дом выбирают не по технологии. */}
-        <fieldset className="cfilter__group cfilter__group--quiet">
+        {facets.technologies.length ? <fieldset className="cfilter__group cfilter__group--quiet">
           <legend className="cfilter__legend">{copy.technologyLegend}</legend>
           <div className="cfilter__checks">
-            {(["modular", "panel"] as const).map((value) => {
+            {facets.technologies.map((value) => {
               const on = filters.tech?.includes(value) ?? false;
               return (
                 <label key={value} className="cfilter__check">
@@ -306,7 +289,7 @@ export function CatalogFilters({
               );
             })}
           </div>
-        </fieldset>
+        </fieldset> : null}
 
         </div>
 
@@ -349,26 +332,6 @@ export function CatalogFilters({
             </label>
           </div>
         </fieldset>
-
-        {chips.length ? (
-          <div className="cfilter__active">
-            {chips.map((chip) => (
-              <button
-                key={chip.label}
-                type="button"
-                className="cfilter__chip"
-                onClick={() => go(chip.clear)}
-              >
-                {chip.label}
-                <IconX size={14} stroke={2} aria-hidden="true" />
-              </button>
-            ))}
-            <button type="button" className="cfilter__reset" onClick={() => go({})}>
-              <IconFilterX size={14} stroke={2} aria-hidden="true" />
-              {copy.resetAll}
-            </button>
-          </div>
-        ) : null}
 
         {/* Только на узком экране, где панель закрывает собой выдачу.
             Условия применяются сразу, по нажатию, поэтому кнопка ничего не

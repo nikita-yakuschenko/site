@@ -3,6 +3,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 import type { Project } from '../../payload-types'
+import { TECHNOLOGY_OPTIONS, technologyLabel } from '../../../../src/lib/catalog/types'
+import type { PriceKind } from '../../config/price-kinds'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
 import { IconExternalLink, IconSearch, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus } from '@tabler/icons-react'
@@ -29,7 +31,7 @@ function facetsFrom(params: { get(name: string): string | null }) {
   const numbers = (key: string) => paramList(params, key).map(Number).filter(value => Number.isInteger(value))
   return {
     status: paramList(params, 'status').filter(value => value === 'published' || value === 'draft'),
-    tech: paramList(params, 'tech').filter(value => value === 'Панельно-каркасный' || value === 'Модульный'),
+    tech: paramList(params, 'tech').filter(value => TECHNOLOGY_OPTIONS.some(option => option.value === value)),
     series: paramList(params, 'series'),
     floors: numbers('floors'),
     bedrooms: numbers('bedrooms'),
@@ -98,13 +100,37 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
   const [removing, setRemoving] = useState<Project | null>(null)
   const [busy, setBusy] = useState(false)
   const [exporting, setExporting] = useState(false)
+  const [exportDialogOpen, setExportDialogOpen] = useState(false)
+  const [priceOptions, setPriceOptions] = useState<{ value: PriceKind; label: string; count: number }[]>([])
+  const [selectedPriceKind, setSelectedPriceKind] = useState<PriceKind | null>(null)
+  const [loadingPriceOptions, setLoadingPriceOptions] = useState(false)
+  const [priceOptionsError, setPriceOptionsError] = useState('')
   const exportLock = useRef(false)
+  const openExportDialog = async () => {
+    setExportDialogOpen(true)
+    setLoadingPriceOptions(true)
+    setPriceOptionsError('')
+    setPriceOptions([])
+    setSelectedPriceKind(null)
+    try {
+      const response = await fetch('/api/projects/export-yml/options', { credentials: 'include', cache: 'no-store' })
+      const body = await response.json()
+      if (!response.ok) throw new Error(body?.error || 'Не удалось получить типы цен')
+      const options = body.options as { value: PriceKind; label: string; count: number }[]
+      setPriceOptions(options)
+      setSelectedPriceKind(options.find(option => option.value === 'nn')?.value ?? options[0]?.value ?? null)
+    } catch (error) {
+      setPriceOptionsError(error instanceof Error ? error.message : 'Не удалось получить типы цен')
+    } finally {
+      setLoadingPriceOptions(false)
+    }
+  }
   const exportYml = async () => {
-    if (exportLock.current) return
+    if (exportLock.current || !selectedPriceKind) return
     exportLock.current = true
     setExporting(true)
     try {
-      const response = await fetch('/api/projects/export-yml', { method: 'POST', credentials: 'include' })
+      const response = await fetch('/api/projects/export-yml', { method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ priceKind: selectedPriceKind }) })
       if (!response.ok) {
         const body = await response.json().catch(() => null)
         throw new Error(body?.error || 'Не удалось выгрузить каталог')
@@ -112,7 +138,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       const url = URL.createObjectURL(await response.blob())
       const link = document.createElement('a')
       link.href = url
-      link.download = 'avgst-catalog.yml'
+      link.download = selectedPriceKind === 'nn' ? 'avgst-catalog.yml' : `avgst-catalog-${selectedPriceKind}.yml`
       document.body.append(link)
       link.click()
       link.remove()
@@ -120,6 +146,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       toast.success(`Выгружено проектов: ${response.headers.get('X-Export-Count') || '—'}`)
       const skipped = Number(response.headers.get('X-Export-Skipped'))
       if (skipped) toast.warning(`Пропущено проектов без корректной цены, технологии или изображения: ${skipped}`)
+      setExportDialogOpen(false)
     } catch (error) {
       toast.error(error instanceof Error ? error.message : 'Не удалось выгрузить каталог')
     } finally {
@@ -213,13 +240,13 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
           <Input aria-label="Поиск проектов" placeholder="Поиск проектов" className="pl-9" value={search} onChange={event => { setSearch(event.target.value); table.setPage(0) }} />
         </div>
         <Button asChild variant="outline"><Link href="/catalog/redirects">Редиректы</Link></Button>
-        <Button type="button" variant="outline" disabled={exporting} aria-busy={exporting} onClick={exportYml}>{exporting ? 'Формирование…' : 'Выгрузить YML'}</Button>
+        <Button type="button" variant="outline" onClick={openExportDialog}>Выгрузить YML</Button>
         <Button asChild><Link href="/collections/projects/create">Создать</Link></Button>
       </div>
     </div>
     <div className="flex flex-wrap items-center gap-2">
       <FacetFilter title="Статус" options={[{ value: 'published', label: 'Опубликован' }, { value: 'draft', label: 'Черновик' }]} selected={facets.status} onChange={status => tune({ status })} />
-      <FacetFilter title="Технология" options={[{ value: 'Панельно-каркасный', label: 'Панельно-каркасная' }, { value: 'Модульный', label: 'Модульная' }]} selected={facets.tech} onChange={tech => tune({ tech })} />
+      <FacetFilter title="Технология" options={[...TECHNOLOGY_OPTIONS]} selected={facets.tech} onChange={tech => tune({ tech })} />
       <FacetFilter title="Серия" options={seriesOptions} selected={facets.series} onChange={series => tune({ series })} />
       <RangeFilter title="Площадь, м²" min={facets.areaMin} max={facets.areaMax} onMin={areaMin => tune({ areaMin })} onMax={areaMax => tune({ areaMax })} />
       <FacetFilter title="Этажи" options={numbers(project => project.floorsValue).map(value => ({ value, label: String(value) }))} selected={facets.floors} onChange={floors => tune({ floors })} />
@@ -235,9 +262,9 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       </colgroup>
       <TableHeader><TableRow className="hover:bg-transparent [&>th]:text-muted-foreground"><TableHead className="pl-4">Название</TableHead><TableHead>Статус</TableHead><TableHead>Технология</TableHead><TableHead className="text-right">Площадь, м²</TableHead><TableHead className="text-right">Этажи</TableHead><TableHead className="text-right">Спальни</TableHead><TableHead className="text-right">Просмотры</TableHead><TableHead className="text-right">Лайки</TableHead><TableHead className="text-right">Шеры</TableHead><TableHead className="text-right">Заявки</TableHead><TableHead className="pr-4"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
       <TableBody>{table.rows.map(project => { const published = project._status === 'published'; return <TableRow key={project.id}>
-        <TableCell className="h-12 pl-4"><Link className="font-medium underline-offset-4 hover:underline" href={`/collections/projects/${project.id}`}>{project.name || '[Без названия]'}</Link></TableCell>
+        <TableCell className="h-12 pl-4"><Link className="font-medium underline-offset-4 hover:underline" href={`/collections/projects/${project.id}`}>{project.name || '[Без названия]'}</Link>{(project.hero_product === 1 || project.hero_product === 2) && <Badge variant="secondary" className="mt-1 w-fit">Слот №{project.hero_product}</Badge>}</TableCell>
         <TableCell><Badge variant="outline" className="text-foreground">{published ? <IconCircleCheckFilled className="text-(--avgst-green)" /> : <IconCircleDashed className="text-muted-foreground" />}{published ? 'Опубликован' : 'Черновик'}</Badge></TableCell>
-        <TableCell className="text-muted-foreground">{project.technologyBadge === 'Модульный' ? 'Модульная' : 'Панельно-каркасная'}</TableCell><TableCell className="text-right tabular-nums">{project.areaValue?.toLocaleString('ru-RU') ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.floorsValue ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.bedrooms ?? '—'}</TableCell>
+        <TableCell className="text-muted-foreground">{technologyLabel(project.technologyBadge)}</TableCell><TableCell className="text-right tabular-nums">{project.areaValue?.toLocaleString('ru-RU') ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.floorsValue ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.bedrooms ?? '—'}</TableCell>
         <TableCell className="text-right tabular-nums">{stat(project.viewCount)}</TableCell><TableCell className="text-right tabular-nums">{stat(project.likeCount)}</TableCell><TableCell className="text-right tabular-nums">{stat(project.shareCount)}</TableCell><TableCell className="text-right tabular-nums">{leads[project.id] ?? 0}</TableCell>
         <TableCell className="catalog-actions pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8 text-muted-foreground data-[state=open]:bg-muted" aria-label={`Действия: ${project.name || 'без названия'}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface w-44">
           <DropdownMenuItem asChild><Link href={`/collections/projects/${project.id}`}><IconPencil />Редактировать</Link></DropdownMenuItem>
@@ -246,6 +273,17 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
         </DropdownMenuContent></DropdownMenu></TableCell>
       </TableRow> })}{table.rows.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={11} className="h-24 text-center text-muted-foreground">Записи не найдены</TableCell></TableRow>}</TableBody>
     </Table></DataTableFrame>
+    <Dialog open={exportDialogOpen} onOpenChange={open => { if (!exporting) setExportDialogOpen(open) }}><DialogContent className="shadcn-surface">
+      <DialogHeader><DialogTitle>Выгрузить каталог в YML</DialogTitle><DialogDescription>Выберите тип цены для предложений в файле.</DialogDescription></DialogHeader>
+      {loadingPriceOptions ? <p className="text-sm text-muted-foreground">Загрузка типов цен…</p> : priceOptionsError ? <p role="alert" className="text-sm text-destructive">{priceOptionsError}</p> : priceOptions.length === 0 ? <p className="text-sm text-muted-foreground">Нет опубликованных проектов с ценой и данными для выгрузки.</p> : <fieldset className="grid gap-2" disabled={exporting}>
+        <legend className="sr-only">Тип цены</legend>
+        {priceOptions.map(option => <label key={option.value} className="flex cursor-pointer items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm has-checked:border-primary has-checked:bg-muted">
+          <span className="flex items-center gap-2"><input type="radio" name="yml-price-kind" value={option.value} checked={selectedPriceKind === option.value} onChange={() => setSelectedPriceKind(option.value)} />{option.label}</span>
+          <span className="text-muted-foreground">{option.count} проектов</span>
+        </label>)}
+      </fieldset>}
+      <DialogFooter><Button type="button" variant="outline" disabled={exporting} onClick={() => setExportDialogOpen(false)}>Отмена</Button><Button type="button" disabled={!selectedPriceKind || loadingPriceOptions || exporting} aria-busy={exporting} onClick={exportYml}>{exporting ? 'Формирование…' : 'Скачать YML'}</Button></DialogFooter>
+    </DialogContent></Dialog>
     <Dialog open={!!removing} onOpenChange={open => { if (!open && !busy) setRemoving(null) }}><DialogContent className="shadcn-surface">
       <DialogHeader><DialogTitle>Удалить «{removing?.name || '[Без названия]'}»?</DialogTitle><DialogDescription>Запись пропадёт из каталога и с сайта вместе с её ценами. Отменить удаление нельзя.</DialogDescription></DialogHeader>
       <DialogFooter><DialogClose asChild><Button variant="outline" disabled={busy}>Отмена</Button></DialogClose><Button variant="destructive" disabled={busy} onClick={remove}>{busy ? 'Удаление…' : 'Удалить'}</Button></DialogFooter>

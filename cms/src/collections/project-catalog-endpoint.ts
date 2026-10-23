@@ -3,6 +3,7 @@ import { catalogPrice } from '../config/catalog-price'
 import { authorizeSiteRequest } from './project-hero-endpoint'
 import { isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
 import type { CatalogProject } from '../../../src/lib/catalog/types'
+import { technologyFromBadge } from '../../../src/lib/catalog/types'
 import { isPublicPriceKind } from '../config/price-kinds'
 
 export const projectCatalogEndpoint: Endpoint = {
@@ -28,8 +29,9 @@ export const projectCatalogEndpoint: Endpoint = {
       if (!('nn' in regionalPrices) && price && price > 0) regionalPrices.nn = price
       return {
         id: record.importKey?.replace(/^catalog:/, '') || `cms:${record.id}`, cmsId: record.code || undefined, slug: record.slug, name: record.name, href: `/catalog/${record.slug}`,
+        hero_product: record.recordType === 'project' ? record.hero_product ?? null : null,
         area: String(record.areaValue), areaValue: record.areaValue, floors: String(record.floorsValue), floorsValue: record.floorsValue, bedrooms: String(record.bedrooms), bathrooms: String(record.bathrooms),
-        technology: modular ? 'modular' : 'panel', technologyBadge: record.technologyBadge, series: record.series || (modular ? 'modular' : 'panel'),
+        technology: technologyFromBadge(record.technologyBadge), technologyBadge: record.technologyBadge, series: record.series || (modular ? 'modular' : 'panel'),
         imageUrl: mediaURL(record.desktopImage, record.imageUrl), mobileImageUrl: mediaURL(record.mobileImage, record.mobileImageUrl) || null,
         priceAmount: price && price > 0 ? price : null, priceLabel: price && price > 0 ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется', regionalPrices,
         description: record.searchDescription?.trim() || record.name,

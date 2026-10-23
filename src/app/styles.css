@@ -4327,7 +4327,7 @@ a {
 
 .referral__field input:focus {
   outline: none;
-  border-color: rgb(252 201 12 / 0.7);
+  border-color: var(--on-dark-2);
 }
 
 .referral__field input.is-invalid {
@@ -5161,23 +5161,15 @@ a {
 @media (min-width: 1024px) {
   .site-shell--catalog { --catalog-bar: 70px; }
   .site-shell--catalog .catalog__bar {
-    top: calc(var(--site-header-offset) - 16px);
+    position: static;
     padding-block: 16px;
     background: transparent;
     pointer-events: none;
   }
   .site-shell--catalog .catalog__bar::after { content: none; }
-  .site-shell--catalog .catalog__results { margin-top: calc(16px - var(--catalog-bar)); }
+  .site-shell--catalog .catalog__results { margin-top: 16px; }
   .catalog__bar { background: transparent; pointer-events: none; }
   .catalog__bar::after { right: auto; width: calc(240px + var(--page-gutter) * 2); }
-  .catalog__bar::before {
-    content: "";
-    position: absolute;
-    inset-block: 0;
-    left: var(--page-gutter);
-    width: 240px;
-    background: #fff;
-  }
   .catalog__barrow { position: relative; width: 240px; pointer-events: auto; }
   .catalog__barrow .catalog-search { height: 38px; padding-inline: 12px; border-radius: 8px; color: var(--avgst-ink); }
   .catalog__barrow .catalog-search input { font-size: 14px; }
@@ -5261,6 +5253,14 @@ a {
     grid-template-columns: 240px minmax(0, 1fr);
     gap: var(--gap-split);
   }
+
+  .catalog__sidebar {
+    position: sticky;
+    top: min(var(--site-header-offset), calc(100dvh - var(--catalog-filter-height, 0px) - 16px));
+    align-self: start;
+    min-width: 0;
+    padding-bottom: 16px;
+  }
 }
 
 .cfilter {
@@ -5295,6 +5295,12 @@ a {
 .cfilter__toggle.is-reset {
   color: var(--danger);
 }
+.catalog__filter-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 24px; margin-bottom: 10px; }
+.catalog__filter-heading .cfilter__legend { width: auto; margin: 0; }
+.cfilter__reset.catalog__reset { position: relative; display: flex; flex: none; width: max-content; min-height: 24px; margin: 0; color: var(--foreground); pointer-events: auto; }
+.catalog__reset:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
+.catalog__reset:disabled { color: var(--ink-3); cursor: default; }
+.catalog__reset:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: 2px; }
 
 /* В самый узкий экран подпись рядом с полем поиска не встаёт: остаётся
    значок, смысл которого понятен и без слова. */
@@ -5316,6 +5322,14 @@ a {
     display: block;
   }
 
+  .catalog__sidebar {
+    position: sticky;
+    top: var(--site-header-offset);
+    z-index: 5;
+  }
+
+  .catalog__sidebar:has(.cfilter__sticky.is-open) { z-index: 40; }
+
   /* На телефоне закреплённое сверху стоит дорого: 110 пикселей полосы плюс
      кнопка отбора это пятая часть экрана, которая не показывает ни одного
      дома. Поле дышит вдвое скромнее, высота полосы падает со 110 до 78. */
@@ -5324,7 +5338,7 @@ a {
   }
 
   .cfilter {
-    position: sticky;
+    position: static;
     /* Плюс растворяющийся край полосы, иначе он ложился бы на кнопку. */
     top: calc(var(--catalog-bar) + var(--catalog-fade));
     z-index: 5;
@@ -5381,7 +5395,7 @@ a {
        внутри прокрутки накрывала собой последние условия. */
     display: flex;
     flex-direction: column;
-    padding: 12px var(--page-gutter);
+    padding: 0 var(--page-gutter) 12px;
     background: #fff;
     overflow: hidden;
   }
@@ -5400,26 +5414,26 @@ a {
   }
 }
 
-/* Колонка фильтров остаётся под закреплённым поиском. */
+/* Высокая колонка сначала прокручивается страницей, затем прилипает нижним
+   краем. Короткая сразу прилипает под поиском. Внутреннего скролла нет. */
 @media (min-width: 1024px) {
   .cfilter__toggle {
     display: none;
   }
 
   .cfilter {
-    position: sticky;
-    top: calc(var(--site-header-offset) + var(--catalog-bar));
-    align-self: start;
-    max-height: calc(100dvh - var(--site-header-offset) - var(--catalog-bar) - 16px);
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
+    position: static;
   }
 
   .cfilter__sticky {
     position: static;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
   }
 }
+
+.cfilter__scroll { display: flex; flex-direction: column; gap: 24px; }
 
 .cfilter__count {
   margin: 0 0 16px;
@@ -5432,26 +5446,9 @@ a {
 
 .cfilter__group {
   min-inline-size: 0;
-  margin: 0 0 20px;
+  margin: 0;
   padding: 0;
   border: 0;
-}
-
-/* Разделительная линия и воздух над ней. padding-top на самом fieldset
-   давать нельзя: legend лежит в его верхней грани, и padding ложится между
-   подписью и содержимым, а не над подписью, отчего разрыв внутри группы
-   становился вдвое больше, чем у соседей. Поэтому воздух уходит в legend. */
-.cfilter__group--quiet {
-  margin-top: 20px;
-  border-top: 1px solid var(--line);
-}
-
-.cfilter__group--quiet .cfilter__legend {
-  padding-top: 16px;
-}
-
-.cfilter__group--fav {
-  margin-bottom: 20px;
 }
 
 .cfilter__legend {
@@ -5625,29 +5622,9 @@ a {
   color: var(--on-dark-3);
 }
 
-/* Снимаемые условия. Дублируют состояние панели нарочно: снять условие
-   надо там же, где видишь результат. */
-.cfilter__active {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  align-items: center;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-}
-
-.cfilter__chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  height: 27px;
-  padding: 0 10px;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  background: #fff;
-  color: var(--avgst-ink);
-  font-size: 12px;
-  cursor: pointer;
+.cfilter__fav:hover:not(.is-on),
+.cfilter__badges button:hover:not(.is-on) {
+  background: var(--tint);
 }
 
 .cfilter__reset {
@@ -5675,7 +5652,7 @@ a {
      подписями, сами элементы управления остаются прежнего размера, иначе по
      ним станет труднее попадать пальцем. */
   .cfilter__sticky.is-open .cfilter__group {
-    margin-bottom: 12px;
+    margin: 0;
   }
 
   .cfilter__sticky.is-open .cfilter__group:last-of-type {
@@ -5686,34 +5663,24 @@ a {
     margin-bottom: 6px;
   }
 
-  .cfilter__sticky.is-open .cfilter__group--quiet {
-    margin-top: 14px;
-  }
-
-  .cfilter__sticky.is-open .cfilter__group--quiet .cfilter__legend {
-    padding-top: 12px;
-  }
+  .cfilter__sticky.is-open .catalog__filter-heading { margin-bottom: 6px; }
+  .cfilter__sticky.is-open .catalog__filter-heading .cfilter__legend { margin-bottom: 0; }
 
   .cfilter__sticky.is-open .cfilter__check {
     min-height: 28px;
   }
 
   .cfilter__sticky.is-open .cfilter__scroll {
+    gap: 16px;
     padding-bottom: 12px;
     mask-image: linear-gradient(to bottom, #000 calc(100% - 12px), transparent);
   }
 
-  /* Неподвижный низ листа: избранное, снятые условия и кнопка возврата. */
-  .cfilter__sticky.is-open > .cfilter__group--fav,
-  .cfilter__sticky.is-open > .cfilter__active {
+  /* Неподвижный низ листа: избранное и кнопка возврата. */
+  .cfilter__sticky.is-open > .cfilter__group--fav {
     flex: none;
     margin-bottom: 0;
     padding-top: 10px;
-  }
-
-  .cfilter__sticky.is-open > .cfilter__active {
-    max-height: 30vh;
-    overflow-y: auto;
   }
 
   .cfilter__apply {
@@ -7519,10 +7486,7 @@ a {
   white-space: nowrap;
 }
 
-/* Сигнал об ошибке — краснеющая подпись и знак в поле. Своих обводок
-   тут нет: поле и так получает зелёное кольцо фокуса от глобального
-   input:focus-visible, и вместе с красной рамкой и тенью на одном
-   инпуте горели три кольца разом. */
+/* Сигнал об ошибке — краснеющая подпись и знак в поле. */
 .lead-card label:has(.lead-field__error.is-quiet),
 .lead-form label:has(.lead-field__error.is-quiet) {
   position: relative;
@@ -7905,6 +7869,13 @@ textarea:focus-visible {
   outline-offset: 2px;
 }
 
+/* Text fields use their existing one-pixel edge as the focus indicator. */
+:is(.lead-form, .lead-card) :is(input:not([type="checkbox"]), textarea):focus {
+  outline: none;
+  border-color: var(--ink-2);
+  box-shadow: none;
+}
+
 .specs--on-dark {
   color: var(--on-dark-0);
 }
@@ -8048,10 +8019,10 @@ html.is-dialog-open {
 
 /* Поле в фокусе отмечается своей гранью: зелёная рамка общего правила
    ложилась поверх скруглённого поля вторым контуром. */
-.ask-dialog__card :is(input, textarea):focus-visible {
+.ask-dialog__card :is(input:not([type="checkbox"]), textarea):focus {
   outline: none;
   border-color: var(--ink-2);
-  box-shadow: 0 0 0 3px var(--tint);
+  box-shadow: none;
 }
 
 .ask-dialog__close {
@@ -12126,15 +12097,6 @@ html.is-dialog-open {
   outline: none;
 }
 
-/* Сброс живёт в полосе поиска, второй такой же кнопке в панели делать
-   нечего. Снимаемые условия рядом остаются: они убирают по одному.
-   Правило стоит в конце файла: базовое описание .cfilter__reset идёт ниже
-   блока узкого экрана, и раньше оно перебивало это скрытие. */
-@media (max-width: 1023px) {
-  .cfilter__reset {
-    display: none;
-  }
-}
 
 /* ───────── Макет страницы проекта (/preview/project) ─────────
    Отдельный префикс pp-: макет не должен задевать боевые страницы, пока
@@ -13227,9 +13189,9 @@ html.is-dialog-open {
   color: var(--on-dark-4);
 }
 
-.project-config__total[data-form="true"] .lead-card input:focus-visible {
+.project-config__total[data-form="true"] .lead-card input:focus {
   border-color: var(--on-dark-2);
-  box-shadow: 0 0 0 3px var(--tint-on-dark);
+  box-shadow: none;
 }
 
 .project-config__total[data-form="true"] .lead-form__consent {
@@ -13358,10 +13320,10 @@ html.is-dialog-open {
 
 /* Поле в фокусе отмечается своей гранью, а не зелёной рамкой общего
    правила: та рисовалась поверх скруглённого поля вторым контуром. */
-.panel-lead__form .lead-card input:focus-visible {
+.panel-lead__form .lead-card input:focus {
   outline: none;
   border-color: var(--ink-2);
-  box-shadow: 0 0 0 3px var(--tint);
+  box-shadow: none;
 }
 
 /* Согласие в узкой колонке переносится по словам: неразрывная строка из
@@ -13419,6 +13381,7 @@ html.is-dialog-open {
 .mortgage-request.is-open .lead-card { --lead-ink: 255 255 255; }
 .mortgage-request.is-open .lead-card input { border-color: var(--on-dark-4); background: var(--tint-on-dark); color: #fff; }
 .mortgage-request.is-open .lead-card input::placeholder { color: var(--on-dark-4); }
+.mortgage-request.is-open .lead-card input:focus { border-color: var(--on-dark-2); }
 .mortgage-request.is-open .lead-form__consent { color: var(--on-dark-2); }
 .panel-lead__close { position: absolute; z-index: 1; top: 12px; right: 6px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--on-dark-2); cursor: pointer; }
 .panel-lead__close:hover { color: #fff; }
@@ -13622,6 +13585,10 @@ html.is-dialog-open {
   border-color: var(--on-dark-4);
   background: var(--tint-on-dark);
   color: #fff;
+}
+
+.ready-home-offer__total .lead-card input:focus {
+  border-color: var(--on-dark-2);
 }
 
 .ready-home-offer__total .lead-form__consent {
@@ -14741,10 +14708,10 @@ picture.hero__frame {
   }
   .project-config__mobile-form .lead-card label,
   .project-config__mobile-form .lead-card input { min-width: 0; max-width: 100%; }
-  .project-config__mobile-form .lead-card input:focus-visible {
+  .project-config__mobile-form .lead-card input:focus {
     outline: none;
     border-color: var(--on-dark-2);
-    box-shadow: 0 0 0 3px var(--tint-on-dark);
+    box-shadow: none;
   }
   .project-config__mobile-form .lead-form__consent { align-items: start; line-height: 1.35; }
   @starting-style {
@@ -14759,3 +14726,10 @@ picture.hero__frame {
   .project-config__tier-front,
   .project-config__tier-card .project-config__mobile-form { transition: none; transform: none; }
 }
+.ui-select-trigger.catalog__sort { width: 100%; height: 38px; padding: 0 12px; border: 1px solid var(--line); outline: none; box-shadow: none; border-radius: 8px; gap: 8px; color: var(--foreground); font-size: 13px; }
+.ui-select-trigger.catalog__sort:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: -2px; }
+.catalog__sort:hover, .catalog__sort[data-state="open"] { background: var(--tint); }
+.catalog__sort > span { min-width: 0; flex: 1; text-align: left; }
+.ui-select-content.catalog__sort-menu { width: 224px; border-radius: 10px; background: var(--surface, #fff); }
+.catalog__sort-menu .ui-select-item { min-height: 40px; border-radius: 6px; padding-left: 12px; }
+@media (max-width: 1023px) { .ui-select-trigger.catalog__sort { height: 44px; } }

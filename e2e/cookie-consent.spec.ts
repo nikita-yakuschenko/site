@@ -6,7 +6,6 @@ const BLOCKED_HOST_PARTS = [
   "metrika",
   "analytics.avgst.ru",
   "vk.com/ads",
-  "top-fwz1.mail.ru",
   "an.yandex.ru",
   "ads.yandex",
   "youtube.com",

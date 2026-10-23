@@ -1,8 +1,8 @@
 import { registerIntegration } from "../registry";
 
 /**
- * Реестр интеграций. Реальные сторонние скрипты подключаются только
- * через init после consent; до согласия в layout их нет.
+ * Реестр интеграций. Метрика, Roistat и VK подключаются независимо
+ * от cookie consent; остальные сервисы — через init после согласия.
  */
 
 registerIntegration({
@@ -41,7 +41,7 @@ registerIntegration({
   id: "roistat",
   category: "analytics",
   /* Счётчик грузится сразу компонентом RoistatCounter в layout, как Метрика.
-     Запись нужна очистке при отзыве согласия: ключи roistat* в cleanup.ts. */
+     Очистка необязательных cookie сохраняет roistat_visit для связи заявки. */
 });
 
 registerIntegration({
@@ -63,7 +63,5 @@ registerIntegration({
 registerIntegration({
   id: "vk-ads",
   category: "marketing",
-  init: async () => {
-    // Pixel ID отсутствует в проекте — placeholder.
-  },
+  // Счётчик грузится компонентом VkPixel независимо от cookie consent.
 });

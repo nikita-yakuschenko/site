@@ -7,13 +7,25 @@ export function isCatalogSeries(value: string): value is CatalogSeries {
 }
 
 /**
- * Технология. Обе разновидности каркасной и отличаются только глубиной
- * заводской готовности: модульная собирает модули из панелей на заводе,
- * панельно-каркасная везёт те же панели на участок.
+ * Технология строительства: панельно-каркасная, модульная или каркасная.
  */
-export const CATALOG_TECHNOLOGIES = ['panel', 'modular'] as const
+export const CATALOG_TECHNOLOGIES = ['panel', 'modular', 'frame'] as const
 
 export type CatalogTechnology = (typeof CATALOG_TECHNOLOGIES)[number]
+
+export const TECHNOLOGY_OPTIONS = [
+  { label: 'Панельно-каркасная', value: 'Панельно-каркасный', technology: 'panel' },
+  { label: 'Модульная', value: 'Модульный', technology: 'modular' },
+  { label: 'Каркасная', value: 'Каркасный', technology: 'frame' },
+] as const
+
+export function technologyFromBadge(badge: unknown): CatalogTechnology {
+  return TECHNOLOGY_OPTIONS.find(option => option.value === badge)?.technology ?? 'panel'
+}
+
+export function technologyLabel(badge: unknown): string {
+  return TECHNOLOGY_OPTIONS.find(option => option.value === badge)?.label ?? '—'
+}
 
 export function isCatalogTechnology(value: string): value is CatalogTechnology {
   return (CATALOG_TECHNOLOGIES as readonly string[]).includes(value)
@@ -28,6 +40,7 @@ export type Range = { min?: number; max?: number }
  * чтобы схема не разъехалась по трём местам.
  */
 export type CatalogFilters = {
+  sort?: 'price-asc' | 'price-desc' | 'area-asc' | 'area-desc'
   /** Поиск по названию проекта. */
   q?: string
   /** Конкретные дома, которые уже построены и выставлены на продажу. */
@@ -99,6 +112,8 @@ export type ReadyHomeSection = {
 
 export type CatalogProject = {
   id: string
+  /** Место проекта-локомотива в начале каталога: 1 или 2. */
+  hero_product?: number | null
   cmsId?: string
   mobileImageUrl?: string | null
   slug: string

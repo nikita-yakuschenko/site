@@ -1,0 +1,42 @@
+import { expect, test } from '@playwright/test'
+
+test('country code starts as a placeholder and the caret follows + then 7', async ({ page }) => {
+  await page.goto('/factory-open-day')
+  const phone = page.locator('#ags-phone')
+  await expect(phone).toHaveValue('')
+  await expect(phone).toHaveAttribute('placeholder', /\+7/)
+  await phone.focus()
+  await page.keyboard.type('+')
+  await expect(phone).toHaveValue('+')
+  expect(await phone.evaluate(input => input instanceof HTMLInputElement ? input.selectionStart : null)).toBe(1)
+  await page.keyboard.type('7')
+  await expect(phone).toHaveValue('+7')
+  expect(await phone.evaluate(input => input instanceof HTMLInputElement ? input.selectionStart : null)).toBe(2)
+  await page.keyboard.type('9001234567')
+  await expect(phone).toHaveValue('+7 900 123-45-67')
+  expect(await phone.evaluate(input => input instanceof HTMLInputElement ? input.selectionStart : null)).toBe(16)
+  await phone.fill('+7')
+  await page.keyboard.press('End')
+  await page.keyboard.press('Backspace')
+  await expect(phone).toHaveValue('+')
+  await page.keyboard.press('Backspace')
+  await expect(phone).toHaveValue('')
+})
+
+for (const start of ['7', '8', '9']) {
+  test(`normalizes a number starting with ${start} without losing fast input or resizing`, async ({ page }) => {
+    await page.goto('/factory-open-day')
+    const phone = page.locator('#ags-phone')
+    await phone.scrollIntoViewIfNeeded()
+    const before = await phone.boundingBox()
+    await phone.focus()
+    await page.keyboard.type(start)
+    await expect(phone).toHaveValue(start === '9' ? '+7 9' : '+7')
+    expect(await phone.evaluate(input => input instanceof HTMLInputElement ? input.selectionStart : null)).toBe(start === '9' ? 4 : 2)
+    await page.keyboard.type(start === '9' ? '001234567' : '9001234567')
+    await expect(phone).toHaveValue('+7 900 123-45-67')
+    expect(await phone.boundingBox()).toEqual(before)
+    await phone.fill('89007654321')
+    await expect(phone).toHaveValue('+7 900 765-43-21')
+  })
+}

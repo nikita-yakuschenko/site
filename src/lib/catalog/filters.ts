@@ -4,6 +4,7 @@ import {
   isCatalogSeries,
   isCatalogTechnology,
   type CatalogFilters,
+  type CatalogTechnology,
   type Range,
 } from './types'
 
@@ -33,7 +34,7 @@ import {
  */
 
 /** Порядок параметров в адресе. Правило 6. */
-const ORDER = ['q', 'status', 'series', 'tech', 'area', 'price', 'bedrooms', 'bathrooms', 'floors'] as const
+const ORDER = ['q', 'status', 'series', 'tech', 'area', 'price', 'bedrooms', 'bathrooms', 'floors', 'sort'] as const
 
 export type RawParams = Record<string, string | string[] | undefined>
 
@@ -105,6 +106,7 @@ export function parseFilters(params: RawParams): CatalogFilters {
   const q = first(params.q)
   const query = q ? normalizeQuery(q) : ''
   return {
+    sort: ['price-asc', 'price-desc', 'area-asc', 'area-desc'].includes(first(params.sort) ?? '') ? first(params.sort) as CatalogFilters['sort'] : undefined,
     q: query || undefined,
     status: first(params.status) === 'ready' ? 'ready' : undefined,
     series: series && isCatalogSeries(series) ? series : undefined,
@@ -127,6 +129,7 @@ function encodeValue(value: string): string {
 
 export function filtersToHref(filters: CatalogFilters, pathname = '/catalog'): string {
   const value: Record<(typeof ORDER)[number], string | undefined> = {
+    sort: filters.sort,
     q: filters.q,
     status: filters.status,
     series: filters.series,
@@ -144,7 +147,7 @@ export function filtersToHref(filters: CatalogFilters, pathname = '/catalog'): s
 }
 
 export function isEmpty(filters: CatalogFilters): boolean {
-  return filtersToHref(filters) === '/catalog'
+  return countActive(filters) === 0
 }
 
 /**
@@ -176,6 +179,7 @@ export type { CatalogFilters, Range }
 
 /** Границы ползунков и наборы значений для сегментов. */
 export type CatalogFacets = {
+  technologies: CatalogTechnology[]
   area: { min: number; max: number }
   price: { min: number; max: number }
   bedrooms: number[]
@@ -188,13 +192,14 @@ export type CatalogFacets = {
  * проект шире прежнего, и ползунок площади сам разъехался под него.
  */
 export function facetsOf(
-  projects: readonly { areaValue: number; priceAmount: number | null; bedrooms: string; bathrooms: string; floorsValue: number }[],
+  projects: readonly { areaValue: number; priceAmount: number | null; bedrooms: string; bathrooms: string; floorsValue: number; technology: CatalogTechnology }[],
 ): CatalogFacets {
   const areas = projects.map((p) => p.areaValue).filter((n) => Number.isFinite(n) && n > 0)
   const prices = projects.map((p) => p.priceAmount ?? 0).filter((n) => Number.isFinite(n) && n > 0)
   const bounds = (values: number[]) => values.length ? { min: Math.min(...values), max: Math.max(...values) } : { min: 0, max: 0 }
   const uniq = (list: number[]) => [...new Set(list)].filter((n) => n > 0).sort((a, b) => a - b)
   return {
+    technologies: (['modular', 'panel', 'frame'] as const).filter(technology => projects.some(project => project.technology === technology)),
     area: bounds(areas),
     price: bounds(prices),
     bedrooms: uniq(projects.map((p) => Number(p.bedrooms))),

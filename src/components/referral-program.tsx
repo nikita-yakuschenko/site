@@ -9,6 +9,8 @@ import { IconArrowUpRight } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
 import { noAutofillFieldProps, noAutofillFormProps } from "../lib/no-autofill";
 
+import { PhoneInput } from './phone-input'
+
 type Status = "idle" | "open" | "sending" | "ok" | "error";
 
 function digits(value: string) {
@@ -21,39 +23,6 @@ function stripNameDigits(value: string) {
 
 function nameLetters(value: string) {
   return value.replace(/[^a-zA-Z\u0400-\u04FF]/g, "");
-}
-
-function nationalDigits(value: string) {
-  let d = digits(value);
-  while (d.startsWith("7") || d.startsWith("8")) d = d.slice(1);
-  while (d.length && !d.startsWith("9")) d = d.slice(1);
-  return d.slice(0, 10);
-}
-
-function maskPhone(value: string) {
-  const n = nationalDigits(value);
-  let out = "+7";
-  if (n.length) out += ` ${n.slice(0, 3)}`;
-  if (n.length > 3) out += ` ${n.slice(3, 6)}`;
-  if (n.length > 6) out += `-${n.slice(6, 8)}`;
-  if (n.length > 8) out += `-${n.slice(8, 10)}`;
-  return out;
-}
-
-function nationalBeforeCaret(value: string, pos: number) {
-  return nationalDigits(value.slice(0, pos)).length;
-}
-
-function caretAfterNational(formatted: string, count: number) {
-  if (count <= 0) return 2;
-  let seen = 0;
-  for (let i = 2; i < formatted.length; i++) {
-    if (/\d/.test(formatted[i]!)) {
-      seen += 1;
-      if (seen === count) return i + 1;
-    }
-  }
-  return formatted.length;
 }
 
 function validEmail(value: string) {
@@ -72,7 +41,7 @@ export function ReferralProgram({
   const [status, setStatus] = useState<Status>("idle");
   const submitting = useRef(false);
   const attempt = useRef<LeadAttempt['current']>(null)
-  const [phone, setPhone] = useState("+7");
+  const [phone, setPhone] = useState("");
   const [rules, setRules] = useState(true);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const nameRef = useRef<HTMLInputElement>(null);
@@ -259,8 +228,9 @@ export function ReferralProgram({
 
                       <label className="referral__field">
                         <span>{data.phoneLabel}</span>
-                        <input
+                        <PhoneInput
                           ref={phoneRef}
+                          placeholder={copy.phonePlaceholder}
                           name="phone"
                           type="tel"
                           inputMode="tel"
@@ -273,51 +243,8 @@ export function ReferralProgram({
                           ]
                             .filter(Boolean)
                             .join(" ") || undefined}
-                          onFocus={() => {
-                            if (!nationalDigits(phone)) {
-                              setPhone("+7");
-                              window.setTimeout(() => {
-                                phoneRef.current?.setSelectionRange(2, 2);
-                              }, 0);
-                            }
-                          }}
-                          onKeyDown={(e) => {
-                            const el = e.currentTarget;
-                            const start = el.selectionStart || 0;
-                            const end = el.selectionEnd || 0;
-                            if (
-                              e.key === "Backspace" &&
-                              start === end &&
-                              start <= 2
-                            ) {
-                              e.preventDefault();
-                            }
-                            if (
-                              e.key === "Delete" &&
-                              start === end &&
-                              start < 2
-                            ) {
-                              e.preventDefault();
-                            }
-                            if (
-                              !nationalDigits(phone) &&
-                              (e.key === "+" || e.key === "7" || e.key === "8")
-                            ) {
-                              e.preventDefault();
-                            }
-                          }}
-                          onChange={(e) => {
-                            const el = e.currentTarget;
-                            const pos = el.selectionStart || 0;
-                            const before = nationalBeforeCaret(el.value, pos);
-                            const masked = maskPhone(el.value);
-                            setPhone(masked);
-                            setInvalid((prev) => ({ ...prev, phone: false }));
-                            window.requestAnimationFrame(() => {
-                              const next = caretAfterNational(masked, before);
-                              el.setSelectionRange(next, next);
-                            });
-                          }}
+                          onValueChange={setPhone}
+                          onEdited={() => setInvalid(prev => ({ ...prev, phone: false }))}
                           required
                         />
                       </label>

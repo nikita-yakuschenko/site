@@ -1,4 +1,5 @@
 import type { CollectionConfig, Field } from 'payload'
+import { TECHNOLOGY_OPTIONS } from '../../../src/lib/catalog/types'
 import { authenticated, contentManager, contentWriter, privilegedField } from '../access/staff'
 import { projectOrderEndpoints } from './project-order-endpoints'
 import { validProjectOrder, completeProjectOrder, normalizeProjectOrder } from '../config/project-order'
@@ -12,7 +13,7 @@ import { projectPlansEndpoint } from './project-plans-endpoint'
 import { blankRoom, normalizePlans, validRoomArea } from '../config/project-plans'
 import { projectNextStepsEndpoint } from './project-next-steps-endpoint'
 import { projectConfigurationsEndpoint } from './project-configurations-endpoint'
-import { projectYmlEndpoint } from './project-yml-endpoint'
+import { projectYmlEndpoint, projectYmlOptionsEndpoint } from './project-yml-endpoint'
 import { projectCatalogEndpoint } from './project-catalog-endpoint'
 import { projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint } from './project-reactions-endpoint'
 import { normalizeConfigurations } from '../config/project-configurations'
@@ -39,7 +40,7 @@ export const Projects: CollectionConfig = {
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'recordType', 'technologyBadge', 'areaValue', 'priceAmount', '_status'], components: { edit: { beforeDocumentControls: ['./components/admin/PageMetadataFields#ProjectRecordMetadata'] } } },
   versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
-  endpoints: [...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
+  endpoints: [...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectYmlOptionsEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
   hooks: { beforeDelete: [async ({ id, req }) => {
     // Price rows require a project, so they go first
     await req.payload.delete({ collection: 'project-prices', where: { project: { equals: id } }, req, overrideAccess: true })
@@ -49,6 +50,7 @@ export const Projects: CollectionConfig = {
     if (operation === 'update' && data) delete data.code
     return data
   }, ({ data, originalDoc }) => {
+    if (data && (data.recordType ?? originalDoc?.recordType) === 'ready-home') data.hero_product = null
     if (Array.isArray(data?.plans)) data.plans = normalizePlans(data.plans)
     if (data && completeProjectOrder(data.blockOrder)) data.blockOrder = normalizeProjectOrder(data.blockOrder)
     if (Array.isArray(data?.interiors)) data.interiors = data.interiors.map((row: { photo?: unknown; image?: string }) => ({ ...row, image: row.photo ? null : row.image }))
@@ -107,6 +109,11 @@ export const Projects: CollectionConfig = {
       { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
     ] },
     { name: 'code', label: 'Код', type: 'text', unique: true, index: true, admin: { hidden: true } },
+    { type: 'collapsible', label: 'Настройки каталога', admin: { initCollapsed: true, condition: data => data.recordType !== 'ready-home' }, fields: [
+      { name: 'hero_product', label: 'Закрепление в каталоге', type: 'number', unique: true, min: 1, max: 2,
+        validate: (value: unknown) => value == null || value === 1 || value === 2 ? true : 'Выберите слот №1 или №2',
+        admin: { components: { Field: './components/admin/HeroProductField#HeroProductField' } } },
+    ] },
     { name: 'preview', type: 'ui', admin: { position: 'sidebar', components: { Field: './components/admin/PagePreviewField#ProjectPreviewField' } } },
     { name: 'blockOrder', label: 'Порядок блоков', type: 'json', validate: (value: unknown) => value == null || validProjectOrder(value) ? true : 'Порядок должен содержать все блоки без повторений', admin: { components: { Field: './components/admin/ProjectBlockOrder#ProjectBlockOrder' } } },
     { type: 'collapsible', label: 'Главный экран', fields: [
@@ -119,7 +126,7 @@ export const Projects: CollectionConfig = {
       { name: 'mobileImageUrl', type: 'text', admin: { hidden: true } },
       { name: 'mobileHeroThumbnail', type: 'ui', admin: { components: { Field: './components/admin/ProjectImageField#ProjectMobileHeroImage' } } },
       { type: 'row', admin: { className: 'project-choice-row' }, fields: [
-        { name: 'technologyBadge', label: 'Технология', type: 'select', required: true, options: [{ label: 'Панельно-каркасная', value: 'Панельно-каркасный' }, { label: 'Модульная', value: 'Модульный' }] },
+        { name: 'technologyBadge', label: 'Технология', type: 'select', required: true, options: TECHNOLOGY_OPTIONS.map(({ label, value }) => ({ label, value })) },
         { name: 'series', label: 'Серия', type: 'select', options: [{ label: 'Панельные', value: 'panel' }, { label: 'Барнхаусы', value: 'barn' }, { label: 'Классические', value: 'classic' }, { label: 'Модульные', value: 'modular' }, { label: 'А-фрейм', value: 'aframe' }] },
       ] },
       { type: 'row', admin: { className: 'project-specs-row' }, fields: [

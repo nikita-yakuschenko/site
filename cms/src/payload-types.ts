@@ -529,6 +529,7 @@ export interface Project {
   recordType: 'project' | 'ready-home';
   slug: string;
   code?: string | null;
+  hero_product?: number | null;
   blockOrder?:
     | {
         [k: string]: unknown;
@@ -546,7 +547,7 @@ export interface Project {
    */
   mobileImage?: (number | null) | Media;
   mobileImageUrl?: string | null;
-  technologyBadge: 'Панельно-каркасный' | 'Модульный';
+  technologyBadge: 'Панельно-каркасный' | 'Модульный' | 'Каркасный';
   series?: ('panel' | 'barn' | 'classic' | 'modular' | 'aframe') | null;
   areaValue: number;
   floorsValue: number;
@@ -1340,6 +1341,7 @@ export interface ProjectsSelect<T extends boolean = true> {
   recordType?: T;
   slug?: T;
   code?: T;
+  hero_product?: T;
   blockOrder?: T;
   name?: T;
   desktopImage?: T;

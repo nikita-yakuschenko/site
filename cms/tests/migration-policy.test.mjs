@@ -33,6 +33,14 @@ test('constraint, type and existing-column changes are rejected', () => {
   assert.ok(rollbackViolations(`ALTER TYPE "public"."enum_project_prices_region" RENAME VALUE 'special' TO 'other'`).length > 0)
 })
 
+test('unique index is safe only on a newly added nullable column without a default', () => {
+  const add = 'ALTER TABLE "projects" ADD COLUMN "hero_product" numeric;'
+  assert.deepEqual(rollbackViolations(`${add} CREATE UNIQUE INDEX "hero_idx" ON "projects" USING btree ("hero_product");`), [])
+  assert.ok(rollbackViolations(`${add} CREATE UNIQUE INDEX "hero_idx" ON "projects" USING btree (lower("hero_product"));`).length > 0)
+  assert.ok(rollbackViolations(`${add} CREATE UNIQUE INDEX "hero_idx" ON "projects" USING btree ("hero_product") NULLS NOT DISTINCT;`).length > 0)
+  assert.ok(rollbackViolations('ALTER TABLE "projects" ADD COLUMN "hero_product" numeric DEFAULT 1; CREATE UNIQUE INDEX "hero_idx" ON "projects" ("hero_product");').length > 0)
+})
+
 test('a nullable column with a default can be rolled back to the previous CMS', () => {
   const sql = `
     CREATE TYPE "public"."enum_demo" AS ENUM('a');

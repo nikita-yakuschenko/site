@@ -16,7 +16,9 @@ import {
   readServerFavorites,
   subscribeFavorites,
 } from "../lib/favorites";
-import { IconFilter, IconFilterX } from "@tabler/icons-react";
+import { IconFilter } from "@tabler/icons-react";
+import { sortCatalog, type SortableProject } from "../lib/catalog/order";
+import { useRegionCode } from "./region-bootstrap";
 import { copy } from "../lib/copy";
 
 /**
@@ -39,7 +41,8 @@ import { copy } from "../lib/copy";
 /* Класс блокировки прокрутки под раскрытым листом отбора. */
 const SHEET_LOCK = "is-catalog-sheet";
 
-export type BoardItem = { id: string; card: ReactNode };
+export type BoardItem = SortableProject & { card: ReactNode };
+
 
 export function CatalogBoard({
   filters,
@@ -56,6 +59,7 @@ export function CatalogBoard({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  const changeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   /* Раскрытие колонки на узком экране. Живёт здесь, потому что кнопка стоит
      в полосе поиска, а сама колонка ниже. */
@@ -69,7 +73,8 @@ export function CatalogBoard({
   const keep = (items: BoardItem[]) =>
     onlyFavorites ? items.filter((item) => favorites.includes(item.id)) : items;
 
-  const shownMatched = keep(matched);
+  const region = useRegionCode();
+  const shownMatched = sortCatalog(keep(matched), filters.sort, region);
   const shownRest = keep(rest);
   const narrowed = picked || onlyFavorites;
 
@@ -78,8 +83,19 @@ export function CatalogBoard({
      Прилипание считаем по самой полосе: её верх упёрся в край экрана,
      значит она встала. */
   const bar = useRef<HTMLDivElement>(null);
+  const sidebar = useRef<HTMLDivElement>(null);
   const results = useRef<HTMLDivElement>(null);
   const [stuck, setStuck] = useState(false);
+
+  useEffect(() => {
+    const node = sidebar.current;
+    if (!node) return;
+    const measure = () => node.style.setProperty('--catalog-filter-height', `${node.offsetHeight}px`);
+    measure();
+    const observer = new ResizeObserver(measure);
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
     const node = bar.current;
@@ -99,7 +115,7 @@ export function CatalogBoard({
 
   /* Избранное считается наравне с условиями отбора: для человека это такое
      же сужение выдачи, просто хранится не в адресе. */
-  const active = countActive(filters) + (onlyFavorites ? 1 : 0);
+  const active = countActive(filters) + (filters.sort ? 1 : 0) + (onlyFavorites ? 1 : 0);
 
   /* Раскрытая на телефоне панель это лист поверх страницы, и страница под
      ним стоять должна неподвижно: иначе прокрутка уводит фон, а лист
@@ -143,8 +159,17 @@ export function CatalogBoard({
     backToStart();
   };
 
+  const reset = () => {
+    if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
+    setOnlyFavorites(false);
+    router.replace(pathname, { scroll: false });
+    backToStart();
+  };
+
   return (
     <>
+      <div className="catalog__layout">
+      <div ref={sidebar} className="catalog__sidebar">
       {/* Поиск липнет вместе с отбором: искать по названию и смотреть
           выдачу приходится одновременно, и уезжающее вверх поле заставляло
           бы возвращаться к началу страницы на каждый запрос. */}
@@ -163,35 +188,21 @@ export function CatalogBoard({
           <CatalogSearch value={filters.q ?? ""} onChange={search} />
           {/* Видна только на узком экране, на широком её прячет CSS: там
               колонка стоит целиком и прятать нечего. */}
-          {/* Одна кнопка в двух состояниях. Отбор пуст, значит она
-              раскрывает лист отбора; отбор задан, значит сбрасывает его.
-              Закрывает лист кнопка «Показать проекты» в самом листе. */}
+          {/* Панель доступна и с активными фильтрами: внутри также сортировка. */}
           <button
             type="button"
-            className={active ? "cfilter__toggle is-reset" : "cfilter__toggle"}
-            aria-expanded={active ? undefined : open}
-            aria-label={active ? copy.resetAll : copy.filtersLabel}
-            onClick={() => {
-              if (!active) {
-                setOpen((value) => !value);
-                return;
-              }
-              setOnlyFavorites(false);
-              setOpen(false);
-              router.replace(pathname, { scroll: false });
-              backToStart();
-            }}
+            className="cfilter__toggle"
+            aria-expanded={open}
+            aria-label={active ? `${copy.filtersLabel}: ${active}` : copy.filtersLabel}
+            onClick={() => setOpen((value) => !value)}
           >
-            {active ? (
-              <IconFilterX size={20} stroke={2} aria-hidden="true" />
-            ) : (
-              <IconFilter size={20} stroke={2} aria-hidden="true" />
-            )}
+            <IconFilter size={20} stroke={2} aria-hidden="true" />
           </button>
         </div>
       </div>
-      <div className="catalog__layout">
       <CatalogFilters
+        onReset={reset}
+        hasActiveFilters={!!active}
         filters={filters}
         facets={facets}
         onlyFavorites={onlyFavorites}
@@ -208,7 +219,9 @@ export function CatalogBoard({
           setTimeout(backToStart, 150);
         }}
         onChanged={backToStart}
+        changeTimerRef={changeTimerRef}
       />
+      </div>
 
       <div ref={results} className="catalog__results">
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку

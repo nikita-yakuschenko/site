@@ -1,36 +1,20 @@
-'use client'
-
-import { useEffect } from 'react'
-
-/**
- * Счётчик Roistat. Грузится сразу, до баннера, как Метрика: номер визита
- * в cookie roistat_visit нужен с первого захода, иначе заявка не свяжется
- * с рекламным источником. Номер визита сервер прикладывает к заявке.
- *
- * Номер проекта приходит с сервера из настроек CMS.
- */
-const host = 'cloud.roistat.com'
-
-type RoistatWindow = Window & { roistatProjectId?: string; roistatHost?: string; roistatPage?: string; roistatReferrer?: string }
-
+/** Стандартный сниппет виден в исходном HTML и запускается до гидратации. */
 export function RoistatCounter({ projectId }: { projectId: string }) {
-  useEffect(() => {
-    const w = window as RoistatWindow
-    if (w.roistatProjectId) return
-    // Параметры и адрес скрипта — как в сниппете из кабинета Roistat.
-    w.roistatProjectId = projectId
-    w.roistatHost = host
-    w.roistatPage = location.href
-    w.roistatReferrer = document.referrer
-    const path = /^.*roistat_visit=[^;]+(.*)?$/.test(document.cookie)
-      ? '/dist/module.js'
-      : `/api/site/1.0/${projectId}/init?referrer=${encodeURIComponent(location.href)}`
-    const script = document.createElement('script')
-    script.charset = 'UTF-8'
-    script.async = true
-    script.src = `https://${host}${path}`
-    document.head.appendChild(script)
-  }, [projectId])
-
-  return null
+  if (!/^[a-zA-Z0-9]{8,64}$/.test(projectId)) return null
+  const code = `(function(w, d, s, h, id) {
+    if (w.roistatProjectId) return;
+    w.roistatProjectId = id; w.roistatHost = h;
+    var previous = w.onRoistatAllModulesLoaded;
+    w.onRoistatAllModulesLoaded = function() {
+      if (typeof previous === 'function') previous();
+      var notify = function() { w.dispatchEvent(new Event('avgst:roistat-phone')); };
+      w.roistat.registerOnCalltrackingPhoneReceivedCallback(notify);
+      notify();
+    };
+    var p = d.location.protocol == "https:" ? "https://" : "http://";
+    var u = /^.*roistat_visit=[^;]+(.*)?$/.test(d.cookie) ? "/dist/module.js" : "/api/site/1.0/"+id+"/init?referrer="+encodeURIComponent(d.location.href);
+    var js = d.createElement(s); js.charset="UTF-8"; js.async = 1; js.fetchPriority="high"; js.src = p+h+u;
+    var js2 = d.getElementsByTagName(s)[0]; js2.parentNode.insertBefore(js, js2);
+  })(window, document, 'script', 'cloud.roistat.com', ${JSON.stringify(projectId)});`
+  return <script id="roistat-counter" dangerouslySetInnerHTML={{ __html: code }} />
 }

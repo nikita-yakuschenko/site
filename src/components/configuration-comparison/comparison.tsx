@@ -42,6 +42,7 @@ import {
   type SpecificationValue,
   type TechnicalElement,
   type TechnicalInfo,
+  type TechnicalMatrix,
 } from "./model/types";
 import type { CatalogProject } from "../../lib/catalog/types";
 import type { PricedTier } from "../../lib/catalog/tiers";
@@ -183,6 +184,8 @@ export function ConfigurationComparison({
   region: "nn" | "msk";
 }) {
   const [open, setOpen] = useState(false);
+  const matrix = project.technology === 'frame' ? null : technicalMatrices[project.technology];
+  if (!matrix) return null;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <div className="comparison-invitation">
@@ -199,6 +202,7 @@ export function ConfigurationComparison({
       </div>
       <DialogContent>
         <ComparisonBody
+          matrix={matrix}
           project={project}
           tiers={tiers}
           selectedTier={selectedTier}
@@ -209,17 +213,18 @@ export function ConfigurationComparison({
   );
 }
 function ComparisonBody({
+  matrix,
   project,
   tiers,
   selectedTier,
   region,
 }: {
+  matrix: TechnicalMatrix;
   project: CatalogProject;
   tiers: readonly PricedTier[];
   selectedTier: string;
   region: "nn" | "msk";
 }) {
-  const matrix = technicalMatrices[project.technology];
   const projectSections = matrix.sections.map((section) => ({
     ...section,
     elements: section.elements

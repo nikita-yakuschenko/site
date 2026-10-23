@@ -22,12 +22,20 @@ test('новая рекламная кампания не смешивается
 })
 
 test('комментарий и плоские поля содержат атрибуцию и параметры выбранной формы', () => {
-  const body = webhookBody({ name: 'Тест', phone: '+79990000000', siteId: 'corporate', consent: true, formId: 'mortgage-calculator', sourceUrl: 'https://avgst.ru/catalog/norway-115', meta: { formHeading: 'Расчёт ипотеки', monthlyPayment: 25000, utm_source: 'yandex', _ym_uid: '12345', yclid: '67890', roistatVisit: '204704' } }, 'test', 'Заявка')
-  for (const line of ['Страница: https://avgst.ru/catalog/norway-115', 'formname: Расчёт ипотеки', 'monthlyPayment: 25000', '_ym_uid: 12345', 'yclid: 67890']) assert.ok(body.comment.includes(line))
+  const body = webhookBody({ name: 'Тест', phone: '+79990000000', siteId: 'corporate', consent: true, formId: 'mortgage-calculator', sourceUrl: 'https://avgst.ru/catalog/norway-115', meta: { formHeading: 'Расчёт ипотеки', monthlyPayment: 25000, utm_source: 'yandex', _ym_uid: '12345', yclid: '67890', roistatVisit: '204704', utm_referrer: 'https://yandex.ru', gclid: 'google-click' } }, 'test', 'Заявка')
+  for (const id of ['12345', '67890', '204704']) assert.equal(body.comment.includes(id), false)
+  assert.ok(body.comment.includes('Обращение: Консультация по ипотеке'))
+  assert.ok(body.comment.includes('Ежемесячный платёж:'))
+  assert.equal(body.comment.includes('Страница:'), false)
+  assert.equal(body.comment.includes('Согласие'), false)
+  assert.equal(body.comment.includes('monthlyPayment'), false)
   assert.equal(body.comment.includes('utm_source:'), false)
   assert.equal(body.utm_source, 'yandex')
   assert.equal(body.yclid, '67890')
   assert.equal(body._ym_uid, '12345')
+  assert.equal(body.utm_referrer, 'https://yandex.ru')
+  assert.equal(body.comment.includes('https://yandex.ru'), false)
+  assert.ok(body.comment.includes('Идентификатор клика Google Ads: google-click'))
 })
 
  test('UTM скрыты также в адресах комментария, но исходный URL вебхука сохранён', () => {
