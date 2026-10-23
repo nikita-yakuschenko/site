@@ -15,6 +15,8 @@ Both workflows run on Ubuntu 24.04, install browsers and their system dependenci
 
 WebKit can emit same-origin `Fetch API cannot load … due to access control checks` exceptions while unloading a document. The captured trace reproduced this during reload, followed by HTTP 200 for the same configuration endpoint in the new document. These events remain in the report as navigation warnings only when WebKit is actively navigating and the fetch target is the current origin. The same error outside navigation, or against a different origin, remains critical.
 
+Request cancellation also tracks the document that initiated each request: a delayed cancellation from an earlier document is not a failure of the newly loaded document. Unknown `Load failed` exceptions remain critical.
+
 ## First production audit, 2026-10-22
 
 The initial five-profile matrix ran 30 synthetic scenarios (5 passed, 19 failed, 6 timed out). The first version of the mobile selectors caused several timeouts; these were corrected and a focused rerun confirmed that mobile filters and favorites pass in Chromium. The form flow opens and validates on mobile, but still reports the React error below. The first matrix totals should not be treated as site failure rates.

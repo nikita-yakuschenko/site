@@ -1,5 +1,5 @@
 import { existsSync } from 'node:fs'
-import type { Page, TestInfo } from '@playwright/test'
+import type { Page, Request, TestInfo } from '@playwright/test'
 import { navigationCancellation, scenarioKey, webkitNavigationFetch, type Finding } from './model'
 
 export type { Finding } from './model'
@@ -24,8 +24,14 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   const findings: Finding[] = []
   const origin = new URL(info.project.use.baseURL || 'https://avgst.ru').origin
   let navigating = false
+  let documentGeneration = 0
+  const requestDocuments = new WeakMap<Request, number>()
   page.on('request', request => {
-    if (request.isNavigationRequest() && request.frame() === page.mainFrame()) navigating = true
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame()) {
+      navigating = true
+      documentGeneration++
+    }
+    requestDocuments.set(request, documentGeneration)
   })
   page.on('load', () => { navigating = false })
   page.on('framenavigated', frame => {
@@ -61,6 +67,7 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   page.on('pageerror', error => {
     const frameUrl = error.stack?.match(/\bat\s+[^\n]*?\((https?:\/\/[^)]+)\)/)?.[1]
       || error.stack?.match(/\bat\s+(https?:\/\/[^\s)]+)/)?.[1]
+      || error.message.match(/\(error: (https?:\/\/[^)]+)\)/)?.[1]
     const category = webkitNavigationFetch(error.message, error.stack || '', info.project.name, navigating, origin)
       ? 'navigation-fetch-cancelled' : 'exception'
     add(category, error.message, error.stack || '', frameUrl || page.url())
@@ -72,7 +79,8 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   })
   page.on('requestfailed', request => {
     if (/^(?:data|blob):/.test(request.url())) return
-    if (navigationCancellation(request.failure()?.errorText || '', navigating)) return
+    const previousDocument = (requestDocuments.get(request) ?? documentGeneration) < documentGeneration
+    if (navigationCancellation(request.failure()?.errorText || '', navigating || previousDocument)) return
     add(/\.(?:js|css)(?:\?|$)/.test(request.url()) ? 'script-failure' : 'network-failure',
       `${request.method()} ${safeUrl(request.url())}: ${request.failure()?.errorText || 'failed'}`, '', request.url())
   })
