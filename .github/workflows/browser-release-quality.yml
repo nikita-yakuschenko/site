@@ -9,12 +9,13 @@ permissions:
 
 jobs:
   browser-release:
-    runs-on: ubuntu-latest
-    container: mcr.microsoft.com/playwright:v1.63.0-noble
+    runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
       CI: '1'
       BROWSER_DIAGNOSTICS_FIXTURE_CATALOG: '1'
+      CMS_PUBLIC_URL: http://127.0.0.1:9
+      YANDEX_SMARTCAPTCHA_SITE_KEY: diagnostic-browser-fixture-key
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -22,9 +23,12 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --no-audit --no-fund
-      - name: Read the public captcha site key for the test server
-        run: |
-          node -e "fetch('https://avgst.ru/api/smartcaptcha-config').then(r => r.json()).then(d => { if (!d.configured || !d.siteKey) throw Error('Public captcha key unavailable'); require('fs').appendFileSync(process.env.GITHUB_ENV, 'YANDEX_SMARTCAPTCHA_SITE_KEY=' + d.siteKey + '\\n') }).catch(e => { console.error(e.message); process.exitCode = 1 })"
+      - name: Install browsers matching package-lock on the supported host
+        run: npx playwright install --with-deps chromium firefox webkit
+      - name: Check browser launch independently of the site
+        run: node scripts/check-diagnostic-browsers.mjs
+      - name: Test diagnostic classification and reporting
+        run: node --experimental-strip-types --test diagnostics/tests/*.test.mjs
       - run: npm run build
       - run: npm run diagnostics:release
       - name: Add diagnostic summary

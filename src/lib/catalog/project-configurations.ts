@@ -4,6 +4,16 @@ import type { PricedTier } from './tiers'
 import type { SharedConfigurationContent } from './configuration-content'
 
 export async function resolveProjectConfigurations(slug: string): Promise<PricedTier[] | null> {
+  if (process.env.BROWSER_DIAGNOSTICS_FIXTURE_CATALOG === '1') {
+    const { CATALOG_PROJECTS } = await import('./projects')
+    const { configurationKeys } = await import('./configuration-rules')
+    const project = CATALOG_PROJECTS.find(item => item.slug === slug)
+    if (!project || project.readyHome) return null
+    return configurationTiers(configurationKeys(project.technology === 'modular').map((key, index) => ({
+      key, price: (index + 1) * 1_000_000,
+      regionalPrices: { nn: (index + 1) * 1_000_000, msk: (index + 1) * 1_000_000 + 500_000 },
+    })), project.technologyBadge)
+  }
   const key = process.env.CMS_SITE_API_KEY
   if (!key) return null
   try {

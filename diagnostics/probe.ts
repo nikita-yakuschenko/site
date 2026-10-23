@@ -1,20 +1,8 @@
 import { existsSync } from 'node:fs'
 import type { Page, TestInfo } from '@playwright/test'
+import { navigationCancellation, scenarioKey, webkitNavigationFetch, type Finding } from './model'
 
-export type Finding = {
-  url: string
-  scenario: string
-  browser: string
-  device: string
-  category: string
-  message: string
-  stack: string
-  severity: 'critical' | 'warning' | 'info'
-  source: 'application' | 'third-party' | 'unknown'
-  component: string
-  cause: 'confirmed' | 'unconfirmed'
-  fingerprint: string
-}
+export type { Finding } from './model'
 
 function safeUrl(raw: string) {
   try { const u = new URL(raw); return u.origin + u.pathname } catch { return raw.slice(0, 200) }
@@ -35,14 +23,23 @@ function reactHydration(text: string) {
 export async function diagnose(page: Page, info: TestInfo, scenario: string, action: () => Promise<void>) {
   const findings: Finding[] = []
   const origin = new URL(info.project.use.baseURL || 'https://avgst.ru').origin
+  let navigating = false
+  page.on('request', request => {
+    if (request.isNavigationRequest() && request.frame() === page.mainFrame()) navigating = true
+  })
+  page.on('load', () => { navigating = false })
+  page.on('framenavigated', frame => {
+    if (frame === page.mainFrame() && /^https?:/.test(frame.url()) && new URL(frame.url()).origin !== origin)
+      add('origin-escape', `Scenario left ${origin}: ${safeUrl(frame.url())}`, '', origin)
+  })
   const add = (category: string, message: string, stack = '', location = page.url()) => {
     const source = !/^https?:/.test(location) ? 'unknown'
-      : location.startsWith(origin) ? 'application' : 'third-party'
-    const severity = reactHydration(message + stack) || (source === 'application' && ['exception', 'console-error', 'script-failure', 'http-5xx'].includes(category))
-      ? 'critical' : category === 'console-warning' || category === 'console-error' || source === 'third-party' ? 'warning' : 'info'
+      : new URL(location).origin === origin ? 'application' : 'third-party'
+    const severity = category === 'origin-escape' || reactHydration(message + stack) || (source === 'application' && ['exception', 'console-error', 'script-failure', 'http-5xx'].includes(category))
+      ? 'critical' : ['console-warning', 'console-error', 'navigation-fetch-cancelled'].includes(category) || source === 'third-party' ? 'warning' : 'info'
     const cleanMessage = scrub(message)
     findings.push({
-      url: safeUrl(page.url()), scenario, browser: info.project.name.split('-')[0]!,
+      url: safeUrl(page.url()), scenario: scenarioKey(scenario), browser: info.project.name,
       device: info.project.name.includes('mobile') ? 'mobile' : 'desktop',
       category: reactHydration(message + stack) ? 'react-hydration' : category,
       message: cleanMessage, stack: scrub(stack), severity, source,
@@ -51,12 +48,22 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
     })
   }
   // Analytics requests are answered locally: the audit does not create real visits, views or clicks.
-  await page.route(/(?:mc\.yandex\.ru|roistat\.com|one2click\.ru|\/api\/(?:views|reactions)(?:\?|$))/, route =>
+  await page.route(/(?:mc\.yandex\.ru|roistat\.com|one2click\.ru|top-fwz1\.mail\.ru|vk\.com\/rtrg|\/api\/(?:views|reactions|consent)(?:\?|$))/, route =>
     route.fulfill({ status: 204, body: '' }))
+  await page.route('**/next/leads', route => route.abort('blockedbyclient'))
+  if (process.env.DIAG_TARGET !== 'production') {
+    await page.route('https://smartcaptcha.cloud.yandex.ru/**', async route => {
+      if (!new URL(route.request().url()).pathname.endsWith('/captcha.js')) return route.fulfill({ status: 204, body: '' })
+      const { captchaFixtureScript } = await import('./third-party-fixtures')
+      return route.fulfill({ contentType: 'application/javascript', body: captchaFixtureScript })
+    })
+  }
   page.on('pageerror', error => {
     const frameUrl = error.stack?.match(/\bat\s+[^\n]*?\((https?:\/\/[^)]+)\)/)?.[1]
       || error.stack?.match(/\bat\s+(https?:\/\/[^\s)]+)/)?.[1]
-    add('exception', error.message, error.stack || '', frameUrl || page.url())
+    const category = webkitNavigationFetch(error.message, error.stack || '', info.project.name, navigating, origin)
+      ? 'navigation-fetch-cancelled' : 'exception'
+    add(category, error.message, error.stack || '', frameUrl || page.url())
   })
   page.on('console', message => {
     if (message.type() !== 'error' && message.type() !== 'warning') return
@@ -65,7 +72,7 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   })
   page.on('requestfailed', request => {
     if (/^(?:data|blob):/.test(request.url())) return
-    if (/^(?:net::ERR_ABORTED|NS_BINDING_ABORTED)$/.test(request.failure()?.errorText || '')) return
+    if (navigationCancellation(request.failure()?.errorText || '', navigating)) return
     add(/\.(?:js|css)(?:\?|$)/.test(request.url()) ? 'script-failure' : 'network-failure',
       `${request.method()} ${safeUrl(request.url())}: ${request.failure()?.errorText || 'failed'}`, '', request.url())
   })

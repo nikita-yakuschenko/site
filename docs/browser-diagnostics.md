@@ -5,13 +5,15 @@
 Install browser binaries once with `npx playwright install chromium firefox webkit`.
 
 - `npm run diagnostics:production` checks `https://avgst.ru` without submitting leads or writing production consent, views, or reactions.
-- `npm run build` followed by `npm run diagnostics:release` checks the production build locally. Set `BROWSER_DIAGNOSTICS_FIXTURE_CATALOG=1` and a public `YANDEX_SMARTCAPTCHA_SITE_KEY` in the process environment to use the same isolated catalog fixture mode as CI.
+- `npm run build` followed by `npm run diagnostics:release` checks the production build locally. Set `BROWSER_DIAGNOSTICS_FIXTURE_CATALOG=1`, `CMS_PUBLIC_URL=http://127.0.0.1:9`, and `YANDEX_SMARTCAPTCHA_SITE_KEY=diagnostic-browser-fixture-key` for both commands to use the isolated CI environment. Do not supply a production CMS token.
 
 Each run writes `diagnostics-results/diagnostics.json`, `summary.md`, `results.json`, an HTML report, screenshots, and traces. This directory is ignored by Git. `syntheticFrequency` is a fraction of browser test runs for that scenario; it is not the share of real user visits.
 
-The release workflow runs on pull requests and manual dispatch. It uses catalog fixtures so PR code never receives a production CMS token. It reads the public captcha site key from the site's configuration endpoint at runtime. The production audit runs daily and on manual dispatch. Both upload the result directory as a GitHub Actions artifact. A confirmed React hydration error, including #418, fails the run even if the page later recovers.
+The release workflow runs on pull requests and manual dispatch. It uses catalog fixtures, disables managed public CMS redirects, and replaces the SmartCaptcha browser script with an explicit fixture. It never accepts fixture tokens on the server. This tests application behavior independently of provider availability and allowed-host restrictions. The production audit uses the real provider and runs daily and on manual dispatch after the workflow is merged into the default branch. Both upload the result directory as a GitHub Actions artifact. React hydration errors, including #418 from the real provider, fail the run even if the page later recovers.
 
-Both workflows run in the official Playwright `v1.63.0-noble` container, matching the locked package version. This avoids a separate browser installation step on each runner.
+Both workflows run on Ubuntu 24.04, install browsers and their system dependencies using the locked Playwright package, and check that all three engines launch before running scenarios. This avoids the previous container HOME/Firefox ownership mismatch. Findings retain the full browser/device profile. Frequencies count affected scenario runs, not repeated console events, and cannot exceed 100%. Known cancelled requests are ignored only while a document navigation is in progress; leaving the target origin fails the scenario.
+
+WebKit can emit same-origin `Fetch API cannot load … due to access control checks` exceptions while unloading a document. The captured trace reproduced this during reload, followed by HTTP 200 for the same configuration endpoint in the new document. These events remain in the report as navigation warnings only when WebKit is actively navigating and the fetch target is the current origin. The same error outside navigation, or against a different origin, remains critical.
 
 ## First production audit, 2026-10-22
 

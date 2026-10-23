@@ -15,8 +15,9 @@ async function browserConsent(page: Parameters<typeof diagnose>[0], baseURL: str
 const functionalConsent = (page: Parameters<typeof diagnose>[0], baseURL: string) => browserConsent(page, baseURL, true)
 
 async function open(page: Parameters<typeof diagnose>[0], path: string) {
-  const response = await page.goto(path, { waitUntil: 'domcontentloaded' })
+  const response = await page.goto(path, { waitUntil: 'load' })
   expect(response?.status(), path).toBeLessThan(400)
+  expect(new URL(page.url()).origin, 'Scenario must remain on its target origin').toBe(new URL(String(test.info().project.use.baseURL)).origin)
   await page.locator('body').waitFor()
 }
 
@@ -36,7 +37,7 @@ async function publishedProjects(page: Parameters<typeof diagnose>[0]) {
 
 test('home direct, reload and repeat navigation @critical', async ({ page }, info) => diagnose(page, info, 'home direct, reload and repeat navigation', async () => {
   await open(page, '/')
-  await page.reload({ waitUntil: 'domcontentloaded' })
+  await page.reload({ waitUntil: 'load' })
   await open(page, '/catalog')
   await open(page, '/')
 }))
@@ -47,7 +48,7 @@ test('catalog and published technologies @critical', async ({ page }, info) => d
   for (const href of projects) {
     await open(page, href)
     await expect(page.locator('h1').first()).toBeVisible()
-    await page.reload({ waitUntil: 'domcontentloaded' })
+    await page.reload({ waitUntil: 'load' })
   }
 }))
 
@@ -65,8 +66,8 @@ test('catalog filters and favorites @critical', async ({ page }, info) => diagno
   if (info.project.name.includes('mobile')) await page.locator('.cfilter__apply').click()
   await expect(page.locator('.card').first()).toBeVisible()
   if (info.project.name.includes('mobile')) {
-    await page.locator('.cfilter__toggle').click() // reset the active favorite filter
-    await page.locator('.cfilter__toggle').click() // open the filter sheet
+    await page.locator('.cfilter__toggle').click()
+    await page.getByRole('button', { name: 'Сбросить всё', exact: true }).click()
   }
   const ready = page.getByRole('checkbox', { name: 'Готовый дом в продаже' })
   if (await ready.isVisible()) {
@@ -79,13 +80,17 @@ test('region change and project prices @critical', async ({ page }, info) => dia
   await functionalConsent(page, String(info.project.use.baseURL))
   const projects = await publishedProjects(page)
   expect(projects.length).toBeGreaterThan(0)
-  await open(page, projects[0]!)
-  const before = await page.locator('.project-config').innerText().catch(() => '')
+  const fixture = process.env.DIAG_TARGET !== 'production'
+  await open(page, fixture ? '/catalog/barhhouse-73' : projects[0]!)
+  await expect(page.locator('.project-config')).toBeVisible()
+  const before = await page.locator('.project-config').innerText()
+  const total = page.locator('.project-config__total-sum').first()
+  if (fixture) await expect(total).toHaveText(/2\s000\s000/)
   await page.locator('.site-region__trigger').click()
   await page.getByRole('option', { name: /Московская область/ }).click()
   await expect(page.locator('.site-region__label')).toHaveText('Московская область')
-  const after = await page.locator('.project-config').innerText().catch(() => '')
-  if (before && after) expect(after).not.toEqual(before)
+  await expect.poll(() => page.locator('.project-config').innerText()).not.toBe(before)
+  if (fixture) await expect(total).toHaveText(/2\s500\s000/)
 }))
 
 test('form open, client validation and invisible captcha @critical', async ({ page }, info) => diagnose(page, info, 'form open, client validation and invisible captcha', async () => {
@@ -105,6 +110,9 @@ test('form open, client validation and invisible captcha @critical', async ({ pa
   expect(config.ok(), 'Invisible SmartCaptcha runtime configuration').toBeTruthy()
   expect((await config.json()).configured).toBe(true)
   await expect.poll(async () => page.evaluate(() => [...document.scripts].some(script => /captcha/i.test(script.src)))).toBe(true)
+  await expect.poll(() => page.evaluate(() => typeof (window as Window & { smartCaptcha?: { render?: unknown } }).smartCaptcha?.render), {
+    message: 'SmartCaptcha browser API must finish initialization',
+  }).toBe('function')
   // Invalid fields prevent the captcha challenge and any lead submission.
   await form.locator('button[type=submit]').click()
   await expect(form.locator('input[name=name]')).toHaveAttribute('aria-invalid', 'true')
@@ -123,5 +131,5 @@ test('mobile menu and state variants', async ({ page, context }, info) => diagno
     await expect(page.locator('.site-menu__panel')).toBeHidden()
   }
   await context.clearCookies()
-  await page.reload({ waitUntil: 'domcontentloaded' })
+  await page.reload({ waitUntil: 'load' })
 }))

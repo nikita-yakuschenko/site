@@ -5,6 +5,7 @@ const baseURL = production ? 'https://avgst.ru' : process.env.PLAYWRIGHT_BASE_UR
 
 export default defineConfig({
   testDir: './diagnostics',
+  testMatch: '**/*.spec.ts',
   timeout: 90_000,
   expect: { timeout: 12_000 },
   workers: 2,
