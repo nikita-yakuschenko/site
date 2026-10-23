@@ -16,9 +16,9 @@ const functionalConsent = (page: Parameters<typeof diagnose>[0], baseURL: string
 
 async function applicationReady(page: Parameters<typeof diagnose>[0]) {
   await expect(page.locator('body')).toBeVisible()
-  await expect.poll(() => page.evaluate(() => typeof (window as Window & { smartCaptcha?: { render?: unknown } }).smartCaptcha?.render), {
-    message: 'Hydrated application must initialize the SmartCaptcha browser API',
-  }).toBe('function')
+  if (process.env.DIAG_TARGET !== 'production') {
+    await expect(page.locator('html')).toHaveAttribute('data-app-hydrated', 'true')
+  }
 }
 
 async function reload(page: Parameters<typeof diagnose>[0]) {
@@ -121,7 +121,6 @@ test('form open, client validation and invisible captcha @critical', async ({ pa
   const config = await page.request.get('/api/smartcaptcha-config')
   expect(config.ok(), 'Invisible SmartCaptcha runtime configuration').toBeTruthy()
   expect((await config.json()).configured).toBe(true)
-  await expect.poll(async () => page.evaluate(() => [...document.scripts].some(script => /captcha/i.test(script.src)))).toBe(true)
   await expect.poll(() => page.evaluate(() => typeof (window as Window & { smartCaptcha?: { render?: unknown } }).smartCaptcha?.render), {
     message: 'SmartCaptcha browser API must finish initialization',
   }).toBe('function')

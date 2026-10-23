@@ -17,7 +17,7 @@ WebKit can emit same-origin `Fetch API cannot load … due to access control che
 
 Request cancellation also tracks the document that initiated each request: a delayed cancellation from an earlier document is not a failure of the newly loaded document. Unknown `Load failed` exceptions remain critical.
 
-Navigation waits for DOMContentLoaded and explicit hydration readiness (the SmartCaptcha browser API), followed by scenario-specific visible UI assertions. It does not wait for every image to finish loading: the first repaired CI trace stalled on Next image optimization for `/catalog/norvegiya-92/02.jpg` while application requests already returned 200. These scenarios do not establish an image performance budget.
+Navigation waits for DOMContentLoaded and scenario-specific visible UI assertions. The local release gate additionally requires the application's client initialization marker; the form scenario separately requires the SmartCaptcha browser API. It does not wait for every image to finish loading: the first repaired CI trace stalled on Next image optimization for `/catalog/norvegiya-92/02.jpg` while application requests already returned 200. These scenarios do not establish an image performance budget.
 
 ## First production audit, 2026-10-22
 
