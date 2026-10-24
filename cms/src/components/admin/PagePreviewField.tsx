@@ -1,6 +1,6 @@
 import { PagePreview } from './PagePreview'
 import { ConfigurationBlockEditor } from './ConfigurationBlockEditor'
-export function ConfigurationPreviewField({ variant }: { variant: 'panel' | 'modular' }) {
+export function ConfigurationPreviewField({ variant }: { variant: 'panel' | 'modular' | 'frame' }) {
   const siteUrl = process.env.SITE_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://new.avgst.ru' : 'http://localhost:3000')
   return <ConfigurationBlockEditor siteUrl={siteUrl} variant={variant} />
 }

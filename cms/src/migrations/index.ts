@@ -1,3 +1,4 @@
+import * as migration_20261024_220000_frame_configurations from './20261024_220000_frame_configurations';
 import * as migration_20261014_074208_initial_record_ids from './20261014_074208_initial_record_ids';
 import * as migration_20261014_094638_pages_drafts from './20261014_094638_pages_drafts';
 import * as migration_20261014_105148_block_part_content from './20261014_105148_block_part_content';
@@ -144,4 +145,5 @@ export const migrations = [
     down: migration_20261024_160000_automation.down,
     name: '20261024_160000_automation',
   },
+  { up: migration_20261024_220000_frame_configurations.up, down: migration_20261024_220000_frame_configurations.down, name: '20261024_220000_frame_configurations' },
 ];

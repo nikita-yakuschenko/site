@@ -40,7 +40,7 @@ function seriesPreview(parts: { key: string; text: string; href: string; image: 
   }
 }
 
-export function PagePreview({ siteUrl, project = false, story = false, configuration, isolateBlock = false }: { siteUrl: string; project?: boolean; story?: boolean; configuration?: { variant: 'panel' | 'modular'; tier: ConfigurationKey }; isolateBlock?: boolean }) {
+export function PagePreview({ siteUrl, project = false, story = false, configuration, isolateBlock = false }: { siteUrl: string; project?: boolean; story?: boolean; configuration?: { variant: 'panel' | 'modular' | 'frame'; tier: ConfigurationKey }; isolateBlock?: boolean }) {
   const { data, hasPublishedDoc } = useDocumentInfo()
   const blockKey = useFormFields(([fields]) => isolateBlock ? String(fields.key?.value || '') : '')
   const blockTitle = useFormFields(([fields]) => isolateBlock ? String(fields.title?.value || '') : '')

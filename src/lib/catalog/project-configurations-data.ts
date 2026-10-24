@@ -1,5 +1,6 @@
 import { configurationKeys, configurationNames, isModularTechnology, mortgageAllowed, validConfigurationKeys, type ConfigurationKey } from './configuration-rules'
-import { tierDefinitions, type PricedTier } from './tiers'
+import { technologyFromBadge } from './types'
+import { tierDefinitionsForTechnology, type PricedTier } from './tiers'
 import type { SharedConfigurationContent } from './configuration-content'
 
 type TextRow = { text: string }
@@ -12,9 +13,9 @@ export function configurationTiers(rows: ConfigurationData[], technologyBadge: s
   if (!validConfigurationKeys(rows, modular) || rows.some(row => typeof row.price !== 'number' || !Number.isFinite(row.price) || row.price < 0)) return null
   return configurationKeys(modular).map(key => {
     const row = rows.find(row => row.key === key)!
-    const base = tierDefinitions.find(tier => tier.id === key)!
+    const base = tierDefinitionsForTechnology(technologyFromBadge(technologyBadge)).find(tier => tier.id === key)!
     // Content is shared by configuration type; only prices belong to a project.
     const content = shared?.find(template => template.key === key)
-    return { ...base, ...(content ? { lead: content.lead, includes: content.includes, gifts: content.gifts, details: content.details } : {}), name: configurationNames[key], price: row.regionalPrices?.nn ?? row.price, regionalPrices: row.regionalPrices, mortgage: mortgageAllowed(key) }
+    return { ...base, ...(content ? { lead: content.lead, includesTitle: content.includesTitle ?? base.includesTitle, includes: content.includes, gifts: content.gifts, details: content.details } : {}), name: configurationNames[key], price: row.regionalPrices?.nn ?? row.price, regionalPrices: row.regionalPrices, mortgage: mortgageAllowed(key) }
   })
 }

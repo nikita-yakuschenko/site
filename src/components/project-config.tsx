@@ -81,9 +81,10 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
     setFormOpen(next);
   };
 
-  const sourceTiers = configurations ? tiersForRegion(configurations, region) : tiersForProject(project);
+  const fallbackTiers = configurations ? null : tiersForProject(project);
+  const sourceTiers = configurations ? tiersForRegion(configurations, region) : fallbackTiers ? tiersForRegion(fallbackTiers, region) : null;
   // Panel houses are supplied without internal finishes, including the Project tier.
-  const tiers = sourceTiers?.map(item => ({
+  const tiers = project.technology === 'frame' ? sourceTiers : sourceTiers?.map(item => ({
     ...item,
     lead: project.technology === 'panel' && /внутренн|гипсокартон/i.test(item.lead) ? 'Окна согласно архитектурному проекту.' : item.lead,
     includes: item.includes.filter(line =>
@@ -134,7 +135,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                     {item.price > 0 ? configText(formatFromRub(item.price)) : 'Цена уточняется'}
                   </span>
                   <span className="project-config__tier-includes-title">
-                    {item.id === 'project' ? <><span className="project-config__tier-base">Стандартная</span> комплектация дополняется:</>
+                    {item.includesTitle ? configText(item.includesTitle) : item.id === 'project' ? <><span className="project-config__tier-base">Стандартная</span> комплектация дополняется:</>
                       : item.id === 'turnkey' ? <><span className="project-config__tier-base">Проектная</span> комплектация дополняется:</>
                       : item.id === 'standard' && hasStartingTier ? <><span className="project-config__tier-base">Стартовая</span> комплектация дополняется:</>
                       : item.id === 'standard' ? configText('Всё необходимое для начала:') : configText('Надёжная основа для вашего дома:')}
@@ -182,6 +183,8 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                 {formatRub(monthly)} {copy.configPerMonth}
                 <span>{configText(copy.configPayNote)}</span>
               </p>
+            ) : project.technology === 'frame' ? (
+              <p className="project-config__total-pay project-config__total-pay--plain" aria-hidden="true">{'\u00a0'}<span>{'\u00a0'}</span></p>
             ) : (
               <p className="project-config__total-pay project-config__total-pay--plain">
                 {configText(copy.configDelivery)}
@@ -282,6 +285,7 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
       <p className="project-config__total-label"><span>Комплектация: </span><strong>{configText(item.name)}</strong></p>
       <p className="project-config__total-sum">{item.price > 0 ? formatRub(item.price) : 'Цена уточняется'}</p>
       {monthly ? <p className="project-config__total-pay">{formatRub(monthly)} {copy.configPerMonth}<span>{configText(copy.configPayNote)}</span></p>
+        : project.technology === 'frame' ? <p className="project-config__total-pay project-config__total-pay--plain" aria-hidden="true">{'\u00a0'}<span>{'\u00a0'}</span></p>
         : <p className="project-config__total-pay project-config__total-pay--plain">{configText(copy.configDelivery)}<span>{configText(copy.configDeliveryNote)}</span></p>}
       <LeadForm siteId={SITE.id} formId="project-configuration" projectExternalId={project.id} variant="card" compact heading={copy.getQuote} submitLabel={copy.getQuote}
         meta={{ project: project.name, tier: item.name, price: item.price }} />

@@ -9,3 +9,6 @@
 20261014_111009_hero_background
 20261014_160000_reconcile_schema
 20261014_164500_product_code
+
+# New frame-only tables and nullable columns; no changes to existing technology data.
+20261024_220000_frame_configurations

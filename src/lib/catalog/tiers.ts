@@ -1,4 +1,5 @@
-import type { CatalogProject } from "./types";
+import { FRAME_TIERS } from './frame-tiers';
+import type { CatalogTechnology, CatalogProject } from "./types";
 import { configurationKeys } from './configuration-rules';
 
 /**
@@ -43,6 +44,7 @@ export type ProjectTier = {
   /** Доступна ли комплектация в ипотеку. У стартовой дома нет — банк
    *  кредитует дом, а не каркас, — и платёж для неё не показывается. */
   mortgage: boolean;
+  includesTitle?: string;
   includes: readonly string[];
   /** Пункты, которые идут подарком: перечисляются последними и помечены
    *  отдельно — иначе теряются в общем списке галочек. */
@@ -212,6 +214,7 @@ export const TURNKEY_TIER: ProjectTier = {
 };
 
 export const tierDefinitions = [...PROJECT_TIERS, TURNKEY_TIER];
+export const tierDefinitionsForTechnology = (technology: CatalogTechnology) => technology === 'frame' ? FRAME_TIERS : tierDefinitions;
 
 export type PricedTier = ProjectTier & { price: number; regionalPrices?: Partial<Record<'nn' | 'msk', number>> };
 
@@ -222,6 +225,7 @@ export function tiersForRegion(tiers: readonly PricedTier[], region: 'nn' | 'msk
 /** Цена комплектации округляется до тысяч: до рубля её всё равно считает
  *  инженер после выезда, а «2 419 950 ₽» обещает несуществующую точность. */
 export function tiersForProject(project: CatalogProject): PricedTier[] | null {
+  if (project.technology === 'frame') return FRAME_TIERS.map(tier => ({ ...tier, price: tier.id === 'standard' ? project.priceAmount ?? 0 : 0, ...(tier.id === 'standard' && project.regionalPrices ? { regionalPrices: project.regionalPrices } : {}) }));
   const base = project.priceAmount;
   if (!base) return null;
   return configurationKeys(project.technology === 'modular').map(key => tierDefinitions.find(tier => tier.id === key)!).map((tier) => ({

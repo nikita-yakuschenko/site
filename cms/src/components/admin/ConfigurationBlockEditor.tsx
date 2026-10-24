@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom'
 import { configurationKeys, configurationNames, type ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
 import { PagePreview } from './PagePreview'
 
-export function ConfigurationBlockEditor({ variant, siteUrl }: { variant: 'panel' | 'modular'; siteUrl: string }) {
+export function ConfigurationBlockEditor({ variant, siteUrl }: { variant: 'panel' | 'modular' | 'frame'; siteUrl: string }) {
   const keys = configurationKeys(variant === 'modular')
   const [selected, setSelected] = useState<ConfigurationKey>('standard')
   const [host, setHost] = useState<HTMLElement | null>(null)

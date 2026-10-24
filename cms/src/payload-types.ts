@@ -426,6 +426,131 @@ export interface Block {
           | null;
       };
     };
+    frame?: {
+      start?: {
+        includesTitle?: string | null;
+        lead?: string | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      standard?: {
+        includesTitle?: string | null;
+        lead?: string | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+      };
+      project?: {
+        includesTitle?: string | null;
+        lead?: string | null;
+        includes?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        gifts?:
+          | {
+              text: string;
+              id?: string | null;
+            }[]
+          | null;
+        details?:
+          | {
+              title: string;
+              lead?: string | null;
+              items?:
+                | {
+                    text: string;
+                    id?: string | null;
+                  }[]
+                | null;
+              groups?:
+                | {
+                    title: string;
+                    items?:
+                      | {
+                          text: string;
+                          id?: string | null;
+                        }[]
+                      | null;
+                    id?: string | null;
+                  }[]
+                | null;
+              id?: string | null;
+            }[]
+          | null;
+      };
+    };
   };
   key?: string | null;
   source?: string | null;
@@ -1470,6 +1595,139 @@ export interface BlocksSelect<T extends boolean = true> {
               turnkey?:
                 | T
                 | {
+                    lead?: T;
+                    includes?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    gifts?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    details?:
+                      | T
+                      | {
+                          title?: T;
+                          lead?: T;
+                          items?:
+                            | T
+                            | {
+                                text?: T;
+                                id?: T;
+                              };
+                          groups?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                        };
+                  };
+            };
+        frame?:
+          | T
+          | {
+              start?:
+                | T
+                | {
+                    includesTitle?: T;
+                    lead?: T;
+                    includes?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    gifts?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    details?:
+                      | T
+                      | {
+                          title?: T;
+                          lead?: T;
+                          items?:
+                            | T
+                            | {
+                                text?: T;
+                                id?: T;
+                              };
+                          groups?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                        };
+                  };
+              standard?:
+                | T
+                | {
+                    includesTitle?: T;
+                    lead?: T;
+                    includes?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    gifts?:
+                      | T
+                      | {
+                          text?: T;
+                          id?: T;
+                        };
+                    details?:
+                      | T
+                      | {
+                          title?: T;
+                          lead?: T;
+                          items?:
+                            | T
+                            | {
+                                text?: T;
+                                id?: T;
+                              };
+                          groups?:
+                            | T
+                            | {
+                                title?: T;
+                                items?:
+                                  | T
+                                  | {
+                                      text?: T;
+                                      id?: T;
+                                    };
+                                id?: T;
+                              };
+                          id?: T;
+                        };
+                  };
+              project?:
+                | T
+                | {
+                    includesTitle?: T;
                     lead?: T;
                     includes?:
                       | T

@@ -24,4 +24,5 @@ export const requiredMigrations = [
   '20261023_160000_frame_technology',
   '20261023_180000_hero_product',
   '20261024_160000_automation',
+  '20261024_220000_frame_configurations',
 ]

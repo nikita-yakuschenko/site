@@ -36,6 +36,7 @@ export function ProjectConfigurationSummary() {
           <AccordionTrigger className="py-3 hover:no-underline">{tier.name}</AccordionTrigger>
           <AccordionContent className="flex flex-col gap-3">
             <p>{tier.lead}</p>
+            {tier.includesTitle && <p className="font-medium">{tier.includesTitle}</p>}
             <ul className="list-disc space-y-1 pl-5">{tier.includes.map(item => <li key={item}>{item}</li>)}</ul>
             {!!tier.gifts?.length && <div><p className="font-medium">В подарок</p><ul className="list-disc pl-5">{tier.gifts.map(item => <li key={item}>{item}</li>)}</ul></div>}
             {!!tier.details.length && <Accordion type="multiple" className="border-t">

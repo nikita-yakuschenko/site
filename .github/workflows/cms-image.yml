@@ -100,6 +100,16 @@ jobs:
           CMS_PROJECT_COPY_TEST_DATABASE: 'true'
         run: npx tsx --test --test-force-exit tests/integration/project-copy.test.ts
 
+      - name: Проверить изоляцию каркасных комплектаций при обновлении
+        working-directory: cms
+        env:
+          DATABASE_URL: postgresql://cms:cms@localhost:5432/cms
+          PAYLOAD_SECRET: ci-payload-secret-is-at-least-32-chars
+          CMS_PUBLIC_URL: http://127.0.0.1:3001
+          CMS_MAINTENANCE: '1'
+          CMS_FRAME_CONFIG_TEST_DATABASE: 'true'
+        run: npx tsx --test --test-force-exit tests/integration/frame-configurations.test.ts
+
   publish:
     name: Сборка и публикация образа CMS
     needs: verify

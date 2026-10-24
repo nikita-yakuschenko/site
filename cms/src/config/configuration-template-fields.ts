@@ -1,12 +1,13 @@
 import type { ArrayField, Field } from 'payload'
 import { configurationKeys, configurationNames, type ConfigurationKey } from '../../../src/lib/catalog/configuration-rules'
-import { tierDefinitions } from '../../../src/lib/catalog/tiers'
+import { tierDefinitionsForTechnology } from '../../../src/lib/catalog/tiers'
 
 const textRows = (name: string, label: string, prefix: string): ArrayField => ({ name, dbName: `${prefix}_${name === 'includes' ? 'inc' : name === 'gifts' ? 'gift' : 'itm'}`, label, type: 'array', admin: { initCollapsed: true, className: 'configuration-text-list', components: { RowLabel: './components/admin/ConfigurationContentRowLabel#ConfigurationContentRowLabel' } }, labels: { singular: 'Пункт', plural: 'Пункты' }, fields: [{ name: 'text', label: 'Текст', type: 'text', required: true }] })
-const template = (key: ConfigurationKey, variant: 'p' | 'm'): Field => {
-  const tier = tierDefinitions.find(tier => tier.id === key)!
+const template = (key: ConfigurationKey, variant: 'p' | 'm' | 'f'): Field => {
+  const tier = tierDefinitionsForTechnology(variant === 'f' ? 'frame' : variant === 'm' ? 'modular' : 'panel').find(tier => tier.id === key)!
   const prefix = `cfg_${variant}_${key}`
   return { name: key, label: configurationNames[key], type: 'group', admin: { className: 'configuration-tier-group' }, fields: [
+    ...(variant === 'f' ? [{ name: 'includesTitle', label: 'Заголовок состава', type: 'text' as const, defaultValue: tier.includesTitle }] : []),
     { name: 'lead', label: 'Краткое описание', type: 'textarea', defaultValue: tier.lead },
     { ...textRows('includes', 'Что входит', prefix), defaultValue: tier.includes.map(text => ({ text })) },
     { ...textRows('gifts', 'В подарок', prefix), defaultValue: (tier.gifts || []).map(text => ({ text })) },
@@ -24,5 +25,6 @@ export const configurationTemplateFields: Field = {
   fields: [{ type: 'tabs', tabs: [
     { name: 'panel', label: 'Панельно-каркасные дома', fields: [{ name: 'editor', type: 'ui', admin: { components: { Field: { path: './components/admin/PagePreviewField#ConfigurationPreviewField', clientProps: { variant: 'panel' } } } } }, ...configurationKeys(false).map(key => template(key, 'p'))] },
     { name: 'modular', label: 'Модульные дома', fields: [{ name: 'editor', type: 'ui', admin: { components: { Field: { path: './components/admin/PagePreviewField#ConfigurationPreviewField', clientProps: { variant: 'modular' } } } } }, ...configurationKeys(true).map(key => template(key, 'm'))] },
+    { name: 'frame', label: 'Каркасные дома', fields: [{ name: 'editor', type: 'ui', admin: { components: { Field: { path: './components/admin/PagePreviewField#ConfigurationPreviewField', clientProps: { variant: 'frame' } } } } }, ...configurationKeys(false).map(key => template(key, 'f'))] },
   ] }],
 }
