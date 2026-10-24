@@ -75,7 +75,7 @@ test('catalog filters and favorites @critical', async ({ page }, info) => diagno
   await expect(favorite).toHaveAttribute('aria-pressed', 'true')
   if (info.project.name.includes('mobile')) await page.getByRole('button', { name: /^Фильтрация/ }).click()
   await page.getByRole('button', { name: /Только избранное/ }).click()
-  if (info.project.name.includes('mobile')) await page.locator('.cfilter__apply').click()
+  if (info.project.name.includes('mobile')) await page.locator('.catalog-filter-popover .cfilter__apply').click()
   await expect(page.locator('.card').first()).toBeVisible()
   if (info.project.name.includes('mobile')) {
     await page.getByRole('button', { name: /^Фильтрация/ }).click()

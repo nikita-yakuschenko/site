@@ -5312,105 +5312,38 @@ a {
    на узком экране раскладка перестаёт быть сеткой: у блочного потомка
    родителем становится вся доска, и блоку есть куда ехать. */
 @media (max-width: 1023px) {
-  /* Полоса здесь короче, и все, кто от неё отсчитывается, тоже: число
-     одно, поэтому правится в одном месте. */
-  :root {
-    --catalog-bar: 78px;
-  }
-
-  .catalog__layout {
-    display: block;
-  }
-
-  .catalog__sidebar {
-    position: sticky;
-    top: var(--site-header-offset);
-    z-index: 5;
-  }
-
-  .catalog__sidebar:has(.cfilter__sticky.is-open) { z-index: 40; }
-
-  /* На телефоне закреплённое сверху стоит дорого: 110 пикселей полосы плюс
-     кнопка отбора это пятая часть экрана, которая не показывает ни одного
-     дома. Поле дышит вдвое скромнее, высота полосы падает со 110 до 78. */
-  .catalog__bar {
-    padding-block: 16px;
-  }
-
-  .cfilter {
-    position: static;
-    /* Плюс растворяющийся край полосы, иначе он ложился бы на кнопку. */
-    top: calc(var(--catalog-bar) + var(--catalog-fade));
-    z-index: 5;
-    /* Отступ до карточек уже задан нижним padding полосы: не удваиваем его
-       внешним полем скрытой панели. */
-    margin-bottom: 0;
-    background: #fff;
-  }
-
-  .cfilter__sticky {
-    display: none;
-  }
-
-  /* Раскрытая панель это лист во весь оставшийся экран, от полосы поиска до
-     низа. Иначе она встаёт в поток на своём месте и уходит вниз за край:
-     предельная высота считалась бы от закреплённого положения, а в покое
-     панель стоит намного ниже, и кнопка возврата к выдаче оказывалась за
-     пределами экрана. */
-  /* Пока лист открыт, полоса поиска встаёт поверх страницы у верхнего края:
-     лист отсчитывается от неё, а в покое она стоит ниже шапки, и лист
-     накрывал бы её собой. */
-  .catalog__bar.is-sheet {
-    position: fixed;
-    top: 0;
-    right: 0;
-    left: 0;
-    /* Выше шапки сайта: у неё 30, и она накрывала бы собой и полосу, и
-       верх листа. */
-    z-index: 40;
-    margin-inline: 0;
-    padding-inline: var(--page-gutter);
-  }
-
-  .is-catalog-sheet,
-  .is-catalog-sheet body {
+  :root { --catalog-bar: 76px; }
+  .catalog__layout { display: block; }
+  .catalog__sidebar { position: sticky; top: var(--site-header-offset); z-index: 5; }
+  .catalog__bar { padding-block: 16px; }
+  .cfilter--desktop { display: none; }
+  .catalog-filter-popover {
+    z-index: 20;
+    display: flex;
+    width: min(360px, calc(var(--radix-popover-trigger-width) * 2 + 8px));
+    max-height: min(560px, calc(var(--radix-popover-content-available-height) - 16px));
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface, #fff);
+    color: var(--foreground);
     overflow: hidden;
   }
-
-  /* Липкий блок с z-index создаёт свой контекст наложения, и лист внутри
-     него не может подняться выше шапки сайта, какое число ему ни ставь.
-     Поэтому поднимается сам блок. */
-  .cfilter:has(.cfilter__sticky.is-open) {
-    z-index: 39;
-  }
-
-  .cfilter__sticky.is-open {
-    position: fixed;
-    top: var(--catalog-bar);
-    right: 0;
-    bottom: 0;
-    left: 0;
-    z-index: 39;
-    /* Колонка из прокручиваемой части и неподвижного подвала: липкая кнопка
-       внутри прокрутки накрывала собой последние условия. */
+  .cfilter--popover { display: flex; width: 100%; min-height: 0; max-height: inherit; }
+  .cfilter--popover .cfilter__sticky.is-open {
     display: flex;
     flex-direction: column;
-    padding: 0 var(--page-gutter) 12px;
-    background: #fff;
-    overflow: hidden;
+    width: 100%;
+    min-height: 0;
+    max-height: inherit;
+    padding: 16px;
   }
-
-  .cfilter__sticky.is-open .cfilter__scroll {
+  .cfilter--popover .cfilter__scroll {
     flex: 1;
     min-height: 0;
-    /* Нижний край растворяется: обрезанная ровной линией строка читается как
-       конец списка, и до оставшихся условий никто не домотает. Снизу оставлен
-       такой же по высоте отступ, поэтому когда список помещается целиком,
-       растворение приходится на пустоту и не видно. */
-    padding-bottom: 20px;
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 20px), transparent);
     overflow-y: auto;
     overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: var(--line) transparent;
   }
 }
 

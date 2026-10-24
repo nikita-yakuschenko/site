@@ -4,6 +4,7 @@ import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } fro
 import { usePathname, useRouter } from "next/navigation";
 import { CatalogFilters, CatalogSort } from "./catalog-filters";
 import { CatalogSearch } from "./catalog-search";
+import * as Popover from "@radix-ui/react-popover";
 import {
   countActive,
   filtersToHref,
@@ -38,8 +39,6 @@ import { copy } from "../lib/copy";
  * отбора, и работает он поверх уже отобранного.
  */
 
-/* Класс блокировки прокрутки под раскрытым листом отбора. */
-const SHEET_LOCK = "is-catalog-sheet";
 
 export type BoardItem = SortableProject & { card: ReactNode };
 
@@ -64,6 +63,9 @@ export function CatalogBoard({
   /* Раскрытие колонки на узком экране. Живёт здесь, потому что кнопка стоит
      в полосе поиска, а сама колонка ниже. */
   const [open, setOpen] = useState(false);
+  useEffect(() => () => {
+    if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
+  }, []);
   const favorites = useSyncExternalStore(
     subscribeFavorites,
     readFavorites,
@@ -117,15 +119,12 @@ export function CatalogBoard({
      же сужение выдачи, просто хранится не в адресе. */
   const active = countActive(filters) + (filters.sort ? 1 : 0) + (onlyFavorites ? 1 : 0);
 
-  /* Раскрытая на телефоне панель это лист поверх страницы, и страница под
-     ним стоять должна неподвижно: иначе прокрутка уводит фон, а лист
-     остаётся, и человек теряет место, куда вернётся. */
   useEffect(() => {
-    if (!open) return;
-    const root = document.documentElement;
-    root.classList.add(SHEET_LOCK);
-    return () => root.classList.remove(SHEET_LOCK);
-  }, [open]);
+    const desktop = window.matchMedia('(min-width: 1024px)');
+    const closeOnDesktop = () => { if (desktop.matches) setOpen(false); };
+    desktop.addEventListener('change', closeOnDesktop);
+    return () => desktop.removeEventListener('change', closeOnDesktop);
+  }, []);
 
   /* Условия поменялись, значит список стал другим, и оставаться на прежней
      высоте бессмысленно: под курсором окажутся чужие карточки. Возвращаемся
@@ -138,10 +137,7 @@ export function CatalogBoard({
   const backToStart = () => {
     const node = results.current;
     if (!node) return;
-    /* Блокировку читаем из DOM, а не из состояния: обработчик может
-       сработать из замыкания, где лист ещё считался открытым, и проверка по
-       состоянию соврала бы. Пока страница заблокирована, ехать ей некуда. */
-    if (document.documentElement.classList.contains(SHEET_LOCK)) return;
+    if (open) return;
     const barHeight = Number.parseInt(
       getComputedStyle(node).getPropertyValue("--catalog-bar"),
       10,
@@ -166,6 +162,28 @@ export function CatalogBoard({
     backToStart();
   };
 
+  const renderFilters = (mobile = false) => (
+    <CatalogFilters
+        mobile={mobile}
+        onReset={reset}
+        hasActiveFilters={!!active}
+        filters={filters}
+        facets={facets}
+        onlyFavorites={onlyFavorites}
+        favoritesCount={favorites.length}
+        onToggleFavorites={() => {
+          setOnlyFavorites((value) => !value);
+          backToStart();
+        }}
+        open={mobile}
+        onApply={() => {
+          setOpen(false);
+        }}
+        onChanged={backToStart}
+        changeTimerRef={changeTimerRef}
+      />
+  );
+
   return (
     <>
       <div className="catalog__layout">
@@ -178,7 +196,6 @@ export function CatalogBoard({
         className={[
           "catalog__bar",
           stuck ? "is-stuck" : "",
-          open ? "is-sheet" : "",
         ]
           .filter(Boolean)
           .join(" ")}
@@ -186,10 +203,19 @@ export function CatalogBoard({
       >
         <div className="catalog__barrow">
           <div className="catalog__mobile-actions">
-            <button type="button" className="catalog__filter-button" aria-expanded={open} aria-controls="catalog-filter-panel" aria-label={active ? `Фильтрация: ${active}` : 'Фильтрация'} onClick={() => setOpen(value => !value)}>
+            <Popover.Root open={open} onOpenChange={setOpen}>
+            <Popover.Trigger asChild>
+            <button type="button" className="catalog__filter-button" aria-label={active ? `Фильтрация: ${active}` : 'Фильтрация'}>
               <IconFilter size={16} stroke={1.5} aria-hidden="true" />
               <span>Фильтрация</span>
             </button>
+            </Popover.Trigger>
+            <Popover.Portal>
+              <Popover.Content className="catalog-filter-popover" side="bottom" align="start" sideOffset={8} collisionPadding={16} avoidCollisions={false} aria-label="Фильтрация проектов" onOpenAutoFocus={event => event.preventDefault()}>
+                {renderFilters(true)}
+              </Popover.Content>
+            </Popover.Portal>
+            </Popover.Root>
             <CatalogSort compact filters={filters} onChange={next => {
               if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
               router.replace(filtersToHref(next, pathname), { scroll: false });
@@ -199,27 +225,7 @@ export function CatalogBoard({
           <CatalogSearch value={filters.q ?? ""} onChange={search} />
         </div>
       </div>
-      <CatalogFilters
-        onReset={reset}
-        hasActiveFilters={!!active}
-        filters={filters}
-        facets={facets}
-        onlyFavorites={onlyFavorites}
-        favoritesCount={favorites.length}
-        onToggleFavorites={() => {
-          setOnlyFavorites((value) => !value);
-          backToStart();
-        }}
-        open={open}
-        onApply={() => {
-          setOpen(false);
-          /* Блокировка снимается эффектом уже после отрисовки, и прокрутка
-             раньше этого момента обрезалась по высоте закрытого документа. */
-          setTimeout(backToStart, 150);
-        }}
-        onChanged={backToStart}
-        changeTimerRef={changeTimerRef}
-      />
+      {renderFilters()}
       </div>
 
       <div ref={results} className="catalog__results">

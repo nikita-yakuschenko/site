@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type RefObject } from "react";
+import { useState, type RefObject } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { IconArrowsSort, IconHeart } from "@tabler/icons-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
@@ -105,6 +105,7 @@ export function CatalogFilters({
   onApply,
   onChanged,
   changeTimerRef,
+  mobile = false,
 }: {
   onReset: () => void;
   hasActiveFilters: boolean;
@@ -120,6 +121,7 @@ export function CatalogFilters({
   /* Условия поменялись: выдача стала другой, и надо вернуться к её началу. */
   onChanged: () => void;
   changeTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
+  mobile?: boolean;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -141,13 +143,6 @@ export function CatalogFilters({
     setDraftArea(null);
     setDraftPrice(null);
   }
-
-  useEffect(
-    () => () => {
-      if (timerRef.current) clearTimeout(timerRef.current);
-    },
-    [timerRef],
-  );
 
   const go = (next: CatalogFilters, delay = 0) => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -199,7 +194,7 @@ export function CatalogFilters({
     TECHNOLOGY_OPTIONS.find(option => option.technology === value)!.label;
 
   return (
-    <aside id="catalog-filter-panel" className="cfilter" aria-label={copy.catalogFiltersAria}>
+    <aside className={mobile ? 'cfilter cfilter--popover' : 'cfilter cfilter--desktop'} aria-label={copy.catalogFiltersAria}>
       <div className={open ? "cfilter__sticky is-open" : "cfilter__sticky"}>
         {/* Прокручивается только эта часть: кнопка возврата к выдаче лежит
             подвалом за её пределами и потому ничего не перекрывает. */}
