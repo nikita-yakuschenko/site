@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { CatalogFilters } from "./catalog-filters";
+import { CatalogFilters, CatalogSort } from "./catalog-filters";
 import { CatalogSearch } from "./catalog-search";
 import {
   countActive,
@@ -64,6 +64,7 @@ export function CatalogBoard({
   /* Раскрытие колонки на узком экране. Живёт здесь, потому что кнопка стоит
      в полосе поиска, а сама колонка ниже. */
   const [open, setOpen] = useState(false);
+  const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(true);
   const favorites = useSyncExternalStore(
     subscribeFavorites,
     readFavorites,
@@ -169,7 +170,7 @@ export function CatalogBoard({
   return (
     <>
       <div className="catalog__layout">
-      <div ref={sidebar} className="catalog__sidebar">
+      <div ref={sidebar} className={`catalog__sidebar${desktopFiltersOpen ? '' : ' is-filters-collapsed'}`}>
       {/* Поиск липнет вместе с отбором: искать по названию и смотреть
           выдачу приходится одновременно, и уезжающее вверх поле заставляло
           бы возвращаться к началу страницы на каждый запрос. */}
@@ -185,6 +186,17 @@ export function CatalogBoard({
 
       >
         <div className="catalog__barrow">
+          <div className="catalog__desktop-actions">
+            <button type="button" className="catalog__filter-button" aria-expanded={desktopFiltersOpen} aria-controls="catalog-filter-panel" onClick={() => setDesktopFiltersOpen(value => !value)}>
+              <IconFilter size={16} stroke={1.5} aria-hidden="true" />
+              <span>Фильтрация</span>
+            </button>
+            <CatalogSort compact filters={filters} onChange={next => {
+              if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
+              router.replace(filtersToHref(next, pathname), { scroll: false });
+              backToStart();
+            }} />
+          </div>
           <CatalogSearch value={filters.q ?? ""} onChange={search} />
           {/* Видна только на узком экране, на широком её прячет CSS: там
               колонка стоит целиком и прятать нечего. */}

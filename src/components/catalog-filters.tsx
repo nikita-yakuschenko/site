@@ -33,6 +33,24 @@ const sortOptions = [
   ['area-desc', 'Сначала просторнее'],
 ] as const;
 
+export function CatalogSort({ filters, onChange, compact = false }: {
+  filters: CatalogFilters;
+  onChange: (next: CatalogFilters) => void;
+  compact?: boolean;
+}) {
+  return <Select value={filters.sort ?? 'default'} onValueChange={value =>
+    onChange({ ...filters, sort: value === 'default' ? undefined : value as CatalogFilters['sort'] })
+  }>
+    <SelectTrigger id={compact ? undefined : 'catalog-sort'} className={compact ? 'catalog__sort catalog__sort--compact' : 'catalog__sort'} aria-label="Сортировка проектов">
+      <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
+      {compact ? <span>Сортировка</span> : <SelectValue />}
+    </SelectTrigger>
+    <SelectContent className="catalog__sort-menu" align="start" sideOffset={6}>
+      {sortOptions.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
+    </SelectContent>
+  </Select>;
+}
+
 /* Radix отдаёт number[] без обещания длины. Приводим к паре явно, а не
    утверждением типа: пустой массив тогда даст края каталога, а не NaN. */
 function pair(values: number[], bounds: { min: number; max: number }): [number, number] {
@@ -181,29 +199,22 @@ export function CatalogFilters({
     TECHNOLOGY_OPTIONS.find(option => option.technology === value)!.label;
 
   return (
-    <aside className="cfilter" aria-label={copy.catalogFiltersAria}>
+    <aside id="catalog-filter-panel" className="cfilter" aria-label={copy.catalogFiltersAria}>
       <div className={open ? "cfilter__sticky is-open" : "cfilter__sticky"}>
         {/* Прокручивается только эта часть: кнопка возврата к выдаче лежит
             подвалом за её пределами и потому ничего не перекрывает. */}
         <div className="cfilter__scroll">
-        <div className="cfilter__group">
+        <div className="cfilter__group cfilter__sort-group">
           <div className="catalog__filter-heading">
             <label className="cfilter__legend" htmlFor="catalog-sort">Сортировка</label>
             <button type="button" className="cfilter__reset catalog__reset" disabled={!hasActiveFilters} onClick={onReset}>
               {copy.resetAll}
             </button>
           </div>
-          <Select value={filters.sort ?? 'default'} onValueChange={value =>
-            go({ ...filters, sort: value === 'default' ? undefined : value as CatalogFilters['sort'] })
-          }>
-            <SelectTrigger id="catalog-sort" className="catalog__sort" aria-label="Сортировка проектов">
-              <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent className="catalog__sort-menu" align="start" sideOffset={6}>
-              {sortOptions.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
-            </SelectContent>
-          </Select>
+          <CatalogSort filters={filters} onChange={go} />
+        </div>
+        <div className="catalog__desktop-reset">
+          <button type="button" className="cfilter__reset catalog__reset" disabled={!hasActiveFilters} onClick={onReset}>{copy.resetAll}</button>
         </div>
         {facets.area.max > facets.area.min && <fieldset className="cfilter__group">
           <legend className="cfilter__legend">
