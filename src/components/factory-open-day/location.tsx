@@ -1,5 +1,7 @@
 'use client'
 import { CMSContentBlock } from '../cms-content'
+import { OfficeMap } from '../office-map'
+import { FACTORY_CENTER, FACTORY_MAP_ZOOM, FACTORY_POINT_URL, FACTORY_ROUTE_URL } from '../../lib/office'
 import { OpenDayArrow, OpenDayRules } from './rules'
 
 export function FactoryOpenDayLocation({ date }: { date: string }) {
@@ -16,14 +18,20 @@ export function FactoryOpenDayLocation({ date }: { date: string }) {
           </dl>
           <nav className="ags-ref ags-ref--routes" aria-label="Маршрут до производства">
             <div className="ags-ref__acts">
-              <a className="ags-goto" href="https://yandex.ru/maps/?rtext=~56.366321,43.791390&rtt=auto" target="_blank" rel="noopener">Построить маршрут <OpenDayArrow size={15} /></a>
-              <a className="ags-goto ags-goto--quiet" href="https://yandex.ru/maps/?pt=43.791390,56.366321&z=17&l=map" target="_blank" rel="noopener">Открыть точку на карте <OpenDayArrow size={15} /></a>
+              <a className="ags-goto" href={FACTORY_ROUTE_URL} target="_blank" rel="noopener noreferrer">Построить маршрут <OpenDayArrow size={15} /></a>
+              <a className="ags-goto ags-goto--quiet" href={FACTORY_POINT_URL} target="_blank" rel="noopener noreferrer">Открыть точку на карте <OpenDayArrow size={15} /></a>
             </div>
           </nav>
         </div>
-        <div className="ags-loc__map">
-          <iframe src="https://yandex.ru/map-widget/v1/?ll=43.791390%2C56.366321&pt=43.791390%2C56.366321%2Cpm2rdm&z=15&scroll=false" title="Яндекс Карта: проходная бывшего завода ЗКПД-4" width={600} height={400} loading="lazy" />
-        </div>
+        <OfficeMap
+          className="ags-loc__map"
+          skeleton
+          center={FACTORY_CENTER}
+          zoom={FACTORY_MAP_ZOOM}
+          routeUrl={FACTORY_ROUTE_URL}
+          ariaLabel="Открыть карту проходной бывшего завода ЗКПД-4"
+          markerLabel="Проходная ЗКПД-4"
+        />
       </div>
     </div>
   </section>}</CMSContentBlock>)
