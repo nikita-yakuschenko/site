@@ -22,11 +22,13 @@ export async function generateMetadata(): Promise<Metadata> {
 
 export default async function FactoryOpenDayPage() {
   const [date, event] = await Promise.all([openDayDate(), openDayEvent()])
+  const minutes = event ? Math.max(0, Math.round((new Date(event.endsAt).getTime() - new Date(event.startsAt).getTime()) / 60000)) : 0
+  const durationLabel = minutes ? [Math.floor(minutes / 60) ? new Intl.NumberFormat('ru-RU', { style: 'unit', unit: 'hour', unitDisplay: 'long' }).format(Math.floor(minutes / 60)) : '', minutes % 60 ? new Intl.NumberFormat('ru-RU', { style: 'unit', unit: 'minute', unitDisplay: 'long' }).format(minutes % 60) : ''].filter(Boolean).join(' ') : undefined
   return <main className={`ags-page ${inter.variable} ${unbounded.variable}`}>
     <script dangerouslySetInnerHTML={{ __html: `(function(){try{var p=localStorage.getItem('ags-theme');var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.agsTheme=(p==='light'||p==='dark')?p:(d?'dark':'light')}catch(e){}})()` }} />
     <OpenDayTheme />
     <FactoryOpenDayHero data-cms-content-connected date={date} />
-    <FactoryOpenDayProgram data-cms-content-connected programme={event?.programme} />
+    <FactoryOpenDayProgram data-cms-content-connected programme={event?.programme} durationLabel={durationLabel} />
     <FactoryOpenDayLocation data-cms-content-connected date={date} event={event} />
     <FactoryOpenDayForm data-cms-content-connected date={date} registrationEnabled={!event || (event.registrationEnabled && event.status === 'published' && new Date(event.startsAt).getTime() > Date.now())} />
     <FactoryOpenDayFooter data-cms-content-connected date={date} phone={event?.phone} address={event?.address} />

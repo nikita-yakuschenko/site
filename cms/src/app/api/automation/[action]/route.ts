@@ -93,6 +93,7 @@ export async function POST(request: Request, context: Context) {
       const record = await payload.findByID({ collection, id: Number(body.id), overrideAccess: true })
       if (!record.email || ['blocked', 'cancelled'].includes(record.status)) return json({ error: 'Письмо недоступно' }, 409)
       const key = `manual-email:${body.requestId}`
+      if ((await payload.find({ collection: 'automation-jobs', where: { key: { equals: key } }, limit: 1, overrideAccess: true })).docs.length) return json({ queued: true })
       if (record.status === 'pending') await payload.update({ collection, id: record.id, data: { tokenVersion: (record.tokenVersion || 1) + 1 }, overrideAccess: true })
       await enqueue(payload, 'email', { flow, recordId: record.id, template: record.status === 'pending' ? 'confirmation' : flow === 'referral' ? 'welcome' : 'programme' }, key)
       return json({ queued: true })
