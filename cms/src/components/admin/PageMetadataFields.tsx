@@ -86,6 +86,12 @@ export function BlockRecordMetadata() {
 const recordTypes = { project: 'Проект дома', 'ready-home': 'Готовый дом' }
 const projectFields: RecordFields = { name: 'name', type: 'recordType', types: recordTypes, typeLabel: 'Тип записи', slug: 'slug', slugFrom: projectSlugFromName, placeholder: 'Введите название проекта' }
 
+const eventFields: RecordFields = { name: 'title', type: 'status', types: { draft: 'Черновик', published: 'Опубликовано', completed: 'Завершено', cancelled: 'Отменено' }, typeLabel: 'Статус мероприятия', slug: 'slug', slugLabel: 'Код мероприятия', slugFrom: projectSlugFromName, placeholder: 'Введите название мероприятия' }
+export function EventRecordMetadata() {
+  const { id } = useDocumentInfo()
+  return <RecordMetadata fields={eventFields}>{!id && <DraftLeavePrompt nameField="title" />}</RecordMetadata>
+}
+
 const storyCustomers = { family: 'Частное лицо', business: 'Бизнес' }
 
 // Адрес только в базе: пишется из заголовка, в шапке не показываем.

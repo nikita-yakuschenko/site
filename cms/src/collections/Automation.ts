@@ -3,6 +3,7 @@ import { randomBytes } from 'node:crypto'
 import { authenticated, contentManager, superAdmin } from '../access/staff'
 import { settings } from '../automation/store'
 
+const statusField = { components: { Field: './components/admin/AutomationSelectField#AutomationSelectField' } }
 const access = { read: authenticated, create: contentManager, update: contentManager, delete: superAdmin }
 const identify: CollectionBeforeValidateHook = async ({ data, originalDoc, collection, req }) => {
   if (!data) return data
@@ -27,24 +28,24 @@ const identity: Field[] = [
   { name: 'importedAt', label: 'Импортировано', type: 'date', admin: { readOnly: true } },
   { name: 'sourceData', label: 'Исходная запись CRM', type: 'json', admin: { readOnly: true } },
 ]
-const template = (name: string, label: string): Field => ({ name, label, type: 'group', fields: [
+const template = (name: string, label: string): Field => ({ name, label, type: 'group', admin: { hidden: true }, fields: [
   { name: 'subject', label: 'Тема письма', type: 'text' },
   { name: 'html', label: 'HTML письма', type: 'textarea', admin: { description: 'Переменные: {{name}}, {{confirm_url}}, {{code}}, {{referral_url}}, {{event_title}}, {{event_date}}, {{event_time}}, {{address}}, {{route_url}}, {{phone}}, {{programme}}, {{google_calendar_url}}, {{ics_url}}.' } },
   { name: 'text', label: 'Текстовая версия', type: 'textarea' },
 ] })
 export const ReferralParticipants: CollectionConfig = {
   slug: 'referral-participants', labels: { singular: 'Участник реферальной программы', plural: 'Участники реферальной программы' },
-  access, hooks: { beforeValidate: [identify] }, admin: { useAsTitle: 'name', defaultColumns: ['name', 'email', 'code', 'status', 'confirmedAt'], group: 'Реферальная программа' },
+  access, hooks: { beforeValidate: [identify] }, admin: { useAsTitle: 'name', defaultColumns: ['name', 'email', 'code', 'status', 'confirmedAt'], group: 'Реферальная программа', components: { views: { list: { Component: './components/admin/AutomationView#ReferralListRedirect' } } } },
   fields: [...identity,
     { name: 'code', label: 'Код участника', type: 'text', required: true, unique: true, admin: { readOnly: true } },
     { name: 'referralUrl', label: 'Реферальная ссылка', type: 'text', admin: { readOnly: true } },
-    { name: 'status', label: 'Состояние', type: 'select', defaultValue: 'pending', required: true, options: [{ value: 'pending', label: 'Ожидает подтверждения' }, { value: 'active', label: 'Активен' }, { value: 'blocked', label: 'Заблокирован' }] },
+    { name: 'status', label: 'Состояние', type: 'select', admin: statusField, defaultValue: 'pending', required: true, options: [{ value: 'pending', label: 'Ожидает подтверждения' }, { value: 'active', label: 'Активен' }, { value: 'blocked', label: 'Заблокирован' }] },
     { name: 'notes', label: 'Примечание', type: 'textarea' },
   ],
 }
 export const Events: CollectionConfig = {
   slug: 'events', labels: { singular: 'Мероприятие', plural: 'Мероприятия' }, access,
-  admin: { useAsTitle: 'title', defaultColumns: ['title', 'startsAt', 'status'], group: 'Мероприятия' },
+  admin: { useAsTitle: 'title', defaultColumns: ['title', 'startsAt', 'status'], group: 'Мероприятия', components: { views: { list: { Component: './components/admin/AutomationView#EventsListRedirect' } }, edit: { beforeDocumentControls: ['./components/admin/PageMetadataFields#EventRecordMetadata'] } } },
   hooks: { beforeValidate: [({ data, originalDoc }) => {
     const next = { ...originalDoc, ...data }
     if (next.startsAt && next.endsAt && !(new Date(next.endsAt).getTime() > new Date(next.startsAt).getTime())) throw new APIError('Окончание мероприятия должно быть позже начала', 400)
@@ -53,14 +54,13 @@ export const Events: CollectionConfig = {
   }] },
   fields: [{ type: 'tabs', tabs: [
     { label: 'Мероприятие', fields: [
-      { name: 'title', label: 'Название', type: 'text', required: true },
-      { name: 'slug', label: 'Код мероприятия', type: 'text', required: true, unique: true },
+      { name: 'title', label: 'Название', type: 'text', required: true, admin: { hidden: true } },
+      { name: 'slug', label: 'Код мероприятия', type: 'text', required: true, unique: true, admin: { hidden: true } },
       { name: 'status', label: 'Состояние', type: 'select', defaultValue: 'draft', options: [{ value: 'draft', label: 'Черновик' }, { value: 'published', label: 'Опубликовано' }, { value: 'completed', label: 'Завершено' }, { value: 'cancelled', label: 'Отменено' }] },
       { name: 'description', label: 'Описание и механика', type: 'textarea' },
       { name: 'startsAt', label: 'Начало', type: 'date', required: true, admin: { date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd.MM.yyyy HH:mm' } } },
       { name: 'endsAt', label: 'Окончание', type: 'date', required: true, admin: { date: { pickerAppearance: 'dayAndTime', displayFormat: 'dd.MM.yyyy HH:mm' } } },
       { name: 'timezone', label: 'Часовой пояс', type: 'text', defaultValue: 'Europe/Moscow' },
-      { name: 'landingUrl', label: 'Страница мероприятия', type: 'text' },
     ] },
     { label: 'Программа', fields: [{ name: 'programme', label: 'Программа мероприятия', type: 'array', fields: [
       { name: 'time', label: 'Время', type: 'text' }, { name: 'title', label: 'Пункт программы', type: 'text', required: true }, { name: 'description', label: 'Описание', type: 'textarea' },
@@ -81,15 +81,19 @@ export const Events: CollectionConfig = {
     ] },
     { label: 'Письма и напоминания', fields: [
       template('confirmationEmail', 'Подтверждение регистрации'), template('programmeEmail', 'Программа и календарь'), template('reminderEmail', 'Напоминание'),
-      { name: 'reminderEnabled', label: 'Автоматическое напоминание', type: 'checkbox', defaultValue: false },
-      { name: 'reminderHoursBefore', label: 'За сколько часов до начала', type: 'number', defaultValue: () => 24, min: 0 },
-      { name: 'mailing', type: 'ui', admin: { components: { Field: './components/admin/AutomationRecordActions#EventMailingField' } } },
+      { name: 'reminderEnabled', label: 'Автоматическое напоминание', type: 'checkbox', defaultValue: false, admin: { hidden: true } },
+      { name: 'reminderHoursBefore', label: 'За сколько часов до начала', type: 'number', defaultValue: () => 24, min: 0, admin: { hidden: true } },
+      { name: 'emailWorkspace', type: 'ui', admin: { components: { Field: './components/admin/EventEmailWorkspace#EventEmailWorkspace' } } },
+    ] },
+    { label: 'Страницы', fields: [
+      { name: 'landingUrl', label: 'Страница мероприятия', type: 'text', validate: (value: unknown) => { if (!value) return true; try { return ['http:', 'https:'].includes(new URL(String(value)).protocol) || 'Укажите HTTP(S) адрес страницы' } catch { return 'Укажите полный адрес страницы' } } },
+      { name: 'linkedPages', type: 'ui', admin: { components: { Field: './components/admin/CMSSettings#LinkedEventPages' } } },
     ] },
   ] }],
 }
 export const EventRegistrations: CollectionConfig = {
   slug: 'event-registrations', labels: { singular: 'Регистрация на мероприятие', plural: 'Регистрации на мероприятия' }, access,
-  hooks: { beforeValidate: [identify] }, admin: { useAsTitle: 'name', defaultColumns: ['name', 'email', 'eventSlug', 'status'], group: 'Мероприятия' },
+  hooks: { beforeValidate: [identify] }, admin: { useAsTitle: 'name', defaultColumns: ['name', 'email', 'eventSlug', 'status'], group: 'Мероприятия', components: { views: { list: { Component: './components/admin/AutomationView#RegistrationsListRedirect' } } } },
   fields: [...identity,
     { name: 'eventSlug', label: 'Мероприятие', type: 'text', required: true, index: true },
     { name: 'status', label: 'Состояние', type: 'select', required: true, defaultValue: 'pending', options: [{ value: 'pending', label: 'Ожидает подтверждения' }, { value: 'confirmed', label: 'Подтверждено' }, { value: 'cancelled', label: 'Отменено' }, { value: 'attended', label: 'Посетил' }] },

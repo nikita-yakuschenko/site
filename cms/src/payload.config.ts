@@ -44,6 +44,8 @@ export default buildConfig({
       views: {
         referral: { Component: './components/admin/AutomationView#ReferralView', path: '/referral', exact: true },
         events: { Component: './components/admin/AutomationView#EventsView', path: '/events', exact: true },
+        eventRegistrations: { Component: './components/admin/AutomationView#RegistrationsView', path: '/event-registrations', exact: true },
+        cmsSettings: { Component: './components/admin/AutomationView#CMSSettingsView', path: '/settings', exact: true },
         site: { Component: './components/admin/StructureView#SiteView', path: '/site', exact: true },
         pages: { Component: './components/admin/StructureView#PagesView', path: '/pages', exact: true },
         redirects: { Component: './components/admin/RedirectsView#RedirectsView', path: '/catalog/redirects', exact: true },

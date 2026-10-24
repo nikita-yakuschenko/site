@@ -340,17 +340,17 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .page-metadata-field__label { font-size: 12px; color: var(--muted-foreground); }
 .page-record-metadata { display: flex; align-items: center; gap: 10px; min-width: 0; margin-inline-end: auto; }
 .page-record-metadata > span[data-slot='badge'] { flex-shrink: 0; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__controls:has(.page-record-metadata) { flex: 1; min-width: 0; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls { padding-inline: 24px; z-index: 50; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__wrapper { align-items: center; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__controls-wrapper:has(.page-record-metadata) { flex: 1; width: 100%; min-width: 0; padding-inline-start: 0; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls .page-record-metadata { display: flex; align-items: center; gap: 10px; margin-inline-start: 0; margin-inline-end: auto; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__content:not(:has(.doc-controls__meta > :not(.doc-controls__value-wrap))):not(:has(.doc-controls__meta-icons)) { display: none; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__value-wrap { display: none; }
-.template-default__wrap:is(:has(.collection-edit--projects), :has(.collection-edit--pages), :has(.collection-edit--stories), :has(.collection-edit--blocks), :has(.collection-edit--forms)) > .doc-header, :is(.collection-edit--projects, .collection-edit--pages, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__content { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls__controls:has(.page-record-metadata) { flex: 1; min-width: 0; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls { padding-inline: 24px; z-index: 50; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls__wrapper { align-items: center; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls__controls-wrapper:has(.page-record-metadata) { flex: 1; width: 100%; min-width: 0; padding-inline-start: 0; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls .page-record-metadata { display: flex; align-items: center; gap: 10px; margin-inline-start: 0; margin-inline-end: auto; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls__content:not(:has(.doc-controls__meta > :not(.doc-controls__value-wrap))):not(:has(.doc-controls__meta-icons)) { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls__value-wrap { display: none; }
+.template-default__wrap:is(:has(.collection-edit--projects), :has(.collection-edit--pages), :has(.collection-edit--stories), :has(.collection-edit--blocks), :has(.collection-edit--forms), :has(.collection-edit--events)) > .doc-header, :is(.collection-edit--projects, .collection-edit--pages, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls__content { display: none; }
 .collection-edit--projects :is(.project-details-row, .project-name-field), .collection-edit--pages :is(.page-details-row, .page-metadata-row, #field-metaTitle), .collection-edit--pages .field-type:has(> * > #field-metaTitle, #field-metaTitle) { display: none; }
 .project-record-metadata .project-record-title { flex: 0 1 260px; min-width: 120px; }
-:is(.collection-edit--projects, .collection-edit--pages, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls .project-record-metadata { flex: 1; gap: 8px; }.project-record-name-wrap { display: flex; flex: 1 1 280px; max-width: 460px; align-items: center; gap: 8px; min-width: 0; border-bottom: 1px solid var(--input); transition: border-color 150ms; }
+:is(.collection-edit--projects, .collection-edit--pages, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls .project-record-metadata { flex: 1; gap: 8px; }.project-record-name-wrap { display: flex; flex: 1 1 280px; max-width: 460px; align-items: center; gap: 8px; min-width: 0; border-bottom: 1px solid var(--input); transition: border-color 150ms; }
 .project-record-name-wrap:focus-within { border-bottom-color: var(--ring); }
 .project-record-name-wrap[aria-invalid] { border-bottom-color: var(--destructive); }
 .project-record-name-wrap > span[data-slot='badge'] { flex-shrink: 0; }
@@ -361,7 +361,7 @@ html[data-theme="dark"] .project-source-label__badge[data-content-source="databa
 .project-record-slug input:disabled { opacity: 1; cursor: default; color: var(--muted-foreground); }
 .project-record-slug button { position: absolute; top: 50%; right: 4px; transform: translateY(-50%); }
 .project-record-code { flex: 0 0 auto; color: var(--muted-foreground); font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 13px; letter-spacing: 0.04em; }
-:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms) .doc-controls__meta:not(:has(> :not(.doc-controls__value-wrap))) { display: none; }
+:is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories, .collection-edit--blocks, .collection-edit--forms, .collection-edit--events) .doc-controls__meta:not(:has(> :not(.doc-controls__value-wrap))) { display: none; }
 :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .page-details-row .field-type,
 :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .page-metadata-row .field-type { margin-bottom: 0; }
 :is(.collection-edit--pages, .collection-edit--projects, .collection-edit--stories) .document-fields__fields { --spacing-field: 12px; }
@@ -910,3 +910,14 @@ html[data-theme="dark"] .avgst-shell [data-slot="tabs-trigger"][data-state="acti
 .story-record-dates { display: flex; flex-wrap: wrap; gap: 8px 16px; flex: 0 1 auto; min-width: 0; color: var(--muted-foreground); font-size: 12px; }
 .story-project-picker-preview { overflow: hidden; border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--muted); aspect-ratio: 16 / 10; }
 .story-project-picker-preview iframe { width: 1280px; height: 800px; border: 0; transform-origin: top left; pointer-events: none; }
+
+/* Operational records use the same compact controls as other CMS sections. */
+:is(.collection-edit--events, .collection-edit--event-registrations, .collection-edit--referral-participants, .collection-edit--automation-jobs, .collection-edit--automation-imports) .doc-controls__meta,
+:is(.collection-edit--events, .collection-edit--event-registrations, .collection-edit--referral-participants, .collection-edit--automation-jobs, .collection-edit--automation-imports) .doc-controls__content:not(:has(.doc-controls__meta-icons)) { display: none; }
+.avgst-shell :is(input[type="date"], input[type="time"], input[type="datetime-local"], .date-time-field input, .react-datepicker__input-container input) {
+  font-family: var(--font-geist-mono), monospace;
+  font-variant-numeric: tabular-nums;
+}
+.avgst-shell :is(input[type="date"], input[type="time"], input[type="datetime-local"])::-webkit-datetime-edit {
+  font-family: var(--font-geist-mono), monospace;
+}

@@ -1,23 +1,22 @@
 'use client'
 
-import { useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import type { Project } from '../../payload-types'
 import { TECHNOLOGY_OPTIONS, technologyLabel } from '../../../../src/lib/catalog/types'
 import type { PriceKind } from '../../config/price-kinds'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { IconExternalLink, IconSearch, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus, IconArrowsSort, IconArrowUp, IconArrowDown } from '@tabler/icons-react'
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
+import { IconExternalLink, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus } from '@tabler/icons-react'
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Input } from '../ui/input'
 import { Button } from '../ui/button'
 import { Badge } from '../ui/badge'
 import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../ui/table'
-import { DataTableFrame, useDataPage } from './DataTable'
+import { DataTableFrame, useDataPage, DataTableSearch, DataTableFacetFilter as FacetFilter, DataTableSortHead, useDataTableQuery } from './DataTable'
 import { compareCatalogRows, sortingFrom, stat, type CatalogSort } from './catalog-sorting'
-import { rememberCatalogQuery, savedCatalogQuery } from './catalog-query'
 
 const seriesLabels = { panel: 'Панельные', barn: 'Барнхаусы', classic: 'Классические', modular: 'Модульные', aframe: 'А-фрейм' } as const
 const emptyFacets = { status: [] as string[], tech: [] as string[], series: [] as string[], floors: [] as number[], bedrooms: [] as number[], bathrooms: [] as number[], areaMin: '', areaMax: '' }
@@ -47,27 +46,6 @@ function inRange(value: number | null | undefined, min: string, max: string) {
   if (lo == null && hi == null) return true
   if (value == null || !Number.isFinite(value)) return false
   return (lo == null || value >= lo) && (hi == null || value <= hi)
-}
-
-function FacetFilter<T extends string | number>({ title, options, selected, onChange }: {
-  title: string
-  options: { value: T; label: string }[]
-  selected: T[]
-  onChange: (next: T[]) => void
-}) {
-  if (options.length < 2) return null
-  const picked = options.filter(option => selected.includes(option.value))
-  return <DropdownMenu modal={false}>
-    <DropdownMenuTrigger asChild>
-      <Button type="button" variant="outline" size="sm" className="h-8 border-dashed">
-        <IconPlus />{title}
-        {picked.length > 0 && <Badge variant="secondary" className="rounded-sm px-1 font-normal">{picked.length > 2 ? picked.length : picked.map(option => option.label).join(', ')}</Badge>}
-      </Button>
-    </DropdownMenuTrigger>
-    <DropdownMenuContent align="start" className="w-56">
-      {options.map(option => <DropdownMenuCheckboxItem key={String(option.value)} checked={selected.includes(option.value)} onSelect={event => event.preventDefault()} onCheckedChange={checked => onChange(checked ? [...selected, option.value] : selected.filter(item => item !== option.value))}>{option.label}</DropdownMenuCheckboxItem>)}
-    </DropdownMenuContent>
-  </DropdownMenu>
 }
 
 function RangeFilter({ title, min, max, onMin, onMax }: { title: string; min: string; max: string; onMin: (value: string) => void; onMax: (value: string) => void }) {
@@ -180,58 +158,31 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
     pageSize: Number(initial.get('size')) || undefined,
   })
   const tune = (next: Partial<typeof emptyFacets>) => { setFacets(current => ({ ...current, ...next })); table.setPage(0) }
-  const restored = useRef('')
-  useLayoutEffect(() => {
-    if (window.location.search.replace(/^\?/, '')) return
-    const saved = savedCatalogQuery()
-    if (!saved) return
-    const params = new URLSearchParams(saved)
-    restored.current = saved
-    const frame = window.requestAnimationFrame(() => {
-      setSearch(params.get('q') ?? '')
-      setRecordType(params.get('tab') === 'ready' ? 'ready-home' : 'project')
-      setFacets(facetsFrom(params))
-      setSorting(sortingFrom(params))
-      const size = Number(params.get('size'))
-      if ([15, 20, 30, 40, 50].includes(size)) table.setPageSize(size)
-      table.setPage(Math.max(0, (Number(params.get('page')) || 1) - 1))
-      window.history.replaceState(window.history.state, '', `${window.location.pathname}?${saved}${window.location.hash}`)
-    })
-    return () => window.cancelAnimationFrame(frame)
-  }, [])
-  useEffect(() => {
-    const params = new URLSearchParams()
-    if (sorting) { params.set('sort', sorting.key); params.set('direction', sorting.direction) }
-    if (recordType === 'ready-home') params.set('tab', 'ready')
-    if (search.trim()) params.set('q', search.trim())
-    const put = (key: string, values: Array<string | number>) => { if (values.length) params.set(key, values.join(',')) }
-    put('status', facets.status)
-    put('tech', facets.tech)
-    put('series', facets.series)
-    put('floors', facets.floors)
-    put('bedrooms', facets.bedrooms)
-    put('bathrooms', facets.bathrooms)
-    if (facets.areaMin.trim()) params.set('areaMin', facets.areaMin.trim())
-    if (facets.areaMax.trim()) params.set('areaMax', facets.areaMax.trim())
-    if (table.page > 0) params.set('page', String(table.page + 1))
-    if (table.pageSize !== 10) params.set('size', String(table.pageSize))
-    const next = params.toString()
-    if (restored.current && next !== restored.current) return
-    restored.current = ''
-    rememberCatalogQuery(next)
-    if (next === window.location.search.replace(/^\?/, '')) return
-    window.history.replaceState(window.history.state, '', `${window.location.pathname}${next ? `?${next}` : ''}${window.location.hash}`)
-  }, [recordType, search, facets, sorting, table.page, table.pageSize])
-  const sortHeading = (key: CatalogSort['key'], label: string) => {
-    const active = sorting?.key === key
-    const Icon = active ? sorting.direction === 'asc' ? IconArrowUp : IconArrowDown : IconArrowsSort
-    const next = active && sorting.direction === 'asc' ? 'desc' : 'asc'
-    return <TableHead className="text-right" aria-sort={active ? sorting.direction === 'asc' ? 'ascending' : 'descending' : 'none'}>
-      <button type="button" className="inline-flex w-full cursor-pointer items-center justify-end gap-1 whitespace-nowrap bg-transparent p-0 text-inherit hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" aria-label={`${label}: сортировать ${next === 'asc' ? 'по возрастанию' : 'по убыванию'}`} onClick={() => { setSorting({ key, direction: next }); table.setPage(0) }}>
-        {label}<Icon className="size-3 shrink-0" aria-hidden="true" />
-      </button>
-    </TableHead>
-  }
+  const params = new URLSearchParams()
+  if (sorting) { params.set('sort', sorting.key); params.set('direction', sorting.direction) }
+  if (recordType === 'ready-home') params.set('tab', 'ready')
+  if (search.trim()) params.set('q', search.trim())
+  const put = (key: string, values: Array<string | number>) => { if (values.length) params.set(key, values.join(',')) }
+  put('status', facets.status)
+  put('tech', facets.tech)
+  put('series', facets.series)
+  put('floors', facets.floors)
+  put('bedrooms', facets.bedrooms)
+  put('bathrooms', facets.bathrooms)
+  if (facets.areaMin.trim()) params.set('areaMin', facets.areaMin.trim())
+  if (facets.areaMax.trim()) params.set('areaMax', facets.areaMax.trim())
+  if (table.page > 0) params.set('page', String(table.page + 1))
+  if (table.pageSize !== 10) params.set('size', String(table.pageSize))
+  useDataTableQuery('avgst-catalog-query', params.toString(), saved => {
+    setSearch(saved.get('q') ?? '')
+    setRecordType(saved.get('tab') === 'ready' ? 'ready-home' : 'project')
+    setFacets(facetsFrom(saved))
+    setSorting(sortingFrom(saved))
+    const size = Number(saved.get('size'))
+    if ([15, 20, 30, 40, 50].includes(size)) table.setPageSize(size)
+    table.setPage(Math.max(0, (Number(saved.get('page')) || 1) - 1))
+  })
+  const sortHeading = (key: CatalogSort['key'], label: string) => <DataTableSortHead align="right" label={label} direction={sorting?.key === key ? sorting.direction : undefined} onSort={direction => { setSorting({ key, direction }); table.setPage(0) }} />
   const filtersOn = facets.status.length + facets.tech.length + facets.series.length + facets.floors.length + facets.bedrooms.length + facets.bathrooms.length > 0 || [facets.areaMin, facets.areaMax].some(Boolean)
   const seriesOrder = ['panel', 'barn', 'classic', 'modular', 'aframe', 'none']
   const seriesOptions = [...new Set(inTab.map(project => project.series || 'none'))].sort((a, b) => seriesOrder.indexOf(a) - seriesOrder.indexOf(b)).map(value => ({ value, label: value === 'none' ? 'Без серии' : seriesLabels[value as keyof typeof seriesLabels] }))
@@ -244,10 +195,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
         </TabsList>
       </Tabs>
       <div className="flex flex-1 items-center justify-end gap-3">
-        <div className="relative w-full max-w-lg">
-          <IconSearch className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-          <Input aria-label="Поиск проектов" placeholder="Поиск проектов" className="pl-9" value={search} onChange={event => { setSearch(event.target.value); table.setPage(0) }} />
-        </div>
+        <DataTableSearch label="Поиск проектов" value={search} onChange={value => { setSearch(value); table.setPage(0) }} />
         <Button asChild variant="outline"><Link href="/catalog/redirects">Редиректы</Link></Button>
         <Button type="button" variant="outline" onClick={openExportDialog}>Выгрузить YML</Button>
         <Button asChild><Link href="/collections/projects/create">Создать</Link></Button>

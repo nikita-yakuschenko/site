@@ -23,7 +23,7 @@ const structureIcons = { referral: Users, events: IconFiles, site: IconWorld, pa
 const aliases: Record<string, string> = { '/pages': '/collections/pages', '/catalog': '/collections/projects', '/stories': '/collections/stories', '/prices': '/collections/project-prices', '/blocks': '/collections/blocks', '/forms': '/collections/forms', '/media': '/collections/media', '/users': '/collections/users' }
 function sectionPaths(href: string) {
   if (href === '/referral') return [href, '/collections/referral-participants']
-  if (href === '/events') return [href, '/collections/events', '/collections/event-registrations']
+  if (href === '/events') return [href, '/event-registrations', '/collections/events', '/collections/event-registrations']
   if (href === '/integrations') return [href, '/leads', '/collections/lead-submissions', '/globals/lead-delivery']
   return aliases[href] ? [href, aliases[href]] : [href]
 }
@@ -67,6 +67,7 @@ function AppSidebar() {
       </SidebarMenuButton>
     </DropdownMenuTrigger><DropdownMenuContent side="top" align="end" className="w-56">
       <DropdownMenuItem asChild><Link href="/account"><Settings />Настройки аккаунта</Link></DropdownMenuItem>
+      {user.role === 'super-admin' && <DropdownMenuItem asChild><Link href="/settings"><Settings />Настройки CMS</Link></DropdownMenuItem>}
       <DropdownMenuSeparator /><DropdownMenuItem asChild><Link href="/logout"><LogOut />Выйти</Link></DropdownMenuItem>
     </DropdownMenuContent></DropdownMenu></SidebarMenuItem></SidebarMenu></SidebarFooter>
   </Sidebar>
@@ -78,6 +79,7 @@ const sections = [
   { title: 'Медиафайлы', href: '/media', lists: sectionPaths('/media') },
   { title: 'Пользователи', href: '/users', lists: sectionPaths('/users') },
   { title: 'Аккаунт', href: '/account', lists: ['/account'] },
+  { title: 'Настройки CMS', href: '/settings', lists: ['/settings'] },
 ]
 
 function sectionOf(pathname: string) {

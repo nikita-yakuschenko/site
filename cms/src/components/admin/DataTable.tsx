@@ -1,10 +1,55 @@
 'use client'
 
-import { useId, useState, type ReactNode } from 'react'
-import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight } from '@tabler/icons-react'
+import { useEffect, useId, useLayoutEffect, useRef, useState, type ReactNode } from 'react'
+import { IconChevronLeft, IconChevronRight, IconChevronsLeft, IconChevronsRight, IconPlus, IconArrowsSort, IconArrowUp, IconArrowDown, IconSearch } from '@tabler/icons-react'
 import { Button } from '../ui/button'
 import { Label } from '../ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
+import { Input } from '../ui/input'
+import { Badge } from '../ui/badge'
+import { TableHead } from '../ui/table'
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '../ui/dropdown-menu'
+import { rememberTableQuery, savedTableQuery } from './catalog-query'
+
+export function useDataTableQuery(storageKey: string, query: string, restore: (params: URLSearchParams) => void) {
+  const restored = useRef('')
+  useLayoutEffect(() => {
+    if (window.location.search.replace(/^\?/, '')) return
+    const saved = savedTableQuery(storageKey)
+    if (!saved) return
+    restored.current = saved
+    const frame = window.requestAnimationFrame(() => {
+      restore(new URLSearchParams(saved))
+      window.history.replaceState(window.history.state, '', `${window.location.pathname}?${saved}${window.location.hash}`)
+    })
+    return () => window.cancelAnimationFrame(frame)
+    // Restore only on mount, just as the catalogue does; setters are captured from that mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+  useEffect(() => {
+    if (restored.current && query !== restored.current) return
+    restored.current = ''
+    rememberTableQuery(storageKey, query)
+    if (query === window.location.search.replace(/^\?/, '')) return
+    window.history.replaceState(window.history.state, '', `${window.location.pathname}${query ? `?${query}` : ''}${window.location.hash}`)
+  }, [storageKey, query])
+}
+
+export function DataTableSearch({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return <div className="relative w-full max-w-lg"><IconSearch className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" /><Input aria-label={label} placeholder={label} className="pl-9" value={value} onChange={event => onChange(event.target.value)} /></div>
+}
+
+export function DataTableFacetFilter<T extends string | number>({ title, options, selected, onChange }: { title: string; options: { value: T; label: string }[]; selected: T[]; onChange: (next: T[]) => void }) {
+  if (options.length < 2) return null
+  const picked = options.filter(option => selected.includes(option.value))
+  return <DropdownMenu modal={false}><DropdownMenuTrigger asChild><Button type="button" variant="outline" size="sm" className="h-8 border-dashed"><IconPlus />{title}{picked.length > 0 && <Badge variant="secondary" className="rounded-sm px-1 font-normal">{picked.length > 2 ? picked.length : picked.map(option => option.label).join(', ')}</Badge>}</Button></DropdownMenuTrigger><DropdownMenuContent align="start" className="w-56">{options.map(option => <DropdownMenuCheckboxItem key={String(option.value)} checked={selected.includes(option.value)} onSelect={event => event.preventDefault()} onCheckedChange={checked => onChange(checked ? [...selected, option.value] : selected.filter(item => item !== option.value))}>{option.label}</DropdownMenuCheckboxItem>)}</DropdownMenuContent></DropdownMenu>
+}
+
+export function DataTableSortHead({ label, direction, onSort, align = 'left', className = '' }: { label: string; direction?: 'asc' | 'desc'; onSort: (direction: 'asc' | 'desc') => void; align?: 'left' | 'right'; className?: string }) {
+  const Icon = direction ? direction === 'asc' ? IconArrowUp : IconArrowDown : IconArrowsSort
+  const next = direction === 'asc' ? 'desc' : 'asc'
+  return <TableHead className={`${align === 'right' ? 'text-right' : ''} ${className}`} aria-sort={direction ? direction === 'asc' ? 'ascending' : 'descending' : 'none'}><button type="button" className={`inline-flex w-full cursor-pointer items-center gap-1 whitespace-nowrap bg-transparent p-0 text-inherit hover:text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring ${align === 'right' ? 'justify-end' : 'justify-start'}`} aria-label={`${label}: сортировать ${next === 'asc' ? 'по возрастанию' : 'по убыванию'}`} onClick={() => onSort(next)}>{label}<Icon className="size-3 shrink-0" aria-hidden="true" /></button></TableHead>
+}
 
 const pageSizes = [10, 15, 20, 30, 40, 50]
 

@@ -1,3 +1,4 @@
+import { AccountCMSSettingsLink as AccountCMSSettingsLink_f959409364bb38fc268d9dc9898e6dcd } from '../../components/admin/CMSSettings'
 import { BlockedCell as BlockedCell_b32a788ac704cc26ef4283a3336d0c04 } from '../../components/admin/BlockedCell'
 import { UsersEmptyState as UsersEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466 } from '../../components/admin/CollectionEmptyState'
 import { PageKindField as PageKindField_39c824816878a36ded3bfc43acf44e05 } from '../../components/admin/PageMetadataFields'
@@ -45,7 +46,13 @@ import { LeadSubmissionDetails as LeadSubmissionDetails_104c0e96c9b5dcfae77c460f
 import { LeadSubmissionPayload as LeadSubmissionPayload_104c0e96c9b5dcfae77c460f4ed9e458 } from '../../components/admin/LeadSubmissionView'
 import { LeadsListRedirect as LeadsListRedirect_e85e6671bf049c3011d2f667f456a2e6 } from '../../components/admin/LeadsView'
 import { RegistrationEmailActions as RegistrationEmailActions_bacaacdac2ba1633ad9f217a685db61b } from '../../components/admin/AutomationRecordActions'
-import { EventMailingField as EventMailingField_bacaacdac2ba1633ad9f217a685db61b } from '../../components/admin/AutomationRecordActions'
+import { AutomationSelectField as AutomationSelectField_38e68e92aba1751a2d9aa82093579c56 } from '../../components/admin/AutomationSelectField'
+import { ReferralListRedirect as ReferralListRedirect_61643e69b92b100371c36117d260ea4e } from '../../components/admin/AutomationView'
+import { EventEmailWorkspace as EventEmailWorkspace_65645c75e2880657d39d76b9ed4b1aa7 } from '../../components/admin/EventEmailWorkspace'
+import { LinkedEventPages as LinkedEventPages_f959409364bb38fc268d9dc9898e6dcd } from '../../components/admin/CMSSettings'
+import { EventRecordMetadata as EventRecordMetadata_39c824816878a36ded3bfc43acf44e05 } from '../../components/admin/PageMetadataFields'
+import { EventsListRedirect as EventsListRedirect_61643e69b92b100371c36117d260ea4e } from '../../components/admin/AutomationView'
+import { RegistrationsListRedirect as RegistrationsListRedirect_61643e69b92b100371c36117d260ea4e } from '../../components/admin/AutomationView'
 import { AutomationJobActions as AutomationJobActions_bacaacdac2ba1633ad9f217a685db61b } from '../../components/admin/AutomationRecordActions'
 import { MediaEmptyState as MediaEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466 } from '../../components/admin/CollectionEmptyState'
 import { EmptyNav as EmptyNav_5cbf29a2fd14a00ffc5141ee4b88c905 } from '../../components/admin/AdminShell'
@@ -55,6 +62,8 @@ import { AdminShellRoot as AdminShellRoot_e024f5d68acb191c51ad1e3b9f2df952 } fro
 import { AdminToasts as AdminToasts_c50bb2264ce0fa960ba738ec7a026948 } from '../../components/admin/AdminToasts'
 import { ReferralView as ReferralView_61643e69b92b100371c36117d260ea4e } from '../../components/admin/AutomationView'
 import { EventsView as EventsView_61643e69b92b100371c36117d260ea4e } from '../../components/admin/AutomationView'
+import { RegistrationsView as RegistrationsView_61643e69b92b100371c36117d260ea4e } from '../../components/admin/AutomationView'
+import { CMSSettingsView as CMSSettingsView_61643e69b92b100371c36117d260ea4e } from '../../components/admin/AutomationView'
 import { SiteView as SiteView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { PagesView as PagesView_1226fdfc491f100b8cb8d80d236e0a07 } from '../../components/admin/StructureView'
 import { RedirectsView as RedirectsView_748188b2c19d87073961306254117b4f } from '../../components/admin/RedirectsView'
@@ -82,6 +91,7 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 /** @type import('payload').ImportMap */
 export const importMap = {
+  "./components/admin/CMSSettings#AccountCMSSettingsLink": AccountCMSSettingsLink_f959409364bb38fc268d9dc9898e6dcd,
   "./components/admin/BlockedCell#BlockedCell": BlockedCell_b32a788ac704cc26ef4283a3336d0c04,
   "./components/admin/CollectionEmptyState#UsersEmptyState": UsersEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466,
   "./components/admin/PageMetadataFields#PageKindField": PageKindField_39c824816878a36ded3bfc43acf44e05,
@@ -129,7 +139,13 @@ export const importMap = {
   "./components/admin/LeadSubmissionView#LeadSubmissionPayload": LeadSubmissionPayload_104c0e96c9b5dcfae77c460f4ed9e458,
   "./components/admin/LeadsView#LeadsListRedirect": LeadsListRedirect_e85e6671bf049c3011d2f667f456a2e6,
   "./components/admin/AutomationRecordActions#RegistrationEmailActions": RegistrationEmailActions_bacaacdac2ba1633ad9f217a685db61b,
-  "./components/admin/AutomationRecordActions#EventMailingField": EventMailingField_bacaacdac2ba1633ad9f217a685db61b,
+  "./components/admin/AutomationSelectField#AutomationSelectField": AutomationSelectField_38e68e92aba1751a2d9aa82093579c56,
+  "./components/admin/AutomationView#ReferralListRedirect": ReferralListRedirect_61643e69b92b100371c36117d260ea4e,
+  "./components/admin/EventEmailWorkspace#EventEmailWorkspace": EventEmailWorkspace_65645c75e2880657d39d76b9ed4b1aa7,
+  "./components/admin/CMSSettings#LinkedEventPages": LinkedEventPages_f959409364bb38fc268d9dc9898e6dcd,
+  "./components/admin/PageMetadataFields#EventRecordMetadata": EventRecordMetadata_39c824816878a36ded3bfc43acf44e05,
+  "./components/admin/AutomationView#EventsListRedirect": EventsListRedirect_61643e69b92b100371c36117d260ea4e,
+  "./components/admin/AutomationView#RegistrationsListRedirect": RegistrationsListRedirect_61643e69b92b100371c36117d260ea4e,
   "./components/admin/AutomationRecordActions#AutomationJobActions": AutomationJobActions_bacaacdac2ba1633ad9f217a685db61b,
   "./components/admin/CollectionEmptyState#MediaEmptyState": MediaEmptyState_d3afc16b6e9a1d36930b6cbdc48b8466,
   "./components/admin/AdminShell#EmptyNav": EmptyNav_5cbf29a2fd14a00ffc5141ee4b88c905,
@@ -139,6 +155,8 @@ export const importMap = {
   "./components/admin/AdminToasts#AdminToasts": AdminToasts_c50bb2264ce0fa960ba738ec7a026948,
   "./components/admin/AutomationView#ReferralView": ReferralView_61643e69b92b100371c36117d260ea4e,
   "./components/admin/AutomationView#EventsView": EventsView_61643e69b92b100371c36117d260ea4e,
+  "./components/admin/AutomationView#RegistrationsView": RegistrationsView_61643e69b92b100371c36117d260ea4e,
+  "./components/admin/AutomationView#CMSSettingsView": CMSSettingsView_61643e69b92b100371c36117d260ea4e,
   "./components/admin/StructureView#SiteView": SiteView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/StructureView#PagesView": PagesView_1226fdfc491f100b8cb8d80d236e0a07,
   "./components/admin/RedirectsView#RedirectsView": RedirectsView_748188b2c19d87073961306254117b4f,

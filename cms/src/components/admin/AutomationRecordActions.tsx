@@ -2,11 +2,6 @@
 import { useDocumentInfo } from '@payloadcms/ui'
 import { useState } from 'react'
 import { Button } from '../ui/button'
-import { EventMailing } from './AutomationPanel'
-export function EventMailingField() {
-  const { data, id } = useDocumentInfo()
-  return <div className="shadcn-surface">{id && data?.slug ? <EventMailing eventSlug={String(data.slug)} /> : <p>Сначала сохраните мероприятие.</p>}</div>
-}
 export function AutomationJobActions() {
   const { data, id } = useDocumentInfo(), [message, setMessage] = useState(''), [busy, setBusy] = useState(false)
   const action = data?.status === 'failed' ? 'retry' : data?.status === 'queued' ? 'cancel' : null
