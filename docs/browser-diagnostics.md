@@ -1,5 +1,26 @@
 # Browser diagnostics
 
+## Production follow-up, 2026-10-24
+
+The scheduled run 40079877427 passed 15 of 30 scenarios. Waiting for the
+existing application hydration marker in production, updating the mobile
+filter trigger, and marking navigation before its request starts raised the
+repeat run 40080735513 to 24 of 30. Its five form failures all point to
+SmartCaptcha's React #418; the remaining WebKit failure came from the test
+reloading while its menu navigation was unfinished. The menu test now waits
+for a real navigation to the catalog and visible cards before reloading.
+
+`node scripts/reproduce-smartcaptcha.mjs` renders one real invisible widget
+on an intercepted blank document at the production origin. It fetches the
+public client key at runtime, loads no application code, never executes the
+challenge and never submits a lead. The independent Chromium reproduction
+also emitted React #418/#423 from the provider's
+`react-with-dom-and-polyfills.18.2.0.min.js`. On audit failure the workflow
+captures this evidence as `smartcaptcha-isolation.json` in its artifact.
+These errors remain critical; the audit does not suppress third-party
+hydration failures. The reproduction can be used for a provider support case
+without including secrets or customer contact data.
+
 ## Run
 
 Install browser binaries once with `npx playwright install chromium firefox webkit`.

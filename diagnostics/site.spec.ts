@@ -139,7 +139,9 @@ test('mobile menu and state variants', async ({ page, context }, info) => diagno
     await burger.click()
     await expect(page.locator('.site-menu__panel')).toBeVisible()
     beginNavigation(page)
-    await page.locator('.site-menu__panel nav a[href="/"]').first().click()
+    await page.locator('.site-menu__panel nav a[href="/catalog"]').first().click()
+    await expect(page).toHaveURL(/\/catalog$/)
+    await expect(page.locator('.card__media').first()).toBeVisible()
     await expect(page.locator('.site-menu__panel')).toBeHidden()
   }
   await context.clearCookies()

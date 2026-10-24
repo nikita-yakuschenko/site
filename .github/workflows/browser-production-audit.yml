@@ -26,6 +26,9 @@ jobs:
       - name: Check browser launch independently of the site
         run: node scripts/check-diagnostic-browsers.mjs
       - run: npm run diagnostics:production
+      - name: Capture independent SmartCaptcha evidence
+        if: failure()
+        run: node scripts/reproduce-smartcaptcha.mjs
       - name: Add diagnostic summary
         if: always()
         run: if test -f diagnostics-results/summary.md; then cat diagnostics-results/summary.md >> "$GITHUB_STEP_SUMMARY"; fi
