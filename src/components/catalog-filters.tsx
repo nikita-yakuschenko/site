@@ -45,7 +45,7 @@ export function CatalogSort({ filters, onChange, compact = false }: {
       <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
       {compact ? <span>Сортировка</span> : <SelectValue />}
     </SelectTrigger>
-    <SelectContent className="catalog__sort-menu" align="start" sideOffset={6}>
+    <SelectContent className="catalog__sort-menu" align={compact ? 'end' : 'start'} sideOffset={8}>
       {sortOptions.map(([value, label]) => <SelectItem key={value} value={value}>{label}</SelectItem>)}
     </SelectContent>
   </Select>;
@@ -297,8 +297,6 @@ export function CatalogFilters({
           </div>
         </fieldset> : null}
 
-        </div>
-
         {/* Внизу и отдельно: это приятная мелочь, а не то, чем выбирают дом.
             И это не условие отбора, а переключатель вида, в адрес оно не
             попадает, потому что лежит в localStorage и у каждого своё. */}
@@ -338,6 +336,8 @@ export function CatalogFilters({
             </label>
           </div>
         </fieldset>
+
+        </div>
 
         {/* Только на узком экране, где панель закрывает собой выдачу.
             Условия применяются сразу, по нажатию, поэтому кнопка ничего не

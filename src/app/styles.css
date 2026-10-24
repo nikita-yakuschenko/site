@@ -5345,6 +5345,9 @@ a {
     scrollbar-width: thin;
     scrollbar-color: var(--line) transparent;
   }
+  .cfilter--popover .cfilter__scroll > * { flex: none; }
+  .cfilter--popover .cfilter__group--quiet .cfilter__checks { display: flex; flex-wrap: wrap; gap: 4px 16px; }
+  .ui-select-content.catalog__sort-menu { box-shadow: none; max-width: calc(100vw - var(--page-gutter) * 2); }
 }
 
 /* Высокая колонка сначала прокручивается страницей, затем прилипает нижним
@@ -5605,8 +5608,8 @@ a {
 
   .cfilter__sticky.is-open .cfilter__scroll {
     gap: 16px;
-    padding-bottom: 12px;
-    mask-image: linear-gradient(to bottom, #000 calc(100% - 12px), transparent);
+    padding-bottom: 0;
+    mask-image: none;
   }
 
   /* Неподвижный низ листа: избранное и кнопка возврата. */
