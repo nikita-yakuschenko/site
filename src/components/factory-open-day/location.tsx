@@ -29,8 +29,8 @@ export function FactoryOpenDayLocation({ date }: { date: string }) {
           center={FACTORY_CENTER}
           zoom={FACTORY_MAP_ZOOM}
           routeUrl={FACTORY_ROUTE_URL}
-          ariaLabel="Открыть карту проходной бывшего завода ЗКПД-4"
-          markerLabel="Проходная ЗКПД-4"
+          ariaLabel="Открыть карту производства Авангард Строй"
+          markerLabel="Авангард Строй"
         />
       </div>
     </div>
