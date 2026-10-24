@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type RefObject } from "react";
 import { IconSearch, IconX } from "@tabler/icons-react";
 import { copy } from "../lib/copy";
 import { normalizeQuery } from "../lib/catalog/filters";
@@ -15,16 +15,18 @@ type SearchState = {
   submitted: { query: string; revision: number } | null;
 };
 
-export function CatalogSearch({ value, onChange, pending = false, expanded = false, onApplied, onClose }: {
+export function CatalogSearch({ value, onChange, pending = false, expanded = false, onApplied, onClose, inputRef }: {
   value: string;
   onChange: (next: string) => void;
   pending?: boolean;
   expanded?: boolean;
   onApplied?: () => void;
   onClose?: () => void;
+  inputRef?: RefObject<HTMLInputElement | null>;
 }) {
   const [state, setState] = useState<SearchState>({ draft: value, seen: value, editing: false, revision: 0, submitted: null });
   const input = useRef<HTMLInputElement>(null);
+  const field = inputRef ?? input;
   const timer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const revision = useRef(0);
   const composing = useRef(false);
@@ -41,9 +43,8 @@ export function CatalogSearch({ value, onChange, pending = false, expanded = fal
 
   useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
   useEffect(() => {
-    if (expanded) input.current?.focus({ preventScroll: true });
-    else if (window.matchMedia('(max-width: 1023px)').matches && document.activeElement === input.current) input.current?.blur();
-  }, [expanded]);
+    if (!expanded && window.matchMedia('(max-width: 1023px)').matches && document.activeElement === field.current) field.current?.blur();
+  }, [expanded, field]);
   useEffect(() => {
     const sent = state.submitted;
     if (!pending && sent && sent.query === value && sent.revision === state.revision && notified.current !== sent) {
@@ -77,7 +78,7 @@ export function CatalogSearch({ value, onChange, pending = false, expanded = fal
 
   return <div className="catalog-search" aria-busy={pending}>
     <IconSearch size={18} stroke={2} aria-hidden="true" />
-    <input ref={input} type="search" value={state.draft} placeholder={copy.searchPlaceholder}
+    <input ref={field} type="search" value={state.draft} placeholder={copy.searchPlaceholder}
       aria-label={copy.searchAria} enterKeyHint="search"
       onChange={event => schedule(event.target.value)}
       onCompositionStart={() => {

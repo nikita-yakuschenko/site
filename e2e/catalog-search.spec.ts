@@ -84,3 +84,24 @@ test('mobile search can close without changing the query', async ({ page }) => {
   expect(new URL(page.url()).searchParams.has('q')).toBe(false)
 })
 
+test('mobile search focuses within the tap gesture and keeps the magnifier still', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 })
+  await page.goto('/catalog', { waitUntil: 'domcontentloaded' })
+  await expect(page.locator('html')).toHaveAttribute('data-app-hydrated', 'true')
+  await page.evaluate(() => {
+    document.addEventListener('click', event => {
+      if (event.target instanceof Element && event.target.closest('.catalog__search-toggle')) {
+        document.documentElement.dataset.searchFocusedDuringTap = String(document.activeElement?.matches('.catalog-search input'))
+      }
+    })
+  })
+  const icon = page.locator('.catalog__search-toggle svg')
+  const before = await icon.boundingBox()
+  await page.locator('.catalog__search-toggle').click()
+  await expect(page.locator('html')).toHaveAttribute('data-search-focused-during-tap', 'true')
+  await expect(page.locator('.catalog-search input')).toBeFocused()
+  expect(await icon.boundingBox()).toEqual(before)
+  await page.getByRole('button', { name: 'Закрыть поиск' }).click()
+  expect(await icon.boundingBox()).toEqual(before)
+})
+

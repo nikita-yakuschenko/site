@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { CatalogFilters, CatalogSort } from "./catalog-filters";
 import { CatalogSearch } from "./catalog-search";
 import * as Popover from "@radix-ui/react-popover";
+import { flushSync } from 'react-dom';
 import {
   countActive,
   filtersToHref,
@@ -64,6 +65,7 @@ export function CatalogBoard({
      в полосе поиска, а сама колонка ниже. */
   const [open, setOpen] = useState(false);
   const [searchExpanded, setSearchExpanded] = useState(false);
+  const searchInput = useRef<HTMLInputElement>(null);
   const [searchPending, startSearchTransition] = useTransition();
   useEffect(() => () => {
     if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
@@ -208,10 +210,7 @@ export function CatalogBoard({
           <Popover.Root open={open} onOpenChange={setOpen}>
           <Popover.Anchor asChild>
           <div className="catalog__mobile-actions" inert={searchExpanded}>
-            <button type="button" className={`catalog__search-toggle${filters.q ? ' is-active' : ''}`} aria-label={filters.q ? `Поиск проектов: ${filters.q}` : 'Поиск проектов'} aria-expanded={searchExpanded} onClick={() => {
-              setOpen(false);
-              setSearchExpanded(true);
-            }}><IconSearch size={18} stroke={1.75} aria-hidden="true" /></button>
+            <span aria-hidden="true" />
             <Popover.Trigger asChild>
             <button type="button" className="catalog__filter-button" aria-label={active ? `Фильтрация: ${active}` : 'Фильтрация'}>
               <IconFilter size={16} stroke={1.5} aria-hidden="true" />
@@ -226,12 +225,19 @@ export function CatalogBoard({
           </div>
           </Popover.Anchor>
           <Popover.Portal>
-              <Popover.Content className="catalog-filter-popover" side="bottom" align="start" sideOffset={8} collisionPadding={16} avoidCollisions={false} aria-label="Фильтрация проектов" onOpenAutoFocus={event => event.preventDefault()}>
+              <Popover.Content className="catalog-filter-popover" side="bottom" align="start" sideOffset={8} collisionPadding={16} avoidCollisions={false} aria-label="Фильтрация проектов" onOpenAutoFocus={event => event.preventDefault()} onCloseAutoFocus={event => { if (document.activeElement === searchInput.current) event.preventDefault(); }}>
                 {renderFilters(true)}
               </Popover.Content>
           </Popover.Portal>
           </Popover.Root>
+          <button type="button" className={`catalog__search-toggle${filters.q ? ' is-active' : ''}`} aria-label={filters.q ? `Поиск проектов: ${filters.q}` : 'Поиск проектов'} aria-expanded={searchExpanded} disabled={searchExpanded} onClick={() => {
+            flushSync(() => { setOpen(false); setSearchExpanded(true); });
+            // Keep focus inside the initiating gesture so iOS opens the keyboard
+            // together with the field, rather than after a passive effect.
+            searchInput.current?.focus({ preventScroll: true });
+          }}><IconSearch size={18} stroke={1.75} aria-hidden="true" /></button>
           <CatalogSearch value={filters.q ?? ""} onChange={search} pending={searchPending} expanded={searchExpanded}
+            inputRef={searchInput}
             onApplied={() => { setSearchExpanded(false); }} onClose={() => setSearchExpanded(false)} />
         </div>
       </div>

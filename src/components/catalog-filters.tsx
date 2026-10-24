@@ -41,11 +41,14 @@ export function CatalogSort({ filters, onChange, compact = false }: {
 }) {
   const [open, setOpen] = useState(false);
   const selected = filters.sort ?? 'default';
+  const selectedLabel = selected === 'default' ? 'Сортировка' : sortOptions.find(([value]) => value === selected)?.[1];
+  const shortLabel = selected === 'default' ? 'Сортировка' : selectedLabel?.replace(/^Сначала /, '').replace(/^./, letter => letter.toUpperCase());
   if (compact) return <Popover.Root open={open} onOpenChange={setOpen}>
     <Popover.Trigger asChild>
       <button type="button" className="ui-select-trigger catalog__sort catalog__sort--compact" aria-haspopup="menu" aria-label={`Сортировка проектов: ${sortOptions.find(([value]) => value === selected)?.[1]}`}>
         <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
-        <span>{selected === 'default' ? 'Сортировка' : sortOptions.find(([value]) => value === selected)?.[1]}</span>
+        <span className="catalog__sort-label">{selectedLabel}</span>
+        <span className="catalog__sort-label--short" aria-hidden="true">{shortLabel}</span>
       </button>
     </Popover.Trigger>
     <Popover.Portal>
