@@ -64,11 +64,11 @@ jobs:
         env:
           DATABASE_URL: postgresql://cms:cms@localhost:5432/cms
           PAYLOAD_SECRET: ci-payload-secret-is-at-least-32-chars
-          CMS_PUBLIC_URL: http://127.0.0.1:3001
+          CMS_PUBLIC_URL: https://cms.example.test
           CMS_SEED: '0'
           PAYLOAD_DB_PUSH: 'false'
-          NODE_ENV: development
-        run: npm run migrate
+          NODE_ENV: production
+        run: node node_modules/tsx/dist/cli.mjs scripts/migrate-runner.ts
       - name: Проверить соответствие схемы базы данных Payload
         working-directory: cms
         env:

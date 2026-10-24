@@ -86,8 +86,9 @@ try {
     if (violations.length) fail(`Миграция ${name} несовместима с откатом на предыдущий образ (${violations.join('; ')}).`)
   }
 
-  // npm run migrate --silent в read-only контейнере завершался с кодом 0 и не записывал миграцию.
-  const migrated = await run(process.execPath, ['node_modules/payload/bin.js', 'migrate'])
+  // Await the full lifecycle; Payload's async CLI loader can otherwise exit 0
+  // without initializing migrations in the read-only production container.
+  const migrated = await run(process.execPath, ['node_modules/tsx/dist/cli.mjs', 'scripts/migrate-runner.ts'])
   if (/would you like to proceed|data loss will occur/i.test(migrated.output)) {
     fail('Payload запросил интерактивное подтверждение и не применил миграцию.')
   }
