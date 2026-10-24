@@ -2,7 +2,8 @@
 
 import { useState, type RefObject } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { IconArrowsSort, IconHeart, IconX } from "@tabler/icons-react";
+import { IconArrowsSort, IconCheck, IconHeart, IconX } from "@tabler/icons-react";
+import * as Popover from "@radix-ui/react-popover";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
 import { RangeSlider } from "./range-slider";
 import { filtersToHref, type CatalogFacets } from "../lib/catalog/filters";
@@ -38,6 +39,35 @@ export function CatalogSort({ filters, onChange, compact = false }: {
   onChange: (next: CatalogFilters) => void;
   compact?: boolean;
 }) {
+  const [open, setOpen] = useState(false);
+  const selected = filters.sort ?? 'default';
+  if (compact) return <Popover.Root open={open} onOpenChange={setOpen}>
+    <Popover.Trigger asChild>
+      <button type="button" className="ui-select-trigger catalog__sort catalog__sort--compact" aria-haspopup="menu" aria-label={`Сортировка проектов: ${sortOptions.find(([value]) => value === selected)?.[1]}`}>
+        <IconArrowsSort size={16} stroke={1.5} aria-hidden="true" />
+        <span>{selected === 'default' ? 'Сортировка' : sortOptions.find(([value]) => value === selected)?.[1]}</span>
+      </button>
+    </Popover.Trigger>
+    <Popover.Portal>
+      <Popover.Content className="ui-select-content catalog__sort-menu catalog__sort-popover" role="menu" aria-label="Сортировка проектов" side="bottom" align="end" sideOffset={8} collisionPadding={16} avoidCollisions={false}
+        onKeyDown={event => {
+          if (!['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const options = Array.from(event.currentTarget.querySelectorAll<HTMLButtonElement>('[role="menuitemradio"]'));
+          const current = options.indexOf(document.activeElement as HTMLButtonElement);
+          const next = event.key === 'Home' ? 0 : event.key === 'End' ? options.length - 1 : (current + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length;
+          options[next]?.focus();
+        }}>
+        {sortOptions.map(([value, label]) => <button key={value} type="button" role="menuitemradio" aria-checked={value === selected} className="ui-select-item" onClick={() => {
+          onChange({ ...filters, sort: value === 'default' ? undefined : value });
+          setOpen(false);
+        }}>
+          {label}
+          {value === selected && <IconCheck size={16} stroke={1.5} className="catalog__sort-check" aria-hidden="true" />}
+        </button>)}
+      </Popover.Content>
+    </Popover.Portal>
+  </Popover.Root>;
   return <Select value={filters.sort ?? 'default'} onValueChange={value =>
     onChange({ ...filters, sort: value === 'default' ? undefined : value as CatalogFilters['sort'] })
   }>
