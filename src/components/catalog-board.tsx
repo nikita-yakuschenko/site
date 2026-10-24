@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CatalogFilters, CatalogSort } from "./catalog-filters";
 import { CatalogSearch } from "./catalog-search";
@@ -17,7 +17,7 @@ import {
   readServerFavorites,
   subscribeFavorites,
 } from "../lib/favorites";
-import { IconFilter } from "@tabler/icons-react";
+import { IconFilter, IconSearch } from "@tabler/icons-react";
 import { sortCatalog, type SortableProject } from "../lib/catalog/order";
 import { useRegionCode } from "./region-bootstrap";
 import { copy } from "../lib/copy";
@@ -63,6 +63,8 @@ export function CatalogBoard({
   /* Раскрытие колонки на узком экране. Живёт здесь, потому что кнопка стоит
      в полосе поиска, а сама колонка ниже. */
   const [open, setOpen] = useState(false);
+  const [searchExpanded, setSearchExpanded] = useState(false);
+  const [searchPending, startSearchTransition] = useTransition();
   useEffect(() => () => {
     if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
   }, []);
@@ -121,7 +123,7 @@ export function CatalogBoard({
 
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 1024px)');
-    const closeOnDesktop = () => { if (desktop.matches) setOpen(false); };
+    const closeOnDesktop = () => { if (desktop.matches) { setOpen(false); setSearchExpanded(false); } };
     desktop.addEventListener('change', closeOnDesktop);
     return () => desktop.removeEventListener('change', closeOnDesktop);
   }, []);
@@ -151,8 +153,9 @@ export function CatalogBoard({
 
   const search = (raw: string) => {
     const q = normalizeQuery(raw);
-    router.replace(filtersToHref({ ...filters, q: q || undefined }, pathname), { scroll: false });
-    backToStart();
+    startSearchTransition(() => {
+      router.replace(filtersToHref({ ...filters, q: q || undefined }, pathname), { scroll: false });
+    });
   };
 
   const reset = () => {
@@ -201,34 +204,41 @@ export function CatalogBoard({
           .join(" ")}
 
       >
-        <div className="catalog__barrow">
-          <div className="catalog__mobile-actions">
-            <Popover.Root open={open} onOpenChange={setOpen}>
+        <div className={`catalog__barrow${searchExpanded ? ' is-search-open' : ''}`}>
+          <Popover.Root open={open} onOpenChange={setOpen}>
+          <Popover.Anchor asChild>
+          <div className="catalog__mobile-actions" inert={searchExpanded}>
+            <button type="button" className={`catalog__search-toggle${filters.q ? ' is-active' : ''}`} aria-label={filters.q ? `Поиск проектов: ${filters.q}` : 'Поиск проектов'} aria-expanded={searchExpanded} onClick={() => {
+              setOpen(false);
+              setSearchExpanded(true);
+            }}><IconSearch size={18} stroke={1.75} aria-hidden="true" /></button>
             <Popover.Trigger asChild>
             <button type="button" className="catalog__filter-button" aria-label={active ? `Фильтрация: ${active}` : 'Фильтрация'}>
               <IconFilter size={16} stroke={1.5} aria-hidden="true" />
               <span>Фильтрация</span>
             </button>
             </Popover.Trigger>
-            <Popover.Portal>
-              <Popover.Content className="catalog-filter-popover" side="bottom" align="start" sideOffset={8} collisionPadding={16} avoidCollisions={false} aria-label="Фильтрация проектов" onOpenAutoFocus={event => event.preventDefault()}>
-                {renderFilters(true)}
-              </Popover.Content>
-            </Popover.Portal>
-            </Popover.Root>
             <CatalogSort compact filters={filters} onChange={next => {
               if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
               router.replace(filtersToHref(next, pathname), { scroll: false });
               backToStart();
             }} />
           </div>
-          <CatalogSearch value={filters.q ?? ""} onChange={search} />
+          </Popover.Anchor>
+          <Popover.Portal>
+              <Popover.Content className="catalog-filter-popover" side="bottom" align="start" sideOffset={8} collisionPadding={16} avoidCollisions={false} aria-label="Фильтрация проектов" onOpenAutoFocus={event => event.preventDefault()}>
+                {renderFilters(true)}
+              </Popover.Content>
+          </Popover.Portal>
+          </Popover.Root>
+          <CatalogSearch value={filters.q ?? ""} onChange={search} pending={searchPending} expanded={searchExpanded}
+            onApplied={() => { setSearchExpanded(false); }} onClose={() => setSearchExpanded(false)} />
         </div>
       </div>
       {renderFilters()}
       </div>
 
-      <div ref={results} className="catalog__results">
+      <div ref={results} className="catalog__results" aria-busy={searchPending}>
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку
             не важно, сколько вариантов он отбросил и насколько велик каталог.
             Важно одно, есть ли в нём то, что он искал. Поэтому говорим только
