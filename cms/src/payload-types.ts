@@ -28,6 +28,11 @@ export interface Config {
     stories: Story;
     'project-prices': ProjectPrice;
     'lead-submissions': LeadSubmission;
+    'referral-participants': ReferralParticipant;
+    events: Event;
+    'event-registrations': EventRegistration;
+    'automation-jobs': AutomationJob;
+    'automation-imports': AutomationImport;
     media: Media;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -44,6 +49,11 @@ export interface Config {
     stories: StoriesSelect<false> | StoriesSelect<true>;
     'project-prices': ProjectPricesSelect<false> | ProjectPricesSelect<true>;
     'lead-submissions': LeadSubmissionsSelect<false> | LeadSubmissionsSelect<true>;
+    'referral-participants': ReferralParticipantsSelect<false> | ReferralParticipantsSelect<true>;
+    events: EventsSelect<false> | EventsSelect<true>;
+    'event-registrations': EventRegistrationsSelect<false> | EventRegistrationsSelect<true>;
+    'automation-jobs': AutomationJobsSelect<false> | AutomationJobsSelect<true>;
+    'automation-imports': AutomationImportsSelect<false> | AutomationImportsSelect<true>;
     media: MediaSelect<false> | MediaSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -56,9 +66,11 @@ export interface Config {
   fallbackLocale: null;
   globals: {
     'lead-delivery': LeadDelivery;
+    'automation-settings': AutomationSetting;
   };
   globalsSelect: {
     'lead-delivery': LeadDeliverySelect<false> | LeadDeliverySelect<true>;
+    'automation-settings': AutomationSettingsSelect<false> | AutomationSettingsSelect<true>;
   };
   locale: null;
   widgets: {
@@ -861,6 +873,203 @@ export interface LeadSubmission {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "referral-participants".
+ */
+export interface ReferralParticipant {
+  id: number;
+  key: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  crmContactId?: string | null;
+  crmDealIds?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  confirmedAt?: string | null;
+  tokenVersion?: number | null;
+  importedAt?: string | null;
+  sourceData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  code: string;
+  referralUrl?: string | null;
+  status: 'pending' | 'active' | 'blocked';
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events".
+ */
+export interface Event {
+  id: number;
+  title: string;
+  slug: string;
+  status?: ('draft' | 'published' | 'completed' | 'cancelled') | null;
+  description?: string | null;
+  startsAt: string;
+  endsAt: string;
+  timezone?: string | null;
+  landingUrl?: string | null;
+  programme?:
+    | {
+        time?: string | null;
+        title: string;
+        description?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  address?: string | null;
+  landmark?: string | null;
+  latitude?: number | null;
+  longitude?: number | null;
+  markerLabel?: string | null;
+  routeUrl?: string | null;
+  phone?: string | null;
+  registrationEnabled?: boolean | null;
+  capacity?: number | null;
+  requireConfirmation?: boolean | null;
+  tokenTtlHours?: number | null;
+  crmTitleMatch?: string | null;
+  crmConfirmedStage?: string | null;
+  confirmationEmail?: {
+    subject?: string | null;
+    /**
+     * Переменные: {{name}}, {{confirm_url}}, {{code}}, {{referral_url}}, {{event_title}}, {{event_date}}, {{event_time}}, {{address}}, {{route_url}}, {{phone}}, {{programme}}, {{google_calendar_url}}, {{ics_url}}.
+     */
+    html?: string | null;
+    text?: string | null;
+  };
+  programmeEmail?: {
+    subject?: string | null;
+    /**
+     * Переменные: {{name}}, {{confirm_url}}, {{code}}, {{referral_url}}, {{event_title}}, {{event_date}}, {{event_time}}, {{address}}, {{route_url}}, {{phone}}, {{programme}}, {{google_calendar_url}}, {{ics_url}}.
+     */
+    html?: string | null;
+    text?: string | null;
+  };
+  reminderEmail?: {
+    subject?: string | null;
+    /**
+     * Переменные: {{name}}, {{confirm_url}}, {{code}}, {{referral_url}}, {{event_title}}, {{event_date}}, {{event_time}}, {{address}}, {{route_url}}, {{phone}}, {{programme}}, {{google_calendar_url}}, {{ics_url}}.
+     */
+    html?: string | null;
+    text?: string | null;
+  };
+  reminderEnabled?: boolean | null;
+  reminderHoursBefore?: number | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-registrations".
+ */
+export interface EventRegistration {
+  id: number;
+  key: string;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  crmContactId?: string | null;
+  crmDealIds?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  confirmedAt?: string | null;
+  tokenVersion?: number | null;
+  importedAt?: string | null;
+  sourceData?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  eventSlug: string;
+  status: 'pending' | 'confirmed' | 'cancelled' | 'attended';
+  notes?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "automation-jobs".
+ */
+export interface AutomationJob {
+  id: number;
+  key: string;
+  kind: string;
+  data:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  status: 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
+  attempts?: number | null;
+  runAt: string;
+  lease?: string | null;
+  lockedAt?: string | null;
+  lastError?: string | null;
+  result?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  completedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "automation-imports".
+ */
+export interface AutomationImport {
+  id: number;
+  name: string;
+  status: string;
+  report?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
@@ -914,6 +1123,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'lead-submissions';
         value: number | LeadSubmission;
+      } | null)
+    | ({
+        relationTo: 'referral-participants';
+        value: number | ReferralParticipant;
+      } | null)
+    | ({
+        relationTo: 'events';
+        value: number | Event;
+      } | null)
+    | ({
+        relationTo: 'event-registrations';
+        value: number | EventRegistration;
+      } | null)
+    | ({
+        relationTo: 'automation-jobs';
+        value: number | AutomationJob;
+      } | null)
+    | ({
+        relationTo: 'automation-imports';
+        value: number | AutomationImport;
       } | null)
     | ({
         relationTo: 'media';
@@ -1625,6 +1854,139 @@ export interface LeadSubmissionsSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "referral-participants_select".
+ */
+export interface ReferralParticipantsSelect<T extends boolean = true> {
+  key?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  crmContactId?: T;
+  crmDealIds?: T;
+  confirmedAt?: T;
+  tokenVersion?: T;
+  importedAt?: T;
+  sourceData?: T;
+  code?: T;
+  referralUrl?: T;
+  status?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "events_select".
+ */
+export interface EventsSelect<T extends boolean = true> {
+  title?: T;
+  slug?: T;
+  status?: T;
+  description?: T;
+  startsAt?: T;
+  endsAt?: T;
+  timezone?: T;
+  landingUrl?: T;
+  programme?:
+    | T
+    | {
+        time?: T;
+        title?: T;
+        description?: T;
+        id?: T;
+      };
+  address?: T;
+  landmark?: T;
+  latitude?: T;
+  longitude?: T;
+  markerLabel?: T;
+  routeUrl?: T;
+  phone?: T;
+  registrationEnabled?: T;
+  capacity?: T;
+  requireConfirmation?: T;
+  tokenTtlHours?: T;
+  crmTitleMatch?: T;
+  crmConfirmedStage?: T;
+  confirmationEmail?:
+    | T
+    | {
+        subject?: T;
+        html?: T;
+        text?: T;
+      };
+  programmeEmail?:
+    | T
+    | {
+        subject?: T;
+        html?: T;
+        text?: T;
+      };
+  reminderEmail?:
+    | T
+    | {
+        subject?: T;
+        html?: T;
+        text?: T;
+      };
+  reminderEnabled?: T;
+  reminderHoursBefore?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "event-registrations_select".
+ */
+export interface EventRegistrationsSelect<T extends boolean = true> {
+  key?: T;
+  name?: T;
+  email?: T;
+  phone?: T;
+  crmContactId?: T;
+  crmDealIds?: T;
+  confirmedAt?: T;
+  tokenVersion?: T;
+  importedAt?: T;
+  sourceData?: T;
+  eventSlug?: T;
+  status?: T;
+  notes?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "automation-jobs_select".
+ */
+export interface AutomationJobsSelect<T extends boolean = true> {
+  key?: T;
+  kind?: T;
+  data?: T;
+  status?: T;
+  attempts?: T;
+  runAt?: T;
+  lease?: T;
+  lockedAt?: T;
+  lastError?: T;
+  result?: T;
+  completedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "automation-imports_select".
+ */
+export interface AutomationImportsSelect<T extends boolean = true> {
+  name?: T;
+  status?: T;
+  report?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "media_select".
  */
 export interface MediaSelect<T extends boolean = true> {
@@ -1733,6 +2095,42 @@ export interface LeadDelivery {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "automation-settings".
+ */
+export interface AutomationSetting {
+  id: number;
+  config?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  vault?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  cutover?:
+    | {
+        [k: string]: unknown;
+      }
+    | unknown[]
+    | string
+    | number
+    | boolean
+    | null;
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "lead-delivery_select".
  */
 export interface LeadDeliverySelect<T extends boolean = true> {
@@ -1747,6 +2145,18 @@ export interface LeadDeliverySelect<T extends boolean = true> {
   mapsApiKey?: T;
   url?: T;
   authorizationEnv?: T;
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "automation-settings_select".
+ */
+export interface AutomationSettingsSelect<T extends boolean = true> {
+  config?: T;
+  vault?: T;
+  cutover?: T;
   updatedAt?: T;
   createdAt?: T;
   globalType?: T;

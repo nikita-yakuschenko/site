@@ -6,7 +6,7 @@ import { FactoryOpenDayForm } from '../../components/factory-open-day/form'
 import { FactoryOpenDayHero } from '../../components/factory-open-day/hero'
 import { FactoryOpenDayLocation } from '../../components/factory-open-day/location'
 import { FactoryOpenDayProgram } from '../../components/factory-open-day/program'
-import { openDayDate } from '../../lib/open-day'
+import { openDayDate, openDayEvent } from '../../lib/open-day'
 import './open-day.css'
 
 const inter = localFont({ src: '../../../public/fonts/inter/Inter-Variable.ttf', weight: '400 700', variable: '--font-ags-inter', display: 'swap', preload: false })
@@ -21,14 +21,14 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function FactoryOpenDayPage() {
-  const date = await openDayDate()
+  const [date, event] = await Promise.all([openDayDate(), openDayEvent()])
   return <main className={`ags-page ${inter.variable} ${unbounded.variable}`}>
     <script dangerouslySetInnerHTML={{ __html: `(function(){try{var p=localStorage.getItem('ags-theme');var d=matchMedia('(prefers-color-scheme: dark)').matches;document.documentElement.dataset.agsTheme=(p==='light'||p==='dark')?p:(d?'dark':'light')}catch(e){}})()` }} />
     <OpenDayTheme />
     <FactoryOpenDayHero data-cms-content-connected date={date} />
-    <FactoryOpenDayProgram data-cms-content-connected />
-    <FactoryOpenDayLocation data-cms-content-connected date={date} />
-    <FactoryOpenDayForm data-cms-content-connected date={date} />
-    <FactoryOpenDayFooter data-cms-content-connected date={date} />
+    <FactoryOpenDayProgram data-cms-content-connected programme={event?.programme} />
+    <FactoryOpenDayLocation data-cms-content-connected date={date} event={event} />
+    <FactoryOpenDayForm data-cms-content-connected date={date} registrationEnabled={!event || (event.registrationEnabled && event.status === 'published' && new Date(event.startsAt).getTime() > Date.now())} />
+    <FactoryOpenDayFooter data-cms-content-connected date={date} phone={event?.phone} address={event?.address} />
   </main>
 }

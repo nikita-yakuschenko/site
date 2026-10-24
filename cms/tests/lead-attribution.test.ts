@@ -3,6 +3,15 @@ import assert from 'node:assert/strict'
 import { attributionFromUrl, leadAttribution, LEAD_ATTRIBUTION_COOKIE } from '../../src/lib/lead-attribution'
 import { webhookBody } from '../src/config/lead-adapters'
 
+test('реферальный код сохраняется при переходах и передаётся в комментарий CRM', () => {
+  const saved = attributionFromUrl('https://avgst.ru/?ref=12345')
+  const meta = leadAttribution('https://avgst.ru/catalog?utm_source=yandex', `${LEAD_ATTRIBUTION_COOKIE}=${encodeURIComponent(JSON.stringify(saved))}`)
+  assert.equal(meta.ref, '12345')
+  const body = webhookBody({ name: 'Тест', phone: '+79990000000', siteId: 'corporate', consent: true, meta }, 'test', 'Заявка')
+  assert.ok(body.comment.includes('Код участника реферальной программы: 12345'))
+  assert.equal(attributionFromUrl('https://avgst.ru/?ref=%3Cscript%3E').ref, undefined)
+})
+
 test('метки первого захода сохраняются после перехода в карточку; идентификаторы читаются из cookie', () => {
   const saved = attributionFromUrl('https://avgst.ru/?utm_source=yandex&utm_campaign=Дом&yclid=123')
   const cookie = `${LEAD_ATTRIBUTION_COOKIE}=${encodeURIComponent(JSON.stringify(saved))}; _ym_uid=1792491948336585363; roistat_visit=204704; secret=hidden`

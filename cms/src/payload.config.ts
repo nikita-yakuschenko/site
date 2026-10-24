@@ -11,6 +11,7 @@ import { Projects } from './collections/Projects'
 import { Stories } from './collections/Stories'
 import { ProjectPrices } from './collections/ProjectPrices'
 import { LeadDelivery, LeadSubmissions } from './collections/LeadSubmissions'
+import { AutomationImports, AutomationJobs, AutomationSettings, EventRegistrations, Events, ReferralParticipants } from './collections/Automation'
 import { createMedia } from './collections/Media'
 import { readEnvironment } from './config/environment'
 import { migrations } from './migrations'
@@ -41,6 +42,8 @@ export default buildConfig({
       providers: ['./components/admin/AdminShellRoot#AdminShellRoot', './components/admin/AdminToasts#AdminToasts'],
       Nav: './components/admin/AdminShell#EmptyNav',
       views: {
+        referral: { Component: './components/admin/AutomationView#ReferralView', path: '/referral', exact: true },
+        events: { Component: './components/admin/AutomationView#EventsView', path: '/events', exact: true },
         site: { Component: './components/admin/StructureView#SiteView', path: '/site', exact: true },
         pages: { Component: './components/admin/StructureView#PagesView', path: '/pages', exact: true },
         redirects: { Component: './components/admin/RedirectsView#RedirectsView', path: '/catalog/redirects', exact: true },
@@ -82,8 +85,8 @@ export default buildConfig({
   debug: false,
   defaultDepth: 0,
   maxDepth: 3,
-  collections: [Users, Pages, Blocks, Forms, Projects, Stories, ProjectPrices, LeadSubmissions, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
-  globals: [LeadDelivery],
+  collections: [Users, Pages, Blocks, Forms, Projects, Stories, ProjectPrices, LeadSubmissions, ReferralParticipants, Events, EventRegistrations, AutomationJobs, AutomationImports, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
+  globals: [LeadDelivery, AutomationSettings],
   editor: lexicalEditor(),
   sharp,
   upload: { limits: { fileSize: 100 * 1024 * 1024 } },
@@ -99,6 +102,8 @@ export default buildConfig({
   onInit: async (payload) => {
     if (process.env.CMS_MAINTENANCE === '1') return
     if (process.env.NEXT_PHASE !== 'phase-production-build' && process.env.npm_lifecycle_event !== 'build' && !process.env.DATABASE_URL?.includes('://build:build@')) {
+      const { startAutomationWorker } = await import('./automation/worker')
+      startAutomationWorker(payload)
       try {
         const { ensureManufacturePerson } = await import('./seed/ensure-manufacture-person')
         await ensureManufacturePerson(payload)

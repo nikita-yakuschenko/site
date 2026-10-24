@@ -14,7 +14,8 @@ const steps = [
   ['09', '15 минут', 'Трансфер на производственную площадку', 'При необходимости.'],
 ]
 
-export function FactoryOpenDayProgram() {
+export function FactoryOpenDayProgram({ programme }: { programme?: { time?: string; title: string; description?: string }[] | null }) {
+  const shown = programme?.length ? programme.map((step, index) => [String(index + 1).padStart(2, '0'), step.time, step.title, step.description]) : steps
   return (<CMSContentBlock cmsBlockKey="FactoryOpenDayProgram">{(
     <section className="ags ags-prog">
       <OpenDayRules />
@@ -23,7 +24,7 @@ export function FactoryOpenDayProgram() {
           <h2 className="ags-prog__title">Программа мероприятия</h2>
         </div>
         <ol className="ags-route">
-          {steps.map(([num, time, title, text]) => (
+          {shown.map(([num, time, title, text]) => (
             <li className="ags-route__step" key={num}>
               <span className="ags-route__n">{num}</span>
               <strong className="ags-route__name">{title}</strong>
@@ -32,7 +33,7 @@ export function FactoryOpenDayProgram() {
             </li>
           ))}
         </ol>
-        <div className="ags-route__total"><span>Всего</span><b>около 3 часов 5 минут</b></div>
+        {!programme?.length && <div className="ags-route__total"><span>Всего</span><b>около 3 часов 5 минут</b></div>}
       </div>
     </section>
   )}</CMSContentBlock>)

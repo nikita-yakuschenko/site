@@ -15,8 +15,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Separator } from '../ui/separator'
 import { Switch } from '../ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
+import { AutomationPanel } from './AutomationPanel'
 
-const providers = ['roistat', 'bitrix', 'yandex'] as const
+const providers = ['roistat', 'bitrix', 'yandex', 'services'] as const
 type Provider = (typeof providers)[number]
 type DeliveryMode = 'test' | 'webhook' | 'roistat'
 type Counter = { projectId: string; connectedAt: string; enabled: boolean }
@@ -142,6 +143,7 @@ export function IntegrationsPanel({ delivery, yandex }: { delivery: DeliverySett
       <TabsTrigger value="roistat">Roistat</TabsTrigger>
       <TabsTrigger value="bitrix">Битрикс24</TabsTrigger>
       <TabsTrigger value="yandex">Яндекс</TabsTrigger>
+      <TabsTrigger value="services">Сервисы</TabsTrigger>
     </TabsList>
     <TabsContent value="roistat">
       <Card className="shadow-none"><CardContent className="flex flex-col gap-8 py-6">
@@ -217,5 +219,6 @@ export function IntegrationsPanel({ delivery, yandex }: { delivery: DeliverySett
         </section>
       </CardContent></Card>
     </TabsContent>
+    <TabsContent value="services"><AutomationPanel section="dmp" /></TabsContent>
   </Tabs>
 }

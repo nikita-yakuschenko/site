@@ -40,9 +40,10 @@ export function marketingDetails(lead: LeadInput) {
   const labels: Record<string, string> = {
     landing_page: 'Страница первого захода',
     gclid: 'Идентификатор клика Google Ads',
+    ref: 'Код участника реферальной программы',
   }
   // Остальная атрибуция уже сопоставлена с отдельными полями CRM.
-  return ['landing_page', 'gclid'].flatMap(key => {
+  return ['landing_page', 'gclid', 'ref'].flatMap(key => {
     let text = value(meta[key])
     if (key === 'landing_page' && text) {
       try { const url = new URL(text); for (const name of [...url.searchParams.keys()]) if (name.startsWith('utm_')) url.searchParams.delete(name); text = url.toString() } catch { /* Сохраняем исходное значение. */ }

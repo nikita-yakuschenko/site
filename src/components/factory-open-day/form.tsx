@@ -15,7 +15,7 @@ export function OpenDayBookButton({ className, children }: { className: string; 
   return <button type="button" className={className} aria-haspopup="dialog" aria-controls="ags-booking-dialog" onClick={() => window.dispatchEvent(new Event(OPEN_BOOKING))}>{children}</button>
 }
 
-export function FactoryOpenDayForm({ date }: { date: string }) {
+export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date: string; registrationEnabled?: boolean }) {
   const submitting = useRef(false)
   const attempt = useRef<LeadAttempt['current']>(null)
   const [phone, setPhone] = useState('')
@@ -30,7 +30,7 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (submitting.current || status === 'ok') return
+    if (submitting.current || status === 'ok' || !registrationEnabled) return
     const data = new FormData(event.currentTarget)
     const name = sanitizeName(String(data.get('name') || '')).trim()
     const email = String(data.get('email') || '').trim()
@@ -104,8 +104,8 @@ export function FactoryOpenDayForm({ date }: { date: string }) {
       <span className="ags-agree__tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M4.5 12.5 9.5 17.5 19.5 6.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
       <span className="ags-agree__text">Согласен на <a href="/legal/privacy" target="_blank" rel="noopener">обработку персональных данных</a></span>
     </label>
-    <button className="ags-submit" type="submit" disabled={status === 'sending'}>
-      <span className="ags-submit-label">{status === 'sending' ? 'Отправка…' : 'Записаться'}</span>
+    <button className="ags-submit" type="submit" disabled={status === 'sending' || !registrationEnabled}>
+      <span className="ags-submit-label">{!registrationEnabled ? 'Регистрация закрыта' : status === 'sending' ? 'Отправка…' : 'Записаться'}</span>
       <OpenDayArrow />
     </button>
     {status === 'error' ? <p className="ags-form__status" data-error="true">Не удалось отправить. Попробуйте ещё раз.</p> : null}

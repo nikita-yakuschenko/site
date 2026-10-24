@@ -7,6 +7,7 @@ import { activeRoistatProjectId, deliverLead, deliveryIsEnabled, roistatWebhookU
 import { leadTitle } from '../config/lead-title'
 import { normalizeMapsApiKey, normalizeMetricaCounterId, publicMapsKey, publicMetrica } from '../config/yandex'
 import { acceptLead } from '../config/lead-intake'
+import { enqueue, settings as automationSettings } from '../automation/store'
 
 export const LeadDelivery: GlobalConfig = {
   slug: 'lead-delivery', label: 'Отправка заявок', access: { read: superAdmin, update: superAdmin },
@@ -59,7 +60,16 @@ export const LeadSubmissions: CollectionConfig = {
   slug: 'lead-submissions', labels: { singular: 'Заявка', plural: 'Заявки' },
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'formId', 'status', 'createdAt'], components: { views: { list: { Component: './components/admin/LeadsView#LeadsListRedirect' } } } },
   access: { read: authenticated, create: () => false, update: () => false, delete: contentManager },
-  hooks: { afterRead: [({ doc }) => { doc.title = storedLeadTitle(doc); return doc }] },
+  hooks: {
+    afterRead: [({ doc }) => { doc.title = storedLeadTitle(doc); return doc }],
+    afterChange: [async ({ doc, operation, req }) => {
+      if (operation !== 'create' || !['referral-program', 'FactoryOpenDayForm'].includes(doc.formId)) return doc
+      const saved = await automationSettings(req.payload)
+      if (!(saved.cutover as { active?: boolean } | null)?.active) return doc
+      await enqueue(req.payload, 'intake', doc.payload as Record<string, unknown>, `intake:${doc.requestId}`, undefined, req)
+      return doc
+    }],
+  },
   fields: [
     { name: 'title', type: 'text', label: 'Название сделки', admin: { hidden: true } },
     { name: 'requestId', type: 'text', label: 'Идентификатор отправки', required: true, unique: true, admin: { hidden: true } },

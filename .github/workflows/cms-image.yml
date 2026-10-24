@@ -80,6 +80,16 @@ jobs:
           NODE_ENV: development
         run: node node_modules/tsx/dist/cli.mjs scripts/check-schema-drift.ts
 
+      - name: Проверить обработку регистраций, писем и DMP
+        working-directory: cms
+        env:
+          DATABASE_URL: postgresql://cms:cms@localhost:5432/cms
+          PAYLOAD_SECRET: ci-payload-secret-is-at-least-32-chars
+          CMS_PUBLIC_URL: http://127.0.0.1:3001
+          CMS_MAINTENANCE: '1'
+          CMS_AUTOMATION_TEST_DATABASE: 'true'
+        run: npx tsx --test --test-force-exit tests/integration/automation.test.ts
+
   publish:
     name: Сборка и публикация образа CMS
     needs: verify

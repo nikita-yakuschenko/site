@@ -1,6 +1,6 @@
 /** Разрешённые параметры источника заявки, без произвольных cookie. */
 export const LEAD_ATTRIBUTION_COOKIE = 'avgst_lead_attribution'
-export const attributionKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_referrer', 'yclid', 'gclid', '_ym_uid'] as const
+export const attributionKeys = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'utm_referrer', 'yclid', 'gclid', '_ym_uid', 'ref'] as const
 export type Attribution = Partial<Record<typeof attributionKeys[number] | 'landing_page', string>>
 
 export function attributionFromUrl(raw: string): Attribution {
@@ -8,7 +8,7 @@ export function attributionFromUrl(raw: string): Attribution {
     const url = new URL(raw)
     return Object.fromEntries(attributionKeys.flatMap(key => {
       const value = url.searchParams.get(key)?.trim().slice(0, 500)
-      return value ? [[key, value]] : []
+      return value && (key !== 'ref' || /^[a-zA-Z0-9_-]{1,64}$/.test(value)) ? [[key, value]] : []
     }))
   } catch { return {} }
 }
@@ -25,6 +25,7 @@ export function leadAttribution(sourceUrl: string | undefined, cookie: string): 
   const current = attributionFromUrl(sourceUrl || '')
   const saved = readAttribution(cookies.get(LEAD_ATTRIBUTION_COOKIE))
   const result: Attribution & { roistatVisit?: string } = Object.keys(current).some(key => key.startsWith('utm_')) ? { ...current, landing_page: sourceUrl?.slice(0, 1500) } : { ...saved, ...current }
+  if (!result.ref && saved.ref) result.ref = saved.ref
   for (const key of ['_ym_uid', 'yclid'] as const) {
     const value = cookies.get(key)
     if ((key === '_ym_uid' || !result[key]) && value && /^[0-9]{1,64}$/.test(value)) result[key] = value

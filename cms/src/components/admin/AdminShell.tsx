@@ -19,9 +19,11 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbP
 
 export function EmptyNav() { return null }
 
-const structureIcons = { site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, stories: IconMessage, prices: IconCash, registers: IconDatabase, sampling: IconFlask, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
+const structureIcons = { referral: Users, events: IconFiles, site: IconWorld, pages: IconFiles, catalog: IconBuildingCommunity, stories: IconMessage, prices: IconCash, registers: IconDatabase, sampling: IconFlask, blocks: IconBlocks, forms: IconForms, sections: IconSitemap, integrations: IconPlugConnected }
 const aliases: Record<string, string> = { '/pages': '/collections/pages', '/catalog': '/collections/projects', '/stories': '/collections/stories', '/prices': '/collections/project-prices', '/blocks': '/collections/blocks', '/forms': '/collections/forms', '/media': '/collections/media', '/users': '/collections/users' }
 function sectionPaths(href: string) {
+  if (href === '/referral') return [href, '/collections/referral-participants']
+  if (href === '/events') return [href, '/collections/events', '/collections/event-registrations']
   if (href === '/integrations') return [href, '/leads', '/collections/lead-submissions', '/globals/lead-delivery']
   return aliases[href] ? [href, aliases[href]] : [href]
 }

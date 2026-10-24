@@ -3,7 +3,7 @@ import { CMSContentBlock } from '../cms-content'
 import { OpenDayBookButton } from './form'
 import { OpenDayArrow, OpenDayRules } from './rules'
 
-export function FactoryOpenDayFooter({ date }: { date: string }) {
+export function FactoryOpenDayFooter({ date, phone = '+7 (831) 200-38-89', address }: { date: string; phone?: string; address?: string }) {
   return (<CMSContentBlock cmsBlockKey="FactoryOpenDayFooter">{<footer className="ags ags-foot">
     <OpenDayRules />
     <div className="ags-sheet">
@@ -18,7 +18,7 @@ export function FactoryOpenDayFooter({ date }: { date: string }) {
         <nav className="ags-foot__col" aria-label="Контакты">
           <p className="ags-foot__h"><span className="ags-footer-highlight">Связь</span></p>
           <ul className="ags-list">
-            <li><a href="tel:+78312003889" className="ags-link ags-num">+7 (831) 200-38-89</a></li>
+            <li><a href={`tel:${phone.replace(/[^+\d]/g, '')}`} className="ags-link ags-num">{phone}</a></li>
             <li><a href="mailto:info@avgst.ru" className="ags-link">info@avgst.ru</a></li>
           </ul>
         </nav>
@@ -33,7 +33,7 @@ export function FactoryOpenDayFooter({ date }: { date: string }) {
         <div className="ags-foot__col ags-foot__col--last">
           <p className="ags-foot__h"><span className="ags-footer-highlight">Производство</span></p>
           <ul className="ags-list">
-            <li className="ags-plain ags-foot__address">город Нижний Новгород,<br />улица Зайцева 31, корпус 1 (проходная),<br />Территория бывшего завода ЗКПД-4</li>
+            <li className="ags-plain ags-foot__address">{address || <>город Нижний Новгород,<br />улица Зайцева 31, корпус 1 (проходная),<br />Территория бывшего завода ЗКПД-4</>}</li>
             <li><OpenDayBookButton className="ags-link ags-link--go">Записаться на <span className="ags-footer-highlight" data-cms-content-connected>{date}</span><OpenDayArrow size={13} /></OpenDayBookButton></li>
           </ul>
         </div>
