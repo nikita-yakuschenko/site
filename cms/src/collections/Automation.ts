@@ -43,6 +43,10 @@ export const ReferralParticipants: CollectionConfig = {
     { name: 'notes', label: 'Примечание', type: 'textarea' },
   ],
 }
+function eventWorkspaceFields(fields: Field[]): Field[] {
+  const stored = fields.flatMap(field => field.type === 'tabs' ? field.tabs.flatMap(tab => tab.fields) : [field]).filter(field => field.type !== 'ui')
+  return [...stored.map(field => ({ ...field, admin: { ...field.admin, hidden: true } } as Field)), { name: 'eventWorkspace', type: 'ui', admin: { components: { Field: './components/admin/EventWorkspace#EventWorkspace' } } }]
+}
 export const Events: CollectionConfig = {
   slug: 'events', labels: { singular: 'Мероприятие', plural: 'Мероприятия' }, access,
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'startsAt', 'status'], group: 'Мероприятия', components: { views: { list: { Component: './components/admin/AutomationView#EventsListRedirect' } }, edit: { beforeDocumentControls: ['./components/admin/PageMetadataFields#EventRecordMetadata'] } } },
@@ -52,7 +56,7 @@ export const Events: CollectionConfig = {
     if (next.timezone) try { new Intl.DateTimeFormat('ru', { timeZone: next.timezone }) } catch { throw new APIError('Проверьте часовой пояс', 400) }
     return data
   }] },
-  fields: [{ type: 'tabs', tabs: [
+  fields: eventWorkspaceFields([{ type: 'tabs', tabs: [
     { label: 'Мероприятие', fields: [
       { name: 'title', label: 'Название', type: 'text', required: true, admin: { hidden: true } },
       { name: 'slug', label: 'Код мероприятия', type: 'text', required: true, unique: true, admin: { hidden: true } },
@@ -89,7 +93,7 @@ export const Events: CollectionConfig = {
       { name: 'landingUrl', label: 'Страница мероприятия', type: 'text', validate: (value: unknown) => { if (!value) return true; try { return ['http:', 'https:'].includes(new URL(String(value)).protocol) || 'Укажите HTTP(S) адрес страницы' } catch { return 'Укажите полный адрес страницы' } } },
       { name: 'linkedPages', type: 'ui', admin: { components: { Field: './components/admin/CMSSettings#LinkedEventPages' } } },
     ] },
-  ] }],
+  ] }]),
 }
 export const EventRegistrations: CollectionConfig = {
   slug: 'event-registrations', labels: { singular: 'Регистрация на мероприятие', plural: 'Регистрации на мероприятия' }, access,

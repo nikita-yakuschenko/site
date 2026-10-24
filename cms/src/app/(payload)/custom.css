@@ -921,3 +921,39 @@ html[data-theme="dark"] .avgst-shell [data-slot="tabs-trigger"][data-state="acti
 .avgst-shell :is(input[type="date"], input[type="time"], input[type="datetime-local"])::-webkit-datetime-edit {
   font-family: var(--font-geist-mono), monospace;
 }
+.event-workspace { display:grid; grid-template-columns:minmax(320px, 480px) minmax(0, 1fr); align-items:start; gap:24px; }
+.event-workspace__settings { min-width:0; gap:20px; }
+.event-workspace__tabs { display:flex; flex-wrap:wrap; justify-content:flex-start; width:100%; height:auto; gap:4px 8px; }
+.event-workspace__tabs [data-slot=tabs-trigger] { flex:0 0 auto; min-height:36px; }
+.event-workspace__fields { padding:20px; border:1px solid var(--border); border-radius:var(--radius-lg); background:var(--card); }
+.event-workspace__preview { position:sticky; top:calc(var(--doc-controls-height, 72px) + 24px); min-width:0; }
+.collection-edit--events .document-fields__main { min-width:0; width:100%; }
+.collection-edit--events .document-fields__main > .render-fields { display:block; }
+.collection-edit--events .event-workspace .font-mono { font-family:var(--font-geist-mono), monospace; }
+.cms-settings { width:100%; }
+@media(max-width:1023px) {
+  .event-workspace { grid-template-columns:minmax(0, 1fr); }
+  .event-workspace__preview { position:static; }
+}
+@media(max-width:767px) {
+  .collection-edit--events .doc-controls__controls { flex-wrap:wrap; gap:8px; }
+  .collection-edit--events .doc-controls .project-record-metadata { flex:1 1 100%; flex-wrap:wrap; }
+  .collection-edit--events .project-record-name-wrap { flex:1 1 100%; max-width:none; }
+  .collection-edit--events .project-record-type { flex:1 1 140px; }
+  .collection-edit--events .project-record-slug { flex:1 1 140px; }
+  .collection-edit--events .doc-controls__wrapper { align-items:flex-start; }
+  .event-workspace__fields { padding:16px; }
+}
+.smtp-settings-grid { grid-template-columns:repeat(12, minmax(0, 1fr)); }
+.smtp-settings-grid > div { grid-column:span 6; }
+.smtp-settings-grid > [data-setting=host] { grid-column:span 8; }
+.smtp-settings-grid > [data-setting=port] { grid-column:span 4; }
+.smtp-settings-grid > [data-setting=secure] { grid-column:1 / -1; grid-row:4; border-top:1px solid var(--border); padding-top:16px; }
+.smtp-settings-grid > [data-setting=user] { grid-row:2; }
+.smtp-settings-grid > [data-setting=smtpPassword] { grid-row:2; }
+.smtp-settings-grid > [data-setting=from] { grid-row:3; }
+.smtp-settings-grid > [data-setting=replyTo] { grid-row:3; }
+@media(max-width:639px) {
+  .smtp-settings-grid { display:flex; flex-direction:column; }
+}
+@media(min-width:1024px) { .automation-referral-editor { grid-template-columns:minmax(280px, 480px) minmax(0, 1fr); } }

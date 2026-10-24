@@ -66,8 +66,7 @@ function AppSidebar() {
         <span className="grid flex-1 text-left text-sm leading-tight"><span className="truncate font-medium">{name}</span><span className="truncate text-xs text-muted-foreground">{user.email}</span></span><MoreVertical className="ml-auto size-4" />
       </SidebarMenuButton>
     </DropdownMenuTrigger><DropdownMenuContent side="top" align="end" className="w-56">
-      <DropdownMenuItem asChild><Link href="/account"><Settings />Настройки аккаунта</Link></DropdownMenuItem>
-      {user.role === 'super-admin' && <DropdownMenuItem asChild><Link href="/settings"><Settings />Настройки CMS</Link></DropdownMenuItem>}
+      <DropdownMenuItem asChild><Link href="/account"><Settings />Настройки</Link></DropdownMenuItem>
       <DropdownMenuSeparator /><DropdownMenuItem asChild><Link href="/logout"><LogOut />Выйти</Link></DropdownMenuItem>
     </DropdownMenuContent></DropdownMenu></SidebarMenuItem></SidebarMenu></SidebarFooter>
   </Sidebar>
@@ -78,8 +77,7 @@ const sections = [
   ...structure.map(item => ({ title: item.title, href: item.href, lists: sectionPaths(item.href) })),
   { title: 'Медиафайлы', href: '/media', lists: sectionPaths('/media') },
   { title: 'Пользователи', href: '/users', lists: sectionPaths('/users') },
-  { title: 'Аккаунт', href: '/account', lists: ['/account'] },
-  { title: 'Настройки CMS', href: '/settings', lists: ['/settings'] },
+  { title: 'Настройки', href: '/account', lists: ['/account', '/settings'] },
 ]
 
 function sectionOf(pathname: string) {

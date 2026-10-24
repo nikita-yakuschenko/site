@@ -4,12 +4,31 @@ import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { Button } from '../ui/button'
+import { Input } from '../ui/input'
+import { Label } from '../ui/label'
 import { AutomationPanel } from './AutomationPanel'
+import { Tabs, TabsList, TabsTrigger } from '../ui/tabs'
+import { useRouter } from 'next/navigation'
 export function CMSMailSettings() { return <AutomationPanel section="mail" /> }
-export function AccountCMSSettingsLink() {
-  const path = usePathname(), { user } = useAuth()
-  if (path !== '/account' || user?.role !== 'super-admin') return null
-  return <div className="shadcn-surface mb-6"><Button asChild variant="outline"><Link href="/settings">Настройки CMS и отправки писем</Link></Button></div>
+export function SettingsTabs() {
+  const path = usePathname(), router = useRouter(), { user } = useAuth()
+  return <Tabs value={path === '/settings' ? 'cms' : 'account'} onValueChange={value => router.push(value === 'cms' ? '/settings' : '/account')}><TabsList variant="line"><TabsTrigger value="account">Аккаунт</TabsTrigger>{user?.role === 'super-admin' && <TabsTrigger value="cms">CMS</TabsTrigger>}</TabsList></Tabs>
+}
+export function AccountSettings() {
+  const { user, fetchFullUser } = useAuth()
+  const [firstName, setFirstName] = useState(String(user?.firstName || '')), [lastName, setLastName] = useState(String(user?.lastName || ''))
+  const [password, setPassword] = useState(''), [confirmation, setConfirmation] = useState(''), [busy, setBusy] = useState(false), [message, setMessage] = useState(''), [error, setError] = useState('')
+  return <form className="flex flex-col gap-6 rounded-lg border bg-card p-6" onSubmit={async event => {
+    event.preventDefault(); setError(''); setMessage('')
+    if (password && password !== confirmation) { setError('Пароли не совпадают'); return }
+    setBusy(true)
+    try {
+      const response = await fetch(`/api/users/${user?.id}`, { method: 'PATCH', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ firstName, lastName, ...(password ? { password } : {}) }) })
+      const result = await response.json()
+      if (!response.ok) throw new Error(result.errors?.[0]?.message || 'Не удалось сохранить настройки')
+      await fetchFullUser(); setPassword(''); setConfirmation(''); setMessage('Настройки аккаунта сохранены')
+    } catch (error) { setError((error as Error).message) } finally { setBusy(false) }
+  }}><div className="flex flex-col gap-2"><h2 className="text-base font-semibold">Личные данные</h2><p className="text-sm text-muted-foreground">{String(user?.email || '')}</p></div><div className="grid gap-5 sm:grid-cols-2"><div className="flex flex-col gap-2"><Label htmlFor="account-first-name">Имя</Label><Input id="account-first-name" autoComplete="given-name" required disabled={busy} value={firstName} onChange={e => setFirstName(e.target.value)} /></div><div className="flex flex-col gap-2"><Label htmlFor="account-last-name">Фамилия</Label><Input id="account-last-name" autoComplete="family-name" required disabled={busy} value={lastName} onChange={e => setLastName(e.target.value)} /></div></div><div className="flex flex-col gap-4 border-t pt-5"><h2 className="text-base font-semibold">Смена пароля</h2><p className="text-sm text-muted-foreground">Оставьте поля пустыми, чтобы сохранить текущий пароль.</p><div className="grid gap-5 sm:grid-cols-2"><div className="flex flex-col gap-2"><Label htmlFor="account-password">Новый пароль</Label><Input id="account-password" type="password" autoComplete="new-password" minLength={12} disabled={busy} value={password} onChange={e => setPassword(e.target.value)} /></div><div className="flex flex-col gap-2"><Label htmlFor="account-confirmation">Повторите пароль</Label><Input id="account-confirmation" type="password" autoComplete="new-password" required={Boolean(password)} disabled={busy} value={confirmation} onChange={e => setConfirmation(e.target.value)} /></div></div></div>{error && <p role="alert" className="text-sm text-destructive">{error}</p>}{message && <p role="status" className="text-sm">{message}</p>}<Button type="submit" disabled={busy} className="w-fit">{busy ? 'Сохранение…' : 'Сохранить'}</Button></form>
 }
 export function LinkedEventPages() {
   const landing = useField<string>({ path: 'landingUrl' }), [pages, setPages] = useState<{ id: number; title: string }[]>([]), [error, setError] = useState('')

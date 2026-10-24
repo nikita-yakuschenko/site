@@ -42,6 +42,7 @@ export default buildConfig({
       providers: ['./components/admin/AdminShellRoot#AdminShellRoot', './components/admin/AdminToasts#AdminToasts'],
       Nav: './components/admin/AdminShell#EmptyNav',
       views: {
+        account: { Component: './components/admin/AutomationView#AccountSettingsView' },
         referral: { Component: './components/admin/AutomationView#ReferralView', path: '/referral', exact: true },
         events: { Component: './components/admin/AutomationView#EventsView', path: '/events', exact: true },
         eventRegistrations: { Component: './components/admin/AutomationView#RegistrationsView', path: '/event-registrations', exact: true },

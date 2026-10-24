@@ -4,7 +4,7 @@ import { ReferralWorkspace } from './AutomationPanel'
 import { Suspense } from 'react'
 import { ParticipantsIndex } from './ParticipantsIndex'
 import { EventsIndex } from './EventsIndex'
-import { CMSMailSettings } from './CMSSettings'
+import { CMSMailSettings, SettingsTabs, AccountSettings } from './CMSSettings'
 import { activeStaff } from '../../access/staff'
 export async function ReferralView({ initPageResult }: AdminViewServerProps) {
   if (!initPageResult.req.user) redirect('/login')
@@ -39,5 +39,11 @@ export async function CMSSettingsView({ initPageResult }: AdminViewServerProps) 
   const user = await activeStaff(initPageResult.req)
   if (!user) redirect('/login')
   if (user.role !== 'super-admin') redirect('/account')
-  return <div className="shadcn-surface flex flex-col gap-6 p-4 lg:p-6"><h1 className="text-2xl font-semibold tracking-tight">Настройки CMS</h1><CMSMailSettings /></div>
+  return <div className="shadcn-surface cms-settings flex max-w-5xl flex-col gap-6 p-4 lg:p-6"><h1 className="text-2xl font-semibold tracking-tight">Настройки</h1><SettingsTabs /><CMSMailSettings /></div>
+}
+
+export async function AccountSettingsView({ initPageResult }: AdminViewServerProps) {
+  const user = await activeStaff(initPageResult.req)
+  if (!user) redirect('/login')
+  return <div className="shadcn-surface cms-settings flex max-w-5xl flex-col gap-6 p-4 lg:p-6"><h1 className="text-2xl font-semibold tracking-tight">Настройки</h1><SettingsTabs /><AccountSettings /></div>
 }

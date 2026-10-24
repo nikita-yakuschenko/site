@@ -58,7 +58,6 @@ export const Users: CollectionConfig = {
     }],
   },
   fields: [
-    { name: 'cmsSettingsLink', type: 'ui', admin: { components: { Field: './components/admin/CMSSettings#AccountCMSSettingsLink' } } },
     { name: 'firstName', type: 'text', label: 'Имя', required: true },
     { name: 'lastName', type: 'text', label: 'Фамилия', required: true },
     {
