@@ -20,12 +20,18 @@ function reactHydration(text: string) {
   return /(?:React error #(?:418|419)|react\.dev\/errors\/(?:418|419)|hydration|hydrating|server rendered HTML|didn't match the client)/i.test(text)
 }
 
+const navigationIntents = new WeakMap<Page, () => void>()
+export function beginNavigation(page: Page) { navigationIntents.get(page)?.() }
+
 export async function diagnose(page: Page, info: TestInfo, scenario: string, action: () => Promise<void>) {
   const findings: Finding[] = []
   const origin = new URL(info.project.use.baseURL || 'https://avgst.ru').origin
   let navigating = false
   let documentGeneration = 0
   const requestDocuments = new WeakMap<Request, number>()
+  // An outgoing document can cancel requests before the next document request
+  // is emitted. Mark navigation at the action, not only at its network event.
+  navigationIntents.set(page, () => { navigating = true; documentGeneration++ })
   const cancelledImages = new Map<string, number[]>()
   const imageMessages: { finding: Finding; url: string; at: number }[] = []
   page.on('request', request => {
@@ -133,6 +139,7 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
     body: Buffer.from(JSON.stringify(findings, null, 2)),
     contentType: 'application/json',
   })
+  navigationIntents.delete(page)
   if (findings.some(item => item.severity === 'critical') || actionError) {
     const screenshot = info.outputPath('diagnostic-failure.png')
     try { await page.screenshot({ path: screenshot, fullPage: true, timeout: 10_000 }) }

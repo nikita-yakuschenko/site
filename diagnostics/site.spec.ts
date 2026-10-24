@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test'
-import { diagnose } from './probe'
+import { diagnose, beginNavigation } from './probe'
 import { CONSENT_COOKIE, CONSENT_VERSION } from '../src/consent/types'
 
 async function browserConsent(page: Parameters<typeof diagnose>[0], baseURL: string, functional: boolean) {
@@ -16,17 +16,17 @@ const functionalConsent = (page: Parameters<typeof diagnose>[0], baseURL: string
 
 async function applicationReady(page: Parameters<typeof diagnose>[0]) {
   await expect(page.locator('body')).toBeVisible()
-  if (process.env.DIAG_TARGET !== 'production') {
-    await expect(page.locator('html')).toHaveAttribute('data-app-hydrated', 'true')
-  }
+  await expect(page.locator('html')).toHaveAttribute('data-app-hydrated', 'true')
 }
 
 async function reload(page: Parameters<typeof diagnose>[0]) {
+  beginNavigation(page)
   await page.reload({ waitUntil: 'domcontentloaded' })
   await applicationReady(page)
 }
 
 async function open(page: Parameters<typeof diagnose>[0], path: string) {
+  beginNavigation(page)
   const response = await page.goto(path, { waitUntil: 'domcontentloaded' })
   expect(response?.status(), path).toBeLessThan(400)
   expect(new URL(page.url()).origin, 'Scenario must remain on its target origin').toBe(new URL(String(test.info().project.use.baseURL)).origin)
@@ -73,12 +73,12 @@ test('catalog filters and favorites @critical', async ({ page }, info) => diagno
   await expect(favorite).toBeVisible()
   await favorite.click()
   await expect(favorite).toHaveAttribute('aria-pressed', 'true')
-  if (info.project.name.includes('mobile')) await page.locator('.cfilter__toggle').click()
+  if (info.project.name.includes('mobile')) await page.getByRole('button', { name: /^Фильтрация/ }).click()
   await page.getByRole('button', { name: /Только избранное/ }).click()
   if (info.project.name.includes('mobile')) await page.locator('.cfilter__apply').click()
   await expect(page.locator('.card').first()).toBeVisible()
   if (info.project.name.includes('mobile')) {
-    await page.locator('.cfilter__toggle').click()
+    await page.getByRole('button', { name: /^Фильтрация/ }).click()
     await page.getByRole('button', { name: 'Сбросить всё', exact: true }).click()
   }
   const ready = page.getByRole('checkbox', { name: 'Готовый дом в продаже' })
@@ -138,6 +138,7 @@ test('mobile menu and state variants', async ({ page, context }, info) => diagno
     const burger = page.locator('.site-header__burger')
     await burger.click()
     await expect(page.locator('.site-menu__panel')).toBeVisible()
+    beginNavigation(page)
     await page.locator('.site-menu__panel nav a[href="/"]').first().click()
     await expect(page.locator('.site-menu__panel')).toBeHidden()
   }
