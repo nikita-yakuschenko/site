@@ -1,5 +1,6 @@
 'use client'
 
+import { useProjectCopy } from './ProjectCopyButton'
 import { useRef, useState } from 'react'
 import Link from 'next/link'
 import type { Project } from '../../payload-types'
@@ -7,7 +8,7 @@ import { TECHNOLOGY_OPTIONS, technologyLabel } from '../../../../src/lib/catalog
 import type { PriceKind } from '../../config/price-kinds'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { IconExternalLink, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus } from '@tabler/icons-react'
+import { IconExternalLink, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus, IconCopy } from '@tabler/icons-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Input } from '../ui/input'
@@ -64,6 +65,7 @@ function RangeFilter({ title, min, max, onMin, onMax }: { title: string; min: st
 }
 
 export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; projects: Project[]; leads: Record<string, number> }) {
+  const projectCopy = useProjectCopy()
   const initial = useSearchParams()
   const [sorting, setSorting] = useState(() => sortingFrom(initial))
   const [search, setSearch] = useState(initial.get('q') ?? '')
@@ -225,6 +227,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
         <TableCell className="text-right tabular-nums">{stat(project.viewCount)}</TableCell><TableCell className="text-right tabular-nums">{stat(project.likeCount)}</TableCell><TableCell className="text-right tabular-nums">{stat(project.shareCount)}</TableCell><TableCell className="text-right tabular-nums">{leads[project.id] ?? 0}</TableCell>
         <TableCell className="catalog-actions pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8 text-muted-foreground data-[state=open]:bg-muted" aria-label={`Действия: ${project.name || 'без названия'}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface w-44">
           <DropdownMenuItem asChild><Link href={`/collections/projects/${project.id}`}><IconPencil />Редактировать</Link></DropdownMenuItem>
+          {projectCopy.allowed && <DropdownMenuItem disabled={projectCopy.copying !== null} onSelect={() => void projectCopy.copy(project.id)}><IconCopy />Дублировать</DropdownMenuItem>}
           {published && project.slug && <DropdownMenuItem asChild><a href={`${siteUrl}/catalog/${project.slug}`} target="_blank" rel="noreferrer"><IconExternalLink />Открыть на сайте</a></DropdownMenuItem>}
           <DropdownMenuSeparator /><DropdownMenuItem variant="destructive" onSelect={() => setRemoving(project)}><IconTrash />Удалить</DropdownMenuItem>
         </DropdownMenuContent></DropdownMenu></TableCell>

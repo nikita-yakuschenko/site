@@ -6,6 +6,7 @@ import type { SelectFieldClientProps, TextFieldClientProps } from 'payload'
 import { Badge } from '../ui/badge'
 import { ChoiceSelect } from './ChoiceSelect'
 import { DraftLeavePrompt } from './DraftLeavePrompt'
+import { ProjectCopyButton } from './ProjectCopyButton'
 import { UnpublishedChanges } from './UnpublishedChanges'
 import { IconInfoCircle, IconPencil } from '@tabler/icons-react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
@@ -125,6 +126,7 @@ export function ProjectRecordMetadata() {
   const code = typeof data?.code === 'string' ? data.code : ''
   return <RecordMetadata fields={projectFields} badge={<Badge variant={hasPublishedDoc ? 'default' : 'outline'}>{hasPublishedDoc ? 'Опубликован' : 'Черновик'}</Badge>}>
     {code && <span className="project-record-code" title="Код проекта">{code}</span>}
+    {id && <ProjectCopyButton />}
     {!id && <DraftLeavePrompt />}
     <UnpublishedChanges />
   </RecordMetadata>

@@ -20,7 +20,8 @@ export const ProjectPrices: CollectionConfig = {
     if (project.recordType === 'ready-home' || !priceConfigurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error('Комплектация не соответствует технологии проекта')
     data.lookupKey = `${projectID}:${row.configuration}:${row.region}`
     return data
-  }], beforeChange: [({ data, originalDoc, operation }) => {
+  }], beforeChange: [({ data, originalDoc, operation, req }) => {
+    if (operation === 'create' && req.context.projectDuplication === true) return data
     if (!data || typeof data.price !== 'number') return data
     const previous = operation === 'update' ? originalDoc : null
     data.history = nextPriceHistory(previous?.history, typeof previous?.price === 'number' ? previous.price : null, previous?.updatedAt ?? null, data.price)

@@ -1,6 +1,7 @@
 import type { CollectionConfig, Field } from 'payload'
 import { TECHNOLOGY_OPTIONS } from '../../../src/lib/catalog/types'
 import { authenticated, contentManager, contentWriter, privilegedField } from '../access/staff'
+import { projectCopyEndpoint } from './project-copy-endpoint'
 import { projectOrderEndpoints } from './project-order-endpoints'
 import { validProjectOrder, completeProjectOrder, normalizeProjectOrder } from '../config/project-order'
 import type { ProjectContentBlock } from '../config/project-content-sources'
@@ -38,9 +39,10 @@ export const Projects: CollectionConfig = {
   slug: 'projects',
   labels: { singular: 'Запись каталога', plural: 'Каталог' },
   admin: { useAsTitle: 'name', defaultColumns: ['name', 'recordType', 'technologyBadge', 'areaValue', 'priceAmount', '_status'], components: { edit: { beforeDocumentControls: ['./components/admin/PageMetadataFields#ProjectRecordMetadata'] } } },
+  disableDuplicate: true,
   versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
-  endpoints: [...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectYmlOptionsEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
+  endpoints: [projectCopyEndpoint, ...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectYmlOptionsEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
   hooks: { beforeDelete: [async ({ id, req }) => {
     // Price rows require a project, so they go first
     await req.payload.delete({ collection: 'project-prices', where: { project: { equals: id } }, req, overrideAccess: true })

@@ -167,3 +167,42 @@ test('event settings stay left of a live preview; Russian calendar, programme an
   expect(save.y).toBeGreaterThanOrEqual(title.y + title.height)
   await page.screenshot({ path: 'C:/Users/Nikita/AppData/Local/Temp/avgst-event-workspace-mobile.png' })
 })
+
+test('catalogue row action duplicates all saved project content and opens a separate draft', async ({ page }) => {
+  const ids: number[] = []
+  const name = `Дубликат ${suffix}`
+  try {
+    const created = await api.post('/api/projects', { data: { name, slug: `project-${suffix}`, recordType: 'project', technologyBadge: 'Панельно-каркасный', areaValue: 138, floorsValue: 2, bedrooms: 4, bathrooms: 2, _status: 'published', searchDescription: 'Описание для копирования', imageUrl: '/catalog/test/main.webp', exteriors: [{ image: '/catalog/test/exterior.webp', isPrimary: true }] } })
+    expect(created.status()).toBe(201)
+    const source = (await created.json()).doc
+    ids.push(source.id)
+    await page.goto(`/catalog?q=${encodeURIComponent(suffix)}`)
+    await page.getByRole('button', { name: `Действия: ${name}`, exact: true }).click()
+    const response = page.waitForResponse(r => new URL(r.url()).pathname === `/api/projects/${source.id}/copy` && r.request().method() === 'POST')
+    await page.getByRole('menuitem', { name: 'Дублировать', exact: true }).click()
+    const result = await response
+    expect(result.status()).toBe(201)
+    const { doc } = await result.json()
+    ids.push(doc.id)
+    await expect(page).toHaveURL(new RegExp(`/collections/projects/${doc.id}$`))
+    await expect(page.locator('.project-record-name')).toHaveValue(name)
+    await expect(page.locator('.project-record-slug input')).toHaveValue(`${source.slug}-copy`)
+    await expect(page.locator('.page-record-metadata')).toContainText('Черновик')
+    await expect(page.getByRole('button', { name: 'Дублировать проект', exact: true })).toBeVisible()
+    const copy = await (await api.get(`/api/projects/${doc.id}?draft=true`)).json()
+    expect(copy.searchDescription).toBe(source.searchDescription)
+    expect(copy.exteriors[0].image).toBe(source.exteriors[0].image)
+    expect(copy._status).toBe('draft')
+    expect(copy.code).not.toBe(source.code)
+    const headerResponse = page.waitForResponse(r => new URL(r.url()).pathname === `/api/projects/${doc.id}/copy` && r.request().method() === 'POST')
+    await page.getByRole('button', { name: 'Дублировать проект', exact: true }).click()
+    const secondResponse = await headerResponse
+    expect(secondResponse.status()).toBe(201)
+    const secondCopy = (await secondResponse.json()).doc
+    ids.push(secondCopy.id)
+    await expect(page).toHaveURL(new RegExp(`/collections/projects/${secondCopy.id}$`))
+    await expect(page.locator('.project-record-name')).toHaveValue(name)
+  } finally {
+    for (const id of ids.reverse()) await api.delete(`/api/projects/${id}`)
+  }
+})
