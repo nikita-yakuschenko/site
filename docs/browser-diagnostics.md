@@ -21,6 +21,12 @@ These errors remain critical; the audit does not suppress third-party
 hydration failures. The reproduction can be used for a provider support case
 without including secrets or customer contact data.
 
+After the catalog deployment completed, stable production run 40082056309
+passed 27 of 30 scenarios. Its three failures were SmartCaptcha React #418
+in the form scenarios; there were no remaining scenario timeouts or RSC
+navigation errors. The separate one-widget reproduction again emitted two
+provider errors. The workflow remains red while this external defect persists.
+
 ## Run
 
 Install browser binaries once with `npx playwright install chromium firefox webkit`.
