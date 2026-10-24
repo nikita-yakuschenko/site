@@ -111,6 +111,7 @@ export const FACTORY_CENTER: readonly [number, number] = [
 ];
 
 export const FACTORY_MAP_ZOOM = 16;
+export const FACTORY_POINT_URL = `https://yandex.ru/maps/?pt=${FACTORY_LON},${FACTORY_LAT}&z=17&l=map`;
 
 export const FACTORY_TRANSIT = [
   { name: "ЗКПД-4", distance: "900 метров" },
