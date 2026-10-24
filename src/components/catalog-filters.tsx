@@ -2,7 +2,7 @@
 
 import { useState, type RefObject } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { IconArrowsSort, IconHeart } from "@tabler/icons-react";
+import { IconArrowsSort, IconHeart, IconX } from "@tabler/icons-react";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
 import { RangeSlider } from "./range-slider";
 import { filtersToHref, type CatalogFacets } from "../lib/catalog/filters";
@@ -193,6 +193,16 @@ export function CatalogFilters({
   const techLabel = (value: CatalogTechnology) =>
     TECHNOLOGY_OPTIONS.find(option => option.technology === value)!.label;
 
+  const favoriteControl = (inline = false) => (
+    <button type="button"
+      className={`cfilter__fav${inline ? ' cfilter__fav--inline' : ''}${onlyFavorites ? ' is-on' : ''}`}
+      aria-pressed={onlyFavorites} onClick={onToggleFavorites}>
+      <IconHeart size={inline ? 16 : 17} stroke={2} fill={onlyFavorites ? 'currentColor' : 'none'} aria-hidden="true" />
+      {copy.favoritesOnly}
+      <span className="cfilter__favorites-count">{favoritesCount}</span>
+    </button>
+  );
+
   return (
     <aside className={mobile ? 'cfilter cfilter--popover' : 'cfilter cfilter--desktop'} aria-label={copy.catalogFiltersAria}>
       <div className={open ? "cfilter__sticky is-open" : "cfilter__sticky"}>
@@ -208,9 +218,12 @@ export function CatalogFilters({
           </div>
           <CatalogSort filters={filters} onChange={go} />
         </div>
-        <div className="catalog__mobile-reset">
-          <button type="button" className="cfilter__reset catalog__reset" disabled={!hasActiveFilters} onClick={onReset}>{copy.resetAll}</button>
-        </div>
+        {mobile && <div className="catalog__mobile-reset">
+          {favoriteControl(true)}
+          <button type="button" className="cfilter__reset catalog__reset" disabled={!hasActiveFilters} onClick={onReset}>
+            <IconX size={16} stroke={2} aria-hidden="true" />{copy.resetAll}
+          </button>
+        </div>}
         {facets.area.max > facets.area.min && <fieldset className="cfilter__group">
           <legend className="cfilter__legend">
             {copy.areaLegend}
@@ -300,23 +313,7 @@ export function CatalogFilters({
         {/* Внизу и отдельно: это приятная мелочь, а не то, чем выбирают дом.
             И это не условие отбора, а переключатель вида, в адрес оно не
             попадает, потому что лежит в localStorage и у каждого своё. */}
-        <div className="cfilter__group cfilter__group--fav">
-          <button
-            type="button"
-            className={onlyFavorites ? "cfilter__fav is-on" : "cfilter__fav"}
-            aria-pressed={onlyFavorites}
-            onClick={onToggleFavorites}
-          >
-            <IconHeart
-              size={17}
-              stroke={2}
-              fill={onlyFavorites ? "currentColor" : "none"}
-              aria-hidden="true"
-            />
-            {copy.favoritesOnly}
-            <span>{favoritesCount}</span>
-          </button>
-        </div>
+        {!mobile && <div className="cfilter__group cfilter__group--fav">{favoriteControl()}</div>}
 
         <fieldset className="cfilter__group">
           <legend className="visually-hidden">Статус</legend>
