@@ -98,7 +98,7 @@ export const OFFICE_TRANSIT = [
  * Производство: ул. Зайцева 31, территория ЗКПД-4.
  * Координаты — точка пина от заказчика.
  */
-const FACTORY_COORDS = "56.366375,43.791405";
+const FACTORY_COORDS = "56.366307,43.791522";
 
 export const FACTORY_ROUTE_URL =
   `https://yandex.ru/maps/?rtext=~${FACTORY_COORDS}&rtt=auto&z=17`;
