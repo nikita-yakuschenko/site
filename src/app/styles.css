@@ -14748,23 +14748,22 @@ picture.hero__frame {
 .catalog__sort > span { min-width: 0; flex: 1; text-align: left; }
 .ui-select-content.catalog__sort-menu { width: 224px; border-radius: 10px; background: var(--surface, #fff); }
 .catalog__sort-menu .ui-select-item { min-height: 40px; border-radius: 6px; padding-left: 12px; }
-.catalog__desktop-actions, .catalog__desktop-reset { display: none; }
-@media (min-width: 1024px) {
+.catalog__mobile-actions, .catalog__mobile-reset { display: none; }
+@media (max-width: 1023px) {
   .catalog__barrow > .catalog-search { display: none; }
-  .catalog__desktop-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
+  .catalog__mobile-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; width: 100%; }
   .catalog__filter-button, .ui-select-trigger.catalog__sort--compact {
     display: flex; align-items: center; justify-content: center; gap: 6px;
-    min-width: 0; height: 38px; padding: 0 7px; border: 1px solid var(--line);
+    min-width: 0; height: 44px; padding: 0 12px; border: 1px solid var(--line);
     border-radius: 8px; background: transparent; color: var(--foreground);
-    font: inherit; font-size: 12px; white-space: nowrap; cursor: pointer;
+    font: inherit; font-size: 14px; white-space: nowrap; cursor: pointer;
   }
   .catalog__filter-button svg, .catalog__sort--compact svg { flex: none; }
   .catalog__sort--compact > span { flex: none; }
-  .catalog__sort--compact > span:last-child { display: none; }
+  .catalog__sort--compact > svg:last-child { display: none; }
   .catalog__filter-button:hover, .catalog__filter-button[aria-expanded="true"] { background: var(--tint); }
   .catalog__filter-button:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: -2px; }
   .cfilter__sort-group { display: none; }
-  .catalog__desktop-reset { display: flex; justify-content: flex-end; }
-  .catalog__sidebar.is-filters-collapsed > .cfilter { display: none; }
+  .catalog__mobile-reset { display: flex; justify-content: flex-end; }
 }
 @media (max-width: 1023px) { .ui-select-trigger.catalog__sort { height: 44px; } }

@@ -213,7 +213,7 @@ export function CatalogFilters({
           </div>
           <CatalogSort filters={filters} onChange={go} />
         </div>
-        <div className="catalog__desktop-reset">
+        <div className="catalog__mobile-reset">
           <button type="button" className="cfilter__reset catalog__reset" disabled={!hasActiveFilters} onClick={onReset}>{copy.resetAll}</button>
         </div>
         {facets.area.max > facets.area.min && <fieldset className="cfilter__group">

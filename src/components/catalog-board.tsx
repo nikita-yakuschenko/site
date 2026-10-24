@@ -64,7 +64,6 @@ export function CatalogBoard({
   /* Раскрытие колонки на узком экране. Живёт здесь, потому что кнопка стоит
      в полосе поиска, а сама колонка ниже. */
   const [open, setOpen] = useState(false);
-  const [desktopFiltersOpen, setDesktopFiltersOpen] = useState(true);
   const favorites = useSyncExternalStore(
     subscribeFavorites,
     readFavorites,
@@ -170,7 +169,7 @@ export function CatalogBoard({
   return (
     <>
       <div className="catalog__layout">
-      <div ref={sidebar} className={`catalog__sidebar${desktopFiltersOpen ? '' : ' is-filters-collapsed'}`}>
+      <div ref={sidebar} className="catalog__sidebar">
       {/* Поиск липнет вместе с отбором: искать по названию и смотреть
           выдачу приходится одновременно, и уезжающее вверх поле заставляло
           бы возвращаться к началу страницы на каждый запрос. */}
@@ -186,8 +185,8 @@ export function CatalogBoard({
 
       >
         <div className="catalog__barrow">
-          <div className="catalog__desktop-actions">
-            <button type="button" className="catalog__filter-button" aria-expanded={desktopFiltersOpen} aria-controls="catalog-filter-panel" onClick={() => setDesktopFiltersOpen(value => !value)}>
+          <div className="catalog__mobile-actions">
+            <button type="button" className="catalog__filter-button" aria-expanded={open} aria-controls="catalog-filter-panel" aria-label={active ? `Фильтрация: ${active}` : 'Фильтрация'} onClick={() => setOpen(value => !value)}>
               <IconFilter size={16} stroke={1.5} aria-hidden="true" />
               <span>Фильтрация</span>
             </button>
@@ -198,18 +197,6 @@ export function CatalogBoard({
             }} />
           </div>
           <CatalogSearch value={filters.q ?? ""} onChange={search} />
-          {/* Видна только на узком экране, на широком её прячет CSS: там
-              колонка стоит целиком и прятать нечего. */}
-          {/* Панель доступна и с активными фильтрами: внутри также сортировка. */}
-          <button
-            type="button"
-            className="cfilter__toggle"
-            aria-expanded={open}
-            aria-label={active ? `${copy.filtersLabel}: ${active}` : copy.filtersLabel}
-            onClick={() => setOpen((value) => !value)}
-          >
-            <IconFilter size={20} stroke={2} aria-hidden="true" />
-          </button>
         </div>
       </div>
       <CatalogFilters
