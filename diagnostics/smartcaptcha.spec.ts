@@ -97,10 +97,12 @@ test('SDK download failure terminates verification without a lead', async ({ pag
 })
 
 test('timeout cleans pending widget and permits another attempt', async ({ page }) => {
+  await page.clock.install()
   const run = await prepare(page, 'pending')
   await run.fill()
-  await page.clock.install()
-  await run.form.locator('button[type=submit]').click()
+  // Exercise the timeout, independently of mobile focus/keyboard tap handling.
+  // Other scenarios cover actual submit-button clicks in the same profiles.
+  await run.form.evaluate(form => (form as HTMLFormElement).requestSubmit())
   await expect(page.locator('.smart-captcha')).toHaveCount(1)
   await expect.poll(() => page.evaluate(() => (window as unknown as { __captchaStats?: { executes: number } }).__captchaStats?.executes)).toBe(1)
   await page.clock.fastForward(120_001)

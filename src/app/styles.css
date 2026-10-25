@@ -9352,7 +9352,8 @@ html.is-dialog-open {
 }
 
 .cookie-banner--notice { z-index: 40; }
-.cookie-banner--notice .cookie-banner__actions { grid-template-columns: 1fr; }
+.cookie-banner--notice .cookie-banner__actions { display: flex; justify-content: flex-start; }
+.cookie-banner--notice .cookie-banner__btn { padding-inline: 16px; }
 
 .cookie-banner__inner {
   pointer-events: auto;
