@@ -39,6 +39,9 @@ export const CONSENT_COOKIE = "avgst_cookie_consent";
 export const CONSENT_VERSION = "2026-09-16.2";
 export const CONSENT_MAX_AGE = 31_536_000; // 12 месяцев
 
+/** Site policy: integrations work immediately, without a consent prompt. */
+export const COOKIE_PROMPT_ENABLED = false;
+
 export const DEFAULT_CONSENT: CookieConsentState = {
   version: CONSENT_VERSION,
   decidedAt: "",
@@ -56,6 +59,7 @@ export function hasConsent(
   state: CookieConsentState | null | undefined,
   category: ConsentCategory,
 ): boolean {
+  if (!COOKIE_PROMPT_ENABLED) return true;
   if (!state) return category === "necessary";
   if (category === "necessary") return true;
   return Boolean(state[category]);

@@ -75,12 +75,12 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
       </head>
       <body suppressHydrationWarning>
         <Suspense fallback={null}><VkPixel /></Suspense>
-        <noscript><div>
+        <div hidden aria-hidden="true" style={{ display: 'none' }} data-analytics-fallback="vk"><noscript><div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`https://top-fwz1.mail.ru/counter?id=${VK_PIXEL_ID};js=na`} style={{ position: 'absolute', left: '-9999px' }} alt="Top.Mail.Ru" />
-        </div></noscript>
+        </div></noscript></div>
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
-        <Suspense><CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider></Suspense>
+        <CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider>
         <CMSPreviewBridge />
         {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в
             клиентский код на сборке, и если переменную задать только в
@@ -98,7 +98,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             до них не доберётся. Картинка спрятана за край экрана, как в
             сниппете из кабинета. */}
         {counter ? (
-          <noscript>
+          <div hidden aria-hidden="true" style={{ display: 'none' }} data-analytics-fallback="yandex"><noscript>
             <div>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -107,7 +107,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
                 alt=""
               />
             </div>
-          </noscript>
+          </noscript></div>
         ) : null}
       </body>
     </html>

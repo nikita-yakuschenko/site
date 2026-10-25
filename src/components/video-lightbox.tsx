@@ -2,8 +2,6 @@
 
 import { IconX } from '@tabler/icons-react'
 import { useEffect, useId } from 'react'
-import { useConsent } from '../consent/ConsentProvider'
-import { EmbedPlaceholder } from '../consent/EmbedPlaceholder'
 import { copy } from '../lib/copy'
 
 /** Модалка с iframe: один хром для обзоров и отзывов. */
@@ -16,8 +14,6 @@ export function VideoLightbox({
   embedSrc: string
   onClose: () => void
 }) {
-  const { hasConsent } = useConsent()
-  const allowed = hasConsent('functional')
   const titleId = useId()
 
   useEffect(() => {
@@ -56,19 +52,12 @@ export function VideoLightbox({
             <IconX size={20} stroke={2.2} />
           </button>
         </div>
-        {allowed ? (
           <iframe
             title={title}
             src={embedSrc}
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowFullScreen
           />
-        ) : (
-          <EmbedPlaceholder
-            title={title}
-            message="Для просмотра видео разрешите функциональные cookie."
-          />
-        )}
       </div>
     </div>
   )

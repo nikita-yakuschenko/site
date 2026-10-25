@@ -4,6 +4,7 @@ import { CookieBanner } from "./CookieBanner";
 import { CookieSettingsDialog } from "./CookieSettingsDialog";
 import { ConsentProvider } from "./ConsentProvider";
 import type { CookieConsentState } from "./types";
+import { COOKIE_PROMPT_ENABLED } from "./types";
 import type { ReactNode } from "react";
 
 /** Клиентская оболочка: provider + banner + settings. */
@@ -18,7 +19,7 @@ export function ConsentShell({
     <ConsentProvider initialState={initialState}>
       {children}
       <CookieBanner />
-      <CookieSettingsDialog />
+      {COOKIE_PROMPT_ENABLED ? <CookieSettingsDialog /> : null}
     </ConsentProvider>
   );
 }

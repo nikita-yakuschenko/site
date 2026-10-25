@@ -9351,6 +9351,9 @@ html.is-dialog-open {
   pointer-events: none;
 }
 
+.cookie-banner--notice { z-index: 40; }
+.cookie-banner--notice .cookie-banner__actions { grid-template-columns: 1fr; }
+
 .cookie-banner__inner {
   pointer-events: auto;
   max-width: none;

@@ -20,6 +20,7 @@ import {
 } from "./storage";
 import {
   isConsentDecided,
+  COOKIE_PROMPT_ENABLED,
   hasConsent as hasConsentState,
   type ConsentAction,
   type ConsentCategory,
@@ -102,6 +103,10 @@ export function ConsentProvider({
      отрисовки незачем, на клиенте остаётся только применить последствия
      уже принятого согласия. */
   useEffect(() => {
+    if (!COOKIE_PROMPT_ENABLED) {
+      for (const category of ['functional', 'analytics', 'marketing'] as const) void initCategory(category);
+      return;
+    }
     if (!initialState) return;
     void applySideEffects(null, initialState);
   }, [initialState]);
