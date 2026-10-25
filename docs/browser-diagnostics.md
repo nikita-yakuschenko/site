@@ -1,5 +1,31 @@
 # Browser diagnostics
 
+## SmartCaptcha lifecycle correction, 2026-10-25
+
+This section supersedes the earlier all-provider-hydration-is-critical policy below;
+those sections retain historical evidence. See `smartcaptcha-lifecycle.md` for the
+implementation, limitations, counts, and release instructions.
+
+Idle or invalid forms must have no captcha widgets. Only a validated submit mounts
+an official invisible widget. Functional scenario failures, application hydration,
+and exceptions from application scripts remain blocking. Proven SmartCaptcha URLs
+are separately reported as provider warnings with stacks and `evidenceUrl`; no
+finding is removed. Unknown hydration sources remain critical. A failed user
+scenario always fails the test, even if its underlying provider event is a warning.
+
+`diagnostics/smartcaptcha.spec.ts` is local-only and uses an explicit SDK double and
+an intercepted receipt endpoint. It covers 13 scenarios in five profiles. It runs
+before the release gate in the browser release workflow, with separate artifacts.
+`cms-image.yml` is unchanged. No production acceptance of test tokens is added.
+
+`node scripts/check-smartcaptcha-integration.mjs` checks the local production build
+through a browser-only allowed-origin proxy using the real SDK and public site key.
+It blocks all lead submissions. `--production` runs the same read-only measurement
+on the deployed site. This is not proof of a completed human challenge or a real CRM
+submission. `node scripts/reproduce-smartcaptcha.mjs` remains the independent,
+non-executing, one-widget provider reproduction.
+
+
 ## Production follow-up, 2026-10-24
 
 The scheduled run 40079877427 passed 15 of 30 scenarios. Waiting for the

@@ -1,5 +1,6 @@
 export type Finding = {
   url: string; scenario: string; browser: string; device: string; category: string
+  evidenceUrl?: string
   message: string; stack: string; severity: 'critical' | 'warning' | 'info'
   source: 'application' | 'third-party' | 'unknown'; component: string
   cause: 'confirmed' | 'unconfirmed'; fingerprint: string
@@ -9,6 +10,24 @@ export type DiagnosticRun = {
   errors?: string[]; screenshot?: string; trace?: string
 }
 export const scenarioKey = (title: string) => title.replace(/\s+@\S+/g, '').trim()
+
+/** Only an actual provider URL is evidence; message keywords are insufficient. */
+export function captchaProviderSource(location: string) {
+  try {
+    const url = new URL(location)
+    return url.protocol === 'https:' && ['smartcaptcha.cloud.yandex.ru', 'smartcaptcha.yandexcloud.net'].includes(url.hostname)
+  } catch { return false }
+}
+
+export function runtimeSeverity(category: string, hydration: boolean, location: string, origin: string): Finding['severity'] {
+  if (['scenario-failure', 'origin-escape', 'runtime-image-optimizer'].includes(category)) return 'critical'
+  if (captchaProviderSource(location)) return 'warning'
+  let application = false
+  try { application = new URL(location).origin === origin } catch { /* Unknown remains critical for hydration. */ }
+  if (hydration || (application && ['exception', 'console-error', 'script-failure', 'http-5xx'].includes(category))) return 'critical'
+  if (['console-warning', 'console-error', 'navigation-fetch-cancelled'].includes(category) || (/^https?:/.test(location) && !application)) return 'warning'
+  return 'info'
+}
 export const navigationCancellation = (message: string, navigating: boolean) =>
   navigating && /^(?:net::ERR_ABORTED|NS_BINDING_ABORTED|Load request cancelled)$/.test(message)
 

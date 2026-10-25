@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { cancelledImageConsole, groupFindings, navigationCancellation, scenarioKey, webkitNavigationFetch } from '../model.ts'
+import { captchaProviderSource, cancelledImageConsole, groupFindings, navigationCancellation, runtimeSeverity, scenarioKey, webkitNavigationFetch } from '../model.ts'
 
 test('frequency counts scenario runs, preserves browser/device profiles and repeated events', () => {
   const finding = { scenario: 'form', browser: 'webkit', fingerprint: 'same', severity: 'critical' }
@@ -41,4 +41,20 @@ test('a Firefox decode message requires a matching recent image cancellation', (
   assert.equal(cancelledImageConsole('firefox-desktop', 'Image corrupt or truncated.'), false)
   assert.equal(cancelledImageConsole('firefox-desktop', 'Image corrupt or truncated.', 1000), false)
   assert.equal(cancelledImageConsole('chromium-desktop', 'Image corrupt or truncated.', 20), false)
+})
+
+ test('provider requires exact trusted URL, not captcha text or lookalike hostname', () => {
+  assert.equal(captchaProviderSource('https://smartcaptcha.cloud.yandex.ru/react.js'), true)
+  assert.equal(captchaProviderSource('https://avgst.ru/_next/captcha.js'), false)
+  assert.equal(captchaProviderSource('https://smartcaptcha.cloud.yandex.ru.evil.test/react.js'), false)
+  assert.equal(captchaProviderSource('captcha React error #418'), false)
+ })
+
+test('provider recovery is visible, app hydration and functional failures remain blocking', () => {
+  const origin = 'https://avgst.ru'
+  assert.equal(runtimeSeverity('exception', true, origin + '/_next/react.js', origin), 'critical')
+  assert.equal(runtimeSeverity('exception', true, '', origin), 'critical')
+  assert.equal(runtimeSeverity('exception', true, 'https://smartcaptcha.cloud.yandex.ru/react.js', origin), 'warning')
+  assert.equal(runtimeSeverity('scenario-failure', false, 'https://smartcaptcha.cloud.yandex.ru/react.js', origin), 'critical')
+  assert.equal(runtimeSeverity('exception', true, origin + '/captcha.js', origin), 'critical')
 })

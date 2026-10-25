@@ -102,7 +102,7 @@ export function LeadReveal({
             <IconX size={14} stroke={2.4} />
           </button>
           {formIntro}
-          <LeadForm formId={formId}
+          <LeadForm active={open} formId={formId}
             projectExternalId={projectExternalId}
             siteId={siteId}
             variant="card"

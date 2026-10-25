@@ -76,7 +76,7 @@ export function FinanceLeadCard({
           {formLead ? (
             <span className="finance-reveal__lead">{nbspText(formLead)}</span>
           ) : null}
-          <LeadForm
+          <LeadForm active={open}
             siteId={siteId}
             variant="card"
             compact

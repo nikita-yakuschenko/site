@@ -125,7 +125,7 @@ export function PanelLeadForm({
         <div>
           {closable ? <button type="button" className="panel-lead__close" aria-label={copy.close} onClick={() => setState(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button> : null}
           {formIntro}
-          <LeadForm formId={formId}
+          <LeadForm active={open} formId={formId}
             siteId={siteId}
             projectExternalId={projectExternalId}
             variant="card"

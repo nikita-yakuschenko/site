@@ -62,6 +62,11 @@ jobs:
           key: ${{ runner.os }}-stored-webp-v1-${{ hashFiles('public/**', 'scripts/prepare-webp-assets.mjs') }}
           restore-keys: ${{ runner.os }}-stored-webp-v1-
       - run: npm run build
+      - name: Regress SmartCaptcha lifecycle without CRM traffic
+        run: npx playwright test -c playwright.diagnostics.config.ts diagnostics/smartcaptcha.spec.ts
+      - name: Preserve captcha regression artifacts
+        if: always()
+        run: if test -d diagnostics-results; then cp -a diagnostics-results smartcaptcha-regression-results; fi
       - run: npm run diagnostics:release
       - name: Add diagnostic summary
         if: always()
@@ -70,6 +75,8 @@ jobs:
         if: always()
         with:
           name: browser-release-diagnostics
-          path: diagnostics-results/
+          path: |
+            diagnostics-results/
+            smartcaptcha-regression-results/
           if-no-files-found: warn
           retention-days: 14

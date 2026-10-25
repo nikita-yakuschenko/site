@@ -10,8 +10,8 @@ test('повтор после обрыва ответа сохраняет кл�
     if (ids.length === 1) throw new Error('connection lost after save')
     return Response.json({ accepted: true, id: ids.at(-1) }, { status: 202 })
   }
-  await assert.rejects(submitLead({ name: 'Test' }, attempt, request))
-  await submitLead({ name: 'Test' }, attempt, request)
+  await assert.rejects(submitLead({ name: 'Test', captchaToken: 'first-one-time-token' }, attempt, request))
+  await submitLead({ name: 'Test', captchaToken: 'fresh-one-time-token' }, attempt, request)
   await submitLead({ name: 'Another' }, attempt, request)
   assert.equal(ids[0], ids[1])
   assert.notEqual(ids[1], ids[2])
@@ -19,4 +19,15 @@ test('повтор после обрыва ответа сохраняет кл�
 
 test('HTTP 200 без подтверждённой заявки не считается успехом', async () => {
   await assert.rejects(submitLead({}, { current: null }, async () => Response.json({ accepted: false })), /lead-not-confirmed/)
+})
+
+test('закрытая форма не отправляет отложенную заявку', async () => {
+  const controller = new AbortController()
+  controller.abort()
+  let calls = 0
+  await assert.rejects(submitLead({}, { current: null }, async () => {
+    calls++
+    return Response.json({ accepted: true })
+  }, controller.signal), { name: 'AbortError' })
+  assert.equal(calls, 0)
 })

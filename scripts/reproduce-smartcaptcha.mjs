@@ -6,7 +6,12 @@ const browser = await chromium.launch()
 try {
   const page = await browser.newPage()
   const errors = []
-  page.on('pageerror', error => errors.push({ message: error.message, stack: error.stack }))
+  const safeUrl = raw => { try { const url = new URL(raw); return url.origin + url.pathname } catch { return '' } }
+  page.on('console', message => {
+    if (message.type() === 'error') errors.push({ type: 'console', message: message.text(), sourceUrl: safeUrl(message.location().url) })
+  })
+  page.on('requestfailed', request => errors.push({ type: 'requestfailed', sourceUrl: safeUrl(request.url()), message: request.failure()?.errorText }))
+  page.on('pageerror', error => errors.push({ type: 'pageerror', message: error.message, stack: error.stack, sourceUrl: safeUrl(error.stack?.match(/\n\s+at[^\n]*?(https?:\/\/[^\s)]+)/)?.[1] || '') }))
   await page.route('https://avgst.ru/__captcha-diagnostic', route => route.fulfill({
     contentType: 'text/html',
     body: '<!doctype html><html lang="ru"><head><meta charset="utf-8"></head><body><div id="captcha"></div></body></html>',
@@ -22,7 +27,8 @@ try {
     sitekey: key, invisible: true, hideShield: true, hl: 'ru',
   }), siteKey)
   await page.waitForTimeout(10_000)
-  const result = { generatedAt: new Date().toISOString(), applicationCode: false, widgetCount: 1, executed: false, errors }
+  const frames = page.frames().map(frame => safeUrl(frame.url())).filter(Boolean)
+  const result = { generatedAt: new Date().toISOString(), applicationCode: false, widgetCount: 1, executed: false, frames, errors }
   await mkdir('diagnostics-results', { recursive: true })
   await writeFile('diagnostics-results/smartcaptcha-isolation.json', JSON.stringify(result, null, 2))
   console.log(`Isolated SmartCaptcha: ${errors.length} browser errors; no application code or lead submission`)

@@ -287,7 +287,7 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
       {monthly ? <p className="project-config__total-pay">{formatRub(monthly)} {copy.configPerMonth}<span>{configText(copy.configPayNote)}</span></p>
         : project.technology === 'frame' ? <p className="project-config__total-pay project-config__total-pay--plain" aria-hidden="true">{'\u00a0'}<span>{'\u00a0'}</span></p>
         : <p className="project-config__total-pay project-config__total-pay--plain">{configText(copy.configDelivery)}<span>{configText(copy.configDeliveryNote)}</span></p>}
-      <LeadForm siteId={SITE.id} formId="project-configuration" projectExternalId={project.id} variant="card" compact heading={copy.getQuote} submitLabel={copy.getQuote}
+      <LeadForm active={open} siteId={SITE.id} formId="project-configuration" projectExternalId={project.id} variant="card" compact heading={copy.getQuote} submitLabel={copy.getQuote}
         meta={{ project: project.name, tier: item.name, price: item.price }} />
     </div>}
   </div>;

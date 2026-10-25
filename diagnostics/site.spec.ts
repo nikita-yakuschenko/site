@@ -121,12 +121,11 @@ test('form open, client validation and invisible captcha @critical', async ({ pa
   const config = await page.request.get('/api/smartcaptcha-config')
   expect(config.ok(), 'Invisible SmartCaptcha runtime configuration').toBeTruthy()
   expect((await config.json()).configured).toBe(true)
-  await expect.poll(() => page.evaluate(() => typeof (window as Window & { smartCaptcha?: { render?: unknown } }).smartCaptcha?.render), {
-    message: 'SmartCaptcha browser API must finish initialization',
-  }).toBe('function')
+  await expect(page.locator('.smart-captcha')).toHaveCount(0)
   // Invalid fields prevent the captcha challenge and any lead submission.
   await form.locator('button[type=submit]').click()
   await expect(form.locator('input[name=name]')).toHaveAttribute('aria-invalid', 'true')
+  await expect(page.locator('.smart-captcha')).toHaveCount(0)
   await dialog.getByRole('button', { name: /Закрыть/ }).first().click()
   await expect(dialog).toBeHidden()
 }))

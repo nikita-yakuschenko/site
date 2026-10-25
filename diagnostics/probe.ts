@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import type { Page, Request, TestInfo } from '@playwright/test'
-import { cancelledImageConsole, navigationCancellation, scenarioKey, webkitNavigationFetch, type Finding } from './model'
+import { captchaProviderSource, cancelledImageConsole, navigationCancellation, runtimeSeverity, scenarioKey, webkitNavigationFetch, type Finding } from './model'
 
 export type { Finding } from './model'
 
@@ -17,7 +17,7 @@ function fingerprint(category: string, text: string) {
   return category + ':' + scrub(text).replace(/(?<!#)\b\d+(?:[:.]\d+)*\b/g, '#').replace(/\s+/g, ' ').slice(0, 240)
 }
 function reactHydration(text: string) {
-  return /(?:React error #(?:418|419)|react\.dev\/errors\/(?:418|419)|hydration|hydrating|server rendered HTML|didn't match the client)/i.test(text)
+  return /(?:React error #(?:418|419|423)|react\.dev\/errors\/(?:418|419|423)|hydration|hydrating|server rendered HTML|didn't match the client)/i.test(text)
 }
 
 const navigationIntents = new WeakMap<Page, () => void>()
@@ -49,16 +49,17 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   const add = (category: string, message: string, stack = '', location = page.url()) => {
     const source = !/^https?:/.test(location) ? 'unknown'
       : new URL(location).origin === origin ? 'application' : 'third-party'
-    const severity = ['origin-escape', 'runtime-image-optimizer'].includes(category) || reactHydration(message + stack) || (source === 'application' && ['exception', 'console-error', 'script-failure', 'http-5xx'].includes(category))
-      ? 'critical' : ['console-warning', 'console-error', 'navigation-fetch-cancelled'].includes(category) || source === 'third-party' ? 'warning' : 'info'
+    const provider = captchaProviderSource(location)
+    const severity = runtimeSeverity(category, reactHydration(message + stack), location, origin)
     const cleanMessage = scrub(message)
     const finding: Finding = {
       url: safeUrl(page.url()), scenario: scenarioKey(scenario), browser: info.project.name,
       device: info.project.name.includes('mobile') ? 'mobile' : 'desktop',
       category: reactHydration(message + stack) ? 'react-hydration' : category,
       message: cleanMessage, stack: scrub(stack), severity, source,
-      component: location.includes('smartcaptcha.cloud.yandex.ru') ? 'Yandex SmartCaptcha iframe' : 'unconfirmed',
-      cause: 'unconfirmed', fingerprint: fingerprint(category, cleanMessage),
+      component: provider ? 'Yandex SmartCaptcha runtime' : 'unconfirmed',
+      evidenceUrl: safeUrl(location),
+      cause: provider ? 'confirmed' : 'unconfirmed', fingerprint: fingerprint(category, cleanMessage),
     }
     findings.push(finding)
     return finding

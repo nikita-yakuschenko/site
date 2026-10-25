@@ -5,3 +5,6 @@
 .lead-submit-feedback__copy { max-width: 320px; }
 .lead-submit-feedback .lead-submit-feedback__title { margin: 0 0 12px; font-size: 20px; font-weight: 700; line-height: 1.3; color: white; }
 .lead-submit-feedback__copy > p:last-child { margin: 0; font-size: 14px; line-height: 1.6; color: rgb(255 255 255 / .7); }
+
+/* Keep form/dialog close controls reachable during verification and submission. */
+.ask-dialog__close, .panel-lead__close, .lead-reveal__close, .project-config__close, .mortgage-finance__toggle { z-index: 4; }

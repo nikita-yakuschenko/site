@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useRef, useState } from 'react'
 import Link from 'next/link'
 import { useProjectLeadContext } from './project-lead-context'
 import { readRegionCode } from '../lib/regions'
@@ -16,7 +16,7 @@ import { noAutofillFieldProps, noAutofillFormProps } from '../lib/no-autofill'
 import { LeadSubmitFeedback } from './lead-submit-feedback'
 import { submitLead, type LeadAttempt } from '../lib/submit-lead'
 import { PhoneInput } from './phone-input'
-import { InvisibleSmartCaptcha } from '@yandex/smart-captcha'
+import { useLeadCaptcha } from './use-lead-captcha'
 
 export function LeadForm({
   siteId,
@@ -32,7 +32,9 @@ export function LeadForm({
   compact = false,
   withMessage = false,
   meta,
+  active = true,
 }: {
+  active?: boolean
   siteId: number | string
   pageId?: number | string
   projectExternalId?: string
@@ -68,10 +70,7 @@ export function LeadForm({
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
   const [phone, setPhone] = useState('')
   const [consent, setConsent] = useState(true)
-  const [captchaVisible, setCaptchaVisible] = useState(false)
-  const [captchaReset, setCaptchaReset] = useState(0)
-  const [captchaSiteKey, setCaptchaSiteKey] = useState<string | null>(null)
-  const [captchaReady, setCaptchaReady] = useState(false)
+  const captcha = useLeadCaptcha(active)
   const [invalid, setInvalid] = useState<{
     name?: boolean
     phone?: boolean
@@ -80,28 +79,6 @@ export function LeadForm({
   const phoneRef = useRef<HTMLInputElement>(null)
   const attempt = useRef<LeadAttempt['current']>(null)
   const submitting = useRef(false)
-  const captchaPending = useRef<{ resolve: (token: string) => void; reject: (error: Error) => void } | null>(null)
-
-  function failCaptcha() {
-    captchaPending.current?.reject(new Error('Не удалось пройти проверку безопасности'))
-    captchaPending.current = null
-    setCaptchaVisible(false)
-  }
-
-  useEffect(() => () => {
-    captchaPending.current?.reject(new Error('Форма закрыта'))
-    captchaPending.current = null
-  }, [])
-
-  useEffect(() => {
-    let active = true
-    fetch('/api/smartcaptcha-config', { cache: 'no-store' })
-      .then(response => response.ok ? response.json() : null)
-      .then(data => { if (active) { setCaptchaSiteKey(typeof data?.siteKey === 'string' ? data.siteKey : null); setCaptchaReady(true) } })
-      .catch(() => { if (active) setCaptchaReady(true) })
-    return () => { active = false }
-  }, [])
-
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
     if (submitting.current || status === 'ok') return
@@ -115,18 +92,12 @@ export function LeadForm({
     if (!agreed) next.consent = true
     setInvalid(next)
     if (Object.keys(next).length) return
-    if (!captchaReady || !captchaSiteKey) return setStatus('error')
 
     submitting.current = true
     setStatus('sending')
-    let captchaTimeout: ReturnType<typeof setTimeout> | undefined
     try {
-      const captchaToken = await new Promise<string>((resolve, reject) => {
-        captchaPending.current = { resolve, reject }
-        captchaTimeout = setTimeout(failCaptcha, 120_000)
-        setCaptchaVisible(true)
-      })
-      clearTimeout(captchaTimeout)
+      const captchaToken = await captcha.verify()
+      if (!captcha.isActive()) return
       await submitLead({
         name,
         phone: phoneE164(phone),
@@ -141,20 +112,19 @@ export function LeadForm({
         sourceUrl: window.location.href,
         sourcePath: window.location.pathname,
         meta: { region: readRegionCode(), formHeading: heading, ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
-      }, attempt)
+      }, attempt, fetch, captcha.submissionSignal())
+      if (!captcha.isActive()) return
       setStatus('ok')
       form.reset()
       setPhone('')
       setConsent(true)
       setInvalid({})
     } catch (error) {
-      console.error(error)
-      setStatus('error')
+      if (captcha.isActive()) {
+        console.error(error)
+        setStatus('error')
+      } else if (captcha.isMounted()) setStatus('idle')
     } finally {
-      clearTimeout(captchaTimeout)
-      captchaPending.current = null
-      setCaptchaVisible(false)
-      setCaptchaReset(value => value + 1)
       submitting.current = false
     }
   }
@@ -264,36 +234,16 @@ export function LeadForm({
           </Link>
         </span>
       </label>
-      {captchaSiteKey ? <InvisibleSmartCaptcha
-        key={captchaReset}
-        sitekey={captchaSiteKey}
-        hideShield
-        visible={captchaVisible}
-        onSuccess={token => {
-          captchaPending.current?.resolve(token)
-          captchaPending.current = null
-          setCaptchaVisible(false)
-        }}
-        onChallengeHidden={() => {
-          setCaptchaVisible(false)
-          // Успех может прийти вместе с закрытием задания: сначала даём
-          // обработчику onSuccess принять токен, затем обрабатываем отмену.
-          window.setTimeout(() => {
-            if (captchaPending.current) failCaptcha()
-          }, 0)
-        }}
-        onNetworkError={failCaptcha}
-        onJavascriptError={failCaptcha}
-        language="ru"
-      /> : null}
-      <button className="btn btn-yellow lead-card__submit" type="submit" disabled={status === 'sending'}>
+      {captcha.widget}
+      <button className="btn btn-yellow lead-card__submit" type="submit" disabled={status === 'sending' || captcha.reloadRequired}>
         {status === 'sending' ? copy.sending : submitLabel || copy.sendLead}
         {status !== 'sending' ? (
           <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
         ) : null}
       </button>
       {status === 'sending' || status === 'ok' ? <LeadSubmitFeedback status={status} text={successText} formId={resolvedFormId} /> : null}
-      {status === 'error' ? <p role="alert">Не удалось получить подтверждение. Повторите отправку — повторная попытка не создаст дубль заявки.</p> : null}
+      {status === 'error' ? <p role="alert">{captcha.reloadRequired ? 'Не удалось загрузить проверку безопасности. Обновите страницу и повторите отправку.' : 'Не удалось получить подтверждение. Повторите отправку — повторная попытка не создаст дубль заявки.'}</p> : null}
+      {status === 'error' && captcha.reloadRequired ? <button type="button" className="btn" onClick={() => window.location.reload()}>Обновить страницу</button> : null}
     </form>
   )
 }
