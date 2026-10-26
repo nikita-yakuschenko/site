@@ -1,6 +1,8 @@
 'use client'
 
-import { useDocumentInfo } from '@payloadcms/ui'
+import { useAuth, useDocumentInfo } from '@payloadcms/ui'
+import { LeadTypeSelect } from './LeadTypeSelect'
+import { resolveLeadClassification } from '../../config/lead-classification'
 import { Badge } from '../ui/badge'
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card'
 import { Field, FieldGroup, FieldLabel } from '../ui/field'
@@ -24,6 +26,7 @@ function formatDate(value: unknown) {
 
 export function LeadSubmissionDetails() {
   const { data } = useDocumentInfo()
+  const { user } = useAuth()
   const payload = record(data?.payload)
   const meta = record(payload.meta)
   const status = text(data?.status)
@@ -49,6 +52,7 @@ export function LeadSubmissionDetails() {
     </CardHeader>
     <CardContent>
       <FieldGroup className="gap-4">
+        {data?.id && <Field><FieldLabel>Тип заявки</FieldLabel><LeadTypeSelect id={Number(data.id)} classification={resolveLeadClassification(data)} editable={['super-admin', 'admin'].includes(String(user?.role))} /></Field>}
         {rows.map(([label, value]) => <Field key={label}>
           <FieldLabel>{label}</FieldLabel>
           {label === 'Страница' && /^https?:\/\//.test(value) ? <a className="break-all text-sm underline-offset-4 hover:underline" href={value} target="_blank" rel="noreferrer">{value}</a> : <p className="whitespace-pre-wrap break-all text-sm">{value}</p>}

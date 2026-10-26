@@ -980,6 +980,9 @@ export interface ProjectPrice {
  */
 export interface LeadSubmission {
   id: number;
+  leadType?: ('work' | 'test' | 'spam') | null;
+  typeSource?: ('auto' | 'manual') | null;
+  typeReason?: string | null;
   title?: string | null;
   requestId: string;
   formId: string;
@@ -2102,6 +2105,9 @@ export interface ProjectPricesSelect<T extends boolean = true> {
  * via the `definition` "lead-submissions_select".
  */
 export interface LeadSubmissionsSelect<T extends boolean = true> {
+  leadType?: T;
+  typeSource?: T;
+  typeReason?: T;
   title?: T;
   requestId?: T;
   formId?: T;

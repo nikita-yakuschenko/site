@@ -8,6 +8,8 @@ import { leadTitle } from '../config/lead-title'
 import { normalizeMapsApiKey, normalizeMetricaCounterId, publicMapsKey, publicMetrica } from '../config/yandex'
 import { acceptLead } from '../config/lead-intake'
 import { enqueue, settings as automationSettings } from '../automation/store'
+import { resolveLeadClassification } from '../config/lead-classification'
+import { leadClassificationEndpoint } from './lead-classification-endpoint'
 
 export const LeadDelivery: GlobalConfig = {
   slug: 'lead-delivery', label: 'Отправка заявок', access: { read: superAdmin, update: superAdmin },
@@ -61,6 +63,7 @@ export const LeadSubmissions: CollectionConfig = {
   admin: { useAsTitle: 'title', defaultColumns: ['title', 'formId', 'status', 'createdAt'], components: { views: { list: { Component: './components/admin/LeadsView#LeadsListRedirect' } } } },
   access: { read: authenticated, create: () => false, update: () => false, delete: contentManager },
   hooks: {
+    beforeValidate: [({ data, originalDoc }) => data ? { ...data, ...resolveLeadClassification(data, originalDoc) } : data],
     afterRead: [({ doc }) => { doc.title = storedLeadTitle(doc); return doc }],
     afterChange: [async ({ doc, operation, req }) => {
       if (operation !== 'create' || !['referral-program', 'FactoryOpenDayForm'].includes(doc.formId)) return doc
@@ -71,6 +74,9 @@ export const LeadSubmissions: CollectionConfig = {
     }],
   },
   fields: [
+    { name: 'leadType', type: 'select', label: 'Тип заявки', defaultValue: 'work', options: [{ value: 'work', label: 'Рабочая' }, { value: 'test', label: 'Тестовая' }, { value: 'spam', label: 'Спам' }], admin: { hidden: true } },
+    { name: 'typeSource', type: 'select', defaultValue: 'auto', options: ['auto', 'manual'], admin: { hidden: true } },
+    { name: 'typeReason', type: 'text', admin: { hidden: true } },
     { name: 'title', type: 'text', label: 'Название сделки', admin: { hidden: true } },
     { name: 'requestId', type: 'text', label: 'Идентификатор отправки', required: true, unique: true, admin: { hidden: true } },
     { name: 'formId', type: 'text', label: 'Форма', required: true, admin: { hidden: true } },
@@ -79,7 +85,7 @@ export const LeadSubmissions: CollectionConfig = {
     { name: 'details', type: 'ui', admin: { components: { Field: './components/admin/LeadSubmissionView#LeadSubmissionDetails' } } },
     { name: 'preview', type: 'ui', admin: { position: 'sidebar', components: { Field: './components/admin/LeadSubmissionView#LeadSubmissionPayload' } } },
   ],
-  endpoints: [{ path: '/submit', method: 'post', handler: async req => {
+  endpoints: [leadClassificationEndpoint, { path: '/submit', method: 'post', handler: async req => {
     const denied = authorizeSiteRequest(req)
     if (denied) return denied
     let input
