@@ -86,4 +86,7 @@ test('page content stays visible if application scripts fail to load', async ({ 
   expect(writes).toBe(0)
   await expect(page.locator('script[src*="metrika/tag.js"]')).toHaveCount(1)
   expect((await page.context().cookies()).some(cookie => cookie.name === CONSENT_COOKIE)).toBe(false)
+  await page.reload({ waitUntil: 'domcontentloaded' })
+  await expect(page.locator('html')).toHaveAttribute('data-app-hydrated', 'true')
+  await expect(notice).toHaveCount(0)
  })
