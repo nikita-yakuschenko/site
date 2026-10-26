@@ -10,6 +10,7 @@ import { copy, nbspText } from "../lib/copy";
 import { noAutofillFieldProps, noAutofillFormProps } from "../lib/no-autofill";
 
 import { PhoneInput } from './phone-input'
+import { useLeadCaptcha } from './use-lead-captcha'
 
 type Status = "idle" | "open" | "sending" | "ok" | "error";
 
@@ -53,6 +54,7 @@ export function ReferralProgram({
     status === "ok" ||
     status === "error";
   const done = status === "ok";
+  const captcha = useLeadCaptcha(open);
 
   function openForm() {
     setInvalid({});
@@ -89,19 +91,25 @@ export function ReferralProgram({
     submitting.current = true;
     setStatus("sending");
     try {
+      const captchaToken = await captcha.verify();
+      if (!captcha.isActive()) return;
       await submitLead({
         name,
         phone: `+${phoneDigits}`,
         consent: true,
-        siteId: Number(siteId),
-        pageId: pageId ? Number(pageId) : undefined,
+        siteId,
+        pageId,
         formId: "referral-program",
+        captchaToken,
+        sourceUrl: window.location.href,
+        meta: { email },
         sourcePath: `${window.location.pathname}#referral`,
         projectExternalId: `referral:${email}`,
-      }, attempt);
+      }, attempt, fetch, captcha.submissionSignal());
+      if (!captcha.isActive()) return;
       setStatus("ok");
     } catch {
-      setStatus("error");
+      if (captcha.isActive()) setStatus("error");
     } finally {
       submitting.current = false;
     }
@@ -299,10 +307,11 @@ export function ReferralProgram({
                         </span>
                       </label>
 
+                      {captcha.widget}
                       <button
                         className="btn btn-yellow referral__submit"
                         type="submit"
-                        disabled={status === "sending"}
+                        disabled={status === "sending" || captcha.reloadRequired}
                       >
                         {status === "sending" ? copy.sending : data.submitLabel}
                         {status === "sending" ? null : (
@@ -315,9 +324,10 @@ export function ReferralProgram({
                       </button>
                       {status === "error" ? (
                         <p className="referral__error" role="alert">
-                          {copy.leadError}
+                          {captcha.reloadRequired ? 'Не удалось загрузить проверку безопасности. Обновите страницу и повторите отправку.' : copy.leadError}
                         </p>
                       ) : null}
+                      {status === 'error' && captcha.reloadRequired ? <button type="button" className="btn" onClick={() => window.location.reload()}>Обновить страницу</button> : null}
                     </div>
 
                     {done ? <FormSuccessAnimation active={done} title={data.successTitle} description={nbspText(data.successBody)} className="referral__success" /> : null}

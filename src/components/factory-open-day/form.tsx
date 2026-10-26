@@ -8,6 +8,7 @@ import { isValidName, isValidRuMobile, phoneE164, sanitizeName } from '../../lib
 import { PhoneInput } from '../phone-input'
 import { copy } from '../../lib/copy'
 import { OpenDayArrow, OpenDayRules } from './rules'
+import { useLeadCaptcha } from '../use-lead-captcha'
 
 const OPEN_BOOKING = 'ags-open-booking'
 
@@ -25,6 +26,7 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
   const [invalid, setInvalid] = useState<{ name?: boolean; phone?: boolean; email?: boolean; consent?: boolean }>({})
   const [open, setOpen] = useState(false)
   const [hold, setHold] = useState(0)
+  const captcha = useLeadCaptcha(registrationEnabled)
   const slot = useRef<HTMLDivElement>(null)
   const dialog = useRef<HTMLDialogElement>(null)
 
@@ -45,6 +47,8 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
     submitting.current = true
     setStatus('sending')
     try {
+      const captchaToken = await captcha.verify()
+      if (!captcha.isActive()) return
       await submitLead({
         name,
         phone: phoneE164(phone),
@@ -53,13 +57,15 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
         siteId: 'corporate',
         pageId: 'factory-open-day',
         formId: 'FactoryOpenDayForm',
+        captchaToken,
         sourceUrl: window.location.href,
         sourcePath: window.location.pathname,
         meta: { email, event: 'factory-open-day', date },
-      }, attempt);
+      }, attempt, fetch, captcha.submissionSignal());
+      if (!captcha.isActive()) return
       setStatus('ok')
     } catch {
-      setStatus('error')
+      if (captcha.isActive()) setStatus('error')
     } finally {
       submitting.current = false
     }
@@ -104,11 +110,13 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
       <span className="ags-agree__tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M4.5 12.5 9.5 17.5 19.5 6.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg></span>
       <span className="ags-agree__text">Согласен на <a href="/legal/privacy" target="_blank" rel="noopener">обработку персональных данных</a></span>
     </label>
-    <button className="ags-submit" type="submit" disabled={status === 'sending' || !registrationEnabled}>
+    {captcha.widget}
+    <button className="ags-submit" type="submit" disabled={status === 'sending' || !registrationEnabled || captcha.reloadRequired}>
       <span className="ags-submit-label">{!registrationEnabled ? 'Регистрация закрыта' : status === 'sending' ? 'Отправка…' : 'Записаться'}</span>
       <OpenDayArrow />
     </button>
-    {status === 'error' ? <p className="ags-form__status" data-error="true">Не удалось отправить. Попробуйте ещё раз.</p> : null}
+    {status === 'error' ? <p className="ags-form__status" data-error="true" role="alert">{captcha.reloadRequired ? 'Не удалось загрузить проверку безопасности. Обновите страницу и повторите отправку.' : 'Не удалось отправить. Попробуйте ещё раз.'}</p> : null}
+    {status === 'error' && captcha.reloadRequired ? <button type="button" className="ags-submit" onClick={() => window.location.reload()}>Обновить страницу</button> : null}
   </form>
 
   return (<CMSContentBlock cmsBlockKey="FactoryOpenDayForm">{<section className="ags ags-book" id="ags-form">
