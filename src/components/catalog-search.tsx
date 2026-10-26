@@ -98,7 +98,7 @@ export function CatalogSearch({ value, onChange, pending = false, expanded = fal
       }} />
     {state.draft ? <button type="button" aria-label={copy.searchClear} onClick={() => {
       schedule(''); commit('', revision.current);
-    }}><IconX size={16} stroke={2} aria-hidden="true" /></button> :
-      onClose ? <button type="button" className="catalog-search__close" aria-label="Закрыть поиск" onClick={cancel}><IconX size={16} stroke={2} aria-hidden="true" /></button> : null}
+    }}><IconX size={16} stroke={1.75} aria-hidden="true" /></button> :
+      expanded && onClose ? <button type="button" className="catalog-search__close" aria-label="Закрыть поиск" onClick={cancel}><IconX size={16} stroke={1.75} aria-hidden="true" /></button> : null}
   </div>;
 }

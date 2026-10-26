@@ -5218,12 +5218,27 @@ a {
 
 .catalog-search button {
   display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 28px;
+  width: 28px;
+  height: 28px;
   padding: 4px;
   border: 0;
-  border-radius: 50%;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--ink-3);
+  cursor: pointer;
+}
+
+.catalog-search button:hover {
   background: var(--tint);
   color: var(--avgst-ink);
-  cursor: pointer;
+}
+
+.catalog-search button:focus-visible {
+  outline: 2px solid var(--avgst-ink);
+  outline-offset: 1px;
 }
 
 .catalog__layout {
