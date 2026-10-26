@@ -3,7 +3,9 @@
 При реальной отправке 26.10.2026 в production обнаружено отсутствие ключа
 под ожидаемым именем `YANDEX_SMARTCAPTCHA_SECRET_KEY`. Сервер теперь также
 поддерживает документированное имя `YANDEX_SMARTCAPTCHA_SERVER_KEY`.
-Если отсутствуют оба значения, возвращается `503 captcha-not-configured`,
+Также поддерживается указанное владельцем старое серверное имя
+`NEXT_PUBLIC_YANDEX_CAPTCHA_SERVER_KEY`; его значение читается только сервером.
+Если отсутствуют все три значения, возвращается `503 captcha-not-configured`,
 а не `403 captcha-failed`; проверка токена не отключается.
 
 26.10.2026: в `FactoryOpenDayForm` и `ReferralProgram` добавлен тот же

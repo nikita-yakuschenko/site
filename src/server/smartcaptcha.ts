@@ -6,7 +6,10 @@ export async function verifySmartCaptcha(
   env: Record<string, string | undefined> = process.env,
   send: typeof fetch = fetch,
 ): Promise<CaptchaVerification> {
-  const secret = env.YANDEX_SMARTCAPTCHA_SECRET_KEY?.trim() || env.YANDEX_SMARTCAPTCHA_SERVER_KEY?.trim()
+  // Старое имя окружения читается только здесь, на сервере, через env.
+  const secret = env.YANDEX_SMARTCAPTCHA_SECRET_KEY?.trim()
+    || env.YANDEX_SMARTCAPTCHA_SERVER_KEY?.trim()
+    || env.NEXT_PUBLIC_YANDEX_CAPTCHA_SERVER_KEY?.trim()
   if (!secret) return 'not-configured'
   try {
     const response = await send('https://smartcaptcha.yandexcloud.net/validate', {

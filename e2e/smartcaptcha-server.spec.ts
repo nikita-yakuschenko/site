@@ -14,13 +14,13 @@ test('server accepts both secret names and distinguishes missing configuration',
   }
   expect(await verifySmartCaptcha('test-token', request, {}, send)).toBe('not-configured')
   expect(calls).toBe(0)
-  for (const key of ['YANDEX_SMARTCAPTCHA_SECRET_KEY', 'YANDEX_SMARTCAPTCHA_SERVER_KEY']) {
+  for (const key of ['YANDEX_SMARTCAPTCHA_SECRET_KEY', 'YANDEX_SMARTCAPTCHA_SERVER_KEY', 'NEXT_PUBLIC_YANDEX_CAPTCHA_SERVER_KEY']) {
     expect(await verifySmartCaptcha('test-token', request, { [key]: 'test-secret' }, send)).toBe('verified')
   }
-  expect(calls).toBe(2)
+  expect(calls).toBe(3)
   // Публичный ключ не используется как секретный.
   expect(await verifySmartCaptcha('test-token', request, { NEXT_PUBLIC_YANDEX_CAPTCHA_KEY: 'public-only' }, send)).toBe('not-configured')
-  expect(calls).toBe(2)
+  expect(calls).toBe(3)
 })
 
 test('provider failure or unavailable validation never accepts the token', async () => {
