@@ -1,5 +1,7 @@
 'use client'
 
+import { projectPublicationStatus } from '../../config/project-publication-status'
+
 import { useProjectCopy } from './ProjectCopyButton'
 import { useRef, useState } from 'react'
 import Link from 'next/link'
@@ -28,7 +30,7 @@ function paramList(params: { get(name: string): string | null }, key: string) {
 function facetsFrom(params: { get(name: string): string | null }) {
   const numbers = (key: string) => paramList(params, key).map(Number).filter(value => Number.isInteger(value))
   return {
-    status: paramList(params, 'status').filter(value => value === 'published' || value === 'draft'),
+    status: paramList(params, 'status').filter(value => value === 'published' || value === 'draft' || value === 'unpublished'),
     tech: paramList(params, 'tech').filter(value => TECHNOLOGY_OPTIONS.some(option => option.value === value)),
     series: paramList(params, 'series'),
     floors: numbers('floors'),
@@ -147,7 +149,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
   const filtered = inTab.filter(project => {
     const text = `${project.name ?? ''} ${project.slug ?? ''} ${project.technologyBadge ?? ''}`.toLocaleLowerCase('ru')
     if (query && !text.includes(query)) return false
-    if (facets.status.length && !facets.status.includes(project._status === 'published' ? 'published' : 'draft')) return false
+    if (facets.status.length && !facets.status.includes(projectPublicationStatus(project))) return false
     if (facets.tech.length && !facets.tech.includes(project.technologyBadge)) return false
     if (facets.series.length && !facets.series.includes(project.series || 'none')) return false
     if (facets.floors.length && !facets.floors.includes(project.floorsValue)) return false
@@ -204,7 +206,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       </div>
     </div>
     <div className="flex flex-wrap items-center gap-2">
-      <FacetFilter title="Статус" options={[{ value: 'published', label: 'Опубликован' }, { value: 'draft', label: 'Черновик' }]} selected={facets.status} onChange={status => tune({ status })} />
+      <FacetFilter title="Статус" options={[{ value: 'published', label: 'Опубликован' }, { value: 'draft', label: 'Черновик' }, { value: 'unpublished', label: 'Снят с публикации' }]} selected={facets.status} onChange={status => tune({ status })} />
       <FacetFilter title="Технология" options={[...TECHNOLOGY_OPTIONS]} selected={facets.tech} onChange={tech => tune({ tech })} />
       <FacetFilter title="Серия" options={seriesOptions} selected={facets.series} onChange={series => tune({ series })} />
       <RangeFilter title="Площадь, м²" min={facets.areaMin} max={facets.areaMax} onMin={areaMin => tune({ areaMin })} onMax={areaMax => tune({ areaMax })} />
@@ -222,7 +224,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       <TableHeader><TableRow className="hover:bg-transparent [&>th]:text-muted-foreground"><TableHead className="pl-4">Название</TableHead><TableHead>Статус</TableHead><TableHead>Технология</TableHead><TableHead className="text-right">Площадь, м²</TableHead><TableHead className="text-right">Этажи</TableHead><TableHead className="text-right">Спальни</TableHead>{sortHeading('views', 'Просмотры')}{sortHeading('likes', 'Лайки')}{sortHeading('shares', 'Шеры')}{sortHeading('leads', 'Заявки')}<TableHead className="pr-4"><span className="sr-only">Действия</span></TableHead></TableRow></TableHeader>
       <TableBody>{table.rows.map(project => { const published = project._status === 'published'; return <TableRow key={project.id}>
         <TableCell className="h-12 pl-4"><Link className="font-medium underline-offset-4 hover:underline" href={`/collections/projects/${project.id}`}>{project.name || '[Без названия]'}</Link>{(project.hero_product === 1 || project.hero_product === 2) && <Badge variant="secondary" className="mt-1 w-fit">Слот №{project.hero_product}</Badge>}</TableCell>
-        <TableCell><Badge variant="outline" className="text-foreground">{published ? <IconCircleCheckFilled className="text-(--avgst-green)" /> : <IconCircleDashed className="text-muted-foreground" />}{published ? 'Опубликован' : 'Черновик'}</Badge></TableCell>
+        <TableCell><Badge variant="outline" className="text-foreground">{published ? <IconCircleCheckFilled className="text-(--avgst-green)" /> : <IconCircleDashed className="text-muted-foreground" />}{published ? 'Опубликован' : projectPublicationStatus(project) === 'unpublished' ? 'Снят с публикации' : 'Черновик'}</Badge></TableCell>
         <TableCell className="text-muted-foreground">{technologyLabel(project.technologyBadge)}</TableCell><TableCell className="text-right tabular-nums">{project.areaValue?.toLocaleString('ru-RU') ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.floorsValue ?? '—'}</TableCell><TableCell className="text-right tabular-nums">{project.bedrooms ?? '—'}</TableCell>
         <TableCell className="text-right tabular-nums">{stat(project.viewCount)}</TableCell><TableCell className="text-right tabular-nums">{stat(project.likeCount)}</TableCell><TableCell className="text-right tabular-nums">{stat(project.shareCount)}</TableCell><TableCell className="text-right tabular-nums">{leads[project.id] ?? 0}</TableCell>
         <TableCell className="catalog-actions pr-4"><DropdownMenu><DropdownMenuTrigger asChild><Button variant="ghost" size="icon" className="size-8 text-muted-foreground data-[state=open]:bg-muted" aria-label={`Действия: ${project.name || 'без названия'}`}><IconDots className="size-4" /></Button></DropdownMenuTrigger><DropdownMenuContent align="end" className="shadcn-surface w-44">

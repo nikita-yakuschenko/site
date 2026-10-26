@@ -124,7 +124,7 @@ export function StoryRecordMetadata() {
 export function ProjectRecordMetadata() {
   const { id, hasPublishedDoc, data } = useDocumentInfo()
   const code = typeof data?.code === 'string' ? data.code : ''
-  return <RecordMetadata fields={projectFields} badge={<Badge variant={hasPublishedDoc ? 'default' : 'outline'}>{hasPublishedDoc ? 'Опубликован' : 'Черновик'}</Badge>}>
+  return <RecordMetadata fields={projectFields} badge={<Badge variant={hasPublishedDoc ? 'default' : 'outline'}>{hasPublishedDoc ? 'Опубликован' : data?.unpublishedAt ? 'Снят с публикации' : 'Черновик'}</Badge>}>
     {code && <span className="project-record-code" title="Код проекта">{code}</span>}
     {id && <ProjectCopyButton />}
     {!id && <DraftLeavePrompt />}

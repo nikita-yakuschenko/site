@@ -665,6 +665,7 @@ export interface Project {
   id: number;
   recordType: 'project' | 'ready-home';
   slug: string;
+  unpublishedAt?: string | null;
   code?: string | null;
   hero_product?: number | null;
   blockOrder?:
@@ -1830,6 +1831,7 @@ export interface FormsSelect<T extends boolean = true> {
 export interface ProjectsSelect<T extends boolean = true> {
   recordType?: T;
   slug?: T;
+  unpublishedAt?: T;
   code?: T;
   hero_product?: T;
   blockOrder?: T;

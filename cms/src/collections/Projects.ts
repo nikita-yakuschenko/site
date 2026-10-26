@@ -1,3 +1,4 @@
+import { preserveProjectState } from '../config/project-publication'
 import type { CollectionConfig, Field } from 'payload'
 import { TECHNOLOGY_OPTIONS } from '../../../src/lib/catalog/types'
 import { authenticated, contentManager, contentWriter, privilegedField } from '../access/staff'
@@ -93,23 +94,13 @@ export const Projects: CollectionConfig = {
     for (const field of ['exteriors', 'interiors', 'built'] as const) if (Array.isArray(data[field]) && data[field].some((row: { photo?: unknown }) => row.photo)) data[`${field}ContentSource`] = 'database'
     if (Array.isArray(data.plans) && data.plans.length > 0) data.plansContentSource = 'database'
     return data
-  }, ({ data, originalDoc }) => {
-    // Счётчики меняет только SQL-приращение. Сохранение карточки не должно
-    // затирать лайки и репосты числом из открытой формы.
-    if (data && originalDoc) {
-      data.likeCount = originalDoc.likeCount ?? 0
-      data.shareCount = originalDoc.shareCount ?? 0
-      data.viewCount = originalDoc.viewCount ?? 0
-      data.likeVoters = originalDoc.likeVoters ?? []
-      data.shareVoters = originalDoc.shareVoters ?? []
-    }
-    return data
-  }] },
+  }, preserveProjectState] },
   fields: [
     { type: 'row', admin: { className: 'project-details-row' }, fields: [
       { name: 'recordType', label: 'Тип записи', type: 'select', required: true, defaultValue: 'project', options: [{ label: 'Проект дома', value: 'project' }, { label: 'Готовый дом', value: 'ready-home' }] },
       { name: 'slug', label: 'Адрес', type: 'text', required: true, unique: true, validate: (value: unknown) => typeof value === 'string' && /^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(value) ? true : 'Используйте латинские буквы, цифры и дефисы' },
     ] },
+    { name: 'unpublishedAt', type: 'date', admin: { hidden: true } },
     { name: 'code', label: 'Код', type: 'text', unique: true, index: true, admin: { hidden: true } },
     { type: 'collapsible', label: 'Настройки каталога', admin: { initCollapsed: true, condition: data => data.recordType !== 'ready-home' }, fields: [
       { name: 'hero_product', label: 'Закрепление в каталоге', type: 'number', unique: true, min: 1, max: 2,

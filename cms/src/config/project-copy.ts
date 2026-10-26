@@ -31,6 +31,6 @@ export function copyProjectFields(fields: Field[], source: Record<string, unknow
 
 export function projectCopyData(fields: Field[], source: Record<string, unknown>, slug: string): Record<string, unknown> {
   const data = copyProjectFields(fields, source)
-  for (const key of ['id', 'code', 'createdAt', 'updatedAt', 'importKey', 'hero_product', 'likeCount', 'shareCount', 'viewCount', 'likeVoters', 'shareVoters']) delete data[key]
+  for (const key of ['unpublishedAt', 'id', 'code', 'createdAt', 'updatedAt', 'importKey', 'hero_product', 'likeCount', 'shareCount', 'viewCount', 'likeVoters', 'shareVoters']) delete data[key]
   return { ...data, slug, _status: 'draft' as const, importKey: null, hero_product: null, likeCount: 0, shareCount: 0, viewCount: 0, likeVoters: [], shareVoters: [] }
 }
