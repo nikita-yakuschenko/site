@@ -64,7 +64,7 @@ export const LeadSubmissions: CollectionConfig = {
   access: { read: authenticated, create: () => false, update: () => false, delete: contentManager },
   hooks: {
     beforeValidate: [({ data, originalDoc }) => data ? { ...data, ...resolveLeadClassification(data, originalDoc) } : data],
-    afterRead: [({ doc }) => { doc.title = storedLeadTitle(doc); return doc }],
+    afterRead: [({ doc }) => { doc.title = storedLeadTitle(doc); Object.assign(doc, resolveLeadClassification(doc)); return doc }],
     afterChange: [async ({ doc, operation, req }) => {
       if (operation !== 'create' || !['referral-program', 'FactoryOpenDayForm'].includes(doc.formId)) return doc
       const saved = await automationSettings(req.payload)
