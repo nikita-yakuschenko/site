@@ -19,7 +19,7 @@ export async function LeadsView({ initPageResult }: AdminViewServerProps) {
   })
   return <div className="shadcn-surface flex flex-col gap-6 p-4 lg:p-6">
     <h1 className="text-2xl font-semibold tracking-tight">Заявки</h1>
-    <LeadsIndex rows={rows} editable={['super-admin', 'admin'].includes(user.role)} />
+    <LeadsIndex rows={rows} />
   </div>
 }
 
