@@ -1,5 +1,11 @@
 # SmartCaptcha: аудит и исправления — 25.10.2026
 
+При реальной отправке 26.10.2026 в production обнаружено отсутствие ключа
+под ожидаемым именем `YANDEX_SMARTCAPTCHA_SECRET_KEY`. Сервер теперь также
+поддерживает документированное имя `YANDEX_SMARTCAPTCHA_SERVER_KEY`.
+Если отсутствуют оба значения, возвращается `503 captcha-not-configured`,
+а не `403 captcha-failed`; проверка токена не отключается.
+
 26.10.2026: в `FactoryOpenDayForm` и `ReferralProgram` добавлен тот же
 `useLeadCaptcha`, что используется основной формой. До этого они отправляли
 заявки без `captchaToken`, а `/next/leads` возвращал `400 invalid-input`.
