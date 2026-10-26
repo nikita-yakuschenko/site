@@ -1,0 +1,13 @@
+[
+  { "event": "lead_success", "name": "Формы: успешная заявка — все формы", "formIds": [] },
+  { "event": "lead_project_quote", "name": "Формы: расчёт стоимости дома", "formIds": ["project-configuration"] },
+  { "event": "lead_ready_home", "name": "Формы: заявка по готовому дому", "formIds": ["ready-home-offer"] },
+  { "event": "lead_mortgage", "name": "Формы: ипотечная консультация и расчёт", "formIds": ["mortgage-consultation", "mortgage-calculator"] },
+  { "event": "lead_exhibition", "name": "Формы: посещение выставки", "formIds": ["exhibition-visit"] },
+  { "event": "lead_factory_tour", "name": "Формы: экскурсия на производство", "formIds": ["factory-tour"] },
+  { "event": "lead_architect", "name": "Формы: консультация архитектора", "formIds": ["architect-consultation"] },
+  { "event": "lead_open_day", "name": "Формы: день открытых дверей", "formIds": ["FactoryOpenDayForm"] },
+  { "event": "lead_question", "name": "Формы: обратная связь", "formIds": ["header-question", "contacts-question"] },
+  { "event": "lead_referral", "name": "Формы: реферальная программа", "formIds": ["referral-program"] },
+  { "event": "lead_other", "name": "Формы: промо и прочие заявки", "formIds": ["hero-promo", "lead-form"] }
+]

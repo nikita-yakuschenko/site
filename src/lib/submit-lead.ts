@@ -1,5 +1,6 @@
 import { waitForRoistatVisit } from './roistat-visit'
 import { trackVkFormSubmit } from './vk-pixel'
+import { trackMetricaFormSuccess } from './metrica-form-goals'
 
 export type LeadAttempt = { current: { payload: string; requestId: string } | null }
 
@@ -22,5 +23,6 @@ export async function submitLead(payload: Record<string, unknown>, attempt: Lead
   const receipt = await response.json()
   if (!response.ok || receipt.accepted !== true) throw new Error('lead-not-confirmed')
   trackVkFormSubmit(requestId)
+  trackMetricaFormSuccess(receipt.id || requestId, typeof payload.formId === 'string' ? payload.formId : 'lead-form')
   return receipt as { accepted: true; id: string }
 }

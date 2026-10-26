@@ -4,6 +4,10 @@ import { leadInputSchema } from '../src/lib/leads'
 
 async function prepare(page: Page, mode = 'success') {
   const submissions: Record<string, unknown>[] = []
+  await page.addInitScript(() => {
+    const calls: unknown[][] = []
+    Object.assign(window, { __metricaCalls: calls, ym: (...args: unknown[]) => { calls.push(args) } })
+  })
   await page.route(/(?:mc\.yandex\.ru|roistat\.com|one2click\.ru|top-fwz1\.mail\.ru|\/api\/(?:views|reactions|consent)(?:\?|$))/, route => route.fulfill({ status: 204, body: '' }))
   await page.route('**/api/smartcaptcha-config', route => route.fulfill({ json: { siteKey: 'local-only' } }))
   await page.route('https://smartcaptcha.cloud.yandex.ru/**', route => route.fulfill({ contentType: 'application/javascript', body: captchaFixtureScript }))
@@ -18,6 +22,13 @@ async function prepare(page: Page, mode = 'success') {
       : { status: 400, json: { error: 'invalid-input' } })
   })
   return submissions
+}
+
+async function expectGoals(page: Page, events: string[]) {
+  await expect.poll(() => page.evaluate(() => {
+    const calls = (window as unknown as { __metricaCalls: unknown[][] }).__metricaCalls
+    return calls.filter(call => call[1] === 'reachGoal').map(call => call[2])
+  })).toEqual(events)
 }
 
 for (const modal of [false, true]) {
@@ -36,6 +47,7 @@ for (const modal of [false, true]) {
     expect(submissions[0]?.captchaToken).toBe('diagnostic-browser-fixture-token')
     expect(submissions[0]?.meta).toMatchObject({ email: 'test@example.test' })
     await expect(page.locator('.ags-form--success')).toBeVisible()
+    await expectGoals(page, ['lead_success', 'lead_open_day'])
   })
 }
 
@@ -51,6 +63,7 @@ test('open day does not submit on captcha failure and allows retry', async ({ pa
   await form.getByRole('button', { name: 'Записаться', exact: true }).click()
   await expect(form.getByRole('alert')).toBeVisible()
   expect(submissions).toHaveLength(0)
+  await expectGoals(page, [])
   await page.evaluate(() => { (window as unknown as Record<string, unknown>).__captchaMode = 'success' })
   await form.getByRole('button', { name: 'Записаться', exact: true }).click()
   await expect(page.locator('.ags-form--success')).toBeVisible()
@@ -72,4 +85,34 @@ test('referral form sends captcha, string identifiers and registration email', a
   expect(submissions[0]?.siteId).toBe('corporate')
   expect(submissions[0]?.meta).toEqual({ email: 'test@example.test' })
   await expect(page.locator('.referral__success')).toBeVisible()
+  await expectGoals(page, ['lead_success', 'lead_referral'])
 })
+
+for (const formId of ['header-question', 'contacts-question']) {
+  test(`${formId}: server rejection has no goal, accepted retry sends both goals`, async ({ page }) => {
+    await prepare(page)
+    let accepted = false
+    await page.route('**/next/leads', route => route.fulfill(accepted
+      ? { json: { accepted: true, id: `receipt-${formId}` } }
+      : { status: 503, json: { error: 'temporarily-unavailable' } }))
+    await page.goto('/', { waitUntil: 'domcontentloaded' })
+    await expect(page.locator('html')).toHaveAttribute('data-app-hydrated', 'true')
+    if (formId === 'header-question') await page.locator('.site-header__cta').click()
+    const form = page.locator(`form[data-form-id="${formId}"]`)
+    await form.locator('[name="name"]').fill('Тест Аналитики')
+    await form.locator('[name="phone"]').fill('9123456789')
+    await form.locator('[type="submit"]').click()
+    await expect(form.getByRole('alert')).toBeVisible()
+    await expectGoals(page, [])
+    accepted = true
+    await form.locator('[type="submit"]').click()
+    await expectGoals(page, ['lead_success', 'lead_question'])
+    await expect.poll(() => page.evaluate(() => {
+      const calls = (window as unknown as { __metricaCalls: unknown[][] }).__metricaCalls
+      return calls.filter(call => call[1] === 'reachGoal').map(call => ({ counter: call[0], params: call[3] }))
+    })).toEqual([
+      { counter: expect.any(Number), params: { form_id: formId } },
+      { counter: expect.any(Number), params: { form_id: formId } },
+    ])
+  })
+}

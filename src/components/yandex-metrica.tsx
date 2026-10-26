@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { usePathname, useSearchParams } from "next/navigation";
+import { bindMetricaFormGoals } from '../lib/metrica-form-goals';
 
 /**
  * Счётчик Яндекс.Метрики.
@@ -78,6 +79,11 @@ export function YandexMetrica({ counter }: { counter: number }) {
   useEffect(() => {
     if (!counter) return;
     loadOnce(counter);
+    bindMetricaFormGoals((event, params) => {
+      const ym = (window as MetricaWindow).ym;
+      if (!ym) throw new Error('metrica-not-ready');
+      ym(counter, 'reachGoal', event, params);
+    });
   }, [counter]);
 
   /* Первый заход Метрика засчитывает сама при init, поэтому первый вызов
