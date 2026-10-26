@@ -68,3 +68,4 @@ if (process.argv.includes('--apply')) {
 await p.destroy()
 
 export {}
+process.exit(0)
