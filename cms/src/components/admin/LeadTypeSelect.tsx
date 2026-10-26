@@ -1,10 +1,12 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { leadTypeLabels, leadTypes, type LeadClassification } from '../../config/lead-classification'
 
 export function LeadTypeSelect({ id, classification, editable = true, onSaved }: { id: number; classification: LeadClassification; editable?: boolean; onSaved?: (next: LeadClassification) => void }) {
+  const router = useRouter()
   const [current, setCurrent] = useState(classification)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -17,6 +19,7 @@ export function LeadTypeSelect({ id, classification, editable = true, onSaved }:
       const next = await response.json() as LeadClassification
       setCurrent(next)
       onSaved?.(next)
+      router.refresh()
     } catch (failure) { setError(failure instanceof Error ? failure.message : 'Не удалось сохранить тип') }
     finally { setSaving(false) }
   }
