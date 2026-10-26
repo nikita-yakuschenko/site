@@ -1,22 +1,25 @@
 import { priceConfigurationKeys, type ConfigurationKey } from '../../../src/lib/catalog/configuration-rules'
 import type { PriceKind } from './price-kinds'
+import type { CatalogTechnology } from '../../../src/lib/catalog/types'
 
-const kitLabels: Record<string, ConfigurationKey> = { 'старт': 'start', 'базовая': 'standard', 'проектная': 'project', 'под ключ': 'turnkey' }
+const kitLabels: Record<string, ConfigurationKey> = { 'старт': 'start', 'стартовая': 'start', 'базовая': 'standard', 'стандартная': 'standard', 'проектная': 'project', 'под ключ': 'turnkey' }
 
 export type MarketingChoice = { projectName: string; sourceName: string; skipped: string[] }
 export type MarketingPriceRow = { projectName: string; configuration: ConfigurationKey; region: PriceKind; price: number }
 
 // Имя файла говорит, чьи это цены и какая технология. «Базовая» в файле — стандартная комплектация.
-export function marketingFileKind(filename: string): { modular: boolean; house: PriceKind; special: PriceKind } {
+export function marketingFileKind(filename: string): { technology: CatalogTechnology; modular: boolean; house: PriceKind; special: PriceKind } {
   const name = filename.toLowerCase().replace(/ё/g, 'е')
   const modular = /(^|[^a-zа-я])мд([^a-zа-я]|$)|модул/.test(name)
   const panel = /(^|[^a-zа-я])пкд([^a-zа-я]|$)|панел/.test(name)
-  if (modular === panel) throw new Error('В имени файла должно быть понятно: модульные дома или ПКД')
-  if (/дилер/.test(name)) return { modular, house: 'dealer', special: 'special-dealer' }
+  const frame = /ручная[\s_-]+стройка|(^|[^a-zа-я-])каркасн/.test(name)
+  if ([modular, panel, frame].filter(Boolean).length !== 1) throw new Error('В имени файла должна быть одна технология: МД, ПКД или каркасные дома / Ручная стройка')
+  const technology: CatalogTechnology = modular ? 'modular' : frame ? 'frame' : 'panel'
+  if (/дилер/.test(name)) return { technology, modular, house: 'dealer', special: 'special-dealer' }
   const moscow = /(^|[^a-zа-я])мск([^a-zа-я]|$)|моск/.test(name)
   const nn = /(^|[^a-zа-я])нн([^a-zа-я]|$)|нижн/.test(name)
   if (moscow === nn) throw new Error('В имени файла должно быть понятно: НН или МСК')
-  return { modular, house: moscow ? 'msk' : 'nn', special: moscow ? 'special-msk' : 'special' }
+  return { technology, modular, house: moscow ? 'msk' : 'nn', special: moscow ? 'special-msk' : 'special' }
 }
 
 // Скобки в конце — планировка одного и того же дома. «Барн» в файле — это «Барнхаус».
@@ -63,7 +66,8 @@ export function parseMarketingGrid(grid: unknown[][], filename: string) {
     if (kind.house === 'dealer' && [...columns.values()].some(kit => kit !== 'start')) throw new Error(`${sourceName}: у дилера ожидается только комплектация «Старт»`)
     const quote: Quote = { sourceName, house: {}, special: {} }
     for (let row = index + 1; row < grid.length && !(grid[row] || []).some(cell => kitOf(cell)); row++) {
-      const target = text(grid[row]?.[0]) === 'Стоимость дома' ? quote.house : text(grid[row]?.[0]) === 'Специальное предложение' ? quote.special : null
+      const label = text(grid[row]?.[0]).toLowerCase()
+      const target = label === 'стоимость дома' ? quote.house : /^(?:наличные\s*\(\s*)?специальное предложение\s*\)?$/.test(label) ? quote.special : null
       if (!target) continue
       for (const [column, kit] of columns) {
         const price = money(grid[row]?.[column])
@@ -93,11 +97,11 @@ export function parseMarketingGrid(grid: unknown[][], filename: string) {
 }
 
 export type MarketingIssue = { projectName: string; kind: 'technology' | 'duplicate'; detail: string }
-export type CatalogPriceProject = { id: string; name: string; slug: string | null; modular: boolean }
+export type CatalogPriceProject = { id: string; name: string; slug: string | null; technology: CatalogTechnology }
 
 // Чужая технология или два проекта с одним названием не отменяют цены остальных домов из файла.
 // Slug черновику не нужен: цена хранится на номере карточки.
-export function matchMarketingCatalog(parsed: { choices: MarketingChoice[]; rows: MarketingPriceRow[] }, projects: CatalogPriceProject[], modular: boolean) {
+export function matchMarketingCatalog(parsed: { choices: MarketingChoice[]; rows: MarketingPriceRow[] }, projects: CatalogPriceProject[], technology: CatalogTechnology) {
   const issues: MarketingIssue[] = []
   const blocked = new Set<string>()
   const byKey = new Map<string, { id: string; slug: string; name: string }>()
@@ -110,7 +114,7 @@ export function matchMarketingCatalog(parsed: { choices: MarketingChoice[]; rows
   for (const choice of parsed.choices) {
     const key = priceNameKey(choice.projectName)
     const found = grouped.get(key) || []
-    const same = found.filter(project => project.modular === modular)
+    const same = found.filter(project => project.technology === technology)
     if (!found.length) continue
     if (!same.length) {
       issues.push({ projectName: choice.projectName, kind: 'technology', detail: `«${choice.projectName}» совпало с проектом «${found[0].name}» другой технологии` })

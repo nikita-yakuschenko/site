@@ -83,10 +83,10 @@ test('a draft without a slug still receives its prices', () => {
     ['Стоимость дома', null, null, null, null, 1200000, 2200000, 3200000],
   ], '41. НН. ПКД. Маркетинг. Октябрь 2026.xlsx')
   const matched = matchMarketingCatalog(parsed, [
-    { id: '10', name: 'Экохаус 132', slug: '', modular: false },
-    { id: '11', name: 'Барнхаус 115', slug: 'barnhouse-115', modular: false },
-    { id: '12', name: 'Барнхаус 115', slug: 'barnhouse-115-copy', modular: true },
-  ], false)
+    { id: '10', name: 'Экохаус 132', slug: '', technology: 'panel' },
+    { id: '11', name: 'Барнхаус 115', slug: 'barnhouse-115', technology: 'panel' },
+    { id: '12', name: 'Барнхаус 115', slug: 'barnhouse-115-copy', technology: 'modular' },
+  ], 'panel')
   assert.deepEqual([...new Set(matched.rows.map(row => row.projectId))], ['10', '11'])
   assert.equal(matched.rows.find(row => row.projectId === '10')?.projectSlug, '')
   assert.equal(matched.issues.length, 0)
