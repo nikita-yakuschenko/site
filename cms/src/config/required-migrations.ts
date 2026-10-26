@@ -27,4 +27,5 @@ export const requiredMigrations = [
   '20261024_220000_frame_configurations',
   '20261026_180000_lead_classification',
   '20261026_200000_project_publication',
+  '20261026_220000_frame_copy',
 ]

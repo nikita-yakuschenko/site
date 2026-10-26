@@ -41,6 +41,13 @@ test('unique index is safe only on a newly added nullable column without a defau
   assert.ok(rollbackViolations('ALTER TABLE "projects" ADD COLUMN "hero_product" numeric DEFAULT 1; CREATE UNIQUE INDEX "hero_idx" ON "projects" ("hero_product");').length > 0)
 })
 
+test('only literal defaults for frame editorial text can change existing columns', () => {
+  assert.deepEqual(rollbackViolations("ALTER TABLE blocks ALTER COLUMN configuration_templates_frame_start_lead SET DEFAULT 'Описание дома'"), [])
+  assert.ok(rollbackViolations('ALTER TABLE blocks ALTER COLUMN configuration_templates_frame_start_lead SET DEFAULT current_user').length > 0)
+  assert.ok(rollbackViolations("ALTER TABLE blocks ALTER COLUMN configuration_templates_frame_start_price SET DEFAULT '100' ").length > 0)
+  assert.ok(rollbackViolations("ALTER TABLE projects ALTER COLUMN code SET DEFAULT 'Описание'").length > 0)
+})
+
 test('a nullable column with a default can be rolled back to the previous CMS', () => {
   const sql = `
     CREATE TYPE "public"."enum_demo" AS ENUM('a');

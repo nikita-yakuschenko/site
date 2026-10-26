@@ -1,3 +1,4 @@
+import * as migration_20261026_220000_frame_copy from './20261026_220000_frame_copy';
 import * as migration_20261026_200000_project_publication from './20261026_200000_project_publication';
 import * as migration_20261024_220000_frame_configurations from './20261024_220000_frame_configurations';
 import * as migration_20261026_180000_lead_classification from './20261026_180000_lead_classification';
@@ -150,4 +151,5 @@ export const migrations = [
   { up: migration_20261024_220000_frame_configurations.up, down: migration_20261024_220000_frame_configurations.down, name: '20261024_220000_frame_configurations' },
   { up: migration_20261026_180000_lead_classification.up, down: migration_20261026_180000_lead_classification.down, name: '20261026_180000_lead_classification' },
   { up: migration_20261026_200000_project_publication.up, down: migration_20261026_200000_project_publication.down, name: '20261026_200000_project_publication' },
+  { up: migration_20261026_220000_frame_copy.up, down: migration_20261026_220000_frame_copy.down, name: '20261026_220000_frame_copy' },
 ];

@@ -40,6 +40,13 @@ import { ConfigurationComparison } from './configuration-comparison/comparison';
 
 const configText = (text: string) => nbspText(nbspText(text.replace(/(?:согласно|по) архитектурному проекту/gi, "согласно проекту").replace(/окнами согласно проекту/gi, "Окнами согласно архитектурному проекту")));
 
+function IncludesTitle({ text }: { text: string }) {
+  const formatted = configText(text);
+  const match = /(стартовой|стандартной|проектной)/i.exec(formatted);
+  if (!match) return formatted;
+  return <>{formatted.slice(0, match.index)}<span className="project-config__tier-base">{match[0]}</span>{formatted.slice(match.index + match[0].length)}</>;
+}
+
 export function ProjectConfig({ project, configurations, previewTier, onPreviewTierChange }: { project: CatalogProject; configurations?: PricedTier[]; previewTier?: string; onPreviewTierChange?: (tier: string) => void }) {
   const persistedTierId = useSyncExternalStore(
     subscribeTier,
@@ -135,7 +142,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                     {item.price > 0 ? configText(formatFromRub(item.price)) : 'Цена уточняется'}
                   </span>
                   <span className="project-config__tier-includes-title">
-                    {item.includesTitle ? configText(item.includesTitle) : item.id === 'project' ? <><span className="project-config__tier-base">Стандартная</span> комплектация дополняется:</>
+                    {item.includesTitle ? <IncludesTitle text={item.includesTitle} /> : item.id === 'project' ? <><span className="project-config__tier-base">Стандартная</span> комплектация дополняется:</>
                       : item.id === 'turnkey' ? <><span className="project-config__tier-base">Проектная</span> комплектация дополняется:</>
                       : item.id === 'standard' && hasStartingTier ? <><span className="project-config__tier-base">Стартовая</span> комплектация дополняется:</>
                       : item.id === 'standard' ? configText('Всё необходимое для начала:') : configText('Надёжная основа для вашего дома:')}

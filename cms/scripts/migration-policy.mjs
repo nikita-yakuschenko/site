@@ -106,6 +106,9 @@ export function rollbackViolations(upSql) {
     if (/^create type\s+\S+\s+as\s+enum\s*\(/i.test(statement)) continue
     if (/^alter type\s+\S+\s+add value\s+/i.test(statement)) continue
     if (/^comment on\b/i.test(statement)) continue
+    // Editorial frame copy is nullable free text, not an identifier or enum.
+    // Updating only these literal defaults keeps older CMS images compatible.
+    if (/^alter table\s+"?blocks"?\s+alter column\s+"?configuration_templates_frame_(?:start|standard|project)_(?:lead|includes_title)"?\s+set default\s+'(?:[^']|'')*'$/i.test(statement)) continue
     const column = addedColumn(statement, added)
     if (column?.error) {
       problems.push(column.error)

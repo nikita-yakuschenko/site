@@ -6,6 +6,8 @@ import type {
   TechnicalMatrix,
   TechnicalInfo,
 } from "./types";
+import { frameMatrix } from './frame-data';
+export { frameMatrix } from './frame-data';
 
 const included = (
   displayValue = "",
@@ -484,6 +486,7 @@ export const modularMatrix: TechnicalMatrix = {
 export const technicalMatrices = {
   panel: panelMatrix,
   modular: modularMatrix,
+  frame: frameMatrix,
 } as const;
 
 export const includedDeliveryZones = {

@@ -1,5 +1,5 @@
 export type PackageId = "start" | "standard" | "project" | "turnkey";
-export type BuildingTechnology = "panel" | "modular";
+export type BuildingTechnology = "panel" | "modular" | "frame";
 export type SpecificationValue = {
   status: "included" | "excluded" | "notApplicable" | "requiresVerification";
   completionLevel: "structural" | "rough" | "prepared" | "finish" | null;

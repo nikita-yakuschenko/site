@@ -184,7 +184,7 @@ export function ConfigurationComparison({
   region: "nn" | "msk";
 }) {
   const [open, setOpen] = useState(false);
-  const matrix = project.technology === 'frame' ? null : technicalMatrices[project.technology];
+  const matrix = technicalMatrices[project.technology];
   if (!matrix) return null;
   return (
     <Dialog open={open} onOpenChange={setOpen}>
