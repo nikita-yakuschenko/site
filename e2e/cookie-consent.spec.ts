@@ -40,18 +40,22 @@ for (const button of ['Понятно', 'Закрыть уведомление �
   })
 }
 
-test('mobile timer dismissal persists after reload', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 })
+for (const { width, delay } of [{ width: 390, delay: 6000 }, { width: 1280, delay: 10000 }]) {
+test(`timer dismissal at ${width}px persists after reload`, async ({ page }) => {
+  await page.setViewportSize({ width, height: 844 })
   await page.clock.install()
   await page.clock.pauseAt(new Date())
   await page.goto('/', { waitUntil: 'domcontentloaded' })
   await expect(page.locator('.cookie-banner')).toBeVisible()
-  await page.clock.fastForward(6000)
+  await page.clock.fastForward(delay - 1)
+  await expect(page.locator('.cookie-banner')).toBeVisible()
+  await page.clock.fastForward(1)
   await expect(page.locator('.cookie-banner')).toHaveCount(0)
   await page.reload({ waitUntil: 'domcontentloaded' })
   await expect(page.locator('html')).toHaveAttribute('data-app-hydrated', 'true')
   await expect(page.locator('.cookie-banner')).toHaveCount(0)
 })
+}
 
 test('cookie fallback retains dismissal when localStorage cannot save it', async ({ page }) => {
   await page.addInitScript(() => {

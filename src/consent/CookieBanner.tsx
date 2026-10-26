@@ -57,8 +57,9 @@ export function CookieBanner() {
   const visible = useSyncExternalStore(subscribe, isNoticeVisible, serverVisibility)
 
   useEffect(() => {
-    if (!visible || !window.matchMedia('(max-width: 899px)').matches) return
-    const timer = window.setTimeout(dismissNotice, 6000)
+    if (!visible) return
+    const delay = window.matchMedia('(max-width: 899px)').matches ? 6000 : 10000
+    const timer = window.setTimeout(dismissNotice, delay)
     return () => window.clearTimeout(timer)
   }, [visible])
 
