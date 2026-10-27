@@ -1,3 +1,4 @@
+import { checkStaffPassword } from '../access/password-policy'
 import { APIError, AuthenticationError, type CollectionConfig } from 'payload'
 import { bootstrapFirstAdmin } from '../access/bootstrap-context'
 import { activeStaff, authenticated, ownAccountOrSuper, privilegedField, superAdmin } from '../access/staff'
@@ -23,12 +24,13 @@ export const Users: CollectionConfig = {
     unlock: superAdmin,
   },
   hooks: {
-    beforeOperation: [({ args, operation }) => {
+    beforeOperation: [async ({ args, operation, req }) => {
       // No SMTP adapter is configured. Payload's development mail adapter
       // must never print password-reset links to infrastructure logs.
       if (operation === 'forgotPassword' || operation === 'resetPassword') {
         throw new APIError('Восстановление пароля через почту пока не настроено', 403)
       }
+      if (['create', 'update', 'updateByID'].includes(operation) && 'data' in args && args.data && Object.hasOwn(args.data, 'password') && args.data.password !== undefined && (req.context[bootstrapFirstAdmin as unknown as string] === true || await activeStaff(req))) await checkStaffPassword(args.data.password)
       return args
     }],
     beforeLogin: [({ user, req }) => {
