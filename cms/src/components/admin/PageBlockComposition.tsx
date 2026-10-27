@@ -26,6 +26,7 @@ const partFields: Record<string, { name: 'text' | 'textMore' | 'href'; label: st
 }
 
 const seriesOptions = [
+  { value: 'frame', label: 'Каркасные дома' },
   { value: 'panel', label: 'Панельно-каркасные дома' },
   { value: 'barn', label: 'Барнхаусы' },
   { value: 'classic', label: 'Классика' },

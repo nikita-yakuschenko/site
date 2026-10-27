@@ -4,14 +4,15 @@ import { useEffect, useState } from 'react'
 import { IconArrowUpRight } from '@tabler/icons-react'
 import { copy, projectsInSeries } from '../lib/copy'
 import { isCatalogSeries } from '../lib/catalog/types'
-import { collectionHref } from '../lib/catalog/collection'
+import { collectionHref, isTechnologyCollection } from '../lib/catalog/collection'
 import type { LayoutBlock } from './block-renderer'
 import { PhotoTile } from './photo-tile'
 
 type SeriesTile = { id: string; place?: string; title: string; href: string; image: string; count?: number }
 type SeriesDraft = { heading?: string; button?: string; tiles?: { title?: string; series?: string; image?: string; count?: number }[] }
 
-const fallbackImage: Record<'panel' | 'barn' | 'classic' | 'modular', string> = {
+const fallbackImage: Record<'frame' | 'panel' | 'barn' | 'classic' | 'modular', string> = {
+  frame: '/series/panel.jpg',
   panel: '/series/panel.jpg',
   barn: '/series/barn.jpg',
   classic: '/series/classic.jpg',
@@ -39,7 +40,7 @@ export function SeriesBento({ block }: { block: LayoutBlock }) {
   const heading = draft?.heading || String(block.heading || copy.seriesHeading)
   const button = draft?.button || String(block.catalogLabel || copy.seriesAll)
   const items = draft?.tiles?.length ? draft.tiles.map((tile, index) => {
-    const series = tile.series && isCatalogSeries(tile.series) && tile.series !== 'aframe' ? tile.series : 'panel'
+    const series = tile.series && (isTechnologyCollection(tile.series) || isCatalogSeries(tile.series)) && tile.series !== 'aframe' ? tile.series : 'panel'
     const current = server[index]
     return {
       id: current?.id || `slot-${index}`,

@@ -301,7 +301,7 @@ export function PagePreview({ siteUrl, project = false, story = false, configura
       const counts = new Map<string, number>()
       for (const doc of result?.docs || []) {
         const series = isCatalogSeries(String(doc.series || '')) ? String(doc.series) : ''
-        const tech = String(doc.technologyBadge || '') === 'Модульный' ? 'modular' : 'panel'
+        const tech = technologyFromBadge(String(doc.technologyBadge || ''))
         if (series && !isTechnologyCollection(series)) counts.set(series, (counts.get(series) || 0) + 1)
         counts.set(tech, (counts.get(tech) || 0) + 1)
       }
