@@ -35,6 +35,12 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      {
+        source: '/catalog',
+        has: [{ type: 'query', key: 'tech', value: 'panel' }],
+        destination: '/catalog?tech=frame',
+        permanent: true,
+      },
       ...Object.entries(webpAssets as Record<string, string>).map(([source, destination]) => ({
         source: source.replace(/[()+*?:{}\\]/g, '\\$&'), destination, permanent: true,
       })),
