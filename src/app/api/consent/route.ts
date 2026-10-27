@@ -1,3 +1,5 @@
+import { requirePublicRequestLimit, requestFailure } from '../../../lib/request-limits'
+import { readJsonLimited } from '../../../lib/request-security'
 import { NextResponse } from "next/server";
 import { appendFile, mkdir } from "node:fs/promises";
 import { join } from "node:path";
@@ -19,9 +21,10 @@ type Body = {
 };
 
 export async function POST(request: Request) {
+  try { await requirePublicRequestLimit(request, 'consent') } catch (error) { return requestFailure(error) }
   let body: Body;
   try {
-    body = (await request.json()) as Body;
+    body = (await readJsonLimited(request, 8192)) as Body;
   } catch {
     return NextResponse.json({ error: "bad-json" }, { status: 400 });
   }

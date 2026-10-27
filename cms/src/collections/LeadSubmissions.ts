@@ -1,3 +1,4 @@
+import { readJsonLimited } from '../../../src/lib/request-security'
 import { after } from 'next/server'
 import type { CollectionConfig, GlobalConfig } from 'payload'
 import { authenticated, contentManager, superAdmin } from '../access/staff'
@@ -89,7 +90,7 @@ export const LeadSubmissions: CollectionConfig = {
     const denied = authorizeSiteRequest(req)
     if (denied) return denied
     let input
-    try { input = leadInputSchema.safeParse(await req.json!()) } catch { return Response.json({ error: 'Некорректные данные' }, { status: 400 }) }
+    try { input = leadInputSchema.safeParse(await readJsonLimited(req)) } catch { return Response.json({ error: 'Некорректные данные' }, { status: 400 }) }
     if (!input.success || !input.data.formId) return Response.json({ error: 'Некорректные данные формы' }, { status: 400 })
     const settings = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: true })
     if (!deliveryIsEnabled(settings)) return Response.json({ error: 'Отправка не настроена' }, { status: 503 })

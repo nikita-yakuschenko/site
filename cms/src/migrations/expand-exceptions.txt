@@ -12,3 +12,6 @@
 
 # New frame-only tables and nullable columns; no changes to existing technology data.
 20261024_220000_frame_configurations
+
+# Reviewed: standalone expiring request counters; no changes to existing tables or data. Older CMS ignores it.
+20261027_090000_request_limits

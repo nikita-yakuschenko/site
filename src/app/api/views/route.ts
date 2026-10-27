@@ -1,3 +1,5 @@
+import { requirePublicRequestLimit, requestFailure } from '../../../lib/request-limits'
+import { readJsonLimited } from '../../../lib/request-security'
 import { NextResponse } from 'next/server'
 
 export const dynamic = 'force-dynamic'
@@ -5,8 +7,9 @@ export const dynamic = 'force-dynamic'
 const slugPattern = /^[a-z0-9]+(?:-[a-z0-9]+)*$/
 
 export async function POST(request: Request) {
+  try { await requirePublicRequestLimit(request, 'views') } catch (error) { return requestFailure(error) }
   let body: { slug?: unknown }
-  try { body = await request.json() } catch { return NextResponse.json({ error: 'bad-json' }, { status: 400 }) }
+  try { body = await readJsonLimited(request) as typeof body } catch (error) { return requestFailure(error) }
   const slug = typeof body.slug === 'string' ? body.slug : ''
   if (!slugPattern.test(slug)) return NextResponse.json({ error: 'bad-input' }, { status: 400 })
   const key = process.env.CMS_SITE_API_KEY

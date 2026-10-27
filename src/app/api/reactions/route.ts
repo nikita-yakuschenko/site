@@ -1,3 +1,5 @@
+import { requirePublicRequestLimit, requestFailure } from '../../../lib/request-limits'
+import { readJsonLimited } from '../../../lib/request-security'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 import { deviceKey, newVoterId, VOTER_COOKIE, VOTER_MAX_AGE, writeProjectReaction, type DeviceSignals } from '../../../lib/reactions'
@@ -17,8 +19,9 @@ function cookieOptions() {
 }
 
 export async function POST(request: Request) {
+  try { await requirePublicRequestLimit(request, 'reactions') } catch (error) { return requestFailure(error) }
   let body: { slug?: unknown; action?: unknown; signals?: DeviceSignals }
-  try { body = await request.json() } catch { return NextResponse.json({ error: 'bad-json' }, { status: 400 }) }
+  try { body = await readJsonLimited(request) as typeof body } catch (error) { return requestFailure(error) }
   const slug = typeof body.slug === 'string' ? body.slug : ''
   const action = body.action
   if (!slugPattern.test(slug) || (action !== 'like' && action !== 'unlike' && action !== 'share')) {

@@ -1,13 +1,15 @@
+import { requirePublicRequestLimit, requestFailure } from '../../../lib/request-limits'
+import { readJsonLimited } from '../../../lib/request-security'
 import { NextResponse } from 'next/server'
-import { allowLeadAttempt, leadInputSchema } from '../../../lib/leads'
+import { leadInputSchema } from '../../../lib/leads'
 import { leadAttribution } from '../../../lib/lead-attribution'
 import { verifySmartCaptcha } from '../../../server/smartcaptcha'
 export const dynamic = 'force-dynamic'
 
 export async function POST(request: Request) {
-  if (!allowLeadAttempt(request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'local')) return NextResponse.json({ error: 'too-many-attempts' }, { status: 429 })
+  try { await requirePublicRequestLimit(request, 'lead') } catch (error) { return requestFailure(error) }
   let input
-  try { input = leadInputSchema.safeParse(await request.json()) } catch { return NextResponse.json({ error: 'invalid-input' }, { status: 400 }) }
+  try { input = leadInputSchema.safeParse(await readJsonLimited(request)) } catch (error) { return requestFailure(error) }
   if (!input.success || !input.data.formId || !input.data.captchaToken) return NextResponse.json({ error: 'invalid-input' }, { status: 400 })
   const captcha = await verifySmartCaptcha(input.data.captchaToken, request)
   if (captcha === 'not-configured') {

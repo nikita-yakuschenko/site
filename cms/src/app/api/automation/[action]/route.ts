@@ -1,6 +1,9 @@
 import { createLocalReq, getPayload } from 'payload'
 import config from '@payload-config'
-import { randomUUID } from 'node:crypto'
+import { webhookEventKey } from '../../../../automation/webhook-key'
+import { readJsonLimited, readTextLimited } from '../../../../../../src/lib/request-security'
+import { requireCMSRequestLimit } from '../../../../config/request-limits'
+import { safeRequestError } from '../../../../config/safe-request-error'
 import { activeStaff } from '../../../../access/staff'
 import { enqueue, saveSettings, settings } from '../../../../automation/store'
 import { equalSecret } from '../../../../automation/crypto'
@@ -23,6 +26,7 @@ async function staff(request: Request, payload: Awaited<ReturnType<typeof getPay
 export async function GET(request: Request, context: Context) {
   const { action } = await context.params, payload = await getPayload({ config }), url = new URL(request.url)
   try {
+    if (action === 'confirm' || action === 'calendar') await requireCMSRequestLimit(payload, request, 'staff')
     if (action === 'confirm') {
       await confirmToken(payload, url.searchParams.get('token') || '')
       return new Response('<!doctype html><html lang="ru"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Регистрация подтверждена</title><body style="font:18px system-ui;max-width:560px;margin:12vh auto;padding:24px"><h1>Регистрация подтверждена</h1><p>Спасибо! Письмо с подробностями придёт на ваш email.</p><a href="https://avgst.ru">На сайт Авангард Строй</a></body></html>', { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store', 'Referrer-Policy': 'no-referrer' } })
@@ -48,14 +52,15 @@ export async function GET(request: Request, context: Context) {
       return json({ config: saved.config, configured: Object.fromEntries(Object.keys(saved.vault).map(k => [k, true])), cutover: saved.cutover })
     }
     return json({ error: 'Не найдено' }, 404)
-  } catch (error) { return json({ error: error instanceof Error ? error.message : 'Ошибка' }, 400) }
+  } catch (error) { return safeRequestError(error, data => payload.logger.error(data)) }
 }
 export async function POST(request: Request, context: Context) {
   const { action } = await context.params, payload = await getPayload({ config })
   try {
+    await requireCMSRequestLimit(payload, request, 'webhook')
     if (action === 'dmp' || action === 'referral-webhook') {
       const saved = await settings(payload)
-      const raw: Record<string, unknown> = request.headers.get('content-type')?.includes('application/json') ? await request.json() : Object.fromEntries(new URLSearchParams(await request.text()))
+      const raw: Record<string, unknown> = request.headers.get('content-type')?.includes('application/json') ? await readJsonLimited(request, 256 * 1024) as Record<string, unknown> : Object.fromEntries(new URLSearchParams(await readTextLimited(request, 256 * 1024)))
       const auth = raw.auth as Record<string, unknown> | undefined
       const token = String(raw['auth[application_token]'] || auth?.application_token || raw.application_token || '')
       const expected = saved.secret(action === 'dmp' ? 'dmpAppTokens' : 'bitrixAppToken').split(/[\s,]+/).filter(Boolean)
@@ -67,14 +72,14 @@ export async function POST(request: Request, context: Context) {
       const fields = (raw.data as { FIELDS?: { ID?: unknown } } | undefined)?.FIELDS
       const id = String(raw['data[FIELDS][ID]'] || fields?.ID || '')
       if (!/^\d+$/.test(id)) return json({ error: 'Не указан ID сделки' }, 400)
-      await enqueue(payload, action === 'dmp' ? 'dmp' : 'crm-registration', { dealId: id }, `${action}:${id}:${randomUUID()}`)
+      await enqueue(payload, action === 'dmp' ? 'dmp' : 'crm-registration', { dealId: id }, webhookEventKey(action, event, id, raw))
       return json({ accepted: true }, 202)
     }
     // Cookie authentication alone is insufficient for state-changing custom routes.
     if (request.headers.get('origin') !== new URL(process.env.CMS_PUBLIC_URL || request.url).origin) return json({ error: 'Недопустимый источник запроса' }, 403)
     const user = await staff(request, payload)
     if (!user || user.role !== 'super-admin') return json({ error: 'Нужны права администратора' }, 403)
-    const body = await request.json() as Record<string, unknown>
+    const body = await readJsonLimited(request, 256 * 1024) as Record<string, unknown>
     if (action === 'settings') {
       const section = String(body.section)
       if (!['referral', 'mail', 'dmp'].includes(section)) return json({ error: 'Укажите раздел настроек' }, 400)
@@ -120,5 +125,5 @@ export async function POST(request: Request, context: Context) {
       return json({ queued: recipients.length, campaignId: id })
     }
     return json({ error: 'Не найдено' }, 404)
-  } catch (error) { return json({ error: error instanceof Error ? error.message.replace(/https?:\/\/\S+/g, '[address]') : 'Ошибка обработки' }, 400) }
+  } catch (error) { return safeRequestError(error, data => payload.logger.error(data)) }
 }

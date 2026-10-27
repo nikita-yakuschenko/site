@@ -1,3 +1,6 @@
+import { safeRequestError } from '../config/safe-request-error'
+import { requireCMSRequestLimit } from '../config/request-limits'
+import { readJsonLimited } from '../../../src/lib/request-security'
 import type { Endpoint } from 'payload'
 import { contentWriter } from '../access/staff'
 import { parsePriceRows } from '../config/price-import'
@@ -7,7 +10,7 @@ export const priceImportEndpoint: Endpoint = {
   path: '/import', method: 'post', handler: async req => {
     if (!await contentWriter({ req })) return Response.json({ error: 'Нет доступа' }, { status: 403 })
     let rows; let dryRun
-    try { const body = await req.json!(); rows = parsePriceRows(body.rows); dryRun = body.dryRun === true } catch (error) { return Response.json({ error: error instanceof Error ? error.message : 'Некорректный прайс' }, { status: 400 }) }
+    try { await requireCMSRequestLimit(req.payload, req, 'staff'); const body = await readJsonLimited(req, 3 * 1024 * 1024) as Record<string, unknown>; rows = parsePriceRows(body.rows); dryRun = body.dryRun === true } catch (error) { return safeRequestError(error, data => req.payload.logger.error(data)) }
     const transactionID = await req.payload.db.beginTransaction()
     if (!transactionID) return Response.json({ error: 'Не удалось начать импорт' }, { status: 503 })
     req.transactionID = transactionID
@@ -32,7 +35,7 @@ export const priceImportEndpoint: Endpoint = {
       return Response.json({ validated: prepared.length, updated: dryRun ? 0 : prepared.length, dryRun })
     } catch (error) {
       await req.payload.db.rollbackTransaction(transactionID)
-      return Response.json({ error: error instanceof Error ? error.message : 'Не удалось импортировать прайс' }, { status: 400 })
+      return safeRequestError(error, data => req.payload.logger.error(data))
     }
   },
 }

@@ -1,3 +1,4 @@
+import { RequestLimits } from './collections/RequestLimits'
 import { postgresAdapter } from '@payloadcms/db-postgres'
 import { lexicalEditor } from '@payloadcms/richtext-lexical'
 import { ru } from '@payloadcms/translations/languages/ru'
@@ -88,7 +89,7 @@ export default buildConfig({
   debug: false,
   defaultDepth: 0,
   maxDepth: 3,
-  collections: [Users, Pages, Blocks, Forms, Projects, Stories, ProjectPrices, LeadSubmissions, ReferralParticipants, Events, EventRegistrations, AutomationJobs, AutomationImports, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
+  collections: [RequestLimits, Users, Pages, Blocks, Forms, Projects, Stories, ProjectPrices, LeadSubmissions, ReferralParticipants, Events, EventRegistrations, AutomationJobs, AutomationImports, createMedia({ directory: path.resolve(environment.mediaDir), uploadsEnabled: environment.uploadsEnabled })],
   globals: [LeadDelivery, AutomationSettings],
   editor: lexicalEditor(),
   sharp,

@@ -20,6 +20,7 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    'request-limits': RequestLimit;
     users: User;
     pages: Page;
     blocks: Block;
@@ -41,6 +42,7 @@ export interface Config {
   };
   collectionsJoins: {};
   collectionsSelect: {
+    'request-limits': RequestLimitsSelect<false> | RequestLimitsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     pages: PagesSelect<false> | PagesSelect<true>;
     blocks: BlocksSelect<false> | BlocksSelect<true>;
@@ -99,6 +101,16 @@ export interface UserAuthOperations {
     email: string;
     password: string;
   };
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "request-limits".
+ */
+export interface RequestLimit {
+  id: number;
+  key: string;
+  hits: number;
+  expiresAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1318,6 +1330,15 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "request-limits_select".
+ */
+export interface RequestLimitsSelect<T extends boolean = true> {
+  key?: T;
+  hits?: T;
+  expiresAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema

@@ -1,3 +1,6 @@
+import { readJsonLimited } from '../../../../../../src/lib/request-security'
+import { requireCMSRequestLimit } from '../../../../config/request-limits'
+import { safeRequestError } from '../../../../config/safe-request-error'
 import { GET as handleGet, POST as handlePost } from '../../../api/automation/[action]/route'
 import { getPayload } from 'payload'
 import config from '@payload-config'
@@ -21,7 +24,8 @@ export async function POST(request: Request, context: Context) {
   const payload = await getPayload({ config }), saved = await settings(payload), secret = saved.secret('tokenSecret')
   if (!secret || !equalSecret(request.headers.get('x-webhook-secret') || '', secret)) return Response.json({ error: 'Нет доступа' }, { status: 401 })
   try {
-    const body = await request.json()
+    await requireCMSRequestLimit(payload, request, 'webhook')
+    const body = await readJsonLimited(request, 8192) as Record<string, unknown>
     if (route === 'api/referral/start') {
       const id = String(body.entity_id || body.entityId || '')
       if (!/^\d+$/.test(id)) return Response.json({ error: 'entity_id required' }, { status: 400 })
@@ -34,5 +38,5 @@ export async function POST(request: Request, context: Context) {
     if (body.dry_run === true) return Response.json({ ok: true, dry_run: true, recipients: rows.totalDocs })
     for (const row of rows.docs) await enqueue(payload, 'email', { flow: 'event', recordId: row.id, template: 'reminder' }, `reminder:${event.id}:${event.startsAt}:${row.id}`)
     return Response.json({ ok: true, queued: rows.totalDocs }, { status: 202 })
-  } catch { return Response.json({ error: 'Не удалось обработать запрос' }, { status: 400 }) }
+  } catch (error) { return safeRequestError(error, data => payload.logger.error(data)) }
 }
