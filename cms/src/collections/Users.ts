@@ -30,7 +30,7 @@ export const Users: CollectionConfig = {
       if (operation === 'forgotPassword' || operation === 'resetPassword') {
         throw new APIError('Восстановление пароля через почту пока не настроено', 403)
       }
-      if (['create', 'update', 'updateByID'].includes(operation) && 'data' in args && args.data && Object.hasOwn(args.data, 'password') && args.data.password !== undefined && (req.context[bootstrapFirstAdmin as unknown as string] === true || await activeStaff(req))) await checkStaffPassword(args.data.password)
+      if (['create', 'update', 'updateByID'].includes(operation) && 'data' in args && args.data && Object.hasOwn(args.data, 'password') && args.data.password !== undefined && !(operation !== 'create' && args.data.password === '') && (req.context[bootstrapFirstAdmin as unknown as string] === true || await activeStaff(req))) await checkStaffPassword(args.data.password)
       return args
     }],
     beforeLogin: [({ user, req }) => {
