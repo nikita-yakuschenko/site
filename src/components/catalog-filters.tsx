@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type RefObject } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import { IconArrowsSort, IconCheck, IconHeart, IconX } from "@tabler/icons-react";
 import * as Popover from "@radix-ui/react-popover";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
@@ -19,8 +18,8 @@ import { copy } from "../lib/copy";
  * колонка растёт вниз сколько нужно. Высокая колонка прокручивается
  * вместе со страницей и прилипает нижним краем, без внутреннего скроллбара.
  *
- * Состояние живёт в адресе, а не здесь: ссылку на отобранную выдачу можно
- * переслать, кнопка «назад» отменяет последнее условие. Ползунки при
+ * Применённые условия живут в адресе, а общий CatalogBoard сразу отражает
+ * новый выбор до ответа сервера. Ссылку на выдачу можно переслать. Ползунки при
  * перетаскивании ждут паузы, иначе каждое движение мыши било бы в сервер и
  * забивало историю браузера.
  */
@@ -136,7 +135,7 @@ export function CatalogFilters({
   onToggleFavorites,
   open,
   onApply,
-  onChanged,
+  onNavigate,
   changeTimerRef,
   mobile = false,
 }: {
@@ -151,14 +150,11 @@ export function CatalogFilters({
      здесь: на телефоне отдельная строка под неё стоила бы целого ряда. */
   open: boolean;
   onApply: () => void;
-  /* Условия поменялись: выдача стала другой, и надо вернуться к её началу. */
-  onChanged: () => void;
+  /* Общий переход обновляет выбор сразу, затем загружает выдачу. */
+  onNavigate: (next: CatalogFilters) => void;
   changeTimerRef: RefObject<ReturnType<typeof setTimeout> | null>;
   mobile?: boolean;
 }) {
-  const router = useRouter();
-  const pathname = usePathname();
-
   /* Пока человек тянет ползунок, показываем его же черновое значение:
      адрес отстаёт на паузу, и без этого ручка дёргалась бы назад. */
   const [draftArea, setDraftArea] = useState<[number, number] | null>(null);
@@ -179,10 +175,8 @@ export function CatalogFilters({
 
   const go = (next: CatalogFilters, delay = 0) => {
     if (timerRef.current) clearTimeout(timerRef.current);
-    const href = filtersToHref(next, pathname);
     const push = () => {
-      router.replace(href, { scroll: false });
-      onChanged();
+      onNavigate(next);
     };
     if (delay) timerRef.current = setTimeout(push, delay);
     else push();

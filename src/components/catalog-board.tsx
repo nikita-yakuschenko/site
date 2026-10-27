@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
+import { useEffect, useOptimistic, useRef, useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CatalogFilters, CatalogSort } from "./catalog-filters";
 import { CatalogSearch } from "./catalog-search";
@@ -45,7 +45,7 @@ export type BoardItem = SortableProject & { card: ReactNode };
 
 
 export function CatalogBoard({
-  filters,
+  filters: appliedFilters,
   facets,
   matched,
   rest,
@@ -59,6 +59,10 @@ export function CatalogBoard({
 }) {
   const router = useRouter();
   const pathname = usePathname();
+  // Controls acknowledge the gesture immediately; server-rendered results
+  // continue to describe appliedFilters until navigation completes.
+  const [filters, setOptimisticFilters] = useOptimistic(appliedFilters);
+  const [filterPending, startFilterTransition] = useTransition();
   const changeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   /* Раскрытие колонки на узком экране. Живёт здесь, потому что кнопка стоит
@@ -80,7 +84,7 @@ export function CatalogBoard({
     onlyFavorites ? items.filter((item) => favorites.includes(item.id)) : items;
 
   const region = useRegionCode();
-  const shownMatched = sortCatalog(keep(matched), filters.sort, region);
+  const shownMatched = sortCatalog(keep(matched), appliedFilters.sort, region);
   const shownRest = keep(rest);
   const narrowed = picked || onlyFavorites;
 
@@ -156,15 +160,23 @@ export function CatalogBoard({
   const search = (raw: string) => {
     const q = normalizeQuery(raw);
     startSearchTransition(() => {
+      setOptimisticFilters({ ...filters, q: q || undefined });
       router.replace(filtersToHref({ ...filters, q: q || undefined }, pathname), { scroll: false });
     });
+  };
+
+  const navigate = (next: Filters) => {
+    startFilterTransition(() => {
+      setOptimisticFilters(next);
+      router.replace(filtersToHref(next, pathname), { scroll: false });
+    });
+    backToStart();
   };
 
   const reset = () => {
     if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
     setOnlyFavorites(false);
-    router.replace(pathname, { scroll: false });
-    backToStart();
+    navigate({});
   };
 
   const renderFilters = (mobile = false) => (
@@ -184,7 +196,7 @@ export function CatalogBoard({
         onApply={() => {
           setOpen(false);
         }}
-        onChanged={backToStart}
+        onNavigate={navigate}
         changeTimerRef={changeTimerRef}
       />
   );
@@ -219,8 +231,7 @@ export function CatalogBoard({
             </Popover.Trigger>
             <CatalogSort compact filters={filters} onChange={next => {
               if (changeTimerRef.current) clearTimeout(changeTimerRef.current);
-              router.replace(filtersToHref(next, pathname), { scroll: false });
-              backToStart();
+              navigate(next);
             }} />
           </div>
           </Popover.Anchor>
@@ -236,7 +247,7 @@ export function CatalogBoard({
             // together with the field, rather than after a passive effect.
             searchInput.current?.focus({ preventScroll: true });
           }}><IconSearch size={18} stroke={1.75} aria-hidden="true" /></button>
-          <CatalogSearch value={filters.q ?? ""} onChange={search} pending={searchPending} expanded={searchExpanded}
+          <CatalogSearch value={appliedFilters.q ?? ""} onChange={search} pending={searchPending} expanded={searchExpanded}
             inputRef={searchInput}
             onApplied={() => { setSearchExpanded(false); }} onClose={() => setSearchExpanded(false)} />
         </div>
@@ -244,7 +255,7 @@ export function CatalogBoard({
       {renderFilters()}
       </div>
 
-      <div ref={results} className="catalog__results" aria-busy={searchPending}>
+      <div ref={results} className="catalog__results" aria-busy={searchPending || filterPending}>
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку
             не важно, сколько вариантов он отбросил и насколько велик каталог.
             Важно одно, есть ли в нём то, что он искал. Поэтому говорим только
