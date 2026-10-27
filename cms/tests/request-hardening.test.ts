@@ -50,3 +50,12 @@ test('archive validation rejects non-ZIP and unsafe declared inflated sizes befo
  const zip=Buffer.alloc(22);zip.writeUInt32LE(0x06054b50)
  assert.throws(()=>validateWorkbookArchive(zip))
 })
+
+
+test('workbook preflight bounds sparse coordinates before loading ExcelJS',async()=>{
+ const ExcelJS=(await import('exceljs')).default
+ const workbook=new ExcelJS.Workbook(),sheet=workbook.addWorksheet('Prices')
+ sheet.getCell('A10001').value='oversized sparse sheet'
+ const buffer=Buffer.from(await workbook.xlsx.writeBuffer())
+ assert.throws(()=>validateWorkbookArchive(buffer))
+})

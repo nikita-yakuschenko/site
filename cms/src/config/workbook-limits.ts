@@ -8,7 +8,7 @@ export function validateWorkbookArchive(data: Buffer) {
   if (end < 0) invalid()
   const count = data.readUInt16LE(end + 10), size = data.readUInt32LE(end + 12), start = data.readUInt32LE(end + 16)
   if (data.readUInt16LE(end + 4) || data.readUInt16LE(end + 6) || count !== data.readUInt16LE(end + 8) || count < 1 || count > 1024 || start + size !== end) invalid()
-  let cursor = start, total = 0
+  let cursor = start, total = 0, cells = 0, rows = 0
   const names = new Set<string>()
   try {
     for (let i = 0; i < count; i++) {
@@ -25,6 +25,22 @@ export function validateWorkbookArchive(data: Buffer) {
       const chunk = data.subarray(offset, offset + compressed)
       const actual = method === 8 ? inflateRawSync(chunk, { maxOutputLength: Math.max(1, uncompressed) }) : chunk
       if (actual.length !== uncompressed) invalid()
+      if (/^xl\/worksheets\/[^/]+\.xml$/.test(name)) {
+        const xml = actual.toString('utf8')
+        rows += (xml.match(/<(?:\w+:)?row\b/g) || []).length
+        cells += (xml.match(/<(?:\w+:)?c\b/g) || []).length
+        if (rows > 10000 || cells > 200000) invalid()
+        const cellRef = (ref: string) => {
+          const match = /^([A-Z]+)([0-9]+)$/.exec(ref)
+          if (!match) invalid()
+          let column = 0
+          for (const letter of match![1]!) column = column * 26 + letter.charCodeAt(0) - 64
+          if (column > 64 || Number(match![2]) > 10000) invalid()
+        }
+        for (const ref of xml.matchAll(/\br=["']([A-Z]+[0-9]+)["']/g)) cellRef(ref[1]!)
+        for (const ref of xml.matchAll(/\bref=["']([A-Z]+[0-9]+(?::[A-Z]+[0-9]+)?)["']/g)) for (const end of ref[1]!.split(':')) cellRef(end)
+      }
+      if (name === 'xl/sharedStrings.xml' && (actual.toString('utf8').match(/<(?:\w+:)?si\b/g) || []).length > 100000) invalid()
       cursor += 46 + nameLength + extra + comment
       if (cursor > end) invalid()
     }
