@@ -20,9 +20,10 @@ const nextConfig: NextConfig = {
     APP_VERSION: process.env.APP_VERSION ?? '0.1.0',
     APP_COMMIT: process.env.APP_COMMIT ?? 'unknown',
   },
-  // Files are encoded at upload/build time and served directly.
+  // CMS uploads retain their originals; cache resized versions for each screen.
   images: {
-    unoptimized: true,
+    deviceSizes: [640, 750, 828, 1080, 1200, 1280, 1920, 2048, 2560, 3840],
+    qualities: [45, 60, 75, 80, 85, 90, 100],
     remotePatterns: [
       { protocol: 'https', hostname: 'new.avgst.ru', pathname: '/**' },
       { protocol: 'https', hostname: 'cms.avgst.ru', pathname: '/api/media/file/**' },
@@ -33,11 +34,14 @@ const nextConfig: NextConfig = {
   async headers() {
     return [{ source: '/generated/webp/:path*', headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }] }]
   },
+  async rewrites() {
+    // Internal image requests must receive image bytes, not an HTTP redirect.
+    return Object.entries(webpAssets as Record<string, string>).map(([source, destination]) => ({
+      source: source.replace(/[()+*?:{}\\]/g, '\\$&'), destination,
+    }))
+  },
   async redirects() {
     return [
-      ...Object.entries(webpAssets as Record<string, string>).map(([source, destination]) => ({
-        source: source.replace(/[()+*?:{}\\]/g, '\\$&'), destination, permanent: true,
-      })),
       {
         source: '/legal/cookies',
         destination: '/cookies',

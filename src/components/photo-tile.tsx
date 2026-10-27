@@ -14,7 +14,7 @@ export function PhotoTile({ href, image, title, className = '', count, address, 
   href: string; image: string; title: string; className?: string; count?: string; address?: string; mobileAddress?: string; sizes?: string; quality?: number; cmsManaged?: boolean
 }) {
   const content = <Link href={href} className={`series-bento__tile ${className}`}>
-    <Image src={image} alt="" fill sizes={sizes} quality={quality} unoptimized />
+    <Image src={image} alt="" fill sizes={sizes} quality={quality} />
     {count != null && <span className="badge series-bento__count" data-cms-content-connected>{count}</span>}
     {address && <PhotoLocationBadge address={address} mobileAddress={mobileAddress} />}
     <span className="series-bento__go" aria-hidden="true"><IconArrowUpRight size={18} stroke={2} /></span>

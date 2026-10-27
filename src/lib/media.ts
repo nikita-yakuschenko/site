@@ -7,19 +7,35 @@ export function mediaUrl(media: MediaLike): string {
   return ''
 }
 
-// Legacy call signature retained for content components; all files are prepared before serving.
-export function optimizedSrc(src: string, _width?: number, _quality?: number): string {
+const imageWidths = [32, 48, 64, 96, 128, 256, 384, 640, 750, 828, 1080, 1200, 1280, 1920, 2048, 2560, 3840]
+const imageQualities = [45, 60, 75, 80, 85, 90, 100]
+
+function isCMSPhoto(src: string): boolean {
+  try {
+    const url = new URL(src)
+    return url.origin === 'https://cms.avgst.ru' && url.pathname.startsWith('/api/media/file/') && /\.(?:jpe?g|png|webp|avif)$/i.test(url.pathname)
+  } catch { return false }
+}
+
+// Local assets stay pre-encoded; CMS originals need cached responsive versions.
+export function optimizedSrc(src: string, width?: number, quality = 75): string {
+  if (isCMSPhoto(src) && width) {
+    const size = imageWidths.find(value => value >= width) ?? imageWidths[imageWidths.length - 1]
+    const q = imageQualities.reduce((best, value) => Math.abs(value - quality) < Math.abs(best - quality) ? value : best)
+    return `/_next/image?url=${encodeURIComponent(src)}&w=${size}&q=${q}`
+  }
   if (!src || !src.startsWith('/')) return src
   if (src.startsWith('/_next/image?')) {
     const original = new URLSearchParams(src.split('?')[1]).get('url')
-    return original && !original.startsWith('/_next/image') ? optimizedSrc(original) : src
+    return original && !original.startsWith('/_next/image') ? optimizedSrc(original, width, quality) : src
   }
   const [pathname] = src.split(/[?#]/)
   try { return (webpAssets as Record<string, string>)[decodeURIComponent(pathname || '')] || src }
   catch { return src }
 }
 
-export function optimizedSrcSet(src: string, _widths: number[], _quality?: number): string {
+export function optimizedSrcSet(src: string, widths: number[], quality?: number): string {
+  if (isCMSPhoto(src)) return [...new Set(widths)].map(width => `${optimizedSrc(src, width, quality)} ${imageWidths.find(value => value >= width) ?? 3840}w`).join(', ')
   return optimizedSrc(src)
 }
 
