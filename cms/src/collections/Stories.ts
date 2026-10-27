@@ -1,3 +1,4 @@
+import { clearPublicMediaCache } from './Media'
 import type { CollectionConfig } from 'payload'
 import { authenticated, contentManager, contentWriter } from '../access/staff'
 import { detectBuiltVideo } from '../config/built-media'
@@ -31,7 +32,7 @@ export const Stories: CollectionConfig = {
   versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
   endpoints: [storiesFeedEndpoint, storiesVideoMetaEndpoint],
-  hooks: {
+  hooks: { afterChange: [({ doc }) => { clearPublicMediaCache(); return doc }], afterDelete: [({ doc }) => { clearPublicMediaCache(); return doc }],
     beforeValidate: [({ data }) => {
       if (!data) return data
       if (typeof data.heading === 'string' && (!data.slug || typeof data.slug !== 'string')) data.slug = projectSlugFromName(data.heading)

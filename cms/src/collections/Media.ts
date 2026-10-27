@@ -37,7 +37,7 @@ const readMedia: Access = async ({ req }) => {
 async function loadPublicMediaIds(req: PayloadRequest): Promise<number[]> {
   const projects = await req.payload.find({
     collection: 'projects', overrideAccess: true, depth: 0, pagination: false,
-    where: { or: [{ heroContentSource: { equals: 'database' } }, { exteriorsContentSource: { equals: 'database' } }, { interiorsContentSource: { equals: 'database' } }, { builtContentSource: { equals: 'database' } }, { plansContentSource: { equals: 'database' } }] },
+    where: { and: [{ _status: { equals: 'published' } }, { or: [{ heroContentSource: { equals: 'database' } }, { exteriorsContentSource: { equals: 'database' } }, { interiorsContentSource: { equals: 'database' } }, { builtContentSource: { equals: 'database' } }, { plansContentSource: { equals: 'database' } }] }] },
     select: { heroContentSource: true, exteriorsContentSource: true, interiorsContentSource: true, builtContentSource: true, plansContentSource: true, plans: true, desktopImage: true, mobileImage: true, exteriors: true, interiors: true, built: true },
   })
   const projectMedia = projects.docs.flatMap(project => [

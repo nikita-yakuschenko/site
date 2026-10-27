@@ -1,3 +1,4 @@
+import { clearPublicMediaCache } from './Media'
 import { preserveProjectState } from '../config/project-publication'
 import type { CollectionConfig, Field } from 'payload'
 import { TECHNOLOGY_OPTIONS } from '../../../src/lib/catalog/types'
@@ -44,7 +45,7 @@ export const Projects: CollectionConfig = {
   versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
   endpoints: [projectCopyEndpoint, ...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectYmlOptionsEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
-  hooks: { beforeDelete: [async ({ id, req }) => {
+  hooks: { afterChange: [({ doc }) => { clearPublicMediaCache(); return doc }], afterDelete: [({ doc }) => { clearPublicMediaCache(); return doc }], beforeDelete: [async ({ id, req }) => {
     // Price rows require a project, so they go first
     await req.payload.delete({ collection: 'project-prices', where: { project: { equals: id } }, req, overrideAccess: true })
   }], beforeValidate: [async ({ data, operation, req }) => {
