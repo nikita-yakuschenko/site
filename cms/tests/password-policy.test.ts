@@ -23,7 +23,7 @@ test('user hook checks weak authorized passwords but allows ordinary profile edi
  const {Users}=await import('../src/collections/Users')
  const hook=Users.hooks!.beforeOperation![0]
  const req={context:{},user:{collection:'users',id:1},payload:{findByID:async()=>({id:1,role:'admin',isBlocked:false})}}
- await assert.rejects(hook({operation:'update',args:{data:{password:'abc'}},req} as never),validation('16'))
+ await assert.rejects(async()=>hook({operation:'update',args:{data:{password:'abc'}},req} as never),validation('16'))
  const args={data:{firstName:'Имя',password:''}}
  assert.equal(await hook({operation:'update',args,req} as never),args)
  assert.equal(await hook({operation:'update',args:{data:{password:'abc'}},req:{context:{},user:null}} as never) instanceof Object,true)
