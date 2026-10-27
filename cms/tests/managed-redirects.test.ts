@@ -14,6 +14,9 @@ test('registry edits and deletions expire; CMS outages retain the last rules', a
  assert.equal((await managedRedirect(source))?.href,'https://avgst.ru/catalog?tech=modular&yclid=123')
  offline=true;now+=31000
  assert.equal((await managedRedirect(source))?.pathname,'/catalog')
- offline=false;rules=[];now+=6000
+ offline=false;rules=[{source:'/catalog?tech=panel',target:'/catalog?tech=frame'}];now+=6000
+ assert.equal((await managedRedirect(new URL('https://avgst.ru/catalog?utm_source=test&tech=panel')))?.href,'https://avgst.ru/catalog?tech=frame&utm_source=test')
+ assert.equal(await managedRedirect(new URL('https://avgst.ru/catalog?tech=frame')),null)
+ rules=[];now+=31000
  assert.equal(await managedRedirect(source),null)
 })

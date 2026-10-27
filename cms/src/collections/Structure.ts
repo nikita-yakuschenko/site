@@ -90,7 +90,12 @@ export const Pages: CollectionConfig = {
   fields: [
     { type: 'row', admin: { className: 'page-details-row' }, fields: [
       { name: 'title', label: 'Название', type: 'text', required: true, admin: { width: '65%' } },
-      { name: 'route', label: 'Маршрут', type: 'text', required: true, unique: true, admin: { width: '35%' }, validate: (value: unknown) => typeof value === 'string' && value.startsWith('/') && !/[?#\s]/.test(value) ? true : 'Укажите маршрут, начинающийся с /, без пробелов и параметров запроса' },
+      { name: 'route', label: 'Маршрут', type: 'text', required: true, unique: true, admin: { width: '35%' }, validate: (value: unknown, { data }: { data?: { kind?: string } }) => {
+        if (data?.kind === 'redirect') {
+          try { redirectPath(typeof value === 'string' ? value : '', true); return true } catch (error) { return error instanceof Error ? error.message : 'Укажите корректный исходный адрес' }
+        }
+        return typeof value === 'string' && value.startsWith('/') && !/[?#\s]/.test(value) ? true : 'Укажите маршрут, начинающийся с /, без пробелов и параметров запроса'
+      } },
     ] },
     { name: 'metaTitle', label: 'Заголовок вкладки (Title)', type: 'text', required: true },
     { type: 'row', admin: { className: 'page-metadata-row' }, fields: [

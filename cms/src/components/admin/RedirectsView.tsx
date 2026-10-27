@@ -13,7 +13,7 @@ export async function RedirectsView({ initPageResult }: AdminViewServerProps) {
   ])
   const targets = [
     { title: 'Каталог — модульные дома', path: '/catalog?tech=modular' },
-    { title: 'Каталог — панельно-каркасные дома', path: '/catalog?tech=panel' },
+    { title: 'Каталог — каркасные дома', path: '/catalog?tech=frame' },
     ...pages.docs.filter(page => page.route && !page.route.includes('[') && !['template', 'preview', 'redirect'].includes(page.kind)).map(page => ({ title: page.title || page.route!, path: page.route! })),
     ...projects.docs.filter(project => project.slug).map(project => ({ title: project.name, path: `/catalog/${project.slug}` })),
   ]
