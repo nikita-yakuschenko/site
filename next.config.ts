@@ -5,8 +5,8 @@ const nextConfig: NextConfig = {
   // Сборка в самодостаточный сервер: в образ едет только то, что нужно рантайму.
   output: 'standalone',
   reactStrictMode: true,
-  // Deliver first-paint styles with HTML instead of blocking on four CSS requests.
-  experimental: { inlineCss: true },
+  // A large shared stylesheet must cache separately: inlineCss duplicates it
+  // inside both server HTML and the React Server Component payload.
   poweredByHeader: false,
   // Playwright / локальный доступ по 127.0.0.1 к dev-ресурсам Next.
   allowedDevOrigins: ['127.0.0.1', 'localhost'],

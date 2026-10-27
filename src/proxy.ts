@@ -7,6 +7,7 @@ import { attributionFromUrl, LEAD_ATTRIBUTION_COOKIE, readAttribution } from './
 export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers)
   headers.set('x-cms-page-route', request.nextUrl.pathname)
+  headers.set('x-cms-editor', request.nextUrl.searchParams.has('cmsPreview') || request.nextUrl.searchParams.has('cmsIndex') ? '1' : '0')
   const marked = regionFromSearch(request.nextUrl.search)
   const saved = request.cookies.get(REGION_COOKIE)?.value
   headers.set('x-avgst-region', marked ?? (saved === 'msk' ? 'msk' : 'nn'))

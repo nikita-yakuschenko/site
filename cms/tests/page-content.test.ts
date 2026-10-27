@@ -1,10 +1,23 @@
 import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import { createElement, type ReactElement, type ReactNode } from 'react'
-import { bindMarkedContent, bindReactContent } from '../../src/lib/cms/react-content'
+import { bindMarkedContent, bindReactContent, findCMSContentRecord } from '../../src/lib/cms/react-content'
 import { countCollectionProjects } from '../../src/lib/catalog/collection'
 
 function props(node: ReactNode) { return (node as ReactElement<Record<string, unknown>>).props }
+
+test('server and client use the same scoped CMS record before rendering saved content', () => {
+  const global = { key: 'Example', parts: [{ key: 'Example.content.0.children', text: 'Общий текст' }] }
+  const scoped = { key: 'Example-page-home', scope: '/', parts: [{ key: 'Example-page-home.content.0.children', text: 'Текст главной' }] }
+  const other = { key: 'Example-page-about', scope: '/about', parts: [] }
+  const records = [global, other, scoped]
+  assert.equal(findCMSContentRecord(records, 'Example', '/'), scoped)
+  assert.equal(findCMSContentRecord(records, 'Example', '/catalog'), global)
+  const original = createElement('p', null, 'Исходный текст')
+  const selected = findCMSContentRecord(records, 'Example', '/')!
+  assert.equal(props(bindReactContent(selected.key, original, selected.parts).content).children, 'Текст главной')
+  assert.equal(findCMSContentRecord([other], 'Example', '/'), undefined)
+})
 
 test('CMS block copy cannot overwrite records owned by the stories collection after reordering', () => {
   const card = (story: { slug: string; heading: string; poster: string; place: string }) => createElement('div', { 'data-cms-content-connected': true, story })

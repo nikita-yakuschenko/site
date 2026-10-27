@@ -3,7 +3,7 @@
 import { cloneElement, createContext, isValidElement, useContext, useEffect, useMemo, useState, type ReactElement, type ReactNode } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
-import { bindMarkedContent, bindReactContent, type ContentField, type ContentPart, type ContentRecord } from '../lib/cms/react-content'
+import { bindMarkedContent, bindReactContent, findCMSContentRecord, type ContentField, type ContentPart, type ContentRecord } from '../lib/cms/react-content'
 
 export type { ContentRecord } from '../lib/cms/react-content'
 const Context = createContext<ContentRecord[]>([])
@@ -27,8 +27,7 @@ export function CMSContentProvider({ records, children }: { records: ContentReco
 export function useCMSBlock(cmsBlockKey: string) {
   const records = useContext(Context)
   const route = usePathname()
-  const matching = records.filter(record => record.key === cmsBlockKey || record.key.startsWith(`${cmsBlockKey}-page-`))
-  const record = matching.find(item => item.scope === route) || matching.find(item => !item.scope)
+  const record = findCMSContentRecord(records, cmsBlockKey, route)
   return { key: record?.key || cmsBlockKey, parts: record?.parts || [] }
 }
 
@@ -71,8 +70,7 @@ export function CMSContentBlock({ cmsBlockKey, children, initialFields, mediaBou
   const records = useContext(Context)
   const route = usePathname()
   const query = useSearchParams()
-  const matching = records.filter(record => record.key === cmsBlockKey || record.key.startsWith(`${cmsBlockKey}-page-`))
-  const record = matching.find(record => record.scope === route) || matching.find(record => !record.scope)
+  const record = findCMSContentRecord(records, cmsBlockKey, route)
   const key = record?.key || cmsBlockKey
   const structureOnly = ['ManufactureTruckTransition', 'ManufactureModuleScene'].includes(cmsBlockKey)
   const parts = mediaBound ? record?.parts.filter(part => !part.key.endsWith('.image')) : record?.parts

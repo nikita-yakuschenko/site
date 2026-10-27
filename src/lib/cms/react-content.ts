@@ -3,6 +3,10 @@ import { cloneElement, createElement, isValidElement, type ReactElement, type Re
 export type ContentPart = { key: string; title?: string; text?: string; textMore?: string; href?: string; image?: string; originalImage?: string }
 export type ContentField = ContentPart & { kind: 'text' | 'image' | 'link' | 'person' }
 export type ContentRecord = { key: string; scope?: string; gallery?: boolean; parts: ContentPart[] }
+export function findCMSContentRecord(records: readonly ContentRecord[], key: string, route: string) {
+  const matching = records.filter(record => record.key === key || record.key.startsWith(`${key}-page-`))
+  return matching.find(record => record.scope === route) || matching.find(record => !record.scope)
+}
 const textProps = new Set(['title', 'heading', 'description', 'label', 'body', 'text', 'cta', 'submitLabel', 'successText', 'imageAlt'])
 const labels: Record<string, string> = { title: 'Заголовок', heading: 'Заголовок', description: 'Описание', label: 'Надпись', body: 'Текст', text: 'Текст', cta: 'Кнопка', submitLabel: 'Кнопка отправки', successText: 'Сообщение после отправки', imageAlt: 'Описание изображения' }
 const dataProps = new Set(['story', 'entry', 'entries', 'photos', 'items', 'steps', 'partners', 'images', 'videos', 'benefits'])
