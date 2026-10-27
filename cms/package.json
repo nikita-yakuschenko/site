@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "engines": {
-    "node": ">=22.13.0"
+    "node": "^22.23.4 || >=24.22.1"
   },
   "scripts": {
     "dev": "next dev --port 3001",
@@ -31,11 +31,11 @@
     "@codemirror/language": "6.13.1",
     "@codemirror/state": "6.7.6",
     "@codemirror/view": "6.43.15",
-    "@payloadcms/db-postgres": "3.90.2",
-    "@payloadcms/next": "3.90.2",
-    "@payloadcms/richtext-lexical": "3.90.2",
-    "@payloadcms/translations": "3.90.2",
-    "@payloadcms/ui": "3.90.2",
+    "@payloadcms/db-postgres": "3.92.0",
+    "@payloadcms/next": "3.92.0",
+    "@payloadcms/richtext-lexical": "3.92.0",
+    "@payloadcms/translations": "3.92.0",
+    "@payloadcms/ui": "3.92.0",
     "@tabler/icons-react": "3.34.1",
     "@tailwindcss/postcss": "4.3.3",
     "class-variance-authority": "^0.7.1",
@@ -47,7 +47,7 @@
     "next": "16.4.3",
     "next-themes": "^0.4.6",
     "nodemailer": "10.2.1",
-    "payload": "3.90.2",
+    "payload": "3.92.0",
     "radix-ui": "^1.8.0",
     "react": "19.2.6",
     "react-day-picker": "^10.0.2",
@@ -70,7 +70,18 @@
     "typescript": "5.7.3"
   },
   "overrides": {
-    "undici": "^7.29.1",
-    "sonner": "$sonner"
+    "undici": "^7.30.1",
+    "sonner": "$sonner",
+    "dompurify": "^3.4.17",
+    "happy-dom": "^21.0.4",
+    "exceljs": {
+      "uuid": "^11.1.1"
+    },
+    "@esbuild-kit/core-utils": {
+      "esbuild": "^0.25.12"
+    },
+    "tsx": {
+      "esbuild": "^0.28.1"
+    }
   }
 }
