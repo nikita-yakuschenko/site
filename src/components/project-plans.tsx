@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { optimizedSrc } from '../lib/media';
 import { useEffect, useState } from "react";
 import { PhotoLightbox } from "./photo-lightbox";
 import { copy } from "../lib/copy";
@@ -65,7 +66,8 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
                 onClick={() => setOpen(index)}
               >
                 <Image
-                  src={src}
+                  src={optimizedSrc(src)}
+                  unoptimized={src.startsWith('/')}
                   alt={copy.plansHeading}
                   width={1600}
                   height={1200}

@@ -2,6 +2,7 @@
 
 import { IconArrowUpRight } from "@tabler/icons-react";
 import Image from "next/image";
+import { optimizedSrc } from '../lib/media';
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LeadDialog } from "./lead-dialog";
@@ -50,7 +51,8 @@ export function ProjectNextSteps({
           </span>
           <Image
             className="project-next-steps__house"
-            src={visitImage}
+            src={optimizedSrc(visitImage)}
+            unoptimized={visitImage.startsWith('/')}
             alt=""
             width={visitIsDefault ? 1974 : 1024}
             height={visitIsDefault ? 750 : 576}
@@ -107,7 +109,8 @@ export function ProjectNextSteps({
             </span>
             <Image
               className="project-next-steps__architects"
-              src="/media/project-next-steps/architects-consult.png"
+              src={optimizedSrc('/media/project-next-steps/architects-consult.png')}
+              unoptimized
               alt=""
               width={1280}
               height={1280}
