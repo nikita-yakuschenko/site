@@ -22,3 +22,16 @@ test('home excludes unrelated route CSS from the critical path @critical', async
   expect(bytes, 'Decoded initial CSS budget (previous build was over 200 kB)').toBeLessThanOrEqual(160_000)
   await info.attach('critical-css-budget', { body: JSON.stringify({ bytes, limit: 160_000, sheets: sheets.map(({ href, text }) => ({ path: new URL(href).pathname, bytes: Buffer.byteLength(text) })) }, null, 2), contentType: 'application/json' })
 }))
+
+test('session recorder initializes after hydration and once per document @critical', async ({ page }, info) => diagnose(page, info, 'session recorder initialization', async () => {
+  await page.route('https://one2click.ru/t.js', route => route.fulfill({ contentType: 'application/javascript', body: `window.__recorderProbe={loads:(window.__recorderProbe?.loads||0)+1,hydrated:document.documentElement.dataset.appHydrated,site:document.currentScript.getAttribute('data-site')};` }))
+  beginNavigation(page)
+  await page.goto('/', { waitUntil: 'domcontentloaded' })
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __recorderProbe?: { loads: number } }).__recorderProbe?.loads)).toBe(1)
+  expect(await page.evaluate(() => (window as unknown as { __recorderProbe: { hydrated: string; site: string } }).__recorderProbe)).toMatchObject({ hydrated: 'true', site: 'o2cdb0f742c97' })
+  const start = await page.evaluate(() => performance.timeOrigin)
+  await page.locator('.card__media').first().click()
+  await expect(page.locator('.project-hero h1')).toBeVisible()
+  expect(await page.evaluate(() => performance.timeOrigin)).toBe(start)
+  expect(await page.evaluate(() => (window as unknown as { __recorderProbe: { loads: number } }).__recorderProbe.loads)).toBe(1)
+}))

@@ -41,4 +41,22 @@ node scripts/measure-mobile-critical-path.mjs D:/site-remediation-20261028 D:/si
 node scripts/measure-mobile-critical-path.mjs D:/site-remediation-20261028 D:/site/output/perf-tools/node_modules D:/site/docs/remediation/mobile-critical-path after
 ```
 
-Raw Lighthouse JSON и подробные CSS-снимки остаются локальными диагностическими артефактами. Production-деплой и итоговая проверка будут зафиксированы после прохождения полного CI.
+Raw Lighthouse JSON и подробные CSS-снимки остаются локальными диагностическими артефактами.
+
+## Выпуск и проверка production
+
+Код опубликован в `main`, коммит `bd6a7c486dc1d7455fa4858d0d5ff35e2140ef6d`. [Полный CI 40697852171](https://github.com/nikita-yakuschenko/site/actions/runs/40697852171) прошёл: 100 браузерных регрессий, 30 критических сценариев, проверки и сборки сайта/CMS. CMS не выкатывалась, миграции не запускались.
+
+Dokploy deployment `HorI2C7muz6UhKMWJoXVp` завершён успешно 28.10.2026 в **16:53:17 Europe/Moscow**. В процессе Dokploy заменил заданное название deployment на сообщение Git-коммита; поэтому итоговый статус проверен по deployment ID и времени, а не по исходному названию.
+
+Production build ID: `0d205983777586cf33bc5f289e288f717d464d05fcd35ba0078539b8f186b916`. Проверка на **https://avgst.ru/**: health/readiness/availability/главная/privacy/каталог/карточка — 200, неизвестный проект — 404. В desktop/mobile начальный CSS — **143 383 декодированных байта**, бюджет 160 000 соблюдён. Переход из каталога в проект сохраняет документ, Back работает, необработанных browser exceptions нет. [Smoke JSON](mobile-critical-path/production-after.json).
+
+Контрольный PageSpeed после выпуска запущен 28.10.2026 в 17:00 Europe/Moscow для **avgst.ru**: [отчёт](https://pagespeed.web.dev/analysis/https-avgst-ru/y8l6ht63kd?form_factor=mobile).
+
+Первый результат после CSS-выпуска: **80**, FCP 1,4 с, LCP 3,9 с, TBT 300 мс, CLS 0; console audit дополнительно зафиксировал timeout `privacy-cs.mail.ru`. Повторный [замер в 17:03](https://pagespeed.web.dev/analysis/https-avgst-ru/ud8scl77ue?form_factor=mobile): **86**, FCP 1,4 с, LCP 4 с, TBT 70 мс, CLS 0. Сокращение CSS подтверждено, но рост итогового production score или улучшение LCP этими замерами **не подтверждены**.
+
+## Дополнительная работа с JavaScript
+
+One2Click выполняет заметную работу в главном потоке (в первом production-замере t.js около 212 мс). Его подключение переведено с раннего async-тега на стандартный Next Script `afterInteractive`: после начала гидратации, без таймеров, ожидания согласия или пользовательского клика. Идентификатор сайта и загрузка при открытии документа сохранены. Остальные счётчики в этом изменении не перенастраиваются.
+
+Локальные проверки CSS-бюджета и инициализации записи сессий — **4/4** в Chromium desktop/mobile: скрипт исполняется после маркера гидратации, получает исходный data-site и не запускается повторно при клиентском переходе. Новый сценарий включён в critical browser gate. Эта часть ожидает полного CI и отдельной выкладки.

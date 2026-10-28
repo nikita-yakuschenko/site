@@ -1,0 +1,104 @@
+{
+  "phase": "after",
+  "time": "2026-10-28T14:00:15.916Z",
+  "http": [
+    {
+      "route": "/api/health",
+      "status": 200,
+      "durationMs": 110,
+      "requestId": null,
+      "data": {
+        "status": "ok",
+        "version": "0.1.0",
+        "commit": "unknown",
+        "buildId": "0d205983777586cf33bc5f289e288f717d464d05fcd35ba0078539b8f186b916",
+        "sourceDirty": null,
+        "uptimeSeconds": 412,
+        "timestamp": "2026-10-28T14:00:16.005Z"
+      }
+    },
+    {
+      "route": "/api/ready",
+      "status": 200,
+      "durationMs": 504,
+      "requestId": "90cd8eda-93aa-4353-b0be-f45d384860ab",
+      "data": {
+        "status": "ready",
+        "buildId": "0d205983777586cf33bc5f289e288f717d464d05fcd35ba0078539b8f186b916"
+      }
+    },
+    {
+      "route": "/api/catalog/availability",
+      "status": 200,
+      "durationMs": 25,
+      "requestId": null,
+      "data": {
+        "readyHouses": false
+      }
+    },
+    {
+      "route": "/",
+      "status": 200,
+      "durationMs": 875,
+      "requestId": "06bcfa11-58f5-4c68-bb20-09fad9aba845"
+    },
+    {
+      "route": "/privacy",
+      "status": 200,
+      "durationMs": 803,
+      "requestId": "556a2d62-6daf-467a-af0b-7c64df07e49d"
+    },
+    {
+      "route": "/catalog",
+      "status": 200,
+      "durationMs": 1022,
+      "requestId": "28a06563-f5b7-4197-9e41-eb725fd17aa8"
+    },
+    {
+      "route": "/catalog/barhhouse-73",
+      "status": 200,
+      "durationMs": 891,
+      "requestId": "8ccf7a5d-4835-4ea6-82c5-fb603904fc18"
+    },
+    {
+      "route": "/catalog/production-smoke-missing-4b96521",
+      "status": 404
+    }
+  ],
+  "browser": [
+    {
+      "mobile": false,
+      "route": "/",
+      "decodedCSSBytes": 143383,
+      "stylesheets": [
+        "/_next/static/chunks/0dbgi41elp0fj.css",
+        "/_next/static/chunks/2cd5wzogq8h7c.css",
+        "/_next/static/chunks/2n1kqo9c2io8l.css"
+      ]
+    },
+    {
+      "mobile": false,
+      "project": "/catalog/barnhouse-71",
+      "sameDocument": true,
+      "back": true,
+      "pageErrors": []
+    },
+    {
+      "mobile": true,
+      "route": "/",
+      "decodedCSSBytes": 143383,
+      "stylesheets": [
+        "/_next/static/chunks/0dbgi41elp0fj.css",
+        "/_next/static/chunks/2cd5wzogq8h7c.css",
+        "/_next/static/chunks/2n1kqo9c2io8l.css"
+      ]
+    },
+    {
+      "mobile": true,
+      "project": "/catalog/barnhouse-71",
+      "sameDocument": true,
+      "back": true,
+      "pageErrors": []
+    }
+  ]
+}
