@@ -7,17 +7,16 @@ import { FactoryOpenDayHero } from '../../components/factory-open-day/hero'
 import { FactoryOpenDayLocation } from '../../components/factory-open-day/location'
 import { FactoryOpenDayProgram } from '../../components/factory-open-day/program'
 import { openDayDate, openDayEvent } from '../../lib/open-day'
+import { readCMSContent } from '../../lib/cms/content'
+import { OPEN_DAY_ROUTE, openDayMetadata } from '../../lib/open-day-metadata'
 import './open-day.css'
 
 const inter = localFont({ src: '../../../public/fonts/inter/Inter-Variable.ttf', weight: '400 700', variable: '--font-ags-inter', display: 'swap', preload: false })
 const unbounded = localFont({ src: '../../../public/fonts/unbounded/Unbounded-Variable.ttf', weight: '600 700', variable: '--font-ags-display', display: 'swap', preload: false })
 
 export async function generateMetadata(): Promise<Metadata> {
-  const date = await openDayDate()
-  return {
-    title: 'Новый взгляд на загородный дом',
-    description: `${date}: производство, выставочные дома, тренды архитектуры и ипотека. Бесплатно, по записи.`,
-  }
+  const [date, content] = await Promise.all([openDayDate(), readCMSContent(OPEN_DAY_ROUTE)])
+  return openDayMetadata(date, content)
 }
 
 export default async function FactoryOpenDayPage() {
