@@ -1,5 +1,4 @@
 import { Suspense, type ReactNode } from 'react'
-import Script from 'next/script'
 import type { Metadata, Viewport } from 'next'
 import { cookies, headers } from 'next/headers'
 import { GeistSans } from 'geist/font/sans'
@@ -79,7 +78,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://cloud.roistat.com" />
-        <Script id="one2click-counter" strategy="afterInteractive" src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
+        <script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
       </head>
       <body suppressHydrationWarning>
         <Suspense fallback={null}><VkPixel /></Suspense>

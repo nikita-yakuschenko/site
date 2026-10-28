@@ -59,4 +59,14 @@ Production build ID: `0d205983777586cf33bc5f289e288f717d464d05fcd35ba0078539b8f1
 
 One2Click выполняет заметную работу в главном потоке (в первом production-замере t.js около 212 мс). Его подключение переведено с раннего async-тега на стандартный Next Script `afterInteractive`: после начала гидратации, без таймеров, ожидания согласия или пользовательского клика. Идентификатор сайта и загрузка при открытии документа сохранены. Остальные счётчики в этом изменении не перенастраиваются.
 
-Локальные проверки CSS-бюджета и инициализации записи сессий — **4/4** в Chromium desktop/mobile: скрипт исполняется после маркера гидратации, получает исходный data-site и не запускается повторно при клиентском переходе. Новый сценарий включён в critical browser gate. Эта часть ожидает полного CI и отдельной выкладки.
+Локальные проверки CSS-бюджета и инициализации записи сессий — **4/4** в Chromium desktop/mobile: скрипт исполняется после маркера гидратации, получает исходный data-site и не запускается повторно при клиентском переходе. Новый сценарий включён в critical browser gate.
+
+Изменение опубликовано в `main`, коммит `38753c5927efa0ca5c6ecb632b48571547663bc9`. [CI 40704447608](https://github.com/nikita-yakuschenko/site/actions/runs/40704447608) прошёл: **100/100** браузерных регрессий и **35/35** критических сценариев. Deployment `n0Z31VpCb0Z4Z3TlndWzS` завершён 28.10.2026 в **17:35:52 Europe/Moscow**, статус done.
+
+Итоговый production build ID: `3d4d025aac36e3500c2012b218b70b0b41e1dde5f98c74e3c1b4b3a9e35958c0`. Повторный [smoke](mobile-critical-path/production-after.json) прошёл на avgst.ru: endpoints/страницы 200, истинный 404 сохранён, CSS 143 383 декодированных байта, desktop/mobile navigation sameDocument и Back работают, browser exceptions нет. Предыдущий smoke CSS-выпуска сохранён отдельно в [production-css-release.json](mobile-critical-path/production-css-release.json).
+
+Замер после изменения инициализации One2Click: [PageSpeed avgst.ru, 17:36 Europe/Moscow](https://pagespeed.web.dev/analysis/https-avgst-ru/t7dzw4c0ti?form_factor=mobile).
+
+Результат изменения One2Click неудовлетворителен: первый замер — **76**, FCP 1,4 с, LCP 3,8 с, TBT 460 мс. [Повторный замер в 17:45](https://pagespeed.web.dev/analysis/https-avgst-ru/xkdfnimx2d?form_factor=mobile) — **78**, FCP 1,4 с, LCP 3,8 с, TBT 400 мс, CLS 0. Причинность всех колебаний не установлена, но оснований сохранять изменение ради производительности нет.
+
+Перенос One2Click отменён: layout и диагностический сценарий возвращены точно к версии `bd6a7c4`, прошедшей CI 40697852171. Проверка `git diff bd6a7c4 -- src diagnostics` пуста, ESLint проходит. Оптимизация CSS и ленивое подтверждение формы сохранены. Задача улучшения итогового мобильного PageSpeed остаётся незавершённой.
