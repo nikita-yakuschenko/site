@@ -27,6 +27,10 @@ async function prepare(page: Page, mode = 'success') {
   const fill = async () => {
     await form.locator('input[name=name]').fill('Тест Проверки')
     await form.locator('input[name=phone]').fill('9123456789')
+    // Consent is checked by default, so check() may leave the phone focused.
+    // Dismiss mobile input focus before the real submit-button click: these
+    // scenarios exercise captcha outcomes, not the keyboard's first-tap handling.
+    await form.locator('input[name=phone]').blur()
     await form.locator('input[name=consent]').check()
   }
   return { form, fill, submissions, sdk: () => sdk }
