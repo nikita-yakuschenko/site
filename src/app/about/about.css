@@ -1,0 +1,45 @@
+
+
+.about-page .about-hero { padding: 0; }
+.about-page .about-hero .project-hero__media img { object-position: center 75%; }
+.about-split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: center; }
+.about-copy { display: grid; gap: 20px; }
+.about-copy p { margin: 0; line-height: 1.65; }
+.about-lead { font-weight: 600; }
+.about-photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 16px; }
+.about-photo img { object-fit: cover; }
+.about-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.about-tinted { background: var(--surface-muted); }
+.about-page #contacts { background: var(--on-dark-0); }
+.about-principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
+.about-principles article { padding: 24px; border: 1px solid var(--line); border-radius: 16px; }
+.about-principles h3 { margin: 0 0 12px; font-size: 20px; }
+.about-principles p { margin: 0; line-height: 1.65; }
+.about-timeline__heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.about-timeline__controls { display: flex; gap: 8px; flex-shrink: 0; }
+.about-timeline__controls button { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: var(--on-dark-0); color: var(--avgst-ink); box-shadow: 0 1px 3px var(--line-2); backdrop-filter: blur(8px); cursor: pointer; transition: background-color 0.2s var(--ease-out); }
+.about-timeline__controls button:hover:not(:disabled) { background: var(--brand-yellow); border-color: var(--brand-yellow); }
+.about-timeline__controls button:disabled { opacity: .3; cursor: default; }
+.about-timeline__controls button:focus-visible, .about-timeline__rail:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
+.about-timeline__rail { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 40px; padding: 8px 0; }
+.about-timeline__scale { position: relative; display: flex; margin-top: 24px; padding-top: 4px; overflow-x: auto; scrollbar-width: none; }
+.about-timeline__scale::before { content: ''; position: absolute; left: 0; right: 0; top: 12px; height: 1px; background: var(--line-2); }
+.about-timeline__scale button { position: relative; flex: 1 0 48px; display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 44px; padding: 0 4px 4px; border: 0; background: transparent; color: var(--ink-1); font: inherit; font-size: 12px; cursor: pointer; }
+.about-timeline__tick { width: 8px; height: 8px; margin-top: 4px; margin-bottom: 4px; border-radius: 50%; background: var(--ink-2); }
+.about-timeline__scale button[aria-current] { color: var(--avgst-ink); font-weight: 700; }
+.about-timeline__scale button[aria-current] .about-timeline__tick { position: relative; width: 20px; height: 20px; margin-top: -2px; margin-bottom: -2px; box-sizing: border-box; border: 1px solid var(--avgst-ink); border-radius: 50%; background: var(--surface-muted); }
+.about-timeline__scale button[aria-current] .about-timeline__tick::after { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: var(--brand-yellow); }
+.about-timeline__scale button:hover:not([aria-current]) .about-timeline__tick { background: var(--brand-yellow); }
+.about-timeline__scale button:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: -2px; border-radius: 4px; }
+.about-timeline__rail::-webkit-scrollbar { display: none; }
+.about-timeline__year { display: inline-block; margin-left: 16px; color: var(--brand-yellow); }
+@media (max-width: 767px) {
+  .about-split, .about-principles { grid-template-columns: 1fr; }
+  .about-timeline__heading { position: relative; align-items: flex-start; }
+  .about-timeline__heading h2 { margin: 0; }
+  .about-timeline__title { display: block; max-width: calc(100% - 92px); }
+  .about-timeline__controls { position: absolute; top: 0; right: 0; }
+  .about-timeline__rail { margin-top: 32px; }
+  .about-timeline__year { display: block; margin-left: 0; font-variant-numeric: tabular-nums; }
+}
+@media (prefers-reduced-motion: reduce) { .about-timeline__controls button { transition: none; } }

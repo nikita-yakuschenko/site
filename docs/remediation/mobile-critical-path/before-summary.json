@@ -1,0 +1,617 @@
+[
+  {
+    "label": "before",
+    "run": 1,
+    "lighthouseVersion": "12.8.2",
+    "buildId": "500731a303a3ef01ab6a00682e63b25f320ade7db739c4a96ba32eeb4a0f4163",
+    "score": 75,
+    "fcpMs": 1573.2364,
+    "lcpMs": 5623.2364,
+    "tbtMs": 217.5,
+    "cls": 0,
+    "cssTransferBytes": 45447,
+    "jsTransferBytes": 235469,
+    "requests": [
+      {
+        "path": "/_next/static/chunks/0dbgi41elp0fj.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 755,
+        "resourceSize": 422
+      },
+      {
+        "path": "/_next/static/chunks/041zd7f_l16iv.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 40593,
+        "resourceSize": 236165
+      },
+      {
+        "path": "/_next/static/chunks/0kevq0i3bcuz8.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1630,
+        "resourceSize": 3433
+      },
+      {
+        "path": "/_next/static/chunks/2n1kqo9c2io8l.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1233,
+        "resourceSize": 900
+      },
+      {
+        "path": "/_next/static/chunks/0hy5urf737ouz.js",
+        "resourceType": "Script",
+        "transferSize": 7859,
+        "resourceSize": 24285
+      },
+      {
+        "path": "/_next/static/chunks/1tcyj5wq8orwq.js",
+        "resourceType": "Script",
+        "transferSize": 48774,
+        "resourceSize": 178256
+      },
+      {
+        "path": "/_next/static/chunks/216iyidhmrh3u.js",
+        "resourceType": "Script",
+        "transferSize": 72345,
+        "resourceSize": 229597
+      },
+      {
+        "path": "/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+        "resourceType": "Script",
+        "transferSize": 4787,
+        "resourceSize": 11255
+      },
+      {
+        "path": "/_next/static/chunks/1wgr67zuwtvm5.js",
+        "resourceType": "Script",
+        "transferSize": 13526,
+        "resourceSize": 42126
+      },
+      {
+        "path": "/_next/static/chunks/3ocbtkfp9ate1.js",
+        "resourceType": "Script",
+        "transferSize": 28017,
+        "resourceSize": 107221
+      },
+      {
+        "path": "/_next/static/chunks/3puiadiqwlrfp.js",
+        "resourceType": "Script",
+        "transferSize": 1591,
+        "resourceSize": 2480
+      },
+      {
+        "path": "/_next/static/chunks/2-qew10ov0_ny.js",
+        "resourceType": "Script",
+        "transferSize": 12300,
+        "resourceSize": 31389
+      },
+      {
+        "path": "/_next/static/chunks/2d8ov2vcx-cs8.js",
+        "resourceType": "Script",
+        "transferSize": 10163,
+        "resourceSize": 32634
+      },
+      {
+        "path": "/_next/static/chunks/0d_frnxr91f13.js",
+        "resourceType": "Script",
+        "transferSize": 21086,
+        "resourceSize": 94222
+      },
+      {
+        "path": "/_next/static/chunks/11848ne52x2eq.js",
+        "resourceType": "Script",
+        "transferSize": 10495,
+        "resourceSize": 27757
+      },
+      {
+        "path": "/_next/static/chunks/2b_33gl98v7pz.js",
+        "resourceType": "Script",
+        "transferSize": 1116,
+        "resourceSize": 1173
+      },
+      {
+        "path": "/_next/static/chunks/0khuhzy17wm1z.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1236,
+        "resourceSize": 2292
+      },
+      {
+        "path": "/_next/static/chunks/0le5889e88ed7.js",
+        "resourceType": "Script",
+        "transferSize": 3410,
+        "resourceSize": 7272
+      }
+    ]
+  },
+  {
+    "label": "before",
+    "run": 2,
+    "lighthouseVersion": "12.8.2",
+    "buildId": "500731a303a3ef01ab6a00682e63b25f320ade7db739c4a96ba32eeb4a0f4163",
+    "score": 70,
+    "fcpMs": 1940.4434999999999,
+    "lcpMs": 6173.5548,
+    "tbtMs": 283,
+    "cls": 0,
+    "cssTransferBytes": 45447,
+    "jsTransferBytes": 235469,
+    "requests": [
+      {
+        "path": "/_next/static/chunks/0dbgi41elp0fj.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 755,
+        "resourceSize": 422
+      },
+      {
+        "path": "/_next/static/chunks/041zd7f_l16iv.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 40593,
+        "resourceSize": 236165
+      },
+      {
+        "path": "/_next/static/chunks/0kevq0i3bcuz8.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1630,
+        "resourceSize": 3433
+      },
+      {
+        "path": "/_next/static/chunks/2n1kqo9c2io8l.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1233,
+        "resourceSize": 900
+      },
+      {
+        "path": "/_next/static/chunks/0hy5urf737ouz.js",
+        "resourceType": "Script",
+        "transferSize": 7859,
+        "resourceSize": 24285
+      },
+      {
+        "path": "/_next/static/chunks/1tcyj5wq8orwq.js",
+        "resourceType": "Script",
+        "transferSize": 48774,
+        "resourceSize": 178256
+      },
+      {
+        "path": "/_next/static/chunks/216iyidhmrh3u.js",
+        "resourceType": "Script",
+        "transferSize": 72345,
+        "resourceSize": 229597
+      },
+      {
+        "path": "/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+        "resourceType": "Script",
+        "transferSize": 4787,
+        "resourceSize": 11255
+      },
+      {
+        "path": "/_next/static/chunks/1wgr67zuwtvm5.js",
+        "resourceType": "Script",
+        "transferSize": 13526,
+        "resourceSize": 42126
+      },
+      {
+        "path": "/_next/static/chunks/3ocbtkfp9ate1.js",
+        "resourceType": "Script",
+        "transferSize": 28017,
+        "resourceSize": 107221
+      },
+      {
+        "path": "/_next/static/chunks/3puiadiqwlrfp.js",
+        "resourceType": "Script",
+        "transferSize": 1591,
+        "resourceSize": 2480
+      },
+      {
+        "path": "/_next/static/chunks/2-qew10ov0_ny.js",
+        "resourceType": "Script",
+        "transferSize": 12300,
+        "resourceSize": 31389
+      },
+      {
+        "path": "/_next/static/chunks/2d8ov2vcx-cs8.js",
+        "resourceType": "Script",
+        "transferSize": 10163,
+        "resourceSize": 32634
+      },
+      {
+        "path": "/_next/static/chunks/0d_frnxr91f13.js",
+        "resourceType": "Script",
+        "transferSize": 21086,
+        "resourceSize": 94222
+      },
+      {
+        "path": "/_next/static/chunks/11848ne52x2eq.js",
+        "resourceType": "Script",
+        "transferSize": 10495,
+        "resourceSize": 27757
+      },
+      {
+        "path": "/_next/static/chunks/2b_33gl98v7pz.js",
+        "resourceType": "Script",
+        "transferSize": 1116,
+        "resourceSize": 1173
+      },
+      {
+        "path": "/_next/static/chunks/0khuhzy17wm1z.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1236,
+        "resourceSize": 2292
+      },
+      {
+        "path": "/_next/static/chunks/0le5889e88ed7.js",
+        "resourceType": "Script",
+        "transferSize": 3410,
+        "resourceSize": 7272
+      }
+    ]
+  },
+  {
+    "label": "before",
+    "run": 3,
+    "lighthouseVersion": "12.8.2",
+    "buildId": "500731a303a3ef01ab6a00682e63b25f320ade7db739c4a96ba32eeb4a0f4163",
+    "score": 73,
+    "fcpMs": 1521.052,
+    "lcpMs": 5646.052,
+    "tbtMs": 271.99999999999955,
+    "cls": 0,
+    "cssTransferBytes": 45447,
+    "jsTransferBytes": 235469,
+    "requests": [
+      {
+        "path": "/_next/static/chunks/0dbgi41elp0fj.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 755,
+        "resourceSize": 422
+      },
+      {
+        "path": "/_next/static/chunks/041zd7f_l16iv.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 40593,
+        "resourceSize": 236165
+      },
+      {
+        "path": "/_next/static/chunks/0kevq0i3bcuz8.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1630,
+        "resourceSize": 3433
+      },
+      {
+        "path": "/_next/static/chunks/2n1kqo9c2io8l.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1233,
+        "resourceSize": 900
+      },
+      {
+        "path": "/_next/static/chunks/0hy5urf737ouz.js",
+        "resourceType": "Script",
+        "transferSize": 7859,
+        "resourceSize": 24285
+      },
+      {
+        "path": "/_next/static/chunks/1tcyj5wq8orwq.js",
+        "resourceType": "Script",
+        "transferSize": 48774,
+        "resourceSize": 178256
+      },
+      {
+        "path": "/_next/static/chunks/216iyidhmrh3u.js",
+        "resourceType": "Script",
+        "transferSize": 72345,
+        "resourceSize": 229597
+      },
+      {
+        "path": "/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+        "resourceType": "Script",
+        "transferSize": 4787,
+        "resourceSize": 11255
+      },
+      {
+        "path": "/_next/static/chunks/1wgr67zuwtvm5.js",
+        "resourceType": "Script",
+        "transferSize": 13526,
+        "resourceSize": 42126
+      },
+      {
+        "path": "/_next/static/chunks/3ocbtkfp9ate1.js",
+        "resourceType": "Script",
+        "transferSize": 28017,
+        "resourceSize": 107221
+      },
+      {
+        "path": "/_next/static/chunks/3puiadiqwlrfp.js",
+        "resourceType": "Script",
+        "transferSize": 1591,
+        "resourceSize": 2480
+      },
+      {
+        "path": "/_next/static/chunks/2-qew10ov0_ny.js",
+        "resourceType": "Script",
+        "transferSize": 12300,
+        "resourceSize": 31389
+      },
+      {
+        "path": "/_next/static/chunks/2d8ov2vcx-cs8.js",
+        "resourceType": "Script",
+        "transferSize": 10163,
+        "resourceSize": 32634
+      },
+      {
+        "path": "/_next/static/chunks/0d_frnxr91f13.js",
+        "resourceType": "Script",
+        "transferSize": 21086,
+        "resourceSize": 94222
+      },
+      {
+        "path": "/_next/static/chunks/11848ne52x2eq.js",
+        "resourceType": "Script",
+        "transferSize": 10495,
+        "resourceSize": 27757
+      },
+      {
+        "path": "/_next/static/chunks/2b_33gl98v7pz.js",
+        "resourceType": "Script",
+        "transferSize": 1116,
+        "resourceSize": 1173
+      },
+      {
+        "path": "/_next/static/chunks/0khuhzy17wm1z.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1236,
+        "resourceSize": 2292
+      },
+      {
+        "path": "/_next/static/chunks/0le5889e88ed7.js",
+        "resourceType": "Script",
+        "transferSize": 3410,
+        "resourceSize": 7272
+      }
+    ]
+  },
+  {
+    "label": "before",
+    "run": 4,
+    "lighthouseVersion": "12.8.2",
+    "buildId": "500731a303a3ef01ab6a00682e63b25f320ade7db739c4a96ba32eeb4a0f4163",
+    "score": 69,
+    "fcpMs": 1927.01,
+    "lcpMs": 11339.807999999999,
+    "tbtMs": 229,
+    "cls": 0,
+    "cssTransferBytes": 45447,
+    "jsTransferBytes": 235469,
+    "requests": [
+      {
+        "path": "/_next/static/chunks/0dbgi41elp0fj.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 755,
+        "resourceSize": 422
+      },
+      {
+        "path": "/_next/static/chunks/041zd7f_l16iv.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 40593,
+        "resourceSize": 236165
+      },
+      {
+        "path": "/_next/static/chunks/0kevq0i3bcuz8.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1630,
+        "resourceSize": 3433
+      },
+      {
+        "path": "/_next/static/chunks/2n1kqo9c2io8l.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1233,
+        "resourceSize": 900
+      },
+      {
+        "path": "/_next/static/chunks/0hy5urf737ouz.js",
+        "resourceType": "Script",
+        "transferSize": 7859,
+        "resourceSize": 24285
+      },
+      {
+        "path": "/_next/static/chunks/1tcyj5wq8orwq.js",
+        "resourceType": "Script",
+        "transferSize": 48774,
+        "resourceSize": 178256
+      },
+      {
+        "path": "/_next/static/chunks/216iyidhmrh3u.js",
+        "resourceType": "Script",
+        "transferSize": 72345,
+        "resourceSize": 229597
+      },
+      {
+        "path": "/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+        "resourceType": "Script",
+        "transferSize": 4787,
+        "resourceSize": 11255
+      },
+      {
+        "path": "/_next/static/chunks/1wgr67zuwtvm5.js",
+        "resourceType": "Script",
+        "transferSize": 13526,
+        "resourceSize": 42126
+      },
+      {
+        "path": "/_next/static/chunks/3ocbtkfp9ate1.js",
+        "resourceType": "Script",
+        "transferSize": 28017,
+        "resourceSize": 107221
+      },
+      {
+        "path": "/_next/static/chunks/3puiadiqwlrfp.js",
+        "resourceType": "Script",
+        "transferSize": 1591,
+        "resourceSize": 2480
+      },
+      {
+        "path": "/_next/static/chunks/2-qew10ov0_ny.js",
+        "resourceType": "Script",
+        "transferSize": 12300,
+        "resourceSize": 31389
+      },
+      {
+        "path": "/_next/static/chunks/2d8ov2vcx-cs8.js",
+        "resourceType": "Script",
+        "transferSize": 10163,
+        "resourceSize": 32634
+      },
+      {
+        "path": "/_next/static/chunks/0d_frnxr91f13.js",
+        "resourceType": "Script",
+        "transferSize": 21086,
+        "resourceSize": 94222
+      },
+      {
+        "path": "/_next/static/chunks/11848ne52x2eq.js",
+        "resourceType": "Script",
+        "transferSize": 10495,
+        "resourceSize": 27757
+      },
+      {
+        "path": "/_next/static/chunks/2b_33gl98v7pz.js",
+        "resourceType": "Script",
+        "transferSize": 1116,
+        "resourceSize": 1173
+      },
+      {
+        "path": "/_next/static/chunks/0khuhzy17wm1z.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1236,
+        "resourceSize": 2292
+      },
+      {
+        "path": "/_next/static/chunks/0le5889e88ed7.js",
+        "resourceType": "Script",
+        "transferSize": 3410,
+        "resourceSize": 7272
+      }
+    ]
+  },
+  {
+    "label": "before",
+    "run": 5,
+    "lighthouseVersion": "12.8.2",
+    "buildId": "500731a303a3ef01ab6a00682e63b25f320ade7db739c4a96ba32eeb4a0f4163",
+    "score": 67,
+    "fcpMs": 1515.075,
+    "lcpMs": 10815.075,
+    "tbtMs": 321,
+    "cls": 0,
+    "cssTransferBytes": 45447,
+    "jsTransferBytes": 235469,
+    "requests": [
+      {
+        "path": "/_next/static/chunks/0dbgi41elp0fj.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 755,
+        "resourceSize": 422
+      },
+      {
+        "path": "/_next/static/chunks/041zd7f_l16iv.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 40593,
+        "resourceSize": 236165
+      },
+      {
+        "path": "/_next/static/chunks/0kevq0i3bcuz8.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1630,
+        "resourceSize": 3433
+      },
+      {
+        "path": "/_next/static/chunks/2n1kqo9c2io8l.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1233,
+        "resourceSize": 900
+      },
+      {
+        "path": "/_next/static/chunks/0hy5urf737ouz.js",
+        "resourceType": "Script",
+        "transferSize": 7859,
+        "resourceSize": 24285
+      },
+      {
+        "path": "/_next/static/chunks/1tcyj5wq8orwq.js",
+        "resourceType": "Script",
+        "transferSize": 48774,
+        "resourceSize": 178256
+      },
+      {
+        "path": "/_next/static/chunks/216iyidhmrh3u.js",
+        "resourceType": "Script",
+        "transferSize": 72345,
+        "resourceSize": 229597
+      },
+      {
+        "path": "/_next/static/chunks/turbopack-2c3mg3r-05n1w.js",
+        "resourceType": "Script",
+        "transferSize": 4787,
+        "resourceSize": 11255
+      },
+      {
+        "path": "/_next/static/chunks/1wgr67zuwtvm5.js",
+        "resourceType": "Script",
+        "transferSize": 13526,
+        "resourceSize": 42126
+      },
+      {
+        "path": "/_next/static/chunks/3ocbtkfp9ate1.js",
+        "resourceType": "Script",
+        "transferSize": 28017,
+        "resourceSize": 107221
+      },
+      {
+        "path": "/_next/static/chunks/3puiadiqwlrfp.js",
+        "resourceType": "Script",
+        "transferSize": 1591,
+        "resourceSize": 2480
+      },
+      {
+        "path": "/_next/static/chunks/2-qew10ov0_ny.js",
+        "resourceType": "Script",
+        "transferSize": 12300,
+        "resourceSize": 31389
+      },
+      {
+        "path": "/_next/static/chunks/2d8ov2vcx-cs8.js",
+        "resourceType": "Script",
+        "transferSize": 10163,
+        "resourceSize": 32634
+      },
+      {
+        "path": "/_next/static/chunks/0d_frnxr91f13.js",
+        "resourceType": "Script",
+        "transferSize": 21086,
+        "resourceSize": 94222
+      },
+      {
+        "path": "/_next/static/chunks/11848ne52x2eq.js",
+        "resourceType": "Script",
+        "transferSize": 10495,
+        "resourceSize": 27757
+      },
+      {
+        "path": "/_next/static/chunks/2b_33gl98v7pz.js",
+        "resourceType": "Script",
+        "transferSize": 1116,
+        "resourceSize": 1173
+      },
+      {
+        "path": "/_next/static/chunks/0khuhzy17wm1z.css",
+        "resourceType": "Stylesheet",
+        "transferSize": 1236,
+        "resourceSize": 2292
+      },
+      {
+        "path": "/_next/static/chunks/0le5889e88ed7.js",
+        "resourceType": "Script",
+        "transferSize": 3410,
+        "resourceSize": 7272
+      }
+    ]
+  }
+]

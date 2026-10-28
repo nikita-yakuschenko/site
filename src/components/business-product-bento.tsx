@@ -1,4 +1,5 @@
 'use client'
+import './company-bento.css'
 import { CMSContentBlock } from './cms-content'
 import type { ReactNode } from "react";
 import Image from "next/image";

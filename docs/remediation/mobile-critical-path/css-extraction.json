@@ -1,0 +1,46 @@
+{
+  "beforeBytes": 483144,
+  "declarationsPreserved": true,
+  "groups": {
+    "global": {
+      "file": "src/app/styles.css",
+      "bytes": 359200,
+      "rules": 1564
+    },
+    "manufacture": {
+      "file": "src/app/manufacture/manufacture.css",
+      "bytes": 19077,
+      "rules": 175
+    },
+    "about": {
+      "file": "src/app/about/about.css",
+      "bytes": 4285,
+      "rules": 43
+    },
+    "company": {
+      "file": "src/components/company-bento.css",
+      "bytes": 14980,
+      "rules": 140
+    },
+    "catalog": {
+      "file": "src/app/catalog/catalog.css",
+      "bytes": 49497,
+      "rules": 389
+    },
+    "rules": {
+      "file": "src/components/referral-rules.css",
+      "bytes": 6428,
+      "rules": 53
+    },
+    "calculator": {
+      "file": "src/components/mortgage-calculator.css",
+      "bytes": 23337,
+      "rules": 136
+    },
+    "preview": {
+      "file": "src/components/preview/project-preview.css",
+      "bytes": 7424,
+      "rules": 63
+    }
+  }
+}

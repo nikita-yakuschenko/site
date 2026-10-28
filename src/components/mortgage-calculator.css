@@ -1,0 +1,914 @@
+
+.mortgage-calc {
+  padding: 40px 0;
+
+  /* Шкала скруглений блока.
+     Радиус убывает вглубь: панель — карточки внутри неё — плитки и мелкие
+     поверхности. Разница между ступенями заметная, иначе вложенность не
+     читается: панель 18 и карточка 16 отличались на два пикселя и выглядели
+     одним уровнем.
+
+     Второе правило — соразмерность. Радиус держится около десятой доли
+     меньшей стороны: каталожная карточка с её 16px рассчитана на высоту
+     381px, а на компактной в 102px те же 16px давали 15.7% и делали её
+     вдвое круглее соседей. */
+  --calc-radius-panel: 18px;
+  --calc-radius-card: 12px;
+  --calc-radius-tile: 10px;
+}
+.mortgage-calc__head {
+  margin: 0 0 16px;
+}
+
+.mortgage-calc__head h2 {
+  margin: 0;
+  max-width: 34ch;
+  font-size: clamp(22px, 1.5vw, 28px);
+  line-height: 1.15;
+}
+
+@media (max-width: 599px) {
+  .mortgage-calc--project .mortgage-calc__head h2 {
+    margin-top: 6px;
+  }
+}
+
+.mortgage-calc__lead {
+  margin: 6px 0 0;
+  max-width: 64ch;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ink-2);
+}
+.mortgage-calc__panel {
+  display: grid;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid var(--tint);
+  border-radius: var(--calc-radius-panel);
+  background: #fff;
+  box-shadow: 0 1px 2px var(--tint);
+}
+
+@media (min-width: 960px) {
+  .mortgage-calc__panel {
+    grid-template-columns: minmax(0, 1fr) 380px;
+    align-items: start;
+    column-gap: 16px;
+    row-gap: 18px;
+  }
+
+  .mortgage-calc__controls {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-rows: auto auto auto auto;
+    align-content: start;
+    column-gap: 16px;
+  }
+
+  .mortgage-calc__modes,
+  .mortgage-calc__programs,
+  .mortgage-calc__tile:last-child {
+    grid-column: 1 / -1;
+  }
+  .mortgage-calc__matches {
+    grid-column: 1 / -1;
+  }
+}
+.mortgage-calc--project .mortgage-calc__panel {
+  padding-right: 16px;
+}
+
+@media (min-width: 960px) {
+  .mortgage-calc--project .mortgage-calc__panel {
+    grid-template-columns: minmax(0, 1fr) 340px;
+    column-gap: 32px;
+  }
+}
+.mortgage-calc__modes {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: stretch;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  height: 28px;
+  margin: 0;
+  padding: 2px;
+  gap: 2px;
+  border-radius: 8px;
+  background: var(--tint);
+}
+
+.mortgage-calc__mode {
+  appearance: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: auto;
+  height: 100%;
+  min-height: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 6px;
+  padding: 0 10px;
+  background: transparent;
+  color: var(--ink-2);
+  font: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  text-align: center;
+  cursor: pointer;
+}
+.mortgage-calc__tier-picker {
+  display: inline-grid;
+  grid-template-columns: auto auto;
+  align-items: stretch;
+  box-sizing: border-box;
+  width: fit-content;
+  max-width: 100%;
+  height: 28px;
+  margin: 0;
+  padding: 0;
+  gap: 2px;
+}
+
+.mortgage-calc__tier-picker .mortgage-calc__modes--tiers {
+  display: grid;
+  grid-column: auto;
+  grid-template-columns: repeat(var(--mortgage-tier-count, 2), auto);
+  width: fit-content;
+  padding: 2px;
+}
+
+.mortgage-calc__tier-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 0 6px 0 8px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-2);
+  white-space: nowrap;
+}
+
+.mortgage-calc__mode.is-active {
+  background: #fff;
+  color: var(--avgst-ink);
+  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
+}
+
+.mortgage-calc__controls {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  align-content: start;
+}
+
+.mortgage-calc__programs {
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.mortgage-calc__program-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.mortgage-calc__program {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
+  min-height: 0;
+  padding: 6px 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: #fff;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.mortgage-calc__program span {
+  font-size: 12px;
+  line-height: 1.25;
+}
+
+.mortgage-calc__program strong {
+  font-size: 13px;
+  letter-spacing: -0.02em;
+  color: var(--avgst-green);
+}
+
+.mortgage-calc__program.is-active {
+  border-color: var(--avgst-ink);
+}
+
+.mortgage-calc__tile {
+  display: grid;
+  gap: 4px;
+  min-height: 0;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.mortgage-calc__tile-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  min-width: 0;
+}
+.mortgage-calc__tile-label {
+  flex: 0 1 auto;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.25;
+  color: var(--ink-1);
+}
+
+@media (max-width: 599px) {
+  .mortgage-calc--project .mortgage-calc__panel {
+    padding: 12px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tier-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    width: 100%;
+    height: auto;
+    padding: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tier-picker .mortgage-calc__modes--tiers {
+    display: grid;
+    grid-template-columns: repeat(var(--mortgage-tier-count, 2), minmax(0, 1fr));
+    width: 100%;
+    min-width: 0;
+    height: 28px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__modes--tiers .mortgage-calc__mode {
+    min-width: 0;
+    padding-inline: 5px;
+    font-size: 12px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tier-label {
+    min-height: 0;
+    min-width: 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    padding-inline: 10px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-head {
+    gap: 8px;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-label {
+    flex-shrink: 0;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-value {
+    flex: 1 1 auto;
+    overflow: hidden;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-value input {
+    width: 100%;
+    max-width: none;
+  }
+
+  .mortgage-calc--project .mortgage-calc__tile-suffix.is-currency {
+    display: none;
+  }
+}
+
+.mortgage-calc__tile-value {
+  display: flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 6px;
+  min-width: 0;
+}
+
+.mortgage-calc__tile-value input {
+  flex: 0 1 auto;
+  min-width: 0;
+  max-width: 12ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  font: inherit;
+  font-size: 16px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.mortgage-calc__tile-value input:focus {
+  outline: none;
+}
+
+.mortgage-calc__tile-value input:focus-visible {
+  outline: 1px solid var(--ink-4);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+.mortgage-calc__tile-value span,
+.mortgage-calc__tile-pct {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ink-3);
+  font-variant-numeric: tabular-nums;
+}
+
+.mortgage-calc__tile-pct {
+  min-width: 4.5ch;
+  text-align: right;
+}
+
+.mortgage-calc__pills {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-top: 2px;
+  min-height: 28px;
+}
+
+.mortgage-calc__pill {
+  appearance: none;
+  border: 0;
+  border-radius: 999px;
+  min-height: 28px;
+  padding: 5px 12px;
+  background: var(--tint);
+  color: var(--ink-1);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+}
+
+.mortgage-calc__pill.is-active {
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+.mortgage-calc__result {
+  /* Не липкая. Пока панель была короткой, ездить карточке было некуда;
+     с проектами внутри панель выросла, и карточка поехала вниз прямо по
+     ним. Держать её в кадре незачем: сумма видна там же, где её считают. */
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  min-width: 0;
+  padding: 12px 14px;
+  border-radius: var(--calc-radius-card);
+  background: #fff;
+  color: var(--avgst-ink);
+  /* Тень мягче: карточка лежит внутри панели, а не парит над страницей.
+     Прежние 32px размытия на 10% отрывали её от собственного контейнера. */
+  box-shadow: 0 4px 16px var(--tint);
+}
+
+.mortgage-calc__hero-num {
+  margin: 0;
+  min-height: 1.15em;
+  font-size: clamp(22px, 2.4vw, 28px);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  line-height: 1.15;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+  color: var(--avgst-green);
+}
+
+.mortgage-calc__hero-label {
+  margin: 0;
+  min-height: 2.6em;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+
+.mortgage-calc__result-metrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  min-height: 48px;
+  padding: 8px 0;
+  border-top: 1px solid var(--tint);
+  border-bottom: 1px solid var(--tint);
+}
+
+.mortgage-calc__result-metrics strong {
+  display: block;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.mortgage-calc__result-metrics span {
+  display: block;
+  margin-top: 1px;
+  font-size: 11px;
+  color: var(--ink-3);
+}
+.mortgage-calc__parts-slot {
+  display: grid;
+  align-content: center;
+  height: 56px;
+}
+
+.mortgage-calc__parts {
+  display: grid;
+  gap: 4px;
+  box-sizing: border-box;
+  height: 100%;
+  padding: 8px 10px;
+  border-radius: 8px;
+  background: var(--tint);
+  align-content: center;
+}
+
+.mortgage-calc__parts p {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px 12px;
+  align-items: baseline;
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.mortgage-calc__parts span {
+  min-width: 0;
+  color: var(--ink-2);
+}
+.mortgage-calc__part-rate {
+  margin-left: 6px;
+  font-style: normal;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  color: var(--ink-0);
+}
+
+.mortgage-calc__parts strong {
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+.mortgage-calc__reveal {
+  display: grid;
+  min-width: 0;
+  height: 100%;
+}
+
+.mortgage-calc__reveal-copy,
+.mortgage-calc__reveal-slot {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+.mortgage-calc__reveal-copy {
+  display: grid;
+  /* Базовый блок рассчитан на баннер: там содержимое стоит по своей
+     ширине (justify-items: start) и по центру клетки. В панели расчёта
+     строки должны тянуться во всю ширину, иначе цифры прижимаются
+     влево, а справа остаётся пустое поле. */
+  justify-items: stretch;
+  /* Не start: содержимое на несколько пикселей короче клетки, и кнопка
+     расчёта не доставала до низа — форма, прижатая к низу, садилась
+     мимо неё. space-between дотягивает кнопку до края, разница уходит
+     в просветы между строками расчёта. */
+  align-content: space-between;
+  /* Свой просвет, а не inherit: раньше он наследовался от обёртки, где
+     gap не задан вовсе, и строки расчёта слипались с кнопкой. */
+  gap: 12px;
+  transition: opacity 0.3s var(--ease-out);
+}
+
+.mortgage-calc__reveal.is-open .mortgage-calc__reveal-copy {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.mortgage-calc__reveal-slot {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  /* Форма тянется во всю клетку: её кнопка встаёт ровно туда, где
+     стояла кнопка расчёта. Иначе при раскрытии кнопка уезжает, и
+     подмена читается как прыжок. */
+  align-content: stretch;
+  pointer-events: none;
+}
+.mortgage-calc__reveal-card .lead-reveal__close {
+  color: var(--ink-3);
+}
+
+.mortgage-calc__reveal-card .lead-reveal__close:hover {
+  color: var(--avgst-ink);
+}
+.mortgage-calc__reveal-card {
+  --lead-ink: var(--avgst-ink-rgb);
+  color: var(--avgst-ink);
+  position: relative;
+  width: 100%;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition:
+    opacity 0.3s var(--ease-out),
+    visibility 0.3s var(--ease-out);
+}
+
+.mortgage-calc__reveal.is-open .mortgage-calc__reveal-card {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+.mortgage-calc__reveal-card .lead-card,
+.mortgage-calc__reveal-card .lead-form {
+  height: 100%;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.mortgage-calc__reveal-card {
+  max-width: none;
+  /* Подъём первой подписи на свою высоту — приём баннера: там она
+     встаёт в строку заголовка, который остаётся видимым. Здесь над
+     формой ничего нет, и подпись с крестиком вылезали за верх панели. */
+  --lead-caption: 0px;
+}
+.mortgage-calc__reveal-card .lead-card button[type="submit"],
+.mortgage-calc__reveal-card .lead-form button[type="submit"] {
+  align-self: stretch;
+  width: 100%;
+}
+
+.mortgage-calc__result-cta {
+  justify-self: stretch;
+  text-align: center;
+  margin-top: 2px;
+}
+
+.mortgage-calc__result-note {
+  box-sizing: border-box;
+  min-height: 36px;
+  margin: 0;
+  padding: 8px 10px;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--ink-2);
+  text-align: center;
+}
+.mortgage-calc__result--project {
+  grid-template-rows: auto auto 1fr;
+  min-height: 280px;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+@media (max-width: 959px) {
+  .mortgage-calc--project .mortgage-calc__result--project {
+    grid-template-rows: auto;
+    min-height: 0;
+  }
+
+}
+
+.mortgage-calc__project-payment {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--avgst-ink);
+  background: transparent;
+}
+
+.mortgage-calc__project-payment .mortgage-calc__hero-num {
+  font-size: clamp(24px, 2.4vw, 30px);
+  color: var(--avgst-green);
+}
+
+.mortgage-calc__project-payment .mortgage-calc__hero-label {
+  min-height: 0;
+  margin-top: 2px;
+  color: var(--ink-2);
+}
+
+.mortgage-calc__receipt {
+  display: grid;
+  align-content: start;
+  gap: 12px;
+  width: 100%;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 16px 0 0 2px;
+}
+.mortgage-calc__receipt > div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: 100%;
+  min-width: 0;
+}
+
+.mortgage-calc__receipt dt {
+  flex: 0 1 auto;
+  min-width: 0;
+  font-size: 12px;
+  color: var(--ink-2);
+}
+
+.mortgage-calc__receipt > div > span {
+  flex: 1 0 12px;
+  align-self: center;
+  border-bottom: 1px dotted var(--line-2);
+}
+
+.mortgage-calc__receipt dd {
+  flex: 0 0 auto;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.2;
+  white-space: nowrap;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+.mortgage-calc__matches {
+  display: grid;
+  gap: 12px;
+  padding-top: 16px;
+  border-top: 1px solid var(--tint);
+}
+
+.mortgage-calc__matches-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.mortgage-calc__matches-head h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--ink-1);
+}
+.mortgage-calc__matches-head strong {
+  color: var(--avgst-ink);
+  font-variant-numeric: tabular-nums;
+}
+.mortgage-calc__matches-all {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--avgst-ink);
+  text-decoration: none;
+}
+
+.mortgage-calc__matches-all svg {
+  transition: transform 0.16s var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .mortgage-calc__matches-all:hover svg {
+    transform: translate(2px, -2px);
+  }
+}
+
+.mortgage-calc__matches-all:active {
+  transform: scale(0.97);
+}
+.mortgage-calc__matches-grid {
+  display: grid;
+  gap: var(--gap-tile);
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+@media (min-width: 960px) {
+  .mortgage-calc__matches-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+.mortgage-calc__matches-grid > * {
+  display: flex;
+}
+
+.mortgage-calc__matches-grid > * > .card {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.mortgage-calc__matches-empty {
+  margin: 0;
+  font-size: 14px;
+  color: var(--ink-2);
+}
+.mortgage-calc__disclaimer {
+  margin: 0;
+  font-size: 11px;
+  /* Без балансировки строк: она подрезает их по длине и оставляет справа
+     пустое поле, хотя ширина карточки позволяет набрать строку до края. */
+  line-height: 1.45;
+  color: var(--ink-2);
+}
+.mortgage-calc__matches .card {
+  display: flex;
+  align-items: stretch;
+  border-radius: var(--calc-radius-tile);
+}
+
+.mortgage-calc__matches .card__title-link::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  cursor: pointer;
+  border-radius: inherit;
+}
+
+.mortgage-calc__matches .card__title-link:focus-visible::after {
+  outline: 2px solid var(--avgst-green);
+  outline-offset: -2px;
+}
+
+.mortgage-calc__matches .card__top {
+  flex: 0 0 clamp(132px, 42%, 168px);
+  /* Колонка кадра тянется по высоте карточки и режет всё, что выйдет за
+     её пределы. Без этого высокая картинка вылезала бы из-под скруглённого
+     нижнего угла: карточка обрезает содержимое по себе, а вложенная
+     колонка — нет. */
+  align-self: stretch;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.mortgage-calc__matches .card__media {
+  height: 100%;
+  aspect-ratio: auto;
+}
+
+.mortgage-calc__matches .card__media img {
+  height: 100%;
+  object-fit: cover;
+}
+
+.mortgage-calc__matches .card__body {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  padding: 10px 12px;
+  gap: 2px;
+}
+
+.mortgage-calc__matches .card h3 {
+  font-size: 0.9375rem;
+  line-height: 1.25;
+}
+
+.mortgage-calc__matches .specs {
+  margin: 4px 0 0;
+  gap: 2px 10px;
+  font-size: 12px;
+}
+
+.mortgage-calc__matches .price {
+  margin: 4px 0 0;
+  font-size: 0.875rem;
+}
+.mortgage-calc__matches .card__cta {
+  display: none;
+}
+.mortgage-calc__matches .badge,
+.mortgage-calc__matches .card__actions {
+  display: none;
+}
+.mortgage-calc__result-metrics .mortgage-calc__rate-edit {
+  display: flex;
+  align-items: baseline;
+  gap: 5px;
+  width: fit-content;
+}
+.mortgage-calc__result-metrics .mortgage-calc__rate-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 0;
+  font-size: 14px;
+  letter-spacing: -0.02em;
+  color: var(--avgst-ink);
+  /* Поля и грань гасятся отрицательными полями ровно на свою величину:
+     плашка не прибавляет строке высоты, и подпись «ставка» остаётся на
+     одной линии с «сумма кредита». */
+  padding: 1px 6px;
+  margin: -2px -6px;
+  border: 1px solid var(--line);
+  border-radius: 7px;
+  background: var(--tint);
+  transition:
+    border-color 0.2s var(--ease-out),
+    background-color 0.2s var(--ease-out);
+}
+
+.mortgage-calc__result-metrics .mortgage-calc__rate-chip:hover {
+  border-color: var(--ink-4);
+  background: var(--tint);
+}
+.mortgage-calc__result-metrics .mortgage-calc__rate-chip:focus-within {
+  border-color: var(--ink-4);
+  background: #fff;
+}
+
+.mortgage-calc__rate-pen {
+  flex: 0 0 auto;
+  color: var(--ink-3);
+}
+
+.mortgage-calc__rate-edit input {
+  /* Пять знаков: «15,99» — ставка с сотыми встречается не реже целой.
+     Это запас для браузеров, которые не умеют мерить поле по содержимому;
+     там, где умеют, ширина всё равно идёт по набору. */
+  width: 5ch;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+  text-align: left;
+}
+@supports (field-sizing: content) {
+  .mortgage-calc__rate-edit input {
+    width: auto;
+    field-sizing: content;
+    min-width: 2ch;
+    max-width: 5ch;
+  }
+}
+.mortgage-calc__rate-edit input:focus,
+.mortgage-calc__rate-edit input:focus-visible {
+  outline: none;
+}
+.mortgage-calc__reveal.mortgage-request { display: flex; flex-direction: column; height: auto; min-width: 0; }
+.mortgage-calc__result:has(.mortgage-request) {
+  display: block;
+  transition: background .42s var(--ease-out), color .42s var(--ease-out);
+}
+.mortgage-calc__result--project:has(.mortgage-request) { min-height: 0; padding: 16px; border-radius: 16px; }
+.mortgage-calc__result:has(.mortgage-request.is-open) { background: var(--avgst-ink); color: #fff; }
+.mortgage-request .mortgage-calc__quote-summary { padding: 10px 32px 0 6px; }
+@media (prefers-reduced-motion: reduce) {
+  .mortgage-calc__result:has(.mortgage-request) { transition: none; }
+}
+.mortgage-calc__quote-summary { display: grid; gap: 4px; }
+.mortgage-calc__quote-name { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.03em; line-height: 1.15; }
+.mortgage-calc__quote-rate { margin: 0; font-size: 13px; line-height: 1.3; color: var(--on-dark-3); }
+.mortgage-calc__quote-pay { margin: 6px 0 0; font-size: 16px; font-weight: 600; line-height: 1.25; color: var(--avgst-green); }

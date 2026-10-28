@@ -1018,694 +1018,7 @@ a {
 
 /* Кадр и фирменный знак масштабируются вместе, чтобы знак оставался на
    верхней панели станка при обрезке фонового снимка на узком экране. */
-.manufacture-hero__scene {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: max(100%, 177.9svh);
-  aspect-ratio: 1672 / 940;
-  transform: translate(-50%, -50%);
-  pointer-events: none;
-}
-
-.manufacture-hero__scene .hero__frame {
-  object-fit: fill;
-}
-
-.manufacture-hero__mark {
-  position: absolute;
-  z-index: 1;
-  top: 27%;
-  left: 69%;
-  width: 15%;
-  height: auto;
-}
-
-.section.manufacture-intro { padding-block: var(--gap-section); }
-.manufacture-intro__banner {
-  position: relative;
-  display: flex;
-  min-height: 420px;
-  overflow: hidden;
-  border-radius: var(--surface-radius);
-  background: var(--avgst-ink);
-  color: #fff;
-}
-.manufacture-intro__banner > img { object-fit: cover; object-position: center; }
-.manufacture-intro__banner::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, var(--avgst-ink) 0%, var(--ink-0) 29%, var(--ink-3) 60%, transparent 100%);
-}
-.manufacture-intro__copy {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  max-width: 680px;
-  padding: var(--gap-split);
-}
-.manufacture-intro__copy h1 {
-  max-width: 19ch;
-  margin: 0;
-  color: #fff;
-  font-size: clamp(2rem, 3.2vw, 2.8rem);
-  line-height: 1.1;
-  text-wrap: balance;
-}
-.manufacture-intro__copy h1 span { display: block; }
-.manufacture-intro__copy p {
-  max-width: 52ch;
-  margin: var(--gap-stack) 0;
-  color: var(--on-dark-1);
-  line-height: 1.6;
-}
-.manufacture-intro__copy .btn { gap: 8px; margin-top: auto; }
-
-.section.manufacture-docs { background: #fff; }
-.manufacture-docs__lead {
-  max-width: 46rem;
-  margin: var(--gap-tile) 0 0;
-  color: var(--ink-1);
-  font-size: 17px;
-  line-height: 1.55;
-}
-.manufacture-docs .manufacture-docs__cards li { min-height: 160px; }
-.manufacture-docs .manufacture-docs__cards strong {
-  font-size: 22px;
-  line-height: 1.15;
-  letter-spacing: -0.04em;
-}
-.manufacture-docs__card-image {
-  position: absolute;
-  top: 12px;
-  right: -22%;
-  width: 94%;
-  height: calc(100% + 24px);
-  object-fit: contain;
-  object-position: center top;
-  pointer-events: none;
-  transition: transform 0.25s var(--ease-out);
-}
-.manufacture-docs__card-image--house {
-  top: 38px;
-  right: -19%;
-  width: 82%;
-}
-.manufacture-docs__cards li:nth-child(2) .manufacture-docs__card-image--house {
-  top: 43px;
-}
-.manufacture-docs__card-image--engineering {
-  top: 44px;
-  right: -12%;
-  width: 76%;
-}
-.manufacture-docs__card-image--estimate {
-  top: 40px;
-  right: -4%;
-  width: 56%;
-}
-@media (hover: hover) and (pointer: fine) {
-  .manufacture-docs__cards li:hover .manufacture-docs__card-image {
-    transform: translateY(-5px);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .manufacture-docs__card-image { transition: none; }
-}
-.manufacture-docs__questions { margin-top: var(--gap-section); }
-
-.section.manufacture-machines { background: var(--page); }
-.manufacture-machines .manufacture-prep__cards li { min-height: 160px; }
-.manufacture-machines .manufacture-prep__cards strong {
-  font-size: 22px;
-  line-height: 1.15;
-  letter-spacing: -0.04em;
-}
-.manufacture-machines .manufacture-prep__cards .manufacture-prep__caption {
-  position: absolute;
-  top: 84px;
-  left: var(--page-gutter);
-  margin: 0;
-}
-.manufacture-prep__caption span { display: block; white-space: nowrap; }
-.manufacture-prep__card-image {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: auto;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-  transition: transform 0.25s var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .manufacture-prep__cards li:hover .manufacture-prep__card-image {
-    transform: translateY(-5px);
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .manufacture-prep__card-image { transition: none; }
-  .manufacture-prep__cards li:hover .manufacture-prep__card-image { transform: none; }
-}
-.manufacture-prep__questions { margin-top: var(--gap-section); }
-@media (min-width: 900px) {
-  .manufacture-machines .manufacture-prep__cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-.manufacture-video-review__avatar {
-  display: grid;
-  place-items: center;
-  width: 80px;
-  height: 80px;
-  flex: 0 0 auto;
-  border-radius: 50%;
-  color: var(--ink-3);
-  background: var(--page);
-}
-.manufacture-video-review .independent-review__item { grid-template-columns: auto minmax(0, 1fr); }
-.manufacture-video-review__pending > span {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-items: center;
-  padding: 24px;
-  color: #fff;
-  font-size: 20px;
-  font-weight: 700;
-  text-align: center;
-  background: var(--ink-2);
-}
-.manufacture-video-review__pending img { filter: grayscale(1); }
-@media (max-width: 719px) {
-  .manufacture-intro__banner { display: block; min-height: 0; padding-top: 56%; }
-  .manufacture-intro__banner > img { object-position: 62% top; }
-  .manufacture-intro__banner::after {
-    background: linear-gradient(180deg, transparent 0%, var(--ink-1) 40%, var(--avgst-ink) 64%);
-  }
-  .manufacture-intro__copy { padding: var(--gap-stack) var(--page-gutter); }
-  .manufacture-intro__copy h1 { font-size: clamp(1.8rem, 7vw, 2.3rem); }
-  .manufacture-intro__copy .btn { margin-top: 0; }
-}
-
-.section.manufacture-documentation {
-  padding-block: var(--gap-section);
-  background: var(--page);
-}
-
-.manufacture-documentation__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  grid-template-rows: min-content 1fr;
-  grid-template-areas: "heading visual" "copy visual";
-  column-gap: clamp(48px, 6vw, 88px);
-  row-gap: var(--gap-stack);
-  align-items: start;
-}
-
-.section.manufacture-documentation h2 {
-  grid-area: heading;
-  max-width: 18ch;
-  margin: 0;
-  text-wrap: balance;
-}
-
-.manufacture-documentation__copy {
-  grid-area: copy;
-  min-width: 0;
-}
-
-.manufacture-documentation__copy p {
-  max-width: 36rem;
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.6;
-  color: var(--ink-2);
-}
-
-.manufacture-documentation__copy p + p {
-  margin-top: var(--gap-tile);
-}
-
-.manufacture-documentation__visual {
-  grid-area: visual;
-  overflow: hidden;
-  margin: 0;
-  aspect-ratio: 1.18;
-  border-radius: var(--surface-radius);
-  background: var(--surface-sunken);
-}
-
-.manufacture-documentation__visual img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.section.manufacture-beam {
-  padding-block: clamp(72px, 8vw, 112px);
-  background: #fff;
-}
-
-.manufacture-beam__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.8fr);
-  grid-template-rows: min-content 1fr;
-  grid-template-areas: "visual heading" "visual copy";
-  column-gap: clamp(48px, 6vw, 88px);
-  row-gap: var(--gap-stack);
-  align-items: start;
-}
-
-.section.manufacture-beam h2 {
-  grid-area: heading;
-  margin: 0;
-  text-wrap: balance;
-}
-
-.manufacture-beam__copy {
-  grid-area: copy;
-  min-width: 0;
-}
-
-.manufacture-beam__copy p {
-  max-width: 36rem;
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.6;
-  color: var(--ink-2);
-}
-
-.manufacture-beam__copy p + p {
-  margin-top: var(--gap-tile);
-}
-
-.manufacture-beam__visual {
-  grid-area: visual;
-  overflow: hidden;
-  margin: 0;
-  aspect-ratio: 4 / 3;
-  border-radius: var(--surface-radius);
-  background: var(--surface-sunken);
-}
-
-.manufacture-beam__visual img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.section.manufacture-cutting {
-  padding-block: clamp(72px, 8vw, 112px);
-  background: var(--page);
-}
-
-.manufacture-cutting__inner {
-  display: grid;
-  grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-  grid-template-rows: min-content 1fr;
-  grid-template-areas: "heading visual" "copy visual";
-  column-gap: clamp(48px, 6vw, 88px);
-  row-gap: var(--gap-stack);
-  align-items: start;
-}
-
-.section.manufacture-cutting h2 {
-  grid-area: heading;
-  margin: 0;
-  text-wrap: balance;
-}
-
-.manufacture-cutting__copy {
-  grid-area: copy;
-  min-width: 0;
-}
-
-.manufacture-cutting__copy p {
-  max-width: 36rem;
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 400;
-  line-height: 1.6;
-  color: var(--ink-2);
-}
-
-.manufacture-cutting__copy p + p {
-  margin-top: var(--gap-tile);
-}
-
-.manufacture-cutting__visual {
-  grid-area: visual;
-  overflow: hidden;
-  margin: 0;
-  aspect-ratio: 1.18;
-  border-radius: var(--surface-radius);
-  background: var(--surface-sunken);
-}
-
-.manufacture-cutting__visual img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.section.manufacture-routes,
-.section.manufacture-finish {
-  padding-block: var(--gap-section);
-}
-
-.section.manufacture-finish { background: var(--page); }
-.section.manufacture-assembly { background: var(--page); }
-.section.manufacture-dispatch { padding-bottom: 0; background: #fff; }
-.section.manufacture-routes { background: var(--page); }
-
-.section.manufacture-module { min-height: 1740svh; }
-.manufacture-module__video {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  object-position: center bottom;
-  z-index: 8;
-  opacity: 0;
-  pointer-events: none;
-}
-.manufacture-module__sticky {
-  position: sticky;
-  top: 80px;
-  height: calc(100svh - 104px);
-  display: flex;
-  flex-direction: column;
-}
-.manufacture-module__sticky .manufacture-section-head { max-width: 100%; }
-.manufacture-module__intro h2 {
-  will-change: transform, opacity;
-}
-.manufacture-module__scene {
-  position: relative;
-  flex: 1;
-  min-height: 0;
-}
-.manufacture-module__scene img {
-  object-fit: contain;
-  object-position: center bottom;
-}
-.manufacture-module__wall {
-  position: absolute;
-  inset: 0;
-  opacity: 0;
-  will-change: transform, opacity;
-  pointer-events: none;
-}
-.manufacture-module__note {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  z-index: 1;
-  max-width: 860px;
-  margin-inline: auto;
-  text-align: center;
-  display: grid;
-}
-.manufacture-module__note p[data-visible="true"] { opacity: 1; transform: translateY(0); }
-.manufacture-module__note p {
-  grid-area: 1 / 1;
-  margin: 0;
-  color: var(--avgst-ink);
-  font-size: clamp(24px, 2.8vw, 40px);
-  font-weight: 600;
-  line-height: 1.2;
-  letter-spacing: -0.025em;
-  opacity: 0;
-  transform: translateY(14px);
-  transition: none;
-}
-.manufacture-module__note:has(.manufacture-module__installation-note) { max-width: 100%; }
-.manufacture-module__installation-note span { display: block; }
-.manufacture-module__desktop-lines > span { display: block; }
-.manufacture-module__note .manufacture-module__mobile-lines { display: none; }
-@media (min-width: 720px) {
-  .manufacture-module__scene img,
-  .manufacture-module__video { object-position: center; }
-}
-@media (min-width: 1000px) {
-  .manufacture-module__installation-note span { white-space: nowrap; }
-  .manufacture-module__note p.manufacture-module__installation-note { font-size: clamp(24px, 2.6vw, 40px); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .manufacture-module__note p, .manufacture-module__intro h2 { transform: none; transition: none; }
-}
-@media (max-width: 719px) {
-  .section.manufacture-module { overflow-x: clip; }
-  .manufacture-module__sticky {
-    top: 72px;
-    height: calc(100svh - 96px);
-    width: calc(100% - 24px);
-  }
-  .manufacture-module__scene {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: calc((100vw - 24px) * 1.5);
-    height: auto;
-    aspect-ratio: 16 / 9;
-    flex: none;
-    transform: translate(-50%, -50%);
-  }
-  .manufacture-module__note,
-  .manufacture-module__note:has(.manufacture-module__installation-note) {
-    left: calc((100% - 100vw + 8px) / 2);
-    right: auto;
-    width: calc(100vw - 8px);
-    max-width: none;
-  }
-  .manufacture-module__text-break { display: none; }
-  .manufacture-module__note .manufacture-module__desktop-lines { display: none; }
-  .manufacture-module__note .manufacture-module__mobile-lines { display: block; }
-  .manufacture-module__note p {
-    min-width: 0;
-    font-size: 22px;
-    letter-spacing: -0.025em;
-    word-spacing: normal;
-  }
-  .manufacture-module__mobile-lines > span { display: block; }
-}
-@media (max-width: 360px) {
-  .manufacture-module__note p { font-size: clamp(19px, 5.833vw, 21px); }
-}
-
-.manufacture-dispatch__stage {
-  position: relative;
-  height: clamp(100px, 11vw, 150px);
-  overflow-x: clip;
-  overflow-y: visible;
-}
-.manufacture-dispatch__truck {
-  position: absolute;
-  bottom: clamp(-17px, -1.15vw, -10px);
-  left: 0;
-  width: clamp(300px, 34vw, 500px);
-  will-change: transform;
-}
-.manufacture-dispatch__truck img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-@media (prefers-reduced-motion: reduce) {
-  .manufacture-dispatch__truck {
-    left: 50%;
-    transform: translateX(-50%) !important;
-    will-change: auto;
-  }
-}
-
-.manufacture-assembly .manufacture-assembly__cards li { min-height: 160px; }
-.manufacture-assembly .manufacture-assembly__cards strong {
-  font-size: 22px;
-  line-height: 1.15;
-  letter-spacing: -0.04em;
-}
-.manufacture-assembly__caption {
-  width: calc(100% - 120px);
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.4;
-  color: var(--ink-2);
-}
-.manufacture-assembly__card-image {
-  position: absolute;
-  top: 5px;
-  right: 0;
-  width: auto;
-  height: 100%;
-  object-fit: contain;
-  pointer-events: none;
-  transition: transform 0.25s var(--ease-out);
-}
-.manufacture-assembly__cards li:nth-child(3) .manufacture-assembly__card-image { right: 16px; }
-@media (hover: hover) and (pointer: fine) {
-  .manufacture-assembly__cards li:hover .manufacture-assembly__card-image { transform: translateY(-5px); }
-}
-@media (prefers-reduced-motion: reduce) {
-  .manufacture-assembly__card-image { transition: none; }
-  .manufacture-assembly__cards li:hover .manufacture-assembly__card-image { transform: none; }
-}
-@media (min-width: 900px) {
-  .manufacture-assembly .manufacture-assembly__cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
-}
-.manufacture-section-head p,
-.manufacture-route p,
-.manufacture-route li,
-.manufacture-finish__grid p {
-  color: var(--ink-2);
-  line-height: 1.6;
-}
-.manufacture-section-head { max-width: 760px; margin-bottom: var(--gap-stack); }
 .manufacture-section-head h2 { margin: 0; text-wrap: balance; }
-.manufacture-section-head p { margin: var(--gap-tile) 0 0; }
-
-.manufacture-finish__layout {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-rows: auto 1fr;
-  grid-template-areas: "heading ." "image text";
-  column-gap: var(--gap-split);
-  row-gap: var(--gap-stack);
-  align-items: start;
-}
-.manufacture-finish .manufacture-finish__layout h2 { grid-area: heading; margin: 0; text-wrap: balance; }
-.manufacture-finish__image { grid-area: image; position: relative; aspect-ratio: 4 / 3; overflow: hidden; }
-.manufacture-finish__image img { object-fit: cover; }
-.manufacture-finish__body { grid-area: text; display: grid; gap: var(--gap-stack); }
-.manufacture-finish__text { margin: 0; color: var(--ink-2); line-height: 1.6; }
-.manufacture-finish__text p { margin: 0; }
-.manufacture-finish__text p + p { margin-top: var(--gap-tile); }
-.manufacture-mounting-videos { display: grid; gap: var(--gap-tile); }
-.manufacture-mounting-videos .mortgage-rules__title { margin: 0; }
-.manufacture-mounting-videos__grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--gap-tile); }
-.manufacture-mounting-videos .manufacture-mounting-videos__player { aspect-ratio: 16 / 9; border-radius: var(--surface-radius); }
-.manufacture-mounting-videos__player .independent-review__play { width: 48px; height: 48px; }
-.manufacture-mounting-videos__caption { margin: 0 0 8px; color: var(--ink-2); font-size: 14px; }
-@media (min-width: 900px) {
-  .manufacture-finish__body {
-    align-self: stretch;
-    grid-template-rows: auto 1fr;
-  }
-  .manufacture-finish__body .manufacture-mounting-videos {
-    align-self: end;
-  }
-}
-@media (max-width: 899px) {
-  .manufacture-mounting-videos__grid { grid-template-columns: minmax(0, 1fr); }
-  .manufacture-finish__layout {
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-rows: auto;
-    grid-template-areas: "heading" "image" "text";
-    gap: var(--page-gutter);
-  }
-}
-
-.manufacture-routes__grid,
-.manufacture-finish__grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0;
-  border-top: 1px solid var(--line);
-}
-
-.manufacture-route,
-.manufacture-finish__grid > div {
-  min-width: 0;
-  padding: var(--gap-stack) clamp(24px, 3vw, 40px) 0 0;
-}
-.manufacture-route + .manufacture-route,
-.manufacture-finish__grid > div + div {
-  border-left: 1px solid var(--line);
-  padding-left: clamp(24px, 3vw, 40px);
-}
-.manufacture-route h3,
-.manufacture-finish__grid h3 {
-  margin: 0 0 var(--gap-tile);
-  font-size: clamp(1.2rem, 2vw, 1.5rem);
-  line-height: 1.25;
-}
-.manufacture-route p,
-.manufacture-finish__grid p { margin: 0; }
-.manufacture-route p + p { margin-top: var(--gap-tile); }
-.manufacture-route ul { margin: var(--gap-tile) 0; padding-left: 1.2em; }
-.manufacture-route li + li { margin-top: 8px; }
-.manufacture-route li::marker { color: var(--avgst-ink); }
-
-@media (max-width: 719px) {
-  .section.manufacture-assembly,
-  .section.manufacture-routes,
-  .section.manufacture-finish { padding-block: 64px; }
-  .manufacture-routes__grid,
-  .manufacture-finish__grid { grid-template-columns: 1fr; }
-  .manufacture-route,
-  .manufacture-finish__grid > div { padding: var(--gap-stack) 0; }
-  .manufacture-route + .manufacture-route,
-  .manufacture-finish__grid > div + div {
-    border-left: 0;
-    border-top: 1px solid var(--line);
-    padding-left: 0;
-  }
-}
-
-@media (max-width: 719px) {
-  .manufacture-documentation__inner {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    grid-template-areas: "heading" "visual" "copy";
-    row-gap: 28px;
-  }
-
-  .manufacture-documentation__visual {
-    aspect-ratio: 1.15;
-  }
-
-  .manufacture-beam__inner {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    grid-template-areas: "heading" "visual" "copy";
-    row-gap: 28px;
-  }
-
-  .manufacture-cutting__inner {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
-    grid-template-areas: "heading" "visual" "copy";
-    row-gap: 28px;
-  }
-
-  .manufacture-cutting__visual {
-    aspect-ratio: 1.15;
-  }
-}
-
-@media (max-width: 599px) {
-  .manufacture-hero__scene {
-    transform: translate(-68%, -50%);
-  }
-
-  .manufacture-hero .hero__tone {
-    background: linear-gradient(
-      to bottom,
-      rgb(var(--veil-rgb) / 0.1) 25%,
-      rgb(var(--veil-rgb) / 0.55) 58%,
-      rgb(var(--veil-rgb) / 0.9) 82%
-    );
-  }
-}
 
 .btn-outline {
   border: 1px solid var(--on-dark-4);
@@ -4609,7 +3922,7 @@ a {
 /* Телефон: переход встаёт в строку надзаголовка, а не отдельной строкой под
    заголовком. Под заголовком он читался обрывком следующего блока —
    висел слева сам по себе, без связи с тем, что над ним.
-   
+
    Обёртка надзаголовка с заголовком на этой ширине раскрывается
    (display: contents), чтобы обе строки стали ячейками одной сетки: иначе
    ссылку не поставить в один ряд с надзаголовком, не трогая разметку. */
@@ -4665,172 +3978,6 @@ a {
   text-transform: uppercase;
   letter-spacing: -0.02em;
 }
-
-.about-page .about-hero { padding: 0; }
-.about-page .about-hero .project-hero__media img { object-position: center 75%; }
-.about-split { display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 56px); align-items: center; }
-.about-copy { display: grid; gap: 20px; }
-.about-copy p { margin: 0; line-height: 1.65; }
-.about-lead { font-weight: 600; }
-.about-photo { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border-radius: 16px; }
-.about-photo img { object-fit: cover; }
-.about-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-.company-bento {
-  --company-bento-height-scale: 0.9;
-  --company-bento-row: calc(207px * var(--company-bento-height-scale));
-  --company-bento-gap: var(--gap-tile);
-  display: grid;
-  grid-template-columns: repeat(6, minmax(0, 1fr));
-  grid-template-rows: repeat(4, var(--company-bento-row));
-  grid-template-areas:
-    "hero hero hero hero factory factory"
-    "hero hero hero hero side side"
-    "card-left card-left card-middle card-middle card-right card-right"
-    "bottom-left bottom-left bottom-left partners partners partners";
-  column-gap: var(--company-bento-gap);
-  row-gap: var(--company-bento-gap);
-}
-.company-bento__tile { position: relative; min-width: 0; margin: 0; padding: 24px; border-radius: var(--surface-radius); overflow: hidden; background: var(--surface-muted); color: var(--foreground); }
-.company-bento__hero { grid-area: hero; padding: var(--gap-stack); background: var(--avgst-ink); color: var(--on-dark-0); }
-.company-bento__hero-image { object-fit: cover; transform: translateX(8%); }
-.company-bento__hero::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(120deg, var(--avgst-ink) 0%, var(--avgst-ink) 30%, rgb(var(--avgst-ink-rgb) / 0.97) 36%, rgb(var(--avgst-ink-rgb) / 0.86) 43%, rgb(var(--avgst-ink-rgb) / 0.64) 50%, rgb(var(--avgst-ink-rgb) / 0.36) 57%, rgb(var(--avgst-ink-rgb) / 0.14) 64%, rgb(var(--avgst-ink-rgb) / 0.03) 71%, transparent 78%); pointer-events: none; }
-.company-bento__hero-content { position: relative; z-index: 2; }
-.company-bento__project-link { position: absolute; top: 16px; right: 16px; z-index: 2; display: flex; align-items: center; gap: 4px; padding: 1px 4px; border: 1px solid var(--on-dark-4); border-radius: 6px; background: rgb(var(--avgst-ink-rgb) / 0.3); color: var(--on-dark-1); text-decoration: none; transition: background-color .2s var(--ease-out), color .2s var(--ease-out), border-color .2s var(--ease-out); }
-.company-bento__project-badge { font-size: 14px; line-height: 1.2; font-weight: 400; white-space: nowrap; }
-.company-bento__project-link > svg { flex-shrink: 0; transition: transform .2s var(--ease-out); }
-.company-bento__project-link:focus-visible { outline: 2px solid var(--on-dark-0); outline-offset: 4px; border-radius: 6px; }
-@media (hover: hover) and (pointer: fine) {
-  .company-bento__project-link:hover { background: var(--brand-yellow); color: var(--avgst-ink); border-color: var(--brand-yellow); }
-  .company-bento__project-link:hover > svg { transform: translate(2px, -2px); }
-}
-.company-bento__logo { display: block; width: 144px; height: auto; max-width: 100%; margin-bottom: var(--gap-stack); }
-.company-bento__hero h2 { max-width: 74%; margin: 0; font-weight: 600; line-height: 1.2; text-transform: none; }
-.company-bento__hero-description { max-width: 60%; margin: 24px 0 0; color: var(--on-dark-1); font-size: 16px; line-height: 1.6; }
-.company-bento__hero-description span { display: block; }
-.company-bento__catalog-cta { position: absolute; bottom: var(--gap-stack); left: var(--gap-stack); z-index: 2; gap: 6px; }
-.company-bento__technologies { grid-area: side; display: flex; flex-direction: column; gap: 8px; padding: 16px; text-decoration: none; }
-.company-bento__technologies-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
-.company-bento__technologies h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
-.company-bento__technologies-heading { min-height: 34px; }
-.company-bento__technologies:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
-.company-bento__technology-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); flex: 1; min-height: 0; }
-.company-bento__technology-list figure { display: flex; flex-direction: column; gap: 6px; min-width: 0; margin: 0; padding: 0 8px; }
-.company-bento__technology-list figure + figure { border-left: 1px solid var(--line); }
-.company-bento__technology-image { position: relative; flex: 1; min-height: 80px; }
-.company-bento__technology-image img { object-fit: contain; }
-.company-bento__technology-list figcaption { color: var(--ink-1); text-align: center; font-size: 12px; line-height: 1.4; }
-.company-bento__production { grid-area: card-left; text-decoration: none; }
-.company-bento__production:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
-.company-bento__production > .company-bento__go { z-index: 3; }
-.company-bento__production-photo { position: absolute; top: 0; bottom: 0; left: 8%; width: 100%; }
-.company-bento__production-image { object-fit: contain; object-position: right center; }
-.company-bento__production::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(90deg, var(--surface-muted), color-mix(in srgb, var(--surface-muted) 80%, transparent) 35%, transparent 66%); }
-.company-bento__production::after { content: ''; position: absolute; z-index: 1; inset: -16px; background: conic-gradient(from 0deg at 77% 50%, transparent 0deg 247deg, var(--surface-muted) 247deg 315deg, transparent 315deg 360deg); filter: blur(22px); }
-.company-bento__production-copy { position: relative; z-index: 2; }
-.company-bento__production h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
-.company-bento__production p { margin: 12px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
-.company-bento__slot--card-middle { grid-area: card-middle; }
-.company-bento__architecture { grid-area: card-middle; background: var(--avgst-ink); color: var(--on-dark-0); }
-.company-bento__architecture-image { object-fit: cover; object-position: center; }
-.company-bento__architecture::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(114deg, var(--avgst-ink) 0%, var(--avgst-ink) 34%, rgb(var(--avgst-ink-rgb) / 0.97) 41%, rgb(var(--avgst-ink-rgb) / 0.82) 48%, rgb(var(--avgst-ink-rgb) / 0.42) 56%, rgb(var(--avgst-ink-rgb) / 0.1) 64%, transparent 72%); pointer-events: none; }
-.company-bento__architecture-copy { position: relative; z-index: 1; }
-.company-bento__architecture h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
-.company-bento__architecture p { margin: 12px 0 0; color: var(--on-dark-1); font-size: 14px; line-height: 1.5; }
-.company-bento__slot--card-right { grid-area: card-right; }
-.company-bento__business { grid-area: card-right; background: var(--avgst-ink); color: var(--on-dark-0); text-decoration: none; }
-.company-bento__business-image { object-fit: cover; object-position: center; }
-.company-bento__business::before { content: ''; position: absolute; z-index: 1; inset: 0; background: linear-gradient(110deg, var(--avgst-ink) 0%, var(--avgst-ink) 40%, rgb(var(--avgst-ink-rgb) / 0.98) 47%, rgb(var(--avgst-ink-rgb) / 0.85) 53%, rgb(var(--avgst-ink-rgb) / 0.45) 61%, rgb(var(--avgst-ink-rgb) / 0.1) 69%, transparent 76%); pointer-events: none; }
-.company-bento__business-copy { position: relative; z-index: 1; }
-.company-bento__business-heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
-.company-bento__business h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
-.company-bento__business p { margin: 12px 0 0; color: var(--on-dark-1); font-size: 14px; line-height: 1.5; }
-.company-bento__business-heading { padding-right: 44px; }
-.company-bento__business:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
-.company-bento__coverage { grid-area: bottom-left; }
-.company-bento__coverage-copy { position: relative; z-index: 1; display: flex; flex-direction: column; justify-content: space-between; gap: 16px; width: 60%; height: 100%; }
-.company-bento__coverage h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
-.company-bento__coverage-caption { margin: 0; color: var(--ink-2); font-size: 14px; line-height: 1.5; font-weight: 400; }
-.company-bento__coverage-radius { display: flex; align-items: baseline; gap: 6px; margin-top: 4px; white-space: nowrap; }
-.company-bento__coverage-radius strong { color: var(--avgst-green); font-size: 40px; line-height: 1; font-weight: 600; letter-spacing: -0.03em; }
-.company-bento__coverage-graphic { position: absolute; z-index: 0; inset: 0; display: block; width: 100%; height: 100%; pointer-events: none; color: var(--avgst-green); }
-.company-bento__coverage-graphic--compact { display: none; }
-.company-bento__coverage-cities { fill: var(--ink-2); font-size: 12px; font-family: inherit; }
-.company-bento__coverage-city-origin { fill: var(--ink); font-weight: 600; }
-.company-bento__factory { grid-area: factory; min-height: var(--company-bento-row); padding: 0; background: var(--avgst-ink); color: var(--on-dark-0); text-decoration: none; }
-.company-bento__factory-heading { position: relative; z-index: 1; display: flex; align-items: start; justify-content: space-between; gap: 12px; padding: 16px; }
-.company-bento__factory-heading h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; letter-spacing: -0.02em; }
-.company-bento__factory-heading p { margin: 6px 0 0; color: var(--ink-1); font-size: 14px; line-height: 1.5; }
-.company-bento__factory-photo { position: absolute; inset: 0; }
-.company-bento__factory-photo img { object-fit: cover; object-position: center; }
-.company-bento__factory:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
-.company-partners { position: relative; grid-area: partners; display: flex; flex-direction: column; justify-content: space-between; gap: 12px; min-width: 0; min-height: var(--company-bento-row); box-sizing: border-box; padding: 24px; border-radius: var(--surface-radius); background: var(--surface-muted); color: var(--foreground); text-decoration: none; }
-.company-partners__heading { display: flex; align-items: start; justify-content: space-between; gap: 12px; }
-.company-partners h3 { margin: 0; font-size: 20px; line-height: 1.2; font-weight: 600; }
-.company-partners__heading { min-height: 34px; padding-right: 44px; }
-.company-partners p { margin: 6px 0 0; color: var(--ink-2); font-size: 14px; line-height: 1.5; }
-.company-partners__logos { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; }
-.company-partners__mobile-strip { display: none; min-width: 0; }
-.company-partners__mobile-strip .mortgage-showcase__partners { padding-top: 0; border-top: 0; }
-.company-partners__logo { display: flex; align-items: center; justify-content: center; min-width: 0; height: 64px; padding: 8px; }
-.company-partners__logo img { display: block; width: 100%; height: 40px; object-fit: contain; filter: brightness(0) saturate(100%); opacity: 0.82; transition: filter .2s var(--ease-out), opacity .2s var(--ease-out); }
-.company-partners__logo:nth-child(3) img { filter: grayscale(1); }
-@media (hover: hover) and (pointer: fine) {
-  .company-partners__logo:hover img { filter: none; opacity: 1; }
-  .company-partners__logo:nth-child(2):hover img { filter: brightness(0) saturate(100%) invert(22%) sepia(86%) saturate(2291%) hue-rotate(211deg) brightness(88%) contrast(102%); }
-}
-.company-partners:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
-.company-bento__go { top: 24px; right: 24px; }
-.company-bento__business-heading .company-bento__go { top: 0; right: 0; }
-.company-partners .company-bento__go { top: 24px; right: 24px; }
-.company-bento__animated-image, .company-bento__coverage-graphic { transition: transform .45s var(--ease-out); }
-@media (hover: hover) and (pointer: fine) {
-  .company-bento__tile:not(.company-bento__technologies):hover .company-bento__animated-image,
-  .company-bento__technology-image img:hover,
-  .company-bento__coverage:hover .company-bento__coverage-graphic { transform: scale(1.04); }
-}
-@media (max-width: 1024px) {
-  .company-bento { --company-bento-height-scale: 1; --company-bento-gap: var(--gap-tile); grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: none; grid-template-areas: none; }
-  .company-bento__tile, .company-partners { grid-area: auto; }
-  .company-bento__hero { grid-column: 1 / -1; grid-row: 1; min-height: calc(var(--company-bento-row) * 2 + var(--company-bento-gap)); }
-  .company-bento__slot { min-height: 176px; }
-  .company-bento__coverage, .company-bento__production, .company-bento__technologies, .company-bento__business, .company-bento__architecture { min-height: var(--company-bento-row); }
-}
-@media (max-width: 600px) {
-  .company-bento { grid-template-columns: 1fr; }
-  .company-bento__hero { padding: 24px; }
-  .company-bento__catalog-cta { position: relative; bottom: auto; left: auto; margin-top: 24px; }
-  .company-bento__project-link { top: 16px; right: 16px; }
-  .company-bento__logo { margin-top: 32px; margin-bottom: 24px; }
-  .company-bento__hero::after { content: ''; position: absolute; inset: 0; background: rgb(var(--avgst-ink-rgb) / 0.56); }
-  .company-bento__hero-image { object-position: 70% center; transform: none; }
-  .company-bento__hero h2, .company-bento__hero-description { max-width: 100%; }
-  .company-bento__hero h2 { text-wrap: balance; }
-  .company-bento__hero h2 br { display: none; }
-  .company-bento__hero-description span { display: inline; }
-  .company-bento__hero-description span:not(:last-child)::after { content: ' '; }
-  .company-bento__coverage-copy { width: 100%; }
-  .company-bento__coverage, .company-partners { height: var(--company-bento-row); min-height: var(--company-bento-row); }
-  .company-bento__coverage-graphic--wide { display: none; }
-  .company-bento__coverage-graphic--compact { display: block; }
-  .company-partners__logos { display: none; }
-  .company-partners__mobile-strip { display: block; }
-}
-@media (prefers-reduced-motion: reduce) {
-  .company-bento__project-link > svg { transition: none; }
-  .company-bento__project-link:hover > svg { transform: none; }
-  .company-bento__animated-image, .company-bento__coverage-graphic { transition: none; }
-  .company-bento__tile:hover .company-bento__animated-image,
-  .company-bento__technology-image img:hover,
-  .company-bento__coverage:hover .company-bento__coverage-graphic { transform: none; }
-}
-@media (hover: none), (pointer: coarse) {
-  .company-bento .company-bento__go { transform: none; }
-}
-.about-tinted { background: var(--surface-muted); }
-.about-page #contacts { background: var(--on-dark-0); }
-.about-principles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 32px; }
-.about-principles article { padding: 24px; border: 1px solid var(--line); border-radius: 16px; }
-.about-principles h3 { margin: 0 0 12px; font-size: 20px; }
 .video-stories__rating { display: flex; align-items: center; gap: 16px; margin-top: 16px; }
 .yandex-rating { display: flex; flex-direction: column; justify-content: center; gap: 5px; width: 210px; min-height: 60px; box-sizing: border-box; padding: 8px 12px; border: 1px solid var(--line-2); border-radius: 8px; color: var(--avgst-ink); text-decoration: none; font-family: inherit; }
 .yandex-rating__row { display: flex; align-items: center; gap: 7px; }
@@ -4854,27 +4001,9 @@ a {
   .video-stories__rating .yandex-rating { width: 190px; min-height: 56px; padding: 8px 16px; }
   .video-stories .video-stories__stage { grid-column: 1 / -1; grid-row: 3; }
 }
-.about-principles p, .about-history p { margin: 0; line-height: 1.65; }
-.about-timeline__heading { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-.about-timeline__controls { display: flex; gap: 8px; flex-shrink: 0; }
-.about-timeline__controls button { display: grid; place-items: center; width: 32px; height: 32px; padding: 0; border: 0; border-radius: 8px; background: var(--on-dark-0); color: var(--avgst-ink); box-shadow: 0 1px 3px var(--line-2); backdrop-filter: blur(8px); cursor: pointer; transition: background-color 0.2s var(--ease-out); }
-.about-timeline__controls button:hover:not(:disabled) { background: var(--brand-yellow); border-color: var(--brand-yellow); }
-.about-timeline__controls button:disabled { opacity: .3; cursor: default; }
-.about-timeline__controls button:focus-visible, .about-timeline__rail:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 4px; }
-.about-timeline__rail { overflow-x: auto; overscroll-behavior-x: contain; scroll-snap-type: x mandatory; scrollbar-width: none; margin-top: 40px; padding: 8px 0; }
-.about-timeline__scale { position: relative; display: flex; margin-top: 24px; padding-top: 4px; overflow-x: auto; scrollbar-width: none; }
-.about-timeline__scale::before { content: ''; position: absolute; left: 0; right: 0; top: 12px; height: 1px; background: var(--line-2); }
-.about-timeline__scale button { position: relative; flex: 1 0 48px; display: flex; flex-direction: column; align-items: center; gap: 8px; min-height: 44px; padding: 0 4px 4px; border: 0; background: transparent; color: var(--ink-1); font: inherit; font-size: 12px; cursor: pointer; }
-.about-timeline__tick { width: 8px; height: 8px; margin-top: 4px; margin-bottom: 4px; border-radius: 50%; background: var(--ink-2); }
-.about-timeline__scale button[aria-current] { color: var(--avgst-ink); font-weight: 700; }
-.about-timeline__scale button[aria-current] .about-timeline__tick { position: relative; width: 20px; height: 20px; margin-top: -2px; margin-bottom: -2px; box-sizing: border-box; border: 1px solid var(--avgst-ink); border-radius: 50%; background: var(--surface-muted); }
-.about-timeline__scale button[aria-current] .about-timeline__tick::after { content: ''; position: absolute; inset: 5px; border-radius: 50%; background: var(--brand-yellow); }
-.about-timeline__scale button:hover:not([aria-current]) .about-timeline__tick { background: var(--brand-yellow); }
-.about-timeline__scale button:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: -2px; border-radius: 4px; }
-.about-timeline__rail::-webkit-scrollbar { display: none; }
+.about-history p { margin: 0; line-height: 1.65; }
 .about-history { display: flex; list-style: none; padding: 0 0 24px; margin: 0; }
 .about-history > .about-history__year { position: relative; flex: 0 0 100%; min-width: 0; scroll-snap-align: start; }
-.about-timeline__year { display: inline-block; margin-left: 16px; color: var(--brand-yellow); }
 .about-history__layout { padding-right: 8px; }
 .about-history__layout--media { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--gap-stack); }
 .about-history__blocks { display: grid; grid-template-columns: 1fr; gap: var(--gap-stack); align-content: start; list-style: none; margin: 0; padding: 0; }
@@ -4919,16 +4048,8 @@ a {
 .about-history__count { position: absolute; bottom: 12px; left: 12px; background: var(--surface); color: var(--avgst-ink); padding: 6px 10px; border-radius: 8px; font-size: 14px; }
 .about-history p { color: var(--ink-1); font-size: 15px; white-space: pre-line; }
 @media (max-width: 767px) {
-  .about-split, .about-principles { grid-template-columns: 1fr; }
   .about-history__blocks, .about-history__layout--media { grid-template-columns: 1fr; }
-  .about-timeline__heading { position: relative; align-items: flex-start; }
-  .about-timeline__heading h2 { margin: 0; }
-  .about-timeline__title { display: block; max-width: calc(100% - 92px); }
-  .about-timeline__controls { position: absolute; top: 0; right: 0; }
-  .about-timeline__rail { margin-top: 32px; }
-  .about-timeline__year { display: block; margin-left: 0; font-variant-numeric: tabular-nums; }
 }
-@media (prefers-reduced-motion: reduce) { .about-timeline__controls button { transition: none; } }
 
 /* Информационные страницы-заглушки под AV4-15: текст, список, заявка. */
 .info-page__lead {
@@ -5049,20 +4170,6 @@ a {
 }
 
 /* Каталог: счётчик над сеткой и состояние пустого результата. */
-.catalog__count {
-  margin: 20px 0 0;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.catalog__empty {
-  margin: 32px 0 0;
-  font-size: 16px;
-  color: var(--ink-1);
-}
 
 /* ======================================================================
    Каталог: колонка отбора слева, выдача справа.
@@ -5088,91 +4195,20 @@ a {
    соседнего блока страницы. Здесь соседа нет, над секцией только шапка, и
    56 пикселей превращались в пустую полосу. Шаг взят тот же, что между
    поиском и выдачей, чтобы вся страница держала один ритм. */
-.catalog-section {
-  /* Верхний отступ отдан липкой полосе поиска: он должен ехать вместе с
-     ней, иначе в закреплённом виде поле встаёт вплотную к краю экрана. */
-  padding-top: 0;
-}
 
 /* Поиск над фильтрами: на десктопе совпадает с шириной колонки отбора. */
-.catalog__bar {
-  position: sticky;
-  top: var(--site-header-offset);
-  z-index: 6;
-  background: #fff;
-  padding-block: var(--gap-stack);
-  /* Подложка шире колонки. Правый край карточек и правый край полосы стояли
-     ровно на одном иксе, и на общей границе двух слоёв вылезал шов в
-     пиксель, тянувшийся вертикальной линией по всей странице. Вынос за
-     колонку убирает совпадение: карточки уходят под полосу с запасом. */
-  margin-inline: calc(var(--page-gutter) * -1);
-  padding-inline: var(--page-gutter);
-}
 
 /* Растворение под полосой отдельным слоем, а не градиентом в самой
    подложке: иначе нижний отступ съедался бы прозрачностью и выходил ниже
    верхнего, хотя по числам они равны. Здесь оба по 32, а мягкий край живёт
    уже за пределами полосы. */
-.catalog__bar::after {
-  content: "";
-  opacity: 0;
-  transition: opacity 0.15s var(--ease-out);
-  position: absolute;
-  top: 100%;
-  right: 0;
-  left: 0;
-  height: var(--catalog-fade);
-  background: linear-gradient(to bottom, #fff, rgb(255 255 255 / 0));
-  pointer-events: none;
-}
-
-.catalog__bar.is-stuck::after {
-  opacity: 1;
-}
 
 /* Поиск и кнопка отбора одной строкой: на телефоне отдельный ряд под
    кнопку стоил бы целых 60 пикселей закреплённой высоты, не показывая при
    этом ни одного дома. */
-.catalog__barrow {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.catalog__barrow .catalog-search {
-  flex: 1;
-  min-width: 0;
-}
-
-.catalog-search {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  height: 46px;
-  padding: 0 14px;
-  margin: 0;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: #fff;
-  color: var(--ink-3);
-}
 
 @media (min-width: 1024px) {
   .site-shell--catalog { --catalog-bar: 70px; }
-  .site-shell--catalog .catalog__bar {
-    position: static;
-    padding-block: 16px;
-    background: transparent;
-    pointer-events: none;
-  }
-  .site-shell--catalog .catalog__bar::after { content: none; }
-  .site-shell--catalog .catalog__results { margin-top: 16px; }
-  .catalog__bar { background: transparent; pointer-events: none; }
-  .catalog__bar::after { right: auto; width: calc(240px + var(--page-gutter) * 2); }
-  .catalog__barrow { position: relative; width: 240px; pointer-events: auto; }
-  .catalog__barrow .catalog-search { height: 38px; padding-inline: 12px; border-radius: 8px; color: var(--avgst-ink); }
-  .catalog__barrow .catalog-search input { font-size: 14px; }
 }
 
 /* Фокус показывает сама рамка коробки, а не кольцо вокруг неё: зелёное
@@ -5181,71 +4217,8 @@ a {
    Совсем без признака фокуса поле оставлять нельзя — по нему ориентируются
    при переходе с клавиатуры, — поэтому признаком стала рамка: она темнеет
    с 16% до полного тона чернил, вместе с ней темнеет и значок поиска. */
-.catalog-search:focus-within {
-  border-color: var(--avgst-ink);
-  color: var(--avgst-ink);
-}
-
-.catalog-search input:focus,
-.catalog-search input:focus-visible {
-  outline: none;
-}
-
-.catalog-search input {
-  flex: 1;
-  min-width: 0;
-  height: 100%;
-  border: 0;
-  outline: 0;
-  background: none;
-  color: var(--avgst-ink);
-  /* Не меньше 16px, и это не про читаемость. Safari на iOS приближает
-     страницу, когда фокус уходит в поле с более мелким кеглем: масштаб
-     растёт, ширина макета остаётся прежней, и вёрстка уезжает за правый
-     край экрана. В средствах разработчика это не воспроизводится — так
-     ведёт себя сама мобильная система, а не страница. */
-  font-size: 16px;
-}
-
-.catalog-search input::placeholder {
-  color: var(--ink-3);
-}
 
 /* Родная крестовина у type="search" в вебките своя и не по стилю. */
-.catalog-search input::-webkit-search-cancel-button {
-  appearance: none;
-}
-
-.catalog-search button {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  flex: 0 0 28px;
-  width: 28px;
-  height: 28px;
-  padding: 4px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--ink-3);
-  cursor: pointer;
-}
-
-.catalog-search button:hover {
-  background: var(--tint);
-  color: var(--avgst-ink);
-}
-
-.catalog-search button:focus-visible {
-  outline: 2px solid var(--avgst-ink);
-  outline-offset: 1px;
-}
-
-.catalog__layout {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: var(--gap-stack);
-}
 
 .grid-2 {
   display: grid;
@@ -5263,24 +4236,6 @@ a {
 /* Колонка отбора появляется с 1024: уже этого 240 пикселей плюс две
    колонки карточек в страницу не встают, и до этой ширины панель едет
    над выдачей. */
-@media (min-width: 1024px) {
-  .catalog__layout {
-    grid-template-columns: 240px minmax(0, 1fr);
-    gap: var(--gap-split);
-  }
-
-  .catalog__sidebar {
-    position: sticky;
-    top: min(var(--site-header-offset), calc(100dvh - var(--catalog-filter-height, 0px) - 16px));
-    align-self: start;
-    min-width: 0;
-    padding-bottom: 16px;
-  }
-}
-
-.cfilter {
-  min-width: 0;
-}
 
 /* Кнопка раскрытия. Нужна там, где колонка целиком не помещается: с 1024
    её прячем, ниже она остаётся липкой у верхнего края. Уговор был, что
@@ -5289,33 +4244,9 @@ a {
 /* Один знак, без коробки под ним: ни рамки, ни подложки, ни подсветки при
    наведении. Область нажатия ростом с поле поиска минус пиксель сверху и
    снизу, сам знак обычного размера. */
-.cfilter__toggle {
-  flex: none;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  height: 44px;
-  min-width: 44px;
-  padding: 0;
-  border: 0;
-  background: none;
-  color: var(--avgst-ink);
-  font-size: 15px;
-  cursor: pointer;
-}
 
 /* Сброс: красный только у знака, заливать кнопку тревожным цветом незачем,
    действие не опасное. */
-.cfilter__toggle.is-reset {
-  color: var(--danger);
-}
-.catalog__filter-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; width: 100%; min-height: 24px; margin-bottom: 10px; }
-.catalog__filter-heading .cfilter__legend { width: auto; margin: 0; }
-.cfilter__reset.catalog__reset { position: relative; display: flex; flex: none; width: max-content; min-height: 24px; margin: 0; color: var(--foreground); pointer-events: auto; }
-.catalog__reset:hover:not(:disabled) { text-decoration: underline; text-underline-offset: 3px; }
-.catalog__reset:disabled { color: var(--ink-3); cursor: default; }
-.catalog__reset:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: 2px; }
 
 /* В самый узкий экран подпись рядом с полем поиска не встаёт: остаётся
    значок, смысл которого понятен и без слова. */
@@ -5328,103 +4259,10 @@ a {
    родителем становится вся доска, и блоку есть куда ехать. */
 @media (max-width: 1023px) {
   :root { --catalog-bar: 76px; }
-  .catalog__layout { display: block; }
-  .catalog__sidebar { position: sticky; top: var(--site-header-offset); z-index: 5; }
-  .catalog__bar { padding-block: 16px; }
-  .cfilter--desktop { display: none; }
-  .catalog-filter-popover {
-    z-index: 20;
-    display: flex;
-    width: min(360px, var(--radix-popover-trigger-width));
-    max-height: min(560px, calc(var(--radix-popover-content-available-height) - 16px));
-    border: 1px solid var(--line);
-    border-radius: 10px;
-    background: var(--surface, #fff);
-    color: var(--foreground);
-    overflow: hidden;
-  }
-  .cfilter--popover { display: flex; width: 100%; min-height: 0; max-height: inherit; }
-  .cfilter--popover .cfilter__sticky.is-open {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    min-height: 0;
-    max-height: inherit;
-    padding: 16px;
-  }
-  .cfilter--popover .cfilter__scroll {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    scrollbar-width: thin;
-    scrollbar-color: var(--line) transparent;
-  }
-  .cfilter--popover .cfilter__scroll > * { flex: none; }
-  .cfilter--popover .cfilter__group--quiet .cfilter__checks { display: flex; flex-wrap: wrap; gap: 4px 16px; }
-  .ui-select-content.catalog__sort-menu { box-shadow: none; max-width: calc(100vw - var(--page-gutter) * 2); }
 }
 
 /* Высокая колонка сначала прокручивается страницей, затем прилипает нижним
    краем. Короткая сразу прилипает под поиском. Внутреннего скролла нет. */
-@media (min-width: 1024px) {
-  .cfilter__toggle {
-    display: none;
-  }
-
-  .cfilter {
-    position: static;
-  }
-
-  .cfilter__sticky {
-    position: static;
-    display: flex;
-    flex-direction: column;
-    gap: 24px;
-  }
-}
-
-.cfilter__scroll { display: flex; flex-direction: column; gap: 24px; }
-
-.cfilter__count {
-  margin: 0 0 16px;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.cfilter__group {
-  min-inline-size: 0;
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.cfilter__legend {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 2px 8px;
-  align-items: baseline;
-  width: 100%;
-  padding: 0;
-  margin: 0 0 10px;
-  font-size: 11px;
-  font-weight: 700;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.cfilter__legend span {
-  margin-left: auto;
-  font-size: 13px;
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--avgst-ink);
-}
 
 /* Ползунок сайта. Один на все места: и отбор в каталоге, и калькулятор
    ипотеки. Раньше калькулятор рисовал нативный input[type=range] с
@@ -5482,180 +4320,24 @@ a {
    пропадали: выбранные подряд значения слипались в одну плашку, и сколько
    их выбрано, прочитать было нельзя. У бейджей граница каждого значения
    своя и видна всегда, при любом числе выбранного. */
-.cfilter__badges {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.cfilter__badges button {
-  min-width: 42px;
-  height: 34px;
-  padding: 0 13px;
-  border: 1px solid var(--line);
-  /* Тот же радиус, что у поля поиска и кнопки избранного рядом: скругление
-     в колонке одно на все элементы. Пилюля со скруглением в половину
-     высоты выбивалась из этого ряда. */
-  border-radius: 8px;
-  background: #fff;
-  color: var(--avgst-ink);
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.cfilter__badges button.is-on {
-  background: var(--avgst-ink);
-  border-color: var(--avgst-ink);
-  color: #fff;
-}
 
 /* Чекбоксы, а не радиокнопки с вариантом «не важно».
    Отбор здесь множественный, как у спален и этажей: ничего не отмечено это
    и есть «не важно», отдельная кнопка под это не нужна. Подписи вроде
    «Панельно-каркасная» в 240 пикселей в строку не встают, поэтому список
    вертикальный, а родство даёт общий отступ и один кегль. */
-.cfilter__checks {
-  display: grid;
-  gap: 2px;
-}
-
-.cfilter__check {
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  min-height: 30px;
-  font-size: 14px;
-  line-height: 1.3;
-  color: var(--avgst-ink);
-  cursor: pointer;
-}
-
-.cfilter__check input {
-  flex: none;
-  width: 16px;
-  height: 16px;
-  margin: 0;
-  accent-color: var(--avgst-ink);
-  cursor: pointer;
-}
-
-.cfilter__fav {
-  display: grid;
-  grid-template-columns: 17px minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px;
-  width: 100%;
-  min-width: 0;
-  min-height: 38px;
-  padding: 8px 12px;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--avgst-ink);
-  font-size: 14px;
-  text-align: left;
-  cursor: pointer;
-}
-
-.cfilter__fav span {
-  margin-left: auto;
-  font-size: 12px;
-  color: var(--ink-3);
-}
-
-.cfilter__fav.is-on {
-  background: var(--avgst-ink);
-  border-color: var(--avgst-ink);
-  color: #fff;
-}
-
-.cfilter__fav.is-on span {
-  color: var(--on-dark-3);
-}
-
-.cfilter__fav:hover:not(.is-on),
-.cfilter__badges button:hover:not(.is-on) {
-  background: var(--tint);
-}
-
-.cfilter__reset {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  border: 0;
-  background: none;
-  padding: 0;
-  font-size: 12px;
-  color: var(--avgst-green);
-  cursor: pointer;
-}
 
 /* Кнопка возврата к выдаче. На широком экране её нет: панель стоит рядом с
    карточками, уходить неоткуда. Липнет к низу панели, потому что панель
    прокручивается, и кнопка в конце списка требовала бы домотать до неё. */
-.cfilter__apply {
-  display: none;
-}
 
 @media (max-width: 1023px) {
   /* Лист плотнее колонки на десктопе: там высота не ограничена, а здесь всё
      должно поместиться целиком. Ужимаются только шаги между группами и
      подписями, сами элементы управления остаются прежнего размера, иначе по
      ним станет труднее попадать пальцем. */
-  .cfilter__sticky.is-open .cfilter__group {
-    margin: 0;
-  }
-
-  .cfilter__sticky.is-open .cfilter__group:last-of-type {
-    margin-bottom: 0;
-  }
-
-  .cfilter__sticky.is-open .cfilter__legend {
-    margin-bottom: 6px;
-  }
-
-  .cfilter__sticky.is-open .catalog__filter-heading { margin-bottom: 6px; }
-  .cfilter__sticky.is-open .catalog__filter-heading .cfilter__legend { margin-bottom: 0; }
-
-  .cfilter__sticky.is-open .cfilter__check {
-    min-height: 28px;
-  }
-
-  .cfilter__sticky.is-open .cfilter__scroll {
-    gap: 16px;
-    padding-bottom: 0;
-    mask-image: none;
-  }
 
   /* Неподвижный низ листа: избранное и кнопка возврата. */
-  .cfilter__sticky.is-open > .cfilter__group--fav {
-    flex: none;
-    margin-bottom: 0;
-    padding-top: 10px;
-  }
-
-  .cfilter__apply {
-    flex: none;
-    display: block;
-    width: 100%;
-    height: 46px;
-    margin-top: 10px;
-    border: 0;
-    border-radius: 10px;
-    background: var(--avgst-ink);
-    color: #fff;
-    font-size: 15px;
-    font-weight: 600;
-    cursor: pointer;
-  }
-}
-
-.catalog__results {
-  min-width: 0;
-}
-
-.catalog__results .grid-2:first-of-type {
-  margin-top: 0;
 }
 
 /* Граница между подходящими под отбор и остальным каталогом.
@@ -5671,48 +4353,10 @@ a {
    между двумя частями одного списка, а не заголовком нового раздела.
    Прежняя версия капсом и с линией во всю ширину выглядела именно
    заголовком, и хвост каталога начинал казаться отдельным блоком. */
-.section .catalog__band {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin: 0 0 14px;
-  font-size: 14px;
-  font-weight: 400;
-  letter-spacing: 0;
-  text-transform: none;
-  color: var(--ink-2);
-}
 
 /* Воздух одинаковый с обеих сторон: разделитель стоит между двумя частями
    списка и не должен прижиматься ни к одной из них. Нижнее поле схлопнется
    с отступом сетки ниже, поэтому оно должно быть не меньше него. */
-.section .catalog__band--rest {
-  margin-block: var(--gap-split);
-}
-
-.catalog__band--rest::before,
-.catalog__band--rest::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: var(--line);
-}
-
-.catalog__band--rest span {
-  flex: none;
-}
-
-.catalog-filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin: 24px 0 0;
-}
-
-.catalog-filters .btn {
-  height: 36px;
-  padding: 0 14px;
-}
 
 /* Раздел «О проекте».
    Шахматка из четырёх прямоугольников: текст и кадр, ниже кадр и текст.
@@ -5722,91 +4366,14 @@ a {
    так оба прямоугольника ряда одинаковы, и шахматка читается сеткой, а не
    случайным набором плиток. */
 /* Слева портрет, справа слово архитектора. */
-.project-about__grid {
-  display: grid;
-  gap: var(--gap-stack);
-  margin-top: 0;
-}
-
-@media (min-width: 900px) {
-  .project-about__grid {
-    grid-template-columns: 280px minmax(0, 1fr);
-    gap: 48px;
-    align-items: start;
-  }
-}
 
 /* Заглушка портрета: серое поле с подписью. Пропорция задана, чтобы
    раскладка не переехала, когда вместо неё встанет фотография. */
-.project-about__portrait {
-  display: grid;
-  place-items: center;
-  margin: 0;
-  aspect-ratio: 4 / 5;
-  border-radius: 16px;
-  background: var(--tint);
-  color: var(--ink-3);
-  font-size: 13px;
-}
-
-.project-about__text p {
-  max-width: 62ch;
-  margin: 0 0 16px;
-  font-size: 17px;
-  line-height: 1.6;
-  color: var(--ink-1);
-}
-
-.project-about__text p:last-child {
-  margin-bottom: 0;
-}
 
 /* Подпись отделена чертой: это уже не текст, а тот, кто его сказал. */
-.project-about__sign {
-  display: grid;
-  gap: 2px;
-  margin: 24px 0 0;
-  padding-top: 16px;
-  border-top: 1px solid var(--line);
-  max-width: 62ch;
-}
-
-.project-about__sign strong {
-  font-size: 15px;
-}
-
-.project-about__sign span {
-  font-size: 13px;
-  color: var(--ink-2);
-}
 
 /* Фасады в карточке проекта: ряд с прокруткой на узком экране, сетка на
    широком — кадры разного размера смотрелись бы случайным коллажем. */
-.project-gallery {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(260px, 1fr);
-  gap: 16px;
-  margin-top: 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-}
-
-.project-gallery img {
-  width: 100%;
-  aspect-ratio: 4 / 3;
-  object-fit: cover;
-  border-radius: var(--radius);
-  scroll-snap-align: start;
-}
-
-@media (min-width: 720px) {
-  .project-gallery {
-    grid-auto-flow: row;
-    grid-template-columns: repeat(2, 1fr);
-    overflow-x: visible;
-  }
-}
 
 .info-page__actions {
   display: flex;
@@ -5989,11 +4556,7 @@ a {
 
 .series-bento__tile:hover .series-bento__go,
 .mortgage-finance__card:hover .series-bento__go,
-.mortgage-program:hover .series-bento__go,
-.company-bento__tile:hover .series-bento__go,
-.company-partners:hover .series-bento__go,
-.company-bento__tile:focus-visible .series-bento__go,
-.company-partners:focus-visible .series-bento__go {
+.mortgage-program:hover .series-bento__go {
   background: var(--brand-yellow);
   color: var(--avgst-ink);
   transform: translate(2px, -2px);
@@ -6012,10 +4575,6 @@ a {
   .mortgage-program:hover .mortgage-program__art {
     transform: none;
   }
-  .company-bento__tile:hover .series-bento__go,
-  .company-partners:hover .series-bento__go,
-  .company-bento__tile:focus-visible .series-bento__go,
-  .company-partners:focus-visible .series-bento__go { transform: none; }
 }
 
 @media (prefers-reduced-transparency: reduce) {
@@ -6642,8 +5201,7 @@ a {
   }
 }
 
-.factory-video,
-.manufacture-finish__image { border-radius: 16px; }
+.factory-video { border-radius: 16px; }
 
 .factory-video {
   position: relative;
@@ -8149,34 +6707,8 @@ html.is-dialog-open {
 /* Форму задаёт сам контур иконки: ни рамки, ни подложки. Кнопка — это
    штриховая иконка и число рядом, поверх фотографии это читается легче
    любой плашки. */
-.project-actions {
-  display: flex;
-  gap: 20px;
-}
-
-.project-actions__btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-size: 16px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 1;
-  cursor: pointer;
-  transition: color 0.2s var(--ease-out);
-}
 
 /* Фирменный жёлтый: поверхность снова тёмная, и на ней он читается. */
-.project-actions__btn:hover,
-.project-actions__btn[aria-pressed="true"] {
-  color: var(--brand-yellow);
-}
 
 /* Прозрачности здесь нет намеренно: поверх фотографии она съедает контраст
    быстрее, чем добавляет иерархию — приглушённая ссылка давала 3.3:1 при
@@ -9004,322 +7536,6 @@ html.is-dialog-open {
 
 /* Правила реферальной программы и юридические документы. */
 
-.referral-rules__head {
-  margin: 0 0 0.5rem;
-  padding: 0 0 1.5rem;
-  border-bottom: 1px solid var(--tint);
-}
-
-.referral-rules h1 {
-  margin: 0;
-  font-size: clamp(1.35rem, 2vw, 1.75rem);
-  font-weight: 750;
-  line-height: 1.25;
-  letter-spacing: -0.02em;
-}
-
-.referral-rules__meta {
-  margin: 14px 0 0;
-  font-size: 13px;
-  line-height: 1.4;
-  color: var(--ink-3);
-}
-
-.referral-rules__meta b {
-  font-weight: 600;
-  color: var(--ink-1);
-}
-
-.referral-rules__intro {
-  margin: 1rem 0 0;
-  max-width: 72ch;
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--ink-1);
-}
-
-.referral-rules__section {
-  margin: 2.75rem 0 0;
-  padding-top: 0.35rem;
-  border-top: 1px solid var(--tint);
-}
-
-.referral-rules__section h2 {
-  margin: 0 0 0.75rem;
-  font-size: 1.15rem;
-  line-height: 1.3;
-}
-
-.referral-rules__lead {
-  margin: 0 0 1.25rem;
-  max-width: 72ch;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--ink-3);
-}
-
-.referral-rules__glossary {
-  margin: 0;
-}
-
-.referral-rules__term {
-  display: grid;
-  gap: 6px;
-  margin: 0;
-  padding: 1rem 0;
-  border-bottom: 1px solid var(--tint);
-}
-
-.referral-rules__term:last-child {
-  border-bottom: 0;
-}
-
-.referral-rules__term dt {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.4;
-}
-
-.referral-rules__term dd {
-  margin: 0;
-  max-width: 72ch;
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--ink-1);
-}
-
-.referral-rules__note {
-  margin: 1.25rem 0 0;
-  padding-top: 1rem;
-  border-top: 1px solid var(--tint);
-  max-width: 72ch;
-  font-size: 13px;
-  line-height: 1.55;
-  color: var(--ink-3);
-}
-
-.referral-rules__group {
-  margin: 1.25rem 0 0;
-  padding: 1rem 1rem 0.25rem;
-  border-radius: var(--surface-radius, var(--radius));
-  background: var(--tint);
-}
-
-.referral-rules .referral-rules__group-title {
-  display: inline-block;
-  margin: 0 0 0.5rem;
-  padding: 4px 8px;
-  border-radius: 2px;
-  border-top: 0;
-  background: rgb(252 201 12 / 0.55);
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.35;
-  color: var(--ink-0);
-}
-
-.referral-rules__list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.referral-rules__item {
-  display: grid;
-  grid-template-columns: 2.5rem minmax(0, 1fr);
-  column-gap: 10px;
-  align-items: start;
-  margin: 0;
-  padding: 0.9rem 0;
-  border-top: 1px solid var(--tint);
-}
-
-.referral-rules__list > .referral-rules__item:first-child {
-  border-top: 0;
-}
-
-.referral-rules__num {
-  font-size: 15px;
-  font-weight: 700;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.65;
-}
-
-.referral-rules__item > p,
-.referral-rules__body,
-.referral-rules__body p {
-  margin: 0;
-  max-width: 72ch;
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--ink-0);
-}
-
-.referral-rules p,
-.referral-rules li {
-  max-width: 72ch;
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--ink-1);
-}
-
-.referral-rules ul,
-.referral-rules ol {
-  margin: 0.75rem 0;
-  padding-left: 1.25rem;
-}
-
-.referral-rules__bullets {
-  list-style: disc;
-  margin: 0.65rem 0 0.85rem;
-  padding-left: 1.25rem;
-}
-
-.referral-rules__bullets li {
-  display: list-item;
-  margin: 0.3rem 0;
-  padding: 0;
-  border: 0;
-  max-width: 72ch;
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--ink-0);
-}
-
-.referral-rules__checks {
-  list-style: none;
-  margin: 0.75rem 0 0;
-  padding: 0.75rem 0 0;
-  border-top: 1px solid var(--tint);
-}
-
-.referral-rules__checks li {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin: 0;
-  padding: 0.65rem 0;
-  font-size: 15px;
-  line-height: 1.6;
-  color: var(--ink-0);
-  border-top: 1px solid var(--tint);
-}
-
-.referral-rules__checks li > * {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.referral-rules__checks li:first-child {
-  border-top: 0;
-}
-
-.referral-rules__checks li::before {
-  content: "";
-  flex: 0 0 auto;
-  width: 10px;
-  height: 10px;
-  margin-top: 6px;
-  border-radius: 50%;
-  background: var(--brand-yellow);
-  box-shadow: 0 0 0 2px rgb(252 201 12 / 0.35);
-}
-
-.referral-rules__item--rate {
-  align-items: center;
-}
-
-.referral-rules__rate-row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 8px 16px;
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
-  background: #fff;
-}
-
-.referral-rules__item--rate-accent .referral-rules__rate-row {
-  border-color: rgb(252 201 12 / 0.45);
-  background: rgb(252 201 12 / 0.16);
-}
-
-.referral-rules__rate-tier {
-  margin: 0;
-  font-size: 15px;
-  font-weight: 700;
-  line-height: 1.35;
-}
-
-.referral-rules__rate-note {
-  margin: 4px 0 0;
-  font-size: 13px;
-  line-height: 1.4;
-  color: var(--ink-3);
-}
-
-.referral-rules__rate-value {
-  margin: 0;
-  font-size: 2rem;
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1;
-  white-space: nowrap;
-}
-
-.referral-rules__rate-value span {
-  font-size: 1rem;
-  font-weight: 600;
-  color: var(--ink-2);
-}
-
-.referral-rules__requisites {
-  margin: 0.75rem 0 0;
-  max-width: 72ch;
-  font-size: 15px;
-  line-height: 1.65;
-  color: var(--ink-0);
-}
-
-.referral-rules table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-  font-size: 14px;
-}
-
-.referral-rules th,
-.referral-rules td {
-  padding: 0.65rem 0.75rem;
-  border: 1px solid var(--line);
-  text-align: left;
-  vertical-align: top;
-}
-
-.referral-rules code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.92em;
-  padding: 0.1em 0.35em;
-  border-radius: 4px;
-  background: var(--tint);
-}
-
-.referral-rules__footer {
-  margin-top: 2.75rem;
-  padding-top: 1.75rem;
-  border-top: 1px solid var(--tint);
-  text-align: center;
-}
-
-.referral-rules__back {
-  display: inline-flex;
-  width: 100%;
-  max-width: 22rem;
-}
-
 .legal-doc__consent-actions {
   margin: 2.5rem 0 0;
   padding-top: 1.5rem;
@@ -9328,31 +7544,6 @@ html.is-dialog-open {
   flex-wrap: wrap;
   gap: 10px;
   align-items: center;
-}
-
-.legal-doc__consent-actions .referral-rules__back {
-  width: auto;
-  max-width: none;
-}
-
-@media (min-width: 640px) {
-  .referral-rules__term {
-    grid-template-columns: minmax(220px, 34%) minmax(0, 1fr);
-    column-gap: 1.5rem;
-    padding: 1.25rem 0;
-  }
-
-  .referral-rules__group {
-    padding: 1.25rem 1.25rem 0.35rem;
-  }
-
-  .referral-rules__item {
-    grid-template-columns: 2.75rem minmax(0, 1fr);
-  }
-
-  .referral-rules__rate-value {
-    font-size: 2.5rem;
-  }
 }
 
 .cookie-banner {
@@ -10608,64 +8799,14 @@ html.is-dialog-open {
    помещаться на экран целиком, иначе связь «поменял параметр — увидел другие
    дома» рвётся прокруткой. Блок собран в бюджет высоты, и каждое значение
    ниже подчинено ему. На 1920×1080 секция занимала 1215px. */
-.mortgage-calc {
-  padding: 40px 0;
-
-  /* Шкала скруглений блока.
-     Радиус убывает вглубь: панель — карточки внутри неё — плитки и мелкие
-     поверхности. Разница между ступенями заметная, иначе вложенность не
-     читается: панель 18 и карточка 16 отличались на два пикселя и выглядели
-     одним уровнем.
-
-     Второе правило — соразмерность. Радиус держится около десятой доли
-     меньшей стороны: каталожная карточка с её 16px рассчитана на высоту
-     381px, а на компактной в 102px те же 16px давали 15.7% и делали её
-     вдвое круглее соседей. */
-  --calc-radius-panel: 18px;
-  --calc-radius-card: 12px;
-  --calc-radius-tile: 10px;
-}
 
 /* Шапка калькулятора — обычный заголовок секции, как у соседних блоков.
    Колонкой внутри панели он забирал треть ширины у полей и результата и
    ломал ритм страницы: у всех секций заголовок сверху, здесь был сбоку. */
-.mortgage-calc__head {
-  margin: 0 0 16px;
-}
-
-.mortgage-calc__head h2 {
-  margin: 0;
-  max-width: 34ch;
-  font-size: clamp(22px, 1.5vw, 28px);
-  line-height: 1.15;
-}
-
-@media (max-width: 599px) {
-  .mortgage-calc--project .mortgage-calc__head h2 {
-    margin-top: 6px;
-  }
-}
-
-.mortgage-calc__lead {
-  margin: 6px 0 0;
-  max-width: 64ch;
-  font-size: 13px;
-  line-height: 1.4;
-  color: var(--ink-2);
-}
 
 /* Панель — одна карточка, а не серая заливка: у неё белый фон, тонкая
    грань и единственная мягкая тень. Прежняя заливка 4% превращала блок в
    бесформенное пятно, внутри которого плавали ещё несколько поверхностей. */
-.mortgage-calc__panel {
-  display: grid;
-  gap: 16px;
-  padding: 16px;
-  border: 1px solid var(--tint);
-  border-radius: var(--calc-radius-panel);
-  background: #fff;
-  box-shadow: 0 1px 2px var(--tint);
-}
 
 @media (min-width: 960px) {
   /* Две колонки вместо трёх: поля и результат. Поля шире — там работа,
@@ -10685,308 +8826,26 @@ html.is-dialog-open {
      Стоимость и взнос получают по 350px: на такой длине у ползунка видна
      цена деления. Срок занимает обе колонки — он самый грубый по шагу, и
      длина ему не вредит, зато ряд не остаётся с пустой ячейкой. */
-  .mortgage-calc__panel {
-    grid-template-columns: minmax(0, 1fr) 380px;
-    align-items: start;
-    column-gap: 16px;
-    row-gap: 18px;
-  }
-
-  .mortgage-calc__controls {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    grid-template-rows: auto auto auto auto;
-    align-content: start;
-    column-gap: 16px;
-  }
-
-  .mortgage-calc__modes,
-  .mortgage-calc__programs,
-  .mortgage-calc__tile:last-child {
-    grid-column: 1 / -1;
-  }
 
   /* Проекты лежат под обеими колонками, внутри той же карточки. */
-  .mortgage-calc__matches {
-    grid-column: 1 / -1;
-  }
 }
 
 /* Результат на карточке проекта — часть общей панели, а не ещё одна
    карточка внутри неё. Правое поле панели остаётся таким же, как у других
    её элементов: акцент не должен прижиматься к наружной границе. */
-.mortgage-calc--project .mortgage-calc__panel {
-  padding-right: 16px;
-}
-
-@media (min-width: 960px) {
-  .mortgage-calc--project .mortgage-calc__panel {
-    grid-template-columns: minmax(0, 1fr) 340px;
-    column-gap: 32px;
-  }
-}
 
 /* Компактный сегмент: по содержимому, не на всю колонку. */
-.mortgage-calc__modes {
-  display: inline-grid;
-  grid-template-columns: auto auto;
-  align-items: stretch;
-  box-sizing: border-box;
-  width: fit-content;
-  max-width: 100%;
-  height: 28px;
-  margin: 0;
-  padding: 2px;
-  gap: 2px;
-  border-radius: 8px;
-  background: var(--tint);
-}
-
-.mortgage-calc__mode {
-  appearance: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  box-sizing: border-box;
-  width: auto;
-  height: 100%;
-  min-height: 0;
-  margin: 0;
-  border: 0;
-  border-radius: 6px;
-  padding: 0 10px;
-  background: transparent;
-  color: var(--ink-2);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: -0.01em;
-  white-space: nowrap;
-  text-align: center;
-  cursor: pointer;
-}
 
 /* Подпись комплектации снаружи сегмента: рядом на десктопе, сверху на мобильном. */
-.mortgage-calc__tier-picker {
-  display: inline-grid;
-  grid-template-columns: auto auto;
-  align-items: stretch;
-  box-sizing: border-box;
-  width: fit-content;
-  max-width: 100%;
-  height: 28px;
-  margin: 0;
-  padding: 0;
-  gap: 2px;
-}
-
-.mortgage-calc__tier-picker .mortgage-calc__modes--tiers {
-  display: grid;
-  grid-column: auto;
-  grid-template-columns: repeat(var(--mortgage-tier-count, 2), auto);
-  width: fit-content;
-  padding: 2px;
-}
-
-.mortgage-calc__tier-label {
-  display: inline-flex;
-  align-items: center;
-  padding: 0 6px 0 8px;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-2);
-  white-space: nowrap;
-}
-
-.mortgage-calc__mode.is-active {
-  background: #fff;
-  color: var(--avgst-ink);
-  box-shadow: 0 1px 2px rgb(0 0 0 / 0.06);
-}
-
-.mortgage-calc__controls {
-  display: grid;
-  gap: 8px;
-  min-width: 0;
-  align-content: start;
-}
-
-.mortgage-calc__programs {
-  margin: 0;
-  padding: 0;
-  border: 0;
-}
-
-.mortgage-calc__program-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-}
-
-.mortgage-calc__program {
-  display: inline-flex;
-  flex: 0 0 auto;
-  align-items: baseline;
-  gap: 6px;
-  min-width: 0;
-  min-height: 0;
-  padding: 6px 10px;
-  border: 1px solid transparent;
-  border-radius: 8px;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  white-space: nowrap;
-  cursor: pointer;
-}
-
-.mortgage-calc__program span {
-  font-size: 12px;
-  line-height: 1.25;
-}
-
-.mortgage-calc__program strong {
-  font-size: 13px;
-  letter-spacing: -0.02em;
-  color: var(--avgst-green);
-}
-
-.mortgage-calc__program.is-active {
-  border-color: var(--avgst-ink);
-}
-
-.mortgage-calc__tile {
-  display: grid;
-  gap: 4px;
-  min-height: 0;
-  padding: 10px 12px;
-  border: 0;
-  border-radius: 8px;
-  background: #fff;
-}
 
 /* Плитка на фокус не реагирует. Кольцо в 2px по всей её ширине сообщало
    «активна вся карточка», хотя редактируется одно число в углу: отклик
    оказывался оторван от места ввода и выглядел сбоем, а не подсветкой. */
 
-.mortgage-calc__tile-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  min-width: 0;
-}
-
 /* Подпись держится в одну строку. На узкой плитке двухколоночной раскладки
    длинное число отжимало её, и «Первоначальный взнос» ломался пополам:
    поле выглядело съехавшим, хотя место было. Сжиматься теперь умеет само
    число — оно набрано моноширинными цифрами и переносов не боится. */
-.mortgage-calc__tile-label {
-  flex: 0 1 auto;
-  min-width: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  font-size: 14px;
-  font-weight: 500;
-  line-height: 1.25;
-  color: var(--ink-1);
-}
-
-@media (max-width: 599px) {
-  .mortgage-calc--project .mortgage-calc__panel {
-    padding: 12px;
-  }
-
-  .mortgage-calc--project .mortgage-calc__tier-picker {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-    width: 100%;
-    height: auto;
-    padding: 0;
-    border-radius: 0;
-    background: transparent;
-  }
-
-  .mortgage-calc--project .mortgage-calc__tier-picker .mortgage-calc__modes--tiers {
-    display: grid;
-    grid-template-columns: repeat(var(--mortgage-tier-count, 2), minmax(0, 1fr));
-    width: 100%;
-    min-width: 0;
-    height: 28px;
-  }
-
-  .mortgage-calc--project .mortgage-calc__modes--tiers .mortgage-calc__mode {
-    min-width: 0;
-    padding-inline: 5px;
-    font-size: 12px;
-  }
-
-  .mortgage-calc--project .mortgage-calc__tier-label {
-    min-height: 0;
-    min-width: 0;
-    padding: 0;
-    font-size: 12px;
-    line-height: 1;
-  }
-
-  .mortgage-calc--project .mortgage-calc__tile {
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0;
-    padding-inline: 10px;
-  }
-
-  .mortgage-calc--project .mortgage-calc__tile-head {
-    gap: 8px;
-  }
-
-  .mortgage-calc--project .mortgage-calc__tile-label {
-    flex-shrink: 0;
-    overflow: visible;
-    text-overflow: clip;
-  }
-
-  .mortgage-calc--project .mortgage-calc__tile-value {
-    flex: 1 1 auto;
-    overflow: hidden;
-  }
-
-  .mortgage-calc--project .mortgage-calc__tile-value input {
-    width: 100%;
-    max-width: none;
-  }
-
-  .mortgage-calc--project .mortgage-calc__tile-suffix.is-currency {
-    display: none;
-  }
-}
-
-.mortgage-calc__tile-value {
-  display: flex;
-  align-items: baseline;
-  justify-content: flex-end;
-  gap: 6px;
-  min-width: 0;
-}
-
-.mortgage-calc__tile-value input {
-  flex: 0 1 auto;
-  min-width: 0;
-  max-width: 12ch;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  font: inherit;
-  font-size: 16px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
 
 /* Ввод мышью не подсвечивается вовсе: место правки показывает каретка,
    а любая плашка вокруг числа — лишний шум.
@@ -10995,250 +8854,21 @@ html.is-dialog-open {
    тень: он рисуется поверх раскладки и не занимает места, поэтому его
    появление и исчезновение не двигают ни число, ни соседние подписи.
    Прежняя плашка на тени была толстой, серой и выглядела артефактом. */
-.mortgage-calc__tile-value input:focus {
-  outline: none;
-}
-
-.mortgage-calc__tile-value input:focus-visible {
-  outline: 1px solid var(--ink-4);
-  outline-offset: 3px;
-  border-radius: 4px;
-}
-
-.mortgage-calc__tile-value span,
-.mortgage-calc__tile-pct {
-  flex: 0 0 auto;
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--ink-3);
-  font-variant-numeric: tabular-nums;
-}
-
-.mortgage-calc__tile-pct {
-  min-width: 4.5ch;
-  text-align: right;
-}
-
-.mortgage-calc__pills {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 6px;
-  margin-top: 2px;
-  min-height: 28px;
-}
-
-.mortgage-calc__pill {
-  appearance: none;
-  border: 0;
-  border-radius: 999px;
-  min-height: 28px;
-  padding: 5px 12px;
-  background: var(--tint);
-  color: var(--ink-1);
-  font: inherit;
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.2;
-  cursor: pointer;
-}
-
-.mortgage-calc__pill.is-active {
-  background: var(--avgst-ink);
-  color: #fff;
-}
-
-.mortgage-calc__result {
-  /* Не липкая. Пока панель была короткой, ездить карточке было некуда;
-     с проектами внутри панель выросла, и карточка поехала вниз прямо по
-     ним. Держать её в кадре незачем: сумма видна там же, где её считают. */
-  display: grid;
-  gap: 8px;
-  align-content: start;
-  min-width: 0;
-  padding: 12px 14px;
-  border-radius: var(--calc-radius-card);
-  background: #fff;
-  color: var(--avgst-ink);
-  /* Тень мягче: карточка лежит внутри панели, а не парит над страницей.
-     Прежние 32px размытия на 10% отрывали её от собственного контейнера. */
-  box-shadow: 0 4px 16px var(--tint);
-}
-
-.mortgage-calc__hero-num {
-  margin: 0;
-  min-height: 1.15em;
-  font-size: clamp(22px, 2.4vw, 28px);
-  font-weight: 700;
-  letter-spacing: -0.04em;
-  line-height: 1.15;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-  color: var(--avgst-green);
-}
-
-.mortgage-calc__hero-label {
-  margin: 0;
-  min-height: 2.6em;
-  font-size: 12px;
-  line-height: 1.3;
-  color: var(--ink-2);
-}
-
-.mortgage-calc__result-metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  min-height: 48px;
-  padding: 8px 0;
-  border-top: 1px solid var(--tint);
-  border-bottom: 1px solid var(--tint);
-}
-
-.mortgage-calc__result-metrics strong {
-  display: block;
-  font-size: 14px;
-  letter-spacing: -0.02em;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.mortgage-calc__result-metrics span {
-  display: block;
-  margin-top: 1px;
-  font-size: 11px;
-  color: var(--ink-3);
-}
 
 /* Фиксированный слот — льготные части не двигают карточку. */
-.mortgage-calc__parts-slot {
-  display: grid;
-  align-content: center;
-  height: 56px;
-}
-
-.mortgage-calc__parts {
-  display: grid;
-  gap: 4px;
-  box-sizing: border-box;
-  height: 100%;
-  padding: 8px 10px;
-  border-radius: 8px;
-  background: var(--tint);
-  align-content: center;
-}
-
-.mortgage-calc__parts p {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px 12px;
-  align-items: baseline;
-  margin: 0;
-  font-size: 12px;
-  line-height: 1.35;
-}
-
-.mortgage-calc__parts span {
-  min-width: 0;
-  color: var(--ink-2);
-}
 
 /* Ставка при названии части: не курсив, чуть плотнее подписи, чтобы не
    слиться с ней и не спорить с суммой справа. */
-.mortgage-calc__part-rate {
-  margin-left: 6px;
-  font-style: normal;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  color: var(--ink-0);
-}
-
-.mortgage-calc__parts strong {
-  white-space: nowrap;
-  font-variant-numeric: tabular-nums;
-  text-align: right;
-}
 
 /* Карточка результата: расчёт и форма в одной клетке. Перекрещиваются
    прозрачностью, поэтому ни карточка, ни то, что вокруг неё, не двигается
    — человек видит подмену содержимого, а не перестройку страницы. */
-.mortgage-calc__reveal {
-  display: grid;
-  min-width: 0;
-  height: 100%;
-}
-
-.mortgage-calc__reveal-copy,
-.mortgage-calc__reveal-slot {
-  grid-column: 1;
-  grid-row: 1;
-  min-width: 0;
-}
-
-.mortgage-calc__reveal-copy {
-  display: grid;
-  /* Базовый блок рассчитан на баннер: там содержимое стоит по своей
-     ширине (justify-items: start) и по центру клетки. В панели расчёта
-     строки должны тянуться во всю ширину, иначе цифры прижимаются
-     влево, а справа остаётся пустое поле. */
-  justify-items: stretch;
-  /* Не start: содержимое на несколько пикселей короче клетки, и кнопка
-     расчёта не доставала до низа — форма, прижатая к низу, садилась
-     мимо неё. space-between дотягивает кнопку до края, разница уходит
-     в просветы между строками расчёта. */
-  align-content: space-between;
-  /* Свой просвет, а не inherit: раньше он наследовался от обёртки, где
-     gap не задан вовсе, и строки расчёта слипались с кнопкой. */
-  gap: 12px;
-  transition: opacity 0.3s var(--ease-out);
-}
-
-.mortgage-calc__reveal.is-open .mortgage-calc__reveal-copy {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.mortgage-calc__reveal-slot {
-  position: relative;
-  z-index: 1;
-  display: grid;
-  /* Форма тянется во всю клетку: её кнопка встаёт ровно туда, где
-     стояла кнопка расчёта. Иначе при раскрытии кнопка уезжает, и
-     подмена читается как прыжок. */
-  align-content: stretch;
-  pointer-events: none;
-}
 
 /* Карточка расчёта светлая: базовый белый крестик на ней был невидим. */
-.mortgage-calc__reveal-card .lead-reveal__close {
-  color: var(--ink-3);
-}
-
-.mortgage-calc__reveal-card .lead-reveal__close:hover {
-  color: var(--avgst-ink);
-}
 
 /* Светлый вариант общей карточки. Базовая рассчитана на тёмный баннер:
    там весь текст белый. Здесь она лежит на белой панели расчёта, и
    подписи полей нужно вернуть в чернила. */
-.mortgage-calc__reveal-card {
-  --lead-ink: var(--avgst-ink-rgb);
-  color: var(--avgst-ink);
-  position: relative;
-  width: 100%;
-  opacity: 0;
-  visibility: hidden;
-  pointer-events: none;
-  transition:
-    opacity 0.3s var(--ease-out),
-    visibility 0.3s var(--ease-out);
-}
-
-.mortgage-calc__reveal.is-open .mortgage-calc__reveal-card {
-  opacity: 1;
-  visibility: visible;
-  pointer-events: auto;
-}
 
 /* Внутри карточки результата форма без своей рамки и фона: коробкой
    служит сама карточка. */
@@ -11246,255 +8876,52 @@ html.is-dialog-open {
    не должна менять размер между расчётом и формой — иначе соседние
    блоки дёргаются при каждом нажатии. Прижать форму к низу мало:
    сверху оставалось пустое поле в треть карточки. */
-.mortgage-calc__reveal-card .lead-card,
-.mortgage-calc__reveal-card .lead-form {
-  height: 100%;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-}
 
 /* В панели расчёта форма занимает её целиком: базовое ограничение в
    340px — это вид для баннера, где поля не должны растягиваться на всю
    колонку. Здесь из-за него форма была у́же кнопки расчёта, и правое
    поле выходило вдвое шире левого. */
-.mortgage-calc__reveal-card {
-  max-width: none;
-  /* Подъём первой подписи на свою высоту — приём баннера: там она
-     встаёт в строку заголовка, который остаётся видимым. Здесь над
-     формой ничего нет, и подпись с крестиком вылезали за верх панели. */
-  --lead-caption: 0px;
-}
 
 /* Кнопка формы встаёт на место кнопки расчёта, значит и ширина у неё
    та же. Базовое правило сужает её по надписи — это вид для баннера,
    где рядом нет кнопки, которую надо повторить. */
-.mortgage-calc__reveal-card .lead-card button[type="submit"],
-.mortgage-calc__reveal-card .lead-form button[type="submit"] {
-  align-self: stretch;
-  width: 100%;
-}
-
-.mortgage-calc__result-cta {
-  justify-self: stretch;
-  text-align: center;
-  margin-top: 2px;
-}
-
-.mortgage-calc__result-note {
-  box-sizing: border-box;
-  min-height: 36px;
-  margin: 0;
-  padding: 8px 10px;
-  font-size: 12px;
-  line-height: 1.3;
-  color: var(--ink-2);
-  text-align: center;
-}
 
 /* Резюме в карточке проекта собрано как чек: последовательность строк,
    а не таблица. Лидер удерживает взгляд между названием и цифрой, а
    фиксированная высота карточки не даёт странице сдвигаться при смене
    комплектации или программы. */
-.mortgage-calc__result--project {
-  grid-template-rows: auto auto 1fr;
-  min-height: 280px;
-  padding: 0;
-  border-radius: 0;
-  background: transparent;
-  box-shadow: none;
-}
 
 /* На узком экране результат стоит под полями, а не колонкой рядом.
    Запас высоты, который держит боковую колонку, здесь остаётся пустым
    полем между чеком и сноской. */
-@media (max-width: 959px) {
-  .mortgage-calc--project .mortgage-calc__result--project {
-    grid-template-rows: auto;
-    min-height: 0;
-  }
-
-}
-
-.mortgage-calc__project-payment {
-  padding: 12px 14px;
-  border-radius: 10px;
-  border: 1px solid var(--avgst-ink);
-  background: transparent;
-}
-
-.mortgage-calc__project-payment .mortgage-calc__hero-num {
-  font-size: clamp(24px, 2.4vw, 30px);
-  color: var(--avgst-green);
-}
-
-.mortgage-calc__project-payment .mortgage-calc__hero-label {
-  min-height: 0;
-  margin-top: 2px;
-  color: var(--ink-2);
-}
-
-.mortgage-calc__receipt {
-  display: grid;
-  align-content: start;
-  gap: 12px;
-  width: 100%;
-  min-width: 0;
-  min-height: 0;
-  margin: 0;
-  padding: 16px 0 0 2px;
-}
 
 /* Одна ширина на все строки: значение прижато к правому краю строки,
    а не к своей колонке. Иначе на узком телефоне длинная подпись
    раздувает строку и суммы встают лесенкой. */
-.mortgage-calc__receipt > div {
-  display: flex;
-  align-items: baseline;
-  gap: 8px;
-  width: 100%;
-  min-width: 0;
-}
-
-.mortgage-calc__receipt dt {
-  flex: 0 1 auto;
-  min-width: 0;
-  font-size: 12px;
-  color: var(--ink-2);
-}
-
-.mortgage-calc__receipt > div > span {
-  flex: 1 0 12px;
-  align-self: center;
-  border-bottom: 1px dotted var(--line-2);
-}
-
-.mortgage-calc__receipt dd {
-  flex: 0 0 auto;
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-  line-height: 1.2;
-  white-space: nowrap;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  font-feature-settings: "tnum" 1;
-}
 
 /* Подбор проектов внутри панели.
    Отделён волосяной линией, а не отступом в целую секцию: это продолжение
    расчёта, а не самостоятельный блок. */
-.mortgage-calc__matches {
-  display: grid;
-  gap: 12px;
-  padding-top: 16px;
-  border-top: 1px solid var(--tint);
-}
-
-.mortgage-calc__matches-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 8px 16px;
-}
-
-.mortgage-calc__matches-head h3 {
-  margin: 0;
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.3;
-  color: var(--ink-1);
-}
 
 /* Число — единственное место, где оно названо. Раньше то же значение стояло
    ещё и в карточке результата, и на жёлтой кнопке под карточками. */
-.mortgage-calc__matches-head strong {
-  color: var(--avgst-ink);
-  font-variant-numeric: tabular-nums;
-}
 
 /* Тихая ссылка вместо второй жёлтой кнопки: главное действие в блоке одно —
    «Получить консультацию», и спорить с ним здесь нечему. */
-.mortgage-calc__matches-all {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--avgst-ink);
-  text-decoration: none;
-}
-
-.mortgage-calc__matches-all svg {
-  transition: transform 0.16s var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .mortgage-calc__matches-all:hover svg {
-    transform: translate(2px, -2px);
-  }
-}
-
-.mortgage-calc__matches-all:active {
-  transform: scale(0.97);
-}
 
 /* Ровно три колонки, как в каталоге. auto-fill на полосе в 1112px нарезал
    четыре места под три карточки: они ужимались до 266px, характеристики
    переносились на вторую строку, и карточка из горизонтальной становилась
    вертикальной. */
-.mortgage-calc__matches-grid {
-  display: grid;
-  gap: var(--gap-tile);
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-}
-
-@media (min-width: 960px) {
-  .mortgage-calc__matches-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
 
 /* Каждая карточка лежит в обёртке, которая считает клики. По высоте ряда
    растягивается обёртка, а карточка внутри оставалась по своему содержимому:
    у кого характеристики переносились на вторую строку, тот выходил на 11px
    выше соседей, и его кадр уходил ниже их нижнего края. Обёртка раздаёт свою
    высоту дальше. */
-.mortgage-calc__matches-grid > * {
-  display: flex;
-}
-
-.mortgage-calc__matches-grid > * > .card {
-  flex: 1 1 auto;
-  min-width: 0;
-}
-
-.mortgage-calc__matches-empty {
-  margin: 0;
-  font-size: 14px;
-  color: var(--ink-2);
-}
 
 /* Предупреждение живёт внутри карточки результата, в боксе под разбивкой
    кредита. Мелкое и приглушённое: это сноска к расчёту, а не сообщение. */
-.mortgage-calc__disclaimer {
-  margin: 0;
-  font-size: 11px;
-  /* Без балансировки строк: она подрезает их по длине и оставляет справа
-     пустое поле, хотя ширина карточки позволяет набрать строку до края. */
-  line-height: 1.45;
-  color: var(--ink-2);
-}
-
-.catalog__budget-note {
-  margin: 0 0 var(--gap-tile);
-  font-size: 15px;
-  color: var(--ink-1);
-}
 
 /* Radix Accordion (shadcn-примитив) под AV4. */
 .ui-accordion {
@@ -11703,83 +9130,12 @@ html.is-dialog-open {
    Высота снимается разворотом, а не обрезкой кадра. Сильнее кадрировать
    нельзя: на пропорции 12:5 дом резался по крыше и переднему плану. Поэтому
    фото уходит влево, сохраняя свои 16:9, а текст встаёт рядом. */
-.mortgage-calc__matches .card {
-  display: flex;
-  align-items: stretch;
-  border-radius: var(--calc-radius-tile);
-}
-
-.mortgage-calc__matches .card__title-link::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  cursor: pointer;
-  border-radius: inherit;
-}
-
-.mortgage-calc__matches .card__title-link:focus-visible::after {
-  outline: 2px solid var(--avgst-green);
-  outline-offset: -2px;
-}
-
-.mortgage-calc__matches .card__top {
-  flex: 0 0 clamp(132px, 42%, 168px);
-  /* Колонка кадра тянется по высоте карточки и режет всё, что выйдет за
-     её пределы. Без этого высокая картинка вылезала бы из-под скруглённого
-     нижнего угла: карточка обрезает содержимое по себе, а вложенная
-     колонка — нет. */
-  align-self: stretch;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.mortgage-calc__matches .card__media {
-  height: 100%;
-  aspect-ratio: auto;
-}
-
-.mortgage-calc__matches .card__media img {
-  height: 100%;
-  object-fit: cover;
-}
-
-.mortgage-calc__matches .card__body {
-  flex: 1 1 auto;
-  min-width: 0;
-  justify-content: center;
-  padding: 10px 12px;
-  gap: 2px;
-}
-
-.mortgage-calc__matches .card h3 {
-  font-size: 0.9375rem;
-  line-height: 1.25;
-}
-
-.mortgage-calc__matches .specs {
-  margin: 4px 0 0;
-  gap: 2px 10px;
-  font-size: 12px;
-}
-
-.mortgage-calc__matches .price {
-  margin: 4px 0 0;
-  font-size: 0.875rem;
-}
 
 /* Жёлтая кнопка снята: карточка кликабельна по фото и названию, а три
    жёлтые кнопки в ряд спорили с единственным действием блока. */
-.mortgage-calc__matches .card__cta {
-  display: none;
-}
 
 /* Бейдж технологии и кнопки «поделиться» на маленьком кадре только мешают:
    они закрывают собой дом, ради которого кадр и показан. */
-.mortgage-calc__matches .badge,
-.mortgage-calc__matches .card__actions {
-  display: none;
-}
 
 /* Первый экран нефотографической программы.
    Ноутбук, колосья и здание банка — предметные знаки на прозрачном фоне.
@@ -11966,1143 +9322,112 @@ html.is-dialog-open {
    Карандаш нужен потому, что рядом лежит сумма кредита, которая только
    читается: без него ставка выглядит такой же строкой отчёта, и нажать в
    неё никто не догадается. */
-.mortgage-calc__result-metrics .mortgage-calc__rate-edit {
-  display: flex;
-  align-items: baseline;
-  gap: 5px;
-  width: fit-content;
-}
 
 /* Правило .mortgage-calc__result-metrics span набрано для единицы
    измерения — одиннадцатым кеглем в половину силы. Плашка тоже span и
    попадала под него: число выглядело подписью, а не значением. Здесь
    возвращается вид соседней суммы кредита. */
-.mortgage-calc__result-metrics .mortgage-calc__rate-chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  margin-top: 0;
-  font-size: 14px;
-  letter-spacing: -0.02em;
-  color: var(--avgst-ink);
-  /* Поля и грань гасятся отрицательными полями ровно на свою величину:
-     плашка не прибавляет строке высоты, и подпись «ставка» остаётся на
-     одной линии с «сумма кредита». */
-  padding: 1px 6px;
-  margin: -2px -6px;
-  border: 1px solid var(--line);
-  border-radius: 7px;
-  background: var(--tint);
-  transition:
-    border-color 0.2s var(--ease-out),
-    background-color 0.2s var(--ease-out);
-}
-
-.mortgage-calc__result-metrics .mortgage-calc__rate-chip:hover {
-  border-color: var(--ink-4);
-  background: var(--tint);
-}
 
 /* Фокус той же волосяной гранью, что у денежных полей калькулятора, а не
    жёлтой: жёлтая обводка в панели больше нигде не встречается и читалась
    чужой. Фон при этом белеет — плашка перестаёт быть кнопкой и становится
    полем, в котором стоит каретка. */
-.mortgage-calc__result-metrics .mortgage-calc__rate-chip:focus-within {
-  border-color: var(--ink-4);
-  background: #fff;
-}
-
-.mortgage-calc__rate-pen {
-  flex: 0 0 auto;
-  color: var(--ink-3);
-}
-
-.mortgage-calc__rate-edit input {
-  /* Пять знаков: «15,99» — ставка с сотыми встречается не реже целой.
-     Это запас для браузеров, которые не умеют мерить поле по содержимому;
-     там, где умеют, ширина всё равно идёт по набору. */
-  width: 5ch;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-variant-numeric: tabular-nums;
-  text-align: left;
-}
 
 /* Где браузер умеет мерить поле по содержимому, ширина следует набору:
    в покое ровно под «16», а при наборе десятых растягивается на знак и
    возвращается обратно. Прежде это не работало вовсе — field-sizing
    действует только при width: auto, а стояла жёсткая ширина, которая его
    и перебивала. */
-@supports (field-sizing: content) {
-  .mortgage-calc__rate-edit input {
-    width: auto;
-    field-sizing: content;
-    min-width: 2ch;
-    max-width: 5ch;
-  }
-}
 
 /* Своей обводки у поля нет: фокус показывает плашка, и вторая рамка
    внутри первой читалась бы ошибкой. */
-.mortgage-calc__rate-edit input:focus,
-.mortgage-calc__rate-edit input:focus-visible {
-  outline: none;
-}
 
 
 /* ───────── Макет страницы проекта (/preview/project) ─────────
    Отдельный префикс pp-: макет не должен задевать боевые страницы, пока
    решение по нему не принято. */
 
-.pp__note {
-  width: min(var(--page-width), calc(100% - var(--page-gutter) * 2));
-  margin: 24px auto 0;
-  padding: 10px 14px;
-  border-radius: 10px;
-  background: var(--tint);
-  font-size: 13px;
-  color: var(--ink-2);
-}
-
 /* Полоса разделов липнет к верху окна. */
-.pp__nav {
-  position: sticky;
-  top: 0;
-  z-index: 5;
-  margin-top: 24px;
-  border-bottom: 1px solid var(--line);
-  background: var(--on-dark-0);
-  backdrop-filter: blur(10px);
-}
-
-.pp__nav-inner {
-  display: flex;
-  gap: 24px;
-  overflow-x: auto;
-  padding-block: 14px;
-  scrollbar-width: none;
-}
-
-.pp__nav-inner::-webkit-scrollbar {
-  display: none;
-}
-
-.pp__nav a {
-  flex: 0 0 auto;
-  color: var(--ink-2);
-  font-size: 14px;
-  font-weight: 600;
-  text-decoration: none;
-  transition: color 0.2s var(--ease-out);
-}
-
-.pp__nav a:hover {
-  color: var(--avgst-ink);
-}
-
-.pp__section {
-  scroll-margin-top: 64px;
-}
 
 /* ── О проекте ── */
-.pp__about {
-  display: grid;
-  gap: var(--gap-stack);
-  margin-top: var(--gap-stack);
-}
-
-@media (min-width: 900px) {
-  .pp__about {
-    grid-template-columns: 300px minmax(0, 1fr);
-    gap: 64px;
-  }
-}
-
-.pp__specs {
-  display: grid;
-  gap: 18px;
-  margin: 0;
-}
-
-.pp__specs dt {
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-
-.pp__specs dd {
-  margin: 4px 0 0;
-  font-size: 13px;
-  color: var(--ink-2);
-}
-
-.pp__about-text p {
-  max-width: 62ch;
-  margin: 0 0 16px;
-  font-size: 16px;
-  line-height: 1.6;
-  color: var(--ink-1);
-}
 
 /* ── Планировка ── */
-.pp__plan {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
-}
-
-@media (min-width: 900px) {
-  .pp__plan {
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 32px;
-    align-items: start;
-  }
-}
-
-.pp__plan-media {
-  overflow: hidden;
-  border-radius: 16px;
-  background: #fff;
-}
-
-.pp__plan-media img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.pp__rooms {
-  display: grid;
-  gap: 8px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
 
 /* Комната — кнопка: ведёт в свои интерьеры. */
-.pp__room {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 2px 12px;
-  width: 100%;
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: 12px;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color 0.2s var(--ease-out),
-    transform 0.16s var(--ease-out);
-}
-
-.pp__room:hover {
-  border-color: var(--ink-4);
-}
-
-.pp__room:active {
-  transform: scale(0.99);
-}
-
-.pp__room--on {
-  border-color: var(--avgst-ink);
-}
-
-.pp__room-name {
-  font-size: 16px;
-  font-weight: 600;
-}
-
-.pp__room-area {
-  font-size: 15px;
-  font-weight: 600;
-  color: var(--ink-2);
-}
-
-.pp__room-go {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  grid-column: 1 / -1;
-  font-size: 12px;
-  color: var(--ink-3);
-}
 
 /* ── Фасады: бенто ── */
-.pp__bento {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-@media (min-width: 900px) {
-  .pp__bento {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .pp__bento-lead {
-    grid-column: span 2;
-    grid-row: span 2;
-  }
-}
 
 /* Кадр заполняет ячейку целиком. Пропорцию держит сама ячейка, а не
    картинка: крупная плитка занимает две колонки и два ряда, и высота у
    неё складывается из рядов с промежутком — задай ей 16:9 отдельно, и
    она разошлась бы с сеткой. Прежде пропорция стояла на картинке, и под
    мелкими плитками оставался серый хвост. */
-.pp__bento figure {
-  overflow: hidden;
-  margin: 0;
-  aspect-ratio: 16 / 9;
-  border-radius: 14px;
-  background: var(--surface-sunken);
-}
 
 @media (min-width: 900px) {
   /* Селектор с именем блока — иначе правило проигрывает по весу
      .pp__bento figure, и крупная плитка берёт ту же пропорцию вместо
      того, чтобы занять свои два ряда. */
-  .pp__bento figure.pp__bento-lead {
-    aspect-ratio: auto;
-  }
-}
-
-.pp__bento img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.45s var(--ease-out);
-}
-
-.pp__bento figure:hover img {
-  transform: scale(1.03);
 }
 
 /* ── Интерьеры ── */
-.pp__filters {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-  margin-top: var(--gap-stack);
-}
-
-.pp__chip {
-  padding: 8px 14px;
-  border: 0;
-  border-radius: 999px;
-  background: var(--tint);
-  color: var(--ink-1);
-  font: inherit;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition:
-    background-color 0.2s var(--ease-out),
-    color 0.2s var(--ease-out);
-}
-
-.pp__chip:hover {
-  background: var(--line);
-}
-
-.pp__chip--on {
-  background: var(--avgst-ink);
-  color: #fff;
-}
-
-.pp__shots {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-tile);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-@media (min-width: 900px) {
-  .pp__shots {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.pp__shots figure {
-  overflow: hidden;
-  margin: 0;
-  aspect-ratio: 16 / 9;
-  border-radius: 14px;
-  background: var(--surface-sunken);
-}
-
-.pp__shots img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
 
 /* ── Комплектация ── */
-.pp__config {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
-}
-
-@media (min-width: 900px) {
-  .pp__config {
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 32px;
-    align-items: start;
-  }
-}
 
 /* Комплектации: три уровня в ряд. Карточка — кнопка, потому что выбор
    меняет цену и платёж в панели справа. Состав перечислен прямо в ней:
    разница между уровнями видна списком, а не описанием. */
-.pp__tiers {
-  display: grid;
-  gap: var(--gap-tile);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 720px) {
-  .pp__tiers {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.pp__tiers li {
-  display: flex;
-  min-width: 0;
-}
-
-.pp__tier {
-  display: grid;
-  align-content: start;
-  gap: 8px;
-  flex: 1 1 auto;
-  padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color 0.2s var(--ease-out),
-    box-shadow 0.2s var(--ease-out),
-    transform 0.16s var(--ease-out);
-}
-
-.pp__tier:hover {
-  border-color: var(--ink-4);
-}
-
-.pp__tier:active {
-  transform: scale(0.995);
-}
 
 /* Выбранная отмечена гранью и тенью, а не заливкой: заливка перекрасила
    бы весь состав, который в ней и читают. */
-.pp__tier--on {
-  border-color: var(--avgst-ink);
-  box-shadow: 0 10px 30px -20px var(--ink-2);
-}
-
-.pp__tier-name {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.pp__tier-lead {
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--ink-2);
-}
-
-.pp__tier-price {
-  margin-top: 4px;
-  font-size: 26px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--avgst-green);
-}
-
-.pp__tier-list {
-  display: grid;
-  gap: 6px;
-  margin-top: 8px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-  font-size: 14px;
-  color: var(--ink-1);
-}
-
-.pp__tier-list > span {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.pp__tier-list svg {
-  flex: 0 0 auto;
-  color: var(--avgst-green);
-}
-
-.pp__details-title {
-  margin: var(--gap-stack) 0 12px;
-  font-size: 18px;
-}
 
 /* Итог липнет к верху: список опций длиннее панели, и цена должна
    оставаться на экране, пока по нему идут. */
-.pp__total {
-  position: sticky;
-  top: 76px;
-  padding: 22px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 8px 28px -18px var(--ink-3);
-}
-
-.pp__total-label {
-  margin: 0;
-  font-size: 13px;
-  color: var(--ink-2);
-}
-
-.pp__total-sum {
-  margin: 4px 0 0;
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-}
-
-.pp__total-pay {
-  display: grid;
-  gap: 2px;
-  margin: 14px 0 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--avgst-green);
-}
-
-.pp__total-pay span {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--ink-3);
-}
-
-.pp__total .btn {
-  width: 100%;
-  gap: 6px;
-}
-
-.pp__total-note {
-  margin: 12px 0 0;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--ink-3);
-}
 
 /* ───────── Комплектация ─────────
    Дом продаётся готовыми наборами, поэтому уровень выбирают карточкой, а
    не набором галочек. Итог держится рядом: выбор меняет и цену, и платёж. */
 
-.project-config {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
-}
-
-@media (min-width: 1200px) {
-  .project-config {
-    grid-template-columns: minmax(0, 1fr) 340px;
-    gap: 32px;
-    /* Карточки тянутся до высоты ряда, панель — по содержимому: пока
-       форма закрыта, она маленькая, а когда вырастает под форму, ряд
-       задаёт уже она, и карточки догоняют. */
-    align-items: stretch;
-  }
-}
-
-.project-config__tiers {
-  display: grid;
-  gap: var(--gap-tile);
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-@media (min-width: 800px) {
-  .project-config__tiers {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.project-config__tiers li {
-  display: flex;
-  min-width: 0;
-}
-
-.project-config__tier {
-  display: grid;
-  align-content: start;
-  gap: 8px;
-  flex: 1 1 auto;
-  padding: 20px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: #fff;
-  color: inherit;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-  transition:
-    border-color 0.2s var(--ease-out),
-    box-shadow 0.2s var(--ease-out),
-    transform 0.16s var(--ease-out);
-}
-
-.project-config__tier:hover {
-  border-color: var(--ink-4);
-}
-
-.project-config__tier:active {
-  transform: scale(0.995);
-}
-
 /* Выбранная отмечена гранью и тенью, а не заливкой: заливка перекрасила
    бы весь состав, который в ней и читают. */
-.project-config__tier--on {
-  border-color: var(--avgst-ink);
-  box-shadow: 0 10px 30px -20px var(--ink-2);
-}
-
-.project-config__tier-name {
-  font-size: 20px;
-  font-weight: 700;
-  letter-spacing: -0.02em;
-}
-
-.project-config__tier-lead {
-  font-size: 14px;
-  line-height: 1.45;
-  color: var(--ink-2);
-}
-
-.project-config__tier-price {
-  margin-top: 4px;
-  font-size: clamp(18px, 1.6vw, 20px);
-  white-space: nowrap;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  color: var(--avgst-green);
-}
-
-.project-config__tier-list {
-  display: grid;
-  align-content: start;
-  gap: 14px;
-  font-size: 14px;
-  color: var(--ink-1);
-}
-
-.project-config__tier-included {
-  display: flex;
-  align-items: flex-start;
-  gap: 8px;
-}
-
-.project-config__tier-list svg {
-  flex: 0 0 auto;
-  color: var(--avgst-green);
-}
-
-.project-config__tier-includes-title {
-  display: block;
-  margin-top: 8px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-  color: var(--avgst-ink);
-  font-size: 13px;
-  font-weight: 600;
-  line-height: 1.4;
-}
-.project-config__tier-base { color: var(--avgst-green); }
-.project-config__total .panel-lead__trigger .btn { margin-top: 0; }
-.project-config__tier-included svg { margin-top: 3px; }
-.project-config__tier-gifts { display: grid; align-content: start; gap: 10px; margin-top: 16px; }
-.project-config__tier-band { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; color: var(--ink-1); }
-.project-config__tier-band::before,
-.project-config__tier-band::after { content: ""; flex: 1; height: 0; border-top: 1px dashed var(--line-2); }
-.project-config__tier-band > span { display: inline-flex; align-items: center; gap: 6px; flex: none; }
-.project-config__tier-band svg { color: var(--brand-yellow); }
-.project-config__tier-gift { display: block; font-size: 14px; line-height: 1.45; color: var(--avgst-ink); }
 
 /* Интерьеры: ровная сетка одинаковых кадров. Бенто с крупной плиткой
    занято фасадами; здесь ни один кадр не главный — это варианты отделки,
    и равные прямоугольники честнее. */
-.project-rows {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-@media (min-width: 900px) {
-  .project-rows {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-.project-rows > * {
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  aspect-ratio: 16 / 10;
-  border-radius: 14px;
-  background: var(--tint-on-dark);
-  cursor: pointer;
-  transition: transform 0.16s var(--ease-out);
-}
-
-.project-rows img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.45s var(--ease-out);
-}
-
-.project-rows > *:hover img,
-.project-rows > *:focus-visible img {
-  transform: scale(1.03);
-}
-
-.project-rows > *:focus-visible {
-  outline: none;
-}
-
-.project-rows > *:active {
-  transform: scale(0.985);
-}
-
-.project-rows__rest {
-  position: relative;
-}
-
-.project-rows__rest img {
-  filter: brightness(0.5);
-}
-
-.project-rows__rest span {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  gap: 2px;
-  color: #fff;
-  font-size: clamp(22px, 3vw, 30px);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  pointer-events: none;
-}
-
-.project-rows__rest small {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.8;
-}
 
 /* Построенные дома: широкий видеообзор и лента снимков под ним. Третье
    бенто подряд слилось бы с фасадами и интерьерами, а кадры здесь
    разнородные — сняты в разных посёлках, и листать их уместнее, чем
    раскладывать сеткой. */
-.project-built__stage {
-  position: relative;
-  display: block;
-  width: 100%;
-  overflow: hidden;
-  margin: var(--gap-stack) 0 0;
-  padding: 0;
-  border: 0;
-  aspect-ratio: 21 / 9;
-  border-radius: var(--surface-radius, 18px);
-  background: var(--surface-sunken);
-  cursor: pointer;
-}
-
-.project-built__stage img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.project-strip {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: minmax(220px, 32%);
-  gap: var(--gap-tile);
-  margin-top: var(--gap-tile);
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-}
-
-.project-strip::-webkit-scrollbar {
-  display: none;
-}
-
-@media (min-width: 900px) {
-  .project-strip {
-    grid-auto-columns: minmax(240px, 1fr);
-  }
-}
-
-@media (max-width: 899px) {
-  .project-strip {
-    grid-auto-columns: calc((100% - var(--gap-tile)) / 2);
-  }
-}
-
-.project-strip > * {
-  position: relative;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  aspect-ratio: 16 / 9;
-  border-radius: 14px;
-  background: var(--surface-sunken);
-  scroll-snap-align: start;
-  cursor: pointer;
-  transition: transform 0.16s var(--ease-out);
-}
-
-.project-strip img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.45s var(--ease-out);
-}
-
-.project-strip > *:hover img {
-  transform: scale(1.03);
-}
-
-.project-strip > *:active {
-  transform: scale(0.985);
-}
 
 /* Похожие проекты продолжают карточку дома, но не повторяют каталог
    сеткой: лента сохраняет место и оставляет видимым следующий выбор. */
-.project-similar__head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--gap-tile);
-}
-
-.project-similar__head h2 {
-  margin: 0;
-}
-
-.project-similar__controls {
-  display: flex;
-  gap: 6px;
-}
-
-.project-similar__controls button {
-  display: grid;
-  width: 30px;
-  height: 30px;
-  place-items: center;
-  padding: 0;
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  background: #fff;
-  color: var(--avgst-ink);
-  cursor: pointer;
-  transition:
-    border-color 0.16s var(--ease-out),
-    background-color 0.16s var(--ease-out),
-    color 0.16s var(--ease-out);
-}
-
-.project-similar__controls button:hover:not(:disabled),
-.project-similar__controls button:focus-visible:not(:disabled) {
-  border-color: var(--avgst-ink);
-  background: var(--avgst-ink);
-  color: #fff;
-}
-
-.project-similar__controls button:disabled {
-  color: var(--ink-4);
-  cursor: default;
-}
-
-.project-similar__track {
-  display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: calc((100% - var(--gap-tile) * 3) / 4);
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
-  padding: 1px 1px 8px;
-  overflow-x: auto;
-  overscroll-behavior-inline: contain;
-  scroll-behavior: smooth;
-  scroll-snap-type: inline mandatory;
-  scroll-padding-inline: 1px;
-  scrollbar-width: none;
-}
-
-.project-similar__track::-webkit-scrollbar {
-  display: none;
-}
-
-.project-similar__track > .card {
-  height: 100%;
-  scroll-snap-align: start;
-}
-
-.project-similar .card__body {
-  gap: 5px;
-  padding: 12px;
-}
-
-.project-similar .card__body h3 {
-  font-size: 1rem;
-}
-
-.project-similar .specs {
-  gap: 3px 8px;
-  margin-top: 2px;
-  font-size: 12px;
-}
-
-.project-similar .price {
-  margin-top: 5px;
-  font-size: 0.9375rem;
-}
-
-.project-similar .card__cta {
-  min-height: 36px;
-  margin-top: 5px;
-  padding: 8px 12px;
-  font-size: 13px;
-}
-
-@media (max-width: 899px) {
-  .project-similar__track {
-    grid-auto-columns: calc((100% - var(--gap-tile) * 2) / 3);
-  }
-}
-
-@media (max-width: 719px) {
-  .project-similar__track {
-    grid-auto-columns: calc((100% - var(--gap-tile)) / 2);
-  }
-}
-
-@media (max-width: 599px) {
-  .project-similar__track {
-    grid-auto-columns: minmax(260px, 88%);
-  }
-}
 
 /* Видеообзор в разделе построенных домов: крупная плитка с затемнением,
    значком и подписью — иначе от фотографии её не отличить. */
-.project-built__tour {
-  position: relative;
-}
-
-.project-built__video-placeholder {
-  display: block;
-  width: 100%;
-  height: 100%;
-  background: var(--avgst-ink);
-}
-
-.project-built__tour img {
-  filter: brightness(0.82);
-  transition:
-    filter 0.3s var(--ease-out),
-    transform 0.45s var(--ease-out);
-}
-
-.project-built__tour:hover img {
-  filter: brightness(0.74);
-}
 
 /* Кружок воспроизведения. Поля у него нет: треугольник уже нарисован со
    смещением, и второе смещение полем сбивало знак набок.
 
    На телефоне круг меньше: 64px занимали шестую часть ширины экрана и
    закрывали собой сам кадр, ради которого на него и смотрят. */
-.project-built__play {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  display: grid;
-  place-items: center;
-  width: 48px;
-  height: 48px;
-  transform: translate(-50%, -50%);
-  border-radius: 999px;
-  background: var(--brand-yellow);
-  color: var(--avgst-ink);
-  transition: transform 0.2s var(--ease-out);
-}
-
-.project-built__play svg {
-  width: 20px;
-  height: 20px;
-}
-
-@media (min-width: 900px) {
-  .project-built__play {
-    width: 60px;
-    height: 60px;
-  }
-
-  .project-built__play svg {
-    width: 24px;
-    height: 24px;
-  }
-}
-
-.project-built__tour:hover .project-built__play {
-  transform: translate(-50%, -50%) scale(1.06);
-}
-
-.project-built__tour-label {
-  position: absolute;
-  left: 18px;
-  bottom: 16px;
-  font-size: 14px;
-  font-weight: 600;
-  letter-spacing: 0.01em;
-  color: #fff;
-  text-shadow: 0 1px 12px rgb(0 0 0 / 0.4);
-}
 
 /* Название, описание, цена и состав встают на общие линии: иначе цена в
    карточке с коротким описанием уезжает вверх, и три уровня перестают
    сравниваться взглядом. Строки задаёт список, карточки наследуют их
    через subgrid; правило идёт после раскладки карточки, чтобы не быть
    перебитым её собственным display. */
-@media (min-width: 800px) {
-  @supports (grid-template-rows: subgrid) {
-    .project-config__tiers {
-      /* Состав забирает остаток высоты, подарки остаются на общей нижней линии. */
-      grid-template-rows: auto auto auto auto 1fr auto;
-      row-gap: 8px;
-    }
-
-    .project-config__tiers li,
-    .project-config__tiers .project-config__tier {
-      display: grid;
-      grid-row: span 6;
-      grid-template-rows: subgrid;
-      gap: 8px;
-    }
-  }
-}
 
 /* Состав пункта: короткая мысль абзацем, узлы подзаголовками, материалы
    списком. Сплошным текстом перечисление слоёв не читается. */
-.project-config__spec-lead {
-  margin: 0 0 10px;
-}
-
-.project-config__spec {
-  margin-top: 14px;
-}
-
-.project-config__spec-title {
-  margin: 0 0 6px;
-  font-size: 14px;
-  font-weight: 700;
-  letter-spacing: 0.01em;
-}
-
-.project-config__spec-list {
-  display: grid;
-  gap: 2px;
-  line-height: 1.5;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.project-config__spec-list li {
-  position: relative;
-  padding-left: 16px;
-}
 
 /* Точка вместо маркера списка: у неё нет отступа браузера, и строка
    выравнивается по тексту, а не по невидимому полю. */
-.project-config__spec-list li::before {
-  content: "";
-  position: absolute;
-  top: 0.62em;
-  left: 2px;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--avgst-green);
-}
-
-.project-config__details-title {
-  margin: var(--gap-stack) 0 12px;
-  font-size: 18px;
-}
 
 /* Уровень в заголовке отмечен цветом: он меняется при переключении, и
    именно на него смотрят, чтобы понять, чей это состав. */
-.project-config__details-mark {
-  color: var(--avgst-green);
-}
 
 /* Итог липнет к верху: состав длиннее панели, и цена должна оставаться
    на экране, пока по нему идут. */
-.project-config__total {
-  box-sizing: border-box;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-self: start;
-  min-width: 0;
-  padding: 22px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: #fff;
-  box-shadow: 0 8px 28px -18px var(--ink-3);
-  transition:
-    background 0.42s var(--ease-out),
-    color 0.42s var(--ease-out),
-    border-color 0.42s var(--ease-out);
-}
 
 /* Инверсия на время заполнения формы. Цвет — фирменный иссиня-чёрный:
    отдельного синего в палитре нет, а этот и есть её синий.
@@ -13110,101 +9435,9 @@ html.is-dialog-open {
    Тогда же панель дотягивается до низа ряда: закрытой ей это ни к чему —
    она маленькая плашка, — а с формой обрыв на двадцать пикселей выше
    карточек читается браком. */
-.project-config__total[data-form="true"] {
-  align-self: stretch;
-  background: var(--avgst-ink);
-  border-color: transparent;
-  color: #fff;
-}
-
-.project-config__total[data-form="true"] .project-config__total-label,
-.project-config__total[data-form="true"] .project-config__total-pay span {
-  color: var(--on-dark-3);
-}
-
-.project-config__total[data-form="true"] .project-config__total-pay {
-  border-top-color: var(--line-on-dark);
-}
-
-.project-config__total[data-form="true"] .project-config__total-pay--plain {
-  color: #fff;
-}
-
-.project-config__total[data-form="true"] .lead-card {
-  --lead-ink: 255 255 255;
-}
-
-.project-config__total[data-form="true"] .lead-card input {
-  border-color: var(--on-dark-4);
-  background: var(--tint-on-dark);
-  color: #fff;
-}
-
-.project-config__total[data-form="true"] .lead-card input::placeholder {
-  color: var(--on-dark-4);
-}
-
-.project-config__total[data-form="true"] .lead-card input:focus {
-  border-color: var(--on-dark-2);
-  box-shadow: none;
-}
-
-.project-config__total[data-form="true"] .lead-form__consent {
-  color: var(--on-dark-2);
-}
-
-.project-config__close { position: absolute; top: 16px; right: 16px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--on-dark-2); cursor: pointer; }
-.project-config__close:hover { color: #fff; }
-.project-config__total[data-form="true"] .project-config__total-label { padding-right: 28px; }
-
-.project-config__total-label {
-  margin: 0;
-  font-size: 12px;
-  color: var(--ink-2);
-}
-
-.project-config__total-label strong { display: block; margin-top: 4px; color: var(--avgst-green); font-size: 20px; line-height: 1.2; font-weight: 700; }
-@media (min-width: 900px) {
-  .project-config__total-label { font-size: 12px; }
-  .project-config__total-label strong { font-size: 24px; }
-}
-
-.project-config__total-sum {
-  margin: 12px 0 0;
-  font-size: 30px;
-  font-weight: 700;
-  letter-spacing: -0.03em;
-  line-height: 1.05;
-}
-
-.project-config__total-pay {
-  display: grid;
-  gap: 2px;
-  margin: 14px 0 18px;
-  padding-top: 14px;
-  border-top: 1px solid var(--line);
-  font-size: 16px;
-  font-weight: 600;
-  color: var(--avgst-green);
-}
 
 /* Без платежа строка остаётся той же по месту и высоте, но не зелёная:
    зелёным на странице отмечены деньги. */
-.project-config__total-pay--plain {
-  color: var(--avgst-ink);
-  font-size: 15px;
-}
-
-.project-config__total-pay span {
-  font-size: 12px;
-  font-weight: 400;
-  color: var(--ink-3);
-}
-
-.project-config__total .btn {
-  width: 100%;
-  gap: 6px;
-}
 
 /* Кнопка и форма — одна группа, прижатая к низу: пока панель тянется до
    низа ряда, лишний воздух должен оставаться над ней, а не под. */
@@ -13311,7 +9544,6 @@ html.is-dialog-open {
 }
 
 /* Та же механика, что у комплектаций: расчёт сворачивается, форма растёт по содержимому. */
-.mortgage-calc__reveal.mortgage-request { display: flex; flex-direction: column; height: auto; min-width: 0; }
 .mortgage-request__summary {
   display: grid;
   grid-template-rows: 1fr;
@@ -13327,12 +9559,6 @@ html.is-dialog-open {
 .mortgage-request .panel-lead__form > div { padding-inline: 3px; }
 .mortgage-request .panel-lead__form .lead-card { height: auto; gap: 16px; padding-top: 16px; }
 .mortgage-request .lead-card button[type="submit"] { width: 100%; align-self: stretch; }
-.mortgage-calc__result:has(.mortgage-request) {
-  display: block;
-  transition: background .42s var(--ease-out), color .42s var(--ease-out);
-}
-.mortgage-calc__result--project:has(.mortgage-request) { min-height: 0; padding: 16px; border-radius: 16px; }
-.mortgage-calc__result:has(.mortgage-request.is-open) { background: var(--avgst-ink); color: #fff; }
 .mortgage-request.is-open .lead-card { --lead-ink: 255 255 255; }
 .mortgage-request.is-open .lead-card input { border-color: var(--on-dark-4); background: var(--tint-on-dark); color: #fff; }
 .mortgage-request.is-open .lead-card input::placeholder { color: var(--on-dark-4); }
@@ -13340,20 +9566,9 @@ html.is-dialog-open {
 .mortgage-request.is-open .lead-form__consent { color: var(--on-dark-2); }
 .panel-lead__close { position: absolute; z-index: 1; top: 12px; right: 6px; display: grid; place-items: center; width: 28px; height: 28px; padding: 0; border: 0; border-radius: 6px; background: transparent; color: var(--on-dark-2); cursor: pointer; }
 .panel-lead__close:hover { color: #fff; }
-.mortgage-request .mortgage-calc__quote-summary { padding: 10px 32px 0 6px; }
 @media (prefers-reduced-motion: reduce) {
-  .panel-lead__trigger, .mortgage-request__summary, .mortgage-calc__result:has(.mortgage-request) { transition: none; }
-}
-.mortgage-calc__quote-summary { display: grid; gap: 4px; }
-.mortgage-calc__quote-name { margin: 0; font-size: 20px; font-weight: 700; letter-spacing: -.03em; line-height: 1.15; }
-.mortgage-calc__quote-rate { margin: 0; font-size: 13px; line-height: 1.3; color: var(--on-dark-3); }
-.mortgage-calc__quote-pay { margin: 6px 0 0; font-size: 16px; font-weight: 600; line-height: 1.25; color: var(--avgst-green); }
-
-.project-config__total-note {
-  margin: 12px 0 0;
-  font-size: 12px;
-  line-height: 1.45;
-  color: var(--ink-3);
+  .panel-lead__trigger,
+.mortgage-request__summary { transition: none; }
 }
 
 .ready-home-offer {
@@ -13562,213 +9777,14 @@ html.is-dialog-open {
   }
 }
 
-.project-next-steps__grid {
-  display: grid;
-  gap: var(--gap-tile);
-}
-
-@media (min-width: 720px) {
-  .project-next-steps__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.project-next-steps__tile {
-  position: relative;
-  overflow: hidden;
-  width: 100%;
-  min-height: 0;
-  aspect-ratio: 16 / 10;
-  padding: 0;
-  border: 0;
-  font: inherit;
-  text-align: left;
-  cursor: pointer;
-}
-
-.project-next-steps__tile--visit {
-  border-radius: 16px;
-  background: var(--page);
-  color: var(--avgst-ink);
-  text-decoration: none;
-}
-
-.project-next-steps__tile--consult {
-  border-radius: 16px;
-  /* Цвет взят с кромки стола на иллюстрации: прозрачный край PNG не
-     обрывается на фоне карточки. */
-  background: rgb(214 207 201);
-  color: var(--avgst-ink);
-}
-
-.project-next-steps__tile--review {
-  border-radius: 16px;
-  background: var(--avgst-ink);
-  color: #fff;
-  text-decoration: none;
-}
-
-.project-next-steps__tile--review::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background: linear-gradient(180deg, rgb(8 12 28 / 0.72), transparent 62%);
-}
-
-.project-next-steps__copy {
-  position: absolute;
-  top: 24px;
-  right: 56px;
-  left: 16px;
-  z-index: 2;
-  display: grid;
-  gap: 8px;
-  pointer-events: none;
-}
-
-.project-next-steps__title {
-  font-size: clamp(1rem, 1.6vw, 1.25rem);
-  font-weight: 800;
-  letter-spacing: -0.035em;
-  line-height: 1.15;
-  white-space: nowrap;
-  text-transform: uppercase;
-}
-
-.project-next-steps__house {
-  position: absolute;
-  z-index: 1;
-  bottom: 16px;
-  left: 16px;
-  width: calc(100% - 32px);
-  height: auto;
-  max-width: none;
-  transform: none;
-  transition: transform 0.45s var(--ease-out);
-}
-
-.project-next-steps__tile--visit:hover .project-next-steps__house {
-  transform: scale(1.04);
-}
-
-.project-next-steps__architects {
-  position: absolute;
-  z-index: 1;
-  right: 16px;
-  bottom: 16px;
-  width: 82%;
-  height: auto;
-  max-width: none;
-  transition: transform 0.45s var(--ease-out);
-}
-
-.project-next-steps__tile--consult:hover .project-next-steps__architects {
-  transform: scale(1.04);
-}
-
-.project-next-steps__review {
-  z-index: 0;
-  object-fit: cover;
-  transition: transform 0.45s var(--ease-out);
-}
-
-.project-next-steps__tile--review:hover .project-next-steps__review {
-  transform: scale(1.04);
-}
-
-.project-next-steps__lead {
-  display: grid;
-  max-width: 43ch;
-  font-size: 15px;
-  line-height: 1.35;
-  color: var(--ink-2);
-}
-
-.project-next-steps__tile--consult .project-next-steps__lead {
-  color: var(--ink-2);
-}
-
-.project-next-steps__tile--review .project-next-steps__lead {
-  color: var(--on-dark-2);
-}
-
-.project-next-steps__tile:hover .series-bento__go {
-  background: var(--brand-yellow);
-  color: var(--avgst-ink);
-  transform: translate(2px, -2px);
-}
-
-@media (max-width: 719px) {
-  .project-next-steps__tile {
-    aspect-ratio: 4 / 3;
-  }
-
-  .project-next-steps__tile--consult {
-    aspect-ratio: 9 / 8;
-  }
-
-  .project-next-steps__copy {
-    right: 16px;
-  }
-
-  .project-next-steps__tile--consult .project-next-steps__title {
-    max-width: calc(100% - 40px);
-    white-space: normal;
-  }
-
-  .project-next-steps__architects {
-    right: 16px;
-    bottom: 16px;
-    width: 80%;
-  }
-
-}
-
 /* ───────── Кадры проекта: фасады, планировки, интерьеры ─────────
    Пропорцию держит ячейка, а не картинка: у <img> есть атрибут height и
    свой aspect (часто 4:3), и без абсолютного кадра lead с aspect:auto
    раздувал ряды — правый столбец и нижний ряд ломались. */
 
-.project-bento {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
 @media (min-width: 900px) {
-  .project-bento {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    grid-auto-flow: dense;
-  }
 
   /* Lead тянется на два ряда, высоту рядов задают мелкие 16:9 — не кадр. */
-  .project-bento > .project-bento__lead {
-    grid-column: span 2;
-    grid-row: span 2;
-    aspect-ratio: auto;
-    align-self: stretch;
-    min-height: 0;
-  }
-}
-
-.project-bento > * {
-  position: relative;
-  overflow: hidden;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  aspect-ratio: 16 / 9;
-  border-radius: 14px;
-  background: var(--surface-sunken);
-  cursor: pointer;
-  transition: transform 0.16s var(--ease-out);
-  min-width: 0;
-}
-
-.project-bento > *:active {
-  transform: scale(0.985);
 }
 
 /* Просмотр кадра целиком: на плитке он обрезан и уменьшен.
@@ -14103,40 +10119,14 @@ html.is-dialog-open {
 }
 
 /* Кадр не участвует в расчёте высоты ячейки — только покрывает её. */
-.project-bento img {
-  position: absolute;
-  inset: 0;
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  object-fit: cover;
-  transition: transform 0.45s var(--ease-out);
-}
-
-.project-bento > *:hover img,
-.project-bento > *:focus-visible img {
-  transform: scale(1.03);
-}
 
 /* Зелёная рамка фокуса ложилась прямо на кадр — она возвращается на
    плитку после закрытия просмотра с клавиатуры. Плитка показывает фокус
    тем же приближением кадра, что и наводку. */
-.project-bento > *:focus-visible {
-  outline: none;
-}
 
 /* Варианты планировки переключаются, а не лежат рядом: сравнивать их
    имеет смысл на одном месте, глядя на ту же коробку. */
-.project-plans__tabs {
-  display: flex;
-  flex-wrap: wrap;
-  max-width: 100%;
-  gap: 8px;
-  margin-top: var(--gap-stack);
-}
 
-.project-plans__tab,
 .photo-lightbox__variants button {
   flex: 0 0 auto;
   min-height: 36px;
@@ -14157,15 +10147,12 @@ html.is-dialog-open {
     box-shadow 0.16s var(--ease-out);
 }
 
-.project-plans__tab:hover,
-.project-plans__tab:focus-visible,
 .photo-lightbox__variants button:hover,
 .photo-lightbox__variants button:focus-visible {
   background: rgb(0 0 0 / 0.72);
   color: #fff;
 }
 
-.project-plans__tab--on,
 .photo-lightbox__variants button.is-active {
   background: #fff;
   color: var(--avgst-ink);
@@ -14174,233 +10161,17 @@ html.is-dialog-open {
 
 /* На светлом фоне раздела залитая плашка читается выбранной.
    Поэтому здесь выбран тёмный пункт, а остальные только обведены. */
-.project-plans__tab {
-  border: 1px solid var(--line-2);
-  background: #fff;
-  color: var(--avgst-ink);
-}
-
-.project-plans__tab:hover,
-.project-plans__tab:focus-visible {
-  border-color: var(--avgst-ink);
-  background: #fff;
-  color: var(--avgst-ink);
-}
-
-.project-plans__tab--on,
-.project-plans__tab--on:hover,
-.project-plans__tab--on:focus-visible {
-  border-color: var(--avgst-ink);
-  background: var(--avgst-ink);
-  color: #fff;
-}
-
-.project-plans__body {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-tile);
-}
-
-@media (min-width: 900px) {
-  .project-plans__body {
-    grid-template-columns: minmax(0, 1fr) 300px;
-    gap: 32px;
-    align-items: start;
-  }
-}
 
 /* Чертёж показывается целиком: обрезать план нельзя. Кликом он
    открывается во весь экран — подписи на нём мелкие. */
-.project-plans__sheet {
-  display: block;
-  width: 100%;
-  margin: 0;
-  padding: 16px;
-  border: 0;
-  border-radius: 16px;
-  background: #fff;
-  cursor: pointer;
-  transition: transform 0.16s var(--ease-out);
-}
-
-.project-plans__sheet:active,
-.project-plans > button:active {
-  transform: scale(0.99);
-}
-
-.project-plans > button {
-  display: block;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  transition: transform 0.16s var(--ease-out);
-}
-
-.project-plans__sheet img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
 
 /* Экспликация: слева комната, справа площадь, между ними отточие из
    границы — так читается строка таблицы, а не два столбца порознь. */
-.project-plans__legend {
-  overflow: hidden;
-  padding: 0;
-  border-radius: 16px;
-  background: #fff;
-}
-
-.project-plans__legend-head {
-  padding: 18px 20px 14px;
-  border-bottom: 1px solid var(--tint);
-}
-
-.project-plans__legend-title {
-  margin: 0;
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  color: var(--ink-3);
-}
-
-.project-plans__floor-tabs {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 3px;
-  margin: 10px 20px 2px;
-  padding: 3px;
-  border-radius: 9px;
-  background: var(--page);
-}
-
-.project-plans__floor-tabs button {
-  min-height: 30px;
-  padding: 0 10px;
-  border: 0;
-  border-radius: 6px;
-  background: transparent;
-  color: var(--ink-2);
-  font: inherit;
-  font-size: 12px;
-  font-weight: 650;
-  cursor: pointer;
-  transition:
-    background-color 0.16s var(--ease-out),
-    color 0.16s var(--ease-out);
-}
-
-.project-plans__floor-tabs button:hover,
-.project-plans__floor-tabs button:focus-visible {
-  color: var(--avgst-ink);
-}
-
-.project-plans__floor-tabs button.is-active {
-  background: var(--avgst-ink);
-  color: #fff;
-}
-
-.project-plans__legend dl {
-  display: grid;
-  gap: 0;
-  margin: 0;
-  padding: 6px 20px 10px;
-}
-
-.project-plans__legend dl > div {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 10px 0;
-  border-bottom: 1px solid var(--tint);
-}
-
-.project-plans__legend dl > div:last-child {
-  border-bottom: 0;
-}
-
-.project-plans__legend dt {
-  text-align: left;
-  font-size: 14px;
-  color: var(--ink-1);
-}
-
-.project-plans__legend dd {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
 
 /* Планы без экспликации — просто листами. */
-.project-plans {
-  display: grid;
-  gap: var(--gap-tile);
-  margin-top: var(--gap-stack);
-}
-
-@media (min-width: 900px) {
-  .project-plans {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-.project-plans figure {
-  overflow: hidden;
-  margin: 0;
-  padding: 12px;
-  border-radius: 14px;
-  background: #fff;
-}
-
-.project-plans img {
-  display: block;
-  width: 100%;
-  height: auto;
-}
 
 /* Фасады и интерьеры: в сетке не больше шести плиток. Если снимков больше,
    последняя плитка говорит, сколько их ещё, и открывает просмотр. */
-.project-bento__rest {
-  position: relative;
-}
-
-.project-bento__rest img {
-  filter: brightness(0.55);
-}
-
-.project-bento__rest span {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  place-content: center;
-  gap: 2px;
-  color: #fff;
-  font-size: clamp(22px, 3vw, 30px);
-  font-weight: 700;
-  letter-spacing: -0.01em;
-  pointer-events: none;
-}
-
-.project-bento__rest small {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  opacity: 0.8;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .project-bento > *:hover img {
-    transform: none;
-  }
-}
 
 /* Выставочные площадки: существующие секции, форма и кнопки сайта. */
 .exposition-hero__layout {
@@ -14477,14 +10248,6 @@ html.is-dialog-open {
   cursor: default;
   padding: 16px;
   text-align: center;
-}
-.exposition-detail-gallery.project-bento > .exposition-photo-placeholder {
-  aspect-ratio: auto;
-  min-height: 160px;
-  background: var(--surface-sunken);
-}
-@media (max-width: 899px) {
-  .exposition-tour-gallery > .project-bento__lead { grid-column: 1 / -1; }
 }
 @media (max-width: 359px) {
   .exposition-detail-hero h1 {
@@ -14596,221 +10359,3 @@ picture.hero__frame {
 
 
 /* На телефоне заявка заменяет выбранную карточку комплектации. */
-.project-config__tier-card,
-.project-config__tier-front { display: contents; }
-.project-config__mobile-quote,
-.project-config__mobile-form { display: none; }
-
-@media (max-width: 799px) {
-  .project-config > .project-config__total { display: none; }
-  .project-config__tier-card {
-    display: block;
-    position: relative;
-    width: 100%;
-    min-width: 0;
-    box-sizing: border-box;
-    overflow: hidden;
-    border: 1px solid var(--line);
-    border-radius: 16px;
-    background: #fff;
-    transition: background-color 220ms var(--ease-out), border-color 220ms var(--ease-out);
-  }
-  .project-config__tier-card[data-selected="true"] {
-    border-color: var(--avgst-ink);
-    box-shadow: 0 10px 30px -20px var(--ink-2);
-  }
-  .project-config__tier-card[data-form="true"] {
-    background: var(--avgst-ink);
-    border-color: var(--avgst-ink);
-  }
-  .project-config__tier-front {
-    display: flex;
-    flex-direction: column;
-    opacity: 1;
-    transform: none;
-    transition: opacity 180ms var(--ease-out), transform 220ms var(--ease-out), visibility 220ms;
-  }
-  .project-config__tier-front .project-config__tier {
-    width: 100%;
-    padding-bottom: 0;
-    border: 0;
-    box-shadow: none;
-    background: transparent;
-  }
-  .project-config__mobile-quote {
-    display: inline-flex;
-    flex: none;
-    gap: 8px;
-    margin: 20px;
-  }
-  .project-config__tier-card .project-config__mobile-form {
-    display: flex;
-    width: 100%;
-    border: 0;
-    border-radius: 0;
-    box-shadow: none;
-    opacity: 0;
-    transform: translateY(8px);
-    transition: opacity 220ms var(--ease-out), transform 260ms var(--ease-out), visibility 220ms;
-  }
-  .project-config__tier-card[data-form="false"] .project-config__mobile-form,
-  .project-config__tier-card[data-form="true"] .project-config__tier-front {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-  .project-config__tier-card[data-form="true"] .project-config__tier-front {
-    opacity: 0;
-    transform: translateY(-6px);
-  }
-  .project-config__tier-card[data-form="true"] .project-config__mobile-form {
-    opacity: 1;
-    transform: none;
-  }
-  .project-config__mobile-form .lead-card {
-    min-width: 0;
-    padding: 0;
-    border: 0;
-    border-radius: 0;
-    background: transparent;
-  }
-  .project-config__mobile-form .lead-card label,
-  .project-config__mobile-form .lead-card input { min-width: 0; max-width: 100%; }
-  .project-config__mobile-form .lead-card input:focus {
-    outline: none;
-    border-color: var(--on-dark-2);
-    box-shadow: none;
-  }
-  .project-config__mobile-form .lead-form__consent { align-items: start; line-height: 1.35; }
-  @starting-style {
-    .project-config__tier-card[data-form="true"] .project-config__mobile-form {
-      opacity: 0;
-      transform: translateY(8px);
-    }
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .project-config__tier-card,
-  .project-config__tier-front,
-  .project-config__tier-card .project-config__mobile-form { transition: none; transform: none; }
-}
-.ui-select-trigger.catalog__sort { width: 100%; height: 38px; padding: 0 12px; border: 1px solid var(--line); outline: none; box-shadow: none; border-radius: 8px; gap: 8px; color: var(--foreground); font-size: 13px; }
-.ui-select-trigger.catalog__sort:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: -2px; }
-.catalog__sort:hover, .catalog__sort[data-state="open"] { background: var(--tint); }
-.catalog__sort > span { min-width: 0; flex: 1; text-align: left; }
-.ui-select-content.catalog__sort-menu { width: 224px; border-radius: 10px; background: var(--surface, #fff); }
-.catalog__sort-menu .ui-select-item { min-height: 40px; border-radius: 6px; padding-left: 12px; }
-.catalog__mobile-actions, .catalog__mobile-reset { display: none; }
-.catalog-search__close, .catalog__search-toggle, .catalog__sort-label--short { display: none; }
-@media (max-width: 1023px) {
-  .catalog__barrow { --catalog-search-hit: 32px; position: relative; height: 44px; }
-  .catalog__barrow::before {
-    content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
-    border: 1px solid var(--line); border-radius: 8px; background: var(--surface, #fff);
-    clip-path: inset(0 calc(100% - var(--catalog-search-hit)) 0 0 round 8px); opacity: 0;
-    transition: clip-path 260ms var(--ease-out), opacity 80ms linear 180ms;
-  }
-  .catalog__barrow.is-search-open::before {
-    clip-path: inset(0 0 0 0 round 8px); opacity: 1;
-    transition: clip-path 260ms var(--ease-out), opacity 80ms linear;
-  }
-  .catalog__barrow > .catalog-search {
-    position: absolute; inset: 0; z-index: 2; display: flex; height: 44px;
-    padding-left: var(--catalog-search-hit); padding-right: 12px; border: 0; border-radius: 8px; background: transparent;
-    opacity: 0; visibility: hidden; pointer-events: none; transform: translateX(6px);
-    transition: opacity 100ms var(--ease-out), transform 180ms var(--ease-out), visibility 0s 100ms;
-  }
-  .catalog__barrow > .catalog-search > svg { display: none; }
-  .catalog__barrow.is-search-open > .catalog-search {
-    opacity: 1; visibility: visible; pointer-events: auto; transform: none;
-    transition: opacity 180ms var(--ease-out) 80ms, transform 220ms var(--ease-out) 80ms, visibility 0s;
-  }
-  .catalog__mobile-actions {
-    position: relative; z-index: 2; display: grid;
-    grid-template-columns: 32px minmax(132px, 1fr) minmax(0, 176px); gap: 4px; width: 100%;
-    transition: opacity 140ms var(--ease-out) 100ms, transform 180ms var(--ease-out) 100ms, visibility 0s;
-  }
-  .catalog__barrow.is-search-open .catalog__mobile-actions {
-    opacity: 0; transform: translateX(8px); visibility: hidden; pointer-events: none;
-    transition: opacity 100ms var(--ease-out), transform 180ms var(--ease-out), visibility 0s 180ms;
-  }
-  .catalog-search__close { display: inline-flex; }
-  .catalog__search-toggle {
-    position: absolute; left: 0; top: 0; z-index: 3; display: flex; align-items: center; justify-content: center;
-    width: var(--catalog-search-hit); height: 44px; border: 0; padding: 0; background: transparent; color: var(--foreground); cursor: pointer;
-    transition: color 160ms var(--ease-out);
-  }
-  .catalog__search-toggle:disabled { opacity: 1; color: var(--foreground); pointer-events: none; }
-  .catalog__search-toggle.is-active { color: var(--avgst-green); }
-  .catalog__search-toggle:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: 2px; border-radius: 6px; }
-  .catalog__filter-button, .ui-select-trigger.catalog__sort--compact {
-    display: flex; align-items: center; justify-content: center; gap: 6px;
-    min-width: 0; height: 44px; padding: 0 12px; border: 1px solid var(--line);
-    border-radius: 8px; background: transparent; color: var(--foreground);
-    font: inherit; font-size: 14px; white-space: nowrap; cursor: pointer;
-  }
-  .catalog__filter-button svg, .catalog__sort--compact svg { flex: none; }
-  .catalog__filter-button { --catalog-filter-pad: 16px; padding-inline: calc(var(--catalog-filter-pad) - 1px) calc(var(--catalog-filter-pad) + 1px); gap: 6px; font-size: 13px; }
-  .ui-select-trigger.catalog__sort--compact { justify-content: flex-start; padding-inline: 6px; gap: 6px; font-size: 13px; container: catalog-sort / inline-size; }
-  .catalog__sort--compact > span { min-width: 0; flex: 0 1 auto; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; line-height: 16px; text-align: left; }
-  .catalog__sort--compact > svg:last-child { display: none; }
-  .catalog__filter-button:hover, .catalog__filter-button[aria-expanded="true"] { background: var(--tint); }
-  .catalog__filter-button:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: -2px; }
-  .cfilter__sort-group { display: none; }
-  .catalog__mobile-reset { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; }
-  .catalog__mobile-reset .cfilter__fav--inline,
-  .catalog__mobile-reset .catalog__reset {
-    display: inline-flex; flex: none; align-items: center; gap: 5px;
-    width: auto; min-width: 0; min-height: 32px; padding: 0;
-    border: 0; border-radius: 0; background: transparent;
-    font: inherit; line-height: 20px; white-space: nowrap;
-  }
-  .catalog__mobile-reset .cfilter__fav--inline.is-on { color: var(--avgst-green); }
-  .catalog__mobile-reset .cfilter__fav--inline span { margin-left: 0; font: inherit; color: var(--ink-3); }
-  .catalog__mobile-reset svg { flex: none; }
-  .catalog__mobile-reset .cfilter__fav--inline:focus-visible { outline: 2px solid var(--avgst-green); outline-offset: 3px; }
-}
-@media (max-width: 389px) { .catalog__mobile-reset { font-size: 13px; } }
-@media (max-width: 374px) { .catalog__mobile-reset { font-size: 12px; } }
-@media (max-width: 359px) { .catalog__mobile-reset .cfilter__favorites-count { display: none; } }
-@media (max-width: 339px) {
-  .cfilter--popover .cfilter__sticky.is-open { padding: 12px; }
-  .catalog__mobile-reset { gap: 4px; }
-  .catalog__mobile-reset .cfilter__fav--inline, .catalog__mobile-reset .catalog__reset { gap: 4px; }
-}
-@media (max-width: 1023px) { .ui-select-trigger.catalog__sort { height: 44px; } }
-.catalog__sort-popover { padding: 4px; max-height: var(--radix-popover-content-available-height); overflow-y: auto; }
-.catalog__sort-popover .ui-select-item { border: 0; background: transparent; color: inherit; font: inherit; font-size: 14px; text-align: left; }
-.catalog__sort-popover .ui-select-item:hover,
-.catalog__sort-popover .ui-select-item:focus-visible,
-.catalog__sort-popover .ui-select-item[aria-checked="true"] { background: var(--tint); }
-.catalog__sort-check { position: absolute; right: 8px; }
-@media (max-width: 389px) {
-  .catalog__mobile-actions { grid-template-columns: 32px 132px minmax(0, 1fr); gap: 4px; }
-  .ui-select-trigger.catalog__sort--compact { padding-inline: 4px; gap: 4px; font-size: 12px; }
-}
-@media (max-width: 374px) {
-  .catalog__mobile-actions { grid-template-columns: 32px 124px minmax(0, 1fr); }
-  .catalog__filter-button { --catalog-filter-pad: 14px; }
-  .catalog__sort--compact > .catalog__sort-label { display: none; }
-  .catalog__sort--compact > .catalog__sort-label--short { display: block; }
-}
-@media (min-width: 390px) {
-  @container catalog-sort (max-width: 154px) {
-    .catalog__sort-label { display: none; }
-    .catalog__sort-label--short { display: block; }
-  }
-}
-@media (max-width: 389px) {
-  @container catalog-sort (max-width: 142px) {
-    .catalog__sort-label { display: none; }
-    .catalog__sort-label--short { display: block; }
-  }
-}
-@media (prefers-reduced-motion: reduce) {
-  .catalog__barrow::before, .catalog__barrow > .catalog-search, .catalog__mobile-actions { transition: opacity 100ms linear !important; }
-  .catalog__barrow > .catalog-search, .catalog__barrow.is-search-open .catalog__mobile-actions { transform: none; }
-}

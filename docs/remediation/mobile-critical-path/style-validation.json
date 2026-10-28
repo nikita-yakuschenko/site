@@ -1,0 +1,127 @@
+{
+  "cases": 20,
+  "passed": 20,
+  "casesDetail": [
+    {
+      "width": 390,
+      "route": "/",
+      "elements": 674,
+      "differences": 0
+    },
+    {
+      "width": 390,
+      "route": "/catalog",
+      "elements": 1157,
+      "differences": 0
+    },
+    {
+      "width": 390,
+      "route": "/catalog/barhhouse-73",
+      "elements": 679,
+      "differences": 0
+    },
+    {
+      "width": 390,
+      "route": "/about",
+      "elements": 647,
+      "differences": 0
+    },
+    {
+      "width": 390,
+      "route": "/manufacture",
+      "elements": 426,
+      "differences": 0
+    },
+    {
+      "width": 390,
+      "route": "/business",
+      "elements": 501,
+      "differences": 0
+    },
+    {
+      "width": 390,
+      "route": "/mortgage",
+      "elements": 703,
+      "differences": 0
+    },
+    {
+      "width": 390,
+      "route": "/referral",
+      "elements": 379,
+      "differences": 0
+    },
+    {
+      "width": 390,
+      "route": "/privacy",
+      "elements": 815,
+      "differences": 0
+    },
+    {
+      "width": 390,
+      "route": "/exposition",
+      "elements": 343,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/",
+      "elements": 674,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/catalog",
+      "elements": 1157,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/catalog/barhhouse-73",
+      "elements": 679,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/about",
+      "elements": 647,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/manufacture",
+      "elements": 426,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/business",
+      "elements": 501,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/mortgage",
+      "elements": 703,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/referral",
+      "elements": 379,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/privacy",
+      "elements": 815,
+      "differences": 0
+    },
+    {
+      "width": 1440,
+      "route": "/exposition",
+      "elements": 343,
+      "differences": 0
+    }
+  ],
+  "method": "Computed CSS Typed OM; not pixel-diff QA."
+}

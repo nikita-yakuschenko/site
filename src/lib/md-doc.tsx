@@ -1,3 +1,4 @@
+import '../components/referral-rules.css'
 import type { ReactNode } from "react";
 
 /**

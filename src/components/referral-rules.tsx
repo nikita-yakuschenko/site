@@ -1,4 +1,5 @@
 'use client'
+import './referral-rules.css'
 import { CMSContentBlock } from './cms-content'
 import Link from "next/link";
 import type { ReactNode } from "react";

@@ -8,6 +8,7 @@ test-results
 playwright-report
 docs/audit/artifacts
 docs/remediation/artifacts
+docs/remediation/mobile-critical-path
 .git
 .github
 cms

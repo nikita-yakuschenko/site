@@ -1,0 +1,22 @@
+{
+  "before": {
+    "score": 70,
+    "fcpMs": 1573.2364,
+    "lcpMs": 6173.5548,
+    "tbtMs": 271.99999999999955,
+    "cls": 0,
+    "cssTransferBytes": 45447,
+    "jsTransferBytes": 235469
+  },
+  "after": {
+    "score": 72,
+    "fcpMs": 1369.758,
+    "lcpMs": 11267.7552,
+    "tbtMs": 205,
+    "cls": 0,
+    "cssTransferBytes": 29281,
+    "jsTransferBytes": 235075
+  },
+  "cssReductionPercent": 35.57110480339737,
+  "note": "Local fixture Lighthouse 12.8.2, not production PSI; simulated LCP is unstable. Compare only like-for-like raw settings."
+}

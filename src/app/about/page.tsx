@@ -1,3 +1,4 @@
+import './about.css'
 import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from 'next'
 import Image from 'next/image'

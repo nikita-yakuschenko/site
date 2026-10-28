@@ -1,4 +1,5 @@
 'use client'
+import './company-bento.css'
 import { CMSContentBlock } from './cms-content'
 import Image from 'next/image'
 import Link from 'next/link'

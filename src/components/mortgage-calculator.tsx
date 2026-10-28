@@ -1,4 +1,5 @@
 "use client";
+import './mortgage-calculator.css';
 import { useRegionCode } from "./region-bootstrap";
 
 import Link from "next/link";

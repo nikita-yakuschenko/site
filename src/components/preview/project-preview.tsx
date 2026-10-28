@@ -1,4 +1,5 @@
 "use client";
+import './project-preview.css';
 
 import { IconCheck, IconArrowUpRight } from "@tabler/icons-react";
 import Image from "next/image";

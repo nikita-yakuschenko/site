@@ -34,6 +34,7 @@ async function prepare(page: Page, mode = 'success') {
 
 test('captcha lazy, single execution, hidden/success race and one server receipt', async ({ page }) => {
   const run = await prepare(page)
+  const initialStylesheets = await page.evaluate(() => [...document.styleSheets].map(sheet => sheet.href).filter(Boolean))
   expect(run.sdk()).toBe(0)
   await run.form.locator('button[type=submit]').click()
   expect(run.sdk()).toBe(0)
@@ -45,6 +46,26 @@ test('captcha lazy, single execution, hidden/success race and one server receipt
   await expect(page.locator('.smart-captcha')).toHaveCount(0)
   expect(await page.evaluate(() => (window as unknown as { __captchaStats: unknown }).__captchaStats)).toEqual({ renders: 1, executes: 1, destroys: 1 })
   await expect(run.form.locator('.form-success-animation, .lead-submit-feedback').first()).toBeVisible()
+  const animation = run.form.locator('[data-form-success-animation]')
+  await expect(animation).toBeVisible()
+  const animationSheets = await animation.evaluate(node => [...document.styleSheets].filter(sheet => {
+    try { return [...sheet.cssRules].some(rule => rule.cssText.includes(`.${CSS.escape(node.classList[0]!)}`)) } catch { return false }
+  }).map(sheet => sheet.href).filter(Boolean))
+  expect(animationSheets.length, 'Animation CSS must be applied after the receipt').toBeGreaterThan(0)
+  expect(animationSheets.some(url => initialStylesheets.includes(url)), 'Success-only CSS must not block the initial page').toBe(false)
+})
+
+test('accepted receipt remains visible when the optional animation chunk fails', async ({ page }) => {
+  const run = await prepare(page)
+  let accepted = false
+  await page.route('**/_next/static/chunks/**', route => accepted && route.request().resourceType() === 'script' ? route.abort('failed') : route.continue())
+  await page.route('**/next/leads', route => { accepted = true; return route.fallback() })
+  await run.fill()
+  await run.form.evaluate(form => (form as HTMLFormElement).requestSubmit())
+  await expect.poll(() => run.submissions.length).toBe(1)
+  await expect(run.form.locator('.lead-submit-feedback')).toBeVisible()
+  await expect(run.form.locator('[data-form-success-animation]')).toHaveCount(0)
+  await expect(page.getByRole('heading', { name: 'Не удалось загрузить страницу' })).toHaveCount(0)
 })
 
 for (const mode of ['network-error', 'javascript-error', 'challenge-hidden', 'token-expired']) {

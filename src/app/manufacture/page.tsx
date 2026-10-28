@@ -1,3 +1,4 @@
+import './manufacture.css'
 import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from "next";
 import { IconChevronRight } from "@tabler/icons-react";
