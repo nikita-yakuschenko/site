@@ -11,6 +11,21 @@ export type DiagnosticRun = {
 }
 export const scenarioKey = (title: string) => title.replace(/\s+@\S+/g, '').trim()
 
+/** The responsive CMS path introduced in b3b063b; local files remain pre-encoded. */
+export function expectedCMSImageOptimization(requestUrl: string, origin: string): boolean {
+  try {
+    const request = new URL(requestUrl)
+    if (request.origin !== origin || request.pathname !== '/_next/image') return false
+    const query = request.searchParams
+    if (Array.from(query.keys()).length !== 3 || !['url', 'w', 'q'].every(key => query.getAll(key).length === 1)) return false
+    if (![32, 48, 64, 96, 128, 256, 384, 640, 750, 828, 1080, 1200, 1280, 1920, 2048, 2560, 3840].some(width => String(width) === query.get('w'))) return false
+    if (![45, 60, 75, 80, 85, 90, 100].some(quality => String(quality) === query.get('q'))) return false
+    const source = new URL(query.get('url') || '')
+    return source.origin === 'https://cms.avgst.ru' && !source.username && !source.password && !source.search && !source.hash
+      && source.pathname.startsWith('/api/media/file/') && /\.(?:jpe?g|png|webp|avif)$/i.test(source.pathname)
+  } catch { return false }
+}
+
 /** Only an actual provider URL is evidence; message keywords are insufficient. */
 export function captchaProviderSource(location: string) {
   try {

@@ -1,6 +1,6 @@
 import { existsSync } from 'node:fs'
 import type { Page, Request, TestInfo } from '@playwright/test'
-import { captchaProviderSource, cancelledImageConsole, navigationCancellation, runtimeSeverity, scenarioKey, webkitNavigationFetch, type Finding } from './model'
+import { captchaProviderSource, cancelledImageConsole, expectedCMSImageOptimization, navigationCancellation, runtimeSeverity, scenarioKey, webkitNavigationFetch, type Finding } from './model'
 
 export type { Finding } from './model'
 
@@ -70,7 +70,7 @@ export async function diagnose(page: Page, info: TestInfo, scenario: string, act
   await page.route('**/next/leads', route => route.abort('blockedbyclient'))
   if (process.env.DIAG_TARGET !== 'production') {
     page.on('request', request => {
-      if (new URL(request.url()).pathname === '/_next/image') add('runtime-image-optimizer', 'Image requested runtime optimization: ' + safeUrl(request.url()), '', origin)
+      if (new URL(request.url()).pathname === '/_next/image' && !expectedCMSImageOptimization(request.url(), origin)) add('runtime-image-optimizer', 'Unexpected runtime image optimization: ' + safeUrl(request.url()), '', origin)
     })
     await page.route('https://smartcaptcha.cloud.yandex.ru/**', async route => {
       if (!new URL(route.request().url()).pathname.endsWith('/captcha.js')) return route.fulfill({ status: 204, body: '' })
