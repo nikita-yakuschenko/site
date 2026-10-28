@@ -3,6 +3,7 @@ import { submitLead, type LeadAttempt } from '../lib/submit-lead'
 import { CMSContentBlock } from './cms-content'
 
 import Image from "next/image";
+import { optimizedSrc } from '../lib/media';
 import { FormSuccessAnimation } from "./form-success-animation";
 import { useRef, useState } from "react";
 import { IconArrowUpRight } from "@tabler/icons-react";
@@ -127,7 +128,8 @@ export function ReferralProgram({
           <div className="referral__media" aria-hidden="true">
             <Image
               className="referral__image referral__image--desktop"
-              src="/media/referral/banner-desktop.jpg"
+              src={optimizedSrc('/media/referral/banner-desktop.jpg')}
+              unoptimized
               alt=""
               fill
               sizes="(min-width: 640px) 100vw, 1px"
@@ -135,7 +137,8 @@ export function ReferralProgram({
             />
             <Image
               className="referral__image referral__image--mobile"
-              src="/media/referral/banner-mobile.png"
+              src={optimizedSrc('/media/referral/banner-mobile.png')}
+              unoptimized
               alt=""
               fill
               sizes="(max-width: 639px) 100vw, 1px"

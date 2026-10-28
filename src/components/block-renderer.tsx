@@ -8,7 +8,7 @@ import {
 import Image from "next/image";
 import { isRegisteredBlock } from "../blocks/registry";
 import { copy, nbspText } from "../lib/copy";
-import { mediaUrl } from "../lib/media";
+import { mediaUrl, optimizedSrc } from "../lib/media";
 import { telHref } from "../lib/phone";
 import type { CatalogProject } from "../lib/catalog/types";
 import type { PublicStory } from "../lib/stories";
@@ -157,7 +157,7 @@ function MortgageShowcase({ block }: { block: LayoutBlock }) {
             о чём баннер и так говорит. */}
         <div className="mortgage-family" data-cms-block="mortgageShowcase.banner">
           <div className="mortgage-family__media">
-            <Image className="mortgage-family__image" src="/persons/family_1.png" alt="" fill sizes="(min-width: 961px) 60vw, 100vw" />
+            <Image className="mortgage-family__image" src={optimizedSrc('/persons/family_1.png')} unoptimized alt="" fill sizes="(min-width: 961px) 60vw, 100vw" />
           </div>
           <div className="mortgage-family__body">
             {block.showEyebrow !== false ? (
@@ -192,7 +192,7 @@ function MortgageShowcase({ block }: { block: LayoutBlock }) {
         <div className="mortgage-showcase__programs" data-cms-block="mortgageShowcase.programs">
           <a className="mortgage-program mortgage-program--it" href="/it-mortgage">
             <span>IT-ипотека</span><strong>6%</strong><small>Для специалистов <span>IT-компаний</span></small>
-            <Image className="mortgage-program__art" src="/persons/it.png" alt="" width={904} height={975} sizes="160px" quality={90} />
+            <Image className="mortgage-program__art" src={optimizedSrc('/persons/it.png')} unoptimized alt="" width={904} height={975} sizes="160px" quality={90} />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>
@@ -205,7 +205,7 @@ function MortgageShowcase({ block }: { block: LayoutBlock }) {
               <br />
               {nbspText("от ведущих банков")}
             </small>
-            <Image className="mortgage-program__art" src="/persons/bank.png" alt="" width={1052} height={958} sizes="180px" quality={90} />
+            <Image className="mortgage-program__art" src={optimizedSrc('/persons/bank.png')} unoptimized alt="" width={1052} height={958} sizes="180px" quality={90} />
             <span className="series-bento__go" aria-hidden="true">
               <IconArrowUpRight size={18} stroke={2} />
             </span>

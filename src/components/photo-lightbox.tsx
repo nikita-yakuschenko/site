@@ -8,6 +8,7 @@ import {
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { copy } from "../lib/copy";
+import { optimizedSrc } from '../lib/media';
 
 /**
  * Просмотр кадра во весь экран.
@@ -453,8 +454,8 @@ export function PhotoLightbox({
             <div className="photo-lightbox__slide">
               {before ? (
                 <Image
-                  src={before}
-                  unoptimized={/^https?:\/\//.test(before)}
+                  src={optimizedSrc(before)}
+                  unoptimized
                   alt=""
                   width={2000}
                   height={1400}
@@ -466,8 +467,8 @@ export function PhotoLightbox({
             <div className="photo-lightbox__slide">
               <Image
                 key={src}
-                src={src}
-                  unoptimized={/^https?:\/\//.test(src)}
+                src={optimizedSrc(src)}
+                unoptimized
                 alt=""
                 width={2000}
                 height={1400}
@@ -480,8 +481,8 @@ export function PhotoLightbox({
             <div className="photo-lightbox__slide">
               {after ? (
                 <Image
-                  src={after}
-                  unoptimized={/^https?:\/\//.test(after)}
+                  src={optimizedSrc(after)}
+                  unoptimized
                   alt=""
                   width={2000}
                   height={1400}
@@ -529,8 +530,8 @@ export function PhotoLightbox({
                 onClick={() => pick(i)}
               >
                 <Image
-                  src={thumb}
-                  unoptimized={/^https?:\/\//.test(thumb)}
+                  src={optimizedSrc(thumb)}
+                  unoptimized
                   alt=""
                   width={200}
                   height={130}

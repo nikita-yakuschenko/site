@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import { CarouselProgress } from './carousel-progress'
+import { optimizedSrc } from '../lib/media'
 
 export function HistoryPhotoCarousel({ images, alt, fit = 'cover', position = 'center', active, onOpen }: {
   images: readonly string[]; alt: string; fit?: 'cover' | 'contain'; position?: string; active: boolean; onOpen: (index: number) => void
@@ -47,7 +48,7 @@ export function HistoryPhotoCarousel({ images, alt, fit = 'cover', position = 'c
         {lane.map((src, item) => {
           const clone = rotating && (item === 0 || item === lane.length - 1)
           return <button key={item} type="button" className="about-history__preview about-history__photo-slide" aria-hidden={clone || undefined} aria-label={`Открыть ${alt}`} tabIndex={!clone && active && item === index + (rotating ? 1 : 0) ? 0 : -1} onClick={() => onOpen(index)}>
-            <Image src={src} alt={clone ? '' : alt} fill unoptimized={/^https?:\/\//.test(src)} style={{ objectFit: portraits[src] ? 'contain' : fit, objectPosition: position }} onLoad={event => { const image = event.currentTarget; const portrait = image.naturalHeight > image.naturalWidth; setPortraits(previous => previous[src] === portrait ? previous : { ...previous, [src]: portrait }) }} sizes="(max-width: 767px) 100vw, 33vw" />
+            <Image src={optimizedSrc(src)} alt={clone ? '' : alt} fill unoptimized style={{ objectFit: portraits[src] ? 'contain' : fit, objectPosition: position }} onLoad={event => { const image = event.currentTarget; const portrait = image.naturalHeight > image.naturalWidth; setPortraits(previous => previous[src] === portrait ? previous : { ...previous, [src]: portrait }) }} sizes="(max-width: 767px) 100vw, 33vw" />
           </button>
         })}
       </div>
