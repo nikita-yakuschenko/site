@@ -126,6 +126,7 @@ for (const file of appFiles.filter(file => /[/\\]page\.tsx$/.test(file)).sort())
     }
   } else {
     title ??= mortgage.find(item => '/' + item.slug === route)?.title
+    if (route === '/factory-open-day') title ??= 'Новый взгляд на загородный дом'
     title ??= ({ '/': 'Главная', '/catalog': copy.catalogTitle, '/mortgage': 'Ипотека', '/for-sale': 'Готовые дома', '/personal-data': copy.personalDataTitle, '/legal/privacy': copy.personalDataTitle, '/legal/cookies': copy.cookiePolicyTitle, '/legal/referral': copy.referralRulesTitle })[route]
     if (!title) throw new Error(`Missing page title: ${route}`)
     pages.push({ ...base, route, title, kind: redirect ? 'redirect' : route.startsWith('/preview/') ? 'preview' : 'page', template: null })
@@ -135,7 +136,7 @@ const openDayTitles = { FactoryOpenDayHero: 'День открытых двер�
 for (const [key, title] of Object.entries(openDayTitles)) { const definition = definitions.get(key); if (definition) definition.title = title }
 pages.sort((a, b) => a.route.localeCompare(b.route, 'en'))
 if (new Set(pages.map(page => page.route)).size !== pages.length) throw new Error('Duplicate routes')
-const services = appFiles.filter(file => /[/\\]route\.ts$/.test(file)).map(file => ({ route: '/' + relative(file).replace(/^src\/app\//, '').replace(/\/route\.ts$/, ''), source: relative(file) })).sort((a, b) => a.route.localeCompare(b.route))
+const services = appFiles.filter(file => /[/\\]route\.tsx?$/.test(file)).map(file => ({ route: '/' + relative(file).replace(/^src\/app\//, '').replace(/\/route\.tsx?$/, ''), source: relative(file) })).sort((a, b) => a.route.localeCompare(b.route))
 const destination = path.join(root, 'cms/src/data/site-index.json')
 await fs.mkdir(path.dirname(destination), { recursive: true })
 const homeBlocks = await records('src/lib/home-layout.ts', 'HOME_LAYOUT')
