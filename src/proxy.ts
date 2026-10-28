@@ -6,6 +6,8 @@ import { attributionFromUrl, LEAD_ATTRIBUTION_COOKIE, readAttribution } from './
 
 export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers)
+  const requestId = crypto.randomUUID()
+  headers.set('x-avgst-request-id', requestId)
   headers.set('x-cms-page-route', request.nextUrl.pathname)
   headers.set('x-cms-editor', request.nextUrl.searchParams.has('cmsPreview') || request.nextUrl.searchParams.has('cmsIndex') ? '1' : '0')
   const marked = regionFromSearch(request.nextUrl.search)
@@ -14,6 +16,7 @@ export async function proxy(request: NextRequest) {
   const managed = await managedRedirect(new URL(request.url))
   const legacy = managed ? { url: managed, status: 308 as const } : legacyRedirect(new URL(request.url))
   const response = legacy ? NextResponse.redirect(legacy.url, legacy.status) : NextResponse.next({ request: { headers } })
+  response.headers.set('X-Request-ID', requestId)
   if (marked) response.cookies.set(REGION_COOKIE, marked, { path: '/', sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
   const attribution = attributionFromUrl(request.url)
   const previous = readAttribution(request.cookies.get(LEAD_ATTRIBUTION_COOKIE)?.value)

@@ -1,3 +1,7 @@
+import { unstable_rethrow } from 'next/navigation'
+import { readCMSJSON } from './cms/request'
+import { decodeObject } from '../server/cms-request'
+
 // Публичный номер счётчика с прода. Пока в CMS пусто — сайт берёт его или ENV.
 export const fallbackMetricaCounterId = '112879989'
 
@@ -16,38 +20,34 @@ function envMapsApiKey() {
 
 export async function activeMetricaCounterId() {
   try {
-    const response = await fetch(`${cmsOrigin()}/api/globals/lead-delivery/metrica`, {
+    const data = await readCMSJSON('settings.metrica', `${cmsOrigin()}/api/globals/lead-delivery/metrica`, {
       next: { revalidate: 60 },
       signal: AbortSignal.timeout(3000),
-    })
-    if (!response.ok) {
-      return Number(envMetricaCounterId() || fallbackMetricaCounterId) || 0
-    }
-    const data = await response.json() as { counterId?: string | null; enabled?: boolean; configured?: boolean }
+    }, decodeObject)
     if (data.enabled === false) return 0
     if (data.configured && !data.counterId) return 0
     const counterId = typeof data.counterId === 'string' ? data.counterId.trim() : ''
     if (/^\d{6,12}$/.test(counterId)) return Number(counterId)
     return Number(envMetricaCounterId() || fallbackMetricaCounterId) || 0
-  } catch {
+  } catch (error) {
+    unstable_rethrow(error)
     return Number(envMetricaCounterId() || fallbackMetricaCounterId) || 0
   }
 }
 
 export async function activeMapsApiKey() {
   try {
-    const response = await fetch(`${cmsOrigin()}/api/globals/lead-delivery/maps-key`, {
+    const data = await readCMSJSON('settings.maps', `${cmsOrigin()}/api/globals/lead-delivery/maps-key`, {
       next: { revalidate: 60 },
       signal: AbortSignal.timeout(3000),
-    })
-    if (!response.ok) return envMapsApiKey()
-    const data = await response.json() as { key?: string; enabled?: boolean; configured?: boolean }
+    }, decodeObject)
     if (data.enabled === false) return ''
     const key = typeof data.key === 'string' ? data.key.trim() : ''
     if (/^[a-zA-Z0-9-]{20,80}$/.test(key)) return key
     // Пока ключ не сохранён в CMS — берём ENV сайта, чтобы карта не пропала.
     return envMapsApiKey()
-  } catch {
+  } catch (error) {
+    unstable_rethrow(error)
     return envMapsApiKey()
   }
 }

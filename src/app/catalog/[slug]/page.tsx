@@ -103,13 +103,17 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
   if (!draft && hero.slug !== slug) redirect(`/catalog/${hero.slug}${query.cmsPreview === '1' ? '?cmsPreview=1' : ''}`)
   const heroProject = { ...project, name: hero.name, slug: hero.slug }
   const voter = draft ? undefined : (await cookies()).get(VOTER_COOKIE)?.value
-  const reactions = draft ? { likes: 0, shares: 0, liked: false } : await readProjectReactions(hero.slug, voter)
-  const [exteriors, interiors, built, nextSteps, plans, configurations] = draft ? [[], [], [], undefined, [], []] : await Promise.all([resolveProjectExteriors(hero.slug), resolveProjectInteriors(hero.slug), resolveProjectBuilt(hero.slug), resolveProjectNextSteps(hero.slug), resolveProjectPlans(hero.slug), resolveProjectConfigurations(hero.slug)])
-
-  const pageOrder = await getProjectPageOrder(slug)
+  // These sections depend on the resolved hero, not on each other's responses.
+  const [reactions, sections, pageOrder, similarCatalog] = await Promise.all([
+    draft ? { likes: 0, shares: 0, liked: false } : readProjectReactions(hero.slug, voter),
+    draft ? [[], [], [], undefined, [], []] as [[], [], [], undefined, [], []] : Promise.all([resolveProjectExteriors(hero.slug), resolveProjectInteriors(hero.slug), resolveProjectBuilt(hero.slug), resolveProjectNextSteps(hero.slug), resolveProjectPlans(hero.slug), resolveProjectConfigurations(hero.slug)]),
+    getProjectPageOrder(slug),
+    draft ? { items: [] } : catalog.list({ siteCode: SITE.code }),
+  ])
+  const [exteriors, interiors, built, nextSteps, plans, configurations] = sections
   const blockStyle = (key: string) => ({ order: pageOrder.indexOf(key), width: '100%' })
 
-  const { items: catalogProjects } = draft ? { items: [] } : await catalog.list({ siteCode: SITE.code })
+  const catalogProjects = similarCatalog.items
   const similarProjects = catalogProjects
     .filter((item) => item.id !== project.id)
     .sort((a, b) => similarityScore(project, a) - similarityScore(project, b))

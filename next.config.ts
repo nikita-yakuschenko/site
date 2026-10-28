@@ -1,10 +1,16 @@
 import type { NextConfig } from 'next'
 import webpAssets from './src/data/webp-assets.json'
+import { existsSync, readFileSync } from 'node:fs'
+
+const identity = process.env.NODE_ENV === 'production' && existsSync('build/identity.json')
+  ? JSON.parse(readFileSync('build/identity.json', 'utf8')) as { version: string; commit: string; buildId: string; sourceDirty: boolean | null }
+  : null
 
 const nextConfig: NextConfig = {
   // Сборка в самодостаточный сервер: в образ едет только то, что нужно рантайму.
   output: 'standalone',
   reactStrictMode: true,
+  ...(identity ? { generateBuildId: async () => identity.buildId } : {}),
   // A large shared stylesheet must cache separately: inlineCss duplicates it
   // inside both server HTML and the React Server Component payload.
   poweredByHeader: false,
@@ -17,8 +23,10 @@ const nextConfig: NextConfig = {
   },
   // Версия и коммит пробрасываются в /api/health, чтобы понимать, что именно катится.
   env: {
-    APP_VERSION: process.env.APP_VERSION ?? '0.1.0',
-    APP_COMMIT: process.env.APP_COMMIT ?? 'unknown',
+    APP_VERSION: identity?.version ?? process.env.APP_VERSION ?? '0.1.0',
+    APP_COMMIT: identity?.commit ?? process.env.APP_COMMIT ?? 'unknown',
+    APP_BUILD_ID: identity?.buildId ?? 'unknown',
+    APP_SOURCE_DIRTY: identity?.sourceDirty == null ? 'unknown' : String(identity.sourceDirty),
   },
   // CMS uploads retain their originals; cache resized versions for each screen.
   images: {

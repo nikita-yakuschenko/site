@@ -4,7 +4,7 @@ import typescript from 'eslint-config-next/typescript'
 // eslint-config-next 16 отдаёт плоский конфиг напрямую — обёртка FlatCompat
 // здесь не нужна и ломается на циклических ссылках в плагинах.
 const config = [
-  { ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'cms/**'] },
+  { ignores: ['.next/**', 'node_modules/**', 'next-env.d.ts', 'cms/**', 'output/**', 'diagnostics-results/**', 'test-results/**', 'playwright-report/**', 'docs/audit/artifacts/**', 'docs/remediation/artifacts/**'] },
   ...coreWebVitals,
   ...typescript,
   {

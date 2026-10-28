@@ -53,6 +53,8 @@ jobs:
         run: node scripts/check-diagnostic-browsers.mjs
       - name: Test diagnostic classification and reporting
         run: node --experimental-strip-types --test diagnostics/tests/*.test.mjs
+      - name: Test CMS failure handling, safe logs and build identity
+        run: npm run test:server
       - name: Test stored WebP preparation
         run: node --test scripts/tests/webp-assets.test.mjs
       - name: Reuse files already encoded before serving
@@ -62,6 +64,8 @@ jobs:
           key: ${{ runner.os }}-stored-webp-v1-${{ hashFiles('public/**', 'scripts/prepare-webp-assets.mjs') }}
           restore-keys: ${{ runner.os }}-stored-webp-v1-
       - run: npm run build
+      - name: Verify CMS outage, recovery, readiness and client navigation against local mocks
+        run: node scripts/check-cms-resilience.mjs . docs/remediation/artifacts
       - name: Regress captcha, cookie notice and resilient page rendering
         run: npx playwright test -c playwright.diagnostics.config.ts diagnostics/smartcaptcha.spec.ts diagnostics/video-consent.spec.ts
       - name: Preserve captcha regression artifacts
@@ -78,5 +82,6 @@ jobs:
           path: |
             diagnostics-results/
             smartcaptcha-regression-results/
+            docs/remediation/artifacts/
           if-no-files-found: warn
           retention-days: 14

@@ -8,6 +8,8 @@ import { applyPopularProjects } from '../lib/popular-content'
 import { copy, footerAboutFor } from '../lib/copy'
 import { SITE } from '../lib/site'
 import './not-found.css'
+import { isCMSUnavailable } from '../server/cms-request'
+import { unstable_rethrow } from 'next/navigation'
 
 export const metadata: Metadata = {
   title: copy.notFound,
@@ -15,7 +17,11 @@ export const metadata: Metadata = {
 
 /** Первый экран возвращает посетителя в каталог; проекты берём из блока главной. */
 export default async function NotFound() {
-  const { projects } = await applyPopularProjects([], new CmsCatalogProvider(), SITE.code)
+  const { projects } = await applyPopularProjects([], new CmsCatalogProvider(), SITE.code).catch(error => {
+    unstable_rethrow(error)
+    if (!isCMSUnavailable(error)) throw error
+    return { projects: [] }
+  })
   return (
     <SiteChrome
       name={SITE.name}

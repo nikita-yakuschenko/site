@@ -26,6 +26,8 @@ import { OG_LOCALE } from '../lib/locale'
 import { regionByCode, REGION_COOKIE } from '../lib/regions'
 import { activeRoistatProjectId } from '../lib/roistat'
 import { activeMetricaCounterId } from '../lib/yandex'
+import { isCMSUnavailable } from '../server/cms-request'
+import { unstable_rethrow } from 'next/navigation'
 import './styles.css'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -58,10 +60,15 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
      провайдера, и ему приходилось переписывать состояние уже после
      отрисовки, хотя кука прочитана прямо тут. */
   /* Номер счётчика — из CMS (интеграции → Яндекс), с запасным ENV/фолбэком. */
-  const counter = await activeMetricaCounterId()
-  const roistatProjectId = await activeRoistatProjectId()
-  const content = await readCMSContent()
-  const { items: catalogItems } = await new CmsCatalogProvider().list({ siteCode: SITE.code })
+  // The shell remains available during a catalog outage; catalog pages surface their own error.
+  const catalogAvailability = new CmsCatalogProvider().list({ siteCode: SITE.code }).then(result => result.items).catch(error => {
+    unstable_rethrow(error)
+    if (!isCMSUnavailable(error)) throw error
+    return []
+  })
+  const [counter, roistatProjectId, content, catalogItems] = await Promise.all([
+    activeMetricaCounterId(), activeRoistatProjectId(), readCMSContent(), catalogAvailability,
+  ])
   const readyHouses = catalogItems.some(item => Boolean(item.readyHome))
 
   const fresh = parsed && parsed.version === CONSENT_VERSION ? parsed : null

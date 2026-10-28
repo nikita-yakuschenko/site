@@ -1,0 +1,22 @@
+[
+  {
+    "path": "cms/src/data/site-index.json",
+    "recorded": true,
+    "unchanged": true
+  },
+  {
+    "path": "cms/src/payload-types.ts",
+    "recorded": true,
+    "unchanged": true
+  },
+  {
+    "path": "package-lock.json",
+    "recorded": true,
+    "unchanged": true
+  },
+  {
+    "path": "src/data/webp-assets.json",
+    "recorded": true,
+    "unchanged": true
+  }
+]

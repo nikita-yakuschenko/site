@@ -2,6 +2,7 @@
 import { useRegionCode } from './region-bootstrap'
 
 import { useState, useSyncExternalStore } from 'react'
+import Link from 'next/link'
 import { IconBath, IconBed, IconHeart, IconRulerMeasure, IconShare3, IconStairs } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
@@ -41,7 +42,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
   return (
     <article className="card">
       <div className="card__top">
-        <a href={project.href} className="card__media" aria-label={badge ? `${project.name}. ${badge}` : project.name}>
+        <Link href={project.href} prefetch={false} className="card__media" aria-label={badge ? `${project.name}. ${badge}` : project.name}>
           {imageMissing ? (
             <span className="card__empty">{copy.noPhoto}</span>
           ) : (
@@ -63,7 +64,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
           <span className="badge">
             {badge}
           </span>
-        </a>
+        </Link>
         <div className="card__actions">
           <button type="button" className="icon-btn" aria-label={copy.share} onClick={() => void shareProject(project).then(shared => { if (shared) return recordCardShare(project.slug) })}>
             <IconShare3 size={16} stroke={1.75} />
@@ -82,11 +83,11 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
       <div className="card__body">
         <div className="card__line">
           {locationLabel ? <div className="card__heading">
-            <a className="card__title-link" href={project.href}><h3>{project.name}</h3></a>
+            <Link className="card__title-link" href={project.href} prefetch={false}><h3>{project.name}</h3></Link>
             <span className="card__location-badge" aria-label={`Выставочная площадка: ${locationLabel}`}>{locationLabel}</span>
-          </div> : <a className="card__title-link" href={project.href}>
+          </div> : <Link className="card__title-link" href={project.href} prefetch={false}>
             <h3>{project.name}</h3>
-          </a>}
+          </Link>}
           <ul className="specs">
             {specs.map((spec) => {
               const Icon = spec.icon
@@ -101,9 +102,9 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
         </div>
         <div className="card__line">
           {showPrice && <p className="price">{priceLabel}</p>}
-          <a className="btn btn-yellow card__cta" href={project.href}>
+          <Link className="btn btn-yellow card__cta" href={project.href} prefetch={false}>
             {project.readyHome ? copy.viewReadyHome : copy.viewProject}
-          </a>
+          </Link>
         </div>
       </div>
     </article>

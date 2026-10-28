@@ -1,0 +1,1182 @@
+[
+  {
+    "delayMs": 0,
+    "run": 1,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 287.43949999999995,
+    "totalMs": 305.0900999999999,
+    "htmlBytes": 403289,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 2.261700000000019
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 126.75659999999993,
+        "end": 128.03230000000008
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 129.23530000000005,
+        "end": 130.62220000000002
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 130.35640000000012,
+        "end": 134.73140000000012
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 134.43859999999995,
+        "end": 144.2306000000001
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 211.46350000000007,
+        "end": 225.73520000000008
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 1,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 105.51710000000003,
+    "totalMs": 109.38079999999991,
+    "htmlBytes": 239815,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 0.49350000000004
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 1,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 128.077,
+    "totalMs": 130.9131,
+    "htmlBytes": 123095,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 6.512699999999995
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 6.12909999999988,
+        "end": 14.091799999999921
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 28.88909999999987,
+        "end": 33.294399999999996
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 29.308699999999817,
+        "end": 33.460599999999886
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 29.56359999999995,
+        "end": 33.56859999999983
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 35.78489999999988,
+        "end": 38.68329999999992
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 35.884799999999814,
+        "end": 38.90809999999988
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 36.0179999999998,
+        "end": 39.0157999999999
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 36.14729999999986,
+        "end": 39.107499999999845
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 36.40299999999979,
+        "end": 39.218799999999874
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 2,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 278.7129,
+    "totalMs": 290.3466000000003,
+    "htmlBytes": 402843,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 12.589500000000044
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 136.76230000000032,
+        "end": 138.54840000000013
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 139.82600000000002,
+        "end": 140.06420000000026
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 140.82310000000007,
+        "end": 145.0365999999999
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 144.83179999999993,
+        "end": 145.82320000000027
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 203.36590000000024,
+        "end": 216.70090000000027
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 2,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 88.29269999999997,
+    "totalMs": 92.16530000000012,
+    "htmlBytes": 239832,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 11.677299999999832
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 2,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 147.04359999999997,
+    "totalMs": 150.44880000000012,
+    "htmlBytes": 122536,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 1.5961999999999534
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 7.42410000000018,
+        "end": 21.088200000000143
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 32.36360000000013,
+        "end": 33.01810000000023
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 32.86860000000024,
+        "end": 37.99810000000025
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 33.116199999999935,
+        "end": 38.190599999999904
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 41.57810000000018,
+        "end": 42.90110000000004
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 41.7195999999999,
+        "end": 43.03430000000026
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 41.98440000000028,
+        "end": 43.145500000000084
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 42.69900000000007,
+        "end": 47.59660000000031
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 43.24220000000014,
+        "end": 47.80729999999994
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 3,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 332.6413999999995,
+    "totalMs": 343.8014999999996,
+    "htmlBytes": 400782,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 13.719199999999546
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 141.64930000000004,
+        "end": 143.02229999999963
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 143.85919999999987,
+        "end": 148.72999999999956
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 144.54999999999927,
+        "end": 148.88989999999922
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 148.52079999999933,
+        "end": 158.02629999999954
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 242.90200000000004,
+        "end": 253.9447
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 3,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 103.2496000000001,
+    "totalMs": 107.5640000000003,
+    "htmlBytes": 239827,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 8.863999999999578
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 3,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 153.03939999999966,
+    "totalMs": 157.2486999999992,
+    "htmlBytes": 124003,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 0.2091999999993277
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 7.2083999999995285,
+        "end": 19.28939999999966
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 32.06790000000001,
+        "end": 33.384900000000016
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 32.78269999999975,
+        "end": 33.58010000000013
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 33.153299999999945,
+        "end": 37.32339999999931
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 43.64039999999932,
+        "end": 44.21990000000005
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 43.794299999999566,
+        "end": 44.425099999999475
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 44.01890000000003,
+        "end": 44.595800000000054
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 44.76119999999992,
+        "end": 50.58730000000014
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 44.8748999999998,
+        "end": 50.867599999999584
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 4,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 268.84599999999955,
+    "totalMs": 281.59979999999996,
+    "htmlBytes": 403651,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 4.904500000000553
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 123.00250000000051,
+        "end": 124.1844000000001
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 125.84619999999995,
+        "end": 127.4962000000005
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 127.2548999999999,
+        "end": 132.75660000000062
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 132.5646999999999,
+        "end": 138.72290000000066
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 223.52010000000064,
+        "end": 231.47600000000057
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 4,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 96.16409999999996,
+    "totalMs": 99.72630000000026,
+    "htmlBytes": 239815,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 7.261899999999514
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 4,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 140.70209999999952,
+    "totalMs": 144.3081000000002,
+    "htmlBytes": 121591,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 5.491500000000087
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 5.308799999999792,
+        "end": 11.83179999999993
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 29.219600000000355,
+        "end": 29.515300000000025
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 30.28179999999975,
+        "end": 33.218300000000454
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 30.855999999999767,
+        "end": 33.41319999999996
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 42.9993000000004,
+        "end": 43.53740000000016
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 43.103000000000065,
+        "end": 43.66859999999997
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 43.39559999999983,
+        "end": 46.31710000000021
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 43.78570000000036,
+        "end": 46.496900000000096
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 43.84559999999965,
+        "end": 46.62259999999969
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 5,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 311.4281000000001,
+    "totalMs": 322.09380000000056,
+    "htmlBytes": 400388,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 3.892899999999827
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 132.6968999999999,
+        "end": 132.90620000000035
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 135.58470000000034,
+        "end": 137.11799999999948
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 141.3762999999999,
+        "end": 148.20929999999953
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 141.64969999999994,
+        "end": 149.10620000000017
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 231.61459999999988,
+        "end": 239.58119999999963
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 5,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 87.64420000000064,
+    "totalMs": 91.46810000000005,
+    "htmlBytes": 239814,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 3.6073999999998705
+      }
+    ]
+  },
+  {
+    "delayMs": 0,
+    "run": 5,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 140.85439999999926,
+    "totalMs": 145.1215999999995,
+    "htmlBytes": 121686,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 3.541900000000169
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 6.377500000000509,
+        "end": 16.993100000000595
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 29.247699999999895,
+        "end": 29.499899999999798
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 30.04610000000048,
+        "end": 30.779099999999744
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 30.597099999999955,
+        "end": 32.52270000000044
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 42.28940000000057,
+        "end": 42.467900000000554
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 42.580700000000434,
+        "end": 44.09979999999996
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 42.645400000000336,
+        "end": 44.35609999999997
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 42.70640000000003,
+        "end": 44.50160000000051
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 43.063600000000406,
+        "end": 44.699000000000524
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 1,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 794.5879999999997,
+    "totalMs": 1039.922700000001,
+    "htmlBytes": 401236,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 253.6913999999997
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 378.1183000000001,
+        "end": 642.4938000000002
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 380.6988000000001,
+        "end": 642.8880000000008
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 381.4943999999996,
+        "end": 643.2980000000007
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 381.6974000000009,
+        "end": 644.3245000000006
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 718.7173000000003,
+        "end": 974.0488999999998
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 1,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 344.4235000000008,
+    "totalMs": 348.4907000000003,
+    "htmlBytes": 239828,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 262.66909999999916
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 1,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 634.2592000000004,
+    "totalMs": 637.6458999999995,
+    "htmlBytes": 123080,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 259.4868999999999
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 11.68119999999908,
+        "end": 273.15239999999903
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 280.47810000000027,
+        "end": 539.6980999999996
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 280.9398999999994,
+        "end": 539.8266999999996
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 281.1994999999988,
+        "end": 539.9080999999987
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 288.0077999999994,
+        "end": 539.9874999999993
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 288.1988000000001,
+        "end": 540.0630999999994
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 288.39719999999943,
+        "end": 540.1340999999993
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 288.5522000000001,
+        "end": 540.2096000000001
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 288.91779999999926,
+        "end": 540.2888000000003
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 2,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 755.5468999999994,
+    "totalMs": 997.3688999999995,
+    "htmlBytes": 399907,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 252.45789999999943
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 376.58410000000003,
+        "end": 628.1888999999992
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 378.5152999999991,
+        "end": 628.4405999999999
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 379.1772999999994,
+        "end": 628.5686000000005
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 379.3626999999997,
+        "end": 640.2437000000009
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 711.8552,
+        "end": 961.8407000000007
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 2,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 330.1139000000003,
+    "totalMs": 334.1671000000006,
+    "htmlBytes": 239826,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 259.54639999999927
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 2,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 662.9370999999992,
+    "totalMs": 665.8199999999997,
+    "htmlBytes": 122833,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 270.91820000000007
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 5.756100000000515,
+        "end": 271.1190000000006
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 303.8633000000009,
+        "end": 564.196100000001
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 305.0506000000005,
+        "end": 564.3651000000009
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 305.6107000000011,
+        "end": 564.5043999999998
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 316.95759999999973,
+        "end": 579.5426000000007
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 317.1815000000006,
+        "end": 579.663700000001
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 317.4207000000006,
+        "end": 579.7407000000003
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 317.65380000000005,
+        "end": 579.8132999999998
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 318.08339999999953,
+        "end": 579.8927999999996
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 3,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 759.5760999999984,
+    "totalMs": 1003.0981999999985,
+    "htmlBytes": 403370,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 252.04830000000038
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 379.9620999999988,
+        "end": 638.918099999999
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 382.5478000000003,
+        "end": 639.1196
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 383.3732999999993,
+        "end": 639.2340000000004
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 383.5537000000004,
+        "end": 639.8622999999989
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 716.9136999999992,
+        "end": 972.3909000000003
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 3,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 335.6263999999992,
+    "totalMs": 340.7381000000005,
+    "htmlBytes": 239831,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 257.3588
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 3,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 646.4317999999985,
+    "totalMs": 650.3850999999995,
+    "htmlBytes": 123357,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 263.97990000000027
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 6.076100000000224,
+        "end": 264.384399999999
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 286.2543000000005,
+        "end": 552.023799999999
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 286.8097999999991,
+        "end": 552.2573000000011
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 287.0774999999994,
+        "end": 552.3568000000014
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 293.4344999999994,
+        "end": 552.4756000000016
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 293.54359999999906,
+        "end": 552.5737999999983
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 293.7656999999999,
+        "end": 552.6539999999986
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 293.83070000000043,
+        "end": 552.7459999999992
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 294.22229999999945,
+        "end": 552.8313999999991
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 4,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 757.3188000000009,
+    "totalMs": 981.0820000000022,
+    "htmlBytes": 400008,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 253.08120000000054
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 374.6909999999989,
+        "end": 626.372800000001
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 377.02160000000003,
+        "end": 628.0679999999993
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 377.89080000000104,
+        "end": 628.9363999999987
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 378.0669000000016,
+        "end": 631.0734000000011
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 690.4817000000003,
+        "end": 951.2596000000012
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 4,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 322.8484000000026,
+    "totalMs": 326.8136000000013,
+    "htmlBytes": 239934,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 253.15160000000105
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 4,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 628.9609999999993,
+    "totalMs": 632.532900000002,
+    "htmlBytes": 122866,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 262.3337999999967
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 5.167199999999866,
+        "end": 262.60379999999714
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 283.04179999999906,
+        "end": 544.6287999999986
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 283.46589999999924,
+        "end": 544.7577999999994
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 283.73899999999776,
+        "end": 544.8400999999976
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 292.77419999999984,
+        "end": 544.9347999999991
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 292.9572999999982,
+        "end": 545.0091999999968
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 293.1869999999981,
+        "end": 545.0856999999996
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 293.3866999999991,
+        "end": 545.1574999999975
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 293.68169999999736,
+        "end": 545.235099999998
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 5,
+    "route": "/privacy",
+    "status": 200,
+    "ttfbMs": 782.6885000000002,
+    "totalMs": 996.3484000000026,
+    "htmlBytes": 400737,
+    "requests": [
+      {
+        "url": "/api/pages/redirects",
+        "start": 0,
+        "end": 261.15179999999964
+      },
+      {
+        "url": "/api/globals/lead-delivery/metrica",
+        "start": 384.7582000000002,
+        "end": 639.8087000000014
+      },
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fprivacy",
+        "start": 386.66690000000017,
+        "end": 640.0165000000015
+      },
+      {
+        "url": "/api/globals/lead-delivery/counter",
+        "start": 387.3270999999986,
+        "end": 640.1587
+      },
+      {
+        "url": "/api/projects/catalog",
+        "start": 387.5070999999989,
+        "end": 640.9713000000011
+      },
+      {
+        "url": "/api/blocks/content?key=popularProjects",
+        "start": 707.0613000000012,
+        "end": 965.9753999999994
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 5,
+    "route": "/catalog",
+    "status": 200,
+    "ttfbMs": 326.1277000000009,
+    "totalMs": 330.9141000000018,
+    "htmlBytes": 239818,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog",
+        "start": 0,
+        "end": 254.15359999999782
+      }
+    ]
+  },
+  {
+    "delayMs": 250,
+    "run": 5,
+    "route": "/catalog/barhhouse-73",
+    "status": 200,
+    "ttfbMs": 643.1064000000006,
+    "totalMs": 646.7720000000008,
+    "htmlBytes": 123724,
+    "requests": [
+      {
+        "url": "/api/blocks/content?all=1&route=%2Fcatalog%2Fbarhhouse-73",
+        "start": 0,
+        "end": 262.64130000000296
+      },
+      {
+        "url": "/api/projects/catalog?slug=barhhouse-73",
+        "start": 5.0174000000006345,
+        "end": 262.84920000000056
+      },
+      {
+        "url": "/api/projects/reactions?slug=barhhouse-73",
+        "start": 286.4688000000024,
+        "end": 544.525700000002
+      },
+      {
+        "url": "/api/projects/exteriors?slug=barhhouse-73",
+        "start": 287.14480000000185,
+        "end": 544.6448000000019
+      },
+      {
+        "url": "/api/projects/interiors?slug=barhhouse-73",
+        "start": 287.479000000003,
+        "end": 544.7311000000009
+      },
+      {
+        "url": "/api/projects/built?slug=barhhouse-73",
+        "start": 299.22360000000117,
+        "end": 555.8006000000023
+      },
+      {
+        "url": "/api/projects/next-steps?slug=barhhouse-73",
+        "start": 299.41719999999987,
+        "end": 555.9119000000028
+      },
+      {
+        "url": "/api/projects/plans?slug=barhhouse-73",
+        "start": 299.59270000000106,
+        "end": 555.9866000000002
+      },
+      {
+        "url": "/api/projects/configurations?slug=barhhouse-73",
+        "start": 299.78110000000015,
+        "end": 556.0529000000024
+      },
+      {
+        "url": "/api/projects/page-order?slug=barhhouse-73",
+        "start": 300.1751000000004,
+        "end": 556.1486000000004
+      }
+    ]
+  }
+]

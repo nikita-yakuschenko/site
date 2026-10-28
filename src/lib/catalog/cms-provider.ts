@@ -1,9 +1,10 @@
 import 'server-only'
 import { cache } from 'react'
 import { connection } from 'next/server'
-import { unstable_rethrow } from 'next/navigation'
 import { FixtureCatalogProvider } from './fixture-provider'
 import { CATALOG_PROJECTS } from './projects'
+import { readCMSJSON } from '../cms/request'
+import { CMSUnavailableError, decodeCatalog, recordCMSFailure } from '../../server/cms-request'
 import type { CatalogProject, ProjectCatalogProvider, ProjectQuery, SiteCatalogContext } from './types'
 
 const readCatalog = cache(async (slug?: string): Promise<CatalogProject[]> => {
@@ -15,14 +16,12 @@ const readCatalog = cache(async (slug?: string): Promise<CatalogProject[]> => {
   // CMS records are added after deployment; always read them at request time.
   await connection()
   const key = process.env.CMS_SITE_API_KEY
-  if (!key) return []
-  try {
-    const origin = process.env.CMS_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://cms.avgst.ru' : 'http://localhost:3001')
-    const response = await fetch(`${origin}/api/projects/catalog${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`, { headers: { Authorization: `Bearer ${key}` }, next: { revalidate: 60 }, signal: AbortSignal.timeout(15000) })
-    if (!response.ok) return []
-    const data = await response.json()
-    return Array.isArray(data.items) ? data.items : []
-  } catch (error) { unstable_rethrow(error); return [] }
+  if (!key) {
+    recordCMSFailure('catalog', 'not-configured')
+    throw new CMSUnavailableError('catalog', 'not-configured')
+  }
+  const origin = process.env.CMS_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://cms.avgst.ru' : 'http://localhost:3001')
+  return readCMSJSON('catalog', `${origin}/api/projects/catalog${slug ? `?slug=${encodeURIComponent(slug)}` : ''}`, { headers: { Authorization: `Bearer ${key}` }, next: { revalidate: 60 }, signal: AbortSignal.timeout(15000) }, decodeCatalog)
 })
 
 export class CmsCatalogProvider implements ProjectCatalogProvider {
@@ -31,6 +30,8 @@ export class CmsCatalogProvider implements ProjectCatalogProvider {
     return new FixtureCatalogProvider(await readCatalog()).list(query)
   }
   async getBySlug(slug: string, _context: SiteCatalogContext): Promise<CatalogProject | null> {
+    // These names cannot exist under the CMS slug contract; no upstream lookup is needed.
+    if (!/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return null
     return (await readCatalog(slug))[0] || null
   }
 }

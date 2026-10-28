@@ -9,9 +9,8 @@ const startedAt = Date.now()
 /**
  * Эндпоинт живости для Docker Swarm и внешнего мониторинга.
  *
- * Сейчас проверяет только то, что процесс отвечает. По мере появления
- * зависимостей (база, хранилище медиа) сюда добавляются их проверки,
- * и ответ становится 503, когда критичная зависимость недоступна.
+ * Проверяет процесс независимо от CMS. Готовность каталога проверяет /api/ready:
+ * отказ зависимости не должен вызывать бесконечные перезапуски здорового процесса.
  */
 export function GET() {
   return NextResponse.json(
@@ -19,6 +18,8 @@ export function GET() {
       status: 'ok',
       version: process.env.APP_VERSION ?? 'unknown',
       commit: process.env.APP_COMMIT ?? 'unknown',
+      buildId: process.env.APP_BUILD_ID ?? 'unknown',
+      sourceDirty: process.env.APP_SOURCE_DIRTY === 'true' ? true : process.env.APP_SOURCE_DIRTY === 'false' ? false : null,
       uptimeSeconds: Math.round((Date.now() - startedAt) / 1000),
       timestamp: new Date().toISOString(),
     },

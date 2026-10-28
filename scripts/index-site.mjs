@@ -66,9 +66,9 @@ function associatedForms(file, visited = new Set()) {
   const source = ts.createSourceFile(file, text, ts.ScriptTarget.Latest, true, ts.ScriptKind.TSX)
   for (const statement of source.statements) {
     if (!ts.isImportDeclaration(statement)) continue
-    const module = literal(statement.moduleSpecifier)
-    if (!module?.startsWith('.')) continue
-    const resolved = relative(path.resolve(root, path.dirname(file), module + '.tsx'))
+    const specifier = literal(statement.moduleSpecifier)
+    if (!specifier?.startsWith('.')) continue
+    const resolved = relative(path.resolve(root, path.dirname(file), specifier + '.tsx'))
     result.push(...associatedForms(resolved, visited))
   }
   return [...new Set(result)]
@@ -88,9 +88,9 @@ for (const file of appFiles.filter(file => /[/\\]page\.tsx$/.test(file)).sort())
   const imports = new Map()
   for (const statement of source.statements) {
     if (!ts.isImportDeclaration(statement)) continue
-    const module = literal(statement.moduleSpecifier)
-    if (!module?.startsWith('.')) continue
-    const resolved = relative(path.resolve(path.dirname(file), module + '.tsx'))
+    const specifier = literal(statement.moduleSpecifier)
+    if (!specifier?.startsWith('.')) continue
+    const resolved = relative(path.resolve(path.dirname(file), specifier + '.tsx'))
     const bindings = statement.importClause?.namedBindings
     if (bindings && ts.isNamedImports(bindings)) for (const element of bindings.elements) imports.set(element.name.text, { source: resolved, exportName: element.propertyName?.text ?? element.name.text })
   }

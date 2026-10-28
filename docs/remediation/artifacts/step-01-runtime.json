@@ -1,0 +1,204 @@
+[
+  {
+    "name": "build identity and independent health/readiness",
+    "status": "PASSED",
+    "details": {
+      "buildId": "53e0e41d2560a846d8e52d0e70be4037dbb44318911de24b680a1e737e5dbb86",
+      "commit": "c544500b9a80946deb53829e5942053c1d78f5bc",
+      "health": 200,
+      "readiness": 200
+    },
+    "elapsedMs": 35.090400000000045
+  },
+  {
+    "name": "healthy catalog and genuine missing slug",
+    "status": "PASSED",
+    "details": {
+      "catalog": 200,
+      "missing": 404,
+      "requestId": "08419a01-ea0a-4702-ae50-7e4dec9bc34a"
+    },
+    "elapsedMs": 2474.2294
+  },
+  {
+    "name": "five client card transitions preserve region/favorite/Back (desktop)",
+    "status": "PASSED",
+    "details": {
+      "navigations": [
+        {
+          "run": 1,
+          "sameDocument": true
+        },
+        {
+          "run": 2,
+          "sameDocument": true
+        },
+        {
+          "run": 3,
+          "sameDocument": true
+        },
+        {
+          "run": 4,
+          "sameDocument": true
+        },
+        {
+          "run": 5,
+          "sameDocument": true
+        }
+      ],
+      "region": "msk",
+      "favoritePreserved": true
+    },
+    "elapsedMs": 2400.7526
+  },
+  {
+    "name": "five client card transitions preserve region/favorite/Back (mobile)",
+    "status": "PASSED",
+    "details": {
+      "navigations": [
+        {
+          "run": 1,
+          "sameDocument": true
+        },
+        {
+          "run": 2,
+          "sameDocument": true
+        },
+        {
+          "run": 3,
+          "sameDocument": true
+        },
+        {
+          "run": 4,
+          "sameDocument": true
+        },
+        {
+          "run": 5,
+          "sameDocument": true
+        }
+      ],
+      "region": "msk",
+      "favoritePreserved": true
+    },
+    "elapsedMs": 1724.5545999999995
+  },
+  {
+    "name": "CMS503 catalog failure 1",
+    "status": "PASSED",
+    "details": {
+      "html": 500,
+      "health": 200,
+      "readiness": 503,
+      "availability": 503
+    },
+    "elapsedMs": 751.2347000000009
+  },
+  {
+    "name": "CMS503 catalog failure 2",
+    "status": "PASSED",
+    "details": {
+      "html": 500,
+      "health": 200,
+      "readiness": 503,
+      "availability": 503
+    },
+    "elapsedMs": 439.5605999999989
+  },
+  {
+    "name": "CMS503 catalog failure 3",
+    "status": "PASSED",
+    "details": {
+      "html": 500,
+      "health": 200,
+      "readiness": 503,
+      "availability": 503
+    },
+    "elapsedMs": 266.52670000000035
+  },
+  {
+    "name": "CMS503 catalog failure 4",
+    "status": "PASSED",
+    "details": {
+      "html": 500,
+      "health": 200,
+      "readiness": 503,
+      "availability": 503
+    },
+    "elapsedMs": 270.2006999999994
+  },
+  {
+    "name": "CMS503 catalog failure 5",
+    "status": "PASSED",
+    "details": {
+      "html": 500,
+      "health": 200,
+      "readiness": 503,
+      "availability": 503
+    },
+    "elapsedMs": 345.9947000000011
+  },
+  {
+    "name": "CMS503 existing project is unavailable rather than missing",
+    "status": "PASSED",
+    "details": {
+      "html": 500
+    },
+    "elapsedMs": 455.78589999999895
+  },
+  {
+    "name": "retry recovers the existing project after an upstream 503",
+    "status": "PASSED",
+    "details": {
+      "project": "Барнхаус 73",
+      "readiness": 200
+    },
+    "elapsedMs": 2469.7344999999987
+  },
+  {
+    "name": "informational privacy page survives a catalog outage",
+    "status": "PASSED",
+    "details": {
+      "status": 200
+    },
+    "elapsedMs": 192.06890000000203
+  },
+  {
+    "name": "malformed uses the error state, not an empty catalog or false 404",
+    "status": "PASSED",
+    "details": {
+      "html": 500,
+      "readiness": 503
+    },
+    "elapsedMs": 546.2731999999996
+  },
+  {
+    "name": "invalid-shape uses the error state, not an empty catalog or false 404",
+    "status": "PASSED",
+    "details": {
+      "html": 500,
+      "readiness": 503
+    },
+    "elapsedMs": 659.7017999999989
+  },
+  {
+    "name": "not-configured uses the error state, not an empty catalog or false 404",
+    "status": "PASSED",
+    "details": {
+      "html": 500,
+      "readiness": 503
+    },
+    "elapsedMs": 620.5568999999996
+  },
+  {
+    "name": "five simultaneous readiness probes coalesce and time out without killing liveness",
+    "status": "PASSED",
+    "details": {
+      "probes": 5,
+      "upstreamRequests": 1,
+      "durationMs": 2540.217199999999,
+      "readiness": 503,
+      "health": 200
+    },
+    "elapsedMs": 2540.327300000001
+  }
+]
