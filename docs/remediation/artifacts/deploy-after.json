@@ -1,0 +1,84 @@
+{
+  "phase": "after",
+  "time": "2026-10-28T09:07:16.029Z",
+  "http": [
+    {
+      "route": "/api/health",
+      "status": 200,
+      "durationMs": 208,
+      "requestId": null,
+      "data": {
+        "status": "ok",
+        "version": "0.1.0",
+        "commit": "unknown",
+        "buildId": "3a313bb0640605afd4a153f8663be613e45c507b041b9b515507ce125f601d6c",
+        "sourceDirty": null,
+        "uptimeSeconds": 14,
+        "timestamp": "2026-10-28T09:07:16.202Z"
+      }
+    },
+    {
+      "route": "/api/ready",
+      "status": 200,
+      "durationMs": 444,
+      "requestId": "41389c4f-abff-45d5-b5b3-d13038ee9fd1",
+      "data": {
+        "status": "ready",
+        "buildId": "3a313bb0640605afd4a153f8663be613e45c507b041b9b515507ce125f601d6c"
+      }
+    },
+    {
+      "route": "/api/catalog/availability",
+      "status": 200,
+      "durationMs": 28,
+      "requestId": null,
+      "data": {
+        "readyHouses": false
+      }
+    },
+    {
+      "route": "/",
+      "status": 200,
+      "durationMs": 1020,
+      "requestId": "3f6b809f-376e-4fc7-9003-64b61c29e080"
+    },
+    {
+      "route": "/privacy",
+      "status": 200,
+      "durationMs": 806,
+      "requestId": "35ad31bb-c0de-43fc-a6d8-e4e555bedb74"
+    },
+    {
+      "route": "/catalog",
+      "status": 200,
+      "durationMs": 689,
+      "requestId": "4201b140-440d-4f31-a654-b1f6b06f5fee"
+    },
+    {
+      "route": "/catalog/barhhouse-73",
+      "status": 200,
+      "durationMs": 785,
+      "requestId": "0b2a6342-6e64-43b4-a16f-bfb5fd9d66fc"
+    },
+    {
+      "route": "/catalog/production-smoke-missing-4b96521",
+      "status": 404
+    }
+  ],
+  "browser": [
+    {
+      "mobile": false,
+      "project": "/catalog/barnhouse-71",
+      "sameDocument": true,
+      "back": true,
+      "pageErrors": []
+    },
+    {
+      "mobile": true,
+      "project": "/catalog/barnhouse-71",
+      "sameDocument": true,
+      "back": true,
+      "pageErrors": []
+    }
+  ]
+}

@@ -1,0 +1,44 @@
+{
+  "phase": "before",
+  "time": "2026-10-28T08:03:37.529Z",
+  "http": [
+    {
+      "route": "/api/health",
+      "status": 200,
+      "durationMs": 118,
+      "requestId": null,
+      "data": {
+        "status": "ok",
+        "version": "0.1.0",
+        "commit": "unknown",
+        "uptimeSeconds": 47913,
+        "timestamp": "2026-10-28T08:03:37.608Z"
+      }
+    },
+    {
+      "route": "/",
+      "status": 200,
+      "durationMs": 602,
+      "requestId": null
+    },
+    {
+      "route": "/privacy",
+      "status": 200,
+      "durationMs": 573,
+      "requestId": null
+    },
+    {
+      "route": "/catalog",
+      "status": 200,
+      "durationMs": 548,
+      "requestId": null
+    },
+    {
+      "route": "/catalog/barhhouse-73",
+      "status": 200,
+      "durationMs": 612,
+      "requestId": null
+    }
+  ],
+  "browser": []
+}
