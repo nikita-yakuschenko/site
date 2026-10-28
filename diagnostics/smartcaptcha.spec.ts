@@ -27,10 +27,6 @@ async function prepare(page: Page, mode = 'success') {
   const fill = async () => {
     await form.locator('input[name=name]').fill('Тест Проверки')
     await form.locator('input[name=phone]').fill('9123456789')
-    // Consent is checked by default, so check() may leave the phone focused.
-    // Dismiss mobile input focus before the real submit-button click: these
-    // scenarios exercise captcha outcomes, not the keyboard's first-tap handling.
-    await form.locator('input[name=phone]').blur()
     await form.locator('input[name=consent]').check()
   }
   return { form, fill, submissions, sdk: () => sdk }
@@ -55,12 +51,14 @@ for (const mode of ['network-error', 'javascript-error', 'challenge-hidden', 'to
   test(`captcha ${mode} fails closed and supports explicit retry`, async ({ page }) => {
     const run = await prepare(page, mode)
     await run.fill()
-    await run.form.locator('button[type=submit]').click()
+    // Exercise SDK outcomes independently of mobile WebKit's synthetic-click
+    // focus/scroll handling. Other scenarios retain real submit-button clicks.
+    await run.form.evaluate(form => (form as HTMLFormElement).requestSubmit())
     await expect(run.form.getByRole('alert')).toBeVisible()
     expect(run.submissions).toHaveLength(0)
     await expect(page.locator('.smart-captcha')).toHaveCount(0)
     await page.evaluate(() => { (window as unknown as Record<string, unknown>).__captchaMode = 'success' })
-    await run.form.locator('button[type=submit]').click()
+    await run.form.evaluate(form => (form as HTMLFormElement).requestSubmit())
     await expect.poll(() => run.submissions.length).toBe(1)
     expect(run.sdk()).toBe(1)
   })
@@ -70,7 +68,7 @@ test('missing sitekey never loads SDK or sends lead', async ({ page }) => {
   const run = await prepare(page)
   await page.route('**/api/smartcaptcha-config', route => route.fulfill({ json: { siteKey: null, configured: false } }))
   await run.fill()
-  await run.form.locator('button[type=submit]').click()
+  await run.form.evaluate(form => (form as HTMLFormElement).requestSubmit())
   await expect(run.form.getByRole('alert')).toBeVisible()
   expect(run.sdk()).toBe(0)
   expect(run.submissions).toHaveLength(0)
