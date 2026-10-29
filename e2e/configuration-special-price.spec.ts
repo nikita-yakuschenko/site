@@ -16,7 +16,9 @@ for (const width of [1440, 390]) test(`special price and ordinary-price mortgage
   await expect(cards).toHaveCount(3)
   await expect(cards.nth(1).locator('.project-config__tier-price')).toHaveText(/Специальная цена\s*1\s*700\s*000\s*руб\./)
   await expect(section).not.toContainText(/2\s*000\s*000\s*руб/)
-  const payment = formatFromRub(monthlyPaymentForProject({ propertyPrice: 2000000, region: 'nn' }))
+  const monthly = monthlyPaymentForProject({ propertyPrice: 2000000, region: 'nn' })
+  expect(monthly).not.toBeNull()
+  const payment = formatFromRub(monthly!)
   const panel = width < 800 ? section.locator('.project-config__tier-card').nth(1).locator('.project-config__mobile-form') : section.locator('aside.project-config__total')
   if (width < 800) await section.locator('.project-config__mobile-quote').nth(1).click()
   await expect(panel.locator('.project-config__total-sum')).toHaveText(/Специальная цена\s*1\s*700\s*000\s*руб\./)
@@ -37,7 +39,7 @@ for (const width of [1440, 390]) test(`frame rename and separate gift items at $
   await page.goto('/cms-preview/configurations')
   await page.waitForFunction(() => (window as unknown as { configurationReady?: boolean }).configurationReady)
   const templates = defaultConfigurationTemplates()
-  templates.frame.project.gifts = [{ text: 'Клееные элементы дома' }, { text: 'Утепление перекрытий, пола и крыши 200 мм' }, { text: 'Покраска дома финскими морозостойкими красками' }]
+  templates.frame.project!.gifts = [{ text: 'Клееные элементы дома' }, { text: 'Утепление перекрытий, пола и крыши 200 мм' }, { text: 'Покраска дома финскими морозостойкими красками' }]
   await page.evaluate(templates => window.dispatchEvent(new MessageEvent('message', { origin: 'http://localhost:3001', source: window, data: { type: 'avgst:preview-configurations', variant: 'frame', templates } })), templates)
   const card = page.locator('.project-config__tier').nth(2)
   await expect(page.locator('.project-config__tiers')).toHaveCSS('display', 'grid')
