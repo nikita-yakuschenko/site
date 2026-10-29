@@ -2,7 +2,7 @@ import { priceConfigurationKeys, type ConfigurationKey } from '../../../src/lib/
 import type { PriceKind } from './price-kinds'
 import type { CatalogTechnology } from '../../../src/lib/catalog/types'
 
-const kitLabels: Record<string, ConfigurationKey> = { 'старт': 'start', 'стартовая': 'start', 'базовая': 'standard', 'стандартная': 'standard', 'проектная': 'project', 'под ключ': 'turnkey' }
+const kitLabels: Record<string, ConfigurationKey> = { 'старт': 'start', 'стартовая': 'start', 'базовая': 'standard', 'стандартная': 'standard', 'проектная': 'project', 'расширенная': 'project', 'под ключ': 'turnkey' }
 
 export type MarketingChoice = { projectName: string; sourceName: string; skipped: string[] }
 export type MarketingPriceRow = { projectName: string; configuration: ConfigurationKey; region: PriceKind; price: number }

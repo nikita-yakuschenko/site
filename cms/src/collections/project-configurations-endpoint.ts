@@ -15,7 +15,11 @@ export const projectConfigurationsEndpoint: Endpoint = {
     const record = result.docs[0]
     if (!record || !configurationTiers(record.configurations || [], record.technologyBadge)) return Response.json({ error: 'Комплектации не настроены' }, { status: 404 })
     const prices = await req.payload.find({ collection: 'project-prices', where: { project: { equals: record.id } }, pagination: false, depth: 0, req, overrideAccess: true })
-    const configurations = (record.configurations || []).map(row => ({ key: row.key, price: row.price, regionalPrices: Object.fromEntries(prices.docs.filter(price => price.configuration === row.key && isPublicPriceKind(price.region)).map(price => [price.region, price.price])) }))
+    const configurations = (record.configurations || []).map(row => ({ key: row.key, price: row.price,
+      regionalPrices: Object.fromEntries(prices.docs.filter(price => price.configuration === row.key && isPublicPriceKind(price.region)).map(price => [price.region, price.price])),
+      // Publish only the two customer special prices, never dealer pricing.
+      specialPrices: Object.fromEntries(prices.docs.filter(price => price.configuration === row.key && (price.region === 'special' || price.region === 'special-msk')).map(price => [price.region === 'special' ? 'nn' : 'msk', price.price])),
+    }))
     // Legacy project prices belong only to NN; never substitute them for another region.
     for (const row of configurations) if (!('nn' in row.regionalPrices) && row.price > 0) row.regionalPrices.nn = row.price
     const blocks = await req.payload.find({ collection: 'blocks', where: { key: { equals: 'ProjectConfig' } }, limit: 1, depth: 0, req, overrideAccess: true })

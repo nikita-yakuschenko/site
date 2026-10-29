@@ -720,7 +720,12 @@
 .project-config__tier-band::after { content: ""; flex: 1; height: 0; border-top: 1px dashed var(--line-2); }
 .project-config__tier-band > span { display: inline-flex; align-items: center; gap: 6px; flex: none; }
 .project-config__tier-band svg { color: var(--brand-yellow); }
-.project-config__tier-gift { display: block; font-size: 14px; line-height: 1.45; color: var(--avgst-ink); }
+.project-config__gift-list { display: grid; gap: 8px; }
+.project-config__tier-gift { position: relative; display: block; padding-left: 14px; font-size: 14px; line-height: 1.45; color: var(--avgst-ink); }
+.project-config__tier-gift::before { content: '•'; position: absolute; left: 0; color: var(--avgst-green); }
+.project-config__special-badge { display: block; width: fit-content; margin-bottom: 8px; padding: 4px 7px; border-radius: 999px; background: var(--brand-yellow); color: var(--avgst-ink); font-size: 10px; font-weight: 600; letter-spacing: 0; line-height: 1; white-space: nowrap; }
+.project-config__total-pay .project-config__mortgage-label { font-size: 12px; font-weight: 500; color: var(--ink-2); }
+.project-config__total-pay .project-config__mortgage-payment { font-size: 16px; font-weight: 600; }
 .project-rows {
   display: grid;
   gap: var(--gap-tile);

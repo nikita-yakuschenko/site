@@ -2,7 +2,7 @@
 
 import { useLayoutEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { configurationKeys, configurationNames, type ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
+import { configurationKeys, configurationName, type ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
 import { PagePreview } from './PagePreview'
 
 export function ConfigurationBlockEditor({ variant, siteUrl }: { variant: 'panel' | 'modular' | 'frame'; siteUrl: string }) {
@@ -33,7 +33,7 @@ export function ConfigurationBlockEditor({ variant, siteUrl }: { variant: 'panel
   return <>
     <div ref={ref} className="configuration-editor-nav shadcn-surface">
       <div className="configuration-editor-tabs" role="group" aria-label="Редактируемая комплектация">
-        {keys.map(key => <button key={key} type="button" aria-pressed={selected === key} onClick={() => setSelected(key)}>{configurationNames[key]}</button>)}
+        {keys.map(key => <button key={key} type="button" aria-pressed={selected === key} onClick={() => setSelected(key)}>{configurationName(key, variant)}</button>)}
       </div>
       <p>Общий состав для всех проектов выбранной технологии.</p>
     </div>

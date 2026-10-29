@@ -1,5 +1,7 @@
 'use client'
 
+import '../../catalog/catalog.css'
+
 import { useEffect, useState } from 'react'
 import { ProjectConfig } from '../../../components/project-config'
 import { sharedConfigurationContent, type ConfigurationTemplatesData } from '../../../lib/catalog/configuration-content'

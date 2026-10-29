@@ -38,7 +38,7 @@ for (const width of [1280, 1024, 390]) {
       await page.evaluate(() => document.fonts.ready);
       const closedHeight = (await page.locator('.project-config__tiers').boundingBox())!.height;
       const panel = page.locator('.project-config__total');
-      await panel.getByRole('button', { name: 'Получить расчёт', exact: true }).click();
+      await panel.getByRole('button', { name: 'Получить смету', exact: true }).click();
       await page.waitForFunction(() => document.querySelector('.project-config__total')!.getAnimations({ subtree: true }).length === 0);
       const openedHeight = (await page.locator('.project-config__tiers').boundingBox())!.height;
       const openedPanelHeight = (await panel.boundingBox())!.height;

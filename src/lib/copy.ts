@@ -187,7 +187,7 @@ export const copy = {
   breadcrumbsHome: "Главная",
   breadcrumbsCatalog: "Каталог",
   consult: "Получить консультацию",
-  getQuote: "Получить расчёт",
+  getQuote: "Получить смету",
   cost: "Стоимость",
   close: "Закрыть",
   factoryTour: "Записаться на экскурсию",

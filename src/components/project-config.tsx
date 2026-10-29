@@ -6,7 +6,7 @@ import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, typ
 import { copy, nbspText } from "../lib/copy";
 import { formatFromRub, formatRub } from "../lib/locale";
 import { getMortgageProgram, monthlyPaymentForProject } from "../lib/mortgage";
-import { tiersForProject, tiersForRegion, type PricedTier } from "../lib/catalog/tiers";
+import { displayedTierPrice, hasSpecialTierPrice, tiersForProject, tiersForRegion, type PricedTier } from "../lib/catalog/tiers";
 import {
   DEFAULT_TIER,
   readTier,
@@ -43,9 +43,20 @@ const configText = (text: string) => nbspText(nbspText(text.replace(/(?:согл
 
 function IncludesTitle({ text }: { text: string }) {
   const formatted = configText(text);
-  const match = /(стартовой|стандартной|проектной)/i.exec(formatted);
+  const match = /(стартовой|стандартной|проектной|расширенной)/i.exec(formatted);
   if (!match) return formatted;
   return <>{formatted.slice(0, match.index)}<span className="project-config__tier-base">{match[0]}</span>{formatted.slice(match.index + match[0].length)}</>;
+}
+
+function SpecialPriceBadge({ tier }: { tier: PricedTier }) {
+  return hasSpecialTierPrice(tier) ? <span className="project-config__special-badge">Специальная цена</span> : null;
+}
+
+function MortgagePayment({ monthly }: { monthly: number }) {
+  return <p className="project-config__total-pay"><span className="project-config__mortgage-label">В ипотеку</span>
+    <strong className="project-config__mortgage-payment">{formatFromRub(monthly)} {copy.configPerMonth}</strong>
+    <span>{configText(copy.configPayNote)}</span>
+  </p>;
 }
 
 export function ProjectConfig({ project, configurations, previewTier, onPreviewTierChange }: { project: CatalogProject; configurations?: PricedTier[]; previewTier?: string; onPreviewTierChange?: (tier: string) => void }) {
@@ -140,7 +151,8 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                   <span className="project-config__tier-name">{configText(item.name)}</span>
                   <span className="project-config__tier-lead">{configText(item.lead)}</span>
                   <span className="project-config__tier-price">
-                    {item.price > 0 ? configText(formatFromRub(item.price)) : 'Цена уточняется'}
+                    <SpecialPriceBadge tier={item} />
+                    {displayedTierPrice(item) > 0 ? configText(formatRub(displayedTierPrice(item))) : 'Цена уточняется'}
                   </span>
                   <span className="project-config__tier-includes-title">
                     {item.includesTitle ? <IncludesTitle text={item.includesTitle} /> : item.id === 'project' ? <><span className="project-config__tier-base">Стандартная</span> комплектация дополняется:</>
@@ -162,7 +174,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                     <span className="project-config__tier-band">
                       <span><IconGiftFilled size={14} aria-hidden="true" />{configText(copy.configGift)}</span>
                     </span>
-                    <span className="project-config__tier-gift">{configText(item.gifts.join(', '))}</span>
+                    <span className="project-config__gift-list" role="list">{item.gifts.map((gift, index) => <span className="project-config__tier-gift" role="listitem" key={`${index}-${gift}`}>{configText(gift)}</span>)}</span>
                   </span> : null}
                 </ConfigurationTierCard>
               </li>
@@ -181,16 +193,13 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
             <p className="project-config__total-label">
               <span>Комплектация: </span><strong>{configText(tier.name)}</strong>
             </p>
-            <p className="project-config__total-sum">{tier.price > 0 ? formatRub(tier.price) : 'Цена уточняется'}</p>
+            <p className="project-config__total-sum"><SpecialPriceBadge tier={tier} />{displayedTierPrice(tier) > 0 ? formatRub(displayedTierPrice(tier)) : 'Цена уточняется'}</p>
             {/* Строка под суммой есть всегда: без неё панель у стартовой
                 схлопывается и выглядит обрезанной. Там, где ипотеки нет,
                 её место занимает факт о доставке — он верен для всех
                 уровней и ни на что не намекает. */}
             {monthly ? (
-              <p className="project-config__total-pay">
-                {formatRub(monthly)} {copy.configPerMonth}
-                <span>{configText(copy.configPayNote)}</span>
-              </p>
+              <MortgagePayment monthly={monthly} />
             ) : project.technology === 'frame' ? (
               <p className="project-config__total-pay project-config__total-pay--plain" aria-hidden="true">{'\u00a0'}<span>{'\u00a0'}</span></p>
             ) : (
@@ -216,6 +225,7 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
                 project: project.name,
                 tier: tier.name,
                 price: tier.price,
+                specialPrice: displayedTierPrice(tier),
               }}
             />
           </aside>
@@ -292,12 +302,12 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
     {visited && <div className="project-config__total project-config__mobile-form" data-form="true" inert={!open} aria-hidden={!open}>
       <button type="button" className="project-config__close" aria-label={copy.close} onClick={() => changeOpen(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button>
       <p className="project-config__total-label"><span>Комплектация: </span><strong>{configText(item.name)}</strong></p>
-      <p className="project-config__total-sum">{item.price > 0 ? formatRub(item.price) : 'Цена уточняется'}</p>
-      {monthly ? <p className="project-config__total-pay">{formatRub(monthly)} {copy.configPerMonth}<span>{configText(copy.configPayNote)}</span></p>
+      <p className="project-config__total-sum"><SpecialPriceBadge tier={item} />{displayedTierPrice(item) > 0 ? formatRub(displayedTierPrice(item)) : 'Цена уточняется'}</p>
+      {monthly ? <MortgagePayment monthly={monthly} />
         : project.technology === 'frame' ? <p className="project-config__total-pay project-config__total-pay--plain" aria-hidden="true">{'\u00a0'}<span>{'\u00a0'}</span></p>
         : <p className="project-config__total-pay project-config__total-pay--plain">{configText(copy.configDelivery)}<span>{configText(copy.configDeliveryNote)}</span></p>}
       <LeadForm active={open} siteId={SITE.id} formId="project-configuration" projectExternalId={project.id} variant="card" compact heading={copy.getQuote} submitLabel={copy.getQuote}
-        meta={{ project: project.name, tier: item.name, price: item.price }} />
+        meta={{ project: project.name, tier: item.name, price: item.price, specialPrice: displayedTierPrice(item) }} />
     </div>}
   </div>;
 }

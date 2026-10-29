@@ -8,7 +8,7 @@ import type { CatalogProject } from '../../src/lib/catalog/types'
 
 test('frame tiers preserve the approved copy and have no inherited gifts or panel construction', () => {
   const tiers = configurationTiers(['start', 'standard', 'project'].map((key, i) => ({ key: key as 'start' | 'standard' | 'project', price: i * 1000000 })), 'Каркасный')!
-  assert.deepEqual(tiers.map(t => t.name), ['Стартовая', 'Стандартная', 'Проектная'])
+  assert.deepEqual(tiers.map(t => t.name), ['Стартовая', 'Стандартная', 'Расширенная'])
   assert.deepEqual(tiers.map(t => t.lead), ['Силовой каркас, кровля и наружная отделка — основа для дальнейшего обустройства дома.', 'Утеплённый дом с окнами и входной дверью. Подготовлен к внутренней отделке.', 'Внутренние стены и основание пола подготовлены к дальнейшей отделке.'])
   assert.deepEqual(tiers.map(t => t.includesTitle), ['Всё необходимое для начала:', 'Дополнительно к стартовой комплектации:', 'Дополнительно к стандартной комплектации:'])
   assert.deepEqual(tiers.map(t => t.includes), [

@@ -22,7 +22,7 @@ export const FRAME_TIERS: readonly ProjectTier[] = [
     ],
   },
   {
-    id: 'project', name: 'Проектная', nameAcc: 'проектную', factor: 0, mortgage: true,
+    id: 'project', name: 'Расширенная', nameAcc: 'расширенную', factor: 0, mortgage: true,
     lead: 'Внутренние стены и основание пола подготовлены к дальнейшей отделке.',
     includesTitle: 'Дополнительно к стандартной комплектации:',
     includes: ['Обшивка стен гипсокартоном', 'Обшивка стен санузлов влагостойкими листами', 'Основание пола из ОСП'],

@@ -30,7 +30,7 @@ for (const width of [1280, 375]) {
     await expect(reveal).not.toHaveClass(/is-open/);
     await expect(reveal.getByRole('button', { name: 'Рассчитать ипотеку', exact: true })).toBeVisible();
     const configurationPanel = page.locator('.project-config__total');
-    await configurationPanel.getByRole('button', { name: 'Получить расчёт', exact: true }).click();
+    await configurationPanel.getByRole('button', { name: 'Получить смету', exact: true }).click();
     await expect(configurationPanel).toHaveAttribute('data-form', 'true');
     const panelRect = await configurationPanel.boundingBox();
     const closeRect = await configurationPanel.getByRole('button', { name: 'Закрыть', exact: true }).boundingBox();
@@ -39,7 +39,7 @@ for (const width of [1280, 375]) {
     await expect(configurationPanel.getByRole('textbox', { name: 'Имя', exact: true })).toBeVisible();
     await configurationPanel.getByRole('button', { name: 'Закрыть', exact: true }).click();
     await expect(configurationPanel).toHaveAttribute('data-form', 'false');
-    await expect(configurationPanel.getByRole('button', { name: 'Получить расчёт', exact: true })).toBeFocused();
+    await expect(configurationPanel.getByRole('button', { name: 'Получить смету', exact: true })).toBeFocused();
     await expect(configurationPanel.getByRole('textbox', { name: 'Имя', exact: true })).toHaveCount(0);
   });
 }

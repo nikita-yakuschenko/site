@@ -45,8 +45,8 @@ import {
   type TechnicalMatrix,
 } from "./model/types";
 import type { CatalogProject } from "../../lib/catalog/types";
-import type { PricedTier } from "../../lib/catalog/tiers";
-import { formatFromRub } from "../../lib/locale";
+import { displayedTierPrice, hasSpecialTierPrice, type PricedTier } from "../../lib/catalog/tiers";
+import { formatRub } from "../../lib/locale";
 import { nbspText } from "../../lib/copy";
 import "./comparison.css";
 
@@ -678,8 +678,9 @@ function ComparisonBody({
                               </span>
                             )}
                             <b className="comparison-price">
-                              {tier && tier.price > 0
-                                ? formatFromRub(tier.price)
+                              {tier && hasSpecialTierPrice(tier) ? <span className="project-config__special-badge">Специальная цена</span> : null}
+                              {tier && displayedTierPrice(tier) > 0
+                                ? formatRub(displayedTierPrice(tier))
                                 : "Цена уточняется"}
                             </b>
                           </div>

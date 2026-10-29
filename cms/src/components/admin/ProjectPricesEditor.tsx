@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react'
 import { IconCheck, IconLoader2 } from '@tabler/icons-react'
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion'
 import { Input } from '@/components/ui/input'
-import { configurationNames, isModularTechnology, priceConfigurationKeys, type ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
+import { configurationName, isModularTechnology, priceConfigurationKeys, type ConfigurationKey } from '../../../../src/lib/catalog/configuration-rules'
 import { priceKindsInForm, type PriceKind } from '../../config/price-kinds'
 
 type PriceDoc = { id: string; configuration: ConfigurationKey; region: PriceKind; price: number }
@@ -89,9 +89,9 @@ export function ProjectPricesEditor() {
             const key = cellKey(configuration, kind.value)
             const value = key in drafts ? drafts[key] : formatPrice(docs[key]?.price)
             return <label key={configuration} className="flex items-center gap-3">
-              <span className="w-36 shrink-0 text-sm">{configurationNames[configuration]}{modular && configuration === 'start' && <span className="mt-0.5 block text-xs font-normal text-muted-foreground">не на сайте</span>}</span>
+              <span className="w-36 shrink-0 text-sm">{configurationName(configuration, technology)}{modular && configuration === 'start' && <span className="mt-0.5 block text-xs font-normal text-muted-foreground">не на сайте</span>}</span>
               <span className="relative w-48">
-                <Input inputMode="numeric" className="h-8 pr-7 text-right tabular-nums" placeholder={kind.value === 'nn' && legacy[configuration] ? formatPrice(legacy[configuration]) : '—'} value={value} aria-label={`${kind.label}: ${configurationNames[configuration]}`}
+                <Input inputMode="numeric" className="h-8 pr-7 text-right tabular-nums" placeholder={kind.value === 'nn' && legacy[configuration] ? formatPrice(legacy[configuration]) : '—'} value={value} aria-label={`${kind.label}: ${configurationName(configuration, technology)}`}
                   onChange={event => { const text = event.target.value; setDrafts(current => ({ ...current, [key]: formatPrice(parsePrice(text)) })) }}
                   onBlur={() => void commit(configuration, kind.value)}
                   onKeyDown={event => { if (event.key === 'Enter') { event.preventDefault(); event.currentTarget.blur() } }} />

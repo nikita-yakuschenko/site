@@ -216,10 +216,14 @@ export const TURNKEY_TIER: ProjectTier = {
 export const tierDefinitions = [...PROJECT_TIERS, TURNKEY_TIER];
 export const tierDefinitionsForTechnology = (technology: CatalogTechnology) => technology === 'frame' ? FRAME_TIERS : tierDefinitions;
 
-export type PricedTier = ProjectTier & { price: number; regionalPrices?: Partial<Record<'nn' | 'msk', number>> };
+// Ordinary prices remain the mortgage principal; only special prices are displayed in this block.
+export type PricedTier = ProjectTier & { price: number; regionalPrices?: Partial<Record<'nn' | 'msk', number>>; specialPrice?: number; regionalSpecialPrices?: Partial<Record<'nn' | 'msk', number>> };
+
+export const hasSpecialTierPrice = (tier: PricedTier) => typeof tier.specialPrice === 'number' && Number.isFinite(tier.specialPrice) && tier.specialPrice > 0;
+export const displayedTierPrice = (tier: PricedTier) => hasSpecialTierPrice(tier) ? tier.specialPrice! : 0;
 
 export function tiersForRegion(tiers: readonly PricedTier[], region: 'nn' | 'msk'): PricedTier[] {
-  return tiers.map(tier => ({ ...tier, price: tier.regionalPrices ? tier.regionalPrices[region] ?? 0 : tier.price }));
+  return tiers.map(tier => ({ ...tier, price: tier.regionalPrices ? tier.regionalPrices[region] ?? 0 : tier.price, specialPrice: tier.regionalSpecialPrices ? tier.regionalSpecialPrices[region] : tier.specialPrice }));
 }
 
 /** Цена комплектации округляется до тысяч: до рубля её всё равно считает

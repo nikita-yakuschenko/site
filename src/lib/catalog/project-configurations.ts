@@ -12,6 +12,7 @@ export async function resolveProjectConfigurations(slug: string): Promise<Priced
     return configurationTiers(configurationKeys(project.technology === 'modular').map((key, index) => ({
       key, price: (index + 1) * 1_000_000,
       regionalPrices: { nn: (index + 1) * 1_000_000, msk: (index + 1) * 1_000_000 + 500_000 },
+      specialPrices: { nn: (index + 1) * 850_000, msk: (index + 1) * 850_000 + 400_000 },
     })), project.technologyBadge)
   }
   const key = process.env.CMS_SITE_API_KEY
