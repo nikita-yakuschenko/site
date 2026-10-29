@@ -6514,6 +6514,16 @@ html.is-dialog-open {
   animation: ask-dialog-card 0.28s var(--ease-out);
 }
 
+@media (max-width: 767px) {
+  .ask-dialog {
+    padding: max(16px, env(safe-area-inset-top, 0px)) 16px max(16px, env(safe-area-inset-bottom, 0px));
+    overflow-y: auto;
+  }
+  .ask-dialog__card {
+    max-height: calc(100dvh - max(16px, env(safe-area-inset-top, 0px)) - max(16px, env(safe-area-inset-bottom, 0px)));
+  }
+}
+
 @keyframes ask-dialog-card {
   from {
     opacity: 0;

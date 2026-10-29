@@ -16,6 +16,7 @@ import {
 import { LeadForm } from "./lead-form";
 import { SITE } from "../lib/site";
 import { PanelLeadForm } from "./panel-lead-form";
+import { isMobileFormViewport, useMobileFormReveal } from './use-mobile-form-reveal';
 import type { CatalogProject } from "../lib/catalog/types";
 import { ConfigurationComparison } from './configuration-comparison/comparison';
 
@@ -272,12 +273,13 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
       });
       animationRef.current = animation;
     }
-    if (open) root.querySelector<HTMLInputElement>('.project-config__mobile-form input:not([type="hidden"])')?.focus({ preventScroll: true });
-    else quoteRef.current?.focus({ preventScroll: true });
+    if (open && !isMobileFormViewport()) root.querySelector<HTMLInputElement>('.project-config__mobile-form input:not([type="hidden"])')?.focus({ preventScroll: true });
+    else if (!open) quoteRef.current?.focus({ preventScroll: true });
     previousHeight.current = null;
     return () => animationRef.current?.cancel();
   }, [open]);
 
+  useMobileFormReveal(open, rootRef);
   return <div ref={rootRef} className="project-config__tier-card" data-form={open} data-selected={selected}>
     <div className="project-config__tier-front" inert={open} aria-hidden={open}>
       <button type="button" className={`project-config__tier${selected ? ' project-config__tier--on' : ''}`} aria-pressed={selected} onClick={onSelect}>

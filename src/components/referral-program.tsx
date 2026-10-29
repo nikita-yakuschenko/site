@@ -12,6 +12,7 @@ import { noAutofillFieldProps, noAutofillFormProps } from "../lib/no-autofill";
 
 import { PhoneInput } from './phone-input'
 import { useLeadCaptcha } from './use-lead-captcha'
+import { isMobileFormViewport, useMobileFormReveal } from './use-mobile-form-reveal'
 
 type Status = "idle" | "open" | "sending" | "ok" | "error";
 
@@ -47,6 +48,7 @@ export function ReferralProgram({
   const [rules, setRules] = useState(true);
   const [invalid, setInvalid] = useState<Record<string, boolean>>({});
   const nameRef = useRef<HTMLInputElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
 
   const open =
@@ -55,13 +57,14 @@ export function ReferralProgram({
     status === "ok" ||
     status === "error";
   const done = status === "ok";
+  useMobileFormReveal(open, cardRef);
   const captcha = useLeadCaptcha(open);
 
   function openForm() {
     setInvalid({});
     setRules(true);
     setStatus("open");
-    window.setTimeout(() => nameRef.current?.focus(), 40);
+    if (!isMobileFormViewport()) window.setTimeout(() => nameRef.current?.focus(), 40);
   }
 
   function closeForm() {
@@ -185,6 +188,7 @@ export function ReferralProgram({
                     done ? "referral__card is-done" : "referral__card"
                   }
                   role="dialog"
+                  ref={cardRef}
                   aria-modal="true"
                   aria-labelledby="referral-lead"
                 >

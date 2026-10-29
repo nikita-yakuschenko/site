@@ -5,6 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from "re
 import { LeadForm } from "./lead-form";
 import { SITE } from "../lib/site";
 import { copy } from "../lib/copy";
+import { isMobileFormViewport, useMobileFormReveal } from './use-mobile-form-reveal';
 
 const REVEAL_MS = 600;
 const REVEAL_MARGIN = 24;
@@ -71,9 +72,10 @@ export function PanelLeadForm({
   const rootRef = useRef<HTMLDivElement>(null);
   const triggerRef = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(open);
+  useMobileFormReveal(open, rootRef);
 
   useLayoutEffect(() => {
-    if (open) {
+    if (open && !isMobileFormViewport()) {
       rootRef.current?.querySelector<HTMLInputElement>('.panel-lead__form input:not([type="hidden"])')?.focus({ preventScroll: true });
     } else if (wasOpen.current) {
       triggerRef.current?.focus({ preventScroll: true });
@@ -82,7 +84,7 @@ export function PanelLeadForm({
   }, [open]);
 
   useEffect(() => {
-    if (!open || !rootRef.current) return;
+    if (!open || !rootRef.current || isMobileFormViewport()) return;
     const anchor = rootRef.current;
     const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     if (reduce) {

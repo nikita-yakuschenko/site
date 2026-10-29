@@ -2,7 +2,8 @@
 import { CMSContentBlock } from './cms-content'
 
 import { IconArrowUpRight, IconX } from '@tabler/icons-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import { useMobileFormReveal } from './use-mobile-form-reveal'
 import { copy } from '../lib/copy'
 import { LeadForm } from './lead-form'
 import { PanelLeadForm } from './panel-lead-form'
@@ -53,6 +54,8 @@ export function LeadReveal({
   projectExternalId?: string
 }) {
   const [open, setOpen] = useState(false)
+  const cardRef = useRef<HTMLDivElement>(null)
+  useMobileFormReveal(open, cardRef)
 
   if (variant === 'panel') return (
     <CMSContentBlock cmsBlockKey={`LeadReveal-instance-${formId.replace(/[^a-zA-Z0-9]+/g, "-")}`}><div className={[classes?.root, 'mortgage-request', open ? 'is-open' : ''].filter(Boolean).join(' ')}>
@@ -91,7 +94,7 @@ export function LeadReveal({
         className={['lead-reveal__slot', classes?.slot].filter(Boolean).join(' ')}
         aria-hidden={!open}
       >
-        <div className={['lead-reveal__card', classes?.card].filter(Boolean).join(' ')}>
+        <div ref={cardRef} className={['lead-reveal__card', classes?.card].filter(Boolean).join(' ')}>
           {/* Крестик в строке подписи первого поля, у правого края. */}
           <button
             type="button"

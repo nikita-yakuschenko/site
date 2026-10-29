@@ -279,6 +279,14 @@ body .ags button.ags-link { font:inherit; font-size:13px; background:none; borde
   body .ags.ags-hero .ags-hero__act .ags-cta { width:100%; justify-content:center; }
 }
 body dialog.ags.ags-dialog { position:fixed; inset:0; width:calc(100% - 32px); max-width:420px; max-height:calc(100dvh - 32px); height:fit-content; margin:auto; padding:36px; overflow:auto; border:1px solid #454545; color:#fff; background:#0A0A0A; }
+@media (max-width:767px) {
+  body dialog.ags.ags-dialog {
+    max-height:calc(100dvh - max(16px,env(safe-area-inset-top,0px)) - max(16px,env(safe-area-inset-bottom,0px)));
+    top:max(16px,env(safe-area-inset-top,0px));
+    bottom:max(16px,env(safe-area-inset-bottom,0px));
+    margin:auto;
+  }
+}
 body dialog.ags-dialog::backdrop { background:rgba(0,0,0,.76); }
 body .ags-dialog h2 { margin:0 32px 28px 0; font-family:var(--font-ags-display),'Unbounded',sans-serif; font-size:28px; line-height:1.2; }
 body .ags-dialog h2 span { color:var(--signal); }

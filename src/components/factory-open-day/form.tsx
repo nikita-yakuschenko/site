@@ -11,9 +11,10 @@ import { OpenDayArrow, OpenDayRules } from './rules'
 import { useLeadCaptcha } from '../use-lead-captcha'
 
 const OPEN_BOOKING = 'ags-open-booking'
+let pendingBooking = false
 
 export function OpenDayBookButton({ className, children }: { className: string; children: React.ReactNode }) {
-  return <button type="button" className={className} aria-haspopup="dialog" aria-controls="ags-booking-dialog" onClick={() => window.dispatchEvent(new Event(OPEN_BOOKING))}>{children}</button>
+  return <button type="button" className={className} aria-haspopup="dialog" aria-controls="ags-booking-dialog" onClick={() => { pendingBooking = true; window.dispatchEvent(new Event(OPEN_BOOKING)) }}>{children}</button>
 }
 
 export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date: string; registrationEnabled?: boolean }) {
@@ -78,8 +79,9 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
   }
 
   useEffect(() => {
-    const onOpen = () => openDialog()
+    const onOpen = () => { pendingBooking = false; openDialog() }
     window.addEventListener(OPEN_BOOKING, onOpen)
+    if (pendingBooking) onOpen()
     return () => window.removeEventListener(OPEN_BOOKING, onOpen)
   })
 
@@ -88,7 +90,8 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
     if (!node) return
     if (open) {
       if (!node.open) node.showModal()
-      node.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true })
+      if (window.matchMedia('(max-width: 767px)').matches) node.focus({ preventScroll: true })
+      else node.querySelector<HTMLInputElement>('input')?.focus({ preventScroll: true })
     } else if (node.open) node.close()
   }, [open])
 
@@ -132,6 +135,7 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
     </div>
     <dialog
       ref={dialog}
+      tabIndex={-1}
       id="ags-booking-dialog"
       className="ags ags-dialog"
       aria-labelledby="ags-dialog-title"
