@@ -45,7 +45,7 @@ export function LeadDialog({
     const focusable = () => Array.from(dialogRef.current?.querySelectorAll<HTMLElement>(
       'button:not([disabled]), input:not([disabled]), textarea:not([disabled]), a[href], [tabindex="0"]'
     ) ?? []).filter((element) => element.getClientRects().length > 0);
-    if (window.matchMedia('(max-width: 767px)').matches) dialogRef.current?.focus({ preventScroll: true });
+    if (window.matchMedia('(max-width: 767px)').matches) dialogRef.current?.querySelector<HTMLButtonElement>('.ask-dialog__close')?.focus({ preventScroll: true });
     else focusable()[0]?.focus();
     const onKey = (event: KeyboardEvent) => {
       if (event.key === "Escape") onClose();
