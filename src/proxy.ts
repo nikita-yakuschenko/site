@@ -3,6 +3,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { legacyRedirect } from '../config/legacy-redirects'
 import { REGION_COOKIE, regionFromSearch } from './lib/region-traffic'
 import { attributionFromUrl, LEAD_ATTRIBUTION_COOKIE, readAttribution } from './lib/lead-attribution'
+import { CATALOG_SESSION_COOKIE, CATALOG_SESSION_HEADER, catalogSessionSeed } from './lib/catalog/session'
 
 export async function proxy(request: NextRequest) {
   const headers = new Headers(request.headers)
@@ -10,6 +11,11 @@ export async function proxy(request: NextRequest) {
   headers.set('x-avgst-request-id', requestId)
   headers.set('x-cms-page-route', request.nextUrl.pathname)
   headers.set('x-cms-editor', request.nextUrl.searchParams.has('cmsPreview') || request.nextUrl.searchParams.has('cmsIndex') ? '1' : '0')
+  const savedCatalogSeed = request.cookies.get(CATALOG_SESSION_COOKIE)?.value
+  const catalogSeed = request.nextUrl.pathname === '/catalog' ? catalogSessionSeed(savedCatalogSeed) : null
+  // Supply the first render with exactly the seed being saved on its response.
+  headers.delete(CATALOG_SESSION_HEADER)
+  if (catalogSeed) headers.set(CATALOG_SESSION_HEADER, catalogSeed)
   const marked = regionFromSearch(request.nextUrl.search)
   const saved = request.cookies.get(REGION_COOKIE)?.value
   headers.set('x-avgst-region', marked ?? (saved === 'msk' ? 'msk' : 'nn'))
@@ -17,6 +23,7 @@ export async function proxy(request: NextRequest) {
   const legacy = managed ? { url: managed, status: 308 as const } : legacyRedirect(new URL(request.url))
   const response = legacy ? NextResponse.redirect(legacy.url, legacy.status) : NextResponse.next({ request: { headers } })
   response.headers.set('X-Request-ID', requestId)
+  if (catalogSeed && catalogSeed !== savedCatalogSeed) response.cookies.set(CATALOG_SESSION_COOKIE, catalogSeed, { path: '/', httpOnly: true, sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
   if (marked) response.cookies.set(REGION_COOKIE, marked, { path: '/', sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
   const attribution = attributionFromUrl(request.url)
   const previous = readAttribution(request.cookies.get(LEAD_ATTRIBUTION_COOKIE)?.value)

@@ -14,6 +14,8 @@ import {
 import { copy, footerAboutFor } from '../../lib/copy'
 import { SITE } from '../../lib/site'
 import { catalogOrder } from '../../lib/catalog/order'
+import { headers } from 'next/headers'
+import { CATALOG_SESSION_HEADER } from '../../lib/catalog/session'
 
 const catalog = new CmsCatalogProvider()
 
@@ -51,6 +53,7 @@ export async function generateMetadata({
  * серверным.
  */
 export default async function CatalogPage({ searchParams }: { searchParams: Search }) {
+  const sessionSeed = (await headers()).get(CATALOG_SESSION_HEADER) || 'default'
   const all = await catalog.list({ siteCode: SITE.code })
   const facets = facetsOf(all.items)
   const params = await searchParams
@@ -93,7 +96,7 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
             <CatalogBoard
               filters={filters}
               facets={facets}
-              matched={toBoard(catalogOrder(items))}
+              matched={toBoard(catalogOrder(items, sessionSeed))}
               rest={filters.status === 'ready' ? [] : toBoard(rest)}
               picked={!isEmpty(filters)}
             />
