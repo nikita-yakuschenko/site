@@ -56,6 +56,7 @@ export type CatalogFilters = {
 
 export type ProjectQuery = {
   siteCode: string
+  region?: 'nn' | 'msk'
   ids?: string[]
   limit?: number
   filters?: CatalogFilters
@@ -127,6 +128,7 @@ export type CatalogProject = {
   priceLabel: string
   priceAmount: number | null
   regionalPrices?: Partial<Record<'nn' | 'msk', number>>
+  regionalSpecialPrices?: Partial<Record<'nn' | 'msk', number>>
   imageUrl: string
   technologyBadge: string
   series: CatalogSeries

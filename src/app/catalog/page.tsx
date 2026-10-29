@@ -16,6 +16,7 @@ import { SITE } from '../../lib/site'
 import { catalogOrder } from '../../lib/catalog/order'
 import { headers } from 'next/headers'
 import { CATALOG_SESSION_HEADER } from '../../lib/catalog/session'
+import { catalogDisplayPrice, catalogDisplayPrices } from '../../lib/catalog/display-price'
 
 const catalog = new CmsCatalogProvider()
 
@@ -53,9 +54,11 @@ export async function generateMetadata({
  * серверным.
  */
 export default async function CatalogPage({ searchParams }: { searchParams: Search }) {
-  const sessionSeed = (await headers()).get(CATALOG_SESSION_HEADER) || 'default'
+  const requestHeaders = await headers()
+  const sessionSeed = requestHeaders.get(CATALOG_SESSION_HEADER) || 'default'
+  const region = requestHeaders.get('x-avgst-region') === 'msk' ? 'msk' : 'nn'
   const all = await catalog.list({ siteCode: SITE.code })
-  const facets = facetsOf(all.items)
+  const facets = facetsOf(all.items.map(project => ({ ...project, priceAmount: catalogDisplayPrice(project, region) })))
   const params = await searchParams
   const filters = parseFilters(params)
 
@@ -67,12 +70,12 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
     permanentRedirect(`${target.pathname}${target.search}`)
   }
 
-  const { items, rest } = await catalog.list({ siteCode: SITE.code, filters })
+  const { items, rest } = await catalog.list({ siteCode: SITE.code, filters, region })
   const heading = copy.catalogProjects
   const toBoard = (list: typeof items): BoardItem[] =>
     list.map((project) => ({ id: project.id, hero_product: project.hero_product, areaValue: project.areaValue,
-      priceAmount: project.readyHome?.salePrice ?? project.priceAmount,
-      regionalPrices: project.readyHome ? undefined : project.regionalPrices,
+      priceAmount: catalogDisplayPrice(project, region),
+      regionalPrices: project.readyHome ? undefined : catalogDisplayPrices(project),
       card: <ProjectCard project={project} /> }))
 
   return (

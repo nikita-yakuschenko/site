@@ -1,5 +1,5 @@
 import { CATALOG_PROJECTS } from './projects'
-import { resolveProjectPrice } from '../mortgage/projects'
+import { catalogDisplayPrice } from './display-price'
 import {
   CATALOG_SERIES,
   type CatalogFilters,
@@ -31,7 +31,7 @@ export class FixtureCatalogProvider implements ProjectCatalogProvider {
     /* Выдача не режется, а делится надвое: подходящие и все остальные.
        Пустого экрана быть не должно, даже если под условия не подошло
        ничего. Хвост упорядочен по числу несошедшихся условий. */
-    const scored = pool.map((item) => ({ item, misses: countMisses(item, filters) }))
+    const scored = pool.map((item) => ({ item, misses: countMisses(item, filters, query.region) }))
     const items = scored.filter((row) => row.misses === 0).map((row) => row.item)
     const rest = scored
       .filter((row) => row.misses > 0)
@@ -71,7 +71,7 @@ function inRange(value: number, range: Range | undefined): boolean {
 }
 
 /** Сколько заданных условий проект не выполнил. 0 значит подходит полностью. */
-function countMisses(item: CatalogProject, filters: CatalogFilters | undefined): number {
+function countMisses(item: CatalogProject, filters: CatalogFilters | undefined, region: 'nn' | 'msk' = 'nn'): number {
   if (!filters) return 0
   let misses = 0
   if (filters.q && !matchesName(item.name, filters.q)) misses += 1
@@ -80,7 +80,7 @@ function countMisses(item: CatalogProject, filters: CatalogFilters | undefined):
   if (filters.tech?.length && !filters.tech.includes(item.technology)) misses += 1
   if (!inRange(item.areaValue, filters.area)) misses += 1
   if (filters.price) {
-    const price = resolveProjectPrice(item)
+    const price = catalogDisplayPrice(item, region)
     if (price == null || !inRange(price, filters.price)) misses += 1
   }
   if (filters.bedrooms?.length && !filters.bedrooms.includes(Number(item.bedrooms))) misses += 1

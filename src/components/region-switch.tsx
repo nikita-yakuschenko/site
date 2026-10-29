@@ -1,5 +1,6 @@
 'use client'
 import { useRegionCode } from './region-bootstrap'
+import { useRouter } from 'next/navigation'
 
 import { useEffect, useRef, useState } from 'react'
 import { copy } from '../lib/copy'
@@ -10,6 +11,7 @@ import {
 } from '../lib/regions'
 
 export function RegionSwitch() {
+  const router = useRouter()
   const root = useRef<HTMLDivElement>(null)
   const [open, setOpen] = useState(false)
   const code = useRegionCode()
@@ -34,6 +36,7 @@ export function RegionSwitch() {
   function select(next: RegionCode): void {
     writeRegionCode(next)
     setOpen(false)
+    router.refresh()
   }
 
   return (

@@ -15,11 +15,12 @@ import { shareProject } from '../lib/share'
 import { recordCardShare, recordSessionView } from '../lib/project-view'
 import { optimizedSrc } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
+import { catalogDisplayPrice } from '../lib/catalog/display-price'
 
 export function ProjectCard({ project, showPrice = true, locationLabel }: { project: CatalogProject; showPrice?: boolean; locationLabel?: string }) {
   const region = useRegionCode()
-  const price = project.regionalPrices?.[region]
-  const priceLabel = project.regionalPrices && !project.readyHome ? (price && price > 0 ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется') : project.priceLabel
+  const price = catalogDisplayPrice(project, region)
+  const priceLabel = price ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется'
   // Подписка на внешнее хранилище вместо синхронизации через эффект.
   const favorites = useSyncExternalStore(subscribeFavorites, readFavorites, readServerFavorites)
   const favorite = favorites.includes(project.id)

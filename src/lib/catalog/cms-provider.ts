@@ -11,7 +11,8 @@ const readCatalog = cache(async (slug?: string): Promise<CatalogProject[]> => {
   // CI's production-build browser gate uses published-shape fixtures without
   // granting untrusted pull-request code access to the production CMS token.
   if (process.env.BROWSER_DIAGNOSTICS_FIXTURE_CATALOG === '1') {
-    return slug ? CATALOG_PROJECTS.filter(project => project.slug === slug) : CATALOG_PROJECTS
+    const projects = CATALOG_PROJECTS.map(project => ({ ...project, regionalSpecialPrices: project.technology === 'modular' ? { nn: 850_000, msk: 1_250_000 } : { nn: 1_700_000, msk: 2_100_000 } }))
+    return slug ? projects.filter(project => project.slug === slug) : projects
   }
   // CMS records are added after deployment; always read them at request time.
   await connection()

@@ -27,13 +27,14 @@ export const projectCatalogEndpoint: Endpoint = {
       const price = catalogPrice(record, importedPrice)
       const regionalPrices = Object.fromEntries(prices.docs.filter(row => projectId(row.project) === record.id && row.configuration === 'standard' && isPublicPriceKind(row.region)).map(row => [row.region, row.price]))
       if (!('nn' in regionalPrices) && price && price > 0) regionalPrices.nn = price
+      const regionalSpecialPrices = Object.fromEntries(prices.docs.filter(row => projectId(row.project) === record.id && row.configuration === 'standard' && (row.region === 'special' || row.region === 'special-msk')).map(row => [row.region === 'special' ? 'nn' : 'msk', row.price]))
       return {
         id: record.importKey?.replace(/^catalog:/, '') || `cms:${record.id}`, cmsId: record.code || undefined, slug: record.slug, name: record.name, href: `/catalog/${record.slug}`,
         hero_product: record.recordType === 'project' ? record.hero_product ?? null : null,
         area: String(record.areaValue), areaValue: record.areaValue, floors: String(record.floorsValue), floorsValue: record.floorsValue, bedrooms: String(record.bedrooms), bathrooms: String(record.bathrooms),
         technology: technologyFromBadge(record.technologyBadge), technologyBadge: record.technologyBadge, series: record.series || (modular ? 'modular' : 'panel'),
         imageUrl: mediaURL(record.desktopImage, record.imageUrl), mobileImageUrl: mediaURL(record.mobileImage, record.mobileImageUrl) || null,
-        priceAmount: price && price > 0 ? price : null, priceLabel: price && price > 0 ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется', regionalPrices,
+        priceAmount: price && price > 0 ? price : null, priceLabel: price && price > 0 ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется', regionalPrices, regionalSpecialPrices,
         description: record.searchDescription?.trim() || record.name,
         exteriors: (record.exteriors || []).map(row => mediaURL(row.photo, row.image)).filter(Boolean), interiors: (record.interiors || []).map(row => mediaURL(row.photo, row.image)).filter(Boolean), floorPlans: [],
         about: (record.about || []).map(row => ({ title: row.title, text: row.text, image: row.image || undefined })), options: [],
