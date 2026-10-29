@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
   // Сборка в самодостаточный сервер: в образ едет только то, что нужно рантайму.
   output: 'standalone',
   reactStrictMode: true,
+  ...(process.env.NODE_ENV === 'development' && process.env.NEXT_PUBLIC_PLAN_REQUEST_DEMO === '1' ? { devIndicators: false as const } : {}),
   ...(identity ? { generateBuildId: async () => identity.buildId } : {}),
   // A large shared stylesheet must cache separately: inlineCss duplicates it
   // inside both server HTML and the React Server Component payload.

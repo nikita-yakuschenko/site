@@ -11,11 +11,13 @@ export const DialogDescription = Primitive.Description;
 export function DialogContent({
   children,
   className = "",
+  overlayClassName = "",
+  closeLabel = "Закрыть сравнение",
   ...props
-}: ComponentProps<typeof Primitive.Content>) {
+}: ComponentProps<typeof Primitive.Content> & { overlayClassName?: string; closeLabel?: string }) {
   return (
     <Primitive.Portal>
-      <Primitive.Overlay className="comparison-overlay" />
+      <Primitive.Overlay className={`comparison-overlay ${overlayClassName}`} />
       <Primitive.Content
         data-slot="dialog-content"
         className={`comparison-dialog ${className}`}
@@ -24,7 +26,7 @@ export function DialogContent({
         {children}
         <Primitive.Close
           className="comparison-close"
-          aria-label="Закрыть сравнение"
+          aria-label={closeLabel}
         >
           <IconX size={22} />
         </Primitive.Close>

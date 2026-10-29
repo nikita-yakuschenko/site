@@ -1,7 +1,12 @@
 import 'server-only'
 import { isPlanVariants } from './project-plans-data'
 import type { PlanVariant } from './types'
+import { planRequestFixturesEnabled } from '../plan-request-feature'
 export async function resolveProjectPlans(slug: string): Promise<PlanVariant[] | null> {
+  if (planRequestFixturesEnabled()) {
+    const { CATALOG_PROJECTS } = await import('./projects')
+    return CATALOG_PROJECTS.find(project => project.slug === slug)?.plans ?? null
+  }
   const key = process.env.CMS_SITE_API_KEY
   if (!key) return null
   try {

@@ -1,0 +1,6 @@
+.ui-checkbox { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; width: 16px; height: 16px; padding: 0; border: 1px solid var(--line-2); border-radius: 4px; background: var(--surface); color: var(--avgst-ink); cursor: pointer; }
+.ui-checkbox[data-state=checked], .ui-checkbox[data-state=indeterminate] { border-color: var(--brand-yellow); background: var(--brand-yellow); }
+.ui-checkbox__indicator { display: grid; place-content: center; color: inherit; }
+.ui-checkbox:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 3px; }
+.ui-checkbox:disabled { cursor: not-allowed; opacity: .5; }
+.ui-checkbox[aria-invalid=true] { border-color: var(--danger); }

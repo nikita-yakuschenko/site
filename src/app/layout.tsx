@@ -28,6 +28,7 @@ import { activeRoistatProjectId } from '../lib/roistat'
 import { activeMetricaCounterId } from '../lib/yandex'
 import { isCMSUnavailable } from '../server/cms-request'
 import { unstable_rethrow } from 'next/navigation'
+import { planRequestDemoEnabled } from '../lib/plan-request-feature'
 import './styles.css'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
@@ -50,6 +51,7 @@ export const viewport: Viewport = {
 }
 
 export default async function RootLayout({ children }: { children: ReactNode }) {
+  const localPlanDemo = planRequestDemoEnabled()
   const jar = await cookies()
   const requestHeaders = await headers()
   const region = regionByCode(requestHeaders.get('x-avgst-region') ?? jar.get(REGION_COOKIE)?.value).code
@@ -67,7 +69,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     return []
   })
   const [counter, roistatProjectId, content, catalogItems] = await Promise.all([
-    activeMetricaCounterId(), activeRoistatProjectId(), readCMSContent(), catalogAvailability,
+    localPlanDemo ? null : activeMetricaCounterId(), localPlanDemo ? null : activeRoistatProjectId(), readCMSContent(), catalogAvailability,
   ])
   const readyHouses = catalogItems.some(item => Boolean(item.readyHome))
 
@@ -77,15 +79,14 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
   return (
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
       <head>
-        <link rel="preconnect" href="https://cloud.roistat.com" />
-        <script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
+        {!localPlanDemo && <><link rel="preconnect" href="https://cloud.roistat.com" /><script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" /></>}
       </head>
       <body suppressHydrationWarning>
-        <Suspense fallback={null}><VkPixel /></Suspense>
+        {!localPlanDemo && <><Suspense fallback={null}><VkPixel /></Suspense>
         <div hidden aria-hidden="true" style={{ display: 'none' }} data-analytics-fallback="vk"><noscript><div>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={`https://top-fwz1.mail.ru/counter?id=${VK_PIXEL_ID};js=na`} style={{ position: 'absolute', left: '-9999px' }} alt="Top.Mail.Ru" />
-        </div></noscript></div>
+        </div></noscript></div></>}
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
         <CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider>
         <CMSPreviewBridge />

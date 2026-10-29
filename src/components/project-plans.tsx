@@ -7,6 +7,8 @@ import { PhotoLightbox } from "./photo-lightbox";
 import { copy } from "../lib/copy";
 import { isPlanVariants } from '../lib/catalog/project-plans-data';
 import type { CatalogProject, PlanVariant } from "../lib/catalog/types";
+import { planRequestDemoEnabled } from '../lib/plan-request-feature';
+import { PlanRequestEntry } from './plan-request-entry';
 
 /**
  * Планировка.
@@ -76,6 +78,7 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
               </button>
             ))}
           </div>
+          {planRequestDemoEnabled() && <PlanRequestEntry context={{ projectId: project.id, projectCode: project.cmsId, projectSlug: project.slug, projectName: project.name, variant: null, floor: null, source: 'project-plans', sourcePath: project.href }} />}
         </div>
 
         {open !== null ? (
@@ -200,6 +203,7 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
               ))}
             </dl>
           </div>
+          {planRequestDemoEnabled() && <PlanRequestEntry context={{ projectId: project.id, projectCode: project.cmsId, projectSlug: project.slug, projectName: project.name, variant: { index: selectedVariant, label: currentVariant.label }, floor: { index: selectedFloor, label: current.label }, source: 'project-plans', sourcePath: project.href }} />}
         </div>
       </div>
 
