@@ -14,7 +14,7 @@ for (const width of [1280, 375]) {
     const before = await reveal.boundingBox();
     const hiddenName = reveal.getByRole('textbox', { name: 'Имя', exact: true });
     await expect(hiddenName).toHaveCount(0);
-    await reveal.getByRole('button', { name: 'Получить консультацию', exact: true }).click();
+    await reveal.getByRole('button', { name: 'Рассчитать ипотеку', exact: true }).click();
     await expect(reveal).toHaveClass(/is-open/);
     await expect(reveal.locator('.mortgage-calc__quote-name')).not.toBeEmpty();
     await expect(reveal.locator('.mortgage-calc__quote-rate')).toHaveText('Семейная ипотека под 6%');
@@ -28,7 +28,7 @@ for (const width of [1280, 375]) {
     await page.screenshot({ path: `test-results/mortgage-request-${width}.png` });
     await reveal.getByRole('button', { name: 'Закрыть', exact: true }).click();
     await expect(reveal).not.toHaveClass(/is-open/);
-    await expect(reveal.getByRole('button', { name: 'Получить консультацию', exact: true })).toBeVisible();
+    await expect(reveal.getByRole('button', { name: 'Рассчитать ипотеку', exact: true })).toBeVisible();
     const configurationPanel = page.locator('.project-config__total');
     await configurationPanel.getByRole('button', { name: 'Получить расчёт', exact: true }).click();
     await expect(configurationPanel).toHaveAttribute('data-form', 'true');
@@ -50,10 +50,10 @@ for (const reducedMotion of ['no-preference', 'reduce'] as const) {
     await page.emulateMedia({ reducedMotion });
     await page.goto('/family-mortgage');
     const reveal = page.locator('#mortgage-calc .mortgage-request');
-    await reveal.getByRole('button', { name: 'Получить консультацию', exact: true }).click();
+    await reveal.getByRole('button', { name: 'Рассчитать ипотеку', exact: true }).click();
     await expect(reveal.getByRole('textbox', { name: 'Имя', exact: true })).toBeVisible();
     await expect(reveal.locator('.mortgage-calc__quote-pay')).toContainText('Платёж от');
     await reveal.getByRole('button', { name: 'Закрыть', exact: true }).click();
-    await expect(reveal.getByRole('button', { name: 'Получить консультацию', exact: true })).toBeFocused();
+    await expect(reveal.getByRole('button', { name: 'Рассчитать ипотеку', exact: true })).toBeFocused();
   });
 }
