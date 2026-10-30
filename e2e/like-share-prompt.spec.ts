@@ -25,6 +25,7 @@ for (const width of [390, 1440]) test(`love prompt preserves controls at ${width
   expect(box!.x).toBeGreaterThanOrEqual(0)
   expect(box!.x + box!.width).toBeLessThanOrEqual(width)
   await expect(popup.locator('.project-love__heart')).toHaveClass(/--(ink|red|yellow)/)
+  await expect.poll(() => popup.evaluate(el => getComputedStyle(el).opacity)).toBe('1')
   await page.screenshot({ path: `output/like-prompt-${width}.png` })
   await page.keyboard.press('Escape')
   await expect(popup).toHaveCount(0)
