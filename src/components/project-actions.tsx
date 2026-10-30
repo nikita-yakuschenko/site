@@ -1,7 +1,8 @@
 'use client'
 
-import { useEffect, useState, useSyncExternalStore } from 'react'
-import { IconHeart, IconShare3 } from '@tabler/icons-react'
+import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { IconHeart, IconShare3, IconX } from '@tabler/icons-react'
+import Image from 'next/image'
 import { useConsent } from '../consent/ConsentProvider'
 import { canPersistFunctional } from '../consent/functional-persist'
 import { copy } from '../lib/copy'
@@ -51,6 +52,23 @@ export function ProjectActions({
   const { openConsentSettings } = useConsent()
   const [counts, setCounts] = useState(stats)
   const [pressed, setPressed] = useState(liked)
+  const [loveColor, setLoveColor] = useState<string | null>(null)
+  const actionsRef = useRef<HTMLDivElement>(null)
+  const reactionPending = useRef(false)
+  const promptSeen = useRef(false)
+  useEffect(() => {
+    if (!loveColor) return
+    const outside = (event: PointerEvent) => {
+      if (event.target instanceof Node && !actionsRef.current?.contains(event.target)) setLoveColor(null)
+    }
+    const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') setLoveColor(null) }
+    document.addEventListener('pointerdown', outside)
+    document.addEventListener('keydown', escape)
+    return () => {
+      document.removeEventListener('pointerdown', outside)
+      document.removeEventListener('keydown', escape)
+    }
+  }, [loveColor])
   const favorites = useSyncExternalStore(
     subscribeFavorites,
     readFavorites,
@@ -61,15 +79,19 @@ export function ProjectActions({
   useEffect(() => { void recordSessionView(project.slug) }, [project.slug])
 
   async function onFavorite() {
+    if (reactionPending.current) return
     if (!canPersistFunctional()) {
       openConsentSettings()
       return
     }
     const removing = pressed
+    reactionPending.current = true
+    if (removing) setLoveColor(null)
     setPressed(!removing)
     if (favorite === removing) toggleFavorite(project.id)
     setCounts((current) => ({ ...current, likes: Math.max(0, current.likes + (removing ? -1 : 1)) }))
-    const result = await sendReaction(project.slug, removing ? 'unlike' : 'like')
+    const result = await sendReaction(project.slug, removing ? 'unlike' : 'like').catch(() => null)
+    reactionPending.current = false
     if (!result) {
       setPressed(removing)
       if (favorite === removing) toggleFavorite(project.id)
@@ -78,10 +100,20 @@ export function ProjectActions({
     }
     setCounts({ likes: result.likes, shares: result.shares })
     setPressed(removing ? false : true)
-    if (!removing) void recordSessionView(project.slug)
+    if (!removing) {
+      void recordSessionView(project.slug)
+      let seen = promptSeen.current
+      try { seen ||= sessionStorage.getItem('avgst-love-prompt-seen') === '1' } catch {}
+      if (!seen) {
+        promptSeen.current = true
+        try { sessionStorage.setItem('avgst-love-prompt-seen', '1') } catch {}
+        setLoveColor(['ink', 'red', 'yellow'][Math.floor(Math.random() * 3)] ?? 'ink')
+      }
+    }
   }
 
   async function onShare() {
+    setLoveColor(null)
     const shared = await shareProject(project)
     if (!shared) return
     setCounts((current) => ({ ...current, shares: current.shares + 1 }))
@@ -95,7 +127,18 @@ export function ProjectActions({
   }
 
   return (
-    <div className="project-actions">
+    <div ref={actionsRef} className={`project-actions${loveColor ? ' project-actions--love' : ''}`}>
+      {loveColor && (
+        <aside className="project-love" aria-label="Поделиться понравившимся проектом">
+          <button type="button" className="project-love__close" aria-label="Закрыть подсказку" onClick={() => setLoveColor(null)}><IconX size={16} /></button>
+          <p className="project-love__title" role="status">Кажется, это любовь <IconHeart className={`project-love__heart project-love__heart--${loveColor}`} size={21} fill="currentColor" stroke={1.5} aria-hidden="true" /></p>
+          <div className="project-love__body">
+            <Image src="/img/ui/like-love-cat.webp" alt="Улыбающийся котик с чашкой" width={136} height={124} className="project-love__cat" />
+            <p>Поделись с тем, с кем вместе мечтаешь о своём доме</p>
+          </div>
+          <svg className="project-love__arrow" viewBox="0 0 64 96" fill="none" aria-hidden="true"><path d="M12 91C48 73 49 39 37 7M37 7L33 23M37 7L48 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
+        </aside>
+      )}
       <button
         type="button"
         className="project-actions__btn"

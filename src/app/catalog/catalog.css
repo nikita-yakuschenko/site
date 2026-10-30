@@ -562,9 +562,29 @@
   }
 }
 .project-actions {
+  position: relative;
   display: flex;
   gap: 20px;
 }
+
+.project-actions--love { z-index: 5; }
+.project-actions__btn > span { min-width: 1.3ch; text-align: center; }
+.project-actions--love::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #414953; z-index: 2; pointer-events: none; }
+.project-actions--love > .project-actions__btn { position: relative; z-index: 3; }
+.project-love { position: absolute; right: -10px; top: -10px; width: min(340px, calc(100vw - 32px)); box-sizing: border-box; padding: 56px 16px 12px; border: 1px solid #e5e7eb; border-radius: 20px; background: white; color: var(--avgst-ink); box-shadow: 0 8px 28px #0b102026; z-index: 1; animation: project-love-in .18s ease-out; }
+.project-love__close { position: absolute; top: 14px; left: 12px; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #858a98; cursor: pointer; }
+.project-love__close:hover { background: #f4f5f7; color: var(--avgst-ink); }
+.project-love__title { display: flex; align-items: center; gap: 4px; margin: 0 0 6px; font-size: 18px; font-weight: 700; line-height: 1.3; letter-spacing: -.4px; }
+.project-love__heart { flex: none; }
+.project-love__heart--ink { color: var(--avgst-ink); }
+.project-love__heart--red { color: #e53935; }
+.project-love__heart--yellow { color: var(--brand-yellow); }
+.project-love__body { display: grid; grid-template-columns: 136px 1fr; gap: 8px; align-items: center; }
+.project-love__cat { display: block; width: 136px; height: 124px; object-fit: contain; }
+.project-love__body p { margin: 16px 0 0; font-size: 14px; line-height: 1.35; font-weight: 500; }
+.project-love__arrow { position: absolute; right: 19px; top: 38px; width: 43px; height: 68px; color: var(--brand-yellow); pointer-events: none; }
+@keyframes project-love-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+@media (prefers-reduced-motion: reduce) { .project-love { animation: none; } }
 
 .project-actions__btn {
   display: inline-flex;
