@@ -130,11 +130,11 @@ export function ProjectActions({
     <div ref={actionsRef} className={`project-actions${loveColor ? ' project-actions--love' : ''}`}>
       {loveColor && (
         <aside className="project-love" aria-label="Поделиться понравившимся проектом">
-          <svg className="project-love__shape" viewBox="0 0 340 240" preserveAspectRatio="none" aria-hidden="true"><path d="M20 36H166C184 36 174 0 206 0H310C328 0 340 12 340 30V220Q340 240 320 240H20Q0 240 0 220V56Q0 36 20 36Z" fill="white" /></svg>
+          <svg className="project-love__shape" viewBox="0 0 340 240" preserveAspectRatio="none" aria-hidden="true"><path d="M20 20H174C190 20 184 0 206 0H310C328 0 340 12 340 30V220Q340 240 320 240H20Q0 240 0 220V40Q0 20 20 20Z" fill="white" /></svg>
           <button type="button" className="project-love__close" aria-label="Закрыть подсказку" onClick={() => setLoveColor(null)}><IconX size={16} /></button>
           <p className="project-love__title" role="status">Кажется, это любовь <IconHeart className={`project-love__heart project-love__heart--${loveColor}`} size={21} fill="currentColor" stroke={1.5} aria-hidden="true" /></p>
           <div className="project-love__body">
-            <Image src="/img/ui/like-love-cat.webp" alt="Улыбающийся котик с чашкой" width={136} height={124} className="project-love__cat" />
+            <Image src="/img/ui/like-love-cat-v2.webp" alt="Улыбающийся котик с чашкой" width={136} height={124} className="project-love__cat" />
             <p>Поделись с тем, с кем вместе мечтаешь о своём доме</p>
           </div>
           <svg className="project-love__arrow" viewBox="0 0 64 96" fill="none" aria-hidden="true"><path d="M12 91C48 73 49 39 37 7M37 7L33 23M37 7L48 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
