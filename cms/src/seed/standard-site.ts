@@ -1,4 +1,5 @@
 import indexJson from '../data/site-index.json'
+import { DEFAULT_REGIONAL_SUFFIX } from '../../../src/lib/regional-suffix'
 
 export type SiteDefinition = { key: string; title: string; source: string; exportName: string; kind: 'blocks' | 'forms'; forms: string[] }
 export type SitePage = { source: string; components: string[]; redirect: string | null; route: string; title: string; kind: string }
@@ -98,6 +99,7 @@ export const standardBlockKeys = new Set([
 export const heroParts: Part[] = [
   { key: 'hero.background', title: 'Фоновое изображение' },
   { key: 'hero.heading', title: 'Заголовок', text: 'Строим модульные и каркасные дома для жизни и отдыха' },
+  { key: 'hero.regionalSuffix', title: 'Региональная приставка', text: DEFAULT_REGIONAL_SUFFIX.nn, textMore: DEFAULT_REGIONAL_SUFFIX.msk },
   { key: 'hero.subtitle', title: 'Подзаголовок', text: 'Через индустриальный подход делаем путь к дому простым и доступным.' },
   { key: 'hero.button', title: 'Кнопка', text: 'Посмотреть проекты домов', href: '/catalog' },
   { key: 'hero.promos', title: 'Слоты быстрых промо' },

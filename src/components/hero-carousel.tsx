@@ -11,6 +11,8 @@ import { copy, nbspText } from "../lib/copy";
 import { optimizedSrc, optimizedSrcSet } from "../lib/media";
 import { CarouselProgress, CAROUSEL_SLIDE_MS } from "./carousel-progress";
 import { LeadDialog } from "./lead-dialog";
+import { useIPRegion } from './use-ip-region';
+import { DEFAULT_REGIONAL_SUFFIX, regionalSuffixFor, type RegionalSuffix } from '../lib/regional-suffix';
 
 /**
  * Сообщение баннера. Постоянное: это то, что компания говорит о себе
@@ -20,6 +22,7 @@ import { LeadDialog } from "./lead-dialog";
 export type HeroMessage = {
   heading: string;
   headingMore?: string;
+  regionalSuffix?: RegionalSuffix;
   text?: string;
   cta: string;
   href: string;
@@ -130,13 +133,14 @@ function usePreviewHeroCopy(message: HeroMessage): HeroMessage {
       if (event.source !== window.parent || !allowed.has(event.origin) || event.data?.type !== "avgst:preview-hero-copy" || !Array.isArray(event.data.parts)) return;
       const parts = event.data.parts as { key?: string; text?: string; textMore?: string; href?: string; image?: string; imageMobile?: string }[];
       const heading = parts.find((part) => part.key === "hero.heading");
+      const suffix = parts.find((part) => part.key === 'hero.regionalSuffix');
       const subtitle = parts.find((part) => part.key === "hero.subtitle");
       const button = parts.find((part) => part.key === "hero.button");
       const background = parts.find((part) => part.key === "hero.background");
       setDraft(current => ({
         ...current,
         heading: heading?.text ?? current?.heading ?? message.heading,
-        headingMore: heading?.textMore ?? current?.headingMore ?? message.headingMore,
+        regionalSuffix: suffix ? { nn: suffix.text ?? '', msk: suffix.textMore ?? '' } : current?.regionalSuffix ?? message.regionalSuffix,
         text: subtitle?.text ?? current?.text ?? message.text,
         cta: button?.text ?? current?.cta ?? message.cta,
         href: button?.href ?? current?.href ?? message.href,
@@ -190,6 +194,8 @@ export function HeroCarousel({
   promos: readonly HeroPromo[];
 }) {
   const shown = usePreviewHeroCopy(message);
+  const ipRegion = useIPRegion();
+  const regionalSuffix = regionalSuffixFor(ipRegion, shown.regionalSuffix ?? DEFAULT_REGIONAL_SUFFIX);
   const slots = usePreviewHeroPromos(promos);
   const [lead, setLead] = useState<HeroPromo | null>(null);
   const count = slots.length;
@@ -513,10 +519,10 @@ export function HeroCarousel({
         <div className="hero__copy">
           <h1 data-cms-block="hero.heading">
             {nbspText(shown.heading)}
-            {shown.headingMore ? (
+            {regionalSuffix ? (
               <>
                 <br />
-                {nbspText(shown.headingMore)}
+                <span data-regional-suffix data-cms-block="hero.regionalSuffix">{nbspText(regionalSuffix)}</span>
               </>
             ) : null}
           </h1>

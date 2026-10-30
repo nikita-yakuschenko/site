@@ -3,6 +3,7 @@ import { cache } from 'react'
 import { unstable_cache } from 'next/cache'
 import sharp from 'sharp'
 import { connection } from 'next/server'
+import { DEFAULT_REGIONAL_SUFFIX } from './regional-suffix'
 import type { LayoutBlock } from '../components/block-renderer'
 import type { HeroMessage, HeroPromo } from '../components/hero-carousel'
 
@@ -24,25 +25,25 @@ const readHeroParts = cache(async (): Promise<Part[] | null> => {
 // Saved hero copy replaces the coded banner. A cleared subtitle is removed.
 export async function withHeroContent(blocks: readonly LayoutBlock[]): Promise<LayoutBlock[]> {
   const parts = await readHeroParts()
-  if (!parts?.length) return [...blocks]
-  const part = (key: string) => parts.find(item => item.key === key)
+  const part = (key: string) => parts?.find(item => item.key === key)
   return blocks.map(block => {
     if (block.blockType !== 'hero') return block
     const message = { ...(block.message as HeroMessage) }
     const promos = (Array.isArray(block.promos) ? block.promos as HeroPromo[] : []).map(promo => ({ ...promo }))
     const heading = part('hero.heading')
+    const regional = part('hero.regionalSuffix')
+    message.regionalSuffix = regional ? { nn: regional.text ?? '', msk: regional.textMore ?? '' } : { ...DEFAULT_REGIONAL_SUFFIX }
     const subtitle = part('hero.subtitle')
     const button = part('hero.button')
     const background = part('hero.background')
     if (heading?.text) message.heading = heading.text
-    if (heading?.textMore) message.headingMore = heading.textMore
     // Пустой подзаголовок в CMS снимает текст. Раньше пустая строка считалась «поле не задано» и оставалась фраза из кода.
     if (subtitle) message.text = subtitle.text || ''
     if (button?.text) message.cta = button.text
     if (button?.href) message.href = button.href
     if (background?.image) message.image = background.image
     if (background?.imageMobile) message.imageMobile = background.imageMobile
-    for (const item of parts) {
+    for (const item of parts ?? []) {
       const match = /^hero\.promo\.(\d+)$/.exec(item.key || '')
       if (!match) continue
       const promo = promos[Number(match[1])]

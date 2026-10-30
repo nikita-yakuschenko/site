@@ -15,7 +15,8 @@ import { configurationKeys, configurationNames } from '../../../../src/lib/catal
 
 // The card header already names the part. Inside, the person edits the words the site shows.
 const partFields: Record<string, { name: 'text' | 'textMore' | 'href'; label: string; rows?: number; bare?: boolean }[]> = {
-  'hero.heading': [{ name: 'text', label: 'Первая строка', rows: 2 }, { name: 'textMore', label: 'Вторая строка', rows: 2 }],
+  'hero.heading': [{ name: 'text', label: 'Основной заголовок', rows: 2 }],
+  'hero.regionalSuffix': [{ name: 'text', label: 'Нижегородская область', rows: 2 }, { name: 'textMore', label: 'Москва и Московская область', rows: 2 }],
   'hero.subtitle': [{ name: 'text', label: 'Текст', rows: 3 }],
   'hero.button': [{ name: 'text', label: 'Надпись', rows: 2 }, { name: 'href', label: 'Ссылка' }],
   'popularProjects.heading': [{ name: 'text', label: 'Заголовок', bare: true }],
