@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
 import { IconHeart, IconShare3, IconX } from '@tabler/icons-react'
 import Image from 'next/image'
 import { useConsent } from '../consent/ConsentProvider'
@@ -38,6 +38,43 @@ async function sendReaction(slug: string, action: 'like' | 'unlike' | 'share') {
   })
   if (!response.ok) return null
   return response.json() as Promise<ProjectStats & { already?: boolean; liked?: boolean }>
+}
+
+function LovePromptShape() {
+  const pencilId = useId()
+  const ref = useRef<SVGSVGElement>(null)
+  const [size, setSize] = useState({ width: 340, height: 222, tab: 160, tipX: 296, tipY: 49 })
+  useEffect(() => {
+    const card = ref.current?.parentElement
+    const actions = card?.parentElement
+    if (!card || !actions) return
+    const measure = () => {
+      const icon = actions.querySelector(':scope > .project-actions__btn:last-child svg')?.getBoundingClientRect()
+      const box = card.getBoundingClientRect()
+      setSize({ width: card.clientWidth, height: card.clientHeight, tab: actions.clientWidth + 20,
+        tipX: icon ? icon.left + icon.width / 2 - box.left : 296,
+        tipY: icon ? icon.bottom - actions.getBoundingClientRect().top - card.offsetTop + 3 : 49 })
+    }
+    measure()
+    const observer = new ResizeObserver(measure)
+    observer.observe(card)
+    observer.observe(actions)
+    return () => observer.disconnect()
+  }, [])
+  const { width: w, height: h, tab, tipX: x, tipY: y } = size
+  const join = w - tab
+  // Draw in CSS pixels: circular corners stay circular at every card size.
+  // Two tangent 10px arcs form the 20px rise; all outer corners are 20px.
+  const contour = `M20 20H${join - 20}A10 10 0 0 0 ${join - 10} 10A10 10 0 0 1 ${join} 0H${w - 20}A20 20 0 0 1 ${w} 20V${h - 20}A20 20 0 0 1 ${w - 20} ${h}H20A20 20 0 0 1 0 ${h - 20}V40A20 20 0 0 1 20 20Z`
+  const arrow = `M${x - 29} ${y + 70}C${x + 3} ${y + 55} ${x + 7} ${y + 30} ${x} ${y}M${x - 5} ${y + 12}L${x} ${y}L${x + 9} ${y + 9}`
+  return <>
+    <svg ref={ref} className="project-love__shape" viewBox={`0 0 ${w} ${h}`} aria-hidden="true"><path d={contour} fill="white" /></svg>
+    <svg className="project-love__arrow" viewBox={`0 0 ${w} ${h}`} fill="none" aria-hidden="true">
+      <defs><filter id={pencilId} x="-20%" y="-20%" width="140%" height="140%"><feTurbulence type="fractalNoise" baseFrequency=".7" numOctaves="3" seed="7" result="grain" /><feDisplacementMap in="SourceGraphic" in2="grain" scale=".8" xChannelSelector="R" yChannelSelector="G" /></filter></defs>
+      <path d={arrow} stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" opacity=".82" filter={`url(#${pencilId})`} />
+      <path d={`M${x - 28} ${y + 71}C${x + 1} ${y + 57} ${x + 9} ${y + 29} ${x + .8} ${y + 1}`} stroke="currentColor" strokeWidth=".8" strokeLinecap="round" opacity=".55" />
+    </svg>
+  </>
 }
 
 export function ProjectActions({
@@ -130,14 +167,13 @@ export function ProjectActions({
     <div ref={actionsRef} className={`project-actions${loveColor ? ' project-actions--love' : ''}`}>
       {loveColor && (
         <aside className="project-love" aria-label="Поделиться понравившимся проектом">
-          <svg className="project-love__shape" viewBox="0 0 340 240" preserveAspectRatio="none" aria-hidden="true"><path d="M20 20H174C190 20 184 0 206 0H310C328 0 340 12 340 30V220Q340 240 320 240H20Q0 240 0 220V40Q0 20 20 20Z" fill="white" /></svg>
+          <LovePromptShape />
           <button type="button" className="project-love__close" aria-label="Закрыть подсказку" onClick={() => setLoveColor(null)}><IconX size={16} /></button>
           <p className="project-love__title" role="status">Кажется, это любовь <IconHeart className={`project-love__heart project-love__heart--${loveColor}`} size={21} fill="currentColor" stroke={1.5} aria-hidden="true" /></p>
           <div className="project-love__body">
             <Image src="/img/ui/like-love-cat-v2.webp" alt="Улыбающийся котик с чашкой" width={136} height={124} className="project-love__cat" />
             <p>Поделись с тем, с кем вместе мечтаешь о своём доме</p>
           </div>
-          <svg className="project-love__arrow" viewBox="0 0 64 96" fill="none" aria-hidden="true"><path d="M12 91C48 73 49 39 37 7M37 7L33 23M37 7L48 17" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
         </aside>
       )}
       <button
