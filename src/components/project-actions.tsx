@@ -165,7 +165,7 @@ export function ProjectActions({
         <aside className="project-love" aria-label="Поделиться понравившимся проектом">
           <LovePromptShape />
           <button type="button" className="project-love__close" aria-label="Закрыть подсказку" onClick={() => setLoveColor(null)}><IconX size={16} /></button>
-          <p className="project-love__title" role="status">Поделись мечтой и сердечко <IconHeart className={`project-love__heart project-love__heart--${loveColor}`} size={21} fill="currentColor" stroke={1.5} aria-hidden="true" /></p>
+          <p className="project-love__title" role="status">Поделись мечтой <IconHeart className={`project-love__heart project-love__heart--${loveColor}`} size={21} fill="currentColor" stroke={1.5} aria-hidden="true" /></p>
           <div className="project-love__body">
             <Image src="/img/ui/like-love-cat-v3.webp" alt="Улыбающийся котик с чашкой" width={136} height={124} className="project-love__cat" />
             <p>Отправь тому, с кем мечтаешь здесь жить</p>
