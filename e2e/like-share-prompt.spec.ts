@@ -2,6 +2,7 @@ import { test, expect } from '@playwright/test'
 
 for (const width of [390, 1440]) test(`love prompt preserves controls at ${width}px`, async ({ page }) => {
   await page.setViewportSize({ width, height: 900 })
+  await page.clock.install()
   await page.addInitScript(() => {
     localStorage.setItem('avgst:cookie-notice-dismissed', '1')
     Object.defineProperty(navigator, 'share', { value: async () => {} })
@@ -17,7 +18,7 @@ for (const width of [390, 1440]) test(`love prompt preserves controls at ${width
   const popup = page.locator('.project-love')
   await expect(popup).toBeVisible()
   await expect.poll(() => popup.locator('img').evaluate((img: HTMLImageElement) => img.complete && img.naturalWidth > 0)).toBe(true)
-  await expect(popup).toContainText('Поделись с тем, с кем вместе мечтаешь о своём доме')
+  await expect(popup).toContainText(/Поделись с\sтем, с\sкем вместе мечтаешь о\sсвоём доме/)
   const after = await like.boundingBox()
   expect(after?.x).toBe(before?.x)
   expect(after?.y).toBe(before?.y)
@@ -30,7 +31,11 @@ for (const width of [390, 1440]) test(`love prompt preserves controls at ${width
   await page.keyboard.press('Escape')
   await expect(popup).toHaveCount(0)
   await like.click()
+  await expect(like).toHaveAttribute('aria-pressed','false')
   await like.click()
+  await expect(popup).toBeVisible()
+  await page.waitForTimeout(100)
+  await page.clock.fastForward(10_100)
   await expect(popup).toHaveCount(0)
 })
 

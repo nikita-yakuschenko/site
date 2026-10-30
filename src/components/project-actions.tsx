@@ -53,7 +53,7 @@ function LovePromptShape() {
       const box = card.getBoundingClientRect()
       setSize({ width: card.clientWidth, height: card.clientHeight, tab: actions.clientWidth + 20,
         tipX: icon ? icon.left + icon.width / 2 - box.left : 296,
-        tipY: icon ? icon.bottom - actions.getBoundingClientRect().top - card.offsetTop + 3 : 49 })
+        tipY: actions.offsetHeight - card.offsetTop + 8 })
     }
     measure()
     const observer = new ResizeObserver(measure)
@@ -63,9 +63,10 @@ function LovePromptShape() {
   }, [])
   const { width: w, height: h, tab, tipX: x, tipY: y } = size
   const join = w - tab
-  // Draw in CSS pixels: circular corners stay circular at every card size.
-  // Two tangent 10px arcs form the 20px rise; all outer corners are 20px.
-  const contour = `M20 20H${join - 20}A10 10 0 0 0 ${join - 10} 10A10 10 0 0 1 ${join} 0H${w - 20}A20 20 0 0 1 ${w} 20V${h - 20}A20 20 0 0 1 ${w - 20} ${h}H20A20 20 0 0 1 0 ${h - 20}V40A20 20 0 0 1 20 20Z`
+  // A 30px outer radius follows the 20px pill radius with a 10px white rim.
+  // The concave 20px fillet is tangent to both the horizontal edge and
+  // the 30px capsule arc: their circle centers are exactly 50px apart.
+  const contour = `M20 20H${join - 10}A20 20 0 0 0 ${join + 6} 12A30 30 0 0 1 ${join + 30} 0H${w - 30}A30 30 0 0 1 ${w} 30V${h - 20}A20 20 0 0 1 ${w - 20} ${h}H20A20 20 0 0 1 0 ${h - 20}V40A20 20 0 0 1 20 20Z`
   const arrow = `M${x - 29} ${y + 70}C${x + 3} ${y + 55} ${x + 7} ${y + 30} ${x} ${y}M${x - 5} ${y + 12}L${x} ${y}L${x + 9} ${y + 9}`
   return <>
     <svg ref={ref} className="project-love__shape" viewBox={`0 0 ${w} ${h}`} aria-hidden="true"><path d={contour} fill="white" /></svg>
@@ -92,16 +93,17 @@ export function ProjectActions({
   const [loveColor, setLoveColor] = useState<string | null>(null)
   const actionsRef = useRef<HTMLDivElement>(null)
   const reactionPending = useRef(false)
-  const promptSeen = useRef(false)
   useEffect(() => {
     if (!loveColor) return
     const outside = (event: PointerEvent) => {
       if (event.target instanceof Node && !actionsRef.current?.contains(event.target)) setLoveColor(null)
     }
     const escape = (event: KeyboardEvent) => { if (event.key === 'Escape') setLoveColor(null) }
+    const timer = window.setTimeout(() => setLoveColor(null), 10_000)
     document.addEventListener('pointerdown', outside)
     document.addEventListener('keydown', escape)
     return () => {
+      window.clearTimeout(timer)
       document.removeEventListener('pointerdown', outside)
       document.removeEventListener('keydown', escape)
     }
@@ -139,13 +141,7 @@ export function ProjectActions({
     setPressed(removing ? false : true)
     if (!removing) {
       void recordSessionView(project.slug)
-      let seen = promptSeen.current
-      try { seen ||= sessionStorage.getItem('avgst-love-prompt-seen') === '1' } catch {}
-      if (!seen) {
-        promptSeen.current = true
-        try { sessionStorage.setItem('avgst-love-prompt-seen', '1') } catch {}
-        setLoveColor(['ink', 'red', 'yellow'][Math.floor(Math.random() * 3)] ?? 'ink')
-      }
+      setLoveColor(['ink', 'red', 'yellow'][Math.floor(Math.random() * 3)] ?? 'ink')
     }
   }
 
@@ -172,7 +168,7 @@ export function ProjectActions({
           <p className="project-love__title" role="status">Кажется, это любовь <IconHeart className={`project-love__heart project-love__heart--${loveColor}`} size={21} fill="currentColor" stroke={1.5} aria-hidden="true" /></p>
           <div className="project-love__body">
             <Image src="/img/ui/like-love-cat-v3.webp" alt="Улыбающийся котик с чашкой" width={136} height={124} className="project-love__cat" />
-            <p>Поделись с тем, с кем вместе мечтаешь о своём доме</p>
+            <p>Поделись с&nbsp;тем, с&nbsp;кем вместе мечтаешь о&nbsp;своём доме</p>
           </div>
         </aside>
       )}

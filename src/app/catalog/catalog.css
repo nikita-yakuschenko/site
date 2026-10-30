@@ -571,9 +571,9 @@
 .project-actions__btn > span { min-width: 1.3ch; text-align: center; }
 .project-actions--love::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: #414953; z-index: 2; pointer-events: none; }
 .project-actions--love > .project-actions__btn { position: relative; z-index: 3; }
-.project-love { position: absolute; right: -10px; top: -10px; width: min(340px, calc(100vw - 32px)); box-sizing: border-box; padding: 56px 16px 12px; border: 0; border-radius: 20px; background: transparent; color: var(--avgst-ink); isolation: isolate; z-index: 1; animation: project-love-in .18s ease-out; }
+.project-love { position: absolute; right: -10px; top: -10px; width: min(340px, calc(100vw - 32px)); box-sizing: border-box; padding: 72px 16px 12px; border: 0; border-radius: 20px; background: transparent; color: var(--avgst-ink); isolation: isolate; z-index: 1; animation: project-love-in .18s ease-out; }
 .project-love__shape { position: absolute; inset: 0; width: 100%; height: 100%; z-index: -1; overflow: visible; filter: drop-shadow(0 8px 14px #0b102026); pointer-events: none; }
-.project-love__close { position: absolute; top: 21px; left: 12px; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #858a98; cursor: pointer; }
+.project-love__close { position: absolute; top: 22px; left: 8px; width: 28px; height: 28px; display: grid; place-items: center; border: 0; border-radius: 50%; background: transparent; color: #858a98; cursor: pointer; }
 .project-love__close:hover { background: #f4f5f7; color: var(--avgst-ink); }
 .project-love__title { display: flex; align-items: center; gap: 4px; margin: 0 0 6px; font-size: 18px; font-weight: 700; line-height: 1.3; letter-spacing: -.4px; }
 .project-love__heart { flex: none; }
@@ -583,7 +583,7 @@
 .project-love__body { display: grid; grid-template-columns: 136px 1fr; gap: 8px; align-items: center; }
 .project-love__cat { display: block; width: 136px; height: 124px; object-fit: contain; }
 .project-love__body p { margin: 16px 0 0; font-size: 14px; line-height: 1.35; font-weight: 500; }
-.project-love__arrow { position: absolute; inset: 0; width: 100%; height: 100%; color: #3275cf; pointer-events: none; }
+.project-love__arrow { position: absolute; inset: 0; width: 100%; height: 100%; color: var(--avgst-ink); pointer-events: none; }
 @keyframes project-love-in { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
 @media (prefers-reduced-motion: reduce) { .project-love { animation: none; } }
 
