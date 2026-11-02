@@ -48,7 +48,8 @@ def main():
             'Content-Type': 'application/json', 'x-api-key': config['DOKPLOY_API_KEY'],
         })
         with urllib.request.urlopen(request, timeout=40) as response:
-            return json.load(response)
+            content = response.read()
+            return json.loads(content) if content.strip() else None
 
     app_id = config['DOKPLOY_APPLICATION_ID']
     query = 'application.one?' + urllib.parse.urlencode({'applicationId': app_id})
