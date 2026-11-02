@@ -7399,7 +7399,21 @@ html.is-dialog-open {
   display: flex;
   justify-content: center;
   margin-top: 16px;
+  width: 100%;
 }
+
+.site-office__route {
+  display: block;
+  width: fit-content;
+  margin: 12px auto 0;
+  color: var(--on-dark-2);
+  font-size: 13px;
+  line-height: 1.4;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  transition: color .16s ease-out;
+}
+.site-office__route:hover, .site-office__route:focus-visible { color: var(--brand-yellow); }
 
 @media (prefers-reduced-motion: reduce) {
   .site-office__dot,
