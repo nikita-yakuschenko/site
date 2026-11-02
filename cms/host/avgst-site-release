@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 """Root-owned release entry point; the runner supplies only image and revision."""
-import fcntl
 import json
 import os
 from pathlib import Path
@@ -23,6 +22,8 @@ def matches_readiness(responses, revision):
 
 
 def main():
+    import fcntl
+
     if os.geteuid() != 0 or len(sys.argv) != 3:
         raise RuntimeError('Root and exactly two arguments required')
     image, revision = sys.argv[1:]
