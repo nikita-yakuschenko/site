@@ -18,6 +18,7 @@
       "components": [
         "SiteChrome",
         "Link",
+        "CMSStaticBlock",
         "Image",
         "AboutCompanyBento",
         "AboutTimeline",
@@ -28,18 +29,6 @@
       "redirect": null,
       "route": "/about",
       "title": "О компании - Авангард Строй",
-      "kind": "page",
-      "template": null
-    },
-    {
-      "source": "src/app/agro-mortgage/page.tsx",
-      "components": [
-        "MortgageProgramPage"
-      ],
-      "sections": [],
-      "redirect": null,
-      "route": "/agro-mortgage",
-      "title": "Сельская ипотека",
       "kind": "page",
       "template": null
     },
@@ -60,6 +49,7 @@
       "components": [
         "Link",
         "LeadDialogButton",
+        "CMSStaticBlock",
         "SiteChrome",
         "PageHero",
         "Inquiry",
@@ -83,12 +73,13 @@
       "components": [
         "ProjectCard",
         "SiteChrome",
+        "CMSStaticBlock",
         "CatalogBoard"
       ],
       "sections": [],
       "redirect": null,
       "route": "/catalog",
-      "title": "Проекты домов",
+      "title": "Каталог проектов",
       "kind": "page",
       "template": null
     },
@@ -1198,6 +1189,7 @@
       "source": "src/app/cookies/page.tsx",
       "components": [
         "SiteChrome",
+        "CMSStaticBlock",
         "CookieSettingsButton"
       ],
       "sections": [],
@@ -1224,6 +1216,7 @@
       "components": [
         "LeadDialogButton",
         "ExpositionShell",
+        "CMSStaticBlock",
         "Image",
         "TourButton",
         "ExpositionVideoTile",
@@ -1246,6 +1239,7 @@
       "source": "src/app/exposition/[slug]/page.tsx",
       "components": [
         "ExpositionShell",
+        "CMSStaticBlock",
         "Image",
         "LeadDialogButton",
         "ProjectCard",
@@ -1265,6 +1259,7 @@
       "source": "src/app/exposition/[slug]/page.tsx",
       "components": [
         "ExpositionShell",
+        "CMSStaticBlock",
         "Image",
         "LeadDialogButton",
         "ProjectCard",
@@ -1293,7 +1288,7 @@
       "sections": [],
       "redirect": null,
       "route": "/factory-open-day",
-      "title": "День открытых дверей на производстве",
+      "title": "Новый взгляд на загородный дом",
       "kind": "page",
       "template": null
     },
@@ -1368,12 +1363,12 @@
         "Link",
         "PageHero",
         "LeadDialogButton",
+        "CMSStaticBlock",
         "Image",
         "ManufactureProjectQuestions",
         "ManufacturePreparationQuestions",
         "ManufactureVideoReview",
         "ManufactureTruckTransition",
-        "ManufactureModuleScene",
         "LeadReveal",
         "ManufactureMountingVideos",
         "ManufactureFaq",
@@ -1422,7 +1417,8 @@
     {
       "source": "src/app/privacy/page.tsx",
       "components": [
-        "SiteChrome"
+        "SiteChrome",
+        "CMSStaticBlock"
       ],
       "sections": [],
       "redirect": null,
@@ -1435,6 +1431,7 @@
       "source": "src/app/referral/page.tsx",
       "components": [
         "SiteChrome",
+        "CMSStaticBlock",
         "ReferralRules"
       ],
       "sections": [],
@@ -1448,12 +1445,15 @@
       "source": "src/app/stories/page.tsx",
       "components": [
         "SiteChrome",
-        "VideoTestimonials"
+        "Link",
+        "YandexRating",
+        "StoriesContent",
+        "ContactsSection"
       ],
       "sections": [],
       "redirect": null,
       "route": "/stories",
-      "title": "Дома и истории - Авангард Строй",
+      "title": "Отзывы о нас и о домах",
       "kind": "page",
       "template": null
     }
@@ -2146,6 +2146,10 @@
   ],
   "services": [
     {
+      "route": "/api/catalog/availability",
+      "source": "src/app/api/catalog/availability/route.ts"
+    },
+    {
       "route": "/api/consent",
       "source": "src/app/api/consent/route.ts"
     },
@@ -2162,8 +2166,28 @@
       "source": "src/app/api/reactions/route.ts"
     },
     {
+      "route": "/api/ready",
+      "source": "src/app/api/ready/route.ts"
+    },
+    {
+      "route": "/api/smartcaptcha-config",
+      "source": "src/app/api/smartcaptcha-config/route.ts"
+    },
+    {
+      "route": "/api/views",
+      "source": "src/app/api/views/route.ts"
+    },
+    {
+      "route": "/api/visitor-region",
+      "source": "src/app/api/visitor-region/route.ts"
+    },
+    {
       "route": "/api/yandex-rating",
       "source": "src/app/api/yandex-rating/route.ts"
+    },
+    {
+      "route": "/factory-open-day/og",
+      "source": "src/app/factory-open-day/og/route.tsx"
     },
     {
       "route": "/next/leads",
@@ -2172,10 +2196,10 @@
   ],
   "definitions": [
     {
-      "key": "FactoryOpenDayForm",
-      "title": "День открытых дверей: запись",
+      "key": "OpenDayBookButton",
+      "title": "OpenDayBookButton",
       "source": "src/components/factory-open-day/form.tsx",
-      "exportName": "FactoryOpenDayForm",
+      "exportName": "OpenDayBookButton",
       "kind": "forms",
       "forms": []
     },
@@ -2193,6 +2217,14 @@
       "source": "src/components/referral-program.tsx",
       "exportName": "ReferralProgram",
       "kind": "forms",
+      "forms": []
+    },
+    {
+      "key": "CMSStaticBlock",
+      "title": "CMSStaticBlock",
+      "source": "src/components/cms-static-content.tsx",
+      "exportName": "CMSStaticBlock",
+      "kind": "blocks",
       "forms": []
     },
     {
@@ -2312,7 +2344,9 @@
       "source": "src/components/project-hero-content.tsx",
       "exportName": "ProjectHeroContent",
       "kind": "blocks",
-      "forms": []
+      "forms": [
+        "LeadForm"
+      ]
     },
     {
       "key": "ProjectHeroPayment",
@@ -2468,7 +2502,9 @@
       "source": "src/components/factory-open-day/hero.tsx",
       "exportName": "FactoryOpenDayHero",
       "kind": "blocks",
-      "forms": []
+      "forms": [
+        "OpenDayBookButton"
+      ]
     },
     {
       "key": "FactoryOpenDayProgram",
@@ -2487,12 +2523,24 @@
       "forms": []
     },
     {
+      "key": "FactoryOpenDayForm",
+      "title": "День открытых дверей: запись",
+      "source": "src/components/factory-open-day/form.tsx",
+      "exportName": "FactoryOpenDayForm",
+      "kind": "blocks",
+      "forms": [
+        "OpenDayBookButton"
+      ]
+    },
+    {
       "key": "FactoryOpenDayFooter",
       "title": "День открытых дверей: подвал",
       "source": "src/components/factory-open-day/footer.tsx",
       "exportName": "FactoryOpenDayFooter",
       "kind": "blocks",
-      "forms": []
+      "forms": [
+        "OpenDayBookButton"
+      ]
     },
     {
       "key": "ManufactureProjectQuestions",
@@ -2523,14 +2571,6 @@
       "title": "ManufactureTruckTransition",
       "source": "src/components/manufacture-truck-transition.tsx",
       "exportName": "ManufactureTruckTransition",
-      "kind": "blocks",
-      "forms": []
-    },
-    {
-      "key": "ManufactureModuleScene",
-      "title": "ManufactureModuleScene",
-      "source": "src/components/manufacture-module-scene.tsx",
-      "exportName": "ManufactureModuleScene",
       "kind": "blocks",
       "forms": []
     },
@@ -2573,6 +2613,22 @@
       "title": "ReferralRules",
       "source": "src/components/referral-rules.tsx",
       "exportName": "ReferralRules",
+      "kind": "blocks",
+      "forms": []
+    },
+    {
+      "key": "YandexRating",
+      "title": "YandexRating",
+      "source": "src/components/yandex-rating.tsx",
+      "exportName": "YandexRating",
+      "kind": "blocks",
+      "forms": []
+    },
+    {
+      "key": "StoriesContent",
+      "title": "StoriesContent",
+      "source": "src/components/stories-page.tsx",
+      "exportName": "StoriesContent",
       "kind": "blocks",
       "forms": []
     },

@@ -1,4 +1,4 @@
-const defaultOrder = ['ProjectExteriors', 'ProjectPlans', 'ProjectInteriors', 'ProjectBuilt', 'MortgageCalculator', 'ProjectConfig', 'ReadyHomeOffer', 'ProjectNextSteps', 'ProjectSimilar', 'contactsSection']
+const defaultOrder = ['ProjectExteriors', 'ProjectPlans', 'ProjectConfig', 'MortgageCalculator', 'ProjectInteriors', 'ProjectBuilt', 'ReadyHomeOffer', 'ProjectNextSteps', 'ProjectSimilar', 'contactsSection']
 export async function getProjectPageOrder(slug: string): Promise<string[]> {
   const origin = process.env.CMS_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://cms.avgst.ru' : 'http://localhost:3001')
   try {
