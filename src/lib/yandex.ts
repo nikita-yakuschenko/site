@@ -3,7 +3,7 @@ import { readCMSJSON } from './cms/request'
 import { decodeObject } from '../server/cms-request'
 
 // Публичный номер счётчика с прода. Пока в CMS пусто — сайт берёт его или ENV.
-export const fallbackMetricaCounterId = '112879989'
+export const fallbackMetricaCounterId = '96524478'
 
 function cmsOrigin() {
   return process.env.CMS_PUBLIC_URL || (process.env.NODE_ENV === 'production' ? 'https://cms.avgst.ru' : 'http://localhost:3001')

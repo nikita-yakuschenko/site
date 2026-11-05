@@ -1,5 +1,5 @@
 // Публичный номер счётчика с прода. Пока в CMS пусто — сайт и панель берут его.
-export const fallbackMetricaCounterId = '112879989'
+export const fallbackMetricaCounterId = '96524478'
 
 export type YandexSettings = {
   metricaEnabled?: boolean | null
