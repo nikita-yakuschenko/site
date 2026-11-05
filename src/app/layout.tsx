@@ -26,6 +26,7 @@ import { OG_LOCALE } from '../lib/locale'
 import { regionByCode, REGION_COOKIE } from '../lib/regions'
 import { activeRoistatProjectId } from '../lib/roistat'
 import { activeMetricaCounterId } from '../lib/yandex'
+import { metricaBootstrapScript } from '../lib/metrica-snippet'
 import { isCMSUnavailable } from '../server/cms-request'
 import { unstable_rethrow } from 'next/navigation'
 import './styles.css'
@@ -78,32 +79,19 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     <html lang="ru-RU" className={GeistSans.variable} suppressHydrationWarning>
       <head>
         <link rel="preconnect" href="https://cloud.roistat.com" />
+        <link rel="preconnect" href="https://mc.yandex.ru" />
         <script async src="https://one2click.ru/t.js" data-site="o2cdb0f742c97" />
+        {/* Метрика до body: на /catalog HTML большой, и клиентский init
+            после {children} доезжал поздно — проверка и ранние отказы
+            не видели счётчик. Номер только с сервера (не NEXT_PUBLIC_*). */}
+        {counter ? (
+          <script
+            dangerouslySetInnerHTML={{ __html: metricaBootstrapScript(counter) }}
+          />
+        ) : null}
       </head>
       <body suppressHydrationWarning>
-        <Suspense fallback={null}><VkPixel /></Suspense>
-        <div hidden aria-hidden="true" style={{ display: 'none' }} data-analytics-fallback="vk"><noscript><div>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={`https://top-fwz1.mail.ru/counter?id=${VK_PIXEL_ID};js=na`} style={{ position: 'absolute', left: '-9999px' }} alt="Top.Mail.Ru" />
-        </div></noscript></div>
-        {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
-        <CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider>
-        <CMSPreviewBridge />
-        {/* Номер счётчика передаётся пропсом: NEXT_PUBLIC_* подставляется в
-            клиентский код на сборке, и если переменную задать только в
-            окружении контейнера, в бандле окажется undefined. Здесь она
-            читается на сервере в рантайме, как и должно быть.
-
-            Suspense нужен из-за useSearchParams внутри: без него Next
-            переводит весь маршрут в динамическую отрисовку. */}
-        {counter ? (
-          <Suspense fallback={null}>
-            <YandexMetrica counter={counter} />
-          </Suspense>
-        ) : null}
-        {/* Пиксель для тех, у кого отключён JavaScript: счётчик из скрипта
-            до них не доберётся. Картинка спрятана за край экрана, как в
-            сниппете из кабинета. */}
+        {/* Пиксель и SPA-hit сразу в начале body — не после каталога. */}
         {counter ? (
           <div hidden aria-hidden="true" style={{ display: 'none' }} data-analytics-fallback="yandex"><noscript>
             <div>
@@ -116,6 +104,19 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             </div>
           </noscript></div>
         ) : null}
+        {counter ? (
+          <Suspense fallback={null}>
+            <YandexMetrica counter={counter} />
+          </Suspense>
+        ) : null}
+        <Suspense fallback={null}><VkPixel /></Suspense>
+        <div hidden aria-hidden="true" style={{ display: 'none' }} data-analytics-fallback="vk"><noscript><div>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={`https://top-fwz1.mail.ru/counter?id=${VK_PIXEL_ID};js=na`} style={{ position: 'absolute', left: '-9999px' }} alt="Top.Mail.Ru" />
+        </div></noscript></div>
+        {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
+        <CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}</RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider>
+        <CMSPreviewBridge />
       </body>
     </html>
   )
