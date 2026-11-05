@@ -236,6 +236,9 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
   const known = useRef(new Map<string, { name: string; size: number; type: string }>())
   const fileInput = useRef<HTMLInputElement>(null)
   const [pending, setPending] = useState<PendingFile[]>([])
+  // Успешная загрузка остаётся в pending, пока строка не появится в форме.
+  // После появления id запоминаем: удаление строки не должно возвращать «Загрузка · 100%».
+  const placedIds = useRef(new Set<string>())
   const [fileDrag, setFileDrag] = useState(false)
   const [rowDrag, setRowDrag] = useState<RowDrag | null>(null)
   const rowDragRef = useRef<RowDrag | null>(null)
@@ -419,7 +422,15 @@ export function GalleryBatchUpload({ target }: { target: GalleryTarget }) {
       }
       setVideoDialog(null)
     }} /> : null}
-    {pending.filter(item => !item.mediaId || !rows.some(row => row.photo === item.mediaId)).map(item => <FileAttachment key={item.key} name={item.name} description={item.error || `Загрузка · ${item.progress}%`} state={item.error ? 'error' : 'uploading'} onRemove={() => setPending(current => current.filter(entry => entry.key !== item.key))} />)}
+    {pending.filter(item => {
+      if (!item.mediaId || item.error) return true
+      const placed = rows.some(row => row.photo === item.mediaId) || meta.some(entry => entry.file === item.mediaId)
+      if (placed) {
+        placedIds.current.add(item.mediaId)
+        return false
+      }
+      return !placedIds.current.has(item.mediaId)
+    }).map(item => <FileAttachment key={item.key} name={item.name} description={item.error || `Загрузка · ${item.progress}%`} state={item.error ? 'error' : 'uploading'} onRemove={() => setPending(current => current.filter(entry => entry.key !== item.key))} />)}
   </div>
 }
 
