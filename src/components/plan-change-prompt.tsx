@@ -210,7 +210,7 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
     };
     apply();
     const observer = new ResizeObserver(apply);
-    observer.observe(measure);
+    if (measure) observer.observe(measure);
     if (card) observer.observe(card);
     window.addEventListener("resize", apply);
     return () => {
