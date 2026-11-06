@@ -18,7 +18,7 @@ function isCMSPhoto(src: string): boolean {
 }
 
 function nearestWidth(width: number): number {
-  return imageWidths.find(value => value >= width) ?? imageWidths[imageWidths.length - 1]
+  return imageWidths.find(value => value >= width) ?? 3840
 }
 
 function nearestQuality(quality: number): number {
