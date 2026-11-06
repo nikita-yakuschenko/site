@@ -3,6 +3,7 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { IconArrowRight, IconArrowUpRight, IconX } from "@tabler/icons-react";
 import { LeadForm } from "./lead-form";
+import { useMobileFormReveal } from "./use-mobile-form-reveal";
 import { RangeSlider } from "./range-slider";
 import { noAutofillFieldProps } from "../lib/no-autofill";
 import { copy } from "../lib/copy";
@@ -92,6 +93,7 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
   const dirRef = useRef(0);
   const [open, setOpen] = useState(false);
   const [closing, setClosing] = useState(false);
+  useMobileFormReveal(open, cardRef);
   const liveRef = useRef<HTMLDivElement>(null);
   const restRef = useRef<HTMLDivElement>(null);
   const [step, setStep] = useState<1 | 2>(1);
