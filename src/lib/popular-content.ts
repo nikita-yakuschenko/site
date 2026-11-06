@@ -2,6 +2,7 @@ import 'server-only'
 import { cache } from 'react'
 import { connection } from 'next/server'
 import type { LayoutBlock } from '../components/block-renderer'
+import { catalogOrder } from './catalog/order'
 import type { CatalogProject } from './catalog/types'
 import type { CmsCatalogProvider } from './catalog/cms-provider'
 
@@ -20,17 +21,14 @@ const readParts = cache(async (key: string): Promise<Part[] | null> => {
   } catch { return null }
 })
 
-function sample(items: CatalogProject[], limit: number) {
-  const pool = [...items]
-  const picked: CatalogProject[] = []
-  while (pool.length && picked.length < limit) {
-    const [next] = pool.splice(Math.floor(Math.random() * pool.length), 1)
-    if (next) picked.push(next)
-  }
-  return picked
+// Пустые слоты держат одни и те же шесть проектов. Случайный набор на каждый
+// заход менял карточки при переходе на главную, и их фото оставались серыми,
+// пока заново не скачивались.
+function stablePopular(items: CatalogProject[], limit: number) {
+  return catalogOrder(items, 'popular').slice(0, limit)
 }
 
-// Empty slots take a fresh random six. Assigned slots stay in the chosen order.
+// Assigned slots stay in the chosen order. Empty slots stay stable.
 export async function applyPopularProjects(blocks: readonly LayoutBlock[], catalog: CmsCatalogProvider, siteCode: string) {
   const parts = await readParts('popularProjects')
   const heading = parts?.find(part => part.key === 'popularProjects.heading')?.text
@@ -39,5 +37,5 @@ export async function applyPopularProjects(blocks: readonly LayoutBlock[], catal
   const { items } = await catalog.list({ siteCode })
   const chosen = (parts || []).filter(part => /^popularProjects\.slot\.\d+$/.test(part.key || '') && part.href)
   const projects = chosen.map(part => items.find(item => item.cmsId === part.href)).filter((item): item is CatalogProject => Boolean(item))
-  return { blocks: next, projects: projects.length ? projects : sample(items, 6) }
+  return { blocks: next, projects: projects.length ? projects : stablePopular(items, 6) }
 }

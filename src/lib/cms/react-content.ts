@@ -12,6 +12,13 @@ const labels: Record<string, string> = { title: 'Заголовок', heading: '
 const dataProps = new Set(['story', 'entry', 'entries', 'photos', 'items', 'steps', 'partners', 'images', 'videos', 'benefits'])
 const technicalKeys = new Set(['id', 'slug', 'className', 'kind', 'variant', 'type', 'icon', 'align', 'programId', 'key', 'formId', 'meta'])
 
+// Сохранённый адрес с прежним хешем того же файла — это старая сборка кадра,
+// а не выбор редактора. Иначе после перекодирования картинка смотрит в 404.
+function currentDerivative(saved: string, current: string): string {
+  const stem = (value: string) => (value.split(/[?#]/)[0] || '').split('/').pop()?.replace(/-[0-9a-f]{16}(?=\.[a-z0-9]+$)/i, '') || ''
+  return saved !== current && stem(saved) === stem(current) ? current : saved
+}
+
 // Rewrite React values, never HTML strings or event handlers. Missing content keeps
 // the original value; an explicitly saved empty string clears only that field.
 export function bindReactContent(block: string, children: ReactNode, parts: readonly ContentPart[] = [], markText = false) {
@@ -35,7 +42,7 @@ export function bindReactContent(block: string, children: ReactNode, parts: read
       const link = ['href', 'url', 'link', 'links', 'video', 'embed'].includes(name)
       const item = field(`${path}${image ? '.image' : link ? '.href' : ''}`, image ? 'image' : link ? 'link' : 'text', labels[name] || (image ? 'Изображение' : link ? 'Ссылка' : 'Текст'), value)
       if (!item.saved) return value
-      return image ? item.saved.image || value : link ? item.saved.href ?? value : item.saved.text ?? value
+      return image ? currentDerivative(item.saved.image || value, value) : link ? item.saved.href ?? value : item.saved.text ?? value
     }
     if (Array.isArray(value)) return value.map((item, index) => data(item, `${path}.${index}`, name))
     if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, data(item, `${path}.${key}`, key)]))
@@ -86,7 +93,7 @@ export function bindReactContent(block: string, children: ReactNode, parts: read
       const item = field(`${path}${video ? '.href' : '.image'}`, video ? 'link' : 'image', video ? 'Видео' : typeof original.alt === 'string' && original.alt ? `Изображение: ${original.alt}` : 'Изображение', source)
       if (video && typeof item.saved?.href === 'string') props.src = item.saved.href
       if (item.saved?.image) {
-        props.src = item.saved.image
+        props.src = currentDerivative(item.saved.image, source)
         if (tag === 'img') props.srcSet = undefined
         if (!original.fill && original.src && typeof original.src === 'object') {
           if (!original.width && 'width' in original.src) props.width = original.src.width
@@ -98,12 +105,12 @@ export function bindReactContent(block: string, children: ReactNode, parts: read
     }
     if (typeof original.poster === 'string') {
       const item = field(`${path}.poster.image`, 'image', 'Обложка видео', original.poster)
-      if (item.saved?.image) props.poster = item.saved.image
+      if (item.saved?.image) props.poster = currentDerivative(item.saved.image, original.poster)
       if (markText) props['data-cms-poster'] = item.key
     }
     if (typeof original.srcMobile === 'string' && original.srcMobile) {
       const item = field(`${path}.mobile.image`, 'image', 'Мобильное изображение', original.srcMobile)
-      if (item.saved?.image) props.srcMobile = item.saved.image
+      if (item.saved?.image) props.srcMobile = currentDerivative(item.saved.image, original.srcMobile)
     }
     if (typeof original.embedSrc === 'string') {
       const item = field(`${path}.embed.href`, 'link', 'Ссылка на видео', original.embedSrc)
@@ -143,10 +150,10 @@ export function bindMarkedContent(children: ReactNode, parts: readonly ContentPa
     const link = values.get(String(element.props['data-cms-link'] || ''))
     const video = values.get(String(element.props['data-cms-video'] || ''))
     const poster = values.get(String(element.props['data-cms-poster'] || ''))
-    if (image?.image) { props.src = image.image; props.srcSet = undefined }
+    if (image?.image) { props.src = currentDerivative(image.image, String(element.props.src || '')); props.srcSet = undefined }
     if (typeof link?.href === 'string') props.href = link.href
     if (typeof video?.href === 'string') props.src = video.href
-    if (poster?.image) props.poster = poster.image
+    if (poster?.image) props.poster = currentDerivative(poster.image, String(element.props.poster || ''))
     if (text && typeof text.text === 'string') props.children = text.text
     else if ('children' in element.props) props.children = walk(element.props.children as ReactNode)
     return cloneElement(element, props)

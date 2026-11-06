@@ -59,9 +59,18 @@ export function ProjectCard({ project, showPrice = true, locationLabel, priority
               onLoad={() => setLoadedUrl(project.imageUrl)}
               onError={() => setFailedUrl(project.imageUrl)}
               ref={(el) => {
-                if (!el?.complete) return
-                if (el.naturalWidth > 0) setLoadedUrl(project.imageUrl)
-                else setFailedUrl(project.imageUrl)
+                if (!el) return
+                if (el.complete && el.naturalWidth > 0) setLoadedUrl(project.imageUrl)
+                // Chrome не начинает lazy-картинку, если она уже в кадре после
+                // клиентского перехода, пока страницу не прокрутят.
+                if (el.loading !== 'lazy') return
+                const observer = new IntersectionObserver((entries) => {
+                  if (!entries.some((entry) => entry.isIntersecting)) return
+                  el.loading = 'eager'
+                  observer.disconnect()
+                })
+                observer.observe(el)
+                return () => observer.disconnect()
               }}
             />
           )}

@@ -86,10 +86,10 @@ export function ProjectExteriors({ project, images, connected = false }: { proje
               >
                 <Image
                   src={src}
-                  unoptimized
                   alt=""
                   width={1600}
                   height={1000}
+                  quality={75}
                   sizes={
                     index === 0 ? "(min-width: 900px) 66vw, 100vw" : "33vw"
                   }
@@ -153,8 +153,8 @@ export function ProjectInteriors({ project, images, connected = false }: { proje
                   src={src}
                   alt=""
                   width={1400}
-                  unoptimized
                   height={900}
+                  quality={75}
                   sizes="(min-width: 900px) 33vw, 50vw"
                 />
                 {last ? (

@@ -69,6 +69,16 @@ test('saved copy, links and images replace their own fields without changing han
   assert.equal(props((props(original).children as ReactNode[])[0]).children, 'Исходный заголовок')
 })
 
+test('a saved image keeps a new encode of the same file and still accepts a different picture', () => {
+  const current = '/generated/webp/persons/family_1-a66c27bd52bfc3a4.webp'
+  const original = createElement('img', { src: current, alt: '' })
+  const field = bindReactContent('Home', original).fields.find(item => item.kind === 'image')!
+  const refreshed = bindReactContent('Home', original, [{ key: field.key, image: '/generated/webp/persons/family_1-062a91e684501954.webp' }])
+  assert.equal(props(refreshed.content).src, current)
+  const replaced = bindReactContent('Home', original, [{ key: field.key, image: '/generated/webp/persons/other-aaaaaaaaaaaaaaaa.webp' }])
+  assert.equal(props(replaced.content).src, '/generated/webp/persons/other-aaaaaaaaaaaaaaaa.webp')
+})
+
 test('an explicitly empty text is retained and records from another block cannot overwrite it', () => {
   const original = createElement('p', null, 'Текст')
   const field = bindReactContent('A', original).fields[0]!

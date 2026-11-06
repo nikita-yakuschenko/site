@@ -56,7 +56,7 @@ export function PageHero({
               alt={imageAlt}
               fill
               preload
-              unoptimized
+              quality={85}
               sizes="(max-width: 960px) calc(100vw - 48px), (max-width: 1199px) 50vw, 576px"
             />
           </div>
