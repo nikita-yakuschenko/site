@@ -23,6 +23,13 @@ test('вопрос называет страницу', () => {
   assert.equal(title('header-question', { pageTitle: 'Семейная ипотека | Авангард Строй' }, { sourcePath: '/mortgage/family-mortgage' }), 'Новая заявка с сайта: Задать вопрос на странице Семейная ипотека')
 })
 
+test('шторка называет канал и страницу', () => {
+  assert.equal(title('contact-rail-telegram', { channel: 'telegram' }, { sourcePath: '/' }), 'Новая заявка с сайта: Заявка из виджета связаться в Telegram на странице Главная')
+  assert.equal(title('contact-rail-whatsapp', { channel: 'whatsapp', projectName: 'Барнхаус 113' }), 'Новая заявка с сайта: Заявка из виджета связаться в WhatsApp на странице Барнхаус 113')
+  assert.equal(title('contact-rail-max', { channel: 'max', pageTitle: 'Семейная ипотека | Авангард Строй' }, { sourcePath: '/mortgage/family-mortgage' }), 'Новая заявка с сайта: Заявка из виджета связаться в MAX на странице Семейная ипотека')
+  assert.equal(title('contact-rail-callback', { channel: 'phone' }, { sourcePath: '/' }), 'Новая заявка с сайта: Заявка из формы обратного звонка на странице Главная')
+})
+
 test('прочие формы называются заголовком формы, без длинных тире', () => {
   assert.equal(title('consultation-dialog', { formHeading: 'Экскурсия в КП Гремячки' }), 'Новая заявка с сайта: Экскурсия в КП Гремячки')
   assert.equal(title('promo-form', {}, {}, 'Запись на просмотр'), 'Новая заявка с сайта: Запись на просмотр')

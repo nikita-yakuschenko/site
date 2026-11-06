@@ -36,6 +36,28 @@ export function whatsappHref(phone: string) {
   return phone ? `https://wa.me/${phone}` : ''
 }
 
+// На телефоне https-ссылка мессенджера открывает промежуточную страницу.
+// У WhatsApp Safari после неё предлагает скачать файл. Схема приложения открывает чат сразу.
+export function nativeMessengerHref(href: string) {
+  let url: URL
+  try { url = new URL(href) } catch { return '' }
+  const host = url.hostname.replace(/^www\./, '')
+  if (host === 'wa.me' || host === 'api.whatsapp.com') {
+    const phone = (host === 'wa.me' ? url.pathname : url.searchParams.get('phone') || '').replace(/\D/g, '')
+    return phone ? `whatsapp://send?phone=${phone}` : ''
+  }
+  if (host === 't.me' || host === 'telegram.me') {
+    const name = decodeURIComponent(url.pathname.split('/').filter(Boolean)[0] || '')
+    if (!name) return ''
+    return name.startsWith('+') ? `tg://join?invite=${encodeURIComponent(name.slice(1))}` : `tg://resolve?domain=${encodeURIComponent(name)}`
+  }
+  if (host === 'max.ru') {
+    const path = `${url.pathname.replace(/^\//, '')}${url.search}`
+    return path ? `max://max.ru/${path}` : ''
+  }
+  return ''
+}
+
 function channel(enabled: boolean | null | undefined, value: string) {
   return enabled === false ? '' : value
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import test from 'node:test'
-import { fallbackMessengerLinks, normalizeMessengerPhone, normalizeMessengerUrl, publicMessengers } from '../../src/lib/messengers'
+import { fallbackMessengerLinks, nativeMessengerHref, normalizeMessengerPhone, normalizeMessengerUrl, publicMessengers } from '../../src/lib/messengers'
 
 test('ссылка мессенджера остаётся https без логина', () => {
   assert.equal(normalizeMessengerUrl('https://max.ru/avg_st'), 'https://max.ru/avg_st')
@@ -11,6 +11,13 @@ test('ссылка мессенджера остаётся https без логи
 test('номер мессенджера хранится цифрами', () => {
   assert.equal(normalizeMessengerPhone('+7 (831) 266-66-45'), '78312666645')
   assert.equal(normalizeMessengerPhone('123'), '')
+})
+
+test('телефон открывает приложение, а не страницу мессенджера', () => {
+  assert.equal(nativeMessengerHref('https://wa.me/78312666645'), 'whatsapp://send?phone=78312666645')
+  assert.equal(nativeMessengerHref('https://t.me/avgstroy'), 'tg://resolve?domain=avgstroy')
+  assert.equal(nativeMessengerHref('https://max.ru/avg_st'), 'max://max.ru/avg_st')
+  assert.equal(nativeMessengerHref('https://avgst.ru/'), '')
 })
 
 test('выключенный мессенджер не отдаёт ссылку, пустое поле берёт запасную', () => {

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState, type CSSProperties } from 'react'
 import { IconBrandTelegram, IconBrandWhatsapp } from '@tabler/icons-react'
+import { nativeMessengerHref } from '../lib/messengers'
 import styles from './form-success-animation.module.css'
 
 export type MessengerAction = 'max' | 'telegram' | 'whatsapp'
@@ -32,6 +33,24 @@ const particles = Array.from({ length: 42 }, (_, index) => {
 
 const redirectSeconds = 5
 
+function phoneScreen() {
+  return window.matchMedia('(hover: none) and (pointer: coarse)').matches
+}
+
+// Компьютер оставляет сайт и открывает чат отдельной вкладкой.
+// Телефон вызывает приложение напрямую, без страницы мессенджера и предложения скачать файл.
+function openMessenger(href: string) {
+  if (!phoneScreen()) {
+    const tab = window.open(href, '_blank')
+    if (tab) tab.opener = null
+    return Boolean(tab)
+  }
+  const native = nativeMessengerHref(href)
+  if (!native) return false
+  window.location.assign(native)
+  return true
+}
+
 function redirectLine(seconds: number) {
   const mod10 = seconds % 10
   const mod100 = seconds % 100
@@ -43,7 +62,9 @@ export function FormSuccessAnimationContent({ active, title = 'Спасибо! �
   const complete = useRef(onComplete)
   const left = useRef(false)
   const [seconds, setSeconds] = useState(redirectSeconds)
+  const [separateTab, setSeparateTab] = useState(false)
   useEffect(() => { complete.current = onComplete }, [onComplete])
+  useEffect(() => { setSeparateTab(!phoneScreen()) }, [])
   useEffect(() => {
     if (!active) return
     const timer = window.setTimeout(() => complete.current?.(), window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : 3500)
@@ -56,18 +77,14 @@ export function FormSuccessAnimationContent({ active, title = 'Спасибо! �
       const remain = Math.ceil((redirectSeconds * 1000 - (performance.now() - started)) / 1000)
       if (remain <= 0) {
         window.clearInterval(timer)
-        if (!left.current) {
-          left.current = true
-          window.location.assign(actionHref)
-        }
+        if (!left.current && openMessenger(actionHref)) left.current = true
       } else setSeconds(remain)
     }, 200)
     return () => window.clearInterval(timer)
   }, [active, actionHref])
   const go = () => {
     if (left.current || !actionHref) return
-    left.current = true
-    window.location.assign(actionHref)
+    if (openMessenger(actionHref)) left.current = true
   }
 
   if (!active) return null
@@ -87,7 +104,7 @@ export function FormSuccessAnimationContent({ active, title = 'Спасибо! �
         <p className={styles.title}>{title}</p>
         <p className={styles.description}>{description}</p>
       </div>
-      {actionHref && actionLabel ? <a className={`${styles.action} ${tone}`} href={actionHref} onClick={(event) => { event.preventDefault(); go() }}>{actionChannel === 'max' ? <img src="/social/max_light.svg" alt="" width={20} height={20} /> : actionChannel === 'telegram' ? <IconBrandTelegram size={20} stroke={1.8} aria-hidden="true" /> : actionChannel === 'whatsapp' ? <IconBrandWhatsapp size={20} stroke={1.8} aria-hidden="true" /> : null}{actionLabel}</a> : null}
+      {actionHref && actionLabel ? <a className={`${styles.action} ${tone}`} href={separateTab ? actionHref : nativeMessengerHref(actionHref) || actionHref} target={separateTab ? '_blank' : undefined} rel={separateTab ? 'noopener noreferrer' : undefined} onClick={(event) => { event.preventDefault(); go() }}>{actionChannel === 'max' ? <img src="/social/max_light.svg" alt="" width={20} height={20} /> : actionChannel === 'telegram' ? <IconBrandTelegram size={20} stroke={1.8} aria-hidden="true" /> : actionChannel === 'whatsapp' ? <IconBrandWhatsapp size={20} stroke={1.8} aria-hidden="true" /> : null}{actionLabel}</a> : null}
       {actionHref ? <p className={styles.countdown} aria-live="polite">{redirectLine(seconds)}</p> : null}
     </div>
   </div>

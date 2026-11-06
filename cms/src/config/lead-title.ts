@@ -31,6 +31,17 @@ function pageName(lead: LeadInput, project: string) {
   return text(lead.meta?.pageTitle).replace(siteSuffix, '') || text(lead.sourcePath)
 }
 
+const railChannel: Record<string, string> = { max: 'MAX', telegram: 'Telegram', whatsapp: 'WhatsApp' }
+
+function railDeal(lead: LeadInput, project: string) {
+  const channel = text(lead.meta?.channel) || text(lead.formId).replace(/^contact-rail-/, '')
+  const kind = channel === 'phone'
+    ? 'Заявка из формы обратного звонка'
+    : `Заявка из виджета связаться в ${railChannel[channel] || ''}`.trim()
+  const page = pageName(lead, project)
+  return prefix + (page ? `${kind} на странице ${page}` : kind)
+}
+
 // Название сделки: по нему менеджер сразу видит, чего хочет человек.
 export function leadTitle(lead: LeadInput, formTitle = '') {
   const meta = lead.meta || {}
@@ -49,6 +60,10 @@ export function leadTitle(lead: LeadInput, formTitle = '') {
       return prefix + (page ? `Задать вопрос на странице ${page}` : 'Задать вопрос')
     }
     case 'referral-program': return prefix + 'Регистрация в реферальной программе'
+    case 'contact-rail-max':
+    case 'contact-rail-telegram':
+    case 'contact-rail-whatsapp':
+    case 'contact-rail-callback': return railDeal(lead, project)
   }
   return prefix + (text(meta.formHeading) || text(formTitle) || text(lead.formId))
 }

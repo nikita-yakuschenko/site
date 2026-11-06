@@ -18,6 +18,17 @@ import { submitLead, type LeadAttempt } from '../lib/submit-lead'
 import { PhoneInput } from './phone-input'
 import { useLeadCaptcha } from './use-lead-captcha'
 
+function documentProject(): { id: string; cmsId?: string; slug: string; name: string } | null {
+  if (typeof document === 'undefined') return null
+  const name = document.documentElement.dataset.leadProject?.trim() || ''
+  if (!name) return null
+  return {
+    id: document.documentElement.dataset.leadProjectId || '',
+    slug: document.documentElement.dataset.leadProjectSlug || '',
+    name,
+  }
+}
+
 export function LeadForm({
   siteId,
   pageId,
@@ -80,6 +91,7 @@ export function LeadForm({
   children?: ReactNode
 }) {
   const project = useProjectLeadContext()
+  const listed = project ?? documentProject()
   const resolvedFormId = formId || 'lead-form'
   const [status, setStatus] = useState<'idle' | 'sending' | 'ok' | 'error'>('idle')
   const [phone, setPhone] = useState('')
@@ -122,14 +134,14 @@ export function LeadForm({
         message: String(data.get('message') || '').trim(),
         consent: agreed,
         siteId,
-        pageId: pageId ?? project?.slug,
-        projectExternalId: projectExternalId ?? project?.id,
-        projectId: projectId ?? project?.cmsId,
+        pageId: pageId ?? listed?.slug,
+        projectExternalId: projectExternalId ?? (listed?.id || undefined),
+        projectId: projectId ?? listed?.cmsId,
         formId: resolvedFormId,
         captchaToken,
         sourceUrl: window.location.href,
         sourcePath: window.location.pathname,
-        meta: { region: readRegionCode(), formHeading: heading, ...(project ? { projectSlug: project.slug, projectName: project.name } : {}), ...meta },
+        meta: { region: readRegionCode(), formHeading: heading, pageTitle: document.title, ...(listed ? { projectSlug: listed.slug, projectName: listed.name } : {}), ...meta },
       }, attempt, fetch, captcha.submissionSignal())
       if (!captcha.isActive()) return
       setStatus('ok')
