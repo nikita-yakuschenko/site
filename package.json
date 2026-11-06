@@ -2,6 +2,7 @@
   "name": "avgst-4-site",
   "version": "0.1.0",
   "private": true,
+  "browserslist": ["chrome 111", "edge 111", "firefox 111", "safari 16.4"],
   "description": "Авангард Строй 4.0 — публичный сайт. Next.js App Router.",
   "type": "module",
   "engines": {

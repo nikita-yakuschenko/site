@@ -8,7 +8,7 @@ import {
   IconChevronRight,
 } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
-import { optimizedSrc, optimizedSrcSet } from "../lib/media";
+import { optimizedSrc, optimizedSrcSet, resizedSrc, resizedSrcSet } from "../lib/media";
 import { CarouselProgress, CAROUSEL_SLIDE_MS } from "./carousel-progress";
 import { LeadDialog } from "./lead-dialog";
 import { useIPRegion } from './use-ip-region';
@@ -604,7 +604,7 @@ export function HeroCarousel({
                             playsInline
                           />
                         ) : (
-                          <img src={optimizedSrc(promo.image ?? '', 640)} alt="" loading="lazy" decoding="async" fetchPriority="low" />
+                          <img src={resizedSrc(promo.image ?? '', 640)} srcSet={resizedSrcSet(promo.image ?? '', [384, 640, 828])} sizes="(max-width: 899px) 70vw, 320px" alt="" loading="lazy" decoding="async" fetchPriority="low" />
                         )}
                       </span>
                     ) : null}

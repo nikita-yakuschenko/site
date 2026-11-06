@@ -13,7 +13,7 @@ import {
 } from '../lib/favorites'
 import { shareProject } from '../lib/share'
 import { recordCardShare, recordSessionView } from '../lib/project-view'
-import { optimizedSrc } from '../lib/media'
+import { resizedSrc, resizedSrcSet } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
 import { catalogDisplayPrice } from '../lib/catalog/display-price'
 
@@ -48,7 +48,9 @@ export function ProjectCard({ project, showPrice = true, locationLabel, priority
             <span className="card__empty">{copy.noPhoto}</span>
           ) : (
             <img
-              src={optimizedSrc(project.imageUrl, 640)}
+              src={resizedSrc(project.imageUrl, 640)}
+              srcSet={resizedSrcSet(project.imageUrl, [384, 640, 828])}
+              sizes="(max-width: 699px) calc(100vw - 32px), (max-width: 1099px) 50vw, 360px"
               alt=""
               loading={priority ? 'eager' : 'lazy'}
               fetchPriority={priority ? 'high' : 'low'}

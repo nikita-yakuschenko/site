@@ -404,7 +404,7 @@ export function SiteChrome({
         <div className="footer-grid">
           <div className="footer-brand-col">
             <Link href="/" className="site-footer__brand">
-              <img src={src} alt={name} loading="lazy" />
+              <img src={src} alt={name} width={143} height={40} loading="lazy" />
             </Link>
             <nav className="footer-socials" aria-label={copy.socialsAria}>
               {FOOTER_SOCIALS.map((item) => (

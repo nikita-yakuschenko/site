@@ -17,13 +17,41 @@ function isCMSPhoto(src: string): boolean {
   } catch { return false }
 }
 
+function nearestWidth(width: number): number {
+  return imageWidths.find(value => value >= width) ?? imageWidths[imageWidths.length - 1]
+}
+
+function nearestQuality(quality: number): number {
+  return imageQualities.reduce((best, value) => Math.abs(value - quality) < Math.abs(best - quality) ? value : best)
+}
+
+function storedSource(src: string): string {
+  if (!src.startsWith('/')) return src
+  const [pathname] = src.split(/[?#]/)
+  try { return (webpAssets as Record<string, string>)[decodeURIComponent(pathname || '')] || src }
+  catch { return src }
+}
+
+// Width asks the image optimizer for that slot. The stored WebP stays the source.
+export function resizedSrc(src: string, width: number, quality = 75): string {
+  const size = nearestWidth(width)
+  const q = nearestQuality(quality)
+  return `/_next/image?url=${encodeURIComponent(storedSource(src))}&w=${size}&q=${q}`
+}
+
+export function resizedSrcSet(src: string, widths: number[], quality = 75): string {
+  const seen = new Set<number>()
+  return widths.flatMap(width => {
+    const size = nearestWidth(width)
+    if (seen.has(size)) return []
+    seen.add(size)
+    return [`${resizedSrc(src, size, quality)} ${size}w`]
+  }).join(', ')
+}
+
 // Local assets stay pre-encoded; CMS originals need cached responsive versions.
 export function optimizedSrc(src: string, width?: number, quality = 75): string {
-  if (isCMSPhoto(src) && width) {
-    const size = imageWidths.find(value => value >= width) ?? imageWidths[imageWidths.length - 1]
-    const q = imageQualities.reduce((best, value) => Math.abs(value - quality) < Math.abs(best - quality) ? value : best)
-    return `/_next/image?url=${encodeURIComponent(src)}&w=${size}&q=${q}`
-  }
+  if (isCMSPhoto(src) && width) return resizedSrc(src, width, quality)
   if (!src || !src.startsWith('/')) return src
   if (src.startsWith('/_next/image?')) {
     const original = new URLSearchParams(src.split('?')[1]).get('url')
@@ -35,7 +63,7 @@ export function optimizedSrc(src: string, width?: number, quality = 75): string 
 }
 
 export function optimizedSrcSet(src: string, widths: number[], quality?: number): string {
-  if (isCMSPhoto(src)) return [...new Set(widths)].map(width => `${optimizedSrc(src, width, quality)} ${imageWidths.find(value => value >= width) ?? 3840}w`).join(', ')
+  if (isCMSPhoto(src)) return resizedSrcSet(src, widths, quality)
   return optimizedSrc(src)
 }
 
