@@ -1,3 +1,4 @@
+import * as migration_20261106_100000_messenger_settings from './20261106_100000_messenger_settings';
 import * as migration_20261027_090000_request_limits from './20261027_090000_request_limits';
 import * as migration_20261026_220000_frame_copy from './20261026_220000_frame_copy';
 import * as migration_20261026_200000_project_publication from './20261026_200000_project_publication';
@@ -154,4 +155,5 @@ export const migrations = [
   { up: migration_20261026_200000_project_publication.up, down: migration_20261026_200000_project_publication.down, name: '20261026_200000_project_publication' },
   { up: migration_20261026_220000_frame_copy.up, down: migration_20261026_220000_frame_copy.down, name: '20261026_220000_frame_copy' },
  {up:migration_20261027_090000_request_limits.up,down:migration_20261027_090000_request_limits.down,name:'20261027_090000_request_limits'},
+ {up:migration_20261106_100000_messenger_settings.up,down:migration_20261106_100000_messenger_settings.down,name:'20261106_100000_messenger_settings'},
 ];

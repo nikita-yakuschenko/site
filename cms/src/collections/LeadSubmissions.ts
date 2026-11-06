@@ -7,6 +7,7 @@ import { leadInputSchema } from '../../../src/lib/leads'
 import { activeRoistatProjectId, deliverLead, deliveryIsEnabled, roistatWebhookUrlError } from '../config/lead-adapters'
 import { leadTitle } from '../config/lead-title'
 import { normalizeMapsApiKey, normalizeMetricaCounterId, publicMapsKey, publicMetrica } from '../config/yandex'
+import { normalizeMessengerPhone, normalizeMessengerUrl, publicMessengers } from '../../../src/lib/messengers'
 import { acceptLead } from '../config/lead-intake'
 import { enqueue, settings as automationSettings } from '../automation/store'
 import { resolveLeadClassification } from '../config/lead-classification'
@@ -24,6 +25,12 @@ export const LeadDelivery: GlobalConfig = {
     { name: 'metricaConnectedAt', label: 'Дата подключения Метрики', type: 'text', admin: { hidden: true } },
     { name: 'mapsEnabled', label: 'Карты включены', type: 'checkbox', defaultValue: true, admin: { hidden: true } },
     { name: 'mapsApiKey', label: 'Ключ API Яндекс.Карт', type: 'text', admin: { hidden: true }, validate: (value: unknown) => !value || Boolean(normalizeMapsApiKey(value)) || 'Укажите ключ JS API Яндекс.Карт' },
+    { name: 'maxEnabled', label: 'MAX включён', type: 'checkbox', defaultValue: true, admin: { hidden: true } },
+    { name: 'maxUrl', label: 'Ссылка MAX', type: 'text', admin: { hidden: true }, validate: (value: unknown) => !value || Boolean(normalizeMessengerUrl(value)) || 'Укажите ссылку HTTPS без логина и пароля' },
+    { name: 'telegramEnabled', label: 'Telegram включён', type: 'checkbox', defaultValue: true, admin: { hidden: true } },
+    { name: 'telegramUrl', label: 'Ссылка Telegram', type: 'text', admin: { hidden: true }, validate: (value: unknown) => !value || Boolean(normalizeMessengerUrl(value)) || 'Укажите ссылку HTTPS без логина и пароля' },
+    { name: 'whatsappEnabled', label: 'WhatsApp включён', type: 'checkbox', defaultValue: true, admin: { hidden: true } },
+    { name: 'whatsappPhone', label: 'Номер WhatsApp', type: 'text', admin: { hidden: true }, validate: (value: unknown) => !value || Boolean(normalizeMessengerPhone(value)) || 'Укажите номер: от 10 до 15 цифр' },
     { name: 'url', label: 'Адрес API / вебхука', type: 'text', admin: { condition: data => data.mode === 'webhook' }, validate: (value: unknown, { siblingData }: { siblingData?: { mode?: string } }) => {
       if (siblingData?.mode !== 'webhook') return true
       try { const url = new URL(String(value)); return ['http:', 'https:'].includes(url.protocol) && !url.username && !url.password ? true : 'Укажите адрес HTTP или HTTPS без логина и пароля' } catch { return 'Укажите адрес HTTP или HTTPS' }
@@ -47,6 +54,12 @@ export const LeadDelivery: GlobalConfig = {
       path: '/maps-key', method: 'get', handler: async req => {
         const settings = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: true })
         return Response.json(publicMapsKey(settings), { headers: { 'Cache-Control': 'public, max-age=60' } })
+      },
+    },
+    {
+      path: '/messengers', method: 'get', handler: async req => {
+        const settings = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: true })
+        return Response.json(publicMessengers(settings), { headers: { 'Cache-Control': 'public, max-age=60' } })
       },
     },
   ],

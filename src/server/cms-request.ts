@@ -2,7 +2,7 @@ import 'server-only'
 import { randomUUID } from 'node:crypto'
 import type { CatalogProject } from '../lib/catalog/types'
 
-export type CMSOperation = 'catalog' | 'catalog.readiness' | 'content' | 'settings.metrica' | 'settings.roistat' | 'settings.maps'
+export type CMSOperation = 'catalog' | 'catalog.readiness' | 'content' | 'settings.metrica' | 'settings.roistat' | 'settings.maps' | 'settings.messengers'
 type Failure = 'not-configured' | 'http' | 'timeout' | 'network' | 'invalid-response'
 type CMSRequestInit = RequestInit & { next?: { revalidate?: number | false; tags?: string[] } }
 type Context = { requestId?: string; route?: string; rethrow?: (error: unknown) => void }

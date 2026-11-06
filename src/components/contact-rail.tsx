@@ -3,20 +3,25 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { IconBrandWhatsapp, IconChevronLeft, IconPhoneCall } from '@tabler/icons-react'
-import { FOOTER_SOCIALS, SITE } from '../lib/site'
+import { FOOTER_SOCIALS } from '../lib/site'
+import { fallbackMessengerLinks, type MessengerLinks } from '../lib/messengers'
 import { LeadDialog } from './lead-dialog'
 import './contact-rail.css'
 
-const messengers = [
-  { id: 'max', label: 'MAX', href: FOOTER_SOCIALS.find(item => item.id === 'max')!.href },
-  { id: 'telegram', label: 'Telegram', href: FOOTER_SOCIALS.find(item => item.id === 'telegram')!.href },
-  { id: 'whatsapp', label: 'WhatsApp', href: `https://wa.me/${SITE.contacts.phone.replace(/\D/g, '')}` },
-] as const
+type MessengerId = 'max' | 'telegram' | 'whatsapp'
+type RailDialog = MessengerId | 'callback'
 
-type RailDialog = (typeof messengers)[number]['id'] | 'callback'
+function channels(links: MessengerLinks) {
+  return [
+    { id: 'max' as const, label: 'MAX', href: links.max },
+    { id: 'telegram' as const, label: 'Telegram', href: links.telegram },
+    { id: 'whatsapp' as const, label: 'WhatsApp', href: links.whatsapp },
+  ].filter(item => item.href)
+}
 
 /** Shared contact actions; the footer remains the source of messenger assets. */
-export function ContactRail() {
+export function ContactRail({ links = fallbackMessengerLinks() }: { links?: MessengerLinks }) {
+  const messengers = channels(links)
   const pathname = usePathname()
   const [dialog, setDialog] = useState<RailDialog | null>(null)
   const [belowHero, setBelowHero] = useState(false)
@@ -127,22 +132,22 @@ export function ContactRail() {
           <span className="contact-rail__label">{item.label}</span>
         </button>
       })}
-      <button type="button" className="contact-rail__action contact-rail__action--whatsapp" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="WhatsApp" onClick={() => setDialog('whatsapp')}>
+      {messengers.some(item => item.id === 'whatsapp') ? <button type="button" className="contact-rail__action contact-rail__action--whatsapp" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="WhatsApp" onClick={() => setDialog('whatsapp')}>
         <IconBrandWhatsapp size={24} stroke={1.7} aria-hidden="true" /><span className="contact-rail__label">WhatsApp</span>
-      </button>
+      </button> : null}
       <button className="contact-rail__action contact-rail__action--callback" type="button" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="Перезвоните мне" onClick={() => setDialog('callback')}>
         <IconPhoneCall size={24} stroke={1.7} aria-hidden="true" /><span className="contact-rail__label">Перезвоните мне</span>
       </button>
     </nav>
-    {dialog ? <RailLead dialog={dialog} pageId={pathname} onClose={() => setDialog(null)} /> : null}
+    {dialog ? <RailLead dialog={dialog} pageId={pathname} links={links} onClose={() => setDialog(null)} /> : null}
   </>
 }
 
-function RailLead({ dialog, pageId, onClose }: { dialog: RailDialog; pageId: string; onClose: () => void }) {
+function RailLead({ dialog, pageId, links, onClose }: { dialog: RailDialog; pageId: string; links: MessengerLinks; onClose: () => void }) {
   if (dialog === 'callback') {
     return <LeadDialog heading="Перезвоните мне" body="Оставьте номер телефона — мы перезвоним." submitLabel="Жду звонка" successText="Заявка принята. Перезвоним вам." formId="contact-rail-callback" pageId={pageId} meta={{ contactSource: 'contact-rail', channel: 'phone' }} onClose={onClose} />
   }
-  const messenger = messengers.find(item => item.id === dialog)!
+  const messenger = channels(links).find(item => item.id === dialog)!
   const successText = 'Заявка принята. Напишите нам первыми — так мы сразу поймём, что это вы.'
   return <LeadDialog heading={`Свяжемся с вами в ${messenger.label}`} body="Оставьте номер телефона. После заявки откроем диалог, напишите туда первыми." submitLabel="Отправить" successText={successText} actionHref={messenger.href} actionLabel={`Написать в ${messenger.label}`} formId={`contact-rail-${messenger.id}`} pageId={pageId} meta={{ contactSource: 'contact-rail', channel: messenger.id }} onSuccess={() => { window.open(messenger.href, '_blank', 'noopener,noreferrer') }} onClose={onClose} />
 }

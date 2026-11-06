@@ -29,4 +29,5 @@ export const requiredMigrations = [
   '20261026_200000_project_publication',
   '20261026_220000_frame_copy',
   '20261027_090000_request_limits',
+  '20261106_100000_messenger_settings',
 ]

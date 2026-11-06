@@ -937,13 +937,25 @@ export interface Story {
   year: number;
   customerKind: 'family' | 'business';
   binding: 'catalog' | 'individual' | 'discontinued';
+  /**
+   * В отзыве автоматически показываются фото, название и характеристики проекта: площадь, этажи, спальни и санузлы. Вместо цены — кнопка «Посмотреть проект».
+   */
   project?: (number | null) | Project;
+  /**
+   * Можно выключить или задать свои заголовок, текст и фото. Кнопка по умолчанию: для бизнеса «Решения для бизнеса», для частников «Смотреть проекты».
+   */
   relatedCard?: {
     enabled?: boolean | null;
     title?: string | null;
     text?: string | null;
+    /**
+     * Только для правой плашки под отзывом. Не связано с превью видео.
+     */
     image?: (number | null) | Media;
   };
+  /**
+   * Кадр слева у видео. Если пусто, берётся из ролика.
+   */
   cover?: (number | null) | Media;
   media?:
     | {
@@ -1064,7 +1076,6 @@ export interface Event {
   startsAt: string;
   endsAt: string;
   timezone?: string | null;
-  landingUrl?: string | null;
   programme?:
     | {
         time?: string | null;
@@ -1112,6 +1123,7 @@ export interface Event {
   };
   reminderEnabled?: boolean | null;
   reminderHoursBefore?: number | null;
+  landingUrl?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2078,18 +2090,20 @@ export interface StoriesSelect<T extends boolean = true> {
   slug?: T;
   subtitle?: T;
   duration?: T;
-  relatedCard?: T | {
-    enabled?: T;
-    title?: T;
-    text?: T;
-    image?: T;
-  };
-  cover?: T;
   place?: T;
   year?: T;
   customerKind?: T;
   binding?: T;
   project?: T;
+  relatedCard?:
+    | T
+    | {
+        enabled?: T;
+        title?: T;
+        text?: T;
+        image?: T;
+      };
+  cover?: T;
   media?:
     | T
     | {
@@ -2173,7 +2187,6 @@ export interface EventsSelect<T extends boolean = true> {
   startsAt?: T;
   endsAt?: T;
   timezone?: T;
-  landingUrl?: T;
   programme?:
     | T
     | {
@@ -2218,6 +2231,7 @@ export interface EventsSelect<T extends boolean = true> {
       };
   reminderEnabled?: T;
   reminderHoursBefore?: T;
+  landingUrl?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2372,6 +2386,12 @@ export interface LeadDelivery {
   metricaConnectedAt?: string | null;
   mapsEnabled?: boolean | null;
   mapsApiKey?: string | null;
+  maxEnabled?: boolean | null;
+  maxUrl?: string | null;
+  telegramEnabled?: boolean | null;
+  telegramUrl?: string | null;
+  whatsappEnabled?: boolean | null;
+  whatsappPhone?: string | null;
   url?: string | null;
   /**
    * Необязательно. Например, CRM_AUTHORIZATION. Значение с токеном задаётся в окружении CMS.
@@ -2430,6 +2450,12 @@ export interface LeadDeliverySelect<T extends boolean = true> {
   metricaConnectedAt?: T;
   mapsEnabled?: T;
   mapsApiKey?: T;
+  maxEnabled?: T;
+  maxUrl?: T;
+  telegramEnabled?: T;
+  telegramUrl?: T;
+  whatsappEnabled?: T;
+  whatsappPhone?: T;
   url?: T;
   authorizationEnv?: T;
   updatedAt?: T;

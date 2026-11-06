@@ -22,6 +22,7 @@ import {
 } from '../consent/types'
 import { RegionBootstrap } from '../components/region-bootstrap'
 import { ContactRail } from '../components/contact-rail'
+import { activeMessengerLinks } from '../lib/active-messengers'
 import { copy } from '../lib/copy'
 import { OG_LOCALE } from '../lib/locale'
 import { regionByCode, REGION_COOKIE } from '../lib/regions'
@@ -68,8 +69,8 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
     if (!isCMSUnavailable(error)) throw error
     return []
   })
-  const [counter, roistatProjectId, content, catalogItems] = await Promise.all([
-    activeMetricaCounterId(), activeRoistatProjectId(), readCMSContent(), catalogAvailability,
+  const [counter, roistatProjectId, content, catalogItems, messengerLinks] = await Promise.all([
+    activeMetricaCounterId(), activeRoistatProjectId(), readCMSContent(), catalogAvailability, activeMessengerLinks(),
   ])
   const readyHouses = catalogItems.some(item => Boolean(item.readyHome))
 
@@ -116,7 +117,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <img src={`https://top-fwz1.mail.ru/counter?id=${VK_PIXEL_ID};js=na`} style={{ position: 'absolute', left: '-9999px' }} alt="Top.Mail.Ru" />
         </div></noscript></div>
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
-        <CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}<ContactRail /></RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider>
+        <CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}<ContactRail links={messengerLinks} /></RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider>
         <CMSPreviewBridge />
       </body>
     </html>

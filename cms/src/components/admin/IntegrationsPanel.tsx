@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { IconCheck, IconChevronRight, IconPencil, IconPlus, IconTrash, IconX } from '@tabler/icons-react'
 import { roistatWebhookUrlError } from '../../config/lead-adapters'
+import { normalizeMessengerPhone, normalizeMessengerUrl } from '../../../src/lib/messengers'
 import { Badge } from '../ui/badge'
 import { Button } from '../ui/button'
 import { Card, CardContent } from '../ui/card'
@@ -17,13 +18,14 @@ import { Switch } from '../ui/switch'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/tabs'
 import { AutomationPanel } from './AutomationPanel'
 
-const providers = ['roistat', 'bitrix', 'yandex', 'services'] as const
+const providers = ['roistat', 'bitrix', 'yandex', 'messengers', 'services'] as const
 type Provider = (typeof providers)[number]
 type DeliveryMode = 'test' | 'webhook' | 'roistat'
 type Counter = { projectId: string; connectedAt: string; enabled: boolean }
 type CounterRow = Counter & { key: string }
 export type DeliverySettings = { mode: DeliveryMode; enabled: boolean; webhookUrl: string; counters: Counter[] } | null
 export type YandexPanelSettings = { metricaEnabled: boolean; metricaCounterId: string; metricaConnectedAt: string; mapsEnabled: boolean; mapsApiKey: string } | null
+export type MessengerPanelSettings = { maxEnabled: boolean; maxUrl: string; telegramEnabled: boolean; telegramUrl: string; whatsappEnabled: boolean; whatsappPhone: string } | null
 
 // Each editor owns a draft. Only explicit submission changes the saved settings.
 function IntegrationEditor({ id, title, label, value, enabled, busy, onSave, validate, children, onDelete, onCancel, initiallyEditing = false }: {
@@ -96,7 +98,7 @@ function IntegrationEditor({ id, title, label, value, enabled, busy, onSave, val
   </section>
 }
 
-export function IntegrationsPanel({ delivery, yandex }: { delivery: DeliverySettings; yandex: YandexPanelSettings }) {
+export function IntegrationsPanel({ delivery, yandex, messengers }: { delivery: DeliverySettings; yandex: YandexPanelSettings; messengers: MessengerPanelSettings }) {
   const params = useSearchParams()
   const asked = params.get('provider')
   const [provider, setProvider] = useState<Provider>(providers.includes(asked as Provider) ? asked as Provider : 'roistat')
@@ -106,6 +108,7 @@ export function IntegrationsPanel({ delivery, yandex }: { delivery: DeliverySett
   const [webhookUrl, setWebhookUrl] = useState(delivery?.webhookUrl ?? '')
   const [counters, setCounters] = useState<CounterRow[]>(() => (delivery?.counters ?? []).map((row, index) => ({ ...row, key: `stored-${index}` })))
   const [settings, setSettings] = useState(yandex)
+  const [messengerSettings, setMessengerSettings] = useState(messengers)
   const [busy, setBusy] = useState(false)
   const saving = useRef(false)
   const bitrixOn = Boolean(delivery) && enabled && mode === 'roistat'
@@ -143,6 +146,7 @@ export function IntegrationsPanel({ delivery, yandex }: { delivery: DeliverySett
       <TabsTrigger value="roistat">Roistat</TabsTrigger>
       <TabsTrigger value="bitrix">Битрикс24</TabsTrigger>
       <TabsTrigger value="yandex">Яндекс</TabsTrigger>
+      <TabsTrigger value="messengers">Мессенджеры</TabsTrigger>
       <TabsTrigger value="services">Сервисы</TabsTrigger>
     </TabsList>
     <TabsContent value="roistat">
@@ -217,6 +221,35 @@ export function IntegrationsPanel({ delivery, yandex }: { delivery: DeliverySett
           <h2 className="text-base font-semibold">Директ</h2>
           <Badge variant="outline">Не настроено</Badge>
         </section>
+      </CardContent></Card>
+    </TabsContent>
+    <TabsContent value="messengers">
+      <Card className="shadow-none"><CardContent className="flex flex-col gap-8 py-6">
+        {messengerSettings ? <>
+          <IntegrationEditor id="max-url" title="MAX" label="Ссылка" value={messengerSettings.maxUrl} enabled={messengerSettings.maxEnabled} busy={busy}
+            validate={(value, active) => !value && !active ? '' : normalizeMessengerUrl(value) ? '' : value ? 'Укажите ссылку HTTPS без логина и пароля' : 'Укажите ссылку'}
+            onSave={async (value, active) => {
+              const maxUrl = normalizeMessengerUrl(value)
+              await persist({ maxEnabled: active, maxUrl })
+              setMessengerSettings(current => current && { ...current, maxEnabled: active, maxUrl: maxUrl || current.maxUrl })
+            }} />
+          <Separator />
+          <IntegrationEditor id="telegram-url" title="Telegram" label="Ссылка" value={messengerSettings.telegramUrl} enabled={messengerSettings.telegramEnabled} busy={busy}
+            validate={(value, active) => !value && !active ? '' : normalizeMessengerUrl(value) ? '' : value ? 'Укажите ссылку HTTPS без логина и пароля' : 'Укажите ссылку'}
+            onSave={async (value, active) => {
+              const telegramUrl = normalizeMessengerUrl(value)
+              await persist({ telegramEnabled: active, telegramUrl })
+              setMessengerSettings(current => current && { ...current, telegramEnabled: active, telegramUrl: telegramUrl || current.telegramUrl })
+            }} />
+          <Separator />
+          <IntegrationEditor id="whatsapp-phone" title="WhatsApp" label="Номер" value={messengerSettings.whatsappPhone} enabled={messengerSettings.whatsappEnabled} busy={busy}
+            validate={(value, active) => !value && !active ? '' : normalizeMessengerPhone(value) ? '' : value ? 'Укажите номер: от 10 до 15 цифр' : 'Укажите номер'}
+            onSave={async (value, active) => {
+              const whatsappPhone = normalizeMessengerPhone(value)
+              await persist({ whatsappEnabled: active, whatsappPhone })
+              setMessengerSettings(current => current && { ...current, whatsappEnabled: active, whatsappPhone: whatsappPhone || current.whatsappPhone })
+            }} />
+        </> : <p className="text-sm text-muted-foreground">Нет доступа к настройкам мессенджеров.</p>}
       </CardContent></Card>
     </TabsContent>
     <TabsContent value="services"><AutomationPanel section="dmp" /></TabsContent>

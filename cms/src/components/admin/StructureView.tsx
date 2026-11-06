@@ -10,6 +10,7 @@ import { PricesTable, type PriceTableRow } from './PricesTable'
 import { IntegrationsPanel } from './IntegrationsPanel'
 import { deliveryIsEnabled, fallbackRoistatConnectedAt, fallbackRoistatProjectId, normalizeRoistatCounters, roistatWebhookAddress } from '../../config/lead-adapters'
 import { fallbackMetricaCounterId, normalizeMapsApiKey, normalizeMetricaCounterId } from '../../config/yandex'
+import { messengerPanelValues, type MessengerSettings } from '../../../src/lib/messengers'
 import { isPriceKind, summaryConfiguration, type PriceKind } from '../../config/price-kinds'
 import { countProjectLeads } from '../../config/catalog-lead-counts'
 
@@ -25,13 +26,14 @@ async function StructureView({ view, initPageResult }: AdminViewServerProps & { 
   const leads = projects && submissions ? Object.fromEntries(countProjectLeads(projects.docs, submissions.docs)) : {}
   const delivery = view === 'integrations' ? await leadDelivery(initPageResult.req) : null
   const yandex = view === 'integrations' ? await yandexSettings(initPageResult.req) : null
+  const messengers = view === 'integrations' ? await messengerSettings(initPageResult.req) : null
   const priceRows = view === 'prices' ? await priceTable(initPageResult.req) : null
   return <div className="shadcn-surface flex flex-col gap-6 p-4 lg:p-6">
     {view === 'prices' ? <PriceImport /> : <h1 className="text-2xl font-semibold tracking-tight">{item.title}</h1>}
     {view === 'prices' && priceRows && <PricesTable rows={priceRows} />}
     {view === 'registers' && <p className="max-w-2xl text-sm text-muted-foreground">{item.description}</p>}
     {view === 'sampling' && <p className="max-w-2xl text-sm text-muted-foreground">{item.description}</p>}
-    {view === 'integrations' && <Suspense><IntegrationsPanel delivery={delivery} yandex={yandex} /></Suspense>}
+    {view === 'integrations' && <Suspense><IntegrationsPanel delivery={delivery} yandex={yandex} messengers={messengers} /></Suspense>}
     {view === 'pages' && pages && <PagesIndex siteUrl={siteUrl} pages={pages.docs} />}
     {view === 'catalog' && projects && <Suspense><CatalogIndex siteUrl={siteUrl} projects={projects.docs} leads={leads} /></Suspense>}
     {view === 'stories' && stories && <StoriesIndex siteUrl={siteUrl} stories={stories.docs} />}
@@ -97,6 +99,15 @@ async function yandexSettings(req: AdminViewServerProps['initPageResult']['req']
       mapsEnabled: settings.mapsEnabled !== false,
       mapsApiKey,
     }
+  } catch {
+    return null
+  }
+}
+
+async function messengerSettings(req: AdminViewServerProps['initPageResult']['req']) {
+  try {
+    const settings = await req.payload.findGlobal({ slug: 'lead-delivery', req, overrideAccess: false })
+    return messengerPanelValues(settings as MessengerSettings)
   } catch {
     return null
   }
