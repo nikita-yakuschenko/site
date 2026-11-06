@@ -1583,6 +1583,18 @@
   width: 100%;
   height: auto;
 }
+
+@media (min-width: 900px) {
+  .project-plans__sheet {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .project-plans__sheet img {
+    flex: 0 0 auto;
+  }
+}
 .project-plans__side {
   position: relative;
   display: grid;
@@ -1603,15 +1615,40 @@
   margin: 0;
 }
 
-.project-plans__side .plan-change[data-form="true"] {
-  position: absolute;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  height: auto;
-  max-height: 100%;
-  z-index: 2;
-  overflow: hidden;
+@media (max-width: 899px) {
+  .project-plans__side {
+    overflow: visible;
+  }
+}
+
+@media (min-width: 900px) {
+  .project-plans__side .plan-change[data-form="true"]:not(.plan-change__measure) {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: auto;
+    z-index: 2;
+  }
+}
+
+/* Скрытый слепок открытой формы: по нему держим минимальную высоту картинки. */
+
+@media (min-width: 900px) {
+  .project-plans__side .plan-change.plan-change__measure {
+    position: absolute;
+    z-index: -1;
+    top: 0;
+    left: 0;
+    display: flex;
+    width: 100%;
+    height: auto;
+    max-height: none;
+    margin: 0;
+    overflow: visible;
+    visibility: hidden;
+    pointer-events: none;
+  }
 }
 
 .plan-change .panel-lead {
@@ -1626,6 +1663,10 @@
   border-radius: 16px;
   background: var(--avgst-ink);
   color: #fff;
+}
+
+.plan-change.plan-change__measure {
+  display: none;
 }
 
 .plan-change[data-form="true"] {

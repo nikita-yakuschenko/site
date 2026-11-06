@@ -85,6 +85,7 @@ const STEP_EASE = "cubic-bezier(.22,.61,.36,1)";
 
 export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
   const cardRef = useRef<HTMLDivElement>(null);
+  const measureRef = useRef<HTMLDivElement>(null);
   const paneRef = useRef<HTMLDivElement>(null);
   const fromRef = useRef(0);
   const closedTop = useRef(0);
@@ -104,6 +105,7 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
   const example = useTypedExample(open && step === 1 && wish.length === 0 && !wishFocus);
 
   const reduced = () => window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const wide = () => window.matchMedia("(min-width: 900px)").matches;
   const sideOf = () => {
     const parent = cardRef.current?.parentElement;
     return parent?.classList.contains("project-plans__side") ? parent : null;
@@ -123,7 +125,7 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
     const card = cardRef.current;
     const side = sideOf();
     closedTop.current = card?.offsetTop ?? 0;
-    if (side) side.style.minHeight = `${side.offsetHeight}px`;
+    if (side && wide()) side.style.minHeight = `${side.offsetHeight}px`;
     setOpen(true);
   };
   useLayoutEffect(() => {
@@ -134,7 +136,7 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
       return;
     }
     const card = cardRef.current;
-    if (!card || reduced()) return;
+    if (!card || reduced() || !wide()) return;
     const rise = Math.max(0, closedTop.current - card.offsetTop);
     fromRef.current = rise;
     if (rise < 8) return;
@@ -151,7 +153,7 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
     const live = liveRef.current;
     const rest = restRef.current;
     const from = fromRef.current;
-    if (!card || !live || !rest || from < 8) {
+    if (!card || !live || !rest || from < 8 || !wide()) {
       setOpen(false);
       setStep(1);
       setClosing(false);
@@ -188,6 +190,34 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
       fade.cancel();
     };
   }, [closing]);
+
+  // На десктопе картинка не ниже открытой формы. На мобилке форма живёт своей высотой.
+  useLayoutEffect(() => {
+    const card = cardRef.current;
+    const measure = measureRef.current;
+    const sheet = card?.closest(".project-plans__body")?.querySelector(".project-plans__sheet");
+    if (!(sheet instanceof HTMLElement)) return;
+    const apply = () => {
+      const side = card?.parentElement;
+      if (!wide() || !measure) {
+        sheet.style.minHeight = "";
+        if (side?.classList.contains("project-plans__side")) side.style.minHeight = "";
+        return;
+      }
+      const live = card?.dataset.form === "true" ? card.offsetHeight : 0;
+      const height = Math.max(measure.offsetHeight, live);
+      if (height > 0) sheet.style.minHeight = `${Math.ceil(height)}px`;
+    };
+    apply();
+    const observer = new ResizeObserver(apply);
+    observer.observe(measure);
+    if (card) observer.observe(card);
+    window.addEventListener("resize", apply);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", apply);
+    };
+  }, [open, step]);
 
   const go = (next: 1 | 2) => {
     if (next === step) return;
@@ -258,13 +288,11 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
     wish.trim(),
   ].filter(Boolean);
 
-  return (
-    <div className="plan-change" ref={cardRef} data-form={open ? "true" : "false"} data-closing={closing ? "true" : "false"}>
-      {open && closing ? <div className="plan-change__rest" ref={restRef}><Teaser onOpen={() => show(true)} /></div> : null}
-      {open ? <div className="plan-change__live" ref={liveRef}>
-      <button type="button" className="plan-change__close" aria-label={copy.close} onClick={() => show(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button>
+  const formBody = (measure: boolean) => (
+    <>
+      <button type="button" className="plan-change__close" aria-label={copy.close} tabIndex={measure ? -1 : 0} onClick={() => { if (!measure) show(false); }}><IconX size={14} stroke={2.4} aria-hidden="true" /></button>
       <div className="plan-change__steps">
-        <button type="button" className="plan-change__back" data-on={step === 2} aria-hidden={step !== 2} tabIndex={step === 2 ? 0 : -1} onClick={() => go(1)}>Назад</button>
+        <button type="button" className="plan-change__back" data-on={step === 2} aria-hidden={step !== 2} tabIndex={measure || step !== 2 ? -1 : 0} onClick={() => go(1)}>Назад</button>
         <div className="plan-change__bars" role="progressbar" aria-valuemin={1} aria-valuemax={stepCount} aria-valuenow={step} aria-label={`Шаг ${step} из ${stepCount}`}>
           {Array.from({ length: stepCount }, (_, index) => {
             const n = index + 1;
@@ -274,39 +302,47 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
         </div>
         <p key={step} className="plan-change__step">Шаг {step} из {stepCount}</p>
       </div>
-      <div className="plan-change__pane" ref={paneRef}>
-      <div className="plan-change-form" data-on={step === 1} inert={step !== 1}>
-        <p className="plan-change__title">Расскажите нам о своих пожеланиях</p>
-        <fieldset className="cfilter__group">
-          <legend className="cfilter__legend">Площадь<span>{area[0]}-{area[1]} м²</span></legend>
-          <RangeSlider min={areaMin} max={areaMax} value={area} labels={["Площадь от", "Площадь до"]} onChange={(next) => {
-            setArea([next[0] ?? areaMin, next[1] ?? areaMax]);
-            setAreaMoved(true);
-          }} />
-        </fieldset>
-        <Count legend="Количество этажей" values={[1, 2]} active={floors} onToggle={(value) => setFloors((current) => toggle(current, value))} />
-        <Count legend="Количество спален" values={[1, 2, 3, 4]} active={bedrooms} onToggle={(value) => setBedrooms((current) => toggle(current, value))} />
-        <Count legend="Количество санузлов" values={[1, 2]} active={bathrooms} onToggle={(value) => setBathrooms((current) => toggle(current, value))} />
-        <div className="plan-change__wish">
-          {wish.length === 0 && !wishFocus ? <div className="plan-change__ghost" aria-hidden="true"><span className="plan-change__mark">Опишите пожелания, например:</span> {example.startsWith(examplePrefix) ? example.slice(examplePrefix.length) : ""}<span className="plan-change__caret" /></div> : null}
-          <textarea rows={4} value={wish} placeholder="" aria-label="Пожелания к планировке" className="ym-disable-keys ym-hide-content" {...noAutofillFieldProps} onPointerDown={() => setWishFocus(true)} onFocus={() => setWishFocus(true)} onBlur={() => setWishFocus(false)} onChange={(event) => setWish(event.target.value)} />
+      <div className="plan-change__pane" ref={measure ? undefined : paneRef}>
+        <div className="plan-change-form" data-on={step === 1} inert={measure || step !== 1}>
+          <p className="plan-change__title">Расскажите нам о своих пожеланиях</p>
+          <fieldset className="cfilter__group">
+            <legend className="cfilter__legend">Площадь<span>{area[0]}-{area[1]} м²</span></legend>
+            <RangeSlider min={areaMin} max={areaMax} value={area} labels={["Площадь от", "Площадь до"]} onChange={(next) => {
+              if (measure) return;
+              setArea([next[0] ?? areaMin, next[1] ?? areaMax]);
+              setAreaMoved(true);
+            }} />
+          </fieldset>
+          <Count legend="Количество этажей" values={[1, 2]} active={floors} onToggle={(value) => { if (!measure) setFloors((current) => toggle(current, value)); }} />
+          <Count legend="Количество спален" values={[1, 2, 3, 4]} active={bedrooms} onToggle={(value) => { if (!measure) setBedrooms((current) => toggle(current, value)); }} />
+          <Count legend="Количество санузлов" values={[1, 2]} active={bathrooms} onToggle={(value) => { if (!measure) setBathrooms((current) => toggle(current, value)); }} />
+          <div className="plan-change__wish">
+            {!measure && wish.length === 0 && !wishFocus ? <div className="plan-change__ghost" aria-hidden="true"><span className="plan-change__mark">Опишите пожелания, например:</span> {example.startsWith(examplePrefix) ? example.slice(examplePrefix.length) : ""}<span className="plan-change__caret" /></div> : null}
+            <textarea rows={4} value={wish} placeholder="" aria-label="Пожелания к планировке" className="ym-disable-keys ym-hide-content" {...noAutofillFieldProps} readOnly={measure} onPointerDown={() => { if (!measure) setWishFocus(true); }} onFocus={() => { if (!measure) setWishFocus(true); }} onBlur={() => { if (!measure) setWishFocus(false); }} onChange={(event) => { if (!measure) setWish(event.target.value); }} />
+          </div>
+          <button type="button" className="btn btn-yellow plan-change__open" tabIndex={measure ? -1 : 0} onClick={() => { if (!measure) go(2); }}>Дальше<IconArrowRight size={18} stroke={2} aria-hidden="true" /></button>
         </div>
-        <button type="button" className="btn btn-yellow plan-change__open" onClick={() => go(2)}>Дальше<IconArrowRight size={18} stroke={2} aria-hidden="true" /></button>
+        <div className="plan-change-form" data-on={step === 2} inert={measure || step !== 2}>
+          <p className="plan-change__title">Давайте познакомимся!</p>
+          <LeadForm active={!measure && step === 2} siteId={SITE.id} formId={measure ? "plan-change-measure" : "plan-change"} variant="card" compact nameLabel="Ваше имя" heading="Хотите изменить планировку?" submitLabel="Жду звонка" successText="Заявка принята. Перезвоним и разберём планировку." meta={{
+            planLabel: planLabel || undefined,
+            ...(areaMoved ? { areaFrom: area[0], areaTo: area[1] } : {}),
+            ...(floors.length ? { floors } : {}),
+            ...(bedrooms.length ? { bedrooms } : {}),
+            ...(bathrooms.length ? { bathrooms } : {}),
+          }}>
+            <input type="hidden" name="message" value={lines.join("\n")} />
+          </LeadForm>
+        </div>
       </div>
-      <div className="plan-change-form" data-on={step === 2} inert={step !== 2}>
-      <p className="plan-change__title">Давайте познакомимся!</p>
-      <LeadForm active={step === 2} siteId={SITE.id} formId="plan-change" variant="card" compact nameLabel="Ваше имя" heading="Хотите изменить планировку?" submitLabel="Жду звонка" successText="Заявка принята. Перезвоним и разберём планировку." meta={{
-        planLabel: planLabel || undefined,
-        ...(areaMoved ? { areaFrom: area[0], areaTo: area[1] } : {}),
-        ...(floors.length ? { floors } : {}),
-        ...(bedrooms.length ? { bedrooms } : {}),
-        ...(bathrooms.length ? { bathrooms } : {}),
-      }}>
-        <input type="hidden" name="message" value={lines.join("\n")} />
-      </LeadForm>
-      </div>
-      </div>
-      </div> : <Teaser onOpen={() => show(true)} />}
+    </>
+  );
+
+  return (
+    <div className="plan-change" ref={cardRef} data-form={open ? "true" : "false"} data-closing={closing ? "true" : "false"}>
+      <div className="plan-change plan-change__measure" data-form="true" ref={measureRef} aria-hidden="true" inert>{formBody(true)}</div>
+      {open && closing ? <div className="plan-change__rest" ref={restRef}><Teaser onOpen={() => show(true)} /></div> : null}
+      {open ? <div className="plan-change__live" ref={liveRef}>{formBody(false)}</div> : <Teaser onOpen={() => show(true)} />}
     </div>
   );
 }
