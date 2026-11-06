@@ -27,6 +27,7 @@ export function LeadDialog({
   onSuccess,
   actionHref,
   actionLabel,
+  actionChannel,
   pageId,
   formId = "consultation-dialog",
   withMessage = false,
@@ -40,6 +41,7 @@ export function LeadDialog({
   onSuccess?: () => void;
   actionHref?: string;
   actionLabel?: string;
+  actionChannel?: 'max' | 'telegram' | 'whatsapp';
   /** Откуда пришла заявка: страница сама себя и называет. */
   pageId?: string;
   formId?: string;
@@ -133,6 +135,7 @@ export function LeadDialog({
           onSuccess={onSuccess}
           actionHref={actionHref}
           actionLabel={actionLabel}
+          actionChannel={actionChannel}
           withMessage={withMessage}
           meta={meta}
         />

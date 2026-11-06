@@ -31,6 +31,7 @@ export function LeadForm({
   onSuccess,
   actionHref,
   actionLabel,
+  actionChannel,
   variant = 'page',
   compact = false,
   withMessage = false,
@@ -50,6 +51,7 @@ export function LeadForm({
   onSuccess?: () => void
   actionHref?: string
   actionLabel?: string
+  actionChannel?: 'max' | 'telegram' | 'whatsapp'
   variant?: 'page' | 'card'
   /**
    * Короткая форма: только имя, телефон, согласие и кнопка.
@@ -100,6 +102,10 @@ export function LeadForm({
     if (Object.keys(next).length) return
 
     submitting.current = true
+    // Высоту фиксируем до смены состояния: подпись кнопки, капча и экран успеха иначе двигают карточку.
+    const card = form.closest<HTMLElement>('.ask-dialog__card')
+    if (card) card.style.height = `${Math.round(card.getBoundingClientRect().height)}px`
+    form.style.height = `${Math.round(form.getBoundingClientRect().height)}px`
     setStatus('sending')
     try {
       const captchaToken = await captcha.verify()
@@ -127,6 +133,8 @@ export function LeadForm({
       setConsent(true)
       setInvalid({})
     } catch (error) {
+      form.style.height = ''
+      card?.style.setProperty('height', '')
       if (captcha.isActive()) {
         console.error(error)
         setStatus('error')
@@ -248,7 +256,7 @@ export function LeadForm({
           <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
         ) : null}
       </button>
-      {status === 'sending' || status === 'ok' ? <LeadSubmitFeedback status={status} text={successText} formId={resolvedFormId} actionHref={actionHref} actionLabel={actionLabel} /> : null}
+      {status === 'sending' || status === 'ok' ? <LeadSubmitFeedback status={status} text={successText} formId={resolvedFormId} actionHref={actionHref} actionLabel={actionLabel} actionChannel={actionChannel} /> : null}
       {status === 'error' ? <p role="alert">{captcha.reloadRequired ? 'Не удалось загрузить проверку безопасности. Обновите страницу и повторите отправку.' : 'Не удалось получить подтверждение. Повторите отправку — повторная попытка не создаст дубль заявки.'}</p> : null}
       {status === 'error' && captcha.reloadRequired ? <button type="button" className="btn" onClick={() => window.location.reload()}>Обновить страницу</button> : null}
     </form>
