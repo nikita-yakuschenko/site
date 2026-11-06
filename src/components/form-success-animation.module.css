@@ -1,4 +1,4 @@
-.root { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; min-height: 300px; padding: 32px 24px; border-radius: 16px; background: var(--form-success-background, #101010); color: var(--form-success-text, #fff); text-align: center; isolation: isolate; overflow: hidden; }
+.root { display: flex; flex-direction: column; align-items: center; justify-content: safe center; gap: 16px; min-height: 300px; padding: 24px 20px; border-radius: 16px; background: var(--form-success-background, #101010); color: var(--form-success-text, #fff); text-align: center; isolation: isolate; overflow: hidden; }
 .stage { position: relative; flex: 0 0 72px; width: 72px; height: 72px; }
 .logo, .check { position: absolute; inset: 0; width: 72px; height: 72px; }
 .logo { filter: var(--form-success-logo-filter, none); object-fit: contain; animation: appear 550ms cubic-bezier(.16,1,.3,1) both, morph 500ms ease 950ms forwards; }
