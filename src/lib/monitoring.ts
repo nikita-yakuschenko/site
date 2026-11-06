@@ -46,13 +46,15 @@ function throttle(key: string, ms: number) {
 function frames(stack: string) {
   const parsed = stack.split('\n').slice(0, 40).flatMap((line) => {
     const match = /^\s*at (?:(.+?) )?\(?(.*?):(\d+):(\d+)\)?$/.exec(line)
-    if (!match) return []
-    const filename = match[2]
+    const filename = match?.[2]
+    const lineno = match?.[3]
+    const colno = match?.[4]
+    if (!filename || !lineno || !colno) return []
     return [{
-      function: match[1] || '?',
+      function: match?.[1] || '?',
       filename,
-      lineno: Number(match[3]),
-      colno: Number(match[4]),
+      lineno: Number(lineno),
+      colno: Number(colno),
       in_app: !filename.includes('node_modules') && !filename.includes('node:'),
     }]
   })
