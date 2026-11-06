@@ -4,6 +4,7 @@ import Image from "next/image";
 import { optimizedSrc } from '../lib/media';
 import { useEffect, useState } from "react";
 import { PhotoLightbox } from "./photo-lightbox";
+import { PlanChangePrompt } from "./plan-change-prompt";
 import { copy } from "../lib/copy";
 import { isPlanVariants } from '../lib/catalog/project-plans-data';
 import type { CatalogProject, PlanVariant } from "../lib/catalog/types";
@@ -76,6 +77,7 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
               </button>
             ))}
           </div>
+          <PlanChangePrompt />
         </div>
 
         {open !== null ? (
@@ -168,37 +170,40 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
             />
           </button>
 
-          <div className="project-plans__legend">
-            <div className="project-plans__legend-head">
-              <p className="project-plans__legend-title">{copy.plansLegend}</p>
-            </div>
-            {currentFloors.length > 1 ? (
-              <div className="project-plans__floor-tabs" role="tablist" aria-label="Этаж дома">
-                {currentFloors.map((floor, index) => (
-                  <button
-                    key={`${floor.label}-${index}`}
-                    type="button"
-                    role="tab"
-                    aria-selected={index === selectedFloor}
-                    className={index === selectedFloor ? "is-active" : undefined}
-                    onClick={() => {
-                      setActiveFloor(index);
-                      setOpen(null);
-                    }}
-                  >
-                    {floor.label}
-                  </button>
-                ))}
+          <div className="project-plans__side">
+            <div className="project-plans__legend">
+              <div className="project-plans__legend-head">
+                <p className="project-plans__legend-title">{copy.plansLegend}</p>
               </div>
-            ) : null}
-            <dl>
-              {current.rooms.map((room, index) => (
-                <div key={`${room.name}-${index}`}>
-                  <dt>{room.name}</dt>
-                  <dd>{/[мm][²2]/.test(room.area) ? room.area : `${room.area} м²`}</dd>
+              {currentFloors.length > 1 ? (
+                <div className="project-plans__floor-tabs" role="tablist" aria-label="Этаж дома">
+                  {currentFloors.map((floor, index) => (
+                    <button
+                      key={`${floor.label}-${index}`}
+                      type="button"
+                      role="tab"
+                      aria-selected={index === selectedFloor}
+                      className={index === selectedFloor ? "is-active" : undefined}
+                      onClick={() => {
+                        setActiveFloor(index);
+                        setOpen(null);
+                      }}
+                    >
+                      {floor.label}
+                    </button>
+                  ))}
                 </div>
-              ))}
-            </dl>
+              ) : null}
+              <dl>
+                {current.rooms.map((room, index) => (
+                  <div key={`${room.name}-${index}`}>
+                    <dt>{room.name}</dt>
+                    <dd>{/[мm][²2]/.test(room.area) ? room.area : `${room.area} м²`}</dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+            <PlanChangePrompt planLabel={[currentVariant.label, currentFloors.length > 1 ? current.label : ""].filter(Boolean).join(", ")} />
           </div>
         </div>
       </div>

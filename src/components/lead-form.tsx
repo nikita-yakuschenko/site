@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useProjectLeadContext } from './project-lead-context'
 import { readRegionCode } from '../lib/regions'
@@ -37,6 +37,7 @@ export function LeadForm({
   withMessage = false,
   meta,
   active = true,
+  children,
 }: {
   active?: boolean
   siteId: number | string
@@ -72,6 +73,8 @@ export function LeadForm({
    * приходит голой, и разговор начинается с «а что вы там считали?».
    */
   meta?: Record<string, unknown>
+  /** Поля перед именем: у планировки это площадь, комнаты и пожелание. */
+  children?: ReactNode
 }) {
   const project = useProjectLeadContext()
   const resolvedFormId = formId || 'lead-form'
@@ -160,6 +163,7 @@ export function LeadForm({
           {body ? <p className="lead-card__body">{body}</p> : null}
         </div>
       )}
+      {children}
       <label>
         {copy.name}
         <input

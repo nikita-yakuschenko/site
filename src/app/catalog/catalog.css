@@ -1583,6 +1583,157 @@
   width: 100%;
   height: auto;
 }
+.project-plans__side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.plan-change {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 18px 16px 16px;
+  border-radius: 16px;
+  background: #fff;
+  transition:
+    background 0.42s var(--ease-out),
+    color 0.42s var(--ease-out);
+}
+
+.plan-change[data-form="true"] {
+  background: var(--avgst-ink);
+  color: #fff;
+}
+
+.plan-change[data-form="true"] .plan-change__text {
+  color: var(--on-dark-2);
+}
+
+.plan-change[data-form="true"] .plan-change__title {
+  padding-right: 28px;
+}
+
+.plan-change__close {
+  position: absolute;
+  top: 14px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--on-dark-2);
+  cursor: pointer;
+}
+
+.plan-change__close:hover {
+  color: #fff;
+}
+
+.plan-change[data-form="true"] .cfilter__legend {
+  color: var(--on-dark-3);
+}
+
+.plan-change[data-form="true"] .cfilter__legend span {
+  color: #fff;
+}
+
+.plan-change[data-form="true"] .cfilter__badges button {
+  background: transparent;
+  border-color: var(--on-dark-4);
+  color: #fff;
+}
+
+.plan-change[data-form="true"] .cfilter__badges button.is-on {
+  background: #fff;
+  border-color: #fff;
+  color: var(--avgst-ink);
+}
+
+.plan-change[data-form="true"] .ui-slider__track {
+  background: var(--on-dark-4);
+}
+
+.plan-change[data-form="true"] .ui-slider__range {
+  background: #fff;
+}
+
+.plan-change[data-form="true"] .ui-slider__thumb {
+  border-color: #fff;
+}
+
+.plan-change[data-form="true"] .lead-card {
+  --lead-ink: 255 255 255;
+}
+
+.plan-change[data-form="true"] .lead-card input,
+.plan-change[data-form="true"] .lead-card textarea {
+  border-color: var(--on-dark-4);
+  background: var(--tint-on-dark);
+  color: #fff;
+}
+
+.plan-change[data-form="true"] .lead-card input::placeholder,
+.plan-change[data-form="true"] .lead-card textarea::placeholder {
+  color: var(--on-dark-4);
+}
+
+.plan-change[data-form="true"] .lead-card input:focus,
+.plan-change[data-form="true"] .lead-card textarea:focus {
+  border-color: var(--on-dark-2);
+  box-shadow: none;
+}
+
+.plan-change[data-form="true"] .lead-form__consent {
+  color: var(--on-dark-2);
+}
+
+.plan-change__title {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 650;
+  line-height: 1.3;
+}
+
+.plan-change__text {
+  margin: 8px 0 14px;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ink-2);
+}
+
+.plan-change__open {
+  width: 100%;
+}
+
+.project-plans + .plan-change {
+  width: 100%;
+}
+
+@media (min-width: 900px) {
+  .project-plans + .plan-change {
+    width: 300px;
+  }
+}
+
+.plan-change-form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.plan-change-form .cfilter__legend {
+  margin-bottom: 0;
+}
+
+.plan-change-form__wish {
+  gap: 8px;
+}
+
 .project-plans__legend {
   overflow: hidden;
   padding: 0;

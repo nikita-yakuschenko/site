@@ -49,6 +49,8 @@ export function PanelLeadForm({
   meta,
   onOpenChange,
   formIntro,
+  children,
+  successText,
   closable = false,
   siteId = SITE.id,
   animateTrigger = false,
@@ -62,6 +64,9 @@ export function PanelLeadForm({
   meta?: Record<string, unknown>;
   onOpenChange?: (open: boolean) => void;
   formIntro?: ReactNode;
+  /** Поля перед именем. У планировки это площадь, комнаты и пожелание. */
+  children?: ReactNode;
+  successText?: string;
   closable?: boolean;
   siteId?: number | string;
   animateTrigger?: boolean;
@@ -134,8 +139,11 @@ export function PanelLeadForm({
             compact
             heading={heading}
             submitLabel={submitLabel ?? label}
+            successText={successText}
             meta={meta}
-          />
+          >
+            {children}
+          </LeadForm>
         </div>
       </div>
     </div>
