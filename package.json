@@ -19,7 +19,7 @@
     "typecheck": "tsc --noEmit",
     "frames:build": "node scripts/build-manufacture-frames.mjs",
     "test:e2e": "playwright test",
-    "test:server": "node --conditions=react-server --experimental-loader ./scripts/tests/server-only-loader.mjs --experimental-strip-types --test scripts/tests/cms-request.test.mjs scripts/tests/build-identity.test.mjs",
+    "test:server": "node --conditions=react-server --experimental-loader ./scripts/tests/server-only-loader.mjs --experimental-strip-types --test scripts/tests/cms-request.test.mjs scripts/tests/build-identity.test.mjs scripts/tests/monitoring.test.mjs",
     "diagnostics:release": "node scripts/run-browser-diagnostics.mjs local release",
     "diagnostics:production": "node scripts/run-browser-diagnostics.mjs production",
     "test:e2e:cookie": "playwright test e2e/cookie-consent.spec.ts"
