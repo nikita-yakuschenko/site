@@ -9,6 +9,8 @@ export type FormSuccessAnimationProps = {
   description?: string
   className?: string
   onComplete?: () => void
+  actionHref?: string
+  actionLabel?: string
 }
 
 const colors = ['#4ade80', '#22c55e', '#86efac', '#bbf7d0', '#fcc90c', '#a3e635']
@@ -24,7 +26,7 @@ const particles = Array.from({ length: 42 }, (_, index) => {
   } as CSSProperties
 })
 
-export function FormSuccessAnimationContent({ active, title = 'Спасибо! Заявка принята', description = 'Мы свяжемся с вами в ближайшее время.', className = '', onComplete }: FormSuccessAnimationProps) {
+export function FormSuccessAnimationContent({ active, title = 'Спасибо! Заявка принята', description = 'Мы свяжемся с вами в ближайшее время.', className = '', onComplete, actionHref, actionLabel }: FormSuccessAnimationProps) {
   const complete = useRef(onComplete)
   useEffect(() => { complete.current = onComplete }, [onComplete])
   useEffect(() => {
@@ -47,6 +49,7 @@ export function FormSuccessAnimationContent({ active, title = 'Спасибо! �
     <div className={styles.copy}>
       <p className={styles.title}>{title}</p>
       <p className={styles.description}>{description}</p>
+      {actionHref && actionLabel ? <a className={`${styles.action} btn btn-yellow`} href={actionHref} target="_blank" rel="noopener noreferrer">{actionLabel}</a> : null}
     </div>
   </div>
 }

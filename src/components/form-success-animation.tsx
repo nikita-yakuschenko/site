@@ -3,8 +3,8 @@
 import { lazy, Suspense } from 'react'
 import type { FormSuccessAnimationProps } from './form-success-animation-content'
 
-function Receipt({ className, title = 'Спасибо! Заявка принята', description = 'Мы свяжемся с вами в ближайшее время.' }: FormSuccessAnimationProps) {
-  return <div className={className} role="status" aria-live="polite" aria-atomic="true"><p>{title}</p><p>{description}</p></div>
+function Receipt({ className, title = 'Спасибо! Заявка принята', description = 'Мы свяжемся с вами в ближайшее время.', actionHref, actionLabel }: FormSuccessAnimationProps) {
+  return <div className={className} role="status" aria-live="polite" aria-atomic="true"><p>{title}</p><p>{description}</p>{actionHref && actionLabel ? <a className="btn btn-yellow" href={actionHref} target="_blank" rel="noopener noreferrer">{actionLabel}</a> : null}</div>
 }
 
 const AnimatedSuccess = lazy(() => import('./form-success-animation-content')

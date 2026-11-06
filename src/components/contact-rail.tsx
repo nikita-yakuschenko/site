@@ -3,14 +3,22 @@
 import { useEffect, useRef, useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { IconBrandWhatsapp, IconChevronLeft, IconPhoneCall } from '@tabler/icons-react'
-import { FOOTER_SOCIALS } from '../lib/site'
+import { FOOTER_SOCIALS, SITE } from '../lib/site'
 import { LeadDialog } from './lead-dialog'
 import './contact-rail.css'
+
+const messengers = [
+  { id: 'max', label: 'MAX', href: FOOTER_SOCIALS.find(item => item.id === 'max')!.href },
+  { id: 'telegram', label: 'Telegram', href: FOOTER_SOCIALS.find(item => item.id === 'telegram')!.href },
+  { id: 'whatsapp', label: 'WhatsApp', href: `https://wa.me/${SITE.contacts.phone.replace(/\D/g, '')}` },
+] as const
+
+type RailDialog = (typeof messengers)[number]['id'] | 'callback'
 
 /** Shared contact actions; the footer remains the source of messenger assets. */
 export function ContactRail() {
   const pathname = usePathname()
-  const [callbackOpen, setCallbackOpen] = useState(false)
+  const [dialog, setDialog] = useState<RailDialog | null>(null)
   const [belowHero, setBelowHero] = useState(false)
   const [expanded, setExpanded] = useState(false)
   const [attention, setAttention] = useState(false)
@@ -20,7 +28,7 @@ export function ContactRail() {
   const collapsed = belowHero && !expanded
   const stopAttention = () => setAttention(false)
   useEffect(() => {
-    if (collapsed || callbackOpen || contactsVisible || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (collapsed || dialog || contactsVisible || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
     let timer = 0
     let finish = 0
     const shine = () => {
@@ -33,7 +41,7 @@ export function ContactRail() {
     }
     timer = window.setTimeout(shine, 1000)
     return () => { window.clearTimeout(timer); window.clearTimeout(finish); setAttention(false) }
-  }, [collapsed, callbackOpen, contactsVisible])
+  }, [collapsed, dialog, contactsVisible])
   useEffect(() => {
     const targets = new Map<Element, boolean>()
     const observer = new IntersectionObserver(entries => {
@@ -109,25 +117,32 @@ export function ContactRail() {
       <button type="button" className="contact-rail__toggle" aria-hidden={!belowHero} tabIndex={belowHero ? 0 : -1} aria-label={expanded ? 'Свернуть контакты' : 'Открыть контакты'} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>
         <IconChevronLeft size={18} aria-hidden="true" />
       </button>
-      {['max', 'telegram'].map(id => {
-        const item = FOOTER_SOCIALS.find(social => social.id === id)!
-        return <button key={id} type="button" className="contact-rail__action" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-disabled="true" aria-label={item.label}>
+      {messengers.filter(item => item.id !== 'whatsapp').map(item => {
+        const social = FOOTER_SOCIALS.find(entry => entry.id === item.id)!
+        return <button key={item.id} type="button" className="contact-rail__action" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label={item.label} onClick={() => setDialog(item.id)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="contact-rail__logo contact-rail__logo--light" src={id === 'telegram' ? '/social/tg_rail_light.svg' : item.light} width={24} height={24} alt="" />
+          <img className="contact-rail__logo contact-rail__logo--light" src={item.id === 'telegram' ? '/social/tg_rail_light.svg' : social.light} width={24} height={24} alt="" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="contact-rail__logo contact-rail__logo--original" src={item.original} width={24} height={24} alt="" />
+          <img className="contact-rail__logo contact-rail__logo--original" src={social.original} width={24} height={24} alt="" />
           <span className="contact-rail__label">{item.label}</span>
         </button>
       })}
-      <button type="button" className="contact-rail__action contact-rail__action--whatsapp" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-disabled="true" aria-label="WhatsApp">
+      <button type="button" className="contact-rail__action contact-rail__action--whatsapp" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="WhatsApp" onClick={() => setDialog('whatsapp')}>
         <IconBrandWhatsapp size={24} stroke={1.7} aria-hidden="true" /><span className="contact-rail__label">WhatsApp</span>
       </button>
-      <button className="contact-rail__action contact-rail__action--callback" type="button" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="Перезвоните мне" onClick={() => setCallbackOpen(true)}>
+      <button className="contact-rail__action contact-rail__action--callback" type="button" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="Перезвоните мне" onClick={() => setDialog('callback')}>
         <IconPhoneCall size={24} stroke={1.7} aria-hidden="true" /><span className="contact-rail__label">Перезвоните мне</span>
       </button>
     </nav>
-    {callbackOpen && <div onSubmitCapture={event => { event.preventDefault(); event.stopPropagation() }}>
-      <LeadDialog heading="Перезвоните мне" body="Оставьте номер телефона — мы свяжемся с вами." submitLabel="Жду звонка" formId="consultation-dialog" pageId={pathname} meta={{ contactSource: 'contact-rail' }} onClose={() => setCallbackOpen(false)} />
-    </div>}
+    {dialog ? <RailLead dialog={dialog} pageId={pathname} onClose={() => setDialog(null)} /> : null}
   </>
+}
+
+function RailLead({ dialog, pageId, onClose }: { dialog: RailDialog; pageId: string; onClose: () => void }) {
+  if (dialog === 'callback') {
+    return <LeadDialog heading="Перезвоните мне" body="Оставьте номер телефона — мы перезвоним." submitLabel="Жду звонка" successText="Заявка принята. Перезвоним вам." formId="contact-rail-callback" pageId={pageId} meta={{ contactSource: 'contact-rail', channel: 'phone' }} onClose={onClose} />
+  }
+  const messenger = messengers.find(item => item.id === dialog)!
+  const successText = 'Заявка принята. Напишите нам первыми — так мы сразу поймём, что это вы.'
+  return <LeadDialog heading={`Свяжемся с вами в ${messenger.label}`} body="Оставьте номер телефона. После заявки откроем диалог, напишите туда первыми." submitLabel="Отправить" successText={successText} actionHref={messenger.href} actionLabel={`Написать в ${messenger.label}`} formId={`contact-rail-${messenger.id}`} pageId={pageId} meta={{ contactSource: 'contact-rail', channel: messenger.id }} onSuccess={() => { window.open(messenger.href, '_blank', 'noopener,noreferrer') }} onClose={onClose} />
 }

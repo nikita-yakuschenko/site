@@ -28,6 +28,9 @@ export function LeadForm({
   body,
   submitLabel,
   successText,
+  onSuccess,
+  actionHref,
+  actionLabel,
   variant = 'page',
   compact = false,
   withMessage = false,
@@ -44,6 +47,9 @@ export function LeadForm({
   body?: string | null
   submitLabel?: string | null
   successText?: string | null
+  onSuccess?: () => void
+  actionHref?: string
+  actionLabel?: string
   variant?: 'page' | 'card'
   /**
    * Короткая форма: только имя, телефон, согласие и кнопка.
@@ -115,6 +121,7 @@ export function LeadForm({
       }, attempt, fetch, captcha.submissionSignal())
       if (!captcha.isActive()) return
       setStatus('ok')
+      onSuccess?.()
       form.reset()
       setPhone('')
       setConsent(true)
@@ -241,7 +248,7 @@ export function LeadForm({
           <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
         ) : null}
       </button>
-      {status === 'sending' || status === 'ok' ? <LeadSubmitFeedback status={status} text={successText} formId={resolvedFormId} /> : null}
+      {status === 'sending' || status === 'ok' ? <LeadSubmitFeedback status={status} text={successText} formId={resolvedFormId} actionHref={actionHref} actionLabel={actionLabel} /> : null}
       {status === 'error' ? <p role="alert">{captcha.reloadRequired ? 'Не удалось загрузить проверку безопасности. Обновите страницу и повторите отправку.' : 'Не удалось получить подтверждение. Повторите отправку — повторная попытка не создаст дубль заявки.'}</p> : null}
       {status === 'error' && captcha.reloadRequired ? <button type="button" className="btn" onClick={() => window.location.reload()}>Обновить страницу</button> : null}
     </form>

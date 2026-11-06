@@ -23,6 +23,10 @@ export function LeadDialog({
   heading = copy.askQuestion,
   body = copy.askDialogBody,
   submitLabel = copy.sendLead,
+  successText,
+  onSuccess,
+  actionHref,
+  actionLabel,
   pageId,
   formId = "consultation-dialog",
   withMessage = false,
@@ -32,6 +36,10 @@ export function LeadDialog({
   heading?: string;
   body?: string | null;
   submitLabel?: string;
+  successText?: string;
+  onSuccess?: () => void;
+  actionHref?: string;
+  actionLabel?: string;
   /** Откуда пришла заявка: страница сама себя и называет. */
   pageId?: string;
   formId?: string;
@@ -121,6 +129,10 @@ export function LeadDialog({
           heading={heading}
           body={body}
           submitLabel={submitLabel}
+          successText={successText}
+          onSuccess={onSuccess}
+          actionHref={actionHref}
+          actionLabel={actionLabel}
           withMessage={withMessage}
           meta={meta}
         />
