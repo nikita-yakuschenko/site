@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
-import { IconBus, IconMapPin, IconX } from '@tabler/icons-react'
+import { IconArrowUpRight, IconBus, IconMapPin, IconX } from '@tabler/icons-react'
 import { copy } from '../lib/copy'
 import {
   formatRange,
@@ -14,11 +14,13 @@ import {
   subscribeOfficeStatus,
 } from '../lib/office'
 import { OfficeMap } from './office-map'
+import { LeadDialog } from './lead-dialog'
 
 export function OfficeStatusIndicator() {
   const root = useRef<HTMLDivElement>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [open, setOpen] = useState(false)
+  const [meetingOpen, setMeetingOpen] = useState(false)
 
   // Между строкой и панелью есть зазор. Если закрывать сразу, курсор не
   // успевает его пересечь и до содержимого панели не добраться: даём фору
@@ -62,7 +64,7 @@ export function OfficeStatusIndicator() {
   }, [open])
 
   return (
-    <div
+    <><div
       className="site-office"
       ref={root}
       onPointerEnter={(event) => {
@@ -150,10 +152,13 @@ export function OfficeStatusIndicator() {
               <span className="site-office__address-line">{copy.officeAddressLine}</span>
             </span>
           </p>
-          {/* Внешний ресурс, поэтому обычная ссылка, а не Link, и новая
-              вкладка: уводить человека со страницы незачем. */}
+          <button type="button" className="btn btn-yellow site-office__cta" onClick={() => {
+            if (closeTimer.current) clearTimeout(closeTimer.current)
+            setOpen(false)
+            setMeetingOpen(true)
+          }}>Запланировать встречу <IconArrowUpRight size={18} stroke={2} aria-hidden="true" /></button>
           <a
-            className="btn btn-yellow site-office__cta"
+            className="site-office__route"
             href={OFFICE_ROUTE_URL}
             target="_blank"
             rel="noopener noreferrer"
@@ -164,5 +169,7 @@ export function OfficeStatusIndicator() {
         </div>
       ) : null}
     </div>
+      {meetingOpen && <LeadDialog heading="Запланировать встречу" body="Оставьте контакты — согласуем удобное время встречи в офисе." submitLabel="Запланировать встречу" formId="consultation-dialog" meta={{ requestType: 'office-meeting', formSource: 'office-status' }} onClose={() => setMeetingOpen(false)} />}
+    </>
   )
 }
