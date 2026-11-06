@@ -344,7 +344,8 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
     <div className="plan-change" ref={cardRef} data-form={open ? "true" : "false"} data-closing={closing ? "true" : "false"}>
       <div className="plan-change plan-change__measure" data-form="true" ref={measureRef} aria-hidden="true" inert>{formBody(true)}</div>
       {open && closing ? <div className="plan-change__rest" ref={restRef}><Teaser onOpen={() => show(true)} /></div> : null}
-      {open ? <div className="plan-change__live" ref={liveRef}>{formBody(false)}</div> : <Teaser onOpen={() => show(true)} />}
+      <div className="plan-change__teaser" inert={open} aria-hidden={open}><div><Teaser onOpen={() => show(true)} /></div></div>
+      <div className="plan-change__live" ref={liveRef} inert={!open} aria-hidden={!open}><div>{formBody(false)}</div></div>
     </div>
   );
 }
