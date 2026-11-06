@@ -38,8 +38,15 @@ export async function prepareWebpAssets(root = process.cwd()) {
       if (!entry.isFile() || !/\.(jpe?g|png|avif)$/i.test(entry.name)) continue
       const source = path.join(folder, entry.name)
       const original = await readFile(source)
-      const digest = createHash('sha256').update('webp-v1-quality85-max2560-png-lossless').update(original).digest('hex').slice(0, 16)
       const relative = path.relative(directory, source).split(path.sep).join('/')
+      // Семья и цех показываются в ячейке уже этого размера. Меньший файл
+      // с тем же кадрированием в CSS; остальные картинки кодируются как раньше.
+      const fitted = relative === 'persons/family_1.png'
+        ? { tag: 'webp-v2-family-1600-q82', width: 1600, quality: 82, lossless: false }
+        : relative === 'production/factory.jpg' || relative === 'production/factory-portrait.jpg'
+          ? { tag: 'webp-v2-slot-1440-q80', width: 1440, quality: 80, lossless: false }
+          : null
+      const digest = createHash('sha256').update(fitted ? fitted.tag : 'webp-v1-quality85-max2560-png-lossless').update(original).digest('hex').slice(0, 16)
       const output = `${relative.replace(/\.[^.]+$/, '')}-${digest}.webp`
       const destination = path.join(generated, output)
       await mkdir(path.dirname(destination), { recursive: true })
@@ -48,8 +55,9 @@ export async function prepareWebpAssets(root = process.cwd()) {
         if (error.code !== 'ENOENT') throw error
         const png = /\.png$/i.test(entry.name)
         let image = sharp(original, { animated: true }).rotate()
-        if (!png) image = image.resize({ width: 2560, height: 2560, fit: 'inside', withoutEnlargement: true })
-        encoded = await image.webp({ quality: 85, lossless: png, effort: 4 }).toBuffer()
+        const maxWidth = fitted ? fitted.width : png ? null : 2560
+        if (maxWidth) image = image.resize({ width: maxWidth, height: maxWidth, fit: 'inside', withoutEnlargement: true })
+        encoded = await image.webp({ quality: fitted ? fitted.quality : 85, lossless: fitted ? fitted.lossless : png, effort: 4 }).toBuffer()
         const temporary = `${destination}.tmp`
         await writeFile(temporary, encoded)
         await rename(temporary, destination)

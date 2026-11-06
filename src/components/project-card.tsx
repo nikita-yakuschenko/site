@@ -17,7 +17,7 @@ import { optimizedSrc } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
 import { catalogDisplayPrice } from '../lib/catalog/display-price'
 
-export function ProjectCard({ project, showPrice = true, locationLabel }: { project: CatalogProject; showPrice?: boolean; locationLabel?: string }) {
+export function ProjectCard({ project, showPrice = true, locationLabel, priority = false }: { project: CatalogProject; showPrice?: boolean; locationLabel?: string; priority?: boolean }) {
   const region = useRegionCode()
   const price = catalogDisplayPrice(project, region)
   const priceLabel = price ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется'
@@ -50,7 +50,8 @@ export function ProjectCard({ project, showPrice = true, locationLabel }: { proj
             <img
               src={optimizedSrc(project.imageUrl, 640)}
               alt=""
-              loading="lazy"
+              loading={priority ? 'eager' : 'lazy'}
+              fetchPriority={priority ? 'high' : 'low'}
               decoding="async"
               className={imageLoaded ? 'is-loaded' : ''}
               onLoad={() => setLoadedUrl(project.imageUrl)}

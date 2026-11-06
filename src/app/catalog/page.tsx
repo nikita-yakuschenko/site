@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from 'next'
 import { permanentRedirect } from 'next/navigation'
@@ -72,11 +73,13 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
 
   const { items, rest } = await catalog.list({ siteCode: SITE.code, filters, region })
   const heading = copy.catalogProjects
-  const toBoard = (list: typeof items): BoardItem[] =>
-    list.map((project) => ({ id: project.id, hero_product: project.hero_product, areaValue: project.areaValue,
+  const toBoard = (list: typeof items, eagerFirst: boolean): BoardItem[] =>
+    list.map((project, index) => ({ id: project.id, hero_product: project.hero_product, areaValue: project.areaValue,
       priceAmount: catalogDisplayPrice(project, region),
       regionalPrices: project.readyHome ? undefined : catalogDisplayPrices(project),
-      card: <ProjectCard project={project} /> }))
+      card: eagerFirst && index < 2
+        ? <ProjectCard project={project} priority={index === 0} />
+        : <Suspense fallback={null}><ProjectCard project={project} /></Suspense> }))
 
   return (
     <SiteChrome
@@ -99,8 +102,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
             <CatalogBoard
               filters={filters}
               facets={facets}
-              matched={toBoard(catalogOrder(items, sessionSeed))}
-              rest={filters.status === 'ready' ? [] : toBoard(rest)}
+              matched={toBoard(catalogOrder(items, sessionSeed), true)}
+              rest={filters.status === 'ready' ? [] : toBoard(rest, items.length === 0)}
               picked={!isEmpty(filters)}
             />
           </div>

@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import {
   IconArrowUpRight,
   IconHourglass,
@@ -573,7 +574,11 @@ export function BlockRenderer({
         if (block.blockType === "faq") return <Faq key={index} block={block} />;
         return <UnknownBlock key={index} type={block.blockType} />;
         };
-        return <div key={`${block.blockType}-${index}`} data-cms-block={block.blockType} style={{ display: 'contents' }}>{['hero', 'popularProjects', 'seriesBento', 'contactsSection', 'independentReview', 'referralProgram'].includes(block.blockType) ? render() : <CMSStaticBlock cmsBlockKey={block.blockType}>{render()}</CMSStaticBlock>}</div>;
+        const content = ['hero', 'popularProjects', 'seriesBento', 'contactsSection', 'independentReview', 'referralProgram'].includes(block.blockType) ? render() : <CMSStaticBlock cmsBlockKey={block.blockType}>{render()}</CMSStaticBlock>;
+        // Герой занимает первый экран. Нижние блоки уже в HTML, а их
+        // интерактив React дорисовывает после него, не сдвигая вёрстку.
+        const scheduled = block.blockType === 'hero' ? content : <Suspense fallback={null}>{content}</Suspense>;
+        return <div key={`${block.blockType}-${index}`} data-cms-block={block.blockType} style={{ display: 'contents' }}>{scheduled}</div>;
       })}
     </>
   );
