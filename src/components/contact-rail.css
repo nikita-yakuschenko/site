@@ -90,8 +90,11 @@
   .contact-rail__toggle svg { transition: transform .28s cubic-bezier(.22, 1, .36, 1); }
   .contact-rail--expanded .contact-rail__toggle svg { transform: rotate(180deg); }
   .contact-rail--compact:not(.contact-rail--expanded) { width: 24px; height: 64px; border-radius: 16px 0 0 16px; }
-  .contact-rail--compact:not(.contact-rail--expanded)::before { opacity: 0; }
-  .contact-rail--compact:not(.contact-rail--expanded)::after { opacity: 1; }
+  .contact-rail--compact:not(.contact-rail--expanded)::before,
+  .contact-rail--compact.contact-rail--expanded:not(.contact-rail--framed)::before { opacity: 0; }
+  .contact-rail--compact:not(.contact-rail--expanded)::after,
+  .contact-rail--compact.contact-rail--expanded:not(.contact-rail--framed)::after { opacity: 1; background: rgb(var(--avgst-ink-rgb) / 0.92); }
+  .contact-rail--compact.contact-rail--expanded .contact-rail__action { transition-delay: 0s, 0s, .2s, 0s, 0s; }
   .contact-rail--compact:not(.contact-rail--expanded) .contact-rail__action { transform: translateX(32px); opacity: 0; pointer-events: none; visibility: hidden; transition-delay: 0s, 0s, 0s, .28s, 0s; }
   .contact-rail--compact:not(.contact-rail--expanded) .contact-rail__toggle { left: 0; top: 0; width: 24px; height: 64px; }
   .contact-rail__toggle:focus-visible { outline: 2px solid var(--brand-yellow); outline-offset: -3px; border-radius: inherit; }

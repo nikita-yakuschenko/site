@@ -26,6 +26,7 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
   const [dialog, setDialog] = useState<RailDialog | null>(null)
   const [belowHero, setBelowHero] = useState(false)
   const [expanded, setExpanded] = useState(false)
+  const [framed, setFramed] = useState(false)
   const [attention, setAttention] = useState(false)
   const [contactsVisible, setContactsVisible] = useState(false)
   const railRef = useRef<HTMLElement>(null)
@@ -111,6 +112,26 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
     return () => { cancelAnimationFrame(frame); window.removeEventListener('scroll', scroll); window.removeEventListener('resize', scroll) }
   }, [pathname])
   useEffect(() => {
+    if (!expanded) {
+      setFramed(false)
+      return
+    }
+    const rail = railRef.current
+    if (!rail || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      setFramed(true)
+      return
+    }
+    let done = false
+    const finish = () => { if (!done) { done = true; setFramed(true) } }
+    const onEnd = (event: TransitionEvent) => {
+      if (event.target !== rail || (event.propertyName !== 'width' && event.propertyName !== 'height')) return
+      finish()
+    }
+    rail.addEventListener('transitionend', onEnd)
+    const timer = window.setTimeout(finish, 360)
+    return () => { rail.removeEventListener('transitionend', onEnd); window.clearTimeout(timer) }
+  }, [expanded])
+  useEffect(() => {
     if (!expanded) return
     const outside = (event: PointerEvent) => { if (event.target instanceof Node && !railRef.current?.contains(event.target)) setExpanded(false) }
     const key = (event: KeyboardEvent) => { if (event.key === 'Escape') setExpanded(false) }
@@ -119,7 +140,7 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
     return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', key) }
   }, [expanded])
   return <>
-    <nav ref={railRef} inert={contactsVisible} aria-hidden={contactsVisible} onPointerEnter={stopAttention} onPointerDown={stopAttention} onFocusCapture={stopAttention} className={`contact-rail${projectPage ? ' contact-rail--project' : ''}${homePage ? ' contact-rail--home' : ''}${belowHero ? ' contact-rail--compact' : ''}${expanded ? ' contact-rail--expanded' : ''}${attention ? ' contact-rail--attention' : ''}${contactsVisible ? ' contact-rail--hidden' : ''}`} aria-label="Связаться с нами">
+    <nav ref={railRef} inert={contactsVisible} aria-hidden={contactsVisible} onPointerEnter={stopAttention} onPointerDown={stopAttention} onFocusCapture={stopAttention} className={`contact-rail${projectPage ? ' contact-rail--project' : ''}${homePage ? ' contact-rail--home' : ''}${belowHero ? ' contact-rail--compact' : ''}${expanded ? ' contact-rail--expanded' : ''}${framed ? ' contact-rail--framed' : ''}${attention ? ' contact-rail--attention' : ''}${contactsVisible ? ' contact-rail--hidden' : ''}`} aria-label="Связаться с нами">
       <button type="button" className="contact-rail__toggle" aria-hidden={!belowHero} tabIndex={belowHero ? 0 : -1} aria-label={expanded ? 'Свернуть контакты' : 'Открыть контакты'} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>
         <IconChevronLeft size={18} aria-hidden="true" />
       </button>
