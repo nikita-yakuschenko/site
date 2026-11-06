@@ -30,6 +30,7 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
   const [contactsVisible, setContactsVisible] = useState(false)
   const railRef = useRef<HTMLElement>(null)
   const projectPage = /^\/catalog\/[^/]+\/?$/.test(pathname)
+  const homePage = pathname === '/'
   const collapsed = belowHero && !expanded
   const stopAttention = () => setAttention(false)
   useEffect(() => {
@@ -96,7 +97,7 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
   useEffect(() => {
     let frame = 0
     const update = () => {
-      const hero = document.querySelector('.project-hero')
+      const hero = document.querySelector(pathname === '/' ? '.hero' : '.project-hero')
       setBelowHero(Boolean(window.matchMedia('(max-width: 767px)').matches && hero && hero.getBoundingClientRect().bottom <= 180))
       setExpanded(false)
     }
@@ -118,7 +119,7 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
     return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', key) }
   }, [expanded])
   return <>
-    <nav ref={railRef} inert={contactsVisible} aria-hidden={contactsVisible} onPointerEnter={stopAttention} onPointerDown={stopAttention} onFocusCapture={stopAttention} className={`contact-rail${projectPage ? ' contact-rail--project' : ''}${belowHero ? ' contact-rail--compact' : ''}${expanded ? ' contact-rail--expanded' : ''}${attention ? ' contact-rail--attention' : ''}${contactsVisible ? ' contact-rail--hidden' : ''}`} aria-label="Связаться с нами">
+    <nav ref={railRef} inert={contactsVisible} aria-hidden={contactsVisible} onPointerEnter={stopAttention} onPointerDown={stopAttention} onFocusCapture={stopAttention} className={`contact-rail${projectPage ? ' contact-rail--project' : ''}${homePage ? ' contact-rail--home' : ''}${belowHero ? ' contact-rail--compact' : ''}${expanded ? ' contact-rail--expanded' : ''}${attention ? ' contact-rail--attention' : ''}${contactsVisible ? ' contact-rail--hidden' : ''}`} aria-label="Связаться с нами">
       <button type="button" className="contact-rail__toggle" aria-hidden={!belowHero} tabIndex={belowHero ? 0 : -1} aria-label={expanded ? 'Свернуть контакты' : 'Открыть контакты'} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>
         <IconChevronLeft size={18} aria-hidden="true" />
       </button>

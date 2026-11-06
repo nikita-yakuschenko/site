@@ -58,14 +58,16 @@
 .contact-rail__toggle { display: none; }
 @media (max-width: 767px) {
   .contact-rail { display: none; }
-  .contact-rail--project {
+  .contact-rail--project,
+  .contact-rail--home {
     display: block; top: max(205px, calc(38svh - 60px));
     width: calc(51px + max(5px, env(safe-area-inset-right))); height: 204px;
     box-sizing: border-box; padding: 0; overflow: visible;
     transition: width .32s cubic-bezier(.22, 1, .36, 1), height .32s cubic-bezier(.22, 1, .36, 1), border-radius .32s cubic-bezier(.22, 1, .36, 1);
   }
   .contact-rail__label { display: none; }
-  .contact-rail--project .contact-rail__action {
+  .contact-rail--project .contact-rail__action,
+  .contact-rail--home .contact-rail__action {
     position: absolute; left: 6px;
     transition: top .32s cubic-bezier(.22, 1, .36, 1), transform .28s cubic-bezier(.22, 1, .36, 1), opacity .18s ease-out, visibility 0s, color .16s ease-out;
   }
@@ -78,7 +80,8 @@
   .contact-rail--compact .contact-rail__action:nth-of-type(3) { top: 88px; }
   .contact-rail--compact .contact-rail__action:nth-of-type(4) { top: 136px; }
   .contact-rail--compact .contact-rail__action:nth-of-type(5) { top: 184px; }
-  .contact-rail--project .contact-rail__toggle {
+  .contact-rail--project .contact-rail__toggle,
+  .contact-rail--home .contact-rail__toggle {
     position: absolute; left: 6px; top: 8px; display: grid; place-items: center;
     width: 44px; height: 28px; border: 0; padding: 0; background: transparent; color: inherit; cursor: pointer;
     opacity: 0; pointer-events: none;
@@ -146,7 +149,9 @@
 .contact-rail { transition: opacity .2s ease-out, visibility 0s; }
 .contact-rail--hidden { opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .2s ease-out, visibility 0s .2s; }
 @media (max-width: 767px) {
-  .contact-rail--project { transition: width .32s cubic-bezier(.22, 1, .36, 1), height .32s cubic-bezier(.22, 1, .36, 1), border-radius .32s cubic-bezier(.22, 1, .36, 1), opacity .2s ease-out, visibility 0s; }
-  .contact-rail--project.contact-rail--hidden { transition: width .32s cubic-bezier(.22, 1, .36, 1), height .32s cubic-bezier(.22, 1, .36, 1), border-radius .32s cubic-bezier(.22, 1, .36, 1), opacity .2s ease-out, visibility 0s .2s; }
+  .contact-rail--project,
+  .contact-rail--home { transition: width .32s cubic-bezier(.22, 1, .36, 1), height .32s cubic-bezier(.22, 1, .36, 1), border-radius .32s cubic-bezier(.22, 1, .36, 1), opacity .2s ease-out, visibility 0s; }
+  .contact-rail--project.contact-rail--hidden,
+  .contact-rail--home.contact-rail--hidden { transition: width .32s cubic-bezier(.22, 1, .36, 1), height .32s cubic-bezier(.22, 1, .36, 1), border-radius .32s cubic-bezier(.22, 1, .36, 1), opacity .2s ease-out, visibility 0s .2s; }
 }
-@media (prefers-reduced-motion: reduce) { .contact-rail, .contact-rail--project, .contact-rail--hidden, .contact-rail--project.contact-rail--hidden { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .contact-rail, .contact-rail--project, .contact-rail--home, .contact-rail--hidden, .contact-rail--project.contact-rail--hidden, .contact-rail--home.contact-rail--hidden { transition: none; } }
