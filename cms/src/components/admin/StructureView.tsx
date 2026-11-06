@@ -10,7 +10,7 @@ import { PricesTable, type PriceTableRow } from './PricesTable'
 import { IntegrationsPanel } from './IntegrationsPanel'
 import { deliveryIsEnabled, fallbackRoistatConnectedAt, fallbackRoistatProjectId, normalizeRoistatCounters, roistatWebhookAddress } from '../../config/lead-adapters'
 import { fallbackMetricaCounterId, normalizeMapsApiKey, normalizeMetricaCounterId } from '../../config/yandex'
-import { messengerPanelValues, type MessengerSettings } from '../../../src/lib/messengers'
+import { messengerPanelValues, type MessengerSettings } from '../../../../src/lib/messengers'
 import { isPriceKind, summaryConfiguration, type PriceKind } from '../../config/price-kinds'
 import { countProjectLeads } from '../../config/catalog-lead-counts'
 
