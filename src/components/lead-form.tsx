@@ -34,6 +34,7 @@ export function LeadForm({
   actionChannel,
   variant = 'page',
   compact = false,
+  nameLabel,
   withMessage = false,
   meta,
   active = true,
@@ -63,6 +64,8 @@ export function LeadForm({
    * уже прочитав условия, вопросы задаст по телефону.
    */
   compact?: boolean
+  /** Подпись поля имени. По умолчанию «Имя». */
+  nameLabel?: string
   /** Поле «Сообщение» только у вопроса в шапке и у формы в блоке контактов. */
   withMessage?: boolean
   /**
@@ -165,7 +168,7 @@ export function LeadForm({
       )}
       {children}
       <label>
-        {copy.name}
+        {nameLabel || copy.name}
         <input
           name="name"
           {...noAutofillFieldProps}
