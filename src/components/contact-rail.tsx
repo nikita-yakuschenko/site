@@ -148,7 +148,7 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
         const social = FOOTER_SOCIALS.find(entry => entry.id === item.id)!
         return <button key={item.id} type="button" className="contact-rail__action" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label={item.label} onClick={() => setDialog(item.id)}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img className="contact-rail__logo contact-rail__logo--light" src={item.id === 'telegram' ? '/social/tg_rail_light.svg' : social.light} width={24} height={24} alt="" />
+          <img className="contact-rail__logo contact-rail__logo--light" src={social.light} width={24} height={24} alt="" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="contact-rail__logo contact-rail__logo--original" src={social.original} width={24} height={24} alt="" />
           <span className="contact-rail__label">{item.label}</span>
