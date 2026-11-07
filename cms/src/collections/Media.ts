@@ -1,5 +1,6 @@
-import type { Access, CollectionConfig, PayloadRequest } from 'payload'
+import type { Access, CollectionConfig, Endpoint, PayloadRequest } from 'payload'
 import { authenticated, contentManager, contentWriter } from '../access/staff'
+import { mediaFitResponse } from '../config/media-fit'
 
 // Имя файла без расширения. Пустые название и alt не должны блокировать сохранение.
 function labelFromFilename(filename?: string | null) {
@@ -62,6 +63,14 @@ async function loadPublicMediaIds(req: PayloadRequest): Promise<number[]> {
   return [...projectMedia, ...storyMedia, ...blockMedia].filter((id): id is number => typeof id === 'number')
 }
 
+function mediaFitEndpoint(directory: string): Endpoint {
+  return {
+    path: '/fit/:width/:filename',
+    method: 'get',
+    handler: req => mediaFitResponse(directory, String(req.routeParams?.width ?? ''), String(req.routeParams?.filename ?? '')),
+  }
+}
+
 export function createMedia({ directory, uploadsEnabled }: { directory: string; uploadsEnabled: boolean }): CollectionConfig {
   return {
     slug: 'media',
@@ -74,6 +83,7 @@ export function createMedia({ directory, uploadsEnabled }: { directory: string; 
       update: uploadsEnabled ? contentWriter : () => false,
       delete: uploadsEnabled ? contentManager : () => false,
     },
+    endpoints: [mediaFitEndpoint(directory)],
     upload: {
       staticDir: directory,
       mimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/avif', 'video/mp4', 'video/webm', 'video/quicktime'],
