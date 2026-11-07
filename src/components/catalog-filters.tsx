@@ -5,6 +5,7 @@ import { IconArrowsSort, IconCheck, IconHeart, IconX } from "@tabler/icons-react
 import * as Popover from "@radix-ui/react-popover";
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectItem } from "./ui/select";
 import { RangeSlider } from "./range-slider";
+import { useReadyHouses } from "./catalog-availability";
 import { filtersToHref, type CatalogFacets } from "../lib/catalog/filters";
 import type { CatalogFilters, Range } from "../lib/catalog/types";
 import { TECHNOLOGY_OPTIONS, type CatalogTechnology } from "../lib/catalog/types";
@@ -159,6 +160,7 @@ export function CatalogFilters({
      адрес отстаёт на паузу, и без этого ручка дёргалась бы назад. */
   const [draftArea, setDraftArea] = useState<[number, number] | null>(null);
   const [draftPrice, setDraftPrice] = useState<[number, number] | null>(null);
+  const hasReadyHouses = useReadyHouses();
   const timerRef = changeTimerRef;
 
   /* Адрес сменился, значит черновик ползунка устарел. Сверяем прямо в
@@ -342,7 +344,7 @@ export function CatalogFilters({
             попадает, потому что лежит в localStorage и у каждого своё. */}
         {!mobile && <div className="cfilter__group cfilter__group--fav">{favoriteControl()}</div>}
 
-        <fieldset className="cfilter__group">
+        {hasReadyHouses ? <fieldset className="cfilter__group">
           <legend className="visually-hidden">Статус</legend>
           <div className="cfilter__checks">
             <label className="cfilter__check">
@@ -359,7 +361,7 @@ export function CatalogFilters({
               Готовый дом в продаже
             </label>
           </div>
-        </fieldset>
+        </fieldset> : null}
 
         </div>
 
