@@ -43,8 +43,31 @@ export const metadata: Metadata = {
     icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
     shortcut: '/favicon.svg',
   },
-  openGraph: { locale: OG_LOCALE, title: copy.seoTitle },
+  openGraph: {
+    locale: OG_LOCALE,
+    title: copy.seoTitle,
+    description: copy.seoDescription,
+    url: 'https://avgst.ru',
+    siteName: SITE.name,
+    images: [{ url: 'https://avgst.ru/img/og.jpg', width: 1200, height: 630, alt: 'Дом Авангард Строй' }],
+  },
+  twitter: { card: 'summary_large_image', images: ['https://avgst.ru/img/og.jpg'] },
   robots: { index: true, follow: true },
+}
+
+const organization = {
+  '@context': 'https://schema.org',
+  '@type': 'Organization',
+  name: SITE.name,
+  url: 'https://avgst.ru',
+  telephone: SITE.contacts.phone,
+  email: SITE.contacts.email,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: SITE.contacts.address,
+    addressLocality: copy.regionNn,
+    addressCountry: 'RU',
+  },
 }
 
 export const viewport: Viewport = {
@@ -91,6 +114,10 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             dangerouslySetInnerHTML={{ __html: metricaBootstrapScript(counter) }}
           />
         ) : null}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(organization).replace(/</g, '\\u003c') }}
+        />
       </head>
       <body suppressHydrationWarning>
         {/* Пиксель и SPA-hit сразу в начале body — не после каталога. */}

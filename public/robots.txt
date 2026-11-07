@@ -1,4 +1,4 @@
-# Публичные страницы new.avgst.ru открыты для индексации.
+# Публичные страницы avgst.ru открыты для индексации.
 # Служебные адреса в выдачу не пускаем.
 User-agent: *
 Allow: /
@@ -6,3 +6,5 @@ Allow: /
 Disallow: /api/
 Disallow: /preview/
 Disallow: /cms-preview/
+
+Sitemap: https://avgst.ru/sitemap.xml
