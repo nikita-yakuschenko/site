@@ -824,6 +824,27 @@ export interface Project {
       }[]
     | null;
   priceAmount?: number | null;
+  partnerCabinet?: {
+    lengthM?: number | null;
+    widthM?: number | null;
+    passportUrl?: string | null;
+    passportNote?: string | null;
+    specUrl?: string | null;
+    specNote?: string | null;
+    planUrl?: string | null;
+    planNote?: string | null;
+    manualUrl?: string | null;
+    manualNote?: string | null;
+    cargoModules?: string | null;
+    cargoDimensions?: string | null;
+    cargoWeight?: string | null;
+    cargoPacking?: string | null;
+    transportMethod?: string | null;
+    transportLead?: string | null;
+    transportDelivery?: string | null;
+    transportUnloading?: string | null;
+    transportMounting?: string | null;
+  };
   options?:
     | {
         key: string;
@@ -2002,6 +2023,29 @@ export interface ProjectsSelect<T extends boolean = true> {
         id?: T;
       };
   priceAmount?: T;
+  partnerCabinet?:
+    | T
+    | {
+        lengthM?: T;
+        widthM?: T;
+        passportUrl?: T;
+        passportNote?: T;
+        specUrl?: T;
+        specNote?: T;
+        planUrl?: T;
+        planNote?: T;
+        manualUrl?: T;
+        manualNote?: T;
+        cargoModules?: T;
+        cargoDimensions?: T;
+        cargoWeight?: T;
+        cargoPacking?: T;
+        transportMethod?: T;
+        transportLead?: T;
+        transportDelivery?: T;
+        transportUnloading?: T;
+        transportMounting?: T;
+      };
   options?:
     | T
     | {

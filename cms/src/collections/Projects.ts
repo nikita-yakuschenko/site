@@ -18,6 +18,7 @@ import { projectNextStepsEndpoint } from './project-next-steps-endpoint'
 import { projectConfigurationsEndpoint } from './project-configurations-endpoint'
 import { projectYmlEndpoint, projectYmlOptionsEndpoint } from './project-yml-endpoint'
 import { projectCatalogEndpoint } from './project-catalog-endpoint'
+import { projectPartnerCabinetEndpoint } from './project-partner-cabinet-endpoint'
 import { projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint } from './project-reactions-endpoint'
 import { normalizeConfigurations } from '../config/project-configurations'
 import { configurationKeys, isModularTechnology } from '../../../src/lib/catalog/configuration-rules'
@@ -44,7 +45,7 @@ export const Projects: CollectionConfig = {
   disableDuplicate: true,
   versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
-  endpoints: [projectCopyEndpoint, ...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectYmlOptionsEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
+  endpoints: [projectCopyEndpoint, ...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectPartnerCabinetEndpoint, projectYmlOptionsEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
   hooks: { afterChange: [({ doc }) => { clearPublicMediaCache(); return doc }], afterDelete: [({ doc }) => { clearPublicMediaCache(); return doc }], beforeDelete: [async ({ id, req }) => {
     // Price rows require a project, so they go first
     await req.payload.delete({ collection: 'project-prices', where: { project: { equals: id } }, req, overrideAccess: true })
@@ -223,6 +224,31 @@ export const Projects: CollectionConfig = {
     ] },
     { type: 'collapsible', label: 'Цены', admin: { className: 'project-prices-section', initCollapsed: true, condition: data => data.recordType !== 'ready-home' }, fields: [
       { name: 'pricesEditor', type: 'ui', admin: { components: { Field: './components/admin/ProjectPricesEditor#ProjectPricesEditor' } } },
+    ] },
+    { type: 'collapsible', label: 'Партнёрский кабинет', admin: { initCollapsed: true, condition: data => data.recordType !== 'ready-home' }, fields: [
+      { name: 'partnerCabinet', label: false, type: 'group', fields: [
+        { type: 'row', fields: [
+          { name: 'lengthM', label: 'Длина, м', type: 'number', min: 0, admin: { width: '50%', description: 'Необязательно. На сайт не выводится.' } },
+          { name: 'widthM', label: 'Ширина, м', type: 'number', min: 0, admin: { width: '50%', description: 'Необязательно. На сайт не выводится.' } },
+        ] },
+        { name: 'passportUrl', label: 'Паспорт: ссылка', type: 'text' },
+        { name: 'passportNote', label: 'Паспорт: примечание', type: 'text' },
+        { name: 'specUrl', label: 'Спецификация: ссылка', type: 'text' },
+        { name: 'specNote', label: 'Спецификация: примечание', type: 'text' },
+        { name: 'planUrl', label: 'Планировочное решение: ссылка', type: 'text' },
+        { name: 'planNote', label: 'Планировочное решение: примечание', type: 'text' },
+        { name: 'manualUrl', label: 'Инструкция по монтажу: ссылка', type: 'text' },
+        { name: 'manualNote', label: 'Инструкция по монтажу: примечание', type: 'text' },
+        { name: 'cargoModules', label: 'Состав отгрузки', type: 'textarea' },
+        { name: 'cargoDimensions', label: 'Габариты упаковки', type: 'textarea' },
+        { name: 'cargoWeight', label: 'Масса', type: 'textarea' },
+        { name: 'cargoPacking', label: 'Упаковка', type: 'textarea' },
+        { name: 'transportMethod', label: 'Способ доставки', type: 'text' },
+        { name: 'transportLead', label: 'Сроки', type: 'textarea' },
+        { name: 'transportDelivery', label: 'Доставка', type: 'textarea' },
+        { name: 'transportUnloading', label: 'Разгрузка', type: 'textarea' },
+        { name: 'transportMounting', label: 'Монтаж', type: 'textarea' },
+      ] },
     ] },
     { type: 'collapsible', label: 'Готовый дом — условия продажи', admin: { initCollapsed: true, condition: data => data.recordType === 'ready-home' }, fields: [
       focus('ReadyHomeOffer', 'Условия продажи готового дома'),

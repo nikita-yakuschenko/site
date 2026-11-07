@@ -30,4 +30,5 @@ export const requiredMigrations = [
   '20261026_220000_frame_copy',
   '20261027_090000_request_limits',
   '20261106_100000_messenger_settings',
+  '20261107_200000_partner_cabinet',
 ]
