@@ -16,5 +16,7 @@ test('frame comparison uses independent construction and cumulative preparation 
  assert.equal(find('wallsFinish').values.standard?.status,'excluded')
  assert.equal(find('wallsFinish').values.project?.status,'included')
  assert.equal(hasDifferences(find('frame'),frameMatrix.packageIds),false)
- assert.doesNotMatch(JSON.stringify(frameMatrix),/панел|Rehau|OSB-3|доставк|50 км|ламинат|террас/i)
+ assert.doesNotMatch(JSON.stringify(frameMatrix),/панел|Rehau|OSB-3|доставк|50 км|ламинат/i)
+ assert.equal(rows.some(row=>row.id==='terrace'),false)
+ assert.match(find('facade').info.technicalFacts.join(' '),/Терраса.*по базовому регламенту в стоимость не входит/)
 })
