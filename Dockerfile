@@ -28,6 +28,10 @@ RUN addgroup -g 1001 -S nodejs && adduser -S nextjs -u 1001
 COPY --from=builder /app/public-runtime ./public
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder /app/src ./src
+COPY --from=builder /app/passports ./passports
+COPY --from=builder /app/node_modules/geist/dist/fonts/geist-sans ./node_modules/geist/dist/fonts/geist-sans
+COPY --from=builder /app/public/logo.svg /app/public/logo_lg.svg ./public/
 
 USER nextjs
 EXPOSE 3000

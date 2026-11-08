@@ -30,3 +30,8 @@ diagnostics-results/
 public/generated/webp/
 public/generated/imports/
 public-runtime/
+
+# Local passport cache and render intermediates
+.local/
+output/
+local-cms-migrate.log

@@ -7,6 +7,7 @@ import { isProjectHeroData, type ProjectHeroData } from '../lib/catalog/project-
 import { preload } from 'react-dom'
 import { optimizedSrc, optimizedSrcSet } from '../lib/media'
 import { LeadDialog } from './lead-dialog'
+import { ProjectPassportConcept } from './project-passport-concept'
 
 export function ProjectHeroContent({ data, connected, location, payment }: { data: ProjectHeroData; connected: boolean; location?: string; payment: ReactNode }) {
   const [draft, setDraft] = useState<ProjectHeroData | null>(null)
@@ -45,6 +46,7 @@ export function ProjectHeroContent({ data, connected, location, payment }: { dat
       {imageUrl && <img src={optimizedSrc(imageUrl, 1920)} srcSet={desktopSet || undefined} sizes="100vw" alt={hero.name} decoding="async" fetchPriority="high" onError={() => setBrokenImage(imageUrl)} ref={(el) => { if (el?.complete && el.naturalWidth === 0) setBrokenImage(imageUrl) }} />}
     </picture>
     <div className="project-hero__veil" />
+    {(process.env.PASSPORT_ENABLED === '1' || process.env.NEXT_PUBLIC_PASSPORT_CONCEPT === '1') && <ProjectPassportConcept key={hero.slug} project={hero.name} projectSlug={hero.slug} />}
     <div className="project-hero__stage">
       <div className="project-hero__intro" data-cms-block="projectHero.heading"><div className="project-hero__heading">
         <div className="project-hero__labels"><p className="project-hero__badge">{hero.technologyBadge}</p>{location && <p className="project-hero__location">В {location}</p>}</div>

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="ru"><head><meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; font-src data:; style-src 'unsafe-inline'; script-src 'none'">
+<title>{{ d.project.name }} · {{ d.region.name }}</title>
+<style>
+{% for font in fonts %}@font-face{font-family:Geist;src:url('{{ font.uri }}') format('woff2');font-style:normal;font-weight:{{font.weight}};font-display:block}{% endfor %}
+{% include 'passport.css' %}
+</style></head><body>
+{% macro footer(n) %}<footer><span>Авангард Строй · {{ d.project.name }}</span><span>{{d.region.name}} · {{d.contacts.updatedAt}}</span><span>{{n}} / {{page_count}}</span></footer>{% endmacro %}
+{% macro project_qr() %}<a class="qr-link" href="{{d.project.url}}"><span>Страница<br>проекта</span><img class="qr" src="{{qr}}" alt="QR"></a>{% endmacro %}
+<section class="page cover"><img class="cover-background" src="{{d.project.heroImage}}" alt=""><div class="content">
+ <header><div class="brand"><img src="{{logo}}" alt="Авангард Строй"></div><span>{{d.region.name}}</span></header>
+ <div class="cover-grid"><div class="cover-copy"><h1>{{d.project.name|project_heading}}</h1><p class="technology">{{d.project.technologyLabel|default(d.project.technology)}}</p>
+
+
+ </div><div class="cover-bar"> <dl class="facts"><div><dt>Общая площадь</dt><dd>{{d.project.areaLabel}}</dd></div><div><dt>Этажность</dt><dd>{{d.project.floorsLabel}}</dd></div><div><dt>Спальни</dt><dd>{{d.project.bedroomsLabel}}</dd></div><div><dt>Санузлы</dt><dd>{{d.project.bathroomsLabel}}</dd></div></dl> {% if d.pricing.mortgagePaymentLabel %}<div class="payment"><span>В ипотеку от</span><strong>{{d.pricing.mortgagePaymentLabel}}</strong></div>{% else %}{% endif %}</div><div class="cover-qr">{{project_qr()}}</div><div class="hero"><img src="{{d.project.heroImage}}" alt="{{d.project.name}}"></div></div>
+</div>{{footer(1)}}</section>
+{% for variant in d.plans %}<section class="page planning"><div class="content">
+ <header><h2>Планировка</h2>{% if d.plans|length > 1 %}<span>{{variant.name}}</span>{% endif %}</header>
+ <div class="floors floors-{{variant.floors|length}}">{% for floor in variant.floors %}<article class="floor"><h3>{{floor.name}}</h3><div class="floor-body"><div class="drawing"><img class="plan-image" src="{{floor.image}}" alt="{{floor.name}}"></div>
+ <table class="rooms"><thead><tr><th>Помещение</th><th>Площадь</th></tr></thead><tbody>{% for room in floor.rooms %}<tr><td>{{room.name}}</td><td>{{room.areaLabel}}</td></tr>{% endfor %}</tbody></table></div></article>{% endfor %}</div>
+ </div>{{footer(loop.index+1)}}</section>{% endfor %}
+<section class="page comparison"><div class="content"><header><h2>Комплектации</h2><span>{{d.project.name}} · {{d.region.name}}</span></header>
+ <table class="matrix"><thead><tr><th>Элемент дома</th>{% for tier in d.pricing.tiers %}<th><span class="tier-name">{{tier.name}}</span><div class="tier-offer"><span class="offer-label">{% if tier.special %}Специальная цена:{% else %}Цена:{% endif %}</span><strong class="tier-price">{{tier.priceLabel}}</strong></div>{% if tier.mortgagePaymentLabel|default(none) %}<div class="tier-offer"><span class="offer-label">В ипотеку:</span><strong class="tier-payment">от {{tier.mortgagePaymentLabel.replace('/мес.', '/месяц')}}</strong></div>{% endif %}</th>{% endfor %}</tr></thead><tbody>
+ {% set ns=namespace(section='') %}{% for row in d.comparison.rows %}{% if row.section|default('') and row.section!=ns.section %}<tr class="matrix-section"><th colspan="4">{{row.section}}</th></tr>{% set ns.section=row.section %}{% endif %}
+ <tr data-row-id="{{row.id}}"><th scope="row">{{row.label}}</th>{% if row.groups %}{% for cell in row.groups %}<td data-status="{{cell.status}}" colspan="{{cell.span}}"><div class="cell-status"><svg viewBox="0 0 24 24">{% if cell.status=='included' %}<path d="m5 12 4 4L19 6"/>{% else %}<path d="M5 12h14"/>{% endif %}</svg><span>{{cell.label}}</span></div>{% if cell.details %}<ul class="cell-details">{% for fact in cell.details %}<li>{{fact}}</li>{% endfor %}</ul>{% endif %}</td>{% endfor %}{% else %}{% for value in row['values'] %}<td>{{value}}</td>{% endfor %}{% endif %}</tr>{% endfor %}
+ </tbody></table>
+</div>{{footer(page_count-1)}}</section>
+<section class="page contacts"><div class="content"><header><div class="brand"><img src="{{logo}}" alt="Авангард Строй"></div><span>{{d.region.name}}</span></header>
+ <div class="contacts-grid"><div><h2>{{d.contacts.company}}</h2><p class="about">{{d.contacts.about}}</p>
+ <dl class="contact-list"><div><dt>Телефон</dt><dd><a href="{{d.contacts.phoneHref}}">{{d.contacts.phone}}</a></dd></div><div><dt>Электронная почта</dt><dd><a href="mailto:{{d.contacts.email}}">{{d.contacts.email}}</a></dd></div><div><dt>Офис</dt><dd>{{d.contacts.address}}</dd></div><div><dt>Сайт</dt><dd><a href="{{d.contacts.website}}">{{d.contacts.website}}</a></dd></div></dl>
+ <div class="socials">{% for social in d.contacts.socials %}<a class="social-card" href="{{social.href}}"><img src="{{social.icon}}" alt="{{social.label}}"><span>{{social.printUrl}}</span></a>{% endfor %}</div></div>
+ <aside><h3>{{d.project.name}}</h3>{{project_qr()}}<p>Актуально на {{d.contacts.updatedAt}}</p></aside></div><p class="legal">{{d.contacts.legal}}</p>
+</div>{{footer(page_count)}}</section>
+</body></html>

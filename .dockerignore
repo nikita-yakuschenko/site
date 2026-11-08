@@ -1,6 +1,10 @@
 node_modules
 public-runtime
 .next
+.local
+passports/.venv
+passports/.browsers
+**/__pycache__
 build
 output
 diagnostics-results
