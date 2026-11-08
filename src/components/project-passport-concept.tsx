@@ -178,11 +178,11 @@ export function ProjectPassportConcept({ project, projectSlug }: { project: stri
         <span className="passport-concept__success-check"><IconCheck size={20} stroke={2.2} aria-hidden="true" /></span>
       </div>}
     </div>}
-    <aside className="passport-concept-tools" aria-label="Управление прототипом анимации">
+    {process.env.NODE_ENV === 'development' && <aside className="passport-concept-tools" aria-label="Управление прототипом анимации">
       <span>PDF · прототип</span>
       <button type="button" onClick={replay}><IconPlayerPlay size={14} aria-hidden="true" />Повторить</button>
       <label><input type="checkbox" checked={slow} onChange={event => { setSlow(event.target.checked); replay(); }} />Замедлить ×3</label>
-    </aside>
+    </aside>}
 
   </>;
 }

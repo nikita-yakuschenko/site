@@ -3,12 +3,15 @@ import { readyPassport } from '../../../lib/passports/service'
 import { passportToken } from '../../../lib/passports/access'
 import { validRegion, validSlug } from '../../../lib/passports/storage'
 import { randomBytes } from 'node:crypto'
+import { allowLeadAttempt } from '../../../lib/leads'
 
 function enabled() { return process.env.PASSPORT_ENABLED === '1' }
 export async function POST(request: Request) {
   if (!enabled()) return new Response(null, { status: 404 })
   const input = await request.json().catch(() => null)
-  if (!input || typeof input.phone !== 'string' || !isValidRuMobile(input.phone) || typeof input.slug !== 'string' || !validSlug(input.slug) || !validRegion(input.region)) return Response.json({ error: 'invalid-input' }, { status: 400 })
+  if (!input || typeof input.phone !== 'string' || !isValidRuMobile(input.phone) || typeof input.slug !== 'string' || !validSlug(input.slug) || !validRegion(input.region) || !/^[a-f0-9-]{36}$/.test(input.requestId || '')) return Response.json({ error: 'invalid-input' }, { status: 400 })
+  const address = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
+  if (!allowLeadAttempt(`passport:${address}`, 10)) return Response.json({ error: 'too-many-requests' }, { status: 429 })
   try {
     const document = await readyPassport(input.slug, input.region)
     if (!document.ready) return Response.json({ error: 'passport-preparing' }, { status: 503, headers: { 'Retry-After': '15' } })
