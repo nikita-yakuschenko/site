@@ -1,4 +1,13 @@
 () => {
+  // Equal image/room baselines must also accommodate long room schedules.
+  for (const floors of document.querySelectorAll('.floors-2')) {
+    const bodies = [...floors.querySelectorAll('.floor-body')];
+    const roomHeight = Math.max(...bodies.map(b => b.querySelector('.rooms').getBoundingClientRect().height));
+    const available = Math.min(...bodies.map(b => b.getBoundingClientRect().height));
+    const gap = parseFloat(getComputedStyle(bodies[0]).rowGap) || 0;
+    const imageHeight = Math.max(80, available - roomHeight - gap - 2);
+    bodies.forEach(b => b.style.gridTemplateRows = `${imageHeight}px auto`);
+  }
   const source = document.querySelector('.comparison');
   const original = [...source.querySelectorAll('tbody tr')];
   const groups = [];
