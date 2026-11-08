@@ -167,7 +167,7 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
 
 function RailLead({ dialog, pageId, links, onClose }: { dialog: RailDialog; pageId: string; links: MessengerLinks; onClose: () => void }) {
   if (dialog === 'callback') {
-    return <LeadDialog heading="Перезвоните мне" body="Оставьте номер телефона — мы перезвоним." submitLabel="Жду звонка" successText="Заявка принята. Перезвоним вам." formId="contact-rail-callback" pageId={pageId} meta={{ contactSource: 'contact-rail', channel: 'phone' }} onClose={onClose} />
+    return <LeadDialog phoneOnly heading="Перезвоните мне" body="Оставьте номер телефона — мы перезвоним." submitLabel="Жду звонка" successText="Заявка принята. Перезвоним вам." formId="contact-rail-callback" pageId={pageId} meta={{ contactSource: 'contact-rail', channel: 'phone' }} onClose={onClose} />
   }
   const messenger = channels(links).find(item => item.id === dialog)!
   const successText = 'Заявка принята. Напишите нам первыми — так мы сразу поймём, что это вы.'

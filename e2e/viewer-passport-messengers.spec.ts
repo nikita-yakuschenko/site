@@ -80,8 +80,12 @@ for (const width of [359, 1440]) {
       await dialog.locator('.ask-dialog__close').click()
     }
     await page.getByRole('button', { name: 'Перезвоните мне', exact: true }).click()
-    await expect(page.locator('.ask-dialog input[name="name"]')).toHaveCount(1)
+    await expect(page.locator('.ask-dialog input[name="name"]')).toHaveCount(0)
     await expect(page.locator('.messenger-form')).toHaveCount(0)
+    await page.locator('.ask-dialog input[name="phone"]').fill('89990000000')
+    await page.getByRole('button', { name: 'Жду звонка', exact: true }).click()
+    await expect.poll(() => submissions.length).toBe(4)
+    expect(submissions[3]?.name).toBe('Перезвоните мне')
     await page.locator('.ask-dialog__close').click()
   })
 }

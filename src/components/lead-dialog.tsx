@@ -31,6 +31,7 @@ export function LeadDialog({
   actionLabel,
   actionChannel,
   messengerTheme,
+  phoneOnly = false,
   pageId,
   formId = "consultation-dialog",
   withMessage = false,
@@ -46,6 +47,7 @@ export function LeadDialog({
   actionLabel?: string;
   actionChannel?: 'max' | 'telegram' | 'whatsapp';
   messengerTheme?: 'max' | 'telegram' | 'whatsapp';
+  phoneOnly?: boolean;
   /** Откуда пришла заявка: страница сама себя и называет. */
   pageId?: string;
   formId?: string;
@@ -130,7 +132,7 @@ export function LeadDialog({
           <IconX size={18} stroke={2.2} />
         </button>
         {messengerTheme && <MessengerFormArtwork channel={messengerTheme} />}
-        <LeadForm phoneOnly={Boolean(messengerTheme)} formId={formId}
+        <LeadForm phoneOnly={phoneOnly || Boolean(messengerTheme)} formId={formId}
           siteId={SITE.id}
           pageId={pageId}
           variant="card"
