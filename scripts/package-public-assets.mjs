@@ -1,4 +1,4 @@
-import { access, cp, mkdir, readFile } from 'node:fs/promises'
+import { access, cp, mkdir, readFile, rm } from 'node:fs/promises'
 import path from 'node:path'
 
 // Used only by Docker's disposable builder. Source files in the repository stay intact.
@@ -17,3 +17,7 @@ await cp(source, target, {
   filter: file => file !== path.join(source, 'generated', 'imports') && !Object.hasOwn(manifest, '/' + path.relative(source, file).split(path.sep).join('/')),
 })
 console.log(`Packaged public assets; ${Object.keys(manifest).length} converted source files omitted from runtime`)
+// Dynamic server-side passport file checks make Next trace public originals.
+// The runner receives public-runtime explicitly; keeping traced originals would
+// ship all source photos a second time and overlay them back into /app/public.
+await rm(path.join(root, '.next', 'standalone', 'public'), { recursive: true, force: true })

@@ -33,7 +33,13 @@ test('stored assets are WebP, preserve alpha, reuse existing output and leave so
     const modified = (await stat(photo)).mtimeMs
     assert.deepEqual(await prepareWebpAssets(root), manifest)
     assert.equal((await stat(photo)).mtimeMs, modified)
+    await mkdir(path.join(root, '.next', 'standalone', 'public'), { recursive: true })
+    await writeFile(path.join(root, '.next', 'standalone', 'public', 'traced-original.jpg'), jpeg)
+    await writeFile(path.join(root, '.next', 'standalone', 'server.js'), 'server')
     execFileSync(process.execPath, [fileURLToPath(new URL('../package-public-assets.mjs', import.meta.url))], { cwd: root })
+    await assert.rejects(stat(path.join(root, '.next', 'standalone', 'public')), { code: 'ENOENT' })
+    assert.equal(await readFile(path.join(root, '.next', 'standalone', 'server.js'), 'utf8'), 'server')
+    assert.deepEqual(await readFile(path.join(root, 'public', 'images', 'photo.jpg')), jpeg)
     await assert.rejects(stat(path.join(root, 'public-runtime', 'images', 'photo.jpg')), { code: 'ENOENT' })
     await assert.rejects(stat(path.join(root, 'public-runtime', 'generated', 'imports')), { code: 'ENOENT' })
     assert.equal((await sharp(await readFile(path.join(root, 'public-runtime', manifest['/images/photo.jpg']))).metadata()).format, 'webp')
