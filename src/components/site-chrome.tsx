@@ -1,7 +1,8 @@
 "use client";
 import { useRegionCode } from "./region-bootstrap";
 import { CMSContentBlock } from './cms-content'
-import { useReadyHouses } from './catalog-availability'
+import { useCatalogCollections, useReadyHouses } from './catalog-availability'
+import { collectionHref } from '../lib/catalog/collection'
 import { TrackedPhone } from './tracked-phone'
 
 import {
@@ -74,6 +75,11 @@ type NavItem = { label?: string | null; href?: string | null };
 function HeaderNavLink({ available, ...props }: ComponentProps<typeof Link> & { available: boolean }) {
   return available ? <Link {...props} /> : null
 }
+function CatalogCollectionLink({ collection, ...props }: ComponentProps<typeof Link> & { collection: string }) {
+  const collections = useCatalogCollections()
+  return collections.includes(collection) ? <Link {...props} href={collectionHref(collection)} /> : null
+}
+
 type MediaLike = { url?: string | null } | number | string | null | undefined;
 
 /**
@@ -478,10 +484,10 @@ export function SiteChrome({
               <h3>{copy.catalogFooter}</h3>
               <nav className="footer-nav" aria-label={copy.catalogFooter}>
                 <Link href="/catalog">{copy.catalog}</Link>
-                <Link href="/catalog?series=modular">{copy.seriesModular}</Link>
-                <Link href="/catalog?series=panel">{copy.seriesPanel}</Link>
-                <Link href="/catalog?series=barn">{copy.seriesBarn}</Link>
-                <Link href="/catalog?series=aframe">{copy.seriesAframe}</Link>
+                <CatalogCollectionLink collection="modular" href="/catalog?tech=modular">{copy.seriesModular}</CatalogCollectionLink>
+                <CatalogCollectionLink collection="panel" href="/catalog?tech=panel">{copy.seriesPanel}</CatalogCollectionLink>
+                <CatalogCollectionLink collection="barn" href="/catalog?series=barn">{copy.seriesBarn}</CatalogCollectionLink>
+                <CatalogCollectionLink collection="aframe" href="/catalog?series=aframe">{copy.seriesAframe}</CatalogCollectionLink>
               </nav>
             </div>
             <div className="footer-section">
