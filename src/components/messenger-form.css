@@ -1,0 +1,55 @@
+/* One composition for all messenger channels; only their palette and mark vary. */
+.ask-dialog__card.messenger-form {
+  --messenger-top: #5533ee;
+  --messenger-bottom: #2346cc;
+  --messenger-glow: #9933dd;
+  --messenger-secondary: #eceaff;
+  width: min(420px, 100%);
+  isolation: isolate;
+  background: linear-gradient(145deg, var(--messenger-top), var(--messenger-bottom));
+  color: #fff;
+  border-radius: 20px;
+}
+.messenger-form[data-messenger="telegram"] {
+  --messenger-top: #1d93d2;
+  --messenger-bottom: #0867b0;
+  --messenger-glow: #38b0e3;
+  --messenger-secondary: #e4f5ff;
+}
+.messenger-form[data-messenger="whatsapp"] {
+  --messenger-top: #008a63;
+  --messenger-bottom: #075e54;
+  --messenger-glow: #25d366;
+  --messenger-secondary: #e1fff0;
+}
+.messenger-form__art { position: absolute; inset: 0; z-index: -1; overflow: hidden; border-radius: inherit; pointer-events: none; }
+.messenger-form__art::before { content: ''; position: absolute; inset: 0; background: radial-gradient(ellipse at 100% 5%, var(--messenger-glow), transparent 68%); opacity: .8; }
+.messenger-form__mark { position: absolute; top: 28px; left: 28px; width: 44px; height: 44px; color: white; }
+.messenger-form__mark > :is(img, svg), .messenger-form__watermark > :is(img, svg) { display: block; width: 100%; height: 100%; object-fit: contain; }
+.messenger-form__watermark { position: absolute; width: 240px; height: 240px; right: -44px; top: 105px; opacity: .09; color: white; transform: rotate(-12deg); }
+.messenger-form__ribbon { position: absolute; width: 620px; height: 230px; left: -65px; bottom: -130px; border: 1px solid rgb(255 255 255 / .16); border-radius: 50%; transform: rotate(-24deg); background: rgb(255 255 255 / .035); }
+.ask-dialog__card.messenger-form .lead-card { position: relative; padding: 92px 28px 28px; min-height: 0; gap: 22px; color: white; }
+.messenger-form .lead-card__title { padding-right: 0; color: white; font-size: 22px; line-height: 1.25; text-wrap: balance; }
+.messenger-form .lead-card__body { color: var(--messenger-secondary); margin-top: 10px; line-height: 1.5; }
+.messenger-form .lead-card label { color: white; }
+.messenger-form .lead-card input:not([type="checkbox"]) { height: 46px; font-size: 16px; background: rgb(255 255 255 / .13); border-color: rgb(255 255 255 / .65); color: white; border-radius: 12px; }
+.messenger-form .lead-card input::placeholder { color: var(--messenger-secondary); opacity: 1; }
+.ask-dialog__card.messenger-form input:not([type="checkbox"]):focus { border-color: white; box-shadow: 0 0 0 1px rgb(255 255 255 / .2); }
+.messenger-form .lead-card .lead-form__consent { color: var(--messenger-secondary); white-space: normal; align-items: start; line-height: 1.45; }
+.messenger-form .lead-form__consent input[type="checkbox"] { margin-top: 2px; }
+.messenger-form .lead-form__consent-link { color: white; }
+.messenger-form .lead-card__submit { min-height: 44px; }
+.ask-dialog__card.messenger-form .ask-dialog__close { top: 20px; right: 20px; width: 36px; height: 36px; color: white; background: rgb(255 255 255 / .15); }
+.messenger-form .lead-card label:has(.is-invalid) { color: #fff0cf; }
+.messenger-form .lead-card input.is-invalid { border-color: #fff0cf; }
+@media (hover: hover) and (pointer: fine) {
+  .ask-dialog__card.messenger-form .ask-dialog__close:hover { background: rgb(255 255 255 / .25); }
+  .messenger-form .lead-form__consent-link:hover { color: white; text-decoration-thickness: 2px; }
+}
+@media (max-width: 399px) {
+  .ask-dialog__card.messenger-form .lead-card { padding: 84px 22px 24px; gap: 20px; }
+  .messenger-form__mark { top: 24px; left: 22px; width: 40px; height: 40px; }
+  .messenger-form .lead-card__title { font-size: 20px; }
+}
+
+.messenger-form[data-messenger="telegram"] .messenger-form__watermark { opacity: .3; }

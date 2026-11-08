@@ -46,6 +46,7 @@ export function LeadForm({
   variant = 'page',
   compact = false,
   nameLabel,
+  phoneOnly = false,
   withMessage = false,
   meta,
   active = true,
@@ -75,6 +76,8 @@ export function LeadForm({
    * уже прочитав условия, вопросы задаст по телефону.
    */
   compact?: boolean
+  /** Messenger callbacks require only a phone; preserve the intake name contract with the form heading. */
+  phoneOnly?: boolean
   /** Подпись поля имени. По умолчанию «Имя». */
   nameLabel?: string
   /** Поле «Сообщение» только у вопроса в шапке и у формы в блоке контактов. */
@@ -110,10 +113,10 @@ export function LeadForm({
     if (submitting.current || status === 'ok') return
     const form = event.currentTarget
     const data = new FormData(form)
-    const name = sanitizeName(String(data.get('name') || '')).trim()
+    const name = phoneOnly ? heading : sanitizeName(String(data.get('name') || '')).trim()
     const agreed = data.get('consent') === 'on'
     const next: typeof invalid = {}
-    if (!isValidName(name)) next.name = true
+    if (!phoneOnly && !isValidName(name)) next.name = true
     if (!isValidRuMobile(phone)) next.phone = true
     if (!agreed) next.consent = true
     setInvalid(next)
@@ -179,7 +182,7 @@ export function LeadForm({
         </div>
       )}
       {children}
-      <label>
+      {!phoneOnly && <label>
         {nameLabel || copy.name}
         <input
           name="name"
@@ -205,7 +208,7 @@ export function LeadForm({
             {copy.leadNameInvalid}
           </span>
         ) : null}
-      </label>
+      </label>}
       <label>
         {copy.phone}
         <PhoneInput

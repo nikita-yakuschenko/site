@@ -2,6 +2,8 @@
 
 import { IconX } from '@tabler/icons-react'
 import { useEffect, useId } from 'react'
+import { useViewerClose } from './use-viewer-close';
+import { ViewerPassport } from './viewer-passport';
 import { copy } from '../lib/copy'
 
 /** Модалка с iframe: один хром для обзоров и отзывов. */
@@ -14,11 +16,12 @@ export function VideoLightbox({
   embedSrc: string
   onClose: () => void
 }) {
+  const { closing, close } = useViewerClose(onClose);
   const titleId = useId()
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') close()
     }
     const prev = document.body.style.overflow
     document.body.style.overflow = 'hidden'
@@ -27,7 +30,7 @@ export function VideoLightbox({
       document.body.style.overflow = prev
       window.removeEventListener('keydown', onKey)
     }
-  }, [onClose])
+  }, [close])
 
   return (
     <div
@@ -35,8 +38,9 @@ export function VideoLightbox({
       role="dialog"
       aria-modal="true"
       aria-labelledby={titleId}
-      onClick={onClose}
+      onClick={close}
     >
+      <ViewerPassport active={!closing} />
       <div
         className="factory-video__modal"
         onClick={(event) => event.stopPropagation()}
@@ -47,7 +51,7 @@ export function VideoLightbox({
             type="button"
             className="factory-video__close"
             aria-label={copy.close}
-            onClick={onClose}
+            onClick={close}
           >
             <IconX size={20} stroke={2.2} />
           </button>

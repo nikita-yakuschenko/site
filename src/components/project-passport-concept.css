@@ -234,3 +234,13 @@
 /* Success copy sizes its own capsule; it does not inherit the phone form width. */
 .passport-concept__success { left: 50%; right: auto; width: max-content; max-width: 100%; transform: translateX(-50%); }
 .passport-concept__success-text { flex: 0 1 auto; }
+
+/* A stable header slot keeps the passport clear of gallery gestures and variant tabs. */
+.viewer-passport { position: absolute; inset: 0 0 auto; z-index: 4; height: 0; }
+.passport-concept.passport-concept--viewer { top: max(24px, env(safe-area-inset-top)); z-index: 4; }
+.photo-lightbox:has(> .viewer-passport) { padding-top: max(112px, calc(env(safe-area-inset-top) + 100px)); }
+.lightbox:has(> .viewer-passport) { padding-top: 112px; }
+@media (max-width: 899px) {
+  .passport-concept.passport-concept--viewer { top: max(76px, calc(env(safe-area-inset-top) + 60px)); width: min(286px, calc(100% - 40px)); max-width: calc(100% - 40px); }
+  .photo-lightbox:has(> .viewer-passport), .lightbox:has(> .viewer-passport) { padding-top: max(150px, calc(env(safe-area-inset-top) + 134px)); }
+}

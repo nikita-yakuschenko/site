@@ -171,5 +171,5 @@ function RailLead({ dialog, pageId, links, onClose }: { dialog: RailDialog; page
   }
   const messenger = channels(links).find(item => item.id === dialog)!
   const successText = 'Заявка принята. Напишите нам первыми — так мы сразу поймём, что это вы.'
-  return <LeadDialog heading={`Свяжемся с вами в ${messenger.label}`} body={`Оставьте номер телефона, по которому с Вами можно связаться в ${messenger.label}`} submitLabel="Отправить" successText={successText} actionHref={messenger.href} actionLabel={`Написать в ${messenger.label}`} actionChannel={messenger.id} formId={`contact-rail-${messenger.id}`} pageId={pageId} meta={{ contactSource: 'contact-rail', channel: messenger.id }} onClose={onClose} />
+  return <LeadDialog messengerTheme={messenger.id} heading={`Свяжемся с вами в ${messenger.label}`} body={`Оставьте номер телефона, по которому с Вами можно связаться в ${messenger.label}`} submitLabel="Отправить" successText={successText} actionHref={messenger.href} actionLabel={`Написать в ${messenger.label}`} actionChannel={messenger.id} formId={`contact-rail-${messenger.id}`} pageId={pageId} meta={{ contactSource: 'contact-rail', channel: messenger.id }} onClose={onClose} />
 }

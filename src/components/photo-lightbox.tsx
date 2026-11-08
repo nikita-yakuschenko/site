@@ -7,6 +7,8 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useViewerClose } from './use-viewer-close';
+import { ViewerPassport } from './viewer-passport';
 import { copy } from "../lib/copy";
 import { optimizedSrc } from '../lib/media';
 
@@ -275,6 +277,7 @@ export function PhotoLightbox({
   onIndex: (next: number) => void;
   onClose: () => void;
 }) {
+  const { closing, close } = useViewerClose(onClose);
   const total = images.length;
   const strip = useRef<HTMLDivElement>(null);
   const shot = useRef<HTMLDivElement>(null);
@@ -336,7 +339,7 @@ export function PhotoLightbox({
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") close();
       if (event.key === "ArrowRight") slideTo(1);
       if (event.key === "ArrowLeft") slideTo(-1);
     };
@@ -347,7 +350,7 @@ export function PhotoLightbox({
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
     };
-  }, [slideTo, onClose]);
+  }, [slideTo, close]);
 
   /* Активная миниатюра уезжает за край ленты, если кадры листают
      стрелками: подтягиваем её обратно. */
@@ -368,13 +371,14 @@ export function PhotoLightbox({
       className={`photo-lightbox${backdrop === 'form' ? ' photo-lightbox--form' : ''}`}
       role="dialog"
       aria-modal="true"
-      onClick={onClose}
+      onClick={close}
     >
+      <ViewerPassport active={!closing} />
       <button
         type="button"
         className="photo-lightbox__close"
         aria-label={copy.close}
-        onClick={onClose}
+        onClick={close}
       >
         <IconX size={20} stroke={2.2} />
       </button>

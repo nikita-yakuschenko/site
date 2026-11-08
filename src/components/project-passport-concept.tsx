@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
 import { IconCheck, IconDownload, IconExclamationMark, IconLoader2, IconPlayerPlay } from '@tabler/icons-react';
 import { PhoneInput } from './phone-input';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
@@ -20,8 +20,9 @@ const SUCCESS_MESSAGES = [
   'Вашей мечте пора сбываться',
 ];
 
-/** Local motion study. Local-only lead capture and test-PDF delivery. */
-export function ProjectPassportConcept({ project, projectSlug }: { project: string; projectSlug: string }) {
+/** Shared passport interaction for the project hero and its media viewers. */
+export function ProjectPassportConcept({ project, projectSlug, placement = 'hero', active = true }: { project: string; projectSlug: string; placement?: 'hero' | 'viewer'; active?: boolean }) {
+  const formId = useId();
   const [run, setRun] = useState(0);
   const [slow, setSlow] = useState(false);
   const [ready, setReady] = useState(false);
@@ -51,14 +52,19 @@ export function ProjectPassportConcept({ project, projectSlug }: { project: stri
     return () => cancelAnimationFrame(frame);
   }, [storageKey]);
   useEffect(() => {
+    if (placement === 'viewer') { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
     const image = document.querySelector<HTMLImageElement>('.project-hero__media img');
     if (!image || image.complete) { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
     const loaded = () => setImageReady(true);
     image.addEventListener('load', loaded, { once: true });
     image.addEventListener('error', loaded, { once: true });
     return () => { image.removeEventListener('load', loaded); image.removeEventListener('error', loaded); };
-  }, []);
+  }, [placement]);
   useEffect(() => {
+    if (placement === 'viewer') {
+      const frame = requestAnimationFrame(() => { visibleRef.current = active; setInView(active); if (!active) setOpen(false); });
+      return () => cancelAnimationFrame(frame);
+    }
     const hero = document.querySelector('.project-hero');
     if (!hero) return;
     let visible = false;
@@ -74,7 +80,17 @@ export function ProjectPassportConcept({ project, projectSlug }: { project: stri
     }, { threshold: [0, .8] });
     observer.observe(hero);
     return () => observer.disconnect();
-  }, []);
+  }, [placement, active]);
+  useEffect(() => {
+    const sync = () => {
+      try {
+        const saved = localStorage.getItem(storageKey);
+        if (saved && SUCCESS_MESSAGES.includes(saved)) { completedRef.current = true; setSuccessMessage(saved); setStatus('done'); setDismissed(true); setOpen(false); }
+      } catch { /* Keep the current visit state. */ }
+    };
+    window.addEventListener('avgst:passport-completed', sync);
+    return () => window.removeEventListener('avgst:passport-completed', sync);
+  }, [storageKey]);
   useEffect(() => {
     if (!open) return;
     const outside = (event: PointerEvent) => {
@@ -82,6 +98,7 @@ export function ProjectPassportConcept({ project, projectSlug }: { project: stri
     };
     const escape = (event: KeyboardEvent) => {
       if (event.key !== 'Escape') return;
+      event.stopPropagation();
       setOpen(false);
       requestAnimationFrame(() => containerRef.current?.querySelector<HTMLButtonElement>('button')?.focus({ preventScroll: true }));
     };
@@ -153,23 +170,26 @@ export function ProjectPassportConcept({ project, projectSlug }: { project: stri
       try { window.localStorage.setItem(storageKey, message); } catch { /* Keep in memory. */ }
       setOpen(false);
       setStatus('done');
+      window.dispatchEvent(new Event('avgst:passport-completed'));
+      // Keep the submitting instance visible for its own success interval.
+      setDismissed(!visibleRef.current);
     } catch { await feedbackLap; setStatus('error'); } finally { busy.current = false; }
   }
   function replay() { setOpen(false); setReady(false); setRun(value => value + 1); }
   return <>
-    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className="passport-concept" data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
+    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${placement === 'viewer' ? ' passport-concept--viewer' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
       <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label="Скачать паспорт проекта" onAnimationEnd={event => { if ((event.animationName === 'passport-flight' || event.animationName === 'passport-fade')) setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
         <span className="passport-concept__surface" aria-hidden="true" />
         <span className="passport-concept__label">Скачать паспорт проекта</span>
       </button>
-      <form id={`passport-${projectSlug}`} inert={!open || status === 'done'} aria-hidden={!open || status === 'done'} className="passport-concept__form" data-status={status} onSubmit={send} aria-busy={status === 'sending'}>
+      <form id={formId} inert={!open || status === 'done'} aria-hidden={!open || status === 'done'} className="passport-concept__form" data-status={status} onSubmit={send} aria-busy={status === 'sending'}>
         {status === 'sending' && <svg className="passport-concept__perimeter" aria-hidden="true"><rect x="1.5" y="1.5" rx="20" pathLength="100" /></svg>}
         <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
 
         <p className="passport-concept__note" aria-hidden={status === 'done'} inert={status === 'done'}>Нажимая скачать, вы соглашаетесь на <a href="/privacy" target="_blank" rel="noreferrer">обработку данных</a></p>
         <span className="passport-concept__announcement" role="status">{status === 'error' ? 'Не удалось отправить. Попробуйте ещё раз.' : status === 'done' ? 'Файл передан для скачивания' : ''}</span>
       </form>
-      <div className="passport-concept__action-flight">        <button form={`passport-${projectSlug}`} inert={!open || status === 'done'} className="passport-concept__download" type="submit" disabled={!isValidRuMobile(phone) || status === 'sending' || status === 'done'} data-valid={isValidRuMobile(phone)} data-status={status} aria-label={status === 'sending' ? 'Подготовка скачивания' : status === 'done' ? 'Файл передан для скачивания' : status === 'error' ? 'Повторить скачивание' : 'Скачать PDF'} title={status === 'error' ? 'Не удалось скачать. Нажмите, чтобы повторить.' : undefined}>
+      <div className="passport-concept__action-flight">        <button form={formId} inert={!open || status === 'done'} className="passport-concept__download" type="submit" disabled={!isValidRuMobile(phone) || status === 'sending' || status === 'done'} data-valid={isValidRuMobile(phone)} data-status={status} aria-label={status === 'sending' ? 'Подготовка скачивания' : status === 'done' ? 'Файл передан для скачивания' : status === 'error' ? 'Повторить скачивание' : 'Скачать PDF'} title={status === 'error' ? 'Не удалось скачать. Нажмите, чтобы повторить.' : undefined}>
           {status === 'sending' ? <IconLoader2 className="passport-concept__spinner" size={19} aria-hidden="true" /> : status === 'done' ? <IconCheck className="passport-concept__check" size={20} stroke={2.2} aria-hidden="true" /> : status === 'error' ? <IconExclamationMark size={20} aria-hidden="true" /> : <IconDownload size={19} aria-hidden="true" />}
         </button>
       </div>
@@ -178,7 +198,7 @@ export function ProjectPassportConcept({ project, projectSlug }: { project: stri
         <span className="passport-concept__success-check"><IconCheck size={20} stroke={2.2} aria-hidden="true" /></span>
       </div>}
     </div>}
-    {process.env.NODE_ENV === 'development' && <aside className="passport-concept-tools" aria-label="Управление прототипом анимации">
+    {process.env.NODE_ENV === 'development' && placement === 'hero' && <aside className="passport-concept-tools" aria-label="Управление прототипом анимации">
       <span>PDF · прототип</span>
       <button type="button" onClick={replay}><IconPlayerPlay size={14} aria-hidden="true" />Повторить</button>
       <label><input type="checkbox" checked={slow} onChange={event => { setSlow(event.target.checked); replay(); }} />Замедлить ×3</label>

@@ -5,6 +5,8 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { copy } from "../lib/copy";
 import { LeadForm } from "./lead-form";
+import { MessengerFormArtwork } from './messenger-form-artwork';
+import './messenger-form.css';
 import { SITE } from "../lib/site";
 
 /**
@@ -28,6 +30,7 @@ export function LeadDialog({
   actionHref,
   actionLabel,
   actionChannel,
+  messengerTheme,
   pageId,
   formId = "consultation-dialog",
   withMessage = false,
@@ -42,6 +45,7 @@ export function LeadDialog({
   actionHref?: string;
   actionLabel?: string;
   actionChannel?: 'max' | 'telegram' | 'whatsapp';
+  messengerTheme?: 'max' | 'telegram' | 'whatsapp';
   /** Откуда пришла заявка: страница сама себя и называет. */
   pageId?: string;
   formId?: string;
@@ -113,7 +117,8 @@ export function LeadDialog({
       onClick={onClose}
     >
       <div
-        className="ask-dialog__card"
+        className={`ask-dialog__card${messengerTheme ? ' messenger-form' : ''}`}
+        data-messenger={messengerTheme}
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -124,7 +129,8 @@ export function LeadDialog({
         >
           <IconX size={18} stroke={2.2} />
         </button>
-        <LeadForm formId={formId}
+        {messengerTheme && <MessengerFormArtwork channel={messengerTheme} />}
+        <LeadForm phoneOnly={Boolean(messengerTheme)} formId={formId}
           siteId={SITE.id}
           pageId={pageId}
           variant="card"
