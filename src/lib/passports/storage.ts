@@ -12,7 +12,7 @@ export function documentDirectory(slug: string, region: string) {
 export async function atomicJSON(file: string, value: unknown) {
   await fs.mkdir(path.dirname(file), { recursive: true })
   const temporary = `${file}.${randomUUID()}.tmp`
-  await fs.writeFile(temporary, JSON.stringify(value, null, 2), { mode: 0o600 })
+  await fs.writeFile(temporary, JSON.stringify(value, null, 2), { mode: 0o644 })
   try {
     for (let attempt = 0; ; attempt++) {
       try { await fs.rename(temporary, file); break } catch (error) {
