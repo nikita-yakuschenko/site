@@ -463,21 +463,6 @@
   color: var(--ink-1);
   font-size: 12px;
 }
-.comparison-note {
-  display: flex;
-  gap: 10px;
-  padding: 20px 0 0;
-  color: var(--ink-1);
-  font-size: 12px;
-  line-height: 1.5;
-}
-.comparison-note svg {
-  flex-shrink: 0;
-}
-.comparison-note p {
-  margin: 0;
-  max-width: 100ch;
-}
 .comparison-mobile-nav,
 .comparison-mobile-info,
 .comparison-inline-info {
@@ -524,6 +509,30 @@
   }
   to {
     opacity: 0;
+  }
+}
+@keyframes passport-dialog-settle {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+@keyframes comparison-sheet-in {
+  from {
+    opacity: 0;
+    clip-path: inset(14dvh 7% 18dvh round 28px);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 round 0);
+  }
+}
+@keyframes comparison-sheet-out {
+  from {
+    opacity: 1;
+    clip-path: inset(0 round 0);
+  }
+  to {
+    opacity: 0;
+    clip-path: inset(10dvh 6% 14dvh round 24px);
   }
 }
 @keyframes comparison-in {
@@ -578,7 +587,8 @@
     padding-top: calc(16px + env(safe-area-inset-top));
   }
   .comparison-dialog .comparison-scroll {
-    padding-bottom: calc(168px + env(safe-area-inset-bottom));
+    padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    transition: padding-bottom 280ms cubic-bezier(.77, 0, .175, 1);
   }
   .comparison-dialog::after {
     content: "";
@@ -587,15 +597,17 @@
     left: 0;
     right: 0;
     bottom: 0;
-    height: calc(168px + env(safe-area-inset-bottom));
-    background: linear-gradient(to top, var(--surface) 0 64px, rgb(255 255 255 / 0));
+    height: calc(70px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--surface) 0 20px, rgb(255 255 255 / 0));
     pointer-events: none;
+    transition: height 280ms cubic-bezier(.77, 0, .175, 1);
   }
   .comparison-dialog .comparison-passport {
     position: absolute;
     z-index: 7;
     top: auto;
-    bottom: calc(96px + env(safe-area-inset-bottom));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    transition: bottom 280ms cubic-bezier(.77, 0, .175, 1);
     left: 0;
     right: 0;
     height: auto;
@@ -786,10 +798,10 @@
     height: 15px;
   }
   .comparison-dialog[data-state="open"] {
-    animation: comparison-fade-in 240ms var(--ease-out);
+    animation: comparison-sheet-in 420ms cubic-bezier(.77, 0, .175, 1) both;
   }
   .comparison-dialog[data-state="closed"] {
-    animation: comparison-fade-out 200ms var(--ease-out);
+    animation: comparison-sheet-out 320ms cubic-bezier(.77, 0, .175, 1) both;
   }
   .comparison-table,
   .comparison-table thead,
@@ -1272,10 +1284,10 @@
     padding-bottom: env(safe-area-inset-bottom);
   }
   .comparison-dialog.package-description-dialog[data-state="open"] {
-    animation: comparison-fade-in 240ms var(--ease-out);
+    animation: comparison-sheet-in 420ms cubic-bezier(.77, 0, .175, 1) both;
   }
   .comparison-dialog.package-description-dialog[data-state="closed"] {
-    animation: comparison-fade-out 200ms var(--ease-out);
+    animation: comparison-sheet-out 320ms cubic-bezier(.77, 0, .175, 1) both;
   }
   .package-description-dialog .comparison-close {
     top: calc(12px + env(safe-area-inset-top));
@@ -1288,7 +1300,8 @@
     min-height: 0;
   }
   .package-description-dialog .comparison-scroll {
-    padding-bottom: calc(168px + env(safe-area-inset-bottom));
+    padding-bottom: calc(70px + env(safe-area-inset-bottom));
+    transition: padding-bottom 280ms cubic-bezier(.77, 0, .175, 1);
   }
   .package-description-dialog::after {
     content: "";
@@ -1297,16 +1310,17 @@
     left: 0;
     right: 0;
     bottom: 0;
-    height: calc(168px + env(safe-area-inset-bottom));
-    background: linear-gradient(to top, var(--surface) 0 64px, rgb(255 255 255 / 0));
+    height: calc(70px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--surface) 0 20px, rgb(255 255 255 / 0));
     pointer-events: none;
+    transition: height 280ms cubic-bezier(.77, 0, .175, 1);
   }
-  /* 84px is the shared passport rise, so the flight finishes on screen instead of under the edge. */
   .package-description-dialog .comparison-passport {
     position: absolute;
     z-index: 7;
     top: auto;
-    bottom: calc(96px + env(safe-area-inset-bottom));
+    bottom: calc(16px + env(safe-area-inset-bottom));
+    transition: bottom 280ms cubic-bezier(.77, 0, .175, 1);
     left: 0;
     right: 0;
     height: auto;
@@ -1384,4 +1398,34 @@ html:has(.comparison-overlay) {
 }
 html:has(.comparison-overlay[data-state="open"]) {
   background-color: color-mix(in srgb, var(--avgst-ink) 65%, var(--surface));
+}
+
+@media (max-width: 900px) {
+  .comparison-dialog:has(.passport-concept[data-open="true"]) .comparison-scroll,
+  .package-description-dialog:has(.passport-concept[data-open="true"]) .comparison-scroll {
+    padding-bottom: calc(108px + env(safe-area-inset-bottom));
+  }
+  .comparison-dialog:has(.passport-concept[data-open="true"])::after,
+  .package-description-dialog:has(.passport-concept[data-open="true"])::after {
+    height: calc(108px + env(safe-area-inset-bottom));
+  }
+  .comparison-dialog:has(.passport-concept[data-open="true"]) .comparison-passport,
+  .package-description-dialog:has(.passport-concept[data-open="true"]) .comparison-passport {
+    bottom: calc(52px + env(safe-area-inset-bottom));
+  }
+  .comparison-dialog :is(
+    .passport-concept__surface,
+    .passport-concept__label,
+    .passport-concept__action-flight,
+    .passport-concept__success,
+    .passport-concept__download
+  ) {
+    animation: none;
+  }
+  .comparison-dialog .passport-concept__button {
+    animation: passport-dialog-settle 180ms ease both;
+  }
+  .comparison-dialog .passport-concept__action-flight .passport-concept__download {
+    opacity: 1;
+  }
 }

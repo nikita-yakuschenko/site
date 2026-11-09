@@ -1068,13 +1068,6 @@ function ComparisonBody({
           </div>
           </div>
           </div>
-          <footer className="comparison-note">
-            <IconInfoCircle size={20} />
-            <p>
-              Подарки и коммерческие условия указаны отдельно в карточках
-              комплектаций.
-            </p>
-          </footer>
         </div>
       </TabsContent>
     </Tabs>

@@ -178,7 +178,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   function replay() { setOpen(false); setReady(false); setRun(value => value + 1); }
   return <>
     {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
-      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label="Скачать паспорт проекта" onAnimationEnd={event => { if ((event.animationName === 'passport-flight' || event.animationName === 'passport-fade')) setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
+      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label="Скачать паспорт проекта" onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
         <span className="passport-concept__surface" aria-hidden="true" />
         <span className="passport-concept__label">Скачать паспорт проекта</span>
       </button>
