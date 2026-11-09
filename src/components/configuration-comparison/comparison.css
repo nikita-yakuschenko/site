@@ -565,16 +565,83 @@
     justify-content: center;
   }
   .comparison-dialog {
-    inset: auto 0 0;
-    top: max(96px, calc(env(safe-area-inset-top) + 80px));
+    inset: 0;
     width: 100%;
-    height: auto;
+    height: 100dvh;
+    max-height: none;
     transform: none;
-    border-radius: 16px 16px 0 0;
+    border-radius: 0;
+    overflow: hidden;
     padding-bottom: env(safe-area-inset-bottom);
   }
-  .comparison-passport {
-    top: calc(max(96px, calc(env(safe-area-inset-top) + 80px)) / -2);
+  .comparison-dialog .comparison-heading {
+    padding-top: calc(16px + env(safe-area-inset-top));
+  }
+  .comparison-dialog .comparison-scroll {
+    padding-bottom: calc(168px + env(safe-area-inset-bottom));
+  }
+  .comparison-dialog::after {
+    content: "";
+    position: absolute;
+    z-index: 6;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: calc(168px + env(safe-area-inset-bottom));
+    background: linear-gradient(to top, var(--surface) 0 64px, rgb(255 255 255 / 0));
+    pointer-events: none;
+  }
+  .comparison-dialog .comparison-passport {
+    position: absolute;
+    z-index: 7;
+    top: auto;
+    bottom: calc(96px + env(safe-area-inset-bottom));
+    left: 0;
+    right: 0;
+    height: auto;
+    display: flex;
+    justify-content: center;
+    pointer-events: none;
+  }
+  .comparison-dialog .passport-concept.passport-concept--comparison,
+  .comparison-dialog .passport-concept.passport-concept--comparison[data-visible="false"] {
+    position: relative;
+    top: auto;
+    left: auto;
+    transform: none;
+  }
+  .comparison-dialog .passport-concept__button,
+  .comparison-dialog .passport-concept__form,
+  .comparison-dialog .passport-concept__success {
+    color: white;
+  }
+  .comparison-dialog .passport-concept__surface,
+  .comparison-dialog .passport-concept__form::before,
+  .comparison-dialog .passport-concept__success::before {
+    background: var(--avgst-ink);
+    box-shadow: 0 10px 28px rgb(11 16 32 / 22%);
+  }
+  .comparison-dialog .passport-concept[data-ready="true"] .passport-concept__button:hover .passport-concept__surface {
+    background: color-mix(in srgb, var(--avgst-ink) 86%, white);
+  }
+  .comparison-dialog .passport-concept__form input {
+    color: white;
+    caret-color: white;
+  }
+  .comparison-dialog .passport-concept__form input::placeholder {
+    color: var(--on-dark-3);
+  }
+  .comparison-dialog .passport-concept__form:focus-within::before {
+    box-shadow: inset 0 0 0 1px rgb(255 255 255 / 42%);
+  }
+  .comparison-dialog .passport-concept__download[data-valid="false"] {
+    background: rgb(255 255 255 / 14%);
+    color: var(--on-dark-3);
+  }
+  .comparison-dialog .passport-concept__note,
+  .comparison-dialog .passport-concept__status {
+    color: var(--ink-2);
+    text-shadow: none;
   }
   .comparison-heading {
     padding: 20px 64px 12px 16px;
@@ -657,7 +724,7 @@
   .comparison-table[data-selected="0"] [data-package="0"],
   .comparison-table[data-selected="1"] [data-package="1"],
   .comparison-table[data-selected="2"] [data-package="2"] {
-    display: table-cell;
+    display: block;
   }
   .comparison-table col:nth-child(n + 3) {
     display: none;
@@ -719,11 +786,200 @@
     height: 15px;
   }
   .comparison-dialog[data-state="open"] {
-    animation: comparison-mobile-in 260ms var(--ease-out);
+    animation: comparison-fade-in 240ms var(--ease-out);
   }
   .comparison-dialog[data-state="closed"] {
-    animation: comparison-mobile-out 220ms var(--ease-out);
+    animation: comparison-fade-out 200ms var(--ease-out);
   }
+  .comparison-table,
+  .comparison-table thead,
+  .comparison-table tbody,
+  .comparison-table tr {
+    display: block;
+    width: 100%;
+  }
+  .comparison-table colgroup { display: none; }
+  .comparison-table thead { position: static; }
+  .comparison-table thead th:first-child { display: none; }
+  .comparison-table thead th {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    padding: 0 0 12px;
+  }
+  .comparison-table tbody {
+    margin: 0 0 12px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .comparison-section th {
+    display: block;
+    border: 0;
+    background: var(--surface-muted);
+  }
+  .comparison-table .comparison-element {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(140px, 46%);
+    align-items: start;
+    background: var(--surface);
+    border-top: 1px solid var(--line);
+  }
+  .comparison-element > :is(th, td) {
+    display: block;
+    width: auto;
+    border: 0;
+  }
+  .comparison-element[data-mobile-status="included"] {
+    background: color-mix(in srgb, var(--avgst-green) 10%, var(--surface));
+  }
+  .comparison-element[data-mobile-status="excluded"],
+  .comparison-element[data-mobile-status="notApplicable"] {
+    background: color-mix(in srgb, var(--danger) 8%, var(--surface));
+  }
+  .comparison-element > td[data-status] { background: transparent; }
+  .comparison-inline-info,
+  .comparison-inline-info td,
+  .comparison-empty,
+  .comparison-empty td { display: block; width: auto; border: 0; }
+  .comparison-toolbar { display: none; }
+  .comparison-table-wrap { display: none; }
+  .comparison-swipe-stage { overflow: hidden; }
+  .comparison-swipe-track { display: flex; align-items: flex-start; }
+  .comparison-swipe-track > .comparison-mobile-sheets {
+    display: flex;
+    flex: none;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .comparison-mobile-sheet {
+    position: relative;
+    flex: none;
+    box-sizing: border-box;
+    width: var(--sheet, 100%);
+  }
+  .comparison-mobile-sheet__head {
+    margin: 0 0 12px;
+  }
+  .comparison-mobile-sheet__head strong {
+    display: block;
+    font-size: 18px;
+    line-height: 1.3;
+  }
+  .comparison-mobile-sheet__prices {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 8px;
+  }
+  .comparison-mobile-sheet .comparison-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 0;
+    white-space: normal;
+  }
+  .comparison-mobile-sheet__mortgage {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    margin: 0;
+    color: var(--avgst-green);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.25;
+    text-align: right;
+  }
+  .comparison-mobile-sheet__mortgage .project-config__special-badge {
+    margin-bottom: 2px;
+  }
+  .comparison-mobile-sheet__mortgage span:last-child {
+    color: var(--ink-2);
+    font-size: 11px;
+    font-weight: 400;
+    line-height: 1.35;
+    white-space: nowrap;
+  }
+  .comparison-mobile-sheet .package-description__section:last-child {
+    margin-bottom: 0;
+  }
+  .comparison-hand {
+    position: absolute;
+    z-index: 5;
+    top: 88px;
+    left: 50%;
+    transform: translateX(-50%);
+    pointer-events: none;
+  }
+  .comparison-hand__arc {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .comparison-hand__mark {
+    fill: none;
+    stroke: #ffe566;
+    stroke-width: 14;
+    stroke-linecap: round;
+    opacity: 0.78;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    animation: comparison-hand-mark 900ms linear both;
+  }
+  .comparison-hand__icon {
+    position: absolute;
+    display: block;
+    color: var(--avgst-ink);
+    transform-origin: 50% 91.67%;
+    filter: drop-shadow(0 1px 2px rgb(11 16 32 / 0.28));
+  }
+  .comparison-hand__icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .comparison-hand__icon svg path {
+    fill: #fff;
+    stroke: var(--avgst-ink);
+    stroke-linejoin: round;
+    stroke-linecap: round;
+  }
+  .comparison-hand[data-dir="1"] .comparison-hand__icon {
+    animation: comparison-hand-next 900ms linear both, comparison-hand-fade 900ms linear both;
+  }
+  .comparison-hand[data-dir="-1"] .comparison-hand__icon {
+    animation: comparison-hand-prev 900ms linear both, comparison-hand-fade 900ms linear both;
+  }
+}
+@keyframes comparison-hand-next {
+  0% { transform: rotate(0deg); animation-timing-function: cubic-bezier(.22, .8, .36, 1); }
+  42% { transform: rotate(-40deg); animation-timing-function: linear; }
+  62% { transform: rotate(-40deg); animation-timing-function: cubic-bezier(.45, 0, .2, 1); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes comparison-hand-prev {
+  0% { transform: rotate(0deg); animation-timing-function: cubic-bezier(.22, .8, .36, 1); }
+  42% { transform: rotate(40deg); animation-timing-function: linear; }
+  62% { transform: rotate(40deg); animation-timing-function: cubic-bezier(.45, 0, .2, 1); }
+  100% { transform: rotate(0deg); }
+}
+@keyframes comparison-hand-fade {
+  0% { opacity: 0; }
+  12% { opacity: 1; }
+  78% { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes comparison-hand-mark {
+  0% { stroke-dashoffset: 1; opacity: 0; }
+  12% { opacity: 0.78; }
+  42% { stroke-dashoffset: 0; opacity: 0.78; }
+  78% { stroke-dashoffset: 0; opacity: 0.78; }
+  100% { stroke-dashoffset: 0; opacity: 0; }
 }
 @keyframes comparison-mobile-in {
   from {
@@ -757,7 +1013,11 @@
   .comparison-switch > span:after {
     transition-duration: 1ms !important;
   }
+  .comparison-hand__icon,
+  .comparison-hand__mark { animation: none; }
 }
+
+.comparison-mobile-sheets { display: none; }
 
 .comparison-short-label {
   display: none;
@@ -838,6 +1098,22 @@
   border-left: 1px solid var(--line);
   border-right: 1px solid var(--line);
   border-bottom: 1px solid var(--line);
+}
+
+@media (max-width: 900px) {
+  .comparison-element > :is(th, td),
+  .comparison-element[data-visible="true"] > :is(th, td),
+  .comparison-section > th,
+  .comparison-empty > td,
+  .comparison-inline-info > td {
+    border: 0;
+  }
+  .comparison-table .comparison-element {
+    border: 0;
+  }
+  .comparison-table tbody .comparison-element {
+    border-top: 1px solid var(--line);
+  }
 }
 
 @media (max-width: 360px) {

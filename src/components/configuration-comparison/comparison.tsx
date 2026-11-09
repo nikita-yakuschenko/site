@@ -3,6 +3,7 @@
 import {
   Fragment,
   useCallback,
+  useEffect,
   useLayoutEffect,
   useRef,
   useState,
@@ -19,6 +20,7 @@ import {
   IconMinus,
   IconQuestionMark,
   IconArrowUpRight,
+  IconHandFinger,
   IconX,
 } from "@tabler/icons-react";
 import {
@@ -37,6 +39,7 @@ import {
 } from "../ui/popover";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
 import { ProjectPassportConcept } from "../project-passport-concept";
+import { PackageDescriptionBody } from "./package-description";
 import { technicalMatrices, deliveryInfoForRegion } from "./model/data";
 import {
   hasDifferences,
@@ -47,9 +50,32 @@ import {
 } from "./model/types";
 import type { CatalogProject } from "../../lib/catalog/types";
 import { displayedTierPrice, hasSpecialTierPrice, type PricedTier } from "../../lib/catalog/tiers";
-import { formatRub } from "../../lib/locale";
-import { nbspText } from "../../lib/copy";
+import { formatRub, RUB_UNIT } from "../../lib/locale";
+import { copy, nbspText } from "../../lib/copy";
+import { getMortgageProgram, monthlyPaymentForProject } from "../../lib/mortgage";
 import "./comparison.css";
+
+const SHEET_GAP = 16;
+const HINT_MS = 900;
+const HAND_SIZE = 48;
+const HAND_SWING = 40;
+const HAND_BOX = { w: 260, h: 190 };
+const HAND_ORIGIN = { x: (HAND_BOX.w - HAND_SIZE) / 2, y: 64 };
+
+function fingerArc(dir: 1 | -1) {
+  const pivotX = HAND_ORIGIN.x + HAND_SIZE * 0.5;
+  const pivotY = HAND_ORIGIN.y + HAND_SIZE * (22 / 24);
+  const tipX = HAND_ORIGIN.x + HAND_SIZE * (9.5 / 24);
+  const tipY = HAND_ORIGIN.y + HAND_SIZE * (3 / 24);
+  const dx = tipX - pivotX;
+  const dy = tipY - pivotY;
+  const radius = Math.hypot(dx, dy);
+  const rad = ((dir === 1 ? -HAND_SWING : HAND_SWING) * Math.PI) / 180;
+  const endX = pivotX + dx * Math.cos(rad) - dy * Math.sin(rad);
+  const endY = pivotY + dx * Math.sin(rad) + dy * Math.cos(rad);
+  const sweep = dir === 1 ? 0 : 1;
+  return `M ${tipX.toFixed(2)} ${tipY.toFixed(2)} A ${radius.toFixed(2)} ${radius.toFixed(2)} 0 0 ${sweep} ${endX.toFixed(2)} ${endY.toFixed(2)}`;
+}
 
 const text = (s: string) =>
   nbspText(
@@ -273,6 +299,11 @@ function ComparisonBody({
   const slideEpoch = useRef(0);
   const tableWrap = useRef<HTMLDivElement>(null);
   const table = useRef<HTMLTableElement>(null);
+  const swipeStage = useRef<HTMLDivElement>(null);
+  const swipeTrack = useRef<HTMLDivElement>(null);
+  const hintAnim = useRef<Animation | null>(null);
+  const hintDir = useRef<1 | -1>(selected >= matrix.packageIds.length - 1 ? -1 : 1);
+  const [hinting, setHinting] = useState(false);
   const pendingSlides = useRef(
     new Map<string, { element: HTMLElement; height: number }>(),
   );
@@ -291,11 +322,7 @@ function ComparisonBody({
     const next = Math.max(0, Math.min(matrix.packageIds.length - 1, index));
     if (next === selected) return;
     pendingSlides.current.clear();
-    const shouldSlide =
-      pointerNavigation.current &&
-      matchMedia("(max-width: 900px)").matches &&
-      (!matchMedia("(prefers-reduced-motion: reduce)").matches ||
-        swipe.current?.axis === "horizontal");
+    const shouldSlide = false;
     if (shouldSlide) {
       table.current
         ?.querySelectorAll<HTMLElement>(
@@ -446,6 +473,87 @@ function ComparisonBody({
       clearSlides();
     });
   };
+  useEffect(() => {
+    const mobile = window.matchMedia("(max-width: 900px)");
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)");
+    if (!mobile.matches || reduce.matches) return;
+    const start = window.setTimeout(() => setHinting(true), 520);
+    return () => window.clearTimeout(start);
+  }, []);
+  const sheetDrag = useRef<{
+    x: number;
+    y: number;
+    axis: "horizontal" | "vertical" | null;
+    lastX: number;
+    lastTime: number;
+    velocity: number;
+  } | null>(null);
+  const placeSheets = useCallback((offset = 0) => {
+    const stage = swipeStage.current;
+    const track = swipeTrack.current;
+    if (!stage || !track || !matchMedia("(max-width: 900px)").matches) return 0;
+    const width = stage.getBoundingClientRect().width;
+    stage.style.setProperty("--sheet", `${width}px`);
+    const x = -selected * (width + SHEET_GAP) + offset;
+    track.style.transform = `translate3d(${x}px,0,0)`;
+    return width;
+  }, [selected]);
+  const sheetsPlaced = useRef(false);
+  useLayoutEffect(() => {
+    const stage = swipeStage.current;
+    const track = swipeTrack.current;
+    if (!stage || !track) return;
+    if (!matchMedia("(max-width: 900px)").matches) {
+      track.style.transform = "";
+      return;
+    }
+    if (sheetDrag.current) return;
+    const width = stage.getBoundingClientRect().width;
+    stage.style.setProperty("--sheet", `${width}px`);
+    const rest = -selected * (width + SHEET_GAP);
+    if (!hinting) {
+      const from = new DOMMatrix(getComputedStyle(track).transform).m41;
+      if (sheetsPlaced.current && Math.abs(from - rest) > 1) {
+        track.animate(
+          [
+            { transform: `translate3d(${from}px,0,0)` },
+            { transform: `translate3d(${rest}px,0,0)` },
+          ],
+          { duration: 280, easing: "cubic-bezier(.22,.61,.36,1)" },
+        );
+      }
+      sheetsPlaced.current = true;
+      track.style.transform = `translate3d(${rest}px,0,0)`;
+      return;
+    }
+    placeSheets();
+    const shift = Math.round(width / 3);
+    const dir = hintDir.current;
+    const reveal = -dir * shift;
+    const animation = track.animate(
+      [
+        { transform: `translate3d(${rest}px,0,0)`, easing: "cubic-bezier(.22,.8,.36,1)" },
+        { transform: `translate3d(${rest + reveal}px,0,0)`, offset: 0.42 },
+        { transform: `translate3d(${rest + reveal}px,0,0)`, offset: 0.62, easing: "cubic-bezier(.45,0,.2,1)" },
+        { transform: `translate3d(${rest}px,0,0)` },
+      ],
+      { duration: HINT_MS, easing: "linear", fill: "both" },
+    );
+    hintAnim.current = animation;
+    animation.onfinish = () => {
+      hintAnim.current = null;
+      placeSheets();
+      setHinting(false);
+    };
+    animation.oncancel = () => {
+      hintAnim.current = null;
+    };
+    return () => animation.cancel();
+  }, [hinting, placeSheets, selected]);
+  const stopHint = () => {
+    hintAnim.current?.cancel();
+    if (hinting) setHinting(false);
+  };
   const toggleSection = (id: string) =>
     setCollapsed((before) => {
       const next = new Set(before);
@@ -548,7 +656,19 @@ function ComparisonBody({
           tabIndex={0}
           aria-label="Техническая таблица"
           onTouchStart={(e) => {
+            stopHint();
             const p = e.touches[0];
+            if (p && matchMedia("(max-width: 900px)").matches) {
+              sheetDrag.current = {
+                x: p.clientX,
+                y: p.clientY,
+                axis: null,
+                lastX: p.clientX,
+                lastTime: performance.now(),
+                velocity: 0,
+              };
+              return;
+            }
             if (
               p &&
               !(e.target as HTMLElement).closest(
@@ -576,6 +696,19 @@ function ComparisonBody({
           }}
           onTouchMove={(e) => {
             const p = e.touches[0];
+            const drag = sheetDrag.current;
+            if (drag && p) {
+              const dx = p.clientX - drag.x;
+              const dy = p.clientY - drag.y;
+              if (!drag.axis && Math.max(Math.abs(dx), Math.abs(dy)) > 8)
+                drag.axis = Math.abs(dx) > Math.abs(dy) * 1.5 ? "horizontal" : "vertical";
+              const now = performance.now();
+              drag.velocity = (p.clientX - drag.lastX) / Math.max(1, now - drag.lastTime);
+              drag.lastX = p.clientX;
+              drag.lastTime = now;
+              if (drag.axis === "horizontal") placeSheets(dx);
+              return;
+            }
             const gesture = swipe.current;
             if (!p || !gesture) return;
             const dx = p.clientX - gesture.x;
@@ -619,6 +752,20 @@ function ComparisonBody({
               );
           }}
           onTouchEnd={(e) => {
+            const drag = sheetDrag.current;
+            if (drag) {
+              sheetDrag.current = null;
+              const p = e.changedTouches[0];
+              const dx = p ? p.clientX - drag.x : 0;
+              const width = swipeStage.current?.getBoundingClientRect().width ?? 1;
+              const velocity = performance.now() - drag.lastTime < 100 ? drag.velocity : 0;
+              if (drag.axis === "horizontal" && (dx < -width / 4 || velocity < -0.4) && selected < matrix.packageIds.length - 1)
+                changePackage(selected + 1);
+              else if (drag.axis === "horizontal" && (dx > width / 4 || velocity > 0.4) && selected > 0)
+                changePackage(selected - 1);
+              else placeSheets();
+              return;
+            }
             const gesture = swipe.current;
             const p = e.changedTouches[0];
             if (!gesture || !p) return;
@@ -643,8 +790,74 @@ function ComparisonBody({
                 changePackage(selected + (dx < 0 ? 1 : -1));
             }
           }}
-          onTouchCancel={() => settleDrag(false)}
+          onTouchCancel={() => {
+            sheetDrag.current = null;
+            placeSheets();
+            settleDrag(false);
+          }}
         >
+          <div className="comparison-swipe-stage" ref={swipeStage}>
+          <div className="comparison-swipe-track" ref={swipeTrack}>
+          <div className="comparison-mobile-sheets">
+            {matrix.packageIds.map((id, index) => {
+              const tier = tiers.find((item) => item.id === id);
+              const monthly = tier?.mortgage && tier.price > 0
+                ? monthlyPaymentForProject({
+                    propertyPrice: tier.price,
+                    region,
+                    combinedMarketRateOverride: getMortgageProgram("market").rate,
+                  })
+                : null;
+              return (
+                <article key={id} className="comparison-mobile-sheet">
+                  {hinting && index === selected ? (
+                    <div
+                      className="comparison-hand"
+                      data-dir={hintDir.current}
+                      style={{ width: HAND_BOX.w, height: HAND_BOX.h }}
+                      aria-hidden="true"
+                    >
+                      <svg className="comparison-hand__arc" viewBox={`0 0 ${HAND_BOX.w} ${HAND_BOX.h}`}>
+                        <path className="comparison-hand__mark" pathLength={1} d={fingerArc(hintDir.current === 1 ? 1 : -1)} />
+                      </svg>
+                      <span
+                        className="comparison-hand__icon"
+                        style={{ left: HAND_ORIGIN.x, top: HAND_ORIGIN.y, width: HAND_SIZE, height: HAND_SIZE }}
+                      >
+                        <IconHandFinger size={HAND_SIZE} stroke={1.6} />
+                      </span>
+                    </div>
+                  ) : null}
+                  <header className="comparison-mobile-sheet__head">
+                    <strong>{tier?.name ?? id}</strong>
+                    <div className="comparison-mobile-sheet__prices">
+                      <b className="comparison-price">
+                        {tier && hasSpecialTierPrice(tier) ? (
+                          <span className="project-config__special-badge">Специальная цена</span>
+                        ) : null}
+                        {tier && displayedTierPrice(tier) > 0
+                          ? formatRub(displayedTierPrice(tier))
+                          : "Цена уточняется"}
+                      </b>
+                      {monthly ? (
+                        <p className="comparison-mobile-sheet__mortgage">
+                          <span className="project-config__special-badge">Цена в ипотеку</span>
+                          {text(`от ${formatRub(monthly).replace(RUB_UNIT, "руб./мес.")}`)}
+                          <span>{text(copy.configPayNote)}</span>
+                        </p>
+                      ) : null}
+                    </div>
+                  </header>
+                  <PackageDescriptionBody
+                    matrix={matrix}
+                    packageId={id}
+                    floors={project.floorsValue}
+                    region={region}
+                  />
+                </article>
+              );
+            })}
+          </div>
           <div className="comparison-table-wrap" ref={tableWrap}>
             <table
               className="comparison-table"
@@ -734,6 +947,7 @@ function ComparisonBody({
                             data-visible={shown}
                             aria-hidden={!shown}
                             className="comparison-element"
+                            data-mobile-status={element.values[matrix.packageIds[selected]!]!.status}
                           >
                             <th scope="row">
                               <div
@@ -851,6 +1065,8 @@ function ComparisonBody({
                 );
               })}
             </table>
+          </div>
+          </div>
           </div>
           <footer className="comparison-note">
             <IconInfoCircle size={20} />

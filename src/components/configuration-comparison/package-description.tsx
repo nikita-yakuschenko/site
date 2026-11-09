@@ -90,6 +90,32 @@ function PackageItem({ element, value }: { element: TechnicalElement; value: Spe
   );
 }
 
+export function PackageDescriptionBody({
+  matrix,
+  packageId,
+  floors,
+  region,
+}: {
+  matrix: TechnicalMatrix;
+  packageId: PackageId;
+  floors: number;
+  region: "nn" | "msk";
+}) {
+  const sections = sectionsForPackage(matrix, packageId, floors, region);
+  return (
+    <>
+      {sections.map((section) => (
+        <section key={section.id} className="package-description__section">
+          <h3>{section.title}</h3>
+          {section.elements.map((element) => (
+            <PackageItem key={element.id} element={element} value={element.values[packageId]!} />
+          ))}
+        </section>
+      ))}
+    </>
+  );
+}
+
 export function PackageDescriptionDialog({
   open,
   onOpenChange,
