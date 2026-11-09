@@ -512,8 +512,8 @@
   }
 }
 @keyframes passport-dialog-settle {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from { opacity: 0; transform: translateY(72px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 @keyframes comparison-sheet-in {
   from {
@@ -1416,14 +1416,13 @@ html:has(.comparison-overlay[data-state="open"]) {
   .comparison-dialog :is(
     .passport-concept__surface,
     .passport-concept__label,
-    .passport-concept__action-flight,
     .passport-concept__success,
     .passport-concept__download
   ) {
     animation: none;
   }
-  .comparison-dialog .passport-concept__button {
-    animation: passport-dialog-settle 180ms ease both;
+  .comparison-dialog .passport-concept[data-visible="true"] :is(.passport-concept__button, .passport-concept__action-flight) {
+    animation: passport-dialog-settle 520ms cubic-bezier(.23, 1, .32, 1) 400ms both;
   }
   .comparison-dialog .passport-concept__action-flight .passport-concept__download {
     opacity: 1;
