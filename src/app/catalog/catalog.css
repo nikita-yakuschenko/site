@@ -652,6 +652,7 @@
 }
 
 .project-config__tier {
+  position: relative;
   display: grid;
   align-content: start;
   gap: 8px;
@@ -674,8 +675,51 @@
   border-color: var(--ink-4);
 }
 
-.project-config__tier:active {
+.project-config__tier:has(.project-config__tier-select:active) {
   transform: scale(0.995);
+}
+.project-config__tier-select {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.project-config__tier-select:focus-visible {
+  outline: 2px solid var(--avgst-ink);
+  outline-offset: -2px;
+}
+.project-config__details-link {
+  position: relative;
+  z-index: 2;
+  justify-self: start;
+  margin: 8px 0 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--avgst-ink);
+  font: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  line-height: 1.4;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.project-config__details-link:hover {
+  color: var(--ink-1);
+}
+.project-config__details-link:focus-visible {
+  outline: 2px solid var(--avgst-ink);
+  outline-offset: 3px;
+}
+.project-config__details-link--mobile {
+  display: none;
 }
 .project-config__tier--on {
   border-color: var(--avgst-ink);
@@ -735,7 +779,7 @@
 .project-config__tier-base { color: var(--avgst-green); }
 .project-config__total .panel-lead__trigger .btn { margin-top: 0; }
 .project-config__tier-included svg { margin-top: 3px; }
-.project-config__tier-gifts { display: grid; align-content: start; gap: 10px; margin-top: 16px; }
+.project-config__tier-gifts { display: grid; align-content: end; gap: 10px; margin-top: 16px; }
 .project-config__tier-band { display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600; color: var(--ink-1); }
 .project-config__tier-band::before,
 .project-config__tier-band::after { content: ""; flex: 1; height: 0; border-top: 1px dashed var(--line-2); }
@@ -745,8 +789,7 @@
 .project-config__tier-gift { position: relative; display: block; padding-left: 14px; font-size: 14px; line-height: 1.45; color: var(--avgst-ink); }
 .project-config__tier-gift::before { content: '•'; position: absolute; left: 0; color: var(--avgst-green); }
 .project-config__special-badge { display: block; width: fit-content; margin-bottom: 8px; padding: 4px 7px; border-radius: 999px; background: var(--brand-yellow); color: var(--avgst-ink); font-size: 10px; font-weight: 600; letter-spacing: 0; line-height: 1; white-space: nowrap; }
-.project-config__total-pay .project-config__mortgage-label { font-size: 12px; font-weight: 500; color: var(--ink-2); }
-.project-config__total-pay .project-config__mortgage-payment { font-size: 16px; font-weight: 600; }
+.project-config__pay-note { display: block; margin-top: 8px; font-size: 12px; font-weight: 400; letter-spacing: 0; line-height: 1.45; color: var(--ink-3); }
 .project-rows {
   display: grid;
   gap: var(--gap-tile);
@@ -1081,17 +1124,21 @@
 @media (min-width: 800px) {
   @supports (grid-template-rows: subgrid) {
     .project-config__tiers {
-      /* Состав забирает остаток высоты, подарки остаются на общей нижней линии. */
-      grid-template-rows: auto auto auto auto 1fr auto;
+      /* Состав забирает остаток высоты, подарки на общей линии, ссылка описания — строкой ниже. */
+      grid-template-rows: auto auto auto auto 1fr auto auto;
       row-gap: 8px;
     }
 
     .project-config__tiers li,
     .project-config__tiers .project-config__tier {
       display: grid;
-      grid-row: span 6;
+      grid-row: span 7;
       grid-template-rows: subgrid;
       gap: 8px;
+    }
+    .project-config__details-link--desktop {
+      grid-row: 7;
+      align-self: end;
     }
   }
 }
@@ -1166,11 +1213,13 @@
 }
 
 .project-config__total[data-form="true"] .project-config__total-label,
-.project-config__total[data-form="true"] .project-config__total-pay span {
+.project-config__total[data-form="true"] .project-config__total-pay span,
+.project-config__total[data-form="true"] .project-config__pay-note {
   color: var(--on-dark-3);
 }
 
-.project-config__total[data-form="true"] .project-config__total-pay {
+.project-config__total[data-form="true"] .project-config__total-pay,
+.project-config__total[data-form="true"] .project-config__total-mortgage {
   border-top-color: var(--line-on-dark);
 }
 
@@ -1223,6 +1272,14 @@
   font-weight: 700;
   letter-spacing: -0.03em;
   line-height: 1.05;
+}
+.project-config__total-sum.project-config__total-mortgage {
+  margin: 16px 0 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--line);
+}
+.project-config__total[data-form="true"] .project-config__total-sum.project-config__total-mortgage {
+  border-top-color: var(--line-on-dark);
 }
 
 .project-config__total-pay {
@@ -2302,6 +2359,16 @@
     flex: none;
     gap: 8px;
     margin: 20px;
+  }
+  .project-config__details-link--desktop {
+    display: none;
+  }
+  .project-config__details-link--mobile {
+    display: inline-flex;
+    align-self: center;
+    justify-content: center;
+    margin: -4px 20px 18px;
+    text-align: center;
   }
   .project-config__tier-card .project-config__mobile-form {
     display: flex;

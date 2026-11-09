@@ -18,7 +18,7 @@ const insulation = () => yes('Стены: плитная минвата 150 мм
 const windows = () => yes('Окна и двери ПВХ: 1,0 × 1,2 м, количество по проекту.')
 const door = () => yes('Металлическая входная дверь с терморазрывом.')
 export const frameMatrix: TechnicalMatrix = {
-  buildingTechnology: 'frame', label: 'Каркасные дома', packageIds: ['start', 'standard', 'project'],
+  buildingTechnology: 'frame', label: 'Каркасный дом', packageIds: ['start', 'standard', 'project'],
   sections: [
     { id: 'structure', title: 'Конструкции дома', elements: [
       common('frame', 'Силовой каркас', 'wall', [

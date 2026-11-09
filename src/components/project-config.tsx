@@ -4,7 +4,7 @@ import { useRegionCode } from "./region-bootstrap";
 import { IconArrowUpRight, IconCheck, IconGiftFilled, IconPlus, IconX } from "@tabler/icons-react";
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { copy, nbspText } from "../lib/copy";
-import { formatFromRub, formatRub } from "../lib/locale";
+import { formatRub, RUB_UNIT } from "../lib/locale";
 import { getMortgageProgram, monthlyPaymentForProject } from "../lib/mortgage";
 import { displayedTierPrice, hasSpecialTierPrice, tiersForProject, tiersForRegion, type PricedTier } from "../lib/catalog/tiers";
 import {
@@ -19,6 +19,7 @@ import { PanelLeadForm } from "./panel-lead-form";
 import { isMobileFormViewport, useMobileFormReveal } from './use-mobile-form-reveal';
 import type { CatalogProject } from "../lib/catalog/types";
 import { ConfigurationComparison } from './configuration-comparison/comparison';
+import { isDescribedPackage, packageCanBeDescribed, PackageDescriptionDialog } from './configuration-comparison/package-description';
 
 /**
  * Комплектация.
@@ -53,9 +54,11 @@ function SpecialPriceBadge({ tier }: { tier: PricedTier }) {
 }
 
 function MortgagePayment({ monthly }: { monthly: number }) {
-  return <p className="project-config__total-pay"><span className="project-config__mortgage-label">В ипотеку</span>
-    <strong className="project-config__mortgage-payment">{formatFromRub(monthly)} {copy.configPerMonth}</strong>
-    <span>{configText(copy.configPayNote)}</span>
+  const amount = configText(`от ${formatRub(monthly).replace(RUB_UNIT, "руб./мес.")}`);
+  return <p className="project-config__total-sum project-config__total-mortgage">
+    <span className="project-config__special-badge">Цена в ипотеку</span>
+    {amount}
+    <span className="project-config__pay-note">{configText(copy.configPayNote)}</span>
   </p>;
 }
 
@@ -255,6 +258,8 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
   const monthly = item.mortgage && item.price > 0 ? monthlyPaymentForProject({
     propertyPrice: item.price, region, combinedMarketRateOverride: getMortgageProgram("market").rate,
   }) : null;
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const described = packageCanBeDescribed(project.technology, item.id);
 
   useEffect(() => {
     const desktop = window.matchMedia('(min-width: 800px)');
@@ -292,12 +297,23 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
   useMobileFormReveal(open, rootRef);
   return <div ref={rootRef} className="project-config__tier-card" data-form={open} data-selected={selected}>
     <div className="project-config__tier-front" inert={open} aria-hidden={open}>
-      <button type="button" className={`project-config__tier${selected ? ' project-config__tier--on' : ''}`} aria-pressed={selected} onClick={onSelect}>
+      <div className={`project-config__tier${selected ? ' project-config__tier--on' : ''}`}>
+        <button type="button" className="project-config__tier-select" aria-pressed={selected} aria-label={`Выбрать комплектацию «${item.name}»`} onClick={onSelect} />
         {children}
-      </button>
+        {described && isDescribedPackage(item.id) && (
+          <button type="button" className="project-config__details-link project-config__details-link--desktop" onClick={() => setDetailsOpen(true)}>
+            Подробная комплектация
+          </button>
+        )}
+      </div>
       <button ref={quoteRef} type="button" className="btn btn-yellow project-config__mobile-quote" aria-expanded={open} onClick={() => changeOpen(true)}>
         {copy.getQuote}<IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
       </button>
+      {described && isDescribedPackage(item.id) && (
+        <button type="button" className="project-config__details-link project-config__details-link--mobile" onClick={() => setDetailsOpen(true)}>
+          Подробная комплектация
+        </button>
+      )}
     </div>
     {visited && <div className="project-config__total project-config__mobile-form" data-form="true" inert={!open} aria-hidden={!open}>
       <button type="button" className="project-config__close" aria-label={copy.close} onClick={() => changeOpen(false)}><IconX size={14} stroke={2.4} aria-hidden="true" /></button>
@@ -309,5 +325,17 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
       <LeadForm active={open} siteId={SITE.id} formId="project-configuration" projectExternalId={project.id} variant="card" compact heading={copy.getQuote} submitLabel={copy.getQuote}
         meta={{ project: project.name, tier: item.name, price: item.price, specialPrice: displayedTierPrice(item) }} />
     </div>}
+    {described && isDescribedPackage(item.id) && (
+      <PackageDescriptionDialog
+        open={detailsOpen}
+        onOpenChange={setDetailsOpen}
+        project={project}
+        packageId={item.id}
+        packageName={item.name}
+        region={region}
+        specialPrice={hasSpecialTierPrice(item) ? formatRub(displayedTierPrice(item)) : null}
+        mortgagePrice={monthly ? configText(`от ${formatRub(monthly).replace(RUB_UNIT, "руб./мес.")}`) : null}
+      />
+    )}
   </div>;
 }

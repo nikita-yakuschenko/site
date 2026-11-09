@@ -236,6 +236,9 @@
 .passport-concept__success-text { flex: 0 1 auto; }
 
 /* A stable header slot keeps the passport clear of gallery gestures and variant tabs. */
+.comparison-passport .passport-concept { pointer-events: auto; }
+.passport-concept.passport-concept--comparison { top: 0; z-index: 6; transform: translate(-50%, -50%); }
+.passport-concept.passport-concept--comparison[data-visible="false"] { transform: translate(-50%, calc(-50% + 84px)); }
 .viewer-passport { position: absolute; inset: 0 0 auto; z-index: 4; height: 0; }
 .passport-concept.passport-concept--viewer { top: max(24px, env(safe-area-inset-top)); z-index: 4; }
 .photo-lightbox:has(> .viewer-passport) { padding-top: max(112px, calc(env(safe-area-inset-top) + 100px)); }

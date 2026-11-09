@@ -473,13 +473,13 @@ const panelIds = ["start", "standard", "project"] as const;
 const modularIds = ["standard", "project", "turnkey"] as const;
 export const panelMatrix: TechnicalMatrix = {
   buildingTechnology: "panel",
-  label: "Панельно-каркасные дома",
+  label: "Панельно-каркасный дом",
   packageIds: panelIds,
   sections: sections(panelIds, panelValues),
 };
 export const modularMatrix: TechnicalMatrix = {
   buildingTechnology: "modular",
-  label: "Модульные дома",
+  label: "Модульный дом",
   packageIds: modularIds,
   sections: sections(modularIds, modularValues),
 };

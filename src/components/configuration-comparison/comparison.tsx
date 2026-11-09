@@ -36,6 +36,7 @@ import {
   PopoverTrigger,
 } from "../ui/popover";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
+import { ProjectPassportConcept } from "../project-passport-concept";
 import { technicalMatrices, deliveryInfoForRegion } from "./model/data";
 import {
   hasDifferences,
@@ -201,6 +202,9 @@ export function ConfigurationComparison({
         </DialogTrigger>
       </div>
       <DialogContent>
+        <div className="comparison-passport">
+          <ProjectPassportConcept project={project.name} projectSlug={project.slug} placement="comparison" active={open} />
+        </div>
         <ComparisonBody
           matrix={matrix}
           project={project}

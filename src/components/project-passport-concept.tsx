@@ -21,7 +21,7 @@ const SUCCESS_MESSAGES = [
 ];
 
 /** Shared passport interaction for the project hero and its media viewers. */
-export function ProjectPassportConcept({ project, projectSlug, placement = 'hero', active = true }: { project: string; projectSlug: string; placement?: 'hero' | 'viewer'; active?: boolean }) {
+export function ProjectPassportConcept({ project, projectSlug, placement = 'hero', active = true }: { project: string; projectSlug: string; placement?: 'hero' | 'viewer' | 'comparison'; active?: boolean }) {
   const formId = useId();
   const [run, setRun] = useState(0);
   const [slow, setSlow] = useState(false);
@@ -52,7 +52,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     return () => cancelAnimationFrame(frame);
   }, [storageKey]);
   useEffect(() => {
-    if (placement === 'viewer') { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
+    if (placement !== 'hero') { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
     const image = document.querySelector<HTMLImageElement>('.project-hero__media img');
     if (!image || image.complete) { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
     const loaded = () => setImageReady(true);
@@ -61,7 +61,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     return () => { image.removeEventListener('load', loaded); image.removeEventListener('error', loaded); };
   }, [placement]);
   useEffect(() => {
-    if (placement === 'viewer') {
+    if (placement !== 'hero') {
       const frame = requestAnimationFrame(() => { visibleRef.current = active; setInView(active); if (!active) setOpen(false); });
       return () => cancelAnimationFrame(frame);
     }
@@ -177,7 +177,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   }
   function replay() { setOpen(false); setReady(false); setRun(value => value + 1); }
   return <>
-    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${placement === 'viewer' ? ' passport-concept--viewer' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
+    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
       <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label="Скачать паспорт проекта" onAnimationEnd={event => { if ((event.animationName === 'passport-flight' || event.animationName === 'passport-fade')) setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
         <span className="passport-concept__surface" aria-hidden="true" />
         <span className="passport-concept__label">Скачать паспорт проекта</span>
