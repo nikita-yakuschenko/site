@@ -157,7 +157,7 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
       <main data-project-sections style={{ display: 'flex', flexDirection: 'column' }}>
         <ProjectSectionTones />
         <section className="project-hero" data-cms-block="projectHero" data-content-source={source} style={{ order: -1 }}>
-          <ProjectHeroContent data={hero} connected={source === 'database'} location={readyHome?.locationPrepositional ?? readyHome?.location} payment={tiers ? <ProjectHeroPayment tiers={tiers} /> :
+          <ProjectHeroContent data={hero} connected={source === 'database'} location={readyHome?.locationPrepositional ?? readyHome?.location} payment={tiers ? <ProjectHeroPayment tiers={tiers} projectName={hero.name} /> :
               <div key="payment" className="project-hero__aside">
                 {/* Подпись над суммой, как у характеристик слева: без неё
                     число висело само по себе и выбивалось из ряда. */}

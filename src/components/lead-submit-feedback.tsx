@@ -12,6 +12,7 @@ const messages: Record<string, [string, string, string]> = {
   'ready-home-offer': ['Отправляем заявку по дому', 'Заявка по готовому дому принята', 'Свяжемся с вами, чтобы рассказать о доме и договориться о просмотре.'],
   'contacts-question': ['Отправляем ваш вопрос', 'Спасибо за вопрос!', 'Свяжемся с вами, чтобы ответить на ваш вопрос.'],
   'header-question': ['Отправляем ваш вопрос', 'Спасибо за вопрос!', 'Свяжемся с вами, чтобы ответить на ваш вопрос.'],
+  'project-hero-quote': ['Отправляем заявку на расчёт', 'Заявка на расчёт принята', 'Свяжемся с вами и подготовим расчёт по этому проекту.'],
 }
 
 export function LeadSubmitFeedback({ status, text, formId, actionHref, actionLabel, actionChannel }: { status: 'sending' | 'ok'; text?: string | null; formId?: string; actionHref?: string; actionLabel?: string; actionChannel?: 'max' | 'telegram' | 'whatsapp' }) {

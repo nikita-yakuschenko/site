@@ -7036,21 +7036,50 @@ html.is-dialog-open {
 
 }
 
-/* В правой части плашки только платёж по ипотеке.
-   Кнопка расчёта убрана, полная цена тоже: рядом с платежом она шла мелкой
-   строкой, и обе цены проигрывали друг другу.
-
-   Устроено так же, как характеристика слева: подпись сверху, значение под
-   ней. Одинаковое устройство само ставит их на одну линию и избавляет от
-   подгонки отступами. */
-/* Подпись и сумма выровнены по правому краю — по той же грани, что и
-   край полосы: слева они висели относительно друг друга случайно. */
+/* Платёж устроен так же, как характеристика слева: подпись сверху, значение
+   под ней. Одинаковое устройство само ставит числа на одну линию.
+   Подпись и сумма выровнены по правому краю своего блока. */
 .project-hero__aside {
   display: block;
   text-align: right;
 }
 
-.project-hero__question { display: none; }
+.project-hero__question,
+.project-hero__quote { display: none; }
+
+/* Кнопка стоит после платежа и только на десктопе. Платёж остаётся первым
+   элементом группы, поэтому базовая линия плашки по-прежнему держится на
+   числах, а действие закрывает чтение строки. */
+@media (min-width: 960px) {
+  /* Кнопка занимает место справа, и без этого характеристики
+     переносились на вторую строку уже на ширине около 1000px. */
+  .project-hero__specs { flex-wrap: nowrap; }
+  .project-hero__specs li { min-width: 0; }
+
+  .project-hero__aside {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+
+  .project-hero__pay-copy { text-align: right; }
+
+  .project-hero__quote.btn {
+    display: inline-flex;
+    flex: none;
+    gap: 8px;
+    white-space: nowrap;
+    transition: transform 160ms var(--ease-out);
+  }
+
+  .project-hero__quote.btn:active { transform: scale(0.97); }
+}
+
+@media (min-width: 960px) and (prefers-reduced-motion: reduce) {
+  .project-hero__quote.btn { transition: none; }
+  .project-hero__quote.btn:active { transform: none; }
+}
 
 @media (max-width: 959px) {
   .project-hero__bar { grid-template-columns: minmax(84px, 1fr) minmax(0, auto); align-items: center; }
