@@ -6792,9 +6792,71 @@ html.is-dialog-open {
 .project-hero__technology-logo {
   display: block;
   width: auto;
-  height: 24px;
+  height: 16px;
   max-width: 100%;
   object-fit: contain;
+}
+
+.project-hero__technology .project-hero__badge {
+  display: inline-flex;
+  align-items: center;
+  height: 24px;
+  margin: 0;
+  border: 0;
+  background: #fff;
+  cursor: pointer;
+  transition: background 150ms ease, transform 150ms var(--ease-out);
+}
+
+.project-hero__technology .project-hero__badge:hover { background: var(--tint); }
+.project-hero__technology .project-hero__badge:active { transform: scale(.97); }
+
+.technology-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 71;
+  width: min(380px, calc(100% - 32px));
+  height: fit-content;
+  margin: auto;
+  overscroll-behavior: contain;
+}
+
+.technology-dialog__panes { display: grid; }
+
+.technology-dialog__pane {
+  grid-area: 1 / 1;
+  min-width: 0;
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out), visibility 180ms;
+}
+
+.technology-dialog__pane[inert] {
+  visibility: hidden;
+  opacity: 0;
+  transform: translateY(5px);
+}
+
+.technology-dialog__intro {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 24px;
+  padding: 52px 30px 30px;
+  color: var(--avgst-ink);
+}
+
+.technology-dialog__logo { width: 100%; height: auto; }
+.technology-dialog__intro p { margin: 0; color: var(--ink-2); line-height: 1.6; }
+.technology-dialog__intro .btn { width: 100%; }
+
+.technology-dialog[data-state='closed'] { animation: technology-card-out 160ms var(--ease-out) both; }
+.technology-dialog__overlay[data-state='closed'] { animation: technology-overlay-out 160ms var(--ease-out) both; }
+@keyframes technology-card-out { to { opacity: 0; transform: translateY(5px) scale(.98); } }
+@keyframes technology-overlay-out { to { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .technology-dialog, .technology-dialog__overlay { animation: none !important; }
+  .technology-dialog__pane, .project-hero__technology .project-hero__badge { transition: none; }
+  .technology-dialog__pane[inert], .project-hero__technology .project-hero__badge:active { transform: none; }
 }
 
 .project-hero__heading {
@@ -6898,14 +6960,6 @@ html.is-dialog-open {
 
   .project-hero__badge {
     margin-bottom: 8px;
-  }
-
-  .project-hero__technology .project-hero__badge {
-    margin-bottom: 0;
-  }
-
-  .project-hero__technology-logo {
-    height: 20px;
   }
 
   .project-hero__bar {
