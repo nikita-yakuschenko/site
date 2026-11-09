@@ -6783,6 +6783,7 @@ html.is-dialog-open {
 }
 
 .project-hero__technology {
+  position: relative;
   display: flex;
   align-items: center;
   flex-wrap: wrap;
@@ -6795,6 +6796,7 @@ html.is-dialog-open {
   height: 16px;
   max-width: 100%;
   object-fit: contain;
+  mix-blend-mode: multiply;
 }
 
 .project-hero__technology .project-hero__badge {
@@ -6805,58 +6807,105 @@ html.is-dialog-open {
   border: 0;
   background: #fff;
   cursor: pointer;
+  isolation: isolate;
   transition: background 150ms ease, transform 150ms var(--ease-out);
 }
 
-.project-hero__technology .project-hero__badge:hover { background: var(--tint); }
+.project-hero__technology .project-hero__badge:hover { background: color-mix(in srgb, var(--avgst-ink) 6%, #fff); }
 .project-hero__technology .project-hero__badge:active { transform: scale(.97); }
 
-.technology-dialog {
-  position: fixed;
-  inset: 0;
-  z-index: 71;
-  width: min(380px, calc(100% - 32px));
-  height: fit-content;
-  margin: auto;
-  overscroll-behavior: contain;
+.technology-popover {
+  position: absolute;
+  z-index: 4;
+  left: calc(100% + 8px);
+  bottom: 0;
+  container: technology-popover / inline-size;
+  width: 324px;
+  height: auto;
+  margin: 0;
+  overflow: visible;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 16px 40px rgb(0 0 0 / 0.16);
+  transform-origin: -8px calc(100% - 12px);
+  animation: technology-popover-in 0.34s var(--ease-out) both;
 }
 
-.technology-dialog__panes { display: grid; }
-
-.technology-dialog__pane {
-  grid-area: 1 / 1;
-  min-width: 0;
-  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out), visibility 180ms;
+.technology-popover[data-closing] {
+  pointer-events: none;
+  animation: technology-popover-out 0.22s var(--ease-out) both;
 }
 
-.technology-dialog__pane[inert] {
-  visibility: hidden;
-  opacity: 0;
-  transform: translateY(5px);
+.technology-popover::before {
+  content: '';
+  position: absolute;
+  right: 100%;
+  top: 0;
+  bottom: 0;
+  width: 10px;
+}
+
+@keyframes technology-popover-in {
+  from { opacity: 0; transform: scale(0.72); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes technology-popover-out {
+  from { opacity: 1; transform: scale(1); }
+  to { opacity: 0; transform: scale(0.72); }
+}
+
+.technology-popover .ask-dialog__close {
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
 }
 
 .technology-dialog__intro {
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 24px;
-  padding: 52px 30px 30px;
+  align-items: stretch;
+  gap: 16px;
+  padding: 24px 24px 22px;
   color: var(--avgst-ink);
 }
 
-.technology-dialog__logo { width: 100%; height: auto; }
-.technology-dialog__intro p { margin: 0; color: var(--ink-2); line-height: 1.6; }
+.technology-dialog__logo { display: block; width: 168px; height: auto; margin-inline: auto; }
+.technology-dialog__intro p { margin: 0; color: var(--ink-2); font-size: 13px; line-height: 1.4; }
 .technology-dialog__intro .btn { width: 100%; }
 
-.technology-dialog[data-state='closed'] { animation: technology-card-out 160ms var(--ease-out) both; }
-.technology-dialog__overlay[data-state='closed'] { animation: technology-overlay-out 160ms var(--ease-out) both; }
-@keyframes technology-card-out { to { opacity: 0; transform: translateY(5px) scale(.98); } }
-@keyframes technology-overlay-out { to { opacity: 0; } }
+/* Справа от бейджей 324px не помещаются: плашка уезжает за край и под рейку связи.
+   На узком экране она встаёт над бейджами и остаётся в кадре. */
+@media (max-width: 719px) {
+  .technology-popover {
+    left: 0;
+    bottom: calc(100% + 8px);
+    width: min(324px, calc(100vw - 88px));
+    transform-origin: 28px calc(100% + 8px);
+  }
+
+  .technology-popover::before {
+    top: 100%;
+    right: auto;
+    bottom: auto;
+    left: 0;
+    width: 100%;
+    height: 8px;
+  }
+}
+
+@container technology-popover (max-width: 318px) {
+  .technology-dialog__intro { padding-inline: 16px; }
+  .technology-dialog__intro p { text-wrap: pretty; }
+  .technology-dialog__intro p br { display: none; }
+}
 
 @media (prefers-reduced-motion: reduce) {
-  .technology-dialog, .technology-dialog__overlay { animation: none !important; }
-  .technology-dialog__pane, .project-hero__technology .project-hero__badge { transition: none; }
-  .technology-dialog__pane[inert], .project-hero__technology .project-hero__badge:active { transform: none; }
+  .project-hero__technology .project-hero__badge { transition: none; }
+  .project-hero__technology .project-hero__badge:active { transform: none; }
+  .technology-popover,
+  .technology-popover[data-closing] { animation: none; }
 }
 
 .project-hero__heading {
