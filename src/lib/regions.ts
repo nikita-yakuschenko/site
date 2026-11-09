@@ -2,6 +2,7 @@ import { canPersistFunctional } from "../consent/functional-persist";
 import { copy } from "./copy";
 import {
   REGION_COOKIE,
+  SELECTED_REGION_COOKIE,
   regionFromSearch,
   type TrafficRegion,
 } from "./region-traffic";
@@ -26,23 +27,36 @@ export function regionByCode(code: string | null | undefined): (typeof REGIONS)[
   return REGIONS.find((region) => region.code === code) || REGIONS[0];
 }
 
-export function readCookieRegionCode(): RegionCode | null {
+function readRegionCookie(name: string): RegionCode | null {
   if (typeof document === "undefined") return null;
-  const entry = document.cookie.split(';').map(value => value.trim()).find(value => value.startsWith(`${REGION_COOKIE}=`));
+  const entry = document.cookie.split(';').map(value => value.trim()).find(value => value.startsWith(`${name}=`));
   if (!entry) return null;
   try {
-    const value = decodeURIComponent(entry.slice(REGION_COOKIE.length + 1));
+    const value = decodeURIComponent(entry.slice(name.length + 1));
     return value === "nn" || value === "msk" ? value : null;
   } catch {
     return null;
   }
 }
 
-function writeCookieRegion(code: RegionCode): void {
+export function readCookieRegionCode(): RegionCode | null {
+  return readRegionCookie(REGION_COOKIE);
+}
+
+export function readSelectedRegionCode(): RegionCode | null {
+  return readRegionCookie(SELECTED_REGION_COOKIE);
+}
+
+function writeCookieRegion(code: RegionCode, name = REGION_COOKIE): void {
   if (typeof document === "undefined") return;
   const lifetime = canPersistFunctional() ? `; Max-Age=${COOKIE_MAX_AGE}` : "";
   const secure = window.location.protocol === "https:" ? "; Secure" : "";
-  document.cookie = `${REGION_COOKIE}=${code}; Path=/; SameSite=Lax${lifetime}${secure}`;
+  document.cookie = `${name}=${code}; Path=/; SameSite=Lax${lifetime}${secure}`;
+}
+
+export function selectRegionCode(code: RegionCode): void {
+  writeCookieRegion(code, SELECTED_REGION_COOKIE);
+  writeRegionCode(code);
 }
 
 export function readRegionCode(): RegionCode {

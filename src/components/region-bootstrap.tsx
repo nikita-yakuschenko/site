@@ -2,13 +2,16 @@
 
 import { createContext, Suspense, useContext, useEffect, useSyncExternalStore, type ReactNode } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { applyRegionFromSearch, readRegionCode, subscribeRegion, type RegionCode } from '../lib/regions';
+import { applyRegionFromSearch, readRegionCode, readSelectedRegionCode, subscribeRegion, type RegionCode } from '../lib/regions';
 
 /** Начальный регион из конкретного серверного запроса, без общих SSR-переменных. */
 const InitialRegion = createContext<RegionCode>('nn');
 export function useRegionCode(): RegionCode {
   const initial = useContext(InitialRegion);
   return useSyncExternalStore(subscribeRegion, readRegionCode, () => initial);
+}
+export function useSelectedRegionCode(): RegionCode | null {
+  return useSyncExternalStore(subscribeRegion, readSelectedRegionCode, () => null);
 }
 function RegionTrafficSync() {
   const search = useSearchParams().toString();

@@ -1,5 +1,6 @@
 /** Cookie с регионом для SSR и повторов захода. */
 export const REGION_COOKIE = "avgst_region";
+export const SELECTED_REGION_COOKIE = "avgst_selected_region";
 
 export type TrafficRegion = "nn" | "msk";
 

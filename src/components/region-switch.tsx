@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from 'react'
 import { copy } from '../lib/copy'
 import {
   REGIONS,
-  writeRegionCode,
+  selectRegionCode,
   type RegionCode,
 } from '../lib/regions'
 
@@ -34,7 +34,7 @@ export function RegionSwitch() {
   }, [open])
 
   function select(next: RegionCode): void {
-    writeRegionCode(next)
+    selectRegionCode(next)
     setOpen(false)
     router.refresh()
   }

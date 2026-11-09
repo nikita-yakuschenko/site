@@ -1,4 +1,5 @@
 import type { ConsentCategory } from "./types";
+import { SELECTED_REGION_COOKIE } from "../lib/region-traffic";
 
 /** First-party ключи, которые чистим при revoke категории. */
 export const CLEANUP_KEYS: Record<
@@ -6,7 +7,7 @@ export const CLEANUP_KEYS: Record<
   { cookies: string[]; prefixes: string[]; localStorage: string[]; sessionStorage: string[] }
 > = {
   functional: {
-    cookies: ["avgst_voter", "avgst_region"],
+    cookies: ["avgst_voter", "avgst_region", SELECTED_REGION_COOKIE],
     prefixes: [],
     localStorage: [
       "avgst:region",

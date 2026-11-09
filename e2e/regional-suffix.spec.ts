@@ -39,3 +39,15 @@ test('returning to the tab drops a suffix the current IP no longer confirms', as
   await page.evaluate(() => document.dispatchEvent(new Event('visibilitychange')))
   await expect(suffix).toHaveCount(0)
 })
+
+test('a region selected in the header overrides IP and survives a reload', async ({ page }) => {
+  await page.route(/\/api\/visitor-region/, route => route.fulfill({ json: { region: 'nn' } }))
+  await page.goto('/')
+  const suffix = page.locator('[data-regional-suffix]')
+  await expect(suffix).toHaveText('в Нижнем Новгороде и области')
+  await page.locator('.site-region__trigger').filter({ visible: true }).first().click()
+  await page.getByRole('option', { name: 'Московская область' }).click()
+  await expect(suffix).toHaveText('в Москве и Московской области')
+  await page.reload()
+  await expect(suffix).toHaveText('в Москве и Московской области')
+})

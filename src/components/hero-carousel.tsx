@@ -12,6 +12,7 @@ import { optimizedSrc, optimizedSrcSet, resizedSrc, resizedSrcSet } from "../lib
 import { CarouselProgress, CAROUSEL_SLIDE_MS } from "./carousel-progress";
 import { LeadDialog } from "./lead-dialog";
 import { useIPRegion } from './use-ip-region';
+import { useSelectedRegionCode } from './region-bootstrap';
 import { DEFAULT_REGIONAL_SUFFIX, regionalSuffixFor, type RegionalSuffix } from '../lib/regional-suffix';
 
 /**
@@ -195,7 +196,8 @@ export function HeroCarousel({
 }) {
   const shown = usePreviewHeroCopy(message);
   const ipRegion = useIPRegion();
-  const regionalSuffix = regionalSuffixFor(ipRegion, shown.regionalSuffix ?? DEFAULT_REGIONAL_SUFFIX);
+  const selectedRegion = useSelectedRegionCode();
+  const regionalSuffix = regionalSuffixFor(selectedRegion ?? ipRegion, shown.regionalSuffix ?? DEFAULT_REGIONAL_SUFFIX);
   const slots = usePreviewHeroPromos(promos);
   const [lead, setLead] = useState<HeroPromo | null>(null);
   const count = slots.length;
