@@ -7047,9 +7047,26 @@ html.is-dialog-open {
 .project-hero__question,
 .project-hero__quote { display: none; }
 
-/* Кнопка стоит после платежа и только на десктопе. Платёж остаётся первым
-   элементом группы, поэтому базовая линия плашки по-прежнему держится на
-   числах, а действие закрывает чтение строки. */
+/* Кнопка стоит сразу после платежа, с планшета и шире. На телефоне её нет:
+   там остаётся «Задать вопрос». Платёж идёт первым в группе, поэтому
+   действие читается следом за суммой. */
+@media (min-width: 720px) {
+  .project-hero__quote.btn {
+    display: inline-flex;
+    flex: none;
+    gap: 8px;
+    white-space: nowrap;
+    transition: transform 160ms var(--ease-out);
+  }
+
+  .project-hero__quote.btn:active { transform: scale(0.97); }
+}
+
+@media (min-width: 720px) and (prefers-reduced-motion: reduce) {
+  .project-hero__quote.btn { transition: none; }
+  .project-hero__quote.btn:active { transform: none; }
+}
+
 @media (min-width: 960px) {
   /* Кнопка занимает место справа, и без этого характеристики
      переносились на вторую строку уже на ширине около 1000px. */
@@ -7064,29 +7081,35 @@ html.is-dialog-open {
   }
 
   .project-hero__pay-copy { text-align: right; }
-
-  .project-hero__quote.btn {
-    display: inline-flex;
-    flex: none;
-    gap: 8px;
-    white-space: nowrap;
-    transition: transform 160ms var(--ease-out);
-  }
-
-  .project-hero__quote.btn:active { transform: scale(0.97); }
-}
-
-@media (min-width: 960px) and (prefers-reduced-motion: reduce) {
-  .project-hero__quote.btn { transition: none; }
-  .project-hero__quote.btn:active { transform: none; }
 }
 
 @media (max-width: 959px) {
   .project-hero__bar { grid-template-columns: minmax(84px, 1fr) minmax(0, auto); align-items: center; }
   .project-hero__specs { grid-column: 1 / -1; }
-  .project-hero__question.btn { display: inline-flex; justify-self: start; min-width: 0; max-width: 100%; padding: 10px; font-size: 12px; white-space: normal; }
   .project-hero__aside { min-width: 0; }
   .project-hero__aside .project-hero__pay { white-space: normal; }
+}
+
+/* На планшете характеристики занимают всю верхнюю строку, поэтому платёж
+   уезжает влево, а кнопка встаёт сразу справа от него. */
+@media (min-width: 720px) and (max-width: 959px) {
+  .project-hero__question.btn { display: none; }
+
+  .project-hero__aside {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 16px;
+    text-align: left;
+  }
+
+  .project-hero__pay-copy { text-align: left; }
+  .project-hero__aside .project-hero__pay { white-space: nowrap; }
+}
+
+@media (max-width: 719px) {
+  .project-hero__question.btn { display: inline-flex; justify-self: start; min-width: 0; max-width: 100%; padding: 10px; font-size: 12px; white-space: normal; }
 }
 
 @media (max-width: 374px) {
