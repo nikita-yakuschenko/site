@@ -1,9 +1,11 @@
 'use client'
 
 import { useEffect, useState, type ReactNode } from 'react'
+import Image from 'next/image'
 import { splitProjectName } from '../lib/project-name'
 import { copy } from '../lib/copy'
 import { isProjectHeroData, type ProjectHeroData } from '../lib/catalog/project-hero-data'
+import { TECHNOLOGY_OPTIONS } from '../lib/catalog/types'
 import { preload } from 'react-dom'
 import { optimizedSrc, optimizedSrcSet } from '../lib/media'
 import { LeadDialog } from './lead-dialog'
@@ -16,6 +18,10 @@ export function ProjectHeroContent({ data, connected, location, payment }: { dat
   const current = draft || data
   // Unfinished drafts show explicit placeholders instead of blanks
   const hero = { ...current, name: current.name.trim() || 'Без названия', technologyBadge: current.technologyBadge || 'Не выбрана' }
+  const technology = TECHNOLOGY_OPTIONS.find(option => option.value === hero.technologyBadge)?.technology
+  const technologyLogo = technology === 'frame'
+    ? { src: '/logos/AS%20Pre-Cut.svg', alt: 'AS Pre-Cut' }
+    : technology ? { src: '/logos/AS%20PREFAB.svg', alt: 'AS PREFAB' } : null
   useEffect(() => {
     if (!connected || window.parent === window || !new URLSearchParams(window.location.search).has('cmsPreview')) return
     const allowed = new Set(['http://localhost:3001', 'https://cms.avgst.ru'])
@@ -49,7 +55,13 @@ export function ProjectHeroContent({ data, connected, location, payment }: { dat
     <ProjectPassportConcept key={hero.slug} project={hero.name} projectSlug={hero.slug} />
     <div className="project-hero__stage">
       <div className="project-hero__intro" data-cms-block="projectHero.heading"><div className="project-hero__heading">
-        <div className="project-hero__labels"><p className="project-hero__badge">{hero.technologyBadge}</p>{location && <p className="project-hero__location">В {location}</p>}</div>
+        <div className="project-hero__labels">
+          <div className="project-hero__technology">
+            <p className="project-hero__badge">{hero.technologyBadge}</p>
+            {technologyLogo && <Image {...technologyLogo} className="project-hero__technology-logo" width={586} height={140} unoptimized />}
+          </div>
+          {location && <p className="project-hero__location">В {location}</p>}
+        </div>
         <h1>{head}{mark ? <span>{mark}</span> : null}{tail}</h1>
       </div></div>
       <div className="project-hero__bar" data-cms-block="projectHero.specs"><ul className="project-hero__specs">{specs.map(spec => <li key={spec.label}><p>{spec.label}</p><strong>{spec.value}</strong></li>)}</ul>

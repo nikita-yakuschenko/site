@@ -6774,11 +6774,27 @@ html.is-dialog-open {
 
 .project-hero__labels {
   display: flex;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
   width: 100%;
   margin: 0 0 16px;
+}
+
+.project-hero__technology {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.project-hero__technology-logo {
+  display: block;
+  width: auto;
+  height: 24px;
+  max-width: 100%;
+  object-fit: contain;
 }
 
 .project-hero__heading {
@@ -6882,6 +6898,14 @@ html.is-dialog-open {
 
   .project-hero__badge {
     margin-bottom: 8px;
+  }
+
+  .project-hero__technology .project-hero__badge {
+    margin-bottom: 0;
+  }
+
+  .project-hero__technology-logo {
+    height: 20px;
   }
 
   .project-hero__bar {
