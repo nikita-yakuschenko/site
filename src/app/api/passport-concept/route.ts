@@ -17,11 +17,11 @@ export async function POST(request: Request) {
     if (!document.ready) return Response.json({ error: 'passport-preparing' }, { status: 503, headers: { 'Retry-After': '15' } })
     const local = process.env.NODE_ENV === 'development' && process.env.CMS_PUBLIC_URL === 'http://localhost:3001'
     const cms = new URL(local ? '/api/passport-concept' : '/api/lead-submissions/submit', process.env.CMS_PUBLIC_URL)
-    const payload = local ? input : { requestId: input.requestId, name: 'Запрос паспорта проекта', phone: input.phone,
+    const payload = local ? input : { requestId: input.requestId, phone: input.phone,
       siteId: 'avgst', formId: 'project-passport', consent: true,
       sourceUrl: `https://avgst.ru/catalog/${input.slug}`, sourcePath: `/catalog/${input.slug}`,
-      message: `Скачать паспорт проекта: ${input.slug}`,
-      meta: { project: input.slug, region: input.region, action: 'project-passport' } }
+      message: `Скачать паспорт проекта: ${document.projectName}`,
+      meta: { project: input.slug, projectName: document.projectName, region: input.region, action: 'project-passport' } }
     const result = await fetch(cms, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.CMS_SITE_API_KEY}` }, body: JSON.stringify(payload), signal: AbortSignal.timeout(20000) })
     if (!result.ok) return Response.json({ error: 'not-saved' }, { status: 502 })
     const receipt = await result.json()

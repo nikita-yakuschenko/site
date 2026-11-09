@@ -35,5 +35,5 @@ export async function readyPassport(slug: string, region: 'nn' | 'msk') {
   }
   const file = path.join(directory, current.fingerprint, 'passport.pdf')
   try { await fs.access(file) } catch { await queuePassport(slug, region, current.fingerprint); return { ready: false as const, fingerprint: current.fingerprint } }
-  return { ready: true as const, file, manifest, fingerprint: current.fingerprint, filename: `AVGST_${slug}_${region.toUpperCase()}.pdf` }
+  return { ready: true as const, file, manifest, fingerprint: current.fingerprint, projectName: current.data.project.name, filename: `AVGST_${slug}_${region.toUpperCase()}.pdf` }
 }

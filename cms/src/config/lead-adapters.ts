@@ -71,10 +71,12 @@ export function webhookBody(lead: LeadInput, id: string, title: string) {
   const project = text(meta.projectName) || text(meta.project)
   const attribution: Attribution = Object.fromEntries(attributionKeys.flatMap(key => text(meta[key]) ? [[key, text(meta[key])]] : []))
   const comment = [requestDetails(lead), marketingDetails(lead)].filter(Boolean).join('\n\n')
+  const { name, ...leadWithoutName } = lead
+  const passport = lead.formId === 'project-passport'
   return {
     id,
     title,
-    name: lead.name,
+    ...(passport ? {} : { name }),
     phone: lead.phone,
     email: text(meta.email),
     comment,
@@ -83,7 +85,7 @@ export function webhookBody(lead: LeadInput, id: string, title: string) {
     form: lead.formId || '',
     project,
     ...attribution,
-    lead,
+    lead: passport ? leadWithoutName : lead,
   }
 }
 

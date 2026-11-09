@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { webhookBody } from '../src/config/lead-adapters'
 import { leadTitle } from '../src/config/lead-title'
-import type { LeadInput } from '../../src/lib/leads'
+import { leadInputSchema, type LeadInput } from '../../src/lib/leads'
 
 test('комментарий содержит русские сведения без дублирования отдельных полей CRM', () => {
   const lead: LeadInput = {
@@ -40,4 +40,16 @@ test('комментарий содержит русские сведения б
   assert.equal(body.page, lead.sourceUrl)
   assert.equal(body.lead.consent, true)
   assert.equal(body.roistat, '123456')
+})
+
+test('скачивание паспорта передаёт название проекта и телефон без имени контакта', () => {
+  const input = { phone: '+79990000000', siteId: 'corporate', consent: true, formId: 'project-passport', meta: { project: 'scandy-106', projectName: 'Сканди 106' } }
+  for (const lead of [leadInputSchema.parse(input), leadInputSchema.parse({ ...input, name: 'Запрос паспорта проекта' })]) {
+    const body = webhookBody(lead, 'sample', leadTitle(lead))
+    assert.equal(body.title, 'Посетитель скачал паспорт проекта Сканди 106')
+    assert.equal(body.phone, input.phone)
+    assert.equal('name' in body, false)
+    assert.equal('name' in body.lead, false)
+  }
+  assert.equal(leadInputSchema.safeParse({ ...input, formId: 'header-question' }).success, false)
 })
