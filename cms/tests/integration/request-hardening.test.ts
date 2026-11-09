@@ -3,11 +3,12 @@ import test from 'node:test'
 import { randomBytes } from 'node:crypto'
 import { checkRequestLimit } from '../../src/config/request-limits'
 import { sql } from '@payloadcms/db-postgres'
+import { getPayload } from 'payload'
 
 test('distributed request counters enforce atomic limits across concurrent requests', {skip:process.env.CMS_HARDENING_TEST_DATABASE!=='true'},async()=>{
  assert.ok(['localhost','127.0.0.1'].includes(new URL(process.env.DATABASE_URL!).hostname))
  process.env.CMS_MAINTENANCE='1';process.env.CMS_SEED='0';process.env.PAYLOAD_DB_PUSH='false'
- const {getPayload}=await import('payload'),{default:config}=await import('../../src/payload.config')
+ const {default:config}=await import('../../src/payload.config')
  const p=await getPayload({config}),identity=randomBytes(32).toString('hex')
  try{
   const result=await Promise.allSettled(Array.from({length:12},()=>checkRequestLimit(p,'lead',identity)))
