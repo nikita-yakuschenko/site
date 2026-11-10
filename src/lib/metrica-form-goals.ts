@@ -25,12 +25,31 @@ export function bindMetricaFormGoals(sender: GoalSender): void {
   flushGoals()
 }
 
+const mortgageEvents: Record<string, string> = {
+  it: 'lead_mortgage_it',
+  family: 'lead_mortgage_family',
+  market: 'lead_mortgage_market',
+}
+
+/** Калькулятор и консультация общие для трёх программ, цель выбирается по программе в заявке. */
+function specificGoal(formId: string, meta?: Record<string, unknown>) {
+  const program = typeof meta?.program === 'string' ? meta.program : ''
+  if (formId === 'mortgage-consultation' || formId === 'mortgage-calculator') {
+    const event = mortgageEvents[program]
+    const match = event ? goals.find(goal => goal.event === event) : undefined
+    if (match) return match
+  }
+  return goals.find(goal => goal.formIds.includes(formId)) ?? goals.find(goal => goal.event === 'lead_other')!
+}
+
 /** Вызывать только после подтверждения сохранения заявки сервером. */
-export function trackMetricaFormSuccess(receiptId: string, formId: string): void {
-  const specific = goals.find(goal => goal.formIds.includes(formId)) ?? goals.find(goal => goal.event === 'lead_other')!
+export function trackMetricaFormSuccess(receiptId: string, formId: string, meta?: Record<string, unknown>): void {
+  const specific = specificGoal(formId, meta)
+  const params: GoalParams = { form_id: formId }
+  if (typeof meta?.program === 'string' && mortgageEvents[meta.program]) params.program = meta.program
   for (const event of ['lead_success', specific.event]) {
     const key = `${receiptId}:${event}`
-    if (!sent.has(key) && !queued.has(key)) queued.set(key, { event, params: { form_id: formId } })
+    if (!sent.has(key) && !queued.has(key)) queued.set(key, { event, params })
   }
   flushGoals()
 }

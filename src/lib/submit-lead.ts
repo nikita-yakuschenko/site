@@ -23,6 +23,6 @@ export async function submitLead(payload: Record<string, unknown>, attempt: Lead
   const receipt = await response.json()
   if (!response.ok || receipt.accepted !== true) throw new Error('lead-not-confirmed')
   trackVkFormSubmit(requestId)
-  trackMetricaFormSuccess(receipt.id || requestId, typeof payload.formId === 'string' ? payload.formId : 'lead-form')
+  trackMetricaFormSuccess(receipt.id || requestId, typeof payload.formId === 'string' ? payload.formId : 'lead-form', meta as Record<string, unknown>)
   return receipt as { accepted: true; id: string }
 }

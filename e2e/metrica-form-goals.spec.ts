@@ -30,6 +30,24 @@ test('all form IDs get one common and one specific event, including CMS promo ke
     }
   }
   calls.length = 0
+  trackMetricaFormSuccess('mortgage-it', 'mortgage-calculator', { program: 'it' })
+  expect(calls).toEqual([
+    ['lead_success', { form_id: 'mortgage-calculator', program: 'it' }],
+    ['lead_mortgage_it', { form_id: 'mortgage-calculator', program: 'it' }],
+  ])
+  calls.length = 0
+  trackMetricaFormSuccess('mortgage-family', 'mortgage-consultation', { program: 'family' })
+  expect(calls).toEqual([
+    ['lead_success', { form_id: 'mortgage-consultation', program: 'family' }],
+    ['lead_mortgage_family', { form_id: 'mortgage-consultation', program: 'family' }],
+  ])
+  calls.length = 0
+  trackMetricaFormSuccess('mortgage-market', 'mortgage-calculator', { program: 'market' })
+  expect(calls).toEqual([
+    ['lead_success', { form_id: 'mortgage-calculator', program: 'market' }],
+    ['lead_mortgage_market', { form_id: 'mortgage-calculator', program: 'market' }],
+  ])
+  calls.length = 0
   trackMetricaFormSuccess('cms-promo', 'custom-cms-promo')
   expect(calls).toEqual([
     ['lead_success', { form_id: 'custom-cms-promo' }],
