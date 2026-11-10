@@ -1,15 +1,62 @@
-.lead-card:has(> .lead-submit-feedback), .lead-form:has(> .lead-submit-feedback) { position: relative; min-height: 300px; }
-.lead-card:has(> .lead-submit-feedback) > :not(.lead-submit-feedback), .lead-form:has(> .lead-submit-feedback) > :not(.lead-submit-feedback) { visibility: hidden; }
-.lead-submit-feedback { position: absolute; inset: 0; z-index: 3; border-radius: 0; background: #101010; }
-.lead-submit-feedback:not(.lead-submit-feedback--sending) { overflow: hidden; }
-.lead-submit-feedback--sending { display: flex; align-items: center; justify-content: center; padding: 32px 24px; background: #101010; color: white; text-align: center; }
-.ask-dialog__card:has(.lead-submit-feedback) { background: #101010; }
-.ask-dialog__card:has(.lead-submit-feedback:not(.lead-submit-feedback--sending)) { overflow: hidden; }
-.ask-dialog__card:has(.lead-submit-feedback) .ask-dialog__close { z-index: 5; color: #fff; background: rgb(255 255 255 / .14); }
-.ask-dialog__card:has(.lead-submit-feedback) .ask-dialog__close:hover { background: rgb(255 255 255 / .24); }
-.lead-submit-feedback__copy { max-width: 320px; }
-.lead-submit-feedback .lead-submit-feedback__title { margin: 0 0 12px; font-size: 20px; font-weight: 700; line-height: 1.3; color: white; }
-.lead-submit-feedback__copy > p:last-child { margin: 0; font-size: 14px; line-height: 1.6; color: rgb(255 255 255 / .7); }
+/* Экран успеха лежит поверх уже открытой формы и не меняет её размер.
+   Фон и цвет берутся у самой формы: отдельная чёрная плашка здесь рисовала
+   второй прямоугольник и раздвигала блок до 300px. */
+.lead-card:has(> .lead-submit-feedback),
+.lead-form:has(> .lead-submit-feedback) {
+  position: relative;
+}
 
-/* Keep form/dialog close controls reachable during verification and submission. */
+.lead-card:has(> .lead-submit-feedback) > :not(.lead-submit-feedback),
+.lead-form:has(> .lead-submit-feedback) > :not(.lead-submit-feedback) {
+  visibility: hidden;
+}
+
+.lead-submit-feedback {
+  --form-success-background: transparent;
+  --form-success-text: var(--avgst-ink);
+  --form-success-description: var(--ink-2);
+  --form-success-logo-filter: brightness(0);
+  --form-success-check: #187640;
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  padding: 16px;
+  border-radius: 0;
+  background: transparent;
+  color: var(--form-success-text);
+  text-align: center;
+}
+
+.lead-submit-feedback[data-form-success-animation] {
+  min-height: 0;
+  border-radius: 0;
+  background: transparent;
+}
+
+.lead-submit-feedback__copy { max-width: 320px; }
+.lead-submit-feedback .lead-submit-feedback__title { margin: 0 0 12px; font-size: 20px; font-weight: 700; line-height: 1.3; color: inherit; }
+.lead-submit-feedback__copy > p:last-child { margin: 0; font-size: 14px; line-height: 1.6; color: var(--form-success-description); }
+
+/* Тёмные поверхности: знак и текст остаются светлыми. */
+.lead-reveal__card .lead-submit-feedback,
+.mortgage-request.is-open .lead-submit-feedback,
+.ready-home-offer__total .lead-submit-feedback {
+  --form-success-text: #fff;
+  --form-success-description: rgb(255 255 255 / .78);
+  --form-success-logo-filter: none;
+  --form-success-check: #4ade80;
+}
+
+/* Светлый баннер со знаком: общий тёмный вариант выше ему не подходит. */
+.mortgage-mid-cta__inner--cutout .lead-submit-feedback {
+  --form-success-text: var(--avgst-ink);
+  --form-success-description: var(--ink-1);
+  --form-success-logo-filter: brightness(0);
+  --form-success-check: #187640;
+}
+
 .ask-dialog__close, .panel-lead__close, .lead-reveal__close, .project-config__close, .mortgage-finance__toggle { z-index: 4; }

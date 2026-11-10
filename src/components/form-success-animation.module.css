@@ -19,7 +19,7 @@
 .whatsapp { background: #25D366; }
 .max { background: linear-gradient(100deg, #44CCFF 0%, #5533EE 62%, #9933DD 100%); }
 .yellow { background: var(--brand-yellow); color: var(--brand-yellow-foreground); }
-.countdown { margin: 12px 0 0; color: rgb(255 255 255 / .72); font-size: 13px; line-height: 1.4; font-variant-numeric: tabular-nums; }
+.countdown { margin: 12px 0 0; color: var(--form-success-description, rgb(255 255 255 / .72)); font-size: 13px; line-height: 1.4; font-variant-numeric: tabular-nums; }
 @keyframes appear { from { opacity: 0; transform: scale(.55) rotate(-8deg); } to { opacity: 1; transform: scale(1) rotate(0); } }
 @keyframes morph { to { opacity: 0; transform: scale(1.35) rotate(12deg); filter: blur(4px); } }
 @keyframes reveal { to { opacity: 1; } }
