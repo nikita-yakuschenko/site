@@ -114,7 +114,7 @@ export function AboutTimeline({ entries: sourceEntries }: { entries: readonly Hi
           </li>
         ))}</ol>
       </div>
-      {gallery && galleryImages ? <PhotoLightbox backdrop="form" images={galleryImages} index={gallery.index} onIndex={index => setGallery({ ...gallery, index })} onClose={() => setGallery(null)} /> : null}
+      {gallery && galleryImages ? <PhotoLightbox backdrop="form" images={galleryImages} index={gallery.index} onIndex={index => setGallery({ ...gallery, index })} onClose={() => setGallery(null)} navEvent="gallery_nav" /> : null}
     </>
   )}</CMSContentBlock>)
 }

@@ -12,6 +12,7 @@ import {
   toggleFavorite,
 } from '../lib/favorites'
 import { shareProject } from '../lib/share'
+import { trackMetricaAction } from '../lib/metrica-form-goals'
 import { recordCardShare, recordSessionView } from '../lib/project-view'
 import { resizedSrc, resizedSrcSet } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
@@ -79,7 +80,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel, priority
           </span>
         </Link>
         <div className="card__actions">
-          <button type="button" className="icon-btn" aria-label={copy.share} onClick={() => void shareProject(project).then(shared => { if (shared) return recordCardShare(project.slug) })}>
+          <button type="button" className="icon-btn" aria-label={copy.share} onClick={() => void shareProject(project).then(shared => { if (!shared) return; trackMetricaAction('project_share'); return recordCardShare(project.slug) })}>
             <IconShare3 size={16} stroke={1.75} />
           </button>
           <button
@@ -87,7 +88,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel, priority
             className="icon-btn"
             aria-label={favorite ? copy.favoriteRemove : copy.favoriteAdd}
             aria-pressed={favorite}
-            onClick={() => { const next = toggleFavorite(project.id); if (!favorite && next.includes(project.id)) void recordSessionView(project.slug) }}
+            onClick={() => { const next = toggleFavorite(project.id); if (!favorite && next.includes(project.id)) { trackMetricaAction('project_like'); void recordSessionView(project.slug) } }}
           >
             <IconHeart size={16} fill={favorite ? 'currentColor' : 'none'} className={favorite ? 'is-fav' : undefined} />
           </button>

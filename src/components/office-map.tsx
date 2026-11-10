@@ -8,6 +8,7 @@ import {
   OFFICE_ROUTE_URL,
 } from '../lib/office'
 import { SITE } from '../lib/site'
+import { trackMetricaAction } from '../lib/metrica-form-goals'
 import { loadYandexMaps, type YmapsMap } from '../lib/yandex-maps'
 
 /**
@@ -150,7 +151,7 @@ export function OfficeMap({
         aria-busy={skeleton && status === 'pending' ? true : undefined}
         aria-hidden={interactive ? undefined : true}
         tabIndex={interactive ? undefined : -1}
-        onClick={onNavigate}
+        onClick={() => { if (routeUrl === OFFICE_ROUTE_URL) trackMetricaAction('office_route'); onNavigate?.() }}
       />
       <div className="site-office__map-canvas" ref={host} />
     </div>

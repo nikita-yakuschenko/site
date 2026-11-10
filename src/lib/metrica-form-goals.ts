@@ -1,6 +1,6 @@
 import goals from './metrica-goals.json' with { type: 'json' }
 
-type GoalParams = { form_id: string }
+type GoalParams = Record<string, string>
 type GoalSender = (event: string, params: GoalParams) => void
 const queued = new Map<string, { event: string; params: GoalParams }>()
 const sent = new Set<string>()
@@ -14,7 +14,7 @@ function flushGoals(): void {
       sent.add(key)
       queued.delete(key)
     } catch {
-      // Сбой аналитики не меняет результат сохранения заявки.
+      // Сбой аналитики не меняет результат действия на сайте.
     }
   }
 }
@@ -32,5 +32,12 @@ export function trackMetricaFormSuccess(receiptId: string, formId: string): void
     const key = `${receiptId}:${event}`
     if (!sent.has(key) && !queued.has(key)) queued.set(key, { event, params: { form_id: formId } })
   }
+  flushGoals()
+}
+
+/** Клик или просмотр. Каждое действие отправляется отдельно, без дедупликации заявки. */
+export function trackMetricaAction(event: string, params: GoalParams = {}): void {
+  const key = `action:${event}:${crypto.randomUUID()}`
+  queued.set(key, { event, params })
   flushGoals()
 }

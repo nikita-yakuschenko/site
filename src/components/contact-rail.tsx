@@ -6,8 +6,10 @@ import { IconBrandWhatsapp, IconChevronLeft, IconPhoneCall } from '@tabler/icons
 import { FOOTER_SOCIALS } from '../lib/site'
 import { fallbackMessengerLinks, type MessengerLinks } from '../lib/messengers'
 import { LeadDialog } from './lead-dialog'
+import { trackMetricaAction } from '../lib/metrica-form-goals'
 import './contact-rail.css'
 
+const messengerClick = { max: 'contact_max_click', telegram: 'contact_telegram_click', whatsapp: 'contact_whatsapp_click' } as const
 type MessengerId = 'max' | 'telegram' | 'whatsapp'
 type RailDialog = MessengerId | 'callback'
 
@@ -141,12 +143,12 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
   }, [expanded])
   return <>
     <nav ref={railRef} inert={contactsVisible} aria-hidden={contactsVisible} onPointerEnter={stopAttention} onPointerDown={stopAttention} onFocusCapture={stopAttention} className={`contact-rail${projectPage ? ' contact-rail--project' : ''}${homePage ? ' contact-rail--home' : ''}${belowHero ? ' contact-rail--compact' : ''}${expanded ? ' contact-rail--expanded' : ''}${framed ? ' contact-rail--framed' : ''}${attention ? ' contact-rail--attention' : ''}${contactsVisible ? ' contact-rail--hidden' : ''}`} aria-label="Связаться с нами">
-      <button type="button" className="contact-rail__toggle" aria-hidden={!belowHero} tabIndex={belowHero ? 0 : -1} aria-label={expanded ? 'Свернуть контакты' : 'Открыть контакты'} aria-expanded={expanded} onClick={() => setExpanded(value => !value)}>
+      <button type="button" className="contact-rail__toggle" aria-hidden={!belowHero} tabIndex={belowHero ? 0 : -1} aria-label={expanded ? 'Свернуть контакты' : 'Открыть контакты'} aria-expanded={expanded} onClick={() => setExpanded(value => { if (!value) trackMetricaAction('contact_rail_open'); return !value })}>
         <IconChevronLeft size={18} aria-hidden="true" />
       </button>
       {messengers.filter(item => item.id !== 'whatsapp').map(item => {
         const social = FOOTER_SOCIALS.find(entry => entry.id === item.id)!
-        return <button key={item.id} type="button" className="contact-rail__action" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label={item.label} onClick={() => setDialog(item.id)}>
+        return <button key={item.id} type="button" className="contact-rail__action" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label={item.label} onClick={() => { trackMetricaAction(messengerClick[item.id]); setDialog(item.id) }}>
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img className="contact-rail__logo contact-rail__logo--light" src={item.id === 'telegram' ? '/social/tg_white.svg' : social.light} width={24} height={24} alt="" />
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -154,10 +156,10 @@ export function ContactRail({ links = fallbackMessengerLinks() }: { links?: Mess
           <span className="contact-rail__label">{item.label}</span>
         </button>
       })}
-      {messengers.some(item => item.id === 'whatsapp') ? <button type="button" className="contact-rail__action contact-rail__action--whatsapp" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="WhatsApp" onClick={() => setDialog('whatsapp')}>
+      {messengers.some(item => item.id === 'whatsapp') ? <button type="button" className="contact-rail__action contact-rail__action--whatsapp" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="WhatsApp" onClick={() => { trackMetricaAction('contact_whatsapp_click'); setDialog('whatsapp') }}>
         <IconBrandWhatsapp size={24} stroke={1.7} aria-hidden="true" /><span className="contact-rail__label">WhatsApp</span>
       </button> : null}
-      <button className="contact-rail__action contact-rail__action--callback" type="button" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="Перезвоните мне" onClick={() => setDialog('callback')}>
+      <button className="contact-rail__action contact-rail__action--callback" type="button" tabIndex={collapsed ? -1 : 0} aria-hidden={collapsed} aria-label="Перезвоните мне" onClick={() => { trackMetricaAction('contact_callback_click'); setDialog('callback') }}>
         <IconPhoneCall size={24} stroke={1.7} aria-hidden="true" /><span className="contact-rail__label">Перезвоните мне</span>
       </button>
     </nav>

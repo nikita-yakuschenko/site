@@ -13,6 +13,7 @@ import {
   toggleFavorite,
 } from '../lib/favorites'
 import { shareProject } from '../lib/share'
+import { trackMetricaAction } from '../lib/metrica-form-goals'
 import { recordSessionView } from '../lib/project-view'
 import type { CatalogProject } from '../lib/catalog/types'
 
@@ -140,6 +141,7 @@ export function ProjectActions({
     setCounts({ likes: result.likes, shares: result.shares })
     setPressed(removing ? false : true)
     if (!removing) {
+      trackMetricaAction('project_like')
       void recordSessionView(project.slug)
       setLoveColor(['ink', 'red', 'yellow'][Math.floor(Math.random() * 3)] ?? 'ink')
     }
@@ -149,6 +151,7 @@ export function ProjectActions({
     setLoveColor(null)
     const shared = await shareProject(project)
     if (!shared) return
+    trackMetricaAction('project_share')
     setCounts((current) => ({ ...current, shares: current.shares + 1 }))
     const result = await sendReaction(project.slug, 'share')
     if (!result) {

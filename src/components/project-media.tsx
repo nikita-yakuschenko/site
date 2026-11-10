@@ -112,6 +112,7 @@ export function ProjectExteriors({ project, images, connected = false }: { proje
           index={open}
           onIndex={setOpen}
           onClose={() => setOpen(null)}
+          navEvent="gallery_nav"
         />
       ) : null}
     </section>
@@ -175,6 +176,7 @@ export function ProjectInteriors({ project, images, connected = false }: { proje
           index={open}
           onIndex={setOpen}
           onClose={() => setOpen(null)}
+          navEvent="gallery_nav"
         />
       ) : null}
     </section>

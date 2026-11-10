@@ -40,6 +40,7 @@ import {
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../ui/tabs";
 import { ProjectPassportConcept } from "../project-passport-concept";
 import { PackageDescriptionBody } from "./package-description";
+import { trackMetricaAction } from "../../lib/metrica-form-goals";
 import { technicalMatrices, deliveryInfoForRegion } from "./model/data";
 import {
   hasDifferences,
@@ -214,7 +215,7 @@ export function ConfigurationComparison({
   const matrix = technicalMatrices[project.technology];
   if (!matrix) return null;
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={(next) => { if (next && !open) trackMetricaAction('config_compare_open'); setOpen(next); }}>
       <div className="comparison-invitation">
         <div>
             <h3>Подробное сравнение комплектаций</h3>

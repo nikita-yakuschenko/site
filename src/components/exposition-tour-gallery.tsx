@@ -32,6 +32,6 @@ export function ExpositionTourGallery({ photos: sourcePhotos }: { photos: readon
       })}
     </div>
     {open !== null && <PhotoLightbox images={photos.map((photo) => photo.src)} labels={photos.map((photo) => photo.alt)}
-      index={open} onIndex={setOpen} onClose={() => setOpen(null)} />}
+      index={open} onIndex={setOpen} onClose={() => setOpen(null)} navEvent="gallery_nav" />}
   </>}</CMSContentBlock>)
 }

@@ -15,10 +15,12 @@ import {
 } from '../lib/office'
 import { OfficeMap } from './office-map'
 import { LeadDialog } from './lead-dialog'
+import { trackMetricaAction } from '../lib/metrica-form-goals'
 
 export function OfficeStatusIndicator() {
   const root = useRef<HTMLDivElement>(null)
   const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const hoursSeen = useRef(false)
   const [open, setOpen] = useState(false)
   const [meetingOpen, setMeetingOpen] = useState(false)
 
@@ -28,12 +30,19 @@ export function OfficeStatusIndicator() {
   function show(): void {
     if (closeTimer.current) clearTimeout(closeTimer.current)
     closeTimer.current = null
+    if (!hoursSeen.current) trackMetricaAction('office_hours_open')
+    hoursSeen.current = true
     setOpen(true)
+  }
+
+  function hide(): void {
+    hoursSeen.current = false
+    setOpen(false)
   }
 
   function hideSoon(): void {
     if (closeTimer.current) clearTimeout(closeTimer.current)
-    closeTimer.current = setTimeout(() => setOpen(false), 220)
+    closeTimer.current = setTimeout(hide, 220)
   }
   // Всё, что зависит от времени, приходит одним снимком: иначе уточнение и
   // подсветка дня подвисали бы, пока статус остаётся прежним.
@@ -50,10 +59,10 @@ export function OfficeStatusIndicator() {
   useEffect(() => {
     if (!open) return
     const onPointer = (event: PointerEvent) => {
-      if (!root.current?.contains(event.target as Node)) setOpen(false)
+      if (!root.current?.contains(event.target as Node)) hide()
     }
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false)
+      if (event.key === 'Escape') hide()
     }
     document.addEventListener('pointerdown', onPointer)
     document.addEventListener('keydown', onKey)
@@ -79,7 +88,7 @@ export function OfficeStatusIndicator() {
       }}
       onFocusCapture={show}
       onBlurCapture={(event) => {
-        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setOpen(false)
+        if (!event.currentTarget.contains(event.relatedTarget as Node | null)) hide()
       }}
     >
       <button
@@ -87,7 +96,7 @@ export function OfficeStatusIndicator() {
         className="site-office__trigger"
         aria-label={trigger.includes(triggerShort) ? `${copy.officeStatusAria}: ${trigger}` : `${copy.officeStatusAria}: ${trigger}. ${triggerShort}`}
         aria-expanded={open}
-        onClick={() => setOpen((value) => !value)}
+        onClick={() => { if (open) hide(); else show() }}
       >
         <span className={`site-office__dot site-office__dot--${status}`} aria-hidden="true" />
         {/* Ширина под самый длинный статус больше не резервируется: резерв
@@ -110,7 +119,7 @@ export function OfficeStatusIndicator() {
             type="button"
             className="site-office__close"
             aria-label={copy.close}
-            onClick={() => setOpen(false)}
+            onClick={hide}
           >
             <IconX size={18} stroke={2} aria-hidden="true" />
           </button>
@@ -135,7 +144,7 @@ export function OfficeStatusIndicator() {
           {/* Карта — превью: жесты сняты, клик ведёт на маршрут, туда же,
               куда кнопка ниже. Ключ компонент запрашивает сам; без ключа
               блок остаётся свёрнутым в ноль и панель работает как прежде. */}
-          <OfficeMap onNavigate={() => setOpen(false)} />
+          <OfficeMap onNavigate={hide} />
           <ul className="site-office__transit">
             {OFFICE_TRANSIT.map((stop) => (
               <li key={stop.name}>
@@ -154,7 +163,7 @@ export function OfficeStatusIndicator() {
           </p>
           <button type="button" className="btn btn-yellow site-office__cta" onClick={() => {
             if (closeTimer.current) clearTimeout(closeTimer.current)
-            setOpen(false)
+            hide()
             setMeetingOpen(true)
           }}>Запланировать встречу <IconArrowUpRight size={18} stroke={2} aria-hidden="true" /></button>
           <a
@@ -162,7 +171,7 @@ export function OfficeStatusIndicator() {
             href={OFFICE_ROUTE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={() => setOpen(false)}
+            onClick={() => { trackMetricaAction('office_route'); hide() }}
           >
             {copy.officeVisit}
           </a>

@@ -22,6 +22,7 @@ import { IconFilter, IconSearch } from "@tabler/icons-react";
 import { sortCatalog, type SortableProject } from "../lib/catalog/order";
 import { useRegionCode } from "./region-bootstrap";
 import { copy } from "../lib/copy";
+import { trackMetricaAction } from "../lib/metrica-form-goals";
 
 /**
  * Каталог: колонка отбора слева, выдача справа.
@@ -166,6 +167,9 @@ export function CatalogBoard({
   };
 
   const navigate = (next: Filters) => {
+    const { q: _currentQuery, ...currentFilters } = filters;
+    const { q: _nextQuery, ...nextFilters } = next;
+    if (JSON.stringify(currentFilters) !== JSON.stringify(nextFilters)) trackMetricaAction('catalog_filter');
     startFilterTransition(() => {
       setOptimisticFilters(next);
       router.replace(filtersToHref(next, pathname), { scroll: false });

@@ -10,6 +10,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useViewerClose } from './use-viewer-close';
 import { ViewerPassport } from './viewer-passport';
 import { copy } from "../lib/copy";
+import { trackMetricaAction } from "../lib/metrica-form-goals";
 import { optimizedSrc } from '../lib/media';
 
 /**
@@ -264,6 +265,7 @@ export function PhotoLightbox({
   index,
   onIndex,
   onClose,
+  navEvent,
 }: {
   backdrop?: 'dark' | 'form';
   images: readonly string[];
@@ -276,6 +278,8 @@ export function PhotoLightbox({
   index: number;
   onIndex: (next: number) => void;
   onClose: () => void;
+  /** Листание галереи. У планировок цель другая и ставится при открытии. */
+  navEvent?: string;
 }) {
   const { closing, close } = useViewerClose(onClose);
   const total = images.length;
@@ -303,6 +307,7 @@ export function PhotoLightbox({
 
   const slideTo = useCallback(
     (step: number) => {
+      if (step !== 0 && navEvent) trackMetricaAction(navEvent);
       const width = track.current?.offsetWidth ?? 0;
       window.clearTimeout(settleTimer.current);
       setSettling(true);
@@ -315,7 +320,7 @@ export function PhotoLightbox({
         if (step !== 0) go(step);
       }, SETTLE_MS);
     },
-    [go],
+    [go, navEvent],
   );
 
   useEffect(() => () => window.clearTimeout(settleTimer.current), []);

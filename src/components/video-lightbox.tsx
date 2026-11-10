@@ -5,6 +5,25 @@ import { useEffect, useId } from 'react'
 import { useViewerClose } from './use-viewer-close';
 import { ViewerPassport } from './viewer-passport';
 import { copy } from '../lib/copy'
+import { trackMetricaAction } from '../lib/metrica-form-goals'
+
+function playerSeconds(data: unknown): number | null {
+  let payload = data
+  if (typeof data === 'string') {
+    try { payload = JSON.parse(data) } catch { return null }
+  }
+  if (!payload || typeof payload !== 'object') return null
+  const record = payload as Record<string, unknown>
+  const nested = record.value && typeof record.value === 'object' ? record.value as Record<string, unknown>
+    : record.data && typeof record.data === 'object' ? record.data as Record<string, unknown> : null
+  const candidates = [record.currentTime, record.time, record.seconds, nested?.currentTime, nested?.time, nested?.seconds]
+  for (const value of candidates) {
+    if (typeof value !== 'number' || !Number.isFinite(value)) continue
+    const seconds = value > 7200 ? value / 1000 : value
+    if (seconds >= 0 && seconds <= 7200) return seconds
+  }
+  return null
+}
 
 /** Модалка с iframe: один хром для обзоров и отзывов. */
 export function VideoLightbox({
@@ -18,6 +37,20 @@ export function VideoLightbox({
 }) {
   const { closing, close } = useViewerClose(onClose);
   const titleId = useId()
+
+  useEffect(() => {
+    trackMetricaAction('video_play')
+    let watched = false
+    const onMessage = (event: MessageEvent) => {
+      if (watched || !/kinescope\.io|vk\.com|vkvideo\.ru/.test(event.origin)) return
+      const seconds = playerSeconds(event.data)
+      if (seconds === null || seconds < 30) return
+      watched = true
+      trackMetricaAction('video_30s')
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [])
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {

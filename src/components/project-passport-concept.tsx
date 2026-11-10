@@ -5,6 +5,7 @@ import { IconCheck, IconDownload, IconExclamationMark, IconLoader2, IconPlayerPl
 import { PhoneInput } from './phone-input';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
 import { readRegionCode } from '../lib/regions';
+import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
 import './project-passport-concept.css';
 
 const SUCCESS_MESSAGES = [
@@ -156,6 +157,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       const response = await fetch('/api/passport-concept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phoneE164(phone), project, slug: projectSlug, region: readRegionCode(), requestId: requestId.current }) });
       const receipt = await response.json();
       if (!response.ok || receipt.accepted !== true || !receipt.downloadUrl) throw new Error('not-accepted');
+      trackMetricaFormSuccess(String(receipt.id || requestId.current), 'project-passport');
       const file = await fetch(receipt.downloadUrl);
       if (!file.ok) throw new Error('download-failed');
       const blob = await file.blob();

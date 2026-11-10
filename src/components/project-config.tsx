@@ -20,6 +20,7 @@ import { isMobileFormViewport, useMobileFormReveal } from './use-mobile-form-rev
 import type { CatalogProject } from "../lib/catalog/types";
 import { ConfigurationComparison } from './configuration-comparison/comparison';
 import { isDescribedPackage, packageCanBeDescribed, PackageDescriptionDialog } from './configuration-comparison/package-description';
+import { trackMetricaAction } from '../lib/metrica-form-goals';
 
 /**
  * Комплектация.
@@ -301,7 +302,7 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
         <button type="button" className="project-config__tier-select" aria-pressed={selected} aria-label={`Выбрать комплектацию «${item.name}»`} onClick={onSelect} />
         {children}
         {described && isDescribedPackage(item.id) && (
-          <button type="button" className="project-config__details-link project-config__details-link--desktop" onClick={() => setDetailsOpen(true)}>
+          <button type="button" className="project-config__details-link project-config__details-link--desktop" onClick={() => { trackMetricaAction('config_detail_open'); setDetailsOpen(true); }}>
             Подробная комплектация
           </button>
         )}
@@ -310,7 +311,7 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
         {copy.getQuote}<IconArrowUpRight size={16} stroke={2} aria-hidden="true" />
       </button>
       {described && isDescribedPackage(item.id) && (
-        <button type="button" className="project-config__details-link project-config__details-link--mobile" onClick={() => setDetailsOpen(true)}>
+        <button type="button" className="project-config__details-link project-config__details-link--mobile" onClick={() => { trackMetricaAction('config_detail_open'); setDetailsOpen(true); }}>
           Подробная комплектация
         </button>
       )}

@@ -6,6 +6,7 @@ import { IconArrowUpRight, IconX } from '@tabler/icons-react'
 import { TECHNOLOGY_OPTIONS } from '../lib/catalog/types'
 import { copy } from '../lib/copy'
 import { LeadDialog } from './lead-dialog'
+import { trackMetricaAction } from '../lib/metrica-form-goals'
 
 const prefab = {
   src: '/logos/AS%20PREFAB.svg',
@@ -63,6 +64,7 @@ export function ProjectTechnology({ badge, project }: { badge: string; project: 
     clearTimer()
     mode.current = 'pinned'
     setPhase('pinned')
+    trackMetricaAction('technology_open', { technology: logo.alt })
   }
 
   useEffect(() => {
@@ -163,7 +165,7 @@ export function ProjectTechnology({ badge, project }: { badge: string; project: 
         <div className="technology-dialog__intro">
           <Image src={logo.src} alt="" width={435} height={76} className="technology-dialog__logo" unoptimized />
           <p>{logo.lines.map((line, index) => <span key={line}>{index > 0 ? <br /> : null}{line}{index < logo.lines.length - 1 ? ' ' : null}</span>)}</p>
-          <button type="button" className="btn btn-yellow" onClick={() => { dismiss(); setBooking(true) }}>
+          <button type="button" className="btn btn-yellow" onClick={() => { trackMetricaAction('technology_tour_click', { technology: logo.alt }); dismiss(); setBooking(true) }}>
             Посетить производство <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
           </button>
         </div>

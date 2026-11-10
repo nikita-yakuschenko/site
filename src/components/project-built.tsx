@@ -76,7 +76,7 @@ function ConnectedProjectBuilt({ project, items }: { project: CatalogProject; it
     </div> : null}
   </div>
   {video?.type === 'video' ? <VideoLightbox title={video.caption || copy.builtTour} embedSrc={reviewEmbedSrc(video.video)} onClose={() => setVideoOpen(null)} /> : null}
-  {open !== null && open < photos.length ? <PhotoLightbox images={photos.map(item => item.image)} labels={photos.map(item => item.caption || '')} index={open} onIndex={setOpen} onClose={() => setOpen(null)} /> : null}
+  {open !== null && open < photos.length ? <PhotoLightbox images={photos.map(item => item.image)} labels={photos.map(item => item.caption || '')} index={open} onIndex={setOpen} onClose={() => setOpen(null)} navEvent="gallery_nav" /> : null}
   </section>;
 }
 
@@ -193,6 +193,7 @@ function LegacyProjectBuilt({ project }: { project: CatalogProject }) {
           index={open}
           onIndex={setOpen}
           onClose={() => setOpen(null)}
+          navEvent="gallery_nav"
         />
       ) : null}
     </section>

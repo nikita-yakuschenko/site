@@ -5,10 +5,12 @@ import { IconArrowUpRight, IconBus, IconMapPin } from '@tabler/icons-react'
 import { copy, nbspText } from '../lib/copy'
 import {
   CONTACT_PLACES,
+  OFFICE_ROUTE_URL,
   type ContactPlace,
   type ContactPlaceId,
 } from '../lib/office'
 import { OfficeMap } from './office-map'
+import { trackMetricaAction } from '../lib/metrica-form-goals'
 
 /** Адрес и остановки одного места — и для живого слоя, и для сайзера. */
 function PlaceCopyBody({ place }: { place: ContactPlace }) {
@@ -114,6 +116,7 @@ export function ContactsPlace({ defaultPlace = 'office' }: { defaultPlace?: Cont
         href={place.routeUrl}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() => { if (place.routeUrl === OFFICE_ROUTE_URL) trackMetricaAction('office_route') }}
       >
         {copy.officeVisit}
         <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />

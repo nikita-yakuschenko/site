@@ -4,6 +4,7 @@ import Image from "next/image";
 import { optimizedSrc } from '../lib/media';
 import { useEffect, useState } from "react";
 import { PhotoLightbox } from "./photo-lightbox";
+import { trackMetricaAction } from "../lib/metrica-form-goals";
 import { PlanChangePrompt } from "./plan-change-prompt";
 import { copy } from "../lib/copy";
 import { isPlanVariants } from '../lib/catalog/project-plans-data';
@@ -64,7 +65,7 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
                 key={src}
                 type="button"
                 aria-label={copy.galleryOpen}
-                onClick={() => setOpen(index)}
+                onClick={() => { trackMetricaAction('plan_open'); setOpen(index); }}
               >
                 <Image
                   src={optimizedSrc(src)}
@@ -157,7 +158,7 @@ export function ProjectPlans({ project, variants: savedVariants, connected = fal
             type="button"
             className="project-plans__sheet"
             aria-label={copy.galleryOpen}
-            onClick={() => setOpen(lightboxShowsFloors ? selectedFloor : selectedVariant)}
+            onClick={() => { trackMetricaAction('plan_open'); setOpen(lightboxShowsFloors ? selectedFloor : selectedVariant); }}
           >
             <Image
               key={current.image}

@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 
 import { useEffect, useRef, useState } from 'react'
 import { copy } from '../lib/copy'
+import { trackMetricaAction } from '../lib/metrica-form-goals'
 import {
   REGIONS,
   selectRegionCode,
@@ -34,6 +35,7 @@ export function RegionSwitch() {
   }, [open])
 
   function select(next: RegionCode): void {
+    if (next !== code) trackMetricaAction('region_switch')
     selectRegionCode(next)
     setOpen(false)
     router.refresh()
