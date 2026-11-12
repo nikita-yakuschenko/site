@@ -11,7 +11,7 @@ import { listStories } from '../lib/stories'
 
 export default async function HomePage() {
   const catalog = new CmsCatalogProvider()
-  const popular = await applyPopularProjects(await withHeroContent(HOME_LAYOUT.filter((block) => block.blockType !== 'advantagesBar')), catalog, SITE.code)
+  const popular = await applyPopularProjects(await withHeroContent(HOME_LAYOUT.filter((block) => block.blockType !== 'advantagesBar' && block.blockType !== 'seriesBento')), catalog, SITE.code)
   const blocks = await withHeroPreviews(await applySeriesBento(popular.blocks, catalog, SITE.code))
   const stories = await listStories()
 
