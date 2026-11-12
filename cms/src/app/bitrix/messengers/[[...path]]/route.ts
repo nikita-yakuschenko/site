@@ -27,11 +27,14 @@ async function receive(request: Request, route: string) {
   try {
     const payload = await getPayload({ config })
     await requireCMSRequestLimit(payload, request, 'webhook')
-    const text = request.method === 'GET' ? new URL(request.url).searchParams.toString() : await readTextLimited(request, 256 * 1024)
-    const body = parseBitrixBody(request.headers.get('content-type'), text)
+    const query = parseBitrixBody(null, new URL(request.url).searchParams.toString())
+    const posted = request.method === 'GET' ? {} : parseBitrixBody(request.headers.get('content-type'), await readTextLimited(request, 256 * 1024))
+    const body = { ...query, ...posted }
     const auth = bitrixAuth(body)
+    const installing = route === 'install' || String(body.event || '').toUpperCase() === 'ONAPPINSTALL'
+    if (auth.domain && auth.domain !== portalDomain) return Response.json({ error: 'Неверный портал' }, { status: 403 })
+    if (installing) return install(payload, auth)
     if (auth.domain !== portalDomain) return Response.json({ error: 'Неверный портал' }, { status: 403 })
-    if (route === 'install' || String(body.event || '').toUpperCase() === 'ONAPPINSTALL') return install(payload, auth)
     if (String(body.PLACEMENT || '') === 'SETTING_CONNECTOR') return settingsPage(payload, auth, body)
     if (String(body.event || '').toUpperCase() === 'ONIMCONNECTORMESSAGEADD') return operatorReply(payload, auth, body)
     return Response.json({ accepted: true, ignored: true })
@@ -39,15 +42,16 @@ async function receive(request: Request, route: string) {
 }
 
 async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
-  if (!auth.accessToken) return page('Не пришёл доступ от Битрикс24', false)
+  if (!auth.accessToken || auth.domain !== portalDomain) return page('Откройте установку из карточки приложения в Битрикс24.', false)
   try {
     await bitrixCall(auth.domain, auth.accessToken, 'user.current')
     await remember(payload, auth)
     await bitrixCall(auth.domain, auth.accessToken, 'imconnector.register', registerParams(handlerUrl()))
     await bitrixCall(auth.domain, auth.accessToken, 'event.bind', { event: 'OnImConnectorMessageAdd', handler: handlerUrl() })
   } catch (error) {
-    console.error({ step: 'messengers-install', failure: error instanceof Error ? error.message : 'Error' })
-    return page('Канал не зарегистрирован. Откройте приложение ещё раз.', false)
+    const failure = error instanceof Error ? error.message : 'Error'
+    console.error(`messengers-install ${failure}`)
+    return page(`Канал не зарегистрирован: ${failure}`, false)
   }
   return page('Канал зарегистрирован. Откройте его в контакт-центре.', true)
 }
