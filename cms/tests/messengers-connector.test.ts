@@ -10,7 +10,7 @@ test('канал называется Avangard Messengers, оба слова с 
   assert.equal(params.ID, connectorId)
   assert.equal(params.PLACEMENT_HANDLER, 'https://cms.avgst.ru/bitrix/messengers')
   assert.equal(publisherName, 'Avangard Web Platform')
-  assert.match(params.ICON.DATA_IMAGE, /^data:image\/svg\+xml,/)
+  assert.match(params.ICON.DATA_IMAGE, /^data:image\/png;base64,/)
   assert.equal(params.ICON.COLOR, '#006ad0')
 })
 
