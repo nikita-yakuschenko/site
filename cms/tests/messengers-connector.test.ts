@@ -1,6 +1,6 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { bitrixAuth, connectorId, connectorName, contactCenterPlacement, messageRows, parseBitrixBody, publisherName, registerParams } from '../src/messengers/bitrix-connector'
+import { bitrixAuth, connectorId, connectorName, messageRows, parseBitrixBody, publisherName, registerParams } from '../src/messengers/bitrix-connector'
 
 test('канал называется Avangard Messengers, оба слова с большой буквы', () => {
   assert.equal(connectorName, 'Avangard Messengers')
@@ -10,10 +10,8 @@ test('канал называется Avangard Messengers, оба слова с 
   assert.equal(params.ID, connectorId)
   assert.equal(params.PLACEMENT_HANDLER, 'https://cms.avgst.ru/bitrix/messengers')
   assert.equal(publisherName, 'Avangard Web Platform')
-  assert.match(params.ICON.DATA_IMAGE, /^data:image\/png;base64,/)
-  const tile = contactCenterPlacement('https://cms.avgst.ru/bitrix/messengers')
-  assert.equal(tile.PLACEMENT, 'CONTACT_CENTER')
-  assert.equal(tile.TITLE, 'Avangard Messengers')
+  assert.match(params.ICON.DATA_IMAGE, /^data:image\/svg\+xml,/)
+  assert.equal(params.ICON.COLOR, '#006ad0')
 })
 
 test('разбирает ответ оператора из формы Битрикс24', () => {

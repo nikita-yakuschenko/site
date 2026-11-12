@@ -1,51 +1,21 @@
-import { readFileSync } from 'node:fs'
-import { dirname, join } from 'node:path'
-import { fileURLToPath } from 'node:url'
-
 // Видимое имя канала в Битрикс24. Оба слова с большой буквы.
 export const connectorName = 'Avangard Messengers'
 export const connectorId = 'avangard_messengers'
 export const publisherName = 'Avangard Web Platform'
 export const portalDomain = 'avgstroy.bitrix24.ru'
 
-const logoUri = 'data:image/png;base64,' + loadLogo().toString('base64')
-
-function loadLogo() {
-  const candidates = [
-    join(dirname(fileURLToPath(import.meta.url)), 'logo.png'),
-    join(process.cwd(), 'src/messengers/logo.png'),
-    join(process.cwd(), 'cms/src/messengers/logo.png'),
-    '/opt/release/cms/src/messengers/logo.png',
-  ]
-  for (const file of candidates) {
-    try { return readFileSync(file) } catch { /* следующий путь */ }
-  }
-  throw new Error('Нет логотипа канала')
-}
-
-export function contactCenterPlacement(handlerUrl: string) {
-  return {
-    PLACEMENT: 'CONTACT_CENTER',
-    HANDLER: handlerUrl,
-    TITLE: connectorName,
-    LANG_ALL: { ru: { TITLE: connectorName }, en: { TITLE: connectorName } },
-    ICON: { fileData: ['avangard-messengers.png', loadLogo().toString('base64')] },
-  }
+function icon(color: string) {
+  const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path fill="#ffffff" d="M12 3 3 10.2V21h6.2v-6.3h5.6V21H21V10.2z"/></svg>'
+  return { DATA_IMAGE: `data:image/svg+xml,${encodeURIComponent(svg)}`, COLOR: color, SIZE: '80%', POSITION: 'center' }
 }
 
 export function registerParams(handlerUrl: string) {
   return {
     ID: connectorId,
     NAME: connectorName,
-    ICON: { DATA_IMAGE: logoUri, COLOR: '#006ad0', SIZE: '100%', POSITION: 'center' },
-    ICON_DISABLED: { DATA_IMAGE: logoUri, COLOR: '#9ca3af', SIZE: '100%', POSITION: 'center' },
+    ICON: icon('#006ad0'),
+    ICON_DISABLED: icon('#99adb3'),
     PLACEMENT_HANDLER: handlerUrl,
-    DEL_EXTERNAL_MESSAGES: true,
-    EDIT_INTERNAL_MESSAGES: true,
-    DEL_INTERNAL_MESSAGES: true,
-    NEWSLETTER: false,
-    NEED_SYSTEM_MESSAGES: false,
-    NEED_SIGNATURE: false,
     CHAT_GROUP: false,
   }
 }

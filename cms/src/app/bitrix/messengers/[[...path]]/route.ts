@@ -5,29 +5,33 @@ import { requireCMSRequestLimit } from '../../../../config/request-limits'
 import { safeRequestError } from '../../../../config/safe-request-error'
 import { equalSecret } from '../../../../automation/crypto'
 import { saveSettings, settings } from '../../../../automation/store'
-import { bitrixAuth, bitrixCall, connectorId, connectorName, contactCenterPlacement, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
+import { bitrixAuth, bitrixCall, connectorId, connectorName, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
 
 export const dynamic = 'force-dynamic'
 type Context = { params: Promise<{ path?: string[] }> }
 const handlerUrl = () => `${(process.env.CMS_PUBLIC_URL || 'https://cms.avgst.ru').replace(/\/$/, '')}/bitrix/messengers`
 
-export async function GET(_request: Request, context: Context) {
+export async function GET(request: Request, context: Context) {
   const { path } = await context.params
   if (path?.join('/') === 'health') return Response.json({ ok: true, name: connectorName })
+  if (path?.join('/') === 'install') return receive(request, 'install')
   return Response.json({ error: 'Не найдено' }, { status: 404 })
 }
 
 export async function POST(request: Request, context: Context) {
   const { path } = await context.params
-  const route = path?.join('/') || ''
+  return receive(request, path?.join('/') || '')
+}
+
+async function receive(request: Request, route: string) {
   try {
     const payload = await getPayload({ config })
     await requireCMSRequestLimit(payload, request, 'webhook')
-    const body = parseBitrixBody(request.headers.get('content-type'), await readTextLimited(request, 256 * 1024))
+    const text = request.method === 'GET' ? new URL(request.url).searchParams.toString() : await readTextLimited(request, 256 * 1024)
+    const body = parseBitrixBody(request.headers.get('content-type'), text)
     const auth = bitrixAuth(body)
     if (auth.domain !== portalDomain) return Response.json({ error: 'Неверный портал' }, { status: 403 })
     if (route === 'install' || String(body.event || '').toUpperCase() === 'ONAPPINSTALL') return install(payload, auth)
-    if (String(body.PLACEMENT || '') === 'CONTACT_CENTER') return connectChannel(payload, auth)
     if (String(body.PLACEMENT || '') === 'SETTING_CONNECTOR') return settingsPage(payload, auth, body)
     if (String(body.event || '').toUpperCase() === 'ONIMCONNECTORMESSAGEADD') return operatorReply(payload, auth, body)
     return Response.json({ accepted: true, ignored: true })
@@ -36,32 +40,16 @@ export async function POST(request: Request, context: Context) {
 
 async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
   if (!auth.accessToken) return page('Не пришёл доступ от Битрикс24', false)
-  await bitrixCall(auth.domain, auth.accessToken, 'user.current')
-  await remember(payload, auth)
-  await bitrixCall(auth.domain, auth.accessToken, 'imconnector.register', registerParams(handlerUrl()))
-  for (const event of ['OnImConnectorMessageAdd', 'OnImConnectorMessageUpdate', 'OnImConnectorMessageDelete']) {
-    await bitrixCall(auth.domain, auth.accessToken, 'event.bind', { event, handler: handlerUrl() })
+  try {
+    await bitrixCall(auth.domain, auth.accessToken, 'user.current')
+    await remember(payload, auth)
+    await bitrixCall(auth.domain, auth.accessToken, 'imconnector.register', registerParams(handlerUrl()))
+    await bitrixCall(auth.domain, auth.accessToken, 'event.bind', { event: 'OnImConnectorMessageAdd', handler: handlerUrl() })
+  } catch (error) {
+    console.error({ step: 'messengers-install', failure: error instanceof Error ? error.message : 'Error' })
+    return page('Канал не зарегистрирован. Откройте приложение ещё раз.', false)
   }
-  await bitrixCall(auth.domain, auth.accessToken, 'placement.bind', contactCenterPlacement(handlerUrl()))
-  return page(`${connectorName} установлен. Плитка появится внизу контакт-центра, в блоке решений от партнёров.`, true)
-}
-
-async function connectChannel(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
-  const token = await usableToken(payload, auth)
-  const saved = await settings(payload)
-  let line = Number(saved.secret('messengerLineId'))
-  if (!Number.isInteger(line) || line <= 0) {
-    line = Number(await bitrixCall(auth.domain, token, 'imopenlines.config.add', { PARAMS: { LINE_NAME: connectorName, ACTIVE: 'Y', CRM: 'Y' } }))
-  }
-  if (!Number.isInteger(line) || line <= 0) return page('Не удалось создать линию', false)
-  await bitrixCall(auth.domain, token, 'imconnector.activate', { CONNECTOR: connectorId, LINE: line, ACTIVE: 1 })
-  await bitrixCall(auth.domain, token, 'imconnector.connector.data.set', {
-    CONNECTOR: connectorId,
-    LINE: line,
-    DATA: { ID: connectorId, NAME: connectorName, URL: 'https://avgst.ru', URL_IM: 'https://avgst.ru' },
-  })
-  await remember(payload, auth, { messengerLineId: String(line) })
-  return page(`${connectorName} подключен к линии ${line}.`, false)
+  return page('Канал зарегистрирован. Откройте его в контакт-центре.', true)
 }
 
 async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
