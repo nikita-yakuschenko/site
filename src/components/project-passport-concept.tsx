@@ -6,7 +6,7 @@ import { PhoneInput } from './phone-input';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
 import { readRegionCode } from '../lib/regions';
 import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
-import { lockPassportDownload, notifyPassportPace, passportPaceDecision, rememberPassportDownload } from '../lib/passport-pace';
+import { lockPassportDownload, markPageDownloaded, nextPageAttempt, notifyPassportPace, passportBanNotice, passportPaceDecision, rememberPassportDownload } from '../lib/passport-pace';
 import './project-passport-concept.css';
 
 const SUCCESS_MESSAGES = [
@@ -30,7 +30,6 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState('');
-  const storageKey = `avgst:passport-success:v1:${projectSlug}`;
   const [dismissed, setDismissed] = useState(false);
   const [storageChecked, setStorageChecked] = useState(false);
   const completedRef = useRef(false);
@@ -44,15 +43,9 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   const [inView, setInView] = useState(false);
   const [imageReady, setImageReady] = useState(false);
   useEffect(() => {
-    const frame = requestAnimationFrame(() => {
-      try {
-        const saved = window.localStorage.getItem(storageKey);
-        if (saved && SUCCESS_MESSAGES.includes(saved)) { completedRef.current = true; setSuccessMessage(saved); setStatus('done'); setDismissed(true); }
-      } catch { /* The current visit still keeps its completed state. */ }
-      setStorageChecked(true);
-    });
+    const frame = requestAnimationFrame(() => setStorageChecked(true));
     return () => cancelAnimationFrame(frame);
-  }, [storageKey]);
+  }, []);
   useEffect(() => {
     if (placement !== 'hero') { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
     const image = document.querySelector<HTMLImageElement>('.project-hero__media img');
@@ -83,16 +76,6 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     observer.observe(hero);
     return () => observer.disconnect();
   }, [placement, active]);
-  useEffect(() => {
-    const sync = () => {
-      try {
-        const saved = localStorage.getItem(storageKey);
-        if (saved && SUCCESS_MESSAGES.includes(saved)) { completedRef.current = true; setSuccessMessage(saved); setStatus('done'); setDismissed(true); setOpen(false); }
-      } catch { /* Keep the current visit state. */ }
-    };
-    window.addEventListener('avgst:passport-completed', sync);
-    return () => window.removeEventListener('avgst:passport-completed', sync);
-  }, [storageKey]);
   useEffect(() => {
     if (!open) return;
     const outside = (event: PointerEvent) => {
@@ -150,6 +133,10 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isValidRuMobile(phone) || busy.current || status === 'done') return;
+    if (passportPaceDecision() === 'banned') { notifyPassportPace(passportBanNotice()); return; }
+    const page = nextPageAttempt(projectSlug);
+    if (page.attempt >= 4) { lockPassportDownload('page'); notifyPassportPace('page-banned'); return; }
+    if (page.downloaded) { notifyPassportPace('repeat'); return; }
     const pace = passportPaceDecision();
     if (pace === 'banned') { notifyPassportPace('banned'); return; }
     if (pace === 'nudge') notifyPassportPace('nudge');
@@ -160,13 +147,15 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     try {
       const response = await fetch('/api/passport-concept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phoneE164(phone), project, slug: projectSlug, region: readRegionCode(), requestId: requestId.current }) });
       const receipt = await response.json().catch(() => ({}));
-      if (response.status === 429 || receipt.error === 'passport-banned') { lockPassportDownload(); notifyPassportPace('banned'); await feedbackLap; setStatus('idle'); return; }
+      if (response.status === 429 || receipt.error === 'passport-banned') { lockPassportDownload('hour'); notifyPassportPace('banned'); await feedbackLap; setStatus('idle'); return; }
       if (!response.ok || receipt.accepted !== true || !receipt.downloadUrl) throw new Error('not-accepted');
+      if (receipt.pace === 'nudge' || receipt.pace === 'joke') notifyPassportPace('nudge');
       trackMetricaFormSuccess(String(receipt.id || requestId.current), 'project-passport');
       const file = await fetch(receipt.downloadUrl);
       if (!file.ok) throw new Error('download-failed');
       const blob = await file.blob();
       rememberPassportDownload();
+      markPageDownloaded(projectSlug);
       await feedbackLap;
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a'); link.href = url; link.download = receipt.filename || `AVGST_${projectSlug}.pdf`; link.click();
@@ -175,10 +164,8 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       completedRef.current = true;
       setDismissed(!visibleRef.current);
       setSuccessMessage(message);
-      try { window.localStorage.setItem(storageKey, message); } catch { /* Keep in memory. */ }
       setOpen(false);
       setStatus('done');
-      window.dispatchEvent(new Event('avgst:passport-completed'));
       // Keep the submitting instance visible for its own success interval.
       setDismissed(!visibleRef.current);
     } catch { await feedbackLap; setStatus('error'); } finally { busy.current = false; }

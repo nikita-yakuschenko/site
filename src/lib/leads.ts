@@ -59,30 +59,47 @@ export function allowLeadAttempt(key: string, limit = 5, windowMs = 10 * 60 * 10
 type PassportBucket = { hits: number[]; banUntil: number }
 const passportBuckets = new Map<string, PassportBucket>()
 const passportHour = 60 * 60 * 1000
+const passportDay = 24 * 60 * 60 * 1000
 const passportBan = 3 * 60 * 60 * 1000
 
-// Больше 10 скачиваний за час закрывает адрес на 3 часа. Пока бан действует, попытка не считается.
-export function allowPassportDownload(key: string): boolean {
-  const now = Date.now()
-  for (const [id, value] of passportBuckets) if (value.banUntil <= now && !value.hits.some(ts => now - ts < passportHour)) passportBuckets.delete(id)
-  if (!passportBuckets.has(key) && passportBuckets.size >= 10000) return false
+export type PassportPlan = 'ok' | 'nudge' | 'joke' | 'banned'
+
+function passportBucket(key: string, now: number) {
+  for (const [id, value] of passportBuckets) if (value.banUntil <= now && !value.hits.some(ts => now - ts < passportDay)) passportBuckets.delete(id)
+  if (!passportBuckets.has(key) && passportBuckets.size >= 10000) return null
   const bucket = passportBuckets.get(key) || { hits: [], banUntil: 0 }
-  if (bucket.banUntil > now) return false
-  bucket.hits = bucket.hits.filter(ts => now - ts < passportHour)
-  if (bucket.hits.length >= 10) {
-    bucket.banUntil = now + passportBan
-    bucket.hits = []
-    passportBuckets.set(key, bucket)
-    return false
-  }
+  bucket.hits = bucket.hits.filter(ts => now - ts < passportDay)
   passportBuckets.set(key, bucket)
-  return true
+  return bucket
+}
+
+// Пятый паспорт за час — предупреждение. С шестого файл шуточный. Десятый закрывает скачивание на 3 часа.
+export function planPassportDownload(key: string, now = Date.now()): PassportPlan {
+  const bucket = passportBucket(key, now)
+  if (!bucket) return 'banned'
+  if (bucket.banUntil > now) return 'banned'
+  const hourHits = bucket.hits.filter(ts => now - ts < passportHour)
+  if (hourHits.length >= 9) {
+    bucket.banUntil = now + passportBan
+    passportBuckets.set(key, bucket)
+    return 'banned'
+  }
+  if (hourHits.length >= 5) return 'joke'
+  if (hourHits.length >= 4) return 'nudge'
+  return 'ok'
+}
+
+// Начиная с третьего паспорта за сутки заявка в Битрикс не создаётся.
+export function passportSkipsLead(key: string, now = Date.now()) {
+  const bucket = passportBucket(key, now)
+  if (!bucket) return true
+  return bucket.hits.filter(ts => now - ts < passportDay).length >= 2
 }
 
 export function notePassportDownload(key: string) {
   const now = Date.now()
-  const bucket = passportBuckets.get(key) || { hits: [], banUntil: 0 }
-  if (bucket.banUntil > now) return
-  bucket.hits = [...bucket.hits.filter(ts => now - ts < passportHour), now]
+  const bucket = passportBucket(key, now)
+  if (!bucket || bucket.banUntil > now) return
+  bucket.hits.push(now)
   passportBuckets.set(key, bucket)
 }
