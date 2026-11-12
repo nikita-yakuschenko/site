@@ -56,50 +56,75 @@ export function allowLeadAttempt(key: string, limit = 5, windowMs = 10 * 60 * 10
   return true
 }
 
-type PassportBucket = { hits: number[]; banUntil: number }
+type PassportHit = { at: number; device: string; scrape: boolean }
+type PassportBucket = { hits: PassportHit[]; bans: Record<string, number> }
 const passportBuckets = new Map<string, PassportBucket>()
 const passportHour = 60 * 60 * 1000
 const passportDay = 24 * 60 * 60 * 1000
 const passportBan = 3 * 60 * 60 * 1000
+const quickVisit = 15 * 1000
 
 export type PassportPlan = 'ok' | 'nudge' | 'joke' | 'banned'
+export type PassportSignal = { device: string; dwellMs: number; leftFast: boolean }
 
 function passportBucket(key: string, now: number) {
-  for (const [id, value] of passportBuckets) if (value.banUntil <= now && !value.hits.some(ts => now - ts < passportDay)) passportBuckets.delete(id)
+  for (const [id, value] of passportBuckets) {
+    const banActive = Object.values(value.bans).some(until => until > now)
+    if (!banActive && !value.hits.some(hit => now - hit.at < passportDay)) passportBuckets.delete(id)
+  }
   if (!passportBuckets.has(key) && passportBuckets.size >= 10000) return null
-  const bucket = passportBuckets.get(key) || { hits: [], banUntil: 0 }
-  bucket.hits = bucket.hits.filter(ts => now - ts < passportDay)
+  const bucket = passportBuckets.get(key) || { hits: [], bans: {} }
+  bucket.hits = bucket.hits.filter(hit => now - hit.at < passportDay)
+  for (const device of Object.keys(bucket.bans)) if ((bucket.bans[device] || 0) <= now) delete bucket.bans[device]
   passportBuckets.set(key, bucket)
   return bucket
 }
 
-// Пятый паспорт за час — предупреждение. С шестого файл шуточный. Десятый закрывает скачивание на 3 часа.
-export function planPassportDownload(key: string, now = Date.now()): PassportPlan {
+function looksLikeScrape(signal: PassportSignal) {
+  return /^[a-f0-9]{32}$/.test(signal.device) && signal.dwellMs >= 0 && signal.dwellMs < quickVisit && signal.leftFast
+}
+
+function scrapeRun(hits: PassportHit[], signal: PassportSignal) {
+  if (!looksLikeScrape(signal)) return 0
+  let run = 1
+  for (let index = hits.length - 1; index >= 0; index -= 1) {
+    const hit = hits[index]
+    if (!hit?.scrape || hit.device !== signal.device) break
+    run += 1
+  }
+  return run
+}
+
+// Пятый паспорт этого устройства за час просит замедлиться, файл остаётся настоящим. Шутка и бан — только у того же адреса и устройства, если заходы короткие и страница сразу покидается.
+export function planPassportDownload(key: string, signal: PassportSignal, now = Date.now()): PassportPlan {
   const bucket = passportBucket(key, now)
   if (!bucket) return 'banned'
-  if (bucket.banUntil > now) return 'banned'
-  const hourHits = bucket.hits.filter(ts => now - ts < passportHour)
-  if (hourHits.length >= 9) {
-    bucket.banUntil = now + passportBan
+  if ((bucket.bans[signal.device] || 0) > now) return 'banned'
+  const ownHour = bucket.hits.filter(hit => hit.device === signal.device && now - hit.at < passportHour)
+  const run = scrapeRun(ownHour, signal)
+  if (ownHour.length >= 9 && run >= 3) {
+    bucket.bans[signal.device] = now + passportBan
     passportBuckets.set(key, bucket)
     return 'banned'
   }
-  if (hourHits.length >= 5) return 'joke'
-  if (hourHits.length >= 4) return 'nudge'
+  if (ownHour.length >= 5 && run >= 3) return 'joke'
+  if (ownHour.length >= 4) return 'nudge'
   return 'ok'
 }
 
-// Начиная с третьего паспорта за сутки заявка в Битрикс не создаётся.
-export function passportSkipsLead(key: string, now = Date.now()) {
+// Повторные заявки одного устройства не создаются. Чужое устройство в той же сети сохраняет свою заявку.
+export function passportSkipsLead(key: string, signal: PassportSignal, now = Date.now()) {
   const bucket = passportBucket(key, now)
   if (!bucket) return true
-  return bucket.hits.filter(ts => now - ts < passportDay).length >= 2
+  const day = bucket.hits.filter(hit => now - hit.at < passportDay)
+  if (day.filter(hit => hit.device === signal.device).length >= 2) return true
+  return looksLikeScrape(signal) && day.filter(hit => hit.scrape).length >= 2
 }
 
-export function notePassportDownload(key: string) {
+export function notePassportDownload(key: string, signal: PassportSignal) {
   const now = Date.now()
   const bucket = passportBucket(key, now)
-  if (!bucket || bucket.banUntil > now) return
-  bucket.hits.push(now)
+  if (!bucket || (bucket.bans[signal.device] || 0) > now) return
+  bucket.hits.push({ at: now, device: signal.device, scrape: looksLikeScrape(signal) })
   passportBuckets.set(key, bucket)
 }

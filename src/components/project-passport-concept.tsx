@@ -6,7 +6,7 @@ import { PhoneInput } from './phone-input';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
 import { readRegionCode } from '../lib/regions';
 import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
-import { lockPassportDownload, markPageDownloaded, nextPageAttempt, notifyPassportPace, passportBanNotice, passportPaceDecision, rememberPassportDownload } from '../lib/passport-pace';
+import { lockPassportDownload, markPageDownloaded, nextPageAttempt, notifyPassportPace, passportBanNotice, passportDevice, passportDwell, passportLeftFast, passportPaceDecision, rememberPassportDownload, rememberPassportHop, watchPassportLeave } from '../lib/passport-pace';
 import './project-passport-concept.css';
 
 const SUCCESS_MESSAGES = [
@@ -46,6 +46,10 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     const frame = requestAnimationFrame(() => setStorageChecked(true));
     return () => cancelAnimationFrame(frame);
   }, []);
+  useEffect(() => {
+    watchPassportLeave();
+    passportDwell(projectSlug);
+  }, [projectSlug]);
   useEffect(() => {
     if (placement !== 'hero') { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
     const image = document.querySelector<HTMLImageElement>('.project-hero__media img');
@@ -135,7 +139,6 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     if (!isValidRuMobile(phone) || busy.current || status === 'done') return;
     if (passportPaceDecision() === 'banned') { notifyPassportPace(passportBanNotice()); return; }
     const page = nextPageAttempt(projectSlug);
-    if (page.attempt >= 4) { lockPassportDownload('page'); notifyPassportPace('page-banned'); return; }
     if (page.downloaded) { notifyPassportPace('repeat'); return; }
     const pace = passportPaceDecision();
     if (pace === 'banned') { notifyPassportPace('banned'); return; }
@@ -145,7 +148,8 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     const feedbackLap = new Promise<void>(resolve => requestAnimationFrame(() => setTimeout(resolve, 950)));
     requestId.current ??= crypto.randomUUID();
     try {
-      const response = await fetch('/api/passport-concept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phoneE164(phone), project, slug: projectSlug, region: readRegionCode(), requestId: requestId.current }) });
+      passportDevice();
+      const response = await fetch('/api/passport-concept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phoneE164(phone), project, slug: projectSlug, region: readRegionCode(), requestId: requestId.current, dwellMs: passportDwell(projectSlug), leftFast: passportLeftFast(projectSlug) }) });
       const receipt = await response.json().catch(() => ({}));
       if (response.status === 429 || receipt.error === 'passport-banned') { lockPassportDownload('hour'); notifyPassportPace('banned'); await feedbackLap; setStatus('idle'); return; }
       if (!response.ok || receipt.accepted !== true || !receipt.downloadUrl) throw new Error('not-accepted');
@@ -155,6 +159,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       if (!file.ok) throw new Error('download-failed');
       const blob = await file.blob();
       rememberPassportDownload();
+      rememberPassportHop(projectSlug);
       markPageDownloaded(projectSlug);
       await feedbackLap;
       const url = URL.createObjectURL(blob);

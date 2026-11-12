@@ -10,7 +10,7 @@ type PaceState = { hits: number[]; banUntil: number; reason?: 'hour' | 'page' }
 export function decidePassportPace(state: PaceState, now: number): { decision: PassportPace; state: PaceState } {
   if (state.banUntil > now) return { decision: 'banned', state }
   const hits = state.hits.filter(ts => now - ts < hour)
-  if (hits.length >= 9) return { decision: 'banned', state: { hits, banUntil: now + banFor, reason: 'hour' } }
+  // Много скачиваний само по себе не закрывает доступ: предупреждаем, файл решает сервер.
   if (hits.length >= 4) return { decision: 'nudge', state: { hits, banUntil: 0 } }
   return { decision: 'ok', state: { hits, banUntil: 0 } }
 }
@@ -67,6 +67,49 @@ export function nextPageAttempt(slug: string) {
   attempts += 1
   try { sessionStorage.setItem(pageKey(slug), JSON.stringify({ attempts, downloaded })) } catch { /* Keep the count for this visit. */ }
   return { attempt: attempts, downloaded }
+}
+
+const hopKey = 'avgst:passport-hop'
+const leaveWindow = 8 * 1000
+let watchingLeave = false
+
+export function passportDevice() {
+  const name = 'avgst_passport_device='
+  const found = document.cookie.split('; ').find(part => part.startsWith(name))?.slice(name.length) || ''
+  if (/^[a-f0-9]{32}$/.test(found)) return found
+  const id = crypto.randomUUID().replace(/-/g, '')
+  document.cookie = `${name}${id}; Path=/; Max-Age=31536000; SameSite=Lax`
+  return id
+}
+
+export function passportDwell(slug: string) {
+  const key = `avgst:passport-visit:${slug}`
+  let started = Number(sessionStorage.getItem(key) || 0)
+  if (!started) { started = Date.now(); sessionStorage.setItem(key, String(started)) }
+  return Math.max(0, Date.now() - started)
+}
+
+export function passportLeftFast(slug: string) {
+  try {
+    const raw = JSON.parse(sessionStorage.getItem(hopKey) || '')
+    return raw?.left === true && raw.slug !== slug && typeof raw.at === 'number' && Date.now() - raw.at < hour
+  } catch { return false }
+}
+
+export function rememberPassportHop(slug: string) {
+  try { sessionStorage.setItem(hopKey, JSON.stringify({ slug, at: Date.now(), left: false })) } catch { /* The file is already downloading. */ }
+}
+
+export function watchPassportLeave() {
+  if (watchingLeave) return
+  watchingLeave = true
+  window.addEventListener('pagehide', () => {
+    try {
+      const raw = JSON.parse(sessionStorage.getItem(hopKey) || '')
+      if (!raw || raw.left === true || typeof raw.at !== 'number' || Date.now() - raw.at >= leaveWindow) return
+      sessionStorage.setItem(hopKey, JSON.stringify({ ...raw, left: true }))
+    } catch { /* A missed leave flag still leaves the next passport real. */ }
+  })
 }
 
 export function markPageDownloaded(slug: string) {
