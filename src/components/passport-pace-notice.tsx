@@ -21,11 +21,11 @@ export function PassportPaceNotice() {
   }, [kind]);
   if (!kind) return null;
   const text = kind === 'repeat'
-    ? 'Вы уже скачали этот паспорт'
+    ? 'Вы уже получили этот паспорт'
     : kind === 'page-banned'
-      ? 'Вам временно не доступно скачивание паспортов'
+      ? 'Вам временно недоступно получение паспортов'
       : kind === 'banned'
-        ? 'Вам временно недоступно скачивание паспортов'
+        ? 'Вам временно недоступно получение паспортов'
         : 'Нам не жалко, но ты бы связался с нами, всё бы рассказали';
   return <div className="passport-pace" onClick={() => setKind(null)}>
     <p className="passport-pace__card" role="status">{text}</p>

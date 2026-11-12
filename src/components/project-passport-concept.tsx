@@ -1,13 +1,20 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
-import { IconCheck, IconDownload, IconExclamationMark, IconLoader2, IconPlayerPlay } from '@tabler/icons-react';
+import { IconBrandWhatsapp, IconCheck, IconExclamationMark, IconLoader2, IconPlayerPlay, IconSend } from '@tabler/icons-react';
 import { PhoneInput } from './phone-input';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
 import { readRegionCode } from '../lib/regions';
 import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
 import { lockPassportDownload, markPageDownloaded, nextPageAttempt, notifyPassportPace, passportBanNotice, passportDevice, passportDwell, passportLeftFast, passportPaceDecision, rememberPassportDownload, rememberPassportHop, watchPassportLeave } from '../lib/passport-pace';
 import './project-passport-concept.css';
+
+const PASSPORT_CHANNELS = [
+  { id: 'max', label: 'MAX', logo: '/social/max_original.svg' },
+  { id: 'telegram', label: 'Telegram', logo: '/social/tg_original.svg' },
+  { id: 'whatsapp', label: 'WhatsApp', logo: '' },
+] as const;
 
 const SUCCESS_MESSAGES = [
   'Вы на шаг ближе к мечте',
@@ -30,6 +37,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   const [ready, setReady] = useState(false);
   const [open, setOpen] = useState(false);
   const [phone, setPhone] = useState('');
+  const [channel, setChannel] = useState('');
   const [dismissed, setDismissed] = useState(false);
   const [storageChecked, setStorageChecked] = useState(false);
   const completedRef = useRef(false);
@@ -136,7 +144,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   }, [imageReady, storageChecked, run]);
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!isValidRuMobile(phone) || busy.current || status === 'done') return;
+    if (!isValidRuMobile(phone) || !PASSPORT_CHANNELS.some(item => item.id === channel) || busy.current || status === 'done') return;
     if (passportPaceDecision() === 'banned') { notifyPassportPace(passportBanNotice()); return; }
     const page = nextPageAttempt(projectSlug);
     if (page.downloaded) { notifyPassportPace('repeat'); return; }
@@ -149,7 +157,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     requestId.current ??= crypto.randomUUID();
     try {
       passportDevice();
-      const response = await fetch('/api/passport-concept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phoneE164(phone), project, slug: projectSlug, region: readRegionCode(), requestId: requestId.current, dwellMs: passportDwell(projectSlug), leftFast: passportLeftFast(projectSlug) }) });
+      const response = await fetch('/api/passport-concept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phoneE164(phone), project, slug: projectSlug, region: readRegionCode(), channel, requestId: requestId.current, dwellMs: passportDwell(projectSlug), leftFast: passportLeftFast(projectSlug) }) });
       const receipt = await response.json().catch(() => ({}));
       if (response.status === 429 || receipt.error === 'passport-banned') { lockPassportDownload('hour'); notifyPassportPace('banned'); await feedbackLap; setStatus('idle'); return; }
       if (!response.ok || receipt.accepted !== true || !receipt.downloadUrl) throw new Error('not-accepted');
@@ -178,19 +186,36 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   function replay() { setOpen(false); setReady(false); setRun(value => value + 1); }
   return <>
     {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
-      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label="Скачать паспорт проекта" onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
+      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label="Получить паспорт проекта" onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
         <span className="passport-concept__surface" aria-hidden="true" />
-        <span className="passport-concept__label">Скачать паспорт проекта</span>
+        <span className="passport-concept__label">Получить паспорт проекта</span>
       </button>
       <form id={formId} inert={!open || status === 'done'} aria-hidden={!open || status === 'done'} className="passport-concept__form" data-status={status} onSubmit={send} aria-busy={status === 'sending'}>
         {status === 'sending' && <svg className="passport-concept__perimeter" aria-hidden="true"><rect x="1.5" y="1.5" rx="20" pathLength="100" /></svg>}
         <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
-
-        <p className="passport-concept__note" aria-hidden={status === 'done'} inert={status === 'done'}>Нажимая скачать, вы соглашаетесь на <a href="/privacy" target="_blank" rel="noreferrer">обработку данных</a></p>
-        <span className="passport-concept__announcement" role="status">{status === 'error' ? 'Не удалось отправить. Попробуйте ещё раз.' : status === 'done' ? 'Файл передан для скачивания' : ''}</span>
+        <div className="passport-concept__below">
+          <div className="passport-concept__channel" data-shown={open && status !== 'done'} inert={!open || status === 'done'}>
+            <div className="passport-concept__channel-clip">
+              <fieldset className="passport-concept__channel-card">
+                <p id={`${formId}-channel`} className="passport-concept__channel-title">Куда отправить?</p>
+                <RadioGroup value={channel} onValueChange={setChannel} aria-labelledby={`${formId}-channel`} disabled={status === 'sending' || status === 'done'}>
+                  {PASSPORT_CHANNELS.map(item => (
+                    <label key={item.id} className="passport-concept__channel-option">
+                      <RadioGroupItem value={item.id} />
+                      {item.logo ? /* eslint-disable-next-line @next/next/no-img-element */ <img className="passport-concept__channel-logo" src={item.logo} width={18} height={18} alt="" /> : <IconBrandWhatsapp className="passport-concept__channel-logo passport-concept__channel-logo--whatsapp" size={18} stroke={1.7} aria-hidden="true" />}
+                      <span>{item.label}</span>
+                    </label>
+                  ))}
+                </RadioGroup>
+              </fieldset>
+            </div>
+          </div>
+          <p className="passport-concept__note" aria-hidden={status === 'done'} inert={status === 'done'}>Отправляя запрос, вы соглашаетесь на <a href="/privacy" target="_blank" rel="noreferrer">обработку данных</a></p>
+        </div>
+        <span className="passport-concept__announcement" role="status">{status === 'error' ? 'Не удалось отправить. Попробуйте ещё раз.' : status === 'done' ? 'Паспорт получен' : ''}</span>
       </form>
-      <div className="passport-concept__action-flight">        <button form={formId} inert={!open || status === 'done'} className="passport-concept__download" type="submit" disabled={!isValidRuMobile(phone) || status === 'sending' || status === 'done'} data-valid={isValidRuMobile(phone)} data-status={status} aria-label={status === 'sending' ? 'Подготовка скачивания' : status === 'done' ? 'Файл передан для скачивания' : status === 'error' ? 'Повторить скачивание' : 'Скачать PDF'} title={status === 'error' ? 'Не удалось скачать. Нажмите, чтобы повторить.' : undefined}>
-          {status === 'sending' ? <IconLoader2 className="passport-concept__spinner" size={19} aria-hidden="true" /> : status === 'done' ? <IconCheck className="passport-concept__check" size={20} stroke={2.2} aria-hidden="true" /> : status === 'error' ? <IconExclamationMark size={20} aria-hidden="true" /> : <IconDownload size={19} aria-hidden="true" />}
+      <div className="passport-concept__action-flight">        <button form={formId} inert={!open || status === 'done'} className="passport-concept__download" type="submit" disabled={!isValidRuMobile(phone) || !channel || status === 'sending' || status === 'done'} data-valid={isValidRuMobile(phone) && Boolean(channel)} data-status={status} aria-label={status === 'sending' ? 'Готовим паспорт' : status === 'done' ? 'Паспорт получен' : status === 'error' ? 'Повторить запрос' : 'Получить паспорт'} title={status === 'error' ? 'Не удалось получить паспорт. Нажмите, чтобы повторить.' : undefined}>
+          {status === 'sending' ? <IconLoader2 className="passport-concept__spinner" size={19} aria-hidden="true" /> : status === 'done' ? <IconCheck className="passport-concept__check" size={20} stroke={2.2} aria-hidden="true" /> : status === 'error' ? <IconExclamationMark size={20} aria-hidden="true" /> : <IconSend className="passport-concept__send" size={18} stroke={1.8} aria-hidden="true" />}
         </button>
       </div>
       {successMessage && <div className="passport-concept__success" role="status" onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade') setReady(true); }}>

@@ -47,7 +47,7 @@ export function leadTitle(lead: LeadInput, formTitle = '') {
   const meta = lead.meta || {}
   const project = text(meta.projectName) || text(meta.project)
   switch (lead.formId) {
-    case 'project-passport': return `Посетитель скачал паспорт проекта ${project}`.trim()
+    case 'project-passport': return `Посетитель направил запрос на получение паспорта проекта ${project}`.trim()
     case 'project-configuration': return prefix + join('Расчёт стоимости', project, meta.tier)
     case 'ready-home-offer': return prefix + join('Готовый дом', project, meta.location)
     case 'architect-consultation': return prefix + join('Консультация архитектора', project)

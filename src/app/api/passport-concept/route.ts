@@ -4,7 +4,9 @@ import { passportToken } from '../../../lib/passports/access'
 import { validRegion, validSlug } from '../../../lib/passports/storage'
 import { randomBytes } from 'node:crypto'
 import { passportSkipsLead, planPassportDownload, notePassportDownload, type PassportSignal } from '../../../lib/leads'
+import { leadAttribution } from '../../../lib/lead-attribution'
 
+const passportChannels = new Set(['max', 'telegram', 'whatsapp'])
 function enabled() { return process.env.PASSPORT_ENABLED === '1' }
 function cookieValue(header: string | null, name: string) {
   const prefix = `${name}=`
@@ -19,7 +21,7 @@ function passportSignal(request: Request, input: { dwellMs?: unknown; leftFast?:
 export async function POST(request: Request) {
   if (!enabled()) return new Response(null, { status: 404 })
   const input = await request.json().catch(() => null)
-  if (!input || typeof input.phone !== 'string' || !isValidRuMobile(input.phone) || typeof input.slug !== 'string' || !validSlug(input.slug) || !validRegion(input.region) || !/^[a-f0-9-]{36}$/.test(input.requestId || '')) return Response.json({ error: 'invalid-input' }, { status: 400 })
+  if (!input || typeof input.phone !== 'string' || !isValidRuMobile(input.phone) || typeof input.slug !== 'string' || !validSlug(input.slug) || !validRegion(input.region) || !/^[a-f0-9-]{36}$/.test(input.requestId || '') || (input.channel != null && !passportChannels.has(input.channel))) return Response.json({ error: 'invalid-input' }, { status: 400 })
   const address = request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'unknown'
   const { signal, freshDevice } = passportSignal(request, input)
   const plan = planPassportDownload(address, signal)
@@ -32,11 +34,12 @@ export async function POST(request: Request) {
     let lead = false
     if (!passportSkipsLead(address, signal)) {
       const cms = new URL(local ? '/api/passport-concept' : '/api/lead-submissions/submit', process.env.CMS_PUBLIC_URL)
+      const sourceUrl = `https://avgst.ru/catalog/${input.slug}`
       const payload = local ? input : { requestId: input.requestId, phone: input.phone,
         siteId: 'avgst', formId: 'project-passport', consent: true,
-        sourceUrl: `https://avgst.ru/catalog/${input.slug}`, sourcePath: `/catalog/${input.slug}`,
-        message: `Скачать паспорт проекта: ${document.projectName}`,
-        meta: { project: input.slug, projectName: document.projectName, region: input.region, action: 'project-passport' } }
+        sourceUrl, sourcePath: `/catalog/${input.slug}`,
+        message: `Запрос на получение паспорта проекта: ${document.projectName}`,
+        meta: { ...leadAttribution(sourceUrl, request.headers.get('cookie') || ''), project: input.slug, projectName: document.projectName, region: input.region, action: 'project-passport', ...(passportChannels.has(input.channel) ? { channel: input.channel } : {}) } }
       const result = await fetch(cms, { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.CMS_SITE_API_KEY}` }, body: JSON.stringify(payload), signal: AbortSignal.timeout(20000) })
       if (!result.ok) return Response.json({ error: 'not-saved' }, { status: 502 })
       const receipt = await result.json()
