@@ -23,6 +23,7 @@ import {
 } from '../consent/types'
 import { RegionBootstrap } from '../components/region-bootstrap'
 import { ContactRail } from '../components/contact-rail'
+import { PassportPaceNotice } from '../components/passport-pace-notice'
 import { activeMessengerLinks } from '../lib/active-messengers'
 import { copy } from '../lib/copy'
 import { OG_LOCALE } from '../lib/locale'
@@ -146,7 +147,7 @@ export default async function RootLayout({ children }: { children: ReactNode }) 
             <img src={`https://top-fwz1.mail.ru/counter?id=${VK_PIXEL_ID};js=na`} style={{ position: 'absolute', left: '-9999px' }} alt="Top.Mail.Ru" />
         </div></noscript></div>
         {roistatProjectId ? <RoistatCounter projectId={roistatProjectId} /> : null}
-        <CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses} collections={collections}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}<ContactRail links={messengerLinks} /></RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider>
+        <CMSContentProvider records={content}><RoistatPhoneProvider initialData={jar.get('roistat_visit') && jar.get('roistat_call_tracking')?.value !== '0' ? jar.get('roistat_phone_script_data')?.value || '' : ''}><CatalogAvailabilityProvider readyHouses={readyHouses} collections={collections}><ConsentShell initialState={initialState}><RegionBootstrap region={region}>{children}<ContactRail links={messengerLinks} /><PassportPaceNotice /></RegionBootstrap></ConsentShell></CatalogAvailabilityProvider></RoistatPhoneProvider></CMSContentProvider>
         <CMSPreviewBridge />
       </body>
     </html>

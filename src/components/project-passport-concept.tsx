@@ -6,6 +6,7 @@ import { PhoneInput } from './phone-input';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
 import { readRegionCode } from '../lib/regions';
 import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
+import { lockPassportDownload, notifyPassportPace, passportPaceDecision, rememberPassportDownload } from '../lib/passport-pace';
 import './project-passport-concept.css';
 
 const SUCCESS_MESSAGES = [
@@ -149,18 +150,23 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isValidRuMobile(phone) || busy.current || status === 'done') return;
+    const pace = passportPaceDecision();
+    if (pace === 'banned') { notifyPassportPace('banned'); return; }
+    if (pace === 'nudge') notifyPassportPace('nudge');
     busy.current = true; setStatus('sending');
     // Start the minimum feedback interval after React can paint the busy state.
     const feedbackLap = new Promise<void>(resolve => requestAnimationFrame(() => setTimeout(resolve, 950)));
     requestId.current ??= crypto.randomUUID();
     try {
       const response = await fetch('/api/passport-concept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phoneE164(phone), project, slug: projectSlug, region: readRegionCode(), requestId: requestId.current }) });
-      const receipt = await response.json();
+      const receipt = await response.json().catch(() => ({}));
+      if (response.status === 429 || receipt.error === 'passport-banned') { lockPassportDownload(); notifyPassportPace('banned'); await feedbackLap; setStatus('idle'); return; }
       if (!response.ok || receipt.accepted !== true || !receipt.downloadUrl) throw new Error('not-accepted');
       trackMetricaFormSuccess(String(receipt.id || requestId.current), 'project-passport');
       const file = await fetch(receipt.downloadUrl);
       if (!file.ok) throw new Error('download-failed');
       const blob = await file.blob();
+      rememberPassportDownload();
       await feedbackLap;
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a'); link.href = url; link.download = receipt.filename || `AVGST_${projectSlug}.pdf`; link.click();

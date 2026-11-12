@@ -1,0 +1,2 @@
+.passport-pace { position: fixed; inset: 0; z-index: 10001; display: grid; place-items: center; padding: 24px; background: rgb(11 16 32 / 28%); }
+.passport-pace__card { width: min(280px, 100%); margin: 0; padding: 16px 18px; border-radius: 16px; background: var(--brand-yellow); color: var(--avgst-ink); font-size: 15px; font-weight: 550; line-height: 1.35; text-align: center; box-shadow: 0 16px 40px rgb(0 0 0 / 22%); }

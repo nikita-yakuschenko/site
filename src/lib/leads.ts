@@ -55,3 +55,34 @@ export function allowLeadAttempt(key: string, limit = 5, windowMs = 10 * 60 * 10
   buckets.set(key, bucket)
   return true
 }
+
+type PassportBucket = { hits: number[]; banUntil: number }
+const passportBuckets = new Map<string, PassportBucket>()
+const passportHour = 60 * 60 * 1000
+const passportBan = 3 * 60 * 60 * 1000
+
+// Больше 10 скачиваний за час закрывает адрес на 3 часа. Пока бан действует, попытка не считается.
+export function allowPassportDownload(key: string): boolean {
+  const now = Date.now()
+  for (const [id, value] of passportBuckets) if (value.banUntil <= now && !value.hits.some(ts => now - ts < passportHour)) passportBuckets.delete(id)
+  if (!passportBuckets.has(key) && passportBuckets.size >= 10000) return false
+  const bucket = passportBuckets.get(key) || { hits: [], banUntil: 0 }
+  if (bucket.banUntil > now) return false
+  bucket.hits = bucket.hits.filter(ts => now - ts < passportHour)
+  if (bucket.hits.length >= 10) {
+    bucket.banUntil = now + passportBan
+    bucket.hits = []
+    passportBuckets.set(key, bucket)
+    return false
+  }
+  passportBuckets.set(key, bucket)
+  return true
+}
+
+export function notePassportDownload(key: string) {
+  const now = Date.now()
+  const bucket = passportBuckets.get(key) || { hits: [], banUntil: 0 }
+  if (bucket.banUntil > now) return
+  bucket.hits = [...bucket.hits.filter(ts => now - ts < passportHour), now]
+  passportBuckets.set(key, bucket)
+}
