@@ -150,7 +150,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       if (response.status === 429 || receipt.error === 'passport-banned') { lockPassportDownload('hour'); notifyPassportPace('banned'); await feedbackLap; setStatus('idle'); return; }
       if (!response.ok || receipt.accepted !== true || !receipt.downloadUrl) throw new Error('not-accepted');
       if (receipt.pace === 'nudge' || receipt.pace === 'joke') notifyPassportPace('nudge');
-      trackMetricaFormSuccess(String(receipt.id || requestId.current), 'project-passport');
+      if (receipt.lead === true) trackMetricaFormSuccess(String(receipt.id || requestId.current), 'project-passport');
       const file = await fetch(receipt.downloadUrl);
       if (!file.ok) throw new Error('download-failed');
       const blob = await file.blob();

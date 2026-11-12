@@ -18,6 +18,7 @@ export async function POST(request: Request) {
     if (!document.ready) return Response.json({ error: 'passport-preparing' }, { status: 503, headers: { 'Retry-After': '15' } })
     const local = process.env.NODE_ENV === 'development' && process.env.CMS_PUBLIC_URL === 'http://localhost:3001'
     let receiptId = ''
+    let lead = false
     if (!passportSkipsLead(address)) {
       const cms = new URL(local ? '/api/passport-concept' : '/api/lead-submissions/submit', process.env.CMS_PUBLIC_URL)
       const payload = local ? input : { requestId: input.requestId, phone: input.phone,
@@ -30,6 +31,7 @@ export async function POST(request: Request) {
       const receipt = await result.json()
       if (receipt.accepted !== true || !receipt.id) return Response.json({ error: 'not-saved' }, { status: 502 })
       receiptId = String(receipt.id)
+      lead = true
     } else receiptId = randomBytes(16).toString('hex')
     const expires = String(Date.now() + 5 * 60_000)
     const grant = randomBytes(32).toString('hex')
@@ -37,7 +39,7 @@ export async function POST(request: Request) {
     const query = new URLSearchParams({ region: input.region, receipt: receiptId, expires, mode, token: passportToken(input.slug, input.region, receiptId, expires, grant, mode) })
     const secure = new URL(request.url).protocol === 'https:' ? '; Secure' : ''
     notePassportDownload(address)
-    return Response.json({ accepted: true, id: receiptId, pace: plan, filename: document.filename, downloadUrl: `/api/passports/${input.slug}?${query}` }, { headers: { 'Cache-Control': 'no-store',
+    return Response.json({ accepted: true, id: receiptId, lead, pace: plan, filename: document.filename, downloadUrl: `/api/passports/${input.slug}?${query}` }, { headers: { 'Cache-Control': 'no-store',
       'Set-Cookie': `avgst_passport_${receiptId}=${grant}; Path=/api/passports/; HttpOnly; SameSite=Strict; Max-Age=300${secure}` } })
   } catch { return Response.json({ error: 'passport-unavailable' }, { status: 503 }) }
 }
