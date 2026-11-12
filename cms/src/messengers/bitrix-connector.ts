@@ -23,6 +23,16 @@ function loadLogo() {
   throw new Error('Нет логотипа канала')
 }
 
+export function contactCenterPlacement(handlerUrl: string) {
+  return {
+    PLACEMENT: 'CONTACT_CENTER',
+    HANDLER: handlerUrl,
+    TITLE: connectorName,
+    LANG_ALL: { ru: { TITLE: connectorName }, en: { TITLE: connectorName } },
+    ICON: { fileData: ['avangard-messengers.png', loadLogo().toString('base64')] },
+  }
+}
+
 export function registerParams(handlerUrl: string) {
   return {
     ID: connectorId,

@@ -18,7 +18,23 @@ const config: NextConfig = {
         headers: [{ key: 'Cache-Control', value: 'public, max-age=2592000' }],
       },
       {
-        source: '/:path*',
+        source: '/bitrix/messengers',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'same-origin' },
+          { key: 'Content-Security-Policy', value: 'frame-ancestors https://avgstroy.bitrix24.ru' },
+        ],
+      },
+      {
+        source: '/bitrix/messengers/:path*',
+        headers: [
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'same-origin' },
+          { key: 'Content-Security-Policy', value: 'frame-ancestors https://avgstroy.bitrix24.ru' },
+        ],
+      },
+      {
+        source: '/((?!bitrix/messengers).*)',
         headers: [
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           { key: 'Referrer-Policy', value: 'same-origin' },

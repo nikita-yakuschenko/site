@@ -5,7 +5,7 @@ import { requireCMSRequestLimit } from '../../../../config/request-limits'
 import { safeRequestError } from '../../../../config/safe-request-error'
 import { equalSecret } from '../../../../automation/crypto'
 import { saveSettings, settings } from '../../../../automation/store'
-import { bitrixAuth, bitrixCall, connectorId, connectorName, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
+import { bitrixAuth, bitrixCall, connectorId, connectorName, contactCenterPlacement, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
 
 export const dynamic = 'force-dynamic'
 type Context = { params: Promise<{ path?: string[] }> }
@@ -27,6 +27,7 @@ export async function POST(request: Request, context: Context) {
     const auth = bitrixAuth(body)
     if (auth.domain !== portalDomain) return Response.json({ error: 'Неверный портал' }, { status: 403 })
     if (route === 'install' || String(body.event || '').toUpperCase() === 'ONAPPINSTALL') return install(payload, auth)
+    if (String(body.PLACEMENT || '') === 'CONTACT_CENTER') return connectChannel(payload, auth)
     if (String(body.PLACEMENT || '') === 'SETTING_CONNECTOR') return settingsPage(payload, auth, body)
     if (String(body.event || '').toUpperCase() === 'ONIMCONNECTORMESSAGEADD') return operatorReply(payload, auth, body)
     return Response.json({ accepted: true, ignored: true })
@@ -41,7 +42,26 @@ async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: Bi
   for (const event of ['OnImConnectorMessageAdd', 'OnImConnectorMessageUpdate', 'OnImConnectorMessageDelete']) {
     await bitrixCall(auth.domain, auth.accessToken, 'event.bind', { event, handler: handlerUrl() })
   }
-  return page(`${connectorName} установлен. Откройте его в контакт-центре и сохраните линию.`, true)
+  await bitrixCall(auth.domain, auth.accessToken, 'placement.bind', contactCenterPlacement(handlerUrl()))
+  return page(`${connectorName} установлен. Плитка появится внизу контакт-центра, в блоке решений от партнёров.`, true)
+}
+
+async function connectChannel(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
+  const token = await usableToken(payload, auth)
+  const saved = await settings(payload)
+  let line = Number(saved.secret('messengerLineId'))
+  if (!Number.isInteger(line) || line <= 0) {
+    line = Number(await bitrixCall(auth.domain, token, 'imopenlines.config.add', { PARAMS: { LINE_NAME: connectorName, ACTIVE: 'Y', CRM: 'Y' } }))
+  }
+  if (!Number.isInteger(line) || line <= 0) return page('Не удалось создать линию', false)
+  await bitrixCall(auth.domain, token, 'imconnector.activate', { CONNECTOR: connectorId, LINE: line, ACTIVE: 1 })
+  await bitrixCall(auth.domain, token, 'imconnector.connector.data.set', {
+    CONNECTOR: connectorId,
+    LINE: line,
+    DATA: { ID: connectorId, NAME: connectorName, URL: 'https://avgst.ru', URL_IM: 'https://avgst.ru' },
+  })
+  await remember(payload, auth, { messengerLineId: String(line) })
+  return page(`${connectorName} подключен к линии ${line}.`, false)
 }
 
 async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
