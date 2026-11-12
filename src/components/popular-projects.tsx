@@ -25,7 +25,7 @@ function usePreviewPopular(heading: string, button: string, projects: CatalogPro
 export function PopularProjects({ block, projects }: { block: LayoutBlock; projects: CatalogProject[] }) {
   const shown = usePreviewPopular(String(block.heading || copy.popularHeading), String(block.catalogLabel || copy.allProjects), projects)
   return (
-    <section className="section" data-cms-block="popularProjects">
+    <section className={block.muted === true ? 'section section--muted' : 'section'} data-cms-block="popularProjects">
       <div className="section__inner">
         <div className="section__head" data-cms-block="popularProjects.heading">
           <div>

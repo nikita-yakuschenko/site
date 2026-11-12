@@ -26,6 +26,7 @@ export const HOME_LAYOUT: LayoutBlock[] = [
   {
     blockType: "popularProjects",
     showEyebrow: false,
+    muted: true,
     heading: copy.popularHeading,
     catalogHref: "/catalog",
     catalogLabel: copy.allProjects,
