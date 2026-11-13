@@ -27,6 +27,7 @@ export type LinkHooks = {
   onQr: (image: string) => void
   onConnected: (phone: string) => void
   onMessage: (phone: string, text: string, person?: { name?: string, username?: string, peer?: string }, externalId?: string) => void
+  onReconnecting?: (hint: string) => void
   onSaved: () => void
   onError: (hint: string) => void
   onHint?: (hint: string) => void
@@ -37,6 +38,8 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
   let stopped = false
   let attempt = 0
   let current: WASocket | null = null
+  let connectedAt = 0
+  let retry: ReturnType<typeof setTimeout> | undefined
   let waiting: ReturnType<typeof setTimeout> | undefined
   const connectionId = randomUUID()
   let sequence = 0
@@ -150,7 +153,7 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       if (update?.connection === 'open') {
         stage('account-connected')
         clearTimeout(waiting)
-        attempt = 0
+        connectedAt = Date.now()
         hooks.onConnected(nationalPhone((socket.user?.id || '').split('@')[0].split(':')[0]))
         hooks.onSaved()
       }
@@ -158,18 +161,28 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
         const code = (update.lastDisconnect?.error as { output?: { statusCode?: number } } | undefined)?.output?.statusCode
         const error = update.lastDisconnect?.error as (Error & { code?: string }) | undefined
         const reason = error?.message === 'WebSocket Error (Opening handshake has timed out)' ? 'websocket-handshake-timeout' : undefined
-        stage('closed', { previousStage: lastStage, status: code, reason, networkCode: /^[A-Z0-9_]{1,40}$/.test(error?.code ?? '') ? error?.code : undefined })
+        const connectedMs = connectedAt ? Date.now() - connectedAt : null
+        stage('closed', { previousStage: lastStage, status: code, reason, connectedMs, networkCode: /^[A-Z0-9_]{1,40}$/.test(error?.code ?? '') ? error?.code : undefined })
+        current = null
+        connectedAt = 0
+        clearTimeout(waiting)
         if (code === DisconnectReason.loggedOut) { hooks.onError('logged-out'); return }
-        if (attempt++ < 1) {
-          diagnostic('retry-scheduled', { delayMs: 800, route: proxyAgent ? 'proxy' : fallbackAgent === directAgent ? 'dns' : 'fallback' })
-          hooks.onHint?.('Связь с WhatsApp прервалась, повторяем.')
-          setTimeout(() => void open().catch(() => {
-            if (!stopped) hooks.onError('Не удалось восстановить соединение WhatsApp')
-          }), 800)
+        if (code === DisconnectReason.connectionReplaced || code === DisconnectReason.badSession || code === DisconnectReason.multideviceMismatch || code === DisconnectReason.forbidden) {
+          hooks.onError(`WhatsApp остановил сессию (код ${code}). Проверьте связанные устройства.`)
           return
         }
-        clearTimeout(waiting)
-        hooks.onError('Сервер не достучался до WhatsApp: соединение обрывается. Нужен исходящий доступ с CMS до web.whatsapp.com.')
+        if (connectedMs !== null && connectedMs >= 60_000) attempt = 0
+        if (state.creds.registered || connectedMs !== null || attempt < 1) {
+          const delayMs = Math.min(60_000, 1000 * 2 ** Math.min(attempt++, 6))
+          diagnostic('retry-scheduled', { delayMs, route: proxyAgent ? 'proxy' : fallbackAgent === directAgent ? 'dns' : 'fallback' })
+          hooks.onReconnecting?.('Связь с WhatsApp прервалась. Восстанавливаем соединение.')
+          retry = setTimeout(() => void open().catch(() => {
+            if (!stopped) hooks.onError('Не удалось восстановить соединение WhatsApp')
+          }), delayMs)
+          return
+        }
+        hooks.onError('Не удалось открыть WebSocket WhatsApp. Проверьте маршрут соединения.')
+        return
       }
       const upsert = events['messages.upsert']
       // notify — живые сообщения; append иногда приходит вместо notify после восстановления сессии.
@@ -217,6 +230,7 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
     },
     stop: async () => {
       stopped = true
+      clearTimeout(retry)
       clearTimeout(waiting)
       current?.end(undefined)
       directAgent.destroy()

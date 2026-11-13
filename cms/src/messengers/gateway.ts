@@ -37,6 +37,9 @@ export async function beginLogin(payload: Payload, channel: MessengerChannel, op
       void enqueue(payload, 'messenger-inbound', { channel, phone, text, person, messageId }, messageId)
         .catch(() => payload.logger.error('Не удалось сохранить входящее сообщение мессенджера'))
     },
+    onReconnecting: (hint: string) => {
+      if (current.generation === generation) current.view = { ...current.view, status: 'qr', qr: '', hint }
+    },
     onSaved: () => { if (current.generation === generation) void rememberSession(payload, channel) },
     onHint: (hint: string) => { if (current.generation === generation && current.view.status === 'qr') current.view = { ...current.view, hint } },
     onError: (hint: string) => {
