@@ -20,6 +20,7 @@ export type LinkHooks = {
   onSaved: () => void
   onError: (hint: string) => void
   onHint?: (hint: string) => void
+  password?: () => Promise<string>
 }
 
 export async function startWhatsApp(directory: string, hooks: LinkHooks): Promise<LinkHandle> {

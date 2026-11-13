@@ -52,6 +52,11 @@ async function pack(payload: Payload, channel: MessengerChannel) {
 export async function clearSession(payload: Payload, channel: MessengerChannel) {
   await rm(sessionDirectory(channel), { recursive: true, force: true })
   await forgetSecret(payload, `messengerSession:${channel}`)
+  // webmaxsocket держит вторую копию сессии в cwd/sessions — иначе после «Отключить» поднимается старый токен.
+  if (channel === 'max') {
+    await rm(path.join(process.cwd(), 'sessions', 'avgst-max.json'), { force: true })
+    await rm(path.join(process.cwd(), 'sessions', 'avgst-max.last_ok.json'), { force: true })
+  }
 }
 
 async function listFiles(dir: string) {
