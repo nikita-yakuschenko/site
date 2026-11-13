@@ -27,7 +27,7 @@ export function readChat(chatId: string) {
   const channel = split > 0 ? chatId.slice(0, split) : ''
   const id = split > 0 ? chatId.slice(split + 1) : ''
   if (!isMessengerChannel(channel)) return { channel: '' as const, phone: '', id: '' }
-  return { channel, phone: nationalPhone(id), id }
+  return { channel, phone: id.startsWith('@') || id.startsWith('peer:') ? '' : nationalPhone(id), id }
 }
 
 export function readablePhone(phone: string) {

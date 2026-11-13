@@ -57,6 +57,23 @@ async function syncCrm(payload: Payload, data: Record<string, unknown>) {
   return { synced: Boolean(record.crmContactId) }
 }
 export async function processJob(payload: Payload, kind: string, data: Record<string, unknown>): Promise<Record<string, unknown>> {
+  if (kind === 'messenger-inbound') {
+    const { isMessengerChannel } = await import('../messengers/phone')
+    const { openVisitorChat } = await import('../messengers/visitor-chat')
+    const channel = String(data.channel || '')
+    if (!isMessengerChannel(channel)) throw new Error('Неизвестный мессенджер')
+    const person = data.person as { name?: string, username?: string, peer?: string } | undefined
+    await openVisitorChat(payload, { channel, person, phone: String(data.phone || ''), text: String(data.text || ''), messageId: String(data.messageId || '') }, { requireLine: true })
+    return { sent: true }
+  }
+  if (kind === 'messenger-reply') {
+    const { lineChannel } = await import('../messengers/lines')
+    const { relayOperatorText } = await import('../messengers/gateway')
+    const channel = await lineChannel(payload, Number(data.line))
+    if (!channel) throw new Error('Мессенджер не закреплён за линией')
+    await relayOperatorText(channel, String(data.chatId || ''), String(data.text || ''))
+    return { sent: true }
+  }
   if (kind === 'email') return sendMail(payload, data)
   if (kind === 'crm-sync') return syncCrm(payload, data)
   if (kind === 'intake') {
@@ -124,10 +141,10 @@ export function startAutomationWorker(payload: Payload) {
     busy = true
     try {
       const saved = await settings(payload)
-      if (!(saved.cutover as { active?: boolean } | null)?.active) return
-      if (Date.now() - lastReminders > 60000) { await scheduleReminders(payload); lastReminders = Date.now() }
+      const automationActive = Boolean((saved.cutover as { active?: boolean } | null)?.active)
+      if (automationActive && Date.now() - lastReminders > 60000) { await scheduleReminders(payload); lastReminders = Date.now() }
       for (let count = 0; count < 10; count++) {
-        const claimed = await claimJob(payload)
+        const claimed = await claimJob(payload, !automationActive)
         if (!claimed) break
         const { job, lease } = claimed
         try { const result = await processJob(payload, job.kind, { ...(job.data as Record<string, unknown>), deliveryKey: job.key }); await finishJob(payload, job.id, lease, result) }

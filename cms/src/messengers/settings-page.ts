@@ -8,31 +8,32 @@ const scanHint: Record<MessengerChannel, string> = {
 
 export function settingsMarkup(line: number, channel: MessengerChannel | '', view: AccountView | undefined, auth: Record<string, string>, notice = '') {
   const authJson = JSON.stringify(auth).replace(/</g, '\\u003c')
-  return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Линия мессенджера</title><style>
+  return `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Подключение мессенджера</title><style>
     @font-face{font-family:Geist;src:url("https://cdn.jsdelivr.net/npm/geist@1.4.2/dist/fonts/geist-sans/Geist-Variable.woff2") format("woff2");font-weight:100 900;font-display:swap}
-    body{margin:0;background:#fff;color:#0b1020;font:15px/1.45 Geist,Inter,Arial,sans-serif}
-    .wrap{max-width:560px;padding:8px 4px 20px}
-    h1{margin:0 0 8px;font-size:24px;font-weight:600;letter-spacing:-.02em}
-    h2{display:flex;align-items:center;gap:10px;margin:0;font-size:20px;font-weight:600;letter-spacing:-.02em}
-    h2 .logo,h2 .logo svg{width:32px;height:32px}
-    .lead{margin:0 0 14px;color:rgb(11 16 32 / .62)}
-    .choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
-    .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;min-height:112px;padding:16px 8px;border:1px solid rgb(11 16 32 / .1);border-radius:16px;background:#fff;color:#0b1020;cursor:pointer;font:inherit}
-    .tile:hover{border-color:#fcc90c;background:#fffdf6;box-shadow:0 0 0 3px rgb(252 201 12 / .35)}
-    .logo{display:block;width:44px;height:44px;flex:none}
-    .logo svg{display:block;width:44px;height:44px}
-    .act{font-size:14px;font-weight:600;letter-spacing:-.01em}
-    @media (max-width:460px){.choices{grid-template-columns:1fr}.tile{flex-direction:row;justify-content:flex-start;min-height:0;padding:12px 14px}}
-    .card{margin-top:4px}
-    .row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
-    .state{margin:6px 0 0;color:rgb(11 16 32 / .62)}
-    .actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
-    img{display:block;width:196px;height:196px;margin:12px 0;border-radius:12px;background:#fff}
-    .go,.password button,.compose button{height:40px;padding:0 14px;border:0;border-radius:10px;background:#fcc90c;color:#0b1020;font:700 14px Geist,Inter,Arial,sans-serif;cursor:pointer}
-    .quiet{height:40px;padding:0 4px;border:0;background:transparent;color:rgb(11 16 32 / .55);font:inherit;cursor:pointer}
-    .password,.compose{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
-    input{flex:1;min-width:140px;height:40px;border:1px solid rgb(11 16 32 / .16);border-radius:10px;padding:0 12px;color:#0b1020;font:inherit}
-  </style></head><body><div class="wrap">${panelMarkup(line, channel, view, notice)}</div>
+    html,body{margin:0;padding:0;background:#fff;color:#0b1020}
+    body,button,input{font:15px/1.45 Geist,Inter,Arial,sans-serif}
+    *,*:before,*:after{box-sizing:border-box}
+    .wrap{padding:4px 2px 16px;max-width:520px}
+    .title{margin:0 0 8px;font-size:18px;line-height:1.3;font-weight:600;letter-spacing:-.02em}
+    .lead{margin:0 0 14px;color:rgb(11 16 32 / .62);font-size:14px;line-height:1.45}
+    .choices{display:grid;gap:8px}
+    .tile{display:flex;align-items:center;gap:12px;width:100%;margin:0;padding:12px 14px;border:1px solid rgb(11 16 32 / .12);border-radius:14px;background:#fff;color:#0b1020;text-align:left;cursor:pointer}
+    .tile:hover{border-color:#fcc90c;background:#fffdf3}
+    .logo{display:inline-flex;width:36px;height:36px;flex:none}
+    .logo svg{display:block;width:36px;height:36px}
+    .act{font-size:15px;font-weight:600}
+    .card{display:grid;gap:12px;margin:0;padding:0;border:0;background:transparent}
+    .head{display:flex;align-items:center;gap:10px}
+    .name{margin:0;font-size:18px;font-weight:600}
+    .state{margin:0;color:rgb(11 16 32 / .62);font-size:14px;line-height:1.45}
+    .actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+    .go,.password button,.compose button{height:40px;margin:0;padding:0 14px;border:0;border-radius:10px;background:#fcc90c;color:#0b1020;font:700 14px Geist,Inter,Arial,sans-serif;cursor:pointer}
+    .go:disabled{opacity:.55;cursor:wait}
+    .quiet{height:40px;margin:0;padding:0 8px;border:0;background:transparent;color:rgb(11 16 32 / .55);font:inherit;cursor:pointer}
+    .qr{display:block;width:200px;height:200px;margin:0;border:1px solid rgb(11 16 32 / .08);border-radius:12px;background:#fff}
+    .password,.compose{display:flex;gap:8px;flex-wrap:wrap}
+    input{flex:1;min-width:140px;height:40px;margin:0;border:1px solid rgb(11 16 32 / .16);border-radius:10px;padding:0 12px;color:#0b1020;background:#fff;font:inherit}
+  </style></head><body><div class="wrap"><div id="feedback" role="status"></div>${panelMarkup(line, channel, view, notice)}</div>
   <script src="https://api.bitrix24.com/api/v1/"></script>
   <script>
     const auth = ${authJson}
@@ -40,7 +41,13 @@ export function settingsMarkup(line: number, channel: MessengerChannel | '', vie
     function fit(){ if (window.BX24 && BX24.fitWindow) BX24.fitWindow() }
     if (window.BX24 && BX24.init) BX24.init(fit)
     window.addEventListener('load', function(){ setTimeout(fit, 50); setTimeout(fit, 400) })
+    let pending = false
     async function call(action, channel, form){
+      if (pending) return
+      pending = true
+      const feedback = document.getElementById('feedback')
+      if (action !== 'status') feedback.textContent = ''
+      try {
       const body = new URLSearchParams(auth)
       body.set('action', action)
       body.set('channel', channel || '')
@@ -52,9 +59,19 @@ export function settingsMarkup(line: number, channel: MessengerChannel | '', vie
       }
       const response = await fetch('/bitrix/messengers/connect', { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body })
       const data = await response.json()
+      if (!response.ok) throw new Error(data.error || 'Не удалось выполнить действие')
       const panel = document.getElementById('panel')
-      if (panel && data.panel) panel.outerHTML = data.panel
+      if (panel && data.panel) {
+        const next = document.createElement('template')
+        next.innerHTML = data.panel
+        if (!(action === 'status' && panel.querySelector('.password') && next.content.querySelector('.password'))) panel.outerHTML = data.panel
+      }
+      feedback.textContent = ''
       fit()
+      } catch (error) {
+        feedback.textContent = error instanceof Error ? error.message : 'Не удалось выполнить действие'
+        fit()
+      } finally { pending = false }
     }
     setInterval(function(){ if (document.querySelector('[data-wait="1"]')) call('status', document.querySelector('[data-channel]') && document.querySelector('[data-channel]').getAttribute('data-channel')) }, 3000)
   </script></body></html>`
@@ -66,22 +83,24 @@ export function panelMarkup(line: number, channel: MessengerChannel | '', view: 
     : !channel ? `<p class="lead">Выберите, какой мессенджер будет подключен к этой открытой линии.</p><div class="choices">${messengerChannels.map(item => `<button class="tile" type="button" onclick="call('bind','${item}')">${logo(item)}<span class="act">${messengerTitles[item]}</span></button>`).join('')}</div>`
     : card(view || { channel, title: messengerTitles[channel], status: 'off', phone: '', qr: '', hint: '' })
   const note = notice ? `<p class="lead">${escapeHtml(notice)}</p>` : ''
-  return `<div id="panel"><h1>${escapeHtml(title)}</h1>${note}${body}</div>`
+  return `<div id="panel"><h1 class="title">${escapeHtml(title)}</h1>${note}${body}</div>`
 }
 
 function card(view: AccountView) {
   const waiting = view.status === 'qr' || view.status === 'password'
   const phone = readablePhone(view.phone)
-  const state = view.status === 'on' ? `Подключён${phone ? `, ${phone}` : ''}` : view.status === 'qr' ? 'Ждём скан' : view.status === 'password' ? 'Нужен пароль' : view.status === 'error' ? 'Не подключился' : 'Не подключён'
-  const hint = view.hint || (view.status === 'on' ? 'Сообщения этой линии уходят и приходят через этот номер.' : scanHint[view.channel])
-  const image = view.qr ? `<img alt="Код для входа" src="${escapeHtml(view.qr)}">` : ''
+  const state = view.status === 'on' ? `Подключён${phone ? `, ${phone}` : ''}` : view.status === 'qr' ? (view.qr ? 'Отсканируйте код в приложении' : 'Ждём код для входа') : view.status === 'password' ? 'Нужен пароль' : view.status === 'error' ? 'Не подключился' : 'Не подключён'
+  const hint = view.hint || (view.status === 'on' ? 'Сообщения этой линии уходят и приходят через этот номер.' : view.status === 'qr' && !view.qr ? 'Сервер открывает связь с мессенджером.' : scanHint[view.channel])
+  const image = view.qr ? `<img class="qr" alt="Код для входа" src="${escapeHtml(view.qr)}">` : ''
   const password = view.status === 'password' ? `<form class="password" onsubmit="call('password','${view.channel}',this);return false"><input name="password" type="password" autocomplete="current-password" placeholder="Пароль" required><button type="submit">Продолжить</button></form>` : ''
   const compose = view.status === 'on' ? `<form class="compose" onsubmit="call('send','${view.channel}',this);return false"><input name="phone" inputmode="tel" autocomplete="tel" placeholder="Номер клиента" required><input name="text" placeholder="Сообщение" required><button type="submit">Написать первым</button></form>` : ''
   const button = view.status === 'on'
     ? `<button class="quiet" type="button" onclick="call('logout','${view.channel}')">Отключить</button>`
-    : `<button class="go" type="button" onclick="call('start','${view.channel}')">Подключить</button>`
+    : view.status === 'qr' && !view.qr
+      ? `<button class="go" type="button" disabled>Ждём код…</button>`
+      : `<button class="go" type="button" onclick="call('start','${view.channel}')">Подключить</button>`
   const change = view.status === 'on' ? '' : `<button class="quiet" type="button" onclick="call('unbind','${view.channel}')">Другой мессенджер</button>`
-  return `<section class="card" data-channel="${view.channel}" data-wait="${waiting ? '1' : '0'}"><div class="row"><div><h2>${logo(view.channel)}<span>${escapeHtml(view.title)}</span></h2><p class="state">${escapeHtml(state)}. ${escapeHtml(hint)}</p></div><div class="actions">${button}${change}</div></div>${image}${password}${compose}</section>`
+  return `<section class="card" data-channel="${view.channel}" data-wait="${waiting ? '1' : '0'}"><div class="head">${logo(view.channel)}<h2 class="name">${escapeHtml(view.title)}</h2></div><p class="state">${escapeHtml(state)}. ${escapeHtml(hint)}</p><div class="actions">${button}${change}</div>${image}${password}${compose}</section>`
 }
 
 function logo(channel: MessengerChannel) {

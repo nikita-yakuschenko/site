@@ -1,12 +1,12 @@
 import { createRequire } from 'node:module'
-import { copyFile, mkdir, readFile } from 'node:fs/promises'
+import { copyFile, mkdir, readFile, rm } from 'node:fs/promises'
 import path from 'node:path'
 import { nationalPhone } from './phone'
 import type { LinkHandle, LinkHooks } from './whatsapp-link'
 
 const require = createRequire(import.meta.url)
 const qrCode = require('qrcode') as { toDataURL: (text: string) => Promise<string> }
-const { WebMaxClient } = require('webmaxsocket') as { WebMaxClient: new (options: { name: string, deviceType: string, logIncoming: false }) => MaxClient }
+const { WebMaxClient } = require('webmaxsocket') as { WebMaxClient: new (options: { name: string, deviceType: string, logIncoming: false, maxReconnectAttempts: number }) => MaxClient }
 const libraryName = 'avgst-max'
 
 type MaxClient = {
@@ -22,7 +22,7 @@ type MaxClient = {
   userAgent: { headerUserAgent?: string, appVersion?: string, osVersion?: string, deviceName?: string, screen?: string, timezone?: string, locale?: string, buildNumber?: number, clientSessionId?: number }
   isAuthorized: boolean
   me: { id?: string | number, phone?: string } | null
-  onMessage: (handler: (message: { text?: string, senderId?: string | number, chatId?: string | number, sender?: { id?: string | number, phone?: string, username?: string | null, firstname?: string, lastname?: string, fullname?: string } }) => void) => void
+  onMessage: (handler: (message: { id?: string | number, text?: string, senderId?: string | number, chatId?: string | number, sender?: { id?: string | number, phone?: string, username?: string | null, firstname?: string, lastname?: string, fullname?: string } }) => void) => void
   sendMessage: (options: { chatId: string | number, text: string }) => Promise<unknown>
   getUserByPhone: (phone: string) => Promise<{ id: string | number } | null>
 }
@@ -31,8 +31,12 @@ export async function startMax(directory: string, hooks: LinkHooks): Promise<Lin
   const libraryFile = path.join(process.cwd(), 'sessions', `${libraryName}.json`)
   const stored = path.join(directory, 'session.json')
   await mkdir(path.dirname(libraryFile), { recursive: true })
-  await copyFile(stored, libraryFile).catch(() => undefined)
-  const client = new WebMaxClient({ name: libraryName, deviceType: 'WEB', logIncoming: false })
+  await rm(libraryFile, { force: true })
+  await copyFile(stored, libraryFile).catch(error => {
+    if (error.code !== 'ENOENT') throw error
+  })
+  const client = new WebMaxClient({ name: libraryName, deviceType: 'WEB', logIncoming: false, maxReconnectAttempts: 0 })
+  let stopped = false
   const finish = async () => {
     await copyFile(libraryFile, stored).catch(() => undefined)
     hooks.onSaved()
@@ -42,7 +46,8 @@ export async function startMax(directory: string, hooks: LinkHooks): Promise<Lin
       const sender = message.sender
       const phone = nationalPhone(String(sender?.phone || ''))
       const name = String(sender?.fullname || [sender?.firstname, sender?.lastname].filter(Boolean).join(' ') || '').trim()
-      if ((phone || sender?.username) && message.text) hooks.onMessage(phone, message.text, { name, username: sender?.username || '' })
+      const peer = String(message.chatId ?? '')
+      if (!stopped && /^-?\d+$/.test(peer) && message.text) hooks.onMessage(phone, message.text, { name, username: sender?.username || '', peer }, message.id == null ? undefined : `${peer}:${message.id}`)
     })
   }
   if (await hasToken(libraryFile)) await client.start().then(finish)
@@ -55,7 +60,9 @@ export async function startMax(directory: string, hooks: LinkHooks): Promise<Lin
     const pollingInterval = qr.pollingInterval
     const expiresAt = qr.expiresAt
     void client.pollQRStatus(trackId, pollingInterval, expiresAt).then(async () => {
+      if (stopped) return
       const login = await client.loginByQR(trackId)
+      if (stopped) return
       const token = login.tokenAttrs?.LOGIN?.token
       if (!token) throw new Error('MAX не подтвердил вход')
       const agent = client.userAgent
@@ -79,13 +86,17 @@ export async function startMax(directory: string, hooks: LinkHooks): Promise<Lin
   return {
     send: async (address, text) => {
       if (!client.isAuthorized) throw new Error('MAX ещё не подключён')
+      if (/^peer:-?\d+$/.test(address)) {
+        await client.sendMessage({ chatId: address.slice(5), text })
+        return
+      }
       const phone = nationalPhone(address)
       const user = phone ? await client.getUserByPhone(`+${phone}`) : null
-      const chatId = user?.id || (!phone ? address : '')
+      const chatId = user?.id
       if (!chatId) throw new Error('В MAX нет пользователя с этим номером')
       await client.sendMessage({ chatId, text })
     },
-    stop: async () => { await client.stop() },
+    stop: async () => { stopped = true; await client.stop(); await rm(libraryFile, { force: true }) },
   }
 }
 

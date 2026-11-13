@@ -4,7 +4,7 @@ import type { Payload } from 'payload'
 import { forgetSecret, saveSettings, settings } from '../automation/store'
 import type { MessengerChannel } from './phone'
 
-const fileName = /^[a-z0-9._-]+$/i
+const fileName = /^[a-z0-9._@+=-]+\.(json|txt)$/i
 
 export function sessionDirectory(channel: MessengerChannel) {
   return path.resolve(process.env.CMS_MESSENGER_DIR || path.join(process.cwd(), 'data', 'messenger-sessions'), channel)

@@ -4,10 +4,9 @@ import { readTextLimited } from '../../../../../../src/lib/request-security'
 import { requireCMSRequestLimit } from '../../../../config/request-limits'
 import { safeRequestError } from '../../../../config/safe-request-error'
 import { equalSecret } from '../../../../automation/crypto'
-import { saveSettings, settings } from '../../../../automation/store'
-import { currentMessengerToken } from '../../../../messengers/authorize-lead'
+import { enqueue, saveSettings, settings } from '../../../../automation/store'
 import { bitrixAuth, bitrixCall, connectorId, connectorName, lineChannelName, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
-import { accountViews, beginLogin, disconnectAccount, relayOperatorText, startOutgoing, submitPassword } from '../../../../messengers/gateway'
+import { accountViews, beginLogin, disconnectAccount, startOutgoing, submitPassword } from '../../../../messengers/gateway'
 import { bindLine, channelLine, lineChannel, unbindLine } from '../../../../messengers/lines'
 import { isMessengerChannel, type MessengerChannel } from '../../../../messengers/phone'
 import { panelMarkup, settingsMarkup } from '../../../../messengers/settings-page'
@@ -38,11 +37,11 @@ async function receive(request: Request, route: string) {
     const auth = bitrixAuth(body)
     const installing = route === 'install' || String(body.event || '').toUpperCase() === 'ONAPPINSTALL'
     if (auth.domain && auth.domain !== portalDomain) return Response.json({ error: 'Неверный портал' }, { status: 403 })
-    if (installing) return install(payload, auth)
+    if (installing) return await install(payload, auth)
     if (auth.domain !== portalDomain) return Response.json({ error: 'Неверный портал' }, { status: 403 })
-    if (route === 'connect') return connectApi(payload, auth, body)
-    if (String(body.PLACEMENT || '') === 'SETTING_CONNECTOR' || String(body.authorize || '') === '1') return settingsPage(payload, auth, body)
-    if (String(body.event || '').toUpperCase() === 'ONIMCONNECTORMESSAGEADD') return operatorReply(payload, auth, body)
+    if (route === 'connect') return await connectApi(payload, auth, body)
+    if (String(body.PLACEMENT || '') === 'SETTING_CONNECTOR' || String(body.authorize || '') === '1') return await settingsPage(payload, auth, body)
+    if (String(body.event || '').toUpperCase() === 'ONIMCONNECTORMESSAGEADD') return await operatorReply(payload, auth, body)
     return Response.json({ accepted: true, ignored: true })
   } catch (error) { return safeRequestError(error, data => console.error(data)) }
 }
@@ -50,10 +49,10 @@ async function receive(request: Request, route: string) {
 async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
   if (!auth.accessToken || auth.domain !== portalDomain) return page('Откройте установку из карточки приложения в Битрикс24.', false)
   try {
-    await bitrixCall(auth.domain, auth.accessToken, 'user.current')
-    await remember(payload, auth)
+    if (!await administratorToken(auth)) return page('Установку должен выполнить администратор Битрикс24.', false)
     await bitrixCall(auth.domain, auth.accessToken, 'imconnector.register', registerParams(handlerUrl()))
     await bitrixCall(auth.domain, auth.accessToken, 'event.bind', { event: 'OnImConnectorMessageAdd', handler: handlerUrl() })
+    await remember(payload, auth)
   } catch (error) {
     const failure = error instanceof Error ? error.message : 'Error'
     console.error(`messengers-install ${failure}`)
@@ -63,17 +62,17 @@ async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: Bi
 }
 
 async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
+  const token = await administratorToken(auth)
+  if (!token) return Response.json({ error: 'Требуется действующая сессия администратора Битрикс24' }, { status: 403 })
   const { connector, line } = placementLine(body)
   if (connector && connector !== connectorId) return page('Это другой канал', false)
   if (line) {
-    const token = await usableToken(payload, auth)
     await bitrixCall(auth.domain, token, 'imconnector.activate', { CONNECTOR: connectorId, LINE: line, ACTIVE: 1 })
     await publishLineName(payload, auth.domain, token, line)
-    await remember(payload, auth)
   }
   const channel = await lineChannel(payload, line)
   const view = channel ? accountViews().find(item => item.channel === channel) : undefined
-  return html(settingsMarkup(line, channel, view, authFields(body)))
+  return html(settingsMarkup(line, channel, view, { AUTH_ID: token, DOMAIN: auth.domain }))
 }
 
 async function operatorReply(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
@@ -84,18 +83,14 @@ async function operatorReply(payload: Awaited<ReturnType<typeof getPayload>>, au
   if (!applicationToken || !auth.applicationToken || !equalSecret(applicationToken, auth.applicationToken)) return Response.json({ error: 'Нет доступа' }, { status: 401 })
   for (const row of messageRows(body)) {
     const key = `messenger:${row.line}:${row.bitrixMessageId}`
-    const existing = await payload.find({ collection: 'automation-jobs', where: { key: { equals: key } }, limit: 1, depth: 0, overrideAccess: true })
-    if (existing.docs[0]) continue
-    await payload.create({ collection: 'automation-jobs', data: { key, kind: 'messenger-reply', data: row, status: 'completed', runAt: new Date().toISOString(), attempts: 0, result: { stored: true }, completedAt: new Date().toISOString() }, overrideAccess: true })
-    const channel = await lineChannel(payload, Number(row.line))
-    if (!channel) continue
-    try { await relayOperatorText(channel, row.chatId, row.text) } catch (error) { console.error(`messenger-reply ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`) }
+    await enqueue(payload, 'messenger-reply', row, key)
   }
   return Response.json({ accepted: true })
 }
 
 async function connectApi(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
-  const token = await usableToken(payload, auth)
+  const token = await administratorToken(auth)
+  if (!token) return Response.json({ error: 'Требуется действующая сессия администратора Битрикс24' }, { status: 403 })
   const line = Number(body.line)
   if (!Number.isInteger(line) || line <= 0) return Response.json({ error: 'Линия не выбрана' }, { status: 400 })
   const action = String(body.action || 'status')
@@ -123,7 +118,7 @@ async function connectApi(payload: Awaited<ReturnType<typeof getPayload>>, auth:
 }
 
 async function runLineAction(payload: Awaited<ReturnType<typeof getPayload>>, channel: MessengerChannel, action: string, body: Record<string, unknown>) {
-  if (action === 'start') { await beginLogin(payload, channel); return '' }
+  if (action === 'start') { await beginLogin(payload, channel, { fresh: true }); return '' }
   if (action === 'logout') { await disconnectAccount(payload, channel); return '' }
   if (action === 'password') { submitPassword(channel, String(body.password || '')); return '' }
   if (action === 'send') {
@@ -155,15 +150,11 @@ async function renderPanel(payload: Awaited<ReturnType<typeof getPayload>>, line
   return panelMarkup(line, channel, channel ? accountViews().find(item => item.channel === channel) : undefined, notice)
 }
 
-async function usableToken(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
-  if (auth.accessToken) {
-    try {
-      await bitrixCall(auth.domain, auth.accessToken, 'user.current')
-      await remember(payload, auth)
-      return auth.accessToken
-    } catch { /* Сохранённый токен обновляется ниже. */ }
-  }
-  return currentMessengerToken(payload)
+async function administratorToken(auth: BitrixAuth) {
+  if (!auth.accessToken) return ''
+  try {
+    return await bitrixCall<boolean>(auth.domain, auth.accessToken, 'user.admin') === true ? auth.accessToken : ''
+  } catch { return '' }
 }
 
 async function remember(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, extra: Record<string, string> = {}) {
@@ -184,15 +175,6 @@ function page(text: string, finish: boolean, extra = '') {
 
 function html(body: string) {
   return new Response(body, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } })
-}
-
-function authFields(body: Record<string, unknown>) {
-  const fields: Record<string, string> = {}
-  for (const key of ['AUTH_ID', 'REFRESH_ID', 'DOMAIN', 'member_id', 'application_token']) {
-    const value = body[key]
-    if (typeof value === 'string' && value) fields[key] = value
-  }
-  return fields
 }
 
 function escapeHtml(value: string) {

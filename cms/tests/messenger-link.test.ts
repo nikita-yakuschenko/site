@@ -11,6 +11,7 @@ test('номер рабочего входа приводится к между�
   assert.equal(chatAddress('whatsapp', '89990000000'), 'whatsapp:79990000000')
   assert.deepEqual(readChat('telegram:79990000000'), { channel: 'telegram', phone: '79990000000', id: '79990000000' })
   assert.equal(readChat('site').channel, '')
+  assert.deepEqual(readChat('telegram:@abc1234567890'), { channel: 'telegram', phone: '', id: '@abc1234567890' })
 })
 
 test('линия закрепляется за одним мессенджером', () => {
@@ -26,12 +27,14 @@ test('линия закрепляется за одним мессенджеро
 
 test('настройка линии показывает один мессенджер и письмо первым', () => {
   const empty = settingsMarkup(41, '', undefined, { AUTH_ID: 'token' })
+  assert.match(empty, /class="title"/)
   assert.match(empty, /Подключение мессенджера к открытой линии/)
   assert.match(empty, /какой мессенджер будет подключен к этой открытой линии/)
   assert.match(empty, /class="tile"/)
   assert.match(empty, /call\('bind','whatsapp'\)/)
   assert.match(empty, /#25D366/)
   assert.equal(empty.includes('Линия 41'), false)
+  assert.equal(empty.includes('class="row"'), false)
   assert.equal(empty.includes('Авторизовать сессию'), false)
   assert.equal(lineChannelName('whatsapp'), 'WhatsApp.Avangard Messengers')
   assert.equal(lineChannelName(''), 'Avangard Messengers')

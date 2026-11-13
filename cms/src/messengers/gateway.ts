@@ -1,4 +1,6 @@
 import type { Payload } from 'payload'
+import { randomUUID } from 'node:crypto'
+import { enqueue } from '../automation/store'
 import { readdir } from 'node:fs/promises'
 import { messengerChannels, messengerTitles, nationalPhone, readChat, type AccountView, type MessengerChannel } from './phone'
 import { clearSession, rememberSession, restoreSession } from './session-store'
@@ -9,26 +11,28 @@ import type { LinkHandle } from './whatsapp-link'
 type Runtime = { view: AccountView, handle?: LinkHandle, password?: (value: string) => void, generation: number }
 
 const runtimes = new Map<MessengerChannel, Runtime>()
-let payloadRef: Payload | null = null
 
 export function accountViews() {
   return messengerChannels.map(channel => ({ ...runtime(channel).view }))
 }
 
-export async function beginLogin(payload: Payload, channel: MessengerChannel) {
-  payloadRef = payload
+export async function beginLogin(payload: Payload, channel: MessengerChannel, options: { fresh?: boolean } = {}) {
   const current = runtime(channel)
-  if ((current.view.status === 'qr' && current.view.qr) || current.view.status === 'password' || current.view.status === 'on') return { ...current.view }
-  await current.handle?.stop().catch(() => undefined)
+  if (current.view.status === 'qr' || current.view.status === 'password' || current.view.status === 'on') return { ...current.view }
   const generation = current.generation + 1
   current.generation = generation
   current.view = { ...current.view, status: 'qr', qr: '', hint: 'Готовим код для входа.', phone: '' }
-  const directory = await restoreSession(payload, channel)
+  // По кнопке «Подключить» начинаем с чистой сессии, иначе обрывок мешает выдаче QR.
   const hooks = {
     onQr: (image: string) => { if (current.generation === generation) current.view = { ...current.view, status: 'qr', qr: image, hint: '' } },
     onConnected: (phone: string) => { if (current.generation === generation) current.view = { ...current.view, status: 'on', qr: '', phone, hint: '' } },
-    onMessage: (phone: string, text: string, person?: { name?: string, username?: string }) => { if (payloadRef) void openVisitorChat(payloadRef, { channel, phone, text, person, messageId: `${channel}-in-${Date.now()}` }).catch(() => undefined) },
-    onSaved: () => { if (payloadRef) void rememberSession(payloadRef, channel) },
+    onMessage: (phone: string, text: string, person?: { name?: string, username?: string, peer?: string }, externalId?: string) => {
+      if (current.generation !== generation) return
+      const messageId = `${channel}-in-${externalId || randomUUID()}`
+      void enqueue(payload, 'messenger-inbound', { channel, phone, text, person, messageId }, messageId)
+        .catch(() => payload.logger.error('Не удалось сохранить входящее сообщение мессенджера'))
+    },
+    onSaved: () => { if (current.generation === generation) void rememberSession(payload, channel) },
     onHint: (hint: string) => { if (current.generation === generation && current.view.status === 'qr') current.view = { ...current.view, hint } },
     onError: (hint: string) => {
       if (current.generation !== generation) return
@@ -42,13 +46,19 @@ export async function beginLogin(payload: Payload, channel: MessengerChannel) {
     }),
   }
   try {
-    current.handle = channel === 'whatsapp'
+    await current.handle?.stop().catch(() => undefined)
+    if (current.generation !== generation) return { ...current.view }
+    if (options.fresh) await clearSession(payload, channel)
+    const directory = await restoreSession(payload, channel)
+    const handle = channel === 'whatsapp'
       ? await (await import('./whatsapp-link')).startWhatsApp(directory, hooks)
       : channel === 'telegram'
         ? await (await import('./telegram-link')).startTelegram(directory, hooks)
         : await (await import('./max-link')).startMax(directory, hooks)
+    if (current.generation === generation) current.handle = handle
+    else await handle.stop()
   } catch (error) {
-    current.view = { ...current.view, status: 'error', qr: '', hint: error instanceof Error ? error.message.slice(0, 240) : 'Не удалось подключить номер' }
+    if (current.generation === generation) current.view = { ...current.view, status: 'error', qr: '', hint: error instanceof Error ? error.message.slice(0, 240) : 'Не удалось подключить номер' }
   }
   const deadline = Date.now() + 8000
   while (Date.now() < deadline && current.generation === generation && current.view.status === 'qr' && !current.view.qr) {
@@ -80,10 +90,11 @@ export async function disconnectAccount(payload: Payload, channel: MessengerChan
 
 export async function relayOperatorText(channel: MessengerChannel, chatId: string, text: string) {
   const parsed = readChat(chatId)
-  const phone = parsed.phone || (parsed.id.startsWith('@') ? parsed.id : '')
-  if (!phone || !text.trim()) return
+  if (parsed.channel !== channel) throw new Error('Канал диалога не совпадает с привязкой линии')
+  const phone = parsed.phone || (/^(?:@|peer:)/.test(parsed.id) ? parsed.id : '')
+  if (!phone || !text.trim()) throw new Error('Нет адреса получателя или текст сообщения пуст')
   const current = runtimes.get(channel)
-  if (current?.view.status !== 'on' || !current.handle) return
+  if (current?.view.status !== 'on' || !current.handle) throw new Error('Мессенджер отключён')
   await current.handle.send(phone, text.trim())
 }
 
@@ -109,7 +120,6 @@ export async function noteVisitorLead(payload: Payload, lead: { phone: string, r
 }
 
 export async function restoreCompanyNumbers(payload: Payload) {
-  payloadRef = payload
   for (const channel of messengerChannels) {
     const directory = await restoreSession(payload, channel)
     const files = await readdir(directory).catch(() => [])

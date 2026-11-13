@@ -2,6 +2,11 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { bitrixAuth, connectorId, connectorName, messageRows, parseBitrixBody, publisherName, registerParams } from '../src/messengers/bitrix-connector'
 
+test('форма Bitrix сохраняет обычные вложенные поля и отбрасывает служебные имена', () => {
+  const form = new URLSearchParams({ 'data[MESSAGES][0][chat][id]': 'telegram:peer:42', 'data[constructor]': 'ignored' })
+  assert.deepEqual(parseBitrixBody(null, form.toString()), { data: { MESSAGES: [{ chat: { id: 'telegram:peer:42' } }] } })
+})
+
 test('канал называется Avangard Messengers, оба слова с большой буквы', () => {
   assert.equal(connectorName, 'Avangard Messengers')
   assert.deepEqual(connectorName.split(' '), ['Avangard', 'Messengers'])

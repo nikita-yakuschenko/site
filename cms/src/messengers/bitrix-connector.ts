@@ -51,7 +51,9 @@ export function parseBitrixBody(contentType: string | null, text: string): Recor
 }
 
 function assign(cursor: Record<string, unknown> | unknown[], parts: string[], value: string) {
+  if (parts.length > 16 || parts.some(part => ['__proto__', 'constructor', 'prototype'].includes(part))) return
   const [head, ...rest] = parts
+  if (Array.isArray(cursor) && (!/^\d{1,4}$/.test(head) || Number(head) > 1024)) return
   if (!rest.length) {
     if (Array.isArray(cursor)) cursor[Number(head)] = value
     else cursor[head] = value
@@ -121,7 +123,7 @@ export const messengerChannelNames = { max: 'MAX', telegram: 'Telegram', whatsap
 const dialogBrand = { max: 'AM.MAX', telegram: 'AM.Telegram', whatsapp: 'AM.WhatsApp' } as const
 
 // Подпись диалога: @юзернейм, иначе имя, иначе телефон, затем AM.WhatsApp / AM.Telegram / AM.MAX.
-export function messengerSession(channel: string, phone: string, messageId: string, text: string, person: { name?: string, username?: string } = {}) {
+export function messengerSession(channel: string, phone: string, messageId: string, text: string, person: { name?: string, username?: string, peer?: string } = {}) {
   const brand = dialogBrand[channel as keyof typeof dialogBrand]
   const digits = phone.replace(/\D/g, '')
   const national = digits.length === 11 && digits.startsWith('8') ? `7${digits.slice(1)}` : digits
@@ -129,9 +131,11 @@ export function messengerSession(channel: string, phone: string, messageId: stri
   const username = (person.username || '').trim().replace(/^@/, '')
   const safeUsername = /^[A-Za-z0-9_]{3,32}$/.test(username) ? username : ''
   const personName = (person.name || '').replace(/\s+/g, ' ').trim().slice(0, 80)
-  const who = safeUsername ? `@${safeUsername}` : personName || readable
+  const peer = person.peer && /^[A-Za-z0-9@._:-]{1,100}$/.test(person.peer) ? person.peer : ''
+  const who = safeUsername ? `@${safeUsername}` : personName || readable || (peer ? 'Клиент' : '')
   if (!brand || !who || !messageId || !text) return null
-  const id = readable ? `${channel}:${national}` : `${channel}:@${safeUsername}`
+  if (!readable && !safeUsername && !peer) return null
+  const id = peer ? `${channel}:peer:${peer}` : readable ? `${channel}:${national}` : `${channel}:@${safeUsername}`
   const user: { id: string, name: string, phone?: string } = { id, name: who }
   if (readable) user.phone = readable
   return {
@@ -170,7 +174,7 @@ export async function bitrixCall<T>(domain: string, token: string, method: strin
   const body = await response.json() as { result?: T; error?: string; error_description?: string }
   if (!response.ok || body.error) {
     const already = String(body.error_description || '').toLowerCase().includes('already')
-    if (already) return true as T
+    if (already && (method === 'imconnector.register' || method === 'event.bind')) return true as T
     throw new Error(body.error || String(response.status))
   }
   return body.result as T
