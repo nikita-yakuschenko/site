@@ -47,7 +47,7 @@ test('запрос паспорта передаёт название проек
   for (const lead of [leadInputSchema.parse(input), leadInputSchema.parse({ ...input, name: 'Запрос паспорта проекта' })]) {
     const body = webhookBody(lead, 'sample', leadTitle(lead))
     assert.equal(body.title, 'Посетитель направил запрос на получение паспорта проекта Сканди 106')
-    assert.match(String(body.comment), /Куда отправить: Telegram/)
+    assert.match(String(body.comment), /Куда менеджеру написать: Telegram/)
     assert.equal(body.phone, input.phone)
     assert.equal('name' in body, false)
     assert.equal('name' in body.lead, false)
