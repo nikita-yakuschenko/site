@@ -26,10 +26,12 @@ test('линия закрепляется за одним мессенджеро
 
 test('настройка линии показывает один мессенджер и письмо первым', () => {
   const empty = settingsMarkup(41, '', undefined, { AUTH_ID: 'token' })
-  assert.match(empty, /какой мессенджер обслуживает эту линию/)
+  assert.match(empty, /Подключение мессенджера к открытой линии/)
+  assert.match(empty, /какой мессенджер будет подключен к этой открытой линии/)
   assert.match(empty, /class="tile"/)
   assert.match(empty, /call\('bind','whatsapp'\)/)
-  assert.match(empty, /Подключить WhatsApp/)
+  assert.match(empty, /#25D366/)
+  assert.equal(empty.includes('Линия 41'), false)
   assert.equal(empty.includes('Авторизовать сессию'), false)
   assert.equal(lineChannelName('whatsapp'), 'WhatsApp.Avangard Messengers')
   assert.equal(lineChannelName(''), 'Avangard Messengers')

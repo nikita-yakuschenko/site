@@ -13,13 +13,16 @@ export function settingsMarkup(line: number, channel: MessengerChannel | '', vie
     body{margin:0;background:#fff;color:#0b1020;font:15px/1.45 Geist,Inter,Arial,sans-serif}
     .wrap{max-width:560px;padding:8px 4px 20px}
     h1{margin:0 0 8px;font-size:24px;font-weight:600;letter-spacing:-.02em}
-    h2{margin:0;font-size:20px;font-weight:600;letter-spacing:-.02em}
+    h2{display:flex;align-items:center;gap:10px;margin:0;font-size:20px;font-weight:600;letter-spacing:-.02em}
+    h2 .logo,h2 .logo svg{width:32px;height:32px}
     .lead{margin:0 0 14px;color:rgb(11 16 32 / .62)}
-    .choices{display:grid;gap:8px}
-    .tile{display:flex;align-items:center;gap:12px;width:100%;padding:12px 14px;border:1px solid rgb(11 16 32 / .08);border-radius:14px;background:#f7f4ea;color:#0b1020;text-align:left;cursor:pointer;font:inherit}
-    .tile:hover{border-color:#fcc90c;background:#fff8df}
-    .mark{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#fcc90c;color:#0b1020;font-weight:700;flex:none}
-    .act{font-size:15px;font-weight:600}
+    .choices{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+    .tile{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;width:100%;min-height:112px;padding:16px 8px;border:1px solid rgb(11 16 32 / .1);border-radius:16px;background:#fff;color:#0b1020;cursor:pointer;font:inherit}
+    .tile:hover{border-color:#fcc90c;background:#fffdf6;box-shadow:0 0 0 3px rgb(252 201 12 / .35)}
+    .logo{display:block;width:44px;height:44px;flex:none}
+    .logo svg{display:block;width:44px;height:44px}
+    .act{font-size:14px;font-weight:600;letter-spacing:-.01em}
+    @media (max-width:460px){.choices{grid-template-columns:1fr}.tile{flex-direction:row;justify-content:flex-start;min-height:0;padding:12px 14px}}
     .card{margin-top:4px}
     .row{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
     .state{margin:6px 0 0;color:rgb(11 16 32 / .62)}
@@ -58,9 +61,9 @@ export function settingsMarkup(line: number, channel: MessengerChannel | '', vie
 }
 
 export function panelMarkup(line: number, channel: MessengerChannel | '', view: AccountView | undefined, notice = '') {
-  const title = line ? `Линия ${line}` : 'Откройте канал из контакт-центра'
-  const body = !line ? '<p class="lead">Сначала подключите Avangard Messengers к открытой линии.</p>'
-    : !channel ? `<p class="lead">Выберите, какой мессенджер обслуживает эту линию. На каждую линию приходится один мессенджер.</p><div class="choices">${messengerChannels.map(item => `<button class="tile" type="button" onclick="call('bind','${item}')"><span class="mark">${messengerTitles[item].slice(0, 1)}</span><span class="act">Подключить ${messengerTitles[item]}</span></button>`).join('')}</div>`
+  const title = 'Подключение мессенджера к открытой линии'
+  const body = !line ? '<p class="lead">Сначала откройте этот канал из настроек открытой линии.</p>'
+    : !channel ? `<p class="lead">Выберите, какой мессенджер будет подключен к этой открытой линии.</p><div class="choices">${messengerChannels.map(item => `<button class="tile" type="button" onclick="call('bind','${item}')">${logo(item)}<span class="act">${messengerTitles[item]}</span></button>`).join('')}</div>`
     : card(view || { channel, title: messengerTitles[channel], status: 'off', phone: '', qr: '', hint: '' })
   const note = notice ? `<p class="lead">${escapeHtml(notice)}</p>` : ''
   return `<div id="panel"><h1>${escapeHtml(title)}</h1>${note}${body}</div>`
@@ -78,7 +81,16 @@ function card(view: AccountView) {
     ? `<button class="quiet" type="button" onclick="call('logout','${view.channel}')">Отключить</button>`
     : `<button class="go" type="button" onclick="call('start','${view.channel}')">Подключить</button>`
   const change = view.status === 'on' ? '' : `<button class="quiet" type="button" onclick="call('unbind','${view.channel}')">Другой мессенджер</button>`
-  return `<section class="card" data-channel="${view.channel}" data-wait="${waiting ? '1' : '0'}"><div class="row"><div><h2>${escapeHtml(view.title)}</h2><p class="state">${escapeHtml(state)}. ${escapeHtml(hint)}</p></div><div class="actions">${button}${change}</div></div>${image}${password}${compose}</section>`
+  return `<section class="card" data-channel="${view.channel}" data-wait="${waiting ? '1' : '0'}"><div class="row"><div><h2>${logo(view.channel)}<span>${escapeHtml(view.title)}</span></h2><p class="state">${escapeHtml(state)}. ${escapeHtml(hint)}</p></div><div class="actions">${button}${change}</div></div>${image}${password}${compose}</section>`
+}
+
+function logo(channel: MessengerChannel) {
+  const mark = channel === 'whatsapp'
+    ? '<circle cx="20" cy="20" r="20" fill="#25D366"/><path fill="#fff" d="M20.2 9.6a8.8 8.8 0 0 0-7.6 13.2l-1.1 4 4.1-1.1a8.8 8.8 0 1 0 4.6-16.1zm5 12.4c-.2.6-1.2 1.1-1.6 1.1-.4 0-.9.2-2.9-.6-2.4-1-4-3.4-4.1-3.5-.1-.2-1.1-1.5-1.1-2.9s.7-2 .9-2.3.4-.4.6-.4h.5c.2 0 .4 0 .5.4.2.6.8 1.9.8 2 0 .2 0 .3-.1.5l-.3.4c-.1.2-.3.3-.1.6.1.3.7 1.2 1.6 2 1.1.9 2 1.2 2.3 1.4.2.1.4.1.5-.1l.5-.6c.1-.2.3-.1.5-.1l1.8.8c.2.1.3.2.4.3.1.2 0 .7-.2 1.1z"/>'
+    : channel === 'telegram'
+      ? '<circle cx="20" cy="20" r="20" fill="#2AABEE"/><path fill="#fff" d="M29 12.2 10.7 19.2c-1.2.5-1.2 1.1-.2 1.4l4.6 1.4 10.7-6.8c.5-.3 1-.1.6.2L17.6 23.4l-.3 4.7c.5 0 .7-.2 1-.5l2.4-2.3 4.8 3.6c.9.5 1.5.2 1.8-.8l3.2-15c.3-1.3-.5-1.9-1.5-1.4z"/>'
+      : '<rect width="40" height="40" rx="12" fill="#111318"/><path fill="#fff" d="M11.5 13.2h17a2 2 0 0 1 2 2v7.6a2 2 0 0 1-2 2H18.2l-4.4 3.4v-3.4h-2.3a2 2 0 0 1-2-2v-7.6a2 2 0 0 1 2-2z"/>'
+  return `<span class="logo" aria-hidden="true"><svg viewBox="0 0 40 40" xmlns="http://www.w3.org/2000/svg">${mark}</svg></span>`
 }
 
 function escapeHtml(value: string) {
