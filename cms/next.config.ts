@@ -11,6 +11,7 @@ const config: NextConfig = {
   poweredByHeader: false,
   images: { unoptimized: true },
   reactStrictMode: true,
+  serverExternalPackages: ['@whiskeysockets/baileys', 'telegram', 'webmaxsocket', 'qrcode', 'big-integer'],
   async headers() {
     return [
       {

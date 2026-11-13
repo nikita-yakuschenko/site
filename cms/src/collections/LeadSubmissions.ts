@@ -9,6 +9,7 @@ import { leadTitle } from '../config/lead-title'
 import { normalizeMapsApiKey, normalizeMetricaCounterId, publicMapsKey, publicMetrica } from '../config/yandex'
 import { normalizeMessengerPhone, normalizeMessengerUrl, publicMessengers } from '../../../src/lib/messengers'
 import { acceptLead } from '../config/lead-intake'
+import { noteVisitorLead } from '../messengers/gateway'
 import { enqueue, settings as automationSettings } from '../automation/store'
 import { resolveLeadClassification } from '../config/lead-classification'
 import { leadClassificationEndpoint } from './lead-classification-endpoint'
@@ -113,7 +114,10 @@ export const LeadSubmissions: CollectionConfig = {
     const result = await acceptLead(lead, {
       find: async requestId => (await req.payload.find({ collection: 'lead-submissions', where: { requestId: { equals: requestId } }, limit: 1, depth: 0, overrideAccess: true })).docs[0],
       save: requestId => req.payload.create({ collection: 'lead-submissions', data: { requestId, formId: lead.formId!, status: 'pending', title, payload: { ...lead, title } }, overrideAccess: true }),
-      defer: work => after(work),
+      defer: work => after(async () => {
+        await work()
+        try { await noteVisitorLead(req.payload, lead) } catch (error) { req.payload.logger.error({ failure: error instanceof Error ? error.name : 'Error', requestId: lead.requestId, msg: 'Messenger dialog was not opened' }) }
+      }),
       deliver: requestId => deliverLead(settings, lead, requestId, fetch, title),
       update: (id, data) => req.payload.update({ collection: 'lead-submissions', id, data, overrideAccess: true }),
       report: error => req.payload.logger.error({ failure: error instanceof Error ? error.name : 'Error', requestId: lead.requestId, msg: 'Lead integration delivery failed; receipt retained in CMS' }),

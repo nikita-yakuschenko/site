@@ -7,6 +7,9 @@ import { equalSecret } from '../../../../automation/crypto'
 import { saveSettings, settings } from '../../../../automation/store'
 import { currentMessengerToken } from '../../../../messengers/authorize-lead'
 import { bitrixAuth, bitrixCall, connectorId, connectorName, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
+import { accountViews, beginLogin, disconnectAccount, relayOperatorText, submitPassword } from '../../../../messengers/gateway'
+import { isMessengerChannel } from '../../../../messengers/phone'
+import { cardMarkup, settingsMarkup } from '../../../../messengers/settings-page'
 
 export const dynamic = 'force-dynamic'
 type Context = { params: Promise<{ path?: string[] }> }
@@ -36,6 +39,7 @@ async function receive(request: Request, route: string) {
     if (auth.domain && auth.domain !== portalDomain) return Response.json({ error: 'Неверный портал' }, { status: 403 })
     if (installing) return install(payload, auth)
     if (auth.domain !== portalDomain) return Response.json({ error: 'Неверный портал' }, { status: 403 })
+    if (route === 'connect') return connectApi(payload, auth, body)
     if (String(body.PLACEMENT || '') === 'SETTING_CONNECTOR' || String(body.authorize || '') === '1') return settingsPage(payload, auth, body)
     if (String(body.event || '').toUpperCase() === 'ONIMCONNECTORMESSAGEADD') return operatorReply(payload, auth, body)
     return Response.json({ accepted: true, ignored: true })
@@ -70,10 +74,7 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
     })
     await remember(payload, auth, { messengerLineId: String(line) })
   }
-  const notice = line
-    ? `${connectorName} подключен к линии ${line}. Номера компании в мессенджерах не подключены, ответы оператора остаются в Битриксе.`
-    : `Откройте ${connectorName} в контакт-центре.`
-  return page(notice, false)
+  return html(settingsMarkup(line, accountViews(), authFields(body)))
 }
 
 async function operatorReply(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
@@ -87,8 +88,21 @@ async function operatorReply(payload: Awaited<ReturnType<typeof getPayload>>, au
     const existing = await payload.find({ collection: 'automation-jobs', where: { key: { equals: key } }, limit: 1, depth: 0, overrideAccess: true })
     if (existing.docs[0]) continue
     await payload.create({ collection: 'automation-jobs', data: { key, kind: 'messenger-reply', data: row, status: 'completed', runAt: new Date().toISOString(), attempts: 0, result: { stored: true }, completedAt: new Date().toISOString() }, overrideAccess: true })
+    try { await relayOperatorText(row.chatId, row.text) } catch (error) { console.error(`messenger-reply ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`) }
   }
   return Response.json({ accepted: true })
+}
+
+async function connectApi(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
+  await usableToken(payload, auth)
+  const channel = String(body.channel || '')
+  if (!isMessengerChannel(channel)) return Response.json({ error: 'Неизвестный мессенджер' }, { status: 400 })
+  const action = String(body.action || 'status')
+  const view = action === 'start' ? await beginLogin(payload, channel)
+    : action === 'logout' ? await disconnectAccount(payload, channel)
+    : action === 'password' ? submitPassword(channel, String(body.password || ''))
+    : accountViews().find(item => item.channel === channel) || accountViews()[0]
+  return Response.json({ markup: cardMarkup(view) }, { headers: { 'Cache-Control': 'no-store' } })
 }
 
 async function usableToken(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
@@ -116,6 +130,19 @@ async function remember(payload: Awaited<ReturnType<typeof getPayload>>, auth: B
 function page(text: string, finish: boolean, extra = '') {
   const script = finish ? '<script src="https://api.bitrix24.com/api/v1/"></script><script>BX24.init(function(){BX24.installFinish()})</script>' : ''
   return new Response(`<!doctype html><html lang="ru"><meta charset="utf-8"><title>${connectorName}</title><body style="font:16px system-ui;margin:24px"><h1>${connectorName}</h1><p>${escapeHtml(text)}</p>${extra}${script}</body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } })
+}
+
+function html(body: string) {
+  return new Response(body, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } })
+}
+
+function authFields(body: Record<string, unknown>) {
+  const fields: Record<string, string> = {}
+  for (const key of ['AUTH_ID', 'REFRESH_ID', 'DOMAIN', 'member_id', 'application_token']) {
+    const value = body[key]
+    if (typeof value === 'string' && value) fields[key] = value
+  }
+  return fields
 }
 
 function escapeHtml(value: string) {

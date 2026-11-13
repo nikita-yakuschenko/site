@@ -19,6 +19,7 @@ next-env.d.ts
 .claude/
 public/media/factory-video.mp4
 data/
+sessions/
 !src/data/
 !src/data/manufacture-frames*.json
 !cms/src/data/

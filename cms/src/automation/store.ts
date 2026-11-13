@@ -15,6 +15,12 @@ export async function saveSettings(payload: Payload, config: AutomationConfig, s
   for (const [key, value] of Object.entries(secrets)) if (value) vault[key] = seal(value)
   return payload.updateGlobal({ slug: 'automation-settings', data: { config, vault, ...(cutover ? { cutover } : {}) }, overrideAccess: true })
 }
+export async function forgetSecret(payload: Payload, key: string) {
+  const current = await settings(payload)
+  const vault = { ...current.vault }
+  delete vault[key]
+  return payload.updateGlobal({ slug: 'automation-settings', data: { config: current.config, vault }, overrideAccess: true })
+}
 export async function enqueue(payload: Payload, kind: string, data: Record<string, unknown>, key: string = randomUUID(), runAt = new Date().toISOString(), req?: PayloadRequest) {
   const existing = await payload.find({ collection: 'automation-jobs', where: { key: { equals: key } }, limit: 1, depth: 0, overrideAccess: true, req })
   if (existing.docs[0]) return existing.docs[0]
