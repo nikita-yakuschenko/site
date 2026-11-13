@@ -69,7 +69,7 @@ async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: Bi
     stage = 'event.bind'
     await bitrixCall(auth.domain, auth.accessToken, 'event.bind', { event: 'OnImConnectorMessageAdd', handler: handlerUrl() })
     log('ok')
-    stage = 'messageservice.sender.add'
+    stage = 'messageservice.sender.sync'
     const crmChannels = await registerMessageSenders(auth.domain, auth.accessToken)
     log(crmChannels ? 'ok' : 'skipped', crmChannels ? undefined : 'insufficient_scope')
     stage = 'save-auth'
@@ -89,10 +89,14 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
   if (!token) return Response.json({ error: 'Требуется действующая сессия администратора Битрикс24' }, { status: 403 })
   const { connector, line } = placementLine(body)
   if (connector && connector !== connectorId) return page('Это другой канал', false)
-  // Повторная регистрация каналов сделки без полной переустановки приложения.
-  await registerMessageSenders(auth.domain, token).catch(error => {
-    console.error(`messenger-crm-senders ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`)
-  })
+  let notice = ''
+  try {
+    if (!await registerMessageSenders(auth.domain, token)) {
+      notice = 'Подписи каналов сделки не обновились. Проверьте право messageservice у приложения Битрикс24.'
+    }
+  } catch {
+    notice = 'Битрикс24 не обновил подписи каналов сделки. Повторите открытие настроек позже.'
+  }
   if (line) {
     await bitrixCall(auth.domain, token, 'imconnector.activate', { CONNECTOR: connectorId, LINE: line, ACTIVE: 1 })
     await ensureOpenLineCrm(auth.domain, token, line)
@@ -100,7 +104,7 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
   }
   const channel = await lineChannel(payload, line)
   const view = channel ? accountViews().find(item => item.channel === channel) : undefined
-  return html(settingsMarkup(line, channel, view, { AUTH_ID: token, DOMAIN: auth.domain }))
+  return html(settingsMarkup(line, channel, view, { AUTH_ID: token, DOMAIN: auth.domain }, notice))
 }
 
 async function crmMessageSend(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, message: NonNullable<ReturnType<typeof parseCrmMessageSend>>) {
@@ -122,15 +126,27 @@ async function crmMessageSend(payload: Awaited<ReturnType<typeof getPayload>>, a
 }
 
 async function registerMessageSenders(domain: string, token: string) {
+  let stage = 'messageservice.sender.list'
+  let senderCode: string | undefined
   try {
+    const existing = await bitrixCall<string[]>(domain, token, stage, { start: -1 })
+    if (!Array.isArray(existing)) throw new Error('UNEXPECTED_SENDER_LIST')
     for (const sender of messageServiceSenders(handlerUrl())) {
-      // Удаляем и создаём заново: update не всегда поднимает пустое имя в «Каналах связи».
-      await bitrixCall(domain, token, 'messageservice.sender.delete', { CODE: sender.CODE }).catch(() => undefined)
-      await bitrixCall(domain, token, 'messageservice.sender.add', sender)
+      const { TYPE, ...provider } = sender
+      const registered = existing.includes(sender.CODE)
+      senderCode = sender.CODE
+      stage = registered ? 'messageservice.sender.update' : 'messageservice.sender.add'
+      const result = await bitrixCall<boolean>(domain, token, stage, registered ? provider : { ...provider, TYPE })
+      if (result !== true) throw new Error('SENDER_SYNC_NOT_CONFIRMED')
+      console.info(JSON.stringify({ component: 'messenger-crm-senders', stage, senderCode, outcome: 'ok' }))
     }
     return true
   } catch (error) {
     const code = error instanceof Error ? error.message : ''
+    console.error(JSON.stringify({
+      component: 'messenger-crm-senders', stage, senderCode, outcome: 'failed',
+      code: /^[a-z0-9_]{1,64}$/i.test(code) ? code : undefined,
+    }))
     if (code === 'insufficient_scope' || code === 'ACCESS_DENIED') return false
     throw error
   }
