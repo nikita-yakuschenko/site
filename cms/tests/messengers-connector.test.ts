@@ -29,3 +29,17 @@ test('разбирает ответ оператора из формы Битр�
   assert.equal(bitrixAuth(body).domain, 'avgstroy.bitrix24.ru')
   assert.deepEqual(messageRows(body), [{ line: '41', chatId: 'whatsapp:79001234567', text: 'Паспорт во вложении', bitrixMessageId: '900', userId: '39' }])
 })
+
+test('сессия мессенджера передаёт телефон и не отключает CRM', async () => {
+  const { messengerSession, refreshMessengerAuth } = await import('../src/messengers/bitrix-connector')
+  const message = messengerSession('telegram', '89990000000', 'lead-1', 'Заявка с сайта.')
+  assert.ok(message)
+  assert.equal(message.user.phone, '+79990000000')
+  assert.equal(message.user.name, 'Telegram')
+  assert.equal(message.chat.id, 'telegram:79990000000')
+  assert.equal(message.message.id, 'lead-1')
+  assert.equal('disable_crm' in message.message, false)
+  assert.equal('skip_phone_validate' in message.user, false)
+  assert.equal(messengerSession('phone', '+79990000000', 'lead-1', 'Заявка с сайта.'), null)
+  assert.equal(await refreshMessengerAuth('refresh-token'), null)
+})

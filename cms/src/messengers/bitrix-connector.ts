@@ -111,6 +111,39 @@ function record(value: unknown): Record<string, unknown> {
   return value && typeof value === 'object' && !Array.isArray(value) ? value as Record<string, unknown> : {}
 }
 
+export const messengerChannelNames = { max: 'MAX', telegram: 'Telegram', whatsapp: 'WhatsApp' } as const
+
+// Телефон в user.phone включает CRM-трекер: без него Битрикс оставляет сессию неавторизованной.
+export function messengerSession(channel: string, phone: string, messageId: string, text: string) {
+  const name = messengerChannelNames[channel as keyof typeof messengerChannelNames]
+  const digits = phone.replace(/\D/g, '')
+  const national = digits.length === 11 && digits.startsWith('8') ? `7${digits.slice(1)}` : digits
+  if (!name || national.length < 10 || !messageId || !text) return null
+  const id = `${channel}:${national}`
+  const readable = `+${national}`
+  return {
+    user: { id, name, phone: readable },
+    message: { id: messageId, date: Math.floor(Date.now() / 1000), text },
+    chat: { id, name: `${name} ${readable}`, url: 'https://avgst.ru' },
+  }
+}
+
+export async function refreshMessengerAuth(refreshToken: string, request: typeof fetch = fetch) {
+  const clientId = process.env.BITRIX_APP_CLIENT_ID || ''
+  const clientSecret = process.env.BITRIX_APP_CLIENT_SECRET || ''
+  if (!clientId || !clientSecret || !refreshToken) return null
+  const response = await request('https://oauth.bitrix24.tech/oauth/token/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({ grant_type: 'refresh_token', client_id: clientId, client_secret: clientSecret, refresh_token: refreshToken }),
+    signal: AbortSignal.timeout(20000),
+    redirect: 'error',
+  })
+  const body = await response.json() as { access_token?: string; refresh_token?: string; expires_in?: number }
+  if (!response.ok || !body.access_token) return null
+  return { accessToken: body.access_token, refreshToken: body.refresh_token || refreshToken, expiresAt: Date.now() + Number(body.expires_in || 3600) * 1000 }
+}
+
 export async function bitrixCall<T>(domain: string, token: string, method: string, params: Record<string, unknown> = {}): Promise<T> {
   if (domain !== portalDomain) throw new Error('Неверный портал')
   if (!/^[a-z0-9.]+$/i.test(method)) throw new Error('Недопустимый метод')
