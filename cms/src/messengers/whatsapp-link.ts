@@ -2,6 +2,7 @@ import makeWASocket, { Browsers, DisconnectReason, useMultiFileAuthState as load
 import { Agent as HttpsAgent } from 'node:https'
 import { createRequire } from 'node:module'
 import { setDefaultResultOrder } from 'node:dns'
+import { isIPv4 } from 'node:net'
 import { nationalPhone } from './phone'
 
 // В контейнере IPv6 до WhatsApp часто молчит, и код входа не появляется. Сначала берём IPv4.
@@ -26,7 +27,21 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
   let attempt = 0
   let current: WASocket | null = null
   let waiting: ReturnType<typeof setTimeout> | undefined
-  const agent = new HttpsAgent({ family: 4, keepAlive: true, timeout: 15000 })
+  // Keep DNS as the first choice. The CMS route to some WhatsApp IPv4 edges times out.
+  const fallback = process.env.WHATSAPP_FALLBACK_IPV4 ?? '163.70.151.60'
+  const directAgent = new HttpsAgent({ family: 4, keepAlive: true, timeout: 15000 })
+  const fallbackAgent = isIPv4(fallback) ? new HttpsAgent({
+    family: 4,
+    timeout: 15000,
+    lookup: (hostname, options, callback) => {
+      if (hostname !== 'web.whatsapp.com') {
+        callback(new Error('Unexpected WhatsApp WebSocket host'), '', 4)
+        return
+      }
+      if (options.all) callback(null, [{ address: fallback, family: 4 }])
+      else callback(null, fallback, 4)
+    },
+  }) : directAgent
   const open = async () => {
     if (stopped) return
     clearTimeout(waiting)
@@ -39,7 +54,7 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       } } },
       logger: quiet as never,
       browser: Browsers.macOS('Chrome'),
-      agent,
+      agent: attempt > 0 ? fallbackAgent : directAgent,
       connectTimeoutMs: 20000,
       syncFullHistory: false,
       markOnlineOnConnect: false,
@@ -99,6 +114,12 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       if (!current || !jid) throw new Error('WhatsApp не подключён или адрес недействителен')
       await current.sendMessage(jid, { text })
     },
-    stop: async () => { stopped = true; clearTimeout(waiting); current?.end(undefined) },
+    stop: async () => {
+      stopped = true
+      clearTimeout(waiting)
+      current?.end(undefined)
+      directAgent.destroy()
+      if (fallbackAgent !== directAgent) fallbackAgent.destroy()
+    },
   }
 }
