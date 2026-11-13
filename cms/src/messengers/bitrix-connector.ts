@@ -42,6 +42,41 @@ export function registerParams(handlerUrl: string) {
   }
 }
 
+// Провайдеры для «Каналы связи» в сделке. TYPE в API всегда SMS, имя — мессенджер.
+export const messageSenderCodes = {
+  whatsapp: 'avgst_whatsapp',
+  telegram: 'avgst_telegram',
+  max: 'avgst_max',
+} as const
+
+export function messageServiceSenders(handlerUrl: string) {
+  return (Object.keys(messageSenderCodes) as MessengerChannel[]).map(channel => ({
+    CODE: messageSenderCodes[channel],
+    TYPE: 'SMS',
+    HANDLER: handlerUrl,
+    NAME: lineChannelName(channel),
+    DESCRIPTION: `Исходящие ${messengerTitles[channel]} через ${connectorName}`,
+  }))
+}
+
+export function channelFromSenderCode(code: string): MessengerChannel | '' {
+  const entry = (Object.entries(messageSenderCodes) as [MessengerChannel, string][])
+    .find(([, value]) => value === code)
+  return entry?.[0] || ''
+}
+
+export function parseCrmMessageSend(body: Record<string, unknown>) {
+  const code = String(body.code || record(body.properties).code || '').trim()
+  const channel = channelFromSenderCode(code)
+  if (!channel) return null
+  const properties = record(body.properties)
+  const messageId = String(body.message_id || body.MESSAGE_ID || '').trim()
+  const phone = String(body.message_to || properties.phone_number || '').trim()
+  const text = String(body.message_body || properties.message_text || '').trim()
+  if (!messageId || !phone || !text) return null
+  return { code, channel, messageId, phone, text }
+}
+
 export function parseBitrixBody(contentType: string | null, text: string): Record<string, unknown> {
   if (!text) return {}
   if (contentType?.includes('application/json')) return JSON.parse(text) as Record<string, unknown>
@@ -173,8 +208,9 @@ export async function bitrixCall<T>(domain: string, token: string, method: strin
   })
   const body = await response.json() as { result?: T; error?: string; error_description?: string }
   if (!response.ok || body.error) {
-    const already = String(body.error_description || '').toLowerCase().includes('already')
-    if (already && (method === 'imconnector.register' || method === 'event.bind')) return true as T
+    const detail = `${body.error || ''} ${body.error_description || ''}`.toLowerCase()
+    const already = detail.includes('already') || detail.includes('exists')
+    if (already && (method === 'imconnector.register' || method === 'event.bind' || method === 'messageservice.sender.add')) return true as T
     throw new Error(body.error || String(response.status))
   }
   return body.result as T

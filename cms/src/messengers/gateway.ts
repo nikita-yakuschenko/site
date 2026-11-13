@@ -2,6 +2,8 @@ import type { Payload } from 'payload'
 import { randomUUID } from 'node:crypto'
 import { enqueue } from '../automation/store'
 import { readdir } from 'node:fs/promises'
+import { bitrixCall, portalDomain } from './bitrix-connector'
+import { currentMessengerToken } from './authorize-lead'
 import { messengerChannels, messengerTitles, nationalPhone, readChat, type AccountView, type MessengerChannel } from './phone'
 import { clearSession, rememberSession, restoreSession } from './session-store'
 import { openVisitorChat } from './visitor-chat'
@@ -109,6 +111,27 @@ export async function startOutgoing(payload: Payload, channel: MessengerChannel,
   await openVisitorChat(payload, { channel, phone: national, text: text.trim(), messageId: `out-${Date.now()}` })
   current.view = { ...current.view, hint: 'Сообщение отправлено, диалог открыт в этой линии.' }
   return { ...current.view }
+}
+
+// Исходящее из карточки сделки / робота через messageservice.
+export async function deliverCrmMessage(payload: Payload, input: { code: string, channel: MessengerChannel, messageId: string, phone: string, text: string }) {
+  try {
+    await startOutgoing(payload, input.channel, input.phone, input.text)
+    await updateCrmMessageStatus(payload, input.code, input.messageId, 'sent')
+    return { ok: true as const }
+  } catch (error) {
+    await updateCrmMessageStatus(payload, input.code, input.messageId, 'failed').catch(() => undefined)
+    throw error
+  }
+}
+
+async function updateCrmMessageStatus(payload: Payload, code: string, messageId: string, status: 'sent' | 'failed' | 'delivered') {
+  const token = await currentMessengerToken(payload)
+  await bitrixCall(portalDomain, token, 'messageservice.message.status.update', {
+    CODE: code,
+    MESSAGE_ID: messageId,
+    STATUS: status,
+  })
 }
 
 export async function noteVisitorLead(payload: Payload, lead: { phone: string, requestId?: string, meta?: Record<string, unknown> }) {

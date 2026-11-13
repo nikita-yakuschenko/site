@@ -6,8 +6,8 @@ import { requireCMSRequestLimit } from '../../../../config/request-limits'
 import { safeRequestError } from '../../../../config/safe-request-error'
 import { equalSecret } from '../../../../automation/crypto'
 import { enqueue, saveSettings, settings } from '../../../../automation/store'
-import { bitrixAuth, bitrixCall, connectorId, connectorName, lineChannelName, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
-import { accountViews, beginLogin, disconnectAccount, startOutgoing, submitPassword } from '../../../../messengers/gateway'
+import { bitrixAuth, bitrixCall, connectorId, connectorName, lineChannelName, messageRows, messageServiceSenders, parseBitrixBody, parseCrmMessageSend, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
+import { accountViews, beginLogin, deliverCrmMessage, disconnectAccount, startOutgoing, submitPassword } from '../../../../messengers/gateway'
 import { bindLine, channelLine, lineChannel, unbindLine } from '../../../../messengers/lines'
 import { isMessengerChannel, type MessengerChannel } from '../../../../messengers/phone'
 import { panelMarkup, settingsMarkup } from '../../../../messengers/settings-page'
@@ -43,6 +43,8 @@ async function receive(request: Request, route: string) {
     if (route === 'connect') return await connectApi(payload, auth, body)
     if (String(body.PLACEMENT || '') === 'SETTING_CONNECTOR' || String(body.authorize || '') === '1') return await settingsPage(payload, auth, body)
     if (String(body.event || '').toUpperCase() === 'ONIMCONNECTORMESSAGEADD') return await operatorReply(payload, auth, body)
+    const crmMessage = parseCrmMessageSend(body)
+    if (crmMessage) return await crmMessageSend(payload, auth, crmMessage)
     return Response.json({ accepted: true, ignored: true })
   } catch (error) { return safeRequestError(error, data => console.error(data)) }
 }
@@ -67,6 +69,9 @@ async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: Bi
     stage = 'event.bind'
     await bitrixCall(auth.domain, auth.accessToken, 'event.bind', { event: 'OnImConnectorMessageAdd', handler: handlerUrl() })
     log('ok')
+    stage = 'messageservice.sender.add'
+    const crmChannels = await registerMessageSenders(auth.domain, auth.accessToken)
+    log(crmChannels ? 'ok' : 'skipped', crmChannels ? undefined : 'insufficient_scope')
     stage = 'save-auth'
     await remember(payload, auth)
     log('ok')
@@ -76,7 +81,7 @@ async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: Bi
     log('failed', code)
     return page(`Не удалось завершить установку (${stage}${code ? `: ${code}` : ''}). Код проверки: ${requestId}.`, false)
   }
-  return page('Канал зарегистрирован. Откройте его в контакт-центре.', true)
+  return page('Канал зарегистрирован. Откройте его в контакт-центре. Каналы для сделки появляются после права messageservice.', true)
 }
 
 async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
@@ -84,6 +89,10 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
   if (!token) return Response.json({ error: 'Требуется действующая сессия администратора Битрикс24' }, { status: 403 })
   const { connector, line } = placementLine(body)
   if (connector && connector !== connectorId) return page('Это другой канал', false)
+  // Повторная регистрация каналов сделки без полной переустановки приложения.
+  await registerMessageSenders(auth.domain, token).catch(error => {
+    console.error(`messenger-crm-senders ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`)
+  })
   if (line) {
     await bitrixCall(auth.domain, token, 'imconnector.activate', { CONNECTOR: connectorId, LINE: line, ACTIVE: 1 })
     await publishLineName(payload, auth.domain, token, line)
@@ -91,6 +100,37 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
   const channel = await lineChannel(payload, line)
   const view = channel ? accountViews().find(item => item.channel === channel) : undefined
   return html(settingsMarkup(line, channel, view, { AUTH_ID: token, DOMAIN: auth.domain }))
+}
+
+async function crmMessageSend(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, message: NonNullable<ReturnType<typeof parseCrmMessageSend>>) {
+  const saved = await settings(payload)
+  const member = saved.secret('messengerMemberId')
+  const applicationToken = saved.secret('messengerApplicationToken')
+  if (!member || auth.memberId !== member) return Response.json({ error: 'Нет доступа' }, { status: 401 })
+  if (applicationToken && auth.applicationToken && !equalSecret(applicationToken, auth.applicationToken)) {
+    return Response.json({ error: 'Нет доступа' }, { status: 401 })
+  }
+  try {
+    await deliverCrmMessage(payload, message)
+    return Response.json({ accepted: true })
+  } catch (error) {
+    const hint = error instanceof Error ? error.message.slice(0, 200) : 'Ошибка отправки'
+    console.error(`messenger-crm-send ${hint}`)
+    return Response.json({ accepted: false, error: hint }, { status: 200 })
+  }
+}
+
+async function registerMessageSenders(domain: string, token: string) {
+  try {
+    for (const sender of messageServiceSenders(handlerUrl())) {
+      await bitrixCall(domain, token, 'messageservice.sender.add', sender)
+    }
+    return true
+  } catch (error) {
+    const code = error instanceof Error ? error.message : ''
+    if (code === 'insufficient_scope' || code === 'ACCESS_DENIED') return false
+    throw error
+  }
 }
 
 async function operatorReply(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
