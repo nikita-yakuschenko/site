@@ -3,7 +3,9 @@ import { Agent as HttpsAgent } from 'node:https'
 import { createRequire } from 'node:module'
 import { lookup, setDefaultResultOrder } from 'node:dns'
 import { isIPv4 } from 'node:net'
+import { connect as connectTls, type ConnectionOptions } from 'node:tls'
 import { randomUUID } from 'node:crypto'
+import { HttpsProxyAgent } from 'https-proxy-agent'
 import { nationalPhone } from './phone'
 
 // В контейнере IPv6 до WhatsApp часто молчит, и код входа не появляется. Сначала берём IPv4.
@@ -33,8 +35,39 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
   let sequence = 0
   // Keep DNS as the first choice. The CMS route to some WhatsApp IPv4 edges times out.
   const fallback = process.env.WHATSAPP_FALLBACK_IPV4 ?? '163.70.151.60'
+  const proxySetting = process.env.WHATSAPP_PROXY_URL?.trim()
+  let proxyAgent: HttpsProxyAgent<string> | undefined
+  if (proxySetting) {
+    try {
+      const url = new URL(proxySetting)
+      if (!['http:', 'https:'].includes(url.protocol) || !url.hostname || url.pathname !== '/' || url.search || url.hash) throw new Error()
+      proxyAgent = new HttpsProxyAgent(url, { timeout: 15000 })
+      proxyAgent.on('proxyConnect', (response: { statusCode?: number }) => diagnostic('proxy-connect', { status: response.statusCode }))
+    } catch {
+      throw new Error('WHATSAPP_PROXY_URL должен содержать адрес HTTP или HTTPS прокси')
+    }
+  }
   const diagnostic = (stage: string, fields: Record<string, unknown> = {}) => {
     console.info(JSON.stringify({ component: 'whatsapp-link', connectionId, attempt: sequence, stage, ...fields }))
+  }
+  function traceSocket(options: ConnectionOptions) {
+    const attemptNumber = sequence
+    const started = Date.now()
+    const socket = connectTls(options)
+    let phase = 'tcp'
+    const log = (stage: string, fields: Record<string, unknown> = {}) => {
+      diagnostic(stage, { attempt: attemptNumber, elapsedMs: Date.now() - started, ...fields })
+    }
+    socket.once('connect', () => {
+      phase = 'tls'
+      log('tcp-connected', { address: socket.remoteAddress })
+    })
+    socket.once('secureConnect', () => {
+      phase = 'http-upgrade'
+      log('tls-connected', { protocol: socket.getProtocol() })
+    })
+    socket.once('close', hadError => log('transport-closed', { phase, hadError }))
+    return socket
   }
   const directAgent = new HttpsAgent({ family: 4, keepAlive: true, timeout: 15000, lookup: (hostname, options, callback) => {
     lookup(hostname, { ...options, all: true }, (error, addresses) => {
@@ -56,6 +89,8 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       else callback(null, fallback, 4)
     },
   }) : directAgent
+  directAgent.createConnection = traceSocket
+  if (fallbackAgent !== directAgent) fallbackAgent.createConnection = traceSocket
   const open = async () => {
     if (stopped) return
     sequence += 1
@@ -68,8 +103,8 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
     clearTimeout(waiting)
     waiting = setTimeout(() => hooks.onHint?.('WhatsApp не отвечает. Ждём код ещё несколько секунд.'), 8000)
     const { state, saveCreds } = await loadAuthState(directory)
-    const agent = attempt > 0 ? fallbackAgent : directAgent
-    stage('connecting', { route: agent === directAgent ? 'dns' : 'fallback', timeoutMs: 20000, registered: Boolean(state.creds.registered) })
+    const agent = proxyAgent ?? (attempt > 0 ? fallbackAgent : directAgent)
+    stage('connecting', { route: proxyAgent ? 'proxy' : agent === directAgent ? 'dns' : 'fallback', timeoutMs: 20000, registered: Boolean(state.creds.registered) })
     const socket = makeWASocket({
       auth: { ...state, keys: { ...state.keys, set: async data => {
         await state.keys.set(data)
@@ -119,7 +154,7 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
         stage('closed', { previousStage: lastStage, status: code, reason, networkCode: /^[A-Z0-9_]{1,40}$/.test(error?.code ?? '') ? error?.code : undefined })
         if (code === DisconnectReason.loggedOut) { hooks.onError('logged-out'); return }
         if (attempt++ < 1) {
-          diagnostic('retry-scheduled', { delayMs: 800, route: fallbackAgent === directAgent ? 'dns' : 'fallback' })
+          diagnostic('retry-scheduled', { delayMs: 800, route: proxyAgent ? 'proxy' : fallbackAgent === directAgent ? 'dns' : 'fallback' })
           hooks.onHint?.('Связь с WhatsApp прервалась, повторяем.')
           setTimeout(() => void open().catch(() => {
             if (!stopped) hooks.onError('Не удалось восстановить соединение WhatsApp')
@@ -158,6 +193,7 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       clearTimeout(waiting)
       current?.end(undefined)
       directAgent.destroy()
+      proxyAgent?.destroy()
       if (fallbackAgent !== directAgent) fallbackAgent.destroy()
     },
   }
