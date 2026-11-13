@@ -45,6 +45,29 @@ export async function startMax(directory: string, hooks: LinkHooks): Promise<Lin
   const client = new WebMaxClient({ name: libraryName, deviceType: 'WEB', logIncoming: false, maxReconnectAttempts: 0 })
   client.handleReconnect = () => undefined
   let stopped = false
+  let reconnect: Promise<void> | undefined
+  async function ensureConnected() {
+    if (stopped || !client.isAuthorized) throw new Error('MAX не подключён')
+    if (reconnect) return reconnect
+    if (client.isConnected) return
+    reconnect = (async () => {
+      await client.connect()
+      if (stopped) {
+        await client.stop()
+        throw new Error('MAX отключён')
+      }
+      await client.sync()
+    })()
+    try {
+      await reconnect
+    } catch (error) {
+      await client.stop().catch(() => undefined)
+      hooks.onError('Не удалось восстановить соединение MAX.')
+      throw error
+    } finally {
+      reconnect = undefined
+    }
+  }
   const finish = async () => {
     await copyFile(libraryFile, stored).catch(() => undefined)
     hooks.onSaved()
@@ -94,7 +117,7 @@ export async function startMax(directory: string, hooks: LinkHooks): Promise<Lin
   }
   return {
     send: async (address, text) => {
-      if (!client.isAuthorized) throw new Error('MAX ещё не подключён')
+      await ensureConnected()
       if (/^peer:-?\d+$/.test(address)) {
         await client.sendMessage({ chatId: address.slice(5), text })
         return
@@ -106,7 +129,7 @@ export async function startMax(directory: string, hooks: LinkHooks): Promise<Lin
       await client.sendMessage({ chatId, text })
     },
     lookup: async phone => {
-      if (!client.isAuthorized) throw new Error('MAX не подключён')
+      await ensureConnected()
       const national = nationalPhone(phone)
       if (!national) throw new Error('Некорректный номер')
       const user = await client.getUserByPhone(`+${national}`)
