@@ -24,12 +24,14 @@ try {
       pushSchema: (
         schema: Record<string, unknown>,
         drizzle: unknown,
+        schemaFilters?: string[],
+        tablesFilter?: string[],
       ) => Promise<{ statementsToExecute?: string[] }>
     }
   }
   const pushSchema = adapter.requireDrizzleKit?.().pushSchema
   if (!pushSchema) throw new Error('В адаптере PostgreSQL нет проверки схемы')
-  const result = await pushSchema(adapter.schema, adapter.drizzle)
+  const result = await pushSchema(adapter.schema, adapter.drizzle, undefined, ['!whatsapp_dialog_aliases'])
   const statements = result.statementsToExecute ?? []
   const blocking = statements.filter(blocksRelease)
   if (blocking.length) {
