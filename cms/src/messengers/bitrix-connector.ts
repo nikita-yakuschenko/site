@@ -113,7 +113,7 @@ function record(value: unknown): Record<string, unknown> {
 
 export const messengerChannelNames = { max: 'MAX', telegram: 'Telegram', whatsapp: 'WhatsApp' } as const
 
-// Телефон в user.phone включает CRM-трекер: без него Битрикс оставляет сессию неавторизованной.
+// Карточка диалога посетителя. Телефон здесь — номер клиента, не учётная запись компании.
 export function messengerSession(channel: string, phone: string, messageId: string, text: string) {
   const name = messengerChannelNames[channel as keyof typeof messengerChannelNames]
   const digits = phone.replace(/\D/g, '')

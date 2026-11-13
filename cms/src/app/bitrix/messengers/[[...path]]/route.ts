@@ -5,8 +5,8 @@ import { requireCMSRequestLimit } from '../../../../config/request-limits'
 import { safeRequestError } from '../../../../config/safe-request-error'
 import { equalSecret } from '../../../../automation/crypto'
 import { saveSettings, settings } from '../../../../automation/store'
-import { authorizeMessengerLead, currentMessengerToken } from '../../../../messengers/authorize-lead'
-import { bitrixAuth, bitrixCall, connectorId, connectorName, messageRows, messengerChannelNames, messengerSession, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
+import { currentMessengerToken } from '../../../../messengers/authorize-lead'
+import { bitrixAuth, bitrixCall, connectorId, connectorName, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
 
 export const dynamic = 'force-dynamic'
 type Context = { params: Promise<{ path?: string[] }> }
@@ -70,25 +70,10 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
     })
     await remember(payload, auth, { messengerLineId: String(line) })
   }
-  let notice = line ? `${connectorName} подключен к линии ${line}.` : `Откройте ${connectorName} в контакт-центре.`
-  if (String(body.authorize || '') === '1') {
-    const phone = String(body.phone || '')
-    const channel = String(body.channel || '')
-    if (!messengerSession(channel, phone, 'check', 'Заявка с сайта.')) notice = 'Укажите телефон и канал: MAX, Telegram или WhatsApp.'
-    else {
-      try {
-        const result = await authorizeMessengerLead(payload, { phone, requestId: crypto.randomUUID(), meta: { channel } })
-        notice = result === 'sent'
-          ? `Сессия авторизована: ${messengerChannelNames[channel as keyof typeof messengerChannelNames]}, ${phone}.`
-          : 'Сначала откройте канал в контакт-центре и подключите его к линии.'
-      } catch (error) {
-        const failure = error instanceof Error ? error.message : 'Error'
-        console.error(`messengers-authorize ${failure}`)
-        notice = `Сессию не удалось авторизовать: ${failure}`
-      }
-    }
-  }
-  return page(notice, false, authorizeForm(body, line))
+  const notice = line
+    ? `${connectorName} подключен к линии ${line}. Номера компании в мессенджерах не подключены, ответы оператора остаются в Битриксе.`
+    : `Откройте ${connectorName} в контакт-центре.`
+  return page(notice, false)
 }
 
 async function operatorReply(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
@@ -131,16 +116,6 @@ async function remember(payload: Awaited<ReturnType<typeof getPayload>>, auth: B
 function page(text: string, finish: boolean, extra = '') {
   const script = finish ? '<script src="https://api.bitrix24.com/api/v1/"></script><script>BX24.init(function(){BX24.installFinish()})</script>' : ''
   return new Response(`<!doctype html><html lang="ru"><meta charset="utf-8"><title>${connectorName}</title><body style="font:16px system-ui;margin:24px"><h1>${connectorName}</h1><p>${escapeHtml(text)}</p>${extra}${script}</body></html>`, { headers: { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-store' } })
-}
-
-function authorizeForm(body: Record<string, unknown>, line: number) {
-  const hidden = ['AUTH_ID', 'REFRESH_ID', 'DOMAIN', 'member_id', 'application_token'].flatMap(key => {
-    const value = body[key]
-    return typeof value === 'string' && value ? [`<input type="hidden" name="${key}" value="${escapeHtml(value)}">`] : []
-  }).join('')
-  const placement = line ? `<input type="hidden" name="PLACEMENT" value="SETTING_CONNECTOR"><input type="hidden" name="PLACEMENT_OPTIONS" value="${escapeHtml(JSON.stringify({ LINE: line, CONNECTOR: connectorId }))}">` : ''
-  const options = Object.entries(messengerChannelNames).map(([id, label]) => `<option value="${id}">${label}</option>`).join('')
-  return `<form method="post" style="display:grid;gap:12px;max-width:360px"><h2>Авторизовать сессию</h2>${hidden}${placement}<input type="hidden" name="authorize" value="1"><label>Телефон<input name="phone" required inputmode="tel" autocomplete="tel" style="display:block;width:100%;margin-top:4px"></label><label>Канал<select name="channel" required style="display:block;width:100%;margin-top:4px">${options}</select></label><button type="submit">Авторизовать</button></form>`
 }
 
 function escapeHtml(value: string) {
