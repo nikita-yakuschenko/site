@@ -3,6 +3,7 @@ import { readdir } from 'node:fs/promises'
 import { messengerChannels, messengerTitles, nationalPhone, readChat, type AccountView, type MessengerChannel } from './phone'
 import { clearSession, rememberSession, restoreSession } from './session-store'
 import { openVisitorChat } from './visitor-chat'
+import { channelLine } from './lines'
 import type { LinkHandle } from './whatsapp-link'
 
 type Runtime = { view: AccountView, handle?: LinkHandle, password?: (value: string) => void, generation: number }
@@ -75,12 +76,26 @@ export async function disconnectAccount(payload: Payload, channel: MessengerChan
   return { ...current.view }
 }
 
-export async function relayOperatorText(chatId: string, text: string) {
+export async function relayOperatorText(channel: MessengerChannel, chatId: string, text: string) {
   const parsed = readChat(chatId)
-  if (!parsed.channel || !text.trim()) return
-  const current = runtimes.get(parsed.channel)
+  const phone = parsed.phone || nationalPhone(parsed.id)
+  if (!phone || !text.trim()) return
+  const current = runtimes.get(channel)
   if (current?.view.status !== 'on' || !current.handle) return
-  await current.handle.send(parsed.phone || parsed.id, text.trim())
+  await current.handle.send(phone, text.trim())
+}
+
+export async function startOutgoing(payload: Payload, channel: MessengerChannel, phone: string, text: string) {
+  const national = nationalPhone(phone)
+  const line = await channelLine(payload, channel)
+  if (!national || !text.trim()) throw new Error('Укажите номер клиента и текст')
+  if (!line) throw new Error('Сначала закрепите мессенджер за этой линией')
+  const current = runtime(channel)
+  if (current.view.status !== 'on' || !current.handle) throw new Error('Сначала подключите рабочий номер')
+  await current.handle.send(national, text.trim())
+  await openVisitorChat(payload, { channel, phone: national, text: text.trim(), messageId: `out-${Date.now()}` })
+  current.view = { ...current.view, hint: 'Сообщение отправлено, диалог открыт в этой линии.' }
+  return { ...current.view }
 }
 
 export async function noteVisitorLead(payload: Payload, lead: { phone: string, requestId?: string, meta?: Record<string, unknown> }) {

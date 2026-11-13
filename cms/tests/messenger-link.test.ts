@@ -1,7 +1,8 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { chatAddress, nationalPhone, readChat } from '../src/messengers/phone'
-import { cardMarkup, settingsMarkup } from '../src/messengers/settings-page'
+import { bindingUpdate } from '../src/messengers/lines'
+import { panelMarkup, settingsMarkup } from '../src/messengers/settings-page'
 
 test('номер рабочего входа приводится к международному виду', () => {
   assert.equal(nationalPhone('8 (999) 000-00-00'), '79990000000')
@@ -11,11 +12,24 @@ test('номер рабочего входа приводится к между�
   assert.equal(readChat('site').channel, '')
 })
 
-test('настройка канала показывает вход по коду, а не телефон посетителя', () => {
-  const html = settingsMarkup(41, [{ channel: 'whatsapp', title: 'WhatsApp', status: 'off', phone: '', qr: '', hint: '' }, { channel: 'telegram', title: 'Telegram', status: 'off', phone: '', qr: '', hint: '' }, { channel: 'max', title: 'MAX', status: 'off', phone: '', qr: '', hint: '' }], { AUTH_ID: 'token' })
-  assert.match(html, /Рабочие номера/)
-  assert.match(html, /Связанные устройства/)
-  assert.match(html, /Подключить/)
-  assert.equal(html.includes('Авторизовать сессию'), false)
-  assert.match(cardMarkup({ channel: 'max', title: 'MAX', status: 'on', phone: '79990000000', qr: '', hint: '' }), /Подключён, \+79990000000/)
+test('линия закрепляется за одним мессенджером', () => {
+  const first = bindingUpdate(41, 'whatsapp', { lineForChannel: 0, channelForLine: '' })
+  assert.equal(first.set['messengerLineChannel:41'], 'whatsapp')
+  assert.equal(first.set['messengerChannelLine:whatsapp'], '41')
+  assert.deepEqual(first.clear, [])
+  const moved = bindingUpdate(42, 'whatsapp', { lineForChannel: 41, channelForLine: '' })
+  assert.deepEqual(moved.clear, ['messengerLineChannel:41'])
+  const replaced = bindingUpdate(42, 'telegram', { lineForChannel: 0, channelForLine: 'whatsapp' })
+  assert.deepEqual(replaced.clear, ['messengerChannelLine:whatsapp'])
+})
+
+test('настройка линии показывает один мессенджер и письмо первым', () => {
+  const empty = settingsMarkup(41, '', undefined, { AUTH_ID: 'token' })
+  assert.match(empty, /какой мессенджер обслуживает эту линию/)
+  assert.match(empty, /call\('bind','whatsapp'\)/)
+  assert.equal(empty.includes('Авторизовать сессию'), false)
+  const ready = panelMarkup(41, 'whatsapp', { channel: 'whatsapp', title: 'WhatsApp', status: 'on', phone: '79990000000', qr: '', hint: '' })
+  assert.match(ready, /Подключён, \+79990000000/)
+  assert.match(ready, /Написать первым/)
+  assert.equal(ready.includes('Telegram'), false)
 })

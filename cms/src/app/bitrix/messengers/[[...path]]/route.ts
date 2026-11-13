@@ -7,9 +7,10 @@ import { equalSecret } from '../../../../automation/crypto'
 import { saveSettings, settings } from '../../../../automation/store'
 import { currentMessengerToken } from '../../../../messengers/authorize-lead'
 import { bitrixAuth, bitrixCall, connectorId, connectorName, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
-import { accountViews, beginLogin, disconnectAccount, relayOperatorText, submitPassword } from '../../../../messengers/gateway'
-import { isMessengerChannel } from '../../../../messengers/phone'
-import { cardMarkup, settingsMarkup } from '../../../../messengers/settings-page'
+import { accountViews, beginLogin, disconnectAccount, relayOperatorText, startOutgoing, submitPassword } from '../../../../messengers/gateway'
+import { bindLine, lineChannel, unbindLine } from '../../../../messengers/lines'
+import { isMessengerChannel, type MessengerChannel } from '../../../../messengers/phone'
+import { panelMarkup, settingsMarkup } from '../../../../messengers/settings-page'
 
 export const dynamic = 'force-dynamic'
 type Context = { params: Promise<{ path?: string[] }> }
@@ -72,9 +73,11 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
       LINE: line,
       DATA: { ID: connectorId, NAME: connectorName, URL: 'https://avgst.ru', URL_IM: 'https://avgst.ru' },
     })
-    await remember(payload, auth, { messengerLineId: String(line) })
+    await remember(payload, auth)
   }
-  return html(settingsMarkup(line, accountViews(), authFields(body)))
+  const channel = await lineChannel(payload, line)
+  const view = channel ? accountViews().find(item => item.channel === channel) : undefined
+  return html(settingsMarkup(line, channel, view, authFields(body)))
 }
 
 async function operatorReply(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
@@ -88,21 +91,49 @@ async function operatorReply(payload: Awaited<ReturnType<typeof getPayload>>, au
     const existing = await payload.find({ collection: 'automation-jobs', where: { key: { equals: key } }, limit: 1, depth: 0, overrideAccess: true })
     if (existing.docs[0]) continue
     await payload.create({ collection: 'automation-jobs', data: { key, kind: 'messenger-reply', data: row, status: 'completed', runAt: new Date().toISOString(), attempts: 0, result: { stored: true }, completedAt: new Date().toISOString() }, overrideAccess: true })
-    try { await relayOperatorText(row.chatId, row.text) } catch (error) { console.error(`messenger-reply ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`) }
+    const channel = await lineChannel(payload, Number(row.line))
+    if (!channel) continue
+    try { await relayOperatorText(channel, row.chatId, row.text) } catch (error) { console.error(`messenger-reply ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`) }
   }
   return Response.json({ accepted: true })
 }
 
 async function connectApi(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
   await usableToken(payload, auth)
-  const channel = String(body.channel || '')
-  if (!isMessengerChannel(channel)) return Response.json({ error: 'Неизвестный мессенджер' }, { status: 400 })
+  const line = Number(body.line)
+  if (!Number.isInteger(line) || line <= 0) return Response.json({ error: 'Линия не выбрана' }, { status: 400 })
   const action = String(body.action || 'status')
-  const view = action === 'start' ? await beginLogin(payload, channel)
-    : action === 'logout' ? await disconnectAccount(payload, channel)
-    : action === 'password' ? submitPassword(channel, String(body.password || ''))
-    : accountViews().find(item => item.channel === channel) || accountViews()[0]
-  return Response.json({ markup: cardMarkup(view) }, { headers: { 'Cache-Control': 'no-store' } })
+  const requested = String(body.channel || '')
+  let notice = ''
+  if (action === 'bind') {
+    if (!isMessengerChannel(requested)) return Response.json({ error: 'Неизвестный мессенджер' }, { status: 400 })
+    notice = await bindLine(payload, line, requested)
+  } else if (action === 'unbind') {
+    const bound = await lineChannel(payload, line)
+    if (bound && accountViews().find(item => item.channel === bound)?.status === 'on') notice = 'Сначала отключите рабочий номер.'
+    else await unbindLine(payload, line)
+  } else {
+    const channel = await lineChannel(payload, line)
+    if (!channel) return Response.json({ panel: await renderPanel(payload, line, 'Сначала выберите мессенджер этой линии.') }, { headers: { 'Cache-Control': 'no-store' } })
+    notice = await runLineAction(payload, channel, action, body)
+  }
+  return Response.json({ panel: await renderPanel(payload, line, notice) }, { headers: { 'Cache-Control': 'no-store' } })
+}
+
+async function runLineAction(payload: Awaited<ReturnType<typeof getPayload>>, channel: MessengerChannel, action: string, body: Record<string, unknown>) {
+  if (action === 'start') { await beginLogin(payload, channel); return '' }
+  if (action === 'logout') { await disconnectAccount(payload, channel); return '' }
+  if (action === 'password') { submitPassword(channel, String(body.password || '')); return '' }
+  if (action === 'send') {
+    try { await startOutgoing(payload, channel, String(body.phone || ''), String(body.text || '')); return '' }
+    catch (error) { return error instanceof Error ? error.message : 'Сообщение не отправлено' }
+  }
+  return ''
+}
+
+async function renderPanel(payload: Awaited<ReturnType<typeof getPayload>>, line: number, notice = '') {
+  const channel = await lineChannel(payload, line)
+  return panelMarkup(line, channel, channel ? accountViews().find(item => item.channel === channel) : undefined, notice)
 }
 
 async function usableToken(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
