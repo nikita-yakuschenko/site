@@ -123,7 +123,14 @@ async function crmMessageSend(payload: Awaited<ReturnType<typeof getPayload>>, a
 async function registerMessageSenders(domain: string, token: string) {
   try {
     for (const sender of messageServiceSenders(handlerUrl())) {
+      // Сначала add (идемпотентно), затем update — иначе пустое имя «через» остаётся навсегда.
       await bitrixCall(domain, token, 'messageservice.sender.add', sender)
+      await bitrixCall(domain, token, 'messageservice.sender.update', {
+        CODE: sender.CODE,
+        HANDLER: sender.HANDLER,
+        NAME: sender.NAME,
+        DESCRIPTION: sender.DESCRIPTION,
+      })
     }
     return true
   } catch (error) {

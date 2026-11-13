@@ -50,13 +50,18 @@ export const messageSenderCodes = {
 } as const
 
 export function messageServiceSenders(handlerUrl: string) {
-  return (Object.keys(messageSenderCodes) as MessengerChannel[]).map(channel => ({
-    CODE: messageSenderCodes[channel],
-    TYPE: 'SMS',
-    HANDLER: handlerUrl,
-    NAME: lineChannelName(channel),
-    DESCRIPTION: `Исходящие ${messengerTitles[channel]} через ${connectorName}`,
-  }))
+  return (Object.keys(messageSenderCodes) as MessengerChannel[]).map(channel => {
+    // Как у Radist: одно и то же имя в заголовке и в подписи «через …».
+    const title = lineChannelName(channel)
+    const localized = { ru: title, en: title }
+    return {
+      CODE: messageSenderCodes[channel],
+      TYPE: 'SMS',
+      HANDLER: handlerUrl,
+      NAME: localized,
+      DESCRIPTION: localized,
+    }
+  })
 }
 
 export function channelFromSenderCode(code: string): MessengerChannel | '' {
