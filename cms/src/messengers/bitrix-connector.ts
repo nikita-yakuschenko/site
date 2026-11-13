@@ -1,9 +1,15 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { messengerTitles, type MessengerChannel } from './phone'
 
 // Видимое имя канала в Битрикс24. Оба слова с большой буквы.
 export const connectorName = 'Avangard Messengers'
+
+// Имя канала на конкретной линии: WhatsApp.Avangard Messengers.
+export function lineChannelName(channel: MessengerChannel | '') {
+  return channel ? `${messengerTitles[channel]}.${connectorName}` : connectorName
+}
 export const connectorId = 'avangard_messengers'
 export const publisherName = 'Avangard Web Platform'
 export const portalDomain = 'avgstroy.bitrix24.ru'

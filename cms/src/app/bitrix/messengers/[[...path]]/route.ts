@@ -6,9 +6,9 @@ import { safeRequestError } from '../../../../config/safe-request-error'
 import { equalSecret } from '../../../../automation/crypto'
 import { saveSettings, settings } from '../../../../automation/store'
 import { currentMessengerToken } from '../../../../messengers/authorize-lead'
-import { bitrixAuth, bitrixCall, connectorId, connectorName, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
+import { bitrixAuth, bitrixCall, connectorId, connectorName, lineChannelName, messageRows, parseBitrixBody, placementLine, portalDomain, registerParams, type BitrixAuth } from '../../../../messengers/bitrix-connector'
 import { accountViews, beginLogin, disconnectAccount, relayOperatorText, startOutgoing, submitPassword } from '../../../../messengers/gateway'
-import { bindLine, lineChannel, unbindLine } from '../../../../messengers/lines'
+import { bindLine, channelLine, lineChannel, unbindLine } from '../../../../messengers/lines'
 import { isMessengerChannel, type MessengerChannel } from '../../../../messengers/phone'
 import { panelMarkup, settingsMarkup } from '../../../../messengers/settings-page'
 
@@ -68,11 +68,7 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
   if (line) {
     const token = await usableToken(payload, auth)
     await bitrixCall(auth.domain, token, 'imconnector.activate', { CONNECTOR: connectorId, LINE: line, ACTIVE: 1 })
-    await bitrixCall(auth.domain, token, 'imconnector.connector.data.set', {
-      CONNECTOR: connectorId,
-      LINE: line,
-      DATA: { ID: connectorId, NAME: connectorName, URL: 'https://avgst.ru', URL_IM: 'https://avgst.ru' },
-    })
+    await publishLineName(payload, auth.domain, token, line)
     await remember(payload, auth)
   }
   const channel = await lineChannel(payload, line)
@@ -99,7 +95,7 @@ async function operatorReply(payload: Awaited<ReturnType<typeof getPayload>>, au
 }
 
 async function connectApi(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth, body: Record<string, unknown>) {
-  await usableToken(payload, auth)
+  const token = await usableToken(payload, auth)
   const line = Number(body.line)
   if (!Number.isInteger(line) || line <= 0) return Response.json({ error: 'Линия не выбрана' }, { status: 400 })
   const action = String(body.action || 'status')
@@ -107,11 +103,17 @@ async function connectApi(payload: Awaited<ReturnType<typeof getPayload>>, auth:
   let notice = ''
   if (action === 'bind') {
     if (!isMessengerChannel(requested)) return Response.json({ error: 'Неизвестный мессенджер' }, { status: 400 })
+    const previousLine = await channelLine(payload, requested)
     notice = await bindLine(payload, line, requested)
+    notice = await rememberLineName(payload, auth.domain, token, line, notice)
+    if (previousLine && previousLine !== line) await rememberLineName(payload, auth.domain, token, previousLine, '')
   } else if (action === 'unbind') {
     const bound = await lineChannel(payload, line)
     if (bound && accountViews().find(item => item.channel === bound)?.status === 'on') notice = 'Сначала отключите рабочий номер.'
-    else await unbindLine(payload, line)
+    else {
+      await unbindLine(payload, line)
+      notice = await rememberLineName(payload, auth.domain, token, line, notice)
+    }
   } else {
     const channel = await lineChannel(payload, line)
     if (!channel) return Response.json({ panel: await renderPanel(payload, line, 'Сначала выберите мессенджер этой линии.') }, { headers: { 'Cache-Control': 'no-store' } })
@@ -129,6 +131,23 @@ async function runLineAction(payload: Awaited<ReturnType<typeof getPayload>>, ch
     catch (error) { return error instanceof Error ? error.message : 'Сообщение не отправлено' }
   }
   return ''
+}
+
+async function rememberLineName(payload: Awaited<ReturnType<typeof getPayload>>, domain: string, token: string, line: number, notice: string) {
+  try { await publishLineName(payload, domain, token, line) } catch (error) {
+    console.error(`messenger-line-name ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`)
+    return notice || 'Линия обновлена, имя в контакт-центре не записалось.'
+  }
+  return notice
+}
+
+async function publishLineName(payload: Awaited<ReturnType<typeof getPayload>>, domain: string, token: string, line: number) {
+  const channel = await lineChannel(payload, line)
+  await bitrixCall(domain, token, 'imconnector.connector.data.set', {
+    CONNECTOR: connectorId,
+    LINE: line,
+    DATA: { ID: connectorId, NAME: lineChannelName(channel), URL: 'https://avgst.ru', URL_IM: 'https://avgst.ru' },
+  })
 }
 
 async function renderPanel(payload: Awaited<ReturnType<typeof getPayload>>, line: number, notice = '') {
