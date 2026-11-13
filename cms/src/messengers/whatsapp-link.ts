@@ -15,7 +15,13 @@ const require = createRequire(import.meta.url)
 const qrCode = require('qrcode') as { toDataURL: (text: string) => Promise<string> }
 const quiet = { level: 'silent', child() { return quiet }, trace() {}, debug() {}, info() {}, warn() {}, error() {} }
 
-export type LinkHandle = { send: (address: string, text: string) => Promise<void>, stop: () => Promise<void> }
+export type ContactLookup = 'found' | 'missing'
+export type LinkHandle = {
+  send: (address: string, text: string) => Promise<void>
+  stop: () => Promise<void>
+  // Есть ли аккаунт с этим номером в мессенджере. Без отправки сообщений.
+  lookup?: (phone: string) => Promise<ContactLookup>
+}
 export type LinkHooks = {
   onQr: (image: string) => void
   onConnected: (phone: string) => void
@@ -165,9 +171,14 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
         hooks.onError('Сервер не достучался до WhatsApp: соединение обрывается. Нужен исходящий доступ с CMS до web.whatsapp.com.')
       }
       const upsert = events['messages.upsert']
-      if (!upsert || upsert.type !== 'notify') return
+      // notify — живые сообщения; append иногда приходит вместо notify после восстановления сессии.
+      if (!upsert || (upsert.type !== 'notify' && upsert.type !== 'append')) return
       for (const item of upsert.messages) {
         if (item.key.fromMe) continue
+        if (upsert.type === 'append') {
+          const stamp = Number(item.messageTimestamp || 0) * 1000
+          if (!stamp || Date.now() - stamp > 120_000) continue
+        }
         const primary = item.key.remoteJid || ''
         const lid = /^\d+@lid$/.test(primary) ? primary : ''
         let jid = primary.endsWith('@lid') ? item.key.remoteJidAlt || '' : primary
@@ -179,7 +190,7 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
         const phone = jid.endsWith('@s.whatsapp.net') ? nationalPhone(jid.split('@')[0].split(':')[0]) : ''
         const pushName = (item.pushName || '').trim()
         const name = pushName && nationalPhone(pushName) !== phone ? pushName : ''
-        if ((phone || lid) && text) hooks.onMessage(phone, text, { name, peer: lid }, item.key.id ? item.key.id : undefined)
+        if ((phone || lid) && text) hooks.onMessage(phone, text, { name, peer: lid || undefined }, item.key.id ? item.key.id : undefined)
       }
     })
   }
@@ -190,6 +201,12 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       const jid = /^peer:\d+@lid$/.test(address) ? address.slice(5) : phone ? `${phone}@s.whatsapp.net` : ''
       if (!current || !jid) throw new Error('WhatsApp не подключён или адрес недействителен')
       await current.sendMessage(jid, { text })
+    },
+    lookup: async phone => {
+      const national = nationalPhone(phone)
+      if (!current || !national) throw new Error('WhatsApp не подключён')
+      const rows = await current.onWhatsApp(`${national}@s.whatsapp.net`)
+      return rows.some(row => row.exists) ? 'found' : 'missing'
     },
     stop: async () => {
       stopped = true

@@ -105,6 +105,13 @@ export async function startMax(directory: string, hooks: LinkHooks): Promise<Lin
       if (!chatId) throw new Error('В MAX нет пользователя с этим номером')
       await client.sendMessage({ chatId, text })
     },
+    lookup: async phone => {
+      if (!client.isAuthorized) throw new Error('MAX не подключён')
+      const national = nationalPhone(phone)
+      if (!national) throw new Error('Некорректный номер')
+      const user = await client.getUserByPhone(`+${national}`)
+      return user?.id != null ? 'found' : 'missing'
+    },
     stop: async () => {
       stopped = true
       client.handleReconnect = () => undefined

@@ -9,7 +9,6 @@ import { leadTitle } from '../config/lead-title'
 import { normalizeMapsApiKey, normalizeMetricaCounterId, publicMapsKey, publicMetrica } from '../config/yandex'
 import { normalizeMessengerPhone, normalizeMessengerUrl, publicMessengers } from '../../../src/lib/messengers'
 import { acceptLead } from '../config/lead-intake'
-import { noteVisitorLead } from '../messengers/gateway'
 import { enqueue, settings as automationSettings } from '../automation/store'
 import { resolveLeadClassification } from '../config/lead-classification'
 import { leadClassificationEndpoint } from './lead-classification-endpoint'
@@ -136,9 +135,20 @@ export const LeadSubmissions: CollectionConfig = {
           } catch (error) {
             req.payload.logger.error({ failure: error instanceof Error ? error.name : 'Error', requestId: lead.requestId, msg: 'Passport comment was not queued' })
           }
-          return
+          try {
+            await enqueue(req.payload, 'messenger-phone-check', {
+              requestId: lead.requestId,
+              phone: lead.phone,
+              title,
+              channel,
+              createdAfter: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+            }, `messenger-phone-check:${lead.requestId}`, new Date(Date.now() + 45000).toISOString())
+          } catch (error) {
+            req.payload.logger.error({ failure: error instanceof Error ? error.name : 'Error', requestId: lead.requestId, msg: 'Messenger phone check was not queued' })
+          }
         }
-        try { await noteVisitorLead(req.payload, lead) } catch (error) { req.payload.logger.error({ failure: error instanceof Error ? error.name : 'Error', requestId: lead.requestId, msg: 'Messenger dialog was not opened' }) }
+        // Заявка с сайта не открывает диалог в открытой линии: линия только от реального входящего
+        // из мессенджера или когда менеджер сам пишет клиенту.
       }),
       deliver: requestId => deliverLead(settings, lead, requestId, fetch, title),
       update: (id, data) => req.payload.update({ collection: 'lead-submissions', id, data, overrideAccess: true }),

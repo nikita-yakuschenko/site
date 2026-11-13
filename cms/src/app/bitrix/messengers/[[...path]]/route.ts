@@ -95,6 +95,7 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
   })
   if (line) {
     await bitrixCall(auth.domain, token, 'imconnector.activate', { CONNECTOR: connectorId, LINE: line, ACTIVE: 1 })
+    await ensureOpenLineCrm(auth.domain, token, line)
     await publishLineName(payload, auth.domain, token, line)
   }
   const channel = await lineChannel(payload, line)
@@ -160,6 +161,7 @@ async function connectApi(payload: Awaited<ReturnType<typeof getPayload>>, auth:
     if (!isMessengerChannel(requested)) return Response.json({ error: 'Неизвестный мессенджер' }, { status: 400 })
     const previousLine = await channelLine(payload, requested)
     notice = await bindLine(payload, line, requested)
+    await ensureOpenLineCrm(auth.domain, token, line)
     notice = await rememberLineName(payload, auth.domain, token, line, notice)
     if (previousLine && previousLine !== line) await rememberLineName(payload, auth.domain, token, previousLine, '')
   } else if (action === 'unbind') {
@@ -202,6 +204,22 @@ async function publishLineName(payload: Awaited<ReturnType<typeof getPayload>>, 
     CONNECTOR: connectorId,
     LINE: line,
     DATA: { ID: connectorId, NAME: lineChannelName(channel), URL: 'https://avgst.ru', URL_IM: 'https://avgst.ru' },
+  })
+}
+
+// Входящий из мессенджера должен создавать сделку+контакт, как у MAX, а не лид / не без CRM.
+async function ensureOpenLineCrm(domain: string, token: string, line: number) {
+  await bitrixCall(domain, token, 'imopenlines.config.update', {
+    CONFIG_ID: line,
+    PARAMS: {
+      CRM: 'Y',
+      CRM_CREATE: 'deal',
+      CRM_CREATE_THIRD: 'Y',
+      CRM_FORWARD: 'Y',
+      CRM_SOURCE: 'create',
+    },
+  }).catch(error => {
+    console.error(`messenger-line-crm ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`)
   })
 }
 

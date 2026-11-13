@@ -60,13 +60,24 @@ export async function startTelegram(directory: string, hooks: LinkHooks & { pass
       if (address.startsWith('@')) { await client.sendMessage(address, { message: text }); return }
       const phone = nationalPhone(address)
       if (!phone) throw new Error('Telegram ещё не подключён')
-      const imported = await client.invoke(new Api.contacts.ImportContacts({
-        contacts: [new Api.InputPhoneContact({ clientId: bigInt(1), phone: `+${phone}`, firstName: 'Клиент', lastName: '' })],
-      }))
-      const user = imported.users[0]
+      const user = await resolveTelegramPhone(client, phone)
       if (!user) throw new Error('В Telegram нет пользователя с этим номером')
       await client.sendMessage(user, { message: text })
     },
+    lookup: async phone => {
+      if (!(await client.isUserAuthorized())) throw new Error('Telegram не подключён')
+      const national = nationalPhone(phone)
+      if (!national) throw new Error('Некорректный номер')
+      const user = await resolveTelegramPhone(client, national)
+      return user ? 'found' : 'missing'
+    },
     stop: async () => { await client.disconnect() },
   }
+}
+
+async function resolveTelegramPhone(client: TelegramClient, phone: string) {
+  const imported = await client.invoke(new Api.contacts.ImportContacts({
+    contacts: [new Api.InputPhoneContact({ clientId: bigInt(1), phone: `+${phone}`, firstName: 'Клиент', lastName: '' })],
+  }))
+  return imported.users[0] || null
 }

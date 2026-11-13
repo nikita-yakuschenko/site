@@ -8,7 +8,9 @@ import { messengerChannels, messengerTitles, nationalPhone, operatorMessageText,
 import { clearSession, rememberSession, restoreSession } from './session-store'
 import { openVisitorChat } from './visitor-chat'
 import { channelLine } from './lines'
-import type { LinkHandle } from './whatsapp-link'
+import type { ContactLookup, LinkHandle } from './whatsapp-link'
+
+export type MessengerLookupResult = ContactLookup | 'unavailable'
 
 type Runtime = { view: AccountView, handle?: LinkHandle, password?: (value: string) => void, generation: number }
 
@@ -114,6 +116,19 @@ export async function startOutgoing(payload: Payload, channel: MessengerChannel,
   return { ...current.view }
 }
 
+// Есть ли аккаунт с номером в подключённом мессенджере. Без отправки сообщений.
+export async function lookupMessengerContact(channel: MessengerChannel, phone: string): Promise<MessengerLookupResult> {
+  const national = nationalPhone(phone)
+  if (!national) return 'unavailable'
+  const current = runtimes.get(channel)
+  if (current?.view.status !== 'on' || !current.handle?.lookup) return 'unavailable'
+  try {
+    return await current.handle.lookup(national)
+  } catch {
+    return 'unavailable'
+  }
+}
+
 // Исходящее из карточки сделки / робота через messageservice.
 export async function deliverCrmMessage(payload: Payload, input: { code: string, channel: MessengerChannel, messageId: string, phone: string, text: string }) {
   try {
@@ -133,14 +148,6 @@ async function updateCrmMessageStatus(payload: Payload, code: string, messageId:
     MESSAGE_ID: messageId,
     STATUS: status,
   })
-}
-
-export async function noteVisitorLead(payload: Payload, lead: { phone: string, requestId?: string, meta?: Record<string, unknown> }) {
-  const channel = typeof lead.meta?.channel === 'string' ? lead.meta.channel : ''
-  if (channel !== 'whatsapp' && channel !== 'telegram' && channel !== 'max') return
-  const phone = nationalPhone(lead.phone)
-  if (!phone || runtime(channel).view.status !== 'on') return
-  await openVisitorChat(payload, { channel, phone, text: `Клиент оставил номер и выбрал ${messengerTitles[channel]}.`, messageId: `lead-${lead.requestId || Date.now()}` })
 }
 
 export async function restoreCompanyNumbers(payload: Payload) {

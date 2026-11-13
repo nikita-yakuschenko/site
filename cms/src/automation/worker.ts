@@ -97,6 +97,17 @@ export async function processJob(payload: Payload, kind: string, data: Record<st
       attempts: Number(data.attempts || 0),
     })
   }
+  if (kind === 'messenger-phone-check') {
+    const { attachMessengerPhoneCheck } = await import('./messenger-phone-check')
+    return attachMessengerPhoneCheck(payload, {
+      requestId: String(data.requestId || ''),
+      phone: String(data.phone || ''),
+      title: String(data.title || ''),
+      channel: typeof data.channel === 'string' ? data.channel : '',
+      createdAfter: typeof data.createdAfter === 'string' ? data.createdAfter : undefined,
+      attempts: Number(data.attempts || 0),
+    })
+  }
   if (kind === 'email') return sendMail(payload, data)
   if (kind === 'crm-sync') return syncCrm(payload, data)
   if (kind === 'intake') {
