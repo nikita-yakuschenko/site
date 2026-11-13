@@ -1,4 +1,5 @@
 import { getPayload } from 'payload'
+import { randomUUID } from 'node:crypto'
 import config from '@payload-config'
 import { readTextLimited } from '../../../../../../src/lib/request-security'
 import { requireCMSRequestLimit } from '../../../../config/request-limits'
@@ -48,15 +49,32 @@ async function receive(request: Request, route: string) {
 
 async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
   if (!auth.accessToken || auth.domain !== portalDomain) return page('Откройте установку из карточки приложения в Битрикс24.', false)
+  const requestId = randomUUID()
+  const started = Date.now()
+  let stage = 'user.admin'
+  const log = (outcome: string, code?: string) => {
+    console.info(JSON.stringify({ component: 'messengers-install', requestId, stage, outcome, code, elapsedMs: Date.now() - started }))
+  }
   try {
-    if (!await administratorToken(auth)) return page('Установку должен выполнить администратор Битрикс24.', false)
+    if (await bitrixCall<boolean>(auth.domain, auth.accessToken, 'user.admin') !== true) {
+      log('denied')
+      return page('Установку должен выполнить администратор Битрикс24.', false)
+    }
+    log('ok')
+    stage = 'imconnector.register'
     await bitrixCall(auth.domain, auth.accessToken, 'imconnector.register', registerParams(handlerUrl()))
+    log('ok')
+    stage = 'event.bind'
     await bitrixCall(auth.domain, auth.accessToken, 'event.bind', { event: 'OnImConnectorMessageAdd', handler: handlerUrl() })
+    log('ok')
+    stage = 'save-auth'
     await remember(payload, auth)
+    log('ok')
   } catch (error) {
     const failure = error instanceof Error ? error.message : 'Error'
-    console.error(`messengers-install ${failure}`)
-    return page(`Канал не зарегистрирован: ${failure}`, false)
+    const code = /^(?:[A-Z][A-Z0-9_]{1,63}|[45]\d\d)$/.test(failure) ? failure : undefined
+    log('failed', code)
+    return page(`Не удалось завершить установку (${stage}${code ? `: ${code}` : ''}). Код проверки: ${requestId}.`, false)
   }
   return page('Канал зарегистрирован. Откройте его в контакт-центре.', true)
 }

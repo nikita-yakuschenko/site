@@ -1,8 +1,9 @@
 import makeWASocket, { Browsers, DisconnectReason, useMultiFileAuthState as loadAuthState, type WASocket } from '@whiskeysockets/baileys'
 import { Agent as HttpsAgent } from 'node:https'
 import { createRequire } from 'node:module'
-import { setDefaultResultOrder } from 'node:dns'
+import { lookup, setDefaultResultOrder } from 'node:dns'
 import { isIPv4 } from 'node:net'
+import { randomUUID } from 'node:crypto'
 import { nationalPhone } from './phone'
 
 // В контейнере IPv6 до WhatsApp часто молчит, и код входа не появляется. Сначала берём IPv4.
@@ -28,9 +29,20 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
   let attempt = 0
   let current: WASocket | null = null
   let waiting: ReturnType<typeof setTimeout> | undefined
+  const connectionId = randomUUID()
+  let sequence = 0
   // Keep DNS as the first choice. The CMS route to some WhatsApp IPv4 edges times out.
   const fallback = process.env.WHATSAPP_FALLBACK_IPV4 ?? '163.70.151.60'
-  const directAgent = new HttpsAgent({ family: 4, keepAlive: true, timeout: 15000 })
+  const diagnostic = (stage: string, fields: Record<string, unknown> = {}) => {
+    console.info(JSON.stringify({ component: 'whatsapp-link', connectionId, attempt: sequence, stage, ...fields }))
+  }
+  const directAgent = new HttpsAgent({ family: 4, keepAlive: true, timeout: 15000, lookup: (hostname, options, callback) => {
+    lookup(hostname, { ...options, all: true }, (error, addresses) => {
+      diagnostic('dns', { route: 'dns', addresses: addresses?.map(entry => entry.address), error: error?.code })
+      if (options.all) callback(error, addresses)
+      else callback(error, addresses?.[0]?.address ?? '', addresses?.[0]?.family ?? 4)
+    })
+  } })
   const fallbackAgent = isIPv4(fallback) ? new HttpsAgent({
     family: 4,
     timeout: 15000,
@@ -39,15 +51,25 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
         callback(new Error('Unexpected WhatsApp WebSocket host'), '', 4)
         return
       }
+      diagnostic('dns', { route: 'fallback', addresses: [fallback] })
       if (options.all) callback(null, [{ address: fallback, family: 4 }])
       else callback(null, fallback, 4)
     },
   }) : directAgent
   const open = async () => {
     if (stopped) return
+    sequence += 1
+    const started = Date.now()
+    let lastStage = 'loading-auth'
+    const stage = (name: string, fields: Record<string, unknown> = {}) => {
+      lastStage = name
+      diagnostic(name, { elapsedMs: Date.now() - started, ...fields })
+    }
     clearTimeout(waiting)
     waiting = setTimeout(() => hooks.onHint?.('WhatsApp не отвечает. Ждём код ещё несколько секунд.'), 8000)
     const { state, saveCreds } = await loadAuthState(directory)
+    const agent = attempt > 0 ? fallbackAgent : directAgent
+    stage('connecting', { route: agent === directAgent ? 'dns' : 'fallback', timeoutMs: 20000, registered: Boolean(state.creds.registered) })
     const socket = makeWASocket({
       auth: { ...state, keys: { ...state.keys, set: async data => {
         await state.keys.set(data)
@@ -55,22 +77,36 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       } } },
       logger: quiet as never,
       browser: Browsers.macOS('Chrome'),
-      agent: attempt > 0 ? fallbackAgent : directAgent,
+      agent,
       connectTimeoutMs: 20000,
       syncFullHistory: false,
       markOnlineOnConnect: false,
       shouldSyncHistoryMessage: () => false,
     })
     current = socket
+    socket.ws.on('upgrade', (response: { statusCode?: number }) => stage('http-upgrade', { status: response.statusCode }))
+    socket.ws.on('open', () => stage('websocket-open'))
+    socket.ws.on('frame', () => {
+      if (lastStage === 'websocket-open') stage('first-protocol-frame')
+    })
     socket.ev.process(async events => {
       if (stopped || socket !== current) return
       if (events['creds.update']) { await saveCreds(); hooks.onSaved() }
       const update = events['connection.update']
       if (update?.qr) {
+        if (lastStage !== 'qr-received' && lastStage !== 'qr-rendered') stage('qr-received')
         clearTimeout(waiting)
-        try { hooks.onQr(await qrCode.toDataURL(update.qr)) } catch { hooks.onError('Не удалось нарисовать код') }
+        try {
+          const image = await qrCode.toDataURL(update.qr)
+          if (lastStage !== 'qr-rendered') stage('qr-rendered')
+          hooks.onQr(image)
+        } catch {
+          stage('qr-render-failed')
+          hooks.onError('Не удалось нарисовать код')
+        }
       }
       if (update?.connection === 'open') {
+        stage('account-connected')
         clearTimeout(waiting)
         attempt = 0
         hooks.onConnected(nationalPhone((socket.user?.id || '').split('@')[0].split(':')[0]))
@@ -78,10 +114,12 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       }
       if (update?.connection === 'close' && !stopped) {
         const code = (update.lastDisconnect?.error as { output?: { statusCode?: number } } | undefined)?.output?.statusCode
-        const detail = update.lastDisconnect?.error instanceof Error ? update.lastDisconnect.error.message : ''
-        console.error(`whatsapp-link close ${code || 'unknown'} ${detail.slice(0, 140)}`)
+        const error = update.lastDisconnect?.error as (Error & { code?: string }) | undefined
+        const reason = error?.message === 'WebSocket Error (Opening handshake has timed out)' ? 'websocket-handshake-timeout' : undefined
+        stage('closed', { previousStage: lastStage, status: code, reason, networkCode: /^[A-Z0-9_]{1,40}$/.test(error?.code ?? '') ? error?.code : undefined })
         if (code === DisconnectReason.loggedOut) { hooks.onError('logged-out'); return }
         if (attempt++ < 1) {
+          diagnostic('retry-scheduled', { delayMs: 800, route: fallbackAgent === directAgent ? 'dns' : 'fallback' })
           hooks.onHint?.('Связь с WhatsApp прервалась, повторяем.')
           setTimeout(() => void open().catch(() => {
             if (!stopped) hooks.onError('Не удалось восстановить соединение WhatsApp')
