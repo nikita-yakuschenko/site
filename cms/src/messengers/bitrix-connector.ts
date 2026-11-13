@@ -51,14 +51,15 @@ export const messageSenderCodes = {
 
 export function messageServiceSenders(handlerUrl: string) {
   return (Object.keys(messageSenderCodes) as MessengerChannel[]).map(channel => {
-    // Как у Radist: одно имя в заголовке и в подписи «через …». Строка, не объект — иначе в UI бывает пустое «через».
     const title = lineChannelName(channel)
+    // A scalar only refreshes Bitrix's default row. Existing localized rows can still shadow it.
+    const localized = { ru: title, en: title, '**': title }
     return {
       CODE: messageSenderCodes[channel],
       TYPE: 'SMS',
       HANDLER: handlerUrl,
-      NAME: title,
-      DESCRIPTION: title,
+      NAME: localized,
+      DESCRIPTION: localized,
     }
   })
 }
