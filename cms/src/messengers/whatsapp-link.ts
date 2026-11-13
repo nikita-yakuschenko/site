@@ -1,4 +1,4 @@
-import makeWASocket, { Browsers, DisconnectReason, useMultiFileAuthState as loadAuthState, type WASocket } from '@whiskeysockets/baileys'
+import makeWASocket, { Browsers, DisconnectReason, jidNormalizedUser, useMultiFileAuthState as loadAuthState, type WASocket } from '@whiskeysockets/baileys'
 import { Agent as HttpsAgent } from 'node:https'
 import { createRequire } from 'node:module'
 import { lookup, setDefaultResultOrder } from 'node:dns'
@@ -21,6 +21,7 @@ export type LinkHandle = {
   stop: () => Promise<void>
   // Есть ли аккаунт с этим номером в мессенджере. Без отправки сообщений.
   lookup?: (phone: string) => Promise<ContactLookup>
+  peerForPhone?: (phone: string) => Promise<string | null>
 }
 export type LinkHooks = {
   onQr: (image: string) => void
@@ -180,7 +181,8 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
           if (!stamp || Date.now() - stamp > 120_000) continue
         }
         const primary = item.key.remoteJid || ''
-        const lid = /^\d+@lid$/.test(primary) ? primary : ''
+        const alternate = item.key.remoteJidAlt || ''
+        const lid = [primary, alternate].map(jidNormalizedUser).find(value => /^\d+@lid$/.test(value)) || ''
         let jid = primary.endsWith('@lid') ? item.key.remoteJidAlt || '' : primary
         if (lid && !jid.endsWith('@s.whatsapp.net')) {
           jid = await socket.signalRepository.lidMapping.getPNForLID(lid).catch(() => null) || ''
@@ -201,6 +203,11 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       const jid = /^peer:\d+@lid$/.test(address) ? address.slice(5) : phone ? `${phone}@s.whatsapp.net` : ''
       if (!current || !jid) throw new Error('WhatsApp не подключён или адрес недействителен')
       await current.sendMessage(jid, { text })
+    },
+    peerForPhone: async phone => {
+      if (!current) return null
+      const lid = await current.signalRepository.lidMapping.getLIDForPN(`${phone}@s.whatsapp.net`).catch(() => null)
+      return lid ? jidNormalizedUser(lid) : null
     },
     lookup: async phone => {
       const national = nationalPhone(phone)

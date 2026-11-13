@@ -15,3 +15,6 @@
 
 # Reviewed: standalone expiring request counters; no changes to existing tables or data. Older CMS ignores it.
 20261027_090000_request_limits
+
+# Standalone WhatsApp dialog aliases. Existing tables and data are untouched.
+20261113_120000_whatsapp_dialogs

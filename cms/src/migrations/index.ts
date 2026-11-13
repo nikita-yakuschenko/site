@@ -1,3 +1,4 @@
+import * as migration_20261113_120000_whatsapp_dialogs from './20261113_120000_whatsapp_dialogs';
 import * as migration_20261107_200000_partner_cabinet from './20261107_200000_partner_cabinet';
 import * as migration_20261106_100000_messenger_settings from './20261106_100000_messenger_settings';
 import * as migration_20261027_090000_request_limits from './20261027_090000_request_limits';
@@ -158,4 +159,5 @@ export const migrations = [
  {up:migration_20261027_090000_request_limits.up,down:migration_20261027_090000_request_limits.down,name:'20261027_090000_request_limits'},
  {up:migration_20261106_100000_messenger_settings.up,down:migration_20261106_100000_messenger_settings.down,name:'20261106_100000_messenger_settings'},
  {up:migration_20261107_200000_partner_cabinet.up,down:migration_20261107_200000_partner_cabinet.down,name:'20261107_200000_partner_cabinet'},
+  { up: migration_20261113_120000_whatsapp_dialogs.up, down: migration_20261113_120000_whatsapp_dialogs.down, name: '20261113_120000_whatsapp_dialogs' },
 ];

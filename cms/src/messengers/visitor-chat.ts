@@ -4,6 +4,7 @@ import { bitrixCall, connectorId, messengerSession, portalDomain } from './bitri
 import { currentMessengerToken } from './authorize-lead'
 import type { MessengerChannel } from './phone'
 import { channelLine } from './lines'
+import { resolveWhatsAppDialog } from './whatsapp-dialog'
 
 // Карточка посетителя в открытой линии. Телефон здесь — номер клиента, номер компании к этому вызову не относится.
 export async function openVisitorChat(payload: Payload, input: { channel: MessengerChannel, phone: string, text: string, messageId: string, person?: { name?: string, username?: string, peer?: string } }, options: { requireLine?: boolean } = {}) {
@@ -16,6 +17,13 @@ export async function openVisitorChat(payload: Payload, input: { channel: Messen
   if (!line) {
     if (options.requireLine) throw new Error('Мессенджер не закреплён за линией')
     return
+  }
+  if (input.channel === 'whatsapp') {
+    const id = await resolveWhatsAppDialog(payload, line, input.phone, input.person?.peer)
+    if (id) {
+      message.user.id = id
+      message.chat.id = id
+    }
   }
   const token = await currentMessengerToken(payload)
   await bitrixCall(portalDomain, token, 'imconnector.send.messages', { CONNECTOR: connectorId, LINE: line, MESSAGES: [message] })

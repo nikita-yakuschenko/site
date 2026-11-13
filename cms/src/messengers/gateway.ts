@@ -8,6 +8,7 @@ import { messengerChannels, messengerTitles, nationalPhone, operatorMessageText,
 import { clearSession, rememberSession, restoreSession } from './session-store'
 import { openVisitorChat } from './visitor-chat'
 import { channelLine } from './lines'
+import { resolveWhatsAppDialog } from './whatsapp-dialog'
 import type { ContactLookup, LinkHandle } from './whatsapp-link'
 
 export type MessengerLookupResult = ContactLookup | 'unavailable'
@@ -110,8 +111,11 @@ export async function startOutgoing(payload: Payload, channel: MessengerChannel,
   if (!line) throw new Error('Сначала закрепите мессенджер за этой линией')
   const current = runtime(channel)
   if (current.view.status !== 'on' || !current.handle) throw new Error('Сначала подключите рабочий номер')
+  const peer = await current.handle.peerForPhone?.(national)
+  // Register the address before sending: a reply can arrive before send resolves.
+  if (channel === 'whatsapp') await resolveWhatsAppDialog(payload, line, national, peer || undefined)
   await current.handle.send(national, text.trim())
-  await openVisitorChat(payload, { channel, phone: national, text: text.trim(), messageId: `out-${Date.now()}` })
+  await openVisitorChat(payload, { channel, phone: national, text: text.trim(), messageId: `out-${Date.now()}`, person: peer ? { peer } : undefined })
   current.view = { ...current.view, hint: 'Сообщение отправлено, диалог открыт в этой линии.' }
   return { ...current.view }
 }
