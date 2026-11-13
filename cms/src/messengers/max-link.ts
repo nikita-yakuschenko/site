@@ -22,7 +22,7 @@ type MaxClient = {
   userAgent: { headerUserAgent?: string, appVersion?: string, osVersion?: string, deviceName?: string, screen?: string, timezone?: string, locale?: string, buildNumber?: number, clientSessionId?: number }
   isAuthorized: boolean
   me: { id?: string | number, phone?: string } | null
-  onMessage: (handler: (message: { text?: string, senderId?: string | number, chatId?: string | number, sender?: { id?: string | number, phone?: string } }) => void) => void
+  onMessage: (handler: (message: { text?: string, senderId?: string | number, chatId?: string | number, sender?: { id?: string | number, phone?: string, username?: string | null, firstname?: string, lastname?: string, fullname?: string } }) => void) => void
   sendMessage: (options: { chatId: string | number, text: string }) => Promise<unknown>
   getUserByPhone: (phone: string) => Promise<{ id: string | number } | null>
 }
@@ -39,8 +39,10 @@ export async function startMax(directory: string, hooks: LinkHooks): Promise<Lin
     hooks.onConnected(nationalPhone(String(client.me?.phone || '')))
     client.onMessage(message => {
       if (message.senderId && client.me?.id && String(message.senderId) === String(client.me.id)) return
-      const phone = nationalPhone(String(message.sender?.phone || ''))
-      if (phone && message.text) hooks.onMessage(phone, message.text)
+      const sender = message.sender
+      const phone = nationalPhone(String(sender?.phone || ''))
+      const name = String(sender?.fullname || [sender?.firstname, sender?.lastname].filter(Boolean).join(' ') || '').trim()
+      if ((phone || sender?.username) && message.text) hooks.onMessage(phone, message.text, { name, username: sender?.username || '' })
     })
   }
   if (await hasToken(libraryFile)) await client.start().then(finish)

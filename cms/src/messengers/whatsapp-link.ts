@@ -10,7 +10,7 @@ export type LinkHandle = { send: (address: string, text: string) => Promise<void
 export type LinkHooks = {
   onQr: (image: string) => void
   onConnected: (phone: string) => void
-  onMessage: (phone: string, text: string) => void
+  onMessage: (phone: string, text: string, person?: { name?: string, username?: string }) => void
   onSaved: () => void
   onError: (hint: string) => void
 }
@@ -48,7 +48,9 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
         if (!jid.endsWith('@s.whatsapp.net')) continue
         const text = item.message?.conversation || item.message?.extendedTextMessage?.text || ''
         const phone = nationalPhone(jid)
-        if (phone && text) hooks.onMessage(phone, text)
+        const pushName = (item.pushName || '').trim()
+        const name = pushName && nationalPhone(pushName) !== phone ? pushName : ''
+        if (phone && text) hooks.onMessage(phone, text, { name })
       }
     })
   }

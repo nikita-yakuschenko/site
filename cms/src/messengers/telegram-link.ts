@@ -27,10 +27,11 @@ export async function startTelegram(directory: string, hooks: LinkHooks & { pass
     hooks.onConnected(nationalPhone((me as { phone?: string }).phone || ''))
     client.addEventHandler(async event => {
       if (!event.isPrivate || event.message.out) return
-      const sender = await event.message.getSender().catch(() => null) as { phone?: string } | null
+      const sender = await event.message.getSender().catch(() => null) as { phone?: string, username?: string, firstName?: string, lastName?: string } | null
       const phone = nationalPhone(sender?.phone || '')
       const text = event.message.message || ''
-      if (phone && text) hooks.onMessage(phone, text)
+      const name = [sender?.firstName, sender?.lastName].filter(Boolean).join(' ')
+      if ((phone || sender?.username) && text) hooks.onMessage(phone, text, { name, username: sender?.username || '' })
     }, new NewMessage({}))
   }
   if (await client.isUserAuthorized()) await finish()
@@ -43,8 +44,10 @@ export async function startTelegram(directory: string, hooks: LinkHooks & { pass
   }
   return {
     send: async (address, text) => {
+      if (!(await client.isUserAuthorized())) throw new Error('Telegram ещё не подключён')
+      if (address.startsWith('@')) { await client.sendMessage(address, { message: text }); return }
       const phone = nationalPhone(address)
-      if (!phone || !(await client.isUserAuthorized())) throw new Error('Telegram ещё не подключён')
+      if (!phone) throw new Error('Telegram ещё не подключён')
       const imported = await client.invoke(new Api.contacts.ImportContacts({
         contacts: [new Api.InputPhoneContact({ clientId: bigInt(1), phone: `+${phone}`, firstName: 'Клиент', lastName: '' })],
       }))

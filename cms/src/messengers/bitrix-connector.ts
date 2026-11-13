@@ -118,19 +118,26 @@ function record(value: unknown): Record<string, unknown> {
 }
 
 export const messengerChannelNames = { max: 'MAX', telegram: 'Telegram', whatsapp: 'WhatsApp' } as const
+const dialogBrand = { max: 'AM.MAX', telegram: 'AM.Telegram', whatsapp: 'AM.WhatsApp' } as const
 
-// Карточка диалога посетителя. Телефон здесь — номер клиента, не учётная запись компании.
-export function messengerSession(channel: string, phone: string, messageId: string, text: string) {
-  const name = messengerChannelNames[channel as keyof typeof messengerChannelNames]
+// Подпись диалога: @юзернейм, иначе имя, иначе телефон, затем AM.WhatsApp / AM.Telegram / AM.MAX.
+export function messengerSession(channel: string, phone: string, messageId: string, text: string, person: { name?: string, username?: string } = {}) {
+  const brand = dialogBrand[channel as keyof typeof dialogBrand]
   const digits = phone.replace(/\D/g, '')
   const national = digits.length === 11 && digits.startsWith('8') ? `7${digits.slice(1)}` : digits
-  if (!name || national.length < 10 || !messageId || !text) return null
-  const id = `${channel}:${national}`
-  const readable = `+${national}`
+  const readable = national.length >= 10 ? `+${national}` : ''
+  const username = (person.username || '').trim().replace(/^@/, '')
+  const safeUsername = /^[A-Za-z0-9_]{3,32}$/.test(username) ? username : ''
+  const personName = (person.name || '').replace(/\s+/g, ' ').trim().slice(0, 80)
+  const who = safeUsername ? `@${safeUsername}` : personName || readable
+  if (!brand || !who || !messageId || !text) return null
+  const id = readable ? `${channel}:${national}` : `${channel}:@${safeUsername}`
+  const user: { id: string, name: string, phone?: string } = { id, name: who }
+  if (readable) user.phone = readable
   return {
-    user: { id, name, phone: readable },
+    user,
     message: { id: messageId, date: Math.floor(Date.now() / 1000), text },
-    chat: { id, name: `${name} ${readable}`, url: 'https://avgst.ru' },
+    chat: { id, name: `${who} - ${brand}`, url: 'https://avgst.ru' },
   }
 }
 

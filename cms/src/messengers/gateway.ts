@@ -26,7 +26,7 @@ export async function beginLogin(payload: Payload, channel: MessengerChannel) {
   const hooks = {
     onQr: (image: string) => { if (current.generation === generation) current.view = { ...current.view, status: 'qr', qr: image, hint: '' } },
     onConnected: (phone: string) => { if (current.generation === generation) current.view = { ...current.view, status: 'on', qr: '', phone, hint: '' } },
-    onMessage: (phone: string, text: string) => { if (payloadRef) void openVisitorChat(payloadRef, { channel, phone, text, messageId: `${channel}-in-${Date.now()}` }).catch(() => undefined) },
+    onMessage: (phone: string, text: string, person?: { name?: string, username?: string }) => { if (payloadRef) void openVisitorChat(payloadRef, { channel, phone, text, person, messageId: `${channel}-in-${Date.now()}` }).catch(() => undefined) },
     onSaved: () => { if (payloadRef) void rememberSession(payloadRef, channel) },
     onError: (hint: string) => {
       if (current.generation !== generation) return
@@ -78,7 +78,7 @@ export async function disconnectAccount(payload: Payload, channel: MessengerChan
 
 export async function relayOperatorText(channel: MessengerChannel, chatId: string, text: string) {
   const parsed = readChat(chatId)
-  const phone = parsed.phone || nationalPhone(parsed.id)
+  const phone = parsed.phone || (parsed.id.startsWith('@') ? parsed.id : '')
   if (!phone || !text.trim()) return
   const current = runtimes.get(channel)
   if (current?.view.status !== 'on' || !current.handle) return
