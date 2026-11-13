@@ -9,7 +9,7 @@ import { clearSession, rememberSession, restoreSession } from './session-store'
 import { openVisitorChat } from './visitor-chat'
 import { channelLine } from './lines'
 import { resolveWhatsAppDialog } from './whatsapp-dialog'
-import type { ContactLookup, LinkHandle } from './whatsapp-link'
+import type { ContactLookup, InboundFile, LinkHandle } from './whatsapp-link'
 
 export type MessengerLookupResult = ContactLookup | 'unavailable'
 
@@ -31,10 +31,10 @@ export async function beginLogin(payload: Payload, channel: MessengerChannel, op
   const hooks = {
     onQr: (image: string) => { if (current.generation === generation) current.view = { ...current.view, status: 'qr', qr: image, hint: '' } },
     onConnected: (phone: string) => { if (current.generation === generation) current.view = { ...current.view, status: 'on', qr: '', phone, hint: '' } },
-    onMessage: (phone: string, text: string, person?: { name?: string, username?: string, peer?: string }, externalId?: string) => {
+    onMessage: (phone: string, text: string, person?: { name?: string, username?: string, peer?: string }, externalId?: string, file?: InboundFile) => {
       if (current.generation !== generation) return
       const messageId = `${channel}-in-${externalId || randomUUID()}`
-      void enqueue(payload, 'messenger-inbound', { channel, phone, text, person, messageId }, messageId)
+      void enqueue(payload, 'messenger-inbound', { channel, phone, text, person, messageId, file }, messageId)
         .catch(() => payload.logger.error('Не удалось сохранить входящее сообщение мессенджера'))
     },
     onReconnecting: (hint: string) => {
@@ -96,15 +96,45 @@ export async function disconnectAccount(payload: Payload, channel: MessengerChan
   return { ...current.view }
 }
 
-export async function relayOperatorText(channel: MessengerChannel, chatId: string, text: string) {
+export async function relayOperatorText(channel: MessengerChannel, chatId: string, text: string, files: { url: string, name: string }[] = []) {
   const parsed = readChat(chatId)
   const message = operatorMessageText(text)
   if (parsed.channel !== channel) throw new Error('Канал диалога не совпадает с привязкой линии')
   const phone = parsed.phone || (/^(?:@|peer:)/.test(parsed.id) ? parsed.id : '')
-  if (!phone || !message) throw new Error('Нет адреса получателя или текст сообщения пуст')
+  if (!phone || (!message && !files.length)) throw new Error('Нет адреса получателя или текст сообщения пуст')
   const current = runtimes.get(channel)
   if (current?.view.status !== 'on' || !current.handle) throw new Error('Мессенджер отключён')
-  await current.handle.send(phone, message)
+  if (!files.length) {
+    await current.handle.send(phone, message)
+    return
+  }
+  if (!current.handle.sendFile) throw new Error('Мессенджер не поддерживает отправку вложений')
+  if (files.length > 10) throw new Error('Слишком много вложений')
+  const attachments = []
+  for (const file of files) {
+    const url = new URL(file.url, `https://${portalDomain}`)
+    if (url.origin !== `https://${portalDomain}` || url.username || url.password) throw new Error('Недопустимый адрес вложения Битрикс24')
+    const response = await fetch(url, { redirect: 'error', signal: AbortSignal.timeout(25000) })
+    if (!response.ok || !response.body) throw new Error('Битрикс24 не отдал вложение')
+    const max = 16 * 1024 * 1024
+    const reader = response.body.getReader()
+    const chunks: Uint8Array[] = []
+    let size = 0
+    try {
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+        size += value.byteLength
+        if (size > max) throw new Error('Вложение превышает 16 МБ')
+        chunks.push(value)
+      }
+    } finally { await reader.cancel().catch(() => undefined) }
+    const mime = response.headers.get('content-type')?.split(';')[0] || 'application/octet-stream'
+    if (!size || mime === 'text/html') throw new Error('Вместо файла Битрикс24 вернул страницу')
+    attachments.push({ bytes: Buffer.concat(chunks), mime, name: file.name })
+  }
+  if (message) await current.handle.send(phone, message)
+  for (const file of attachments) await current.handle.sendFile(phone, file.bytes, file.mime, file.name, '')
 }
 
 export async function startOutgoing(payload: Payload, channel: MessengerChannel, phone: string, text: string) {

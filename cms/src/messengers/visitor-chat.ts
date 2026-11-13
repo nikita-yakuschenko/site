@@ -7,8 +7,8 @@ import { channelLine } from './lines'
 import { resolveWhatsAppDialog } from './whatsapp-dialog'
 
 // Карточка посетителя в открытой линии. Телефон здесь — номер клиента, номер компании к этому вызову не относится.
-export async function openVisitorChat(payload: Payload, input: { channel: MessengerChannel, phone: string, text: string, messageId: string, person?: { name?: string, username?: string, peer?: string } }, options: { requireLine?: boolean } = {}) {
-  const message = messengerSession(input.channel, input.phone, input.messageId, input.text, input.person)
+export async function openVisitorChat(payload: Payload, input: { channel: MessengerChannel, phone: string, text: string, messageId: string, person?: { name?: string, username?: string, peer?: string }, files?: { url: string, name: string }[] }, options: { requireLine?: boolean } = {}) {
+  const message = messengerSession(input.channel, input.phone, input.messageId, input.text, input.person, input.files)
   if (!message) {
     if (options.requireLine) throw new Error('Не удалось определить диалог или сообщение')
     return

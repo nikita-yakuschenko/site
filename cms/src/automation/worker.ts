@@ -72,7 +72,9 @@ export async function processJob(payload: Payload, kind: string, data: Record<st
     const channel = String(data.channel || '')
     if (!isMessengerChannel(channel)) throw new Error('Неизвестный мессенджер')
     const person = data.person as { name?: string, username?: string, peer?: string } | undefined
-    await openVisitorChat(payload, { channel, person, phone: String(data.phone || ''), text: String(data.text || ''), messageId: String(data.messageId || '') }, { requireLine: true })
+    const { inboundFileLink } = await import('../messengers/inbound-file')
+    const file = inboundFileLink(data)
+    await openVisitorChat(payload, { channel, person, files: file ? [file] : undefined, phone: String(data.phone || ''), text: String(data.text || ''), messageId: String(data.messageId || '') }, { requireLine: true })
     return { sent: true }
   }
   if (kind === 'messenger-reply') {
@@ -80,7 +82,7 @@ export async function processJob(payload: Payload, kind: string, data: Record<st
     const { relayOperatorText } = await import('../messengers/gateway')
     const channel = await lineChannel(payload, Number(data.line))
     if (!channel) throw new Error('Мессенджер не закреплён за линией')
-    await relayOperatorText(channel, String(data.chatId || ''), String(data.text || ''))
+    await relayOperatorText(channel, String(data.chatId || ''), String(data.text || ''), Array.isArray(data.files) ? data.files : [])
     return { sent: true }
   }
   if (kind === 'passport-comment') {

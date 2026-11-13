@@ -1,4 +1,4 @@
-import makeWASocket, { Browsers, DisconnectReason, jidNormalizedUser, useMultiFileAuthState as loadAuthState, type WASocket } from '@whiskeysockets/baileys'
+import makeWASocket, { Browsers, DisconnectReason, jidNormalizedUser, downloadMediaMessage, normalizeMessageContent, useMultiFileAuthState as loadAuthState, type WASocket } from '@whiskeysockets/baileys'
 import { Agent as HttpsAgent } from 'node:https'
 import { createRequire } from 'node:module'
 import { lookup, setDefaultResultOrder } from 'node:dns'
@@ -18,15 +18,18 @@ const quiet = { level: 'silent', child() { return quiet }, trace() {}, debug() {
 export type ContactLookup = 'found' | 'missing'
 export type LinkHandle = {
   send: (address: string, text: string) => Promise<void>
+  sendFile?: (address: string, bytes: Buffer, mime: string, name: string, caption: string) => Promise<void>
   stop: () => Promise<void>
   // Есть ли аккаунт с этим номером в мессенджере. Без отправки сообщений.
   lookup?: (phone: string) => Promise<ContactLookup>
   peerForPhone?: (phone: string) => Promise<string | null>
 }
+export type InboundFile = { name: string, mime: string, content: string }
+
 export type LinkHooks = {
   onQr: (image: string) => void
   onConnected: (phone: string) => void
-  onMessage: (phone: string, text: string, person?: { name?: string, username?: string, peer?: string }, externalId?: string) => void
+  onMessage: (phone: string, text: string, person?: { name?: string, username?: string, peer?: string }, externalId?: string, file?: InboundFile) => void
   onReconnecting?: (hint: string) => void
   onSaved: () => void
   onError: (hint: string) => void
@@ -201,11 +204,36 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
           jid = await socket.signalRepository.lidMapping.getPNForLID(lid).catch(() => null) || ''
         }
         if (!jid.endsWith('@s.whatsapp.net') && !lid) continue
-        const text = item.message?.conversation || item.message?.extendedTextMessage?.text || ''
+        const content = normalizeMessageContent(item.message)
+        const media = content?.imageMessage || content?.documentMessage || content?.videoMessage || content?.audioMessage || content?.stickerMessage
+        let text = content?.conversation || content?.extendedTextMessage?.text || content?.imageMessage?.caption || content?.documentMessage?.caption || content?.videoMessage?.caption || ''
+        let file: InboundFile | undefined
+        if (media && (jid.endsWith('@s.whatsapp.net') || lid)) {
+          try {
+            const maxBytes = 16 * 1024 * 1024
+            if (Number(media.fileLength || 0) > maxBytes) throw new Error('size-limit')
+            const stream = await downloadMediaMessage({ ...item, message: content }, 'stream', {}, { logger: quiet as never, reuploadRequest: socket.updateMediaMessage })
+            const chunks: Buffer[] = []
+            let size = 0
+            try {
+              for await (const chunk of stream) {
+                size += chunk.length
+                if (size > maxBytes) throw new Error('size-limit')
+                chunks.push(Buffer.from(chunk))
+              }
+            } finally { stream.destroy() }
+            if (!size) throw new Error('empty-file')
+            const mime = media.mimetype?.split(';')[0] || 'application/octet-stream'
+            const extension = mime.split('/')[1]?.replace(/[^a-z0-9]/gi, '') || 'bin'
+            file = { mime, name: content?.documentMessage?.fileName || `WhatsApp.${extension}`, content: Buffer.concat(chunks).toString('base64') }
+          } catch {
+            text = [text, 'Вложение WhatsApp не удалось загрузить.'].filter(Boolean).join('\n')
+          }
+        }
         const phone = jid.endsWith('@s.whatsapp.net') ? nationalPhone(jid.split('@')[0].split(':')[0]) : ''
         const pushName = (item.pushName || '').trim()
         const name = pushName && nationalPhone(pushName) !== phone ? pushName : ''
-        if ((phone || lid) && text) hooks.onMessage(phone, text, { name, peer: lid || undefined }, item.key.id ? item.key.id : undefined)
+        if ((phone || lid) && (text || file)) hooks.onMessage(phone, text, { name, peer: lid || undefined }, item.key.id || undefined, file)
       }
     })
   }
@@ -216,6 +244,20 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       const jid = /^peer:\d+@lid$/.test(address) ? address.slice(5) : phone ? `${phone}@s.whatsapp.net` : ''
       if (!current || !jid) throw new Error('WhatsApp не подключён или адрес недействителен')
       await current.sendMessage(jid, { text })
+    },
+    sendFile: async (address, bytes, mime, name, caption) => {
+      const phone = address.startsWith('peer:') ? '' : nationalPhone(address)
+      const jid = /^peer:\d+@lid$/.test(address) ? address.slice(5) : phone ? `${phone}@s.whatsapp.net` : ''
+      if (!current || !jid) throw new Error('WhatsApp не подключён или адрес недействителен')
+      if (mime.startsWith('image/') && mime !== 'image/svg+xml') {
+        await current.sendMessage(jid, { image: bytes, mimetype: mime, caption })
+      } else if (mime === 'video/mp4') {
+        await current.sendMessage(jid, { video: bytes, mimetype: mime, caption })
+      } else if (mime === 'audio/ogg' || mime === 'audio/mpeg') {
+        await current.sendMessage(jid, { audio: bytes, mimetype: mime === 'audio/ogg' ? 'audio/ogg; codecs=opus' : mime, ptt: mime === 'audio/ogg' })
+      } else {
+        await current.sendMessage(jid, { document: bytes, mimetype: mime, fileName: name, caption })
+      }
     },
     peerForPhone: async phone => {
       if (!current) return null

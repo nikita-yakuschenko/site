@@ -151,6 +151,10 @@ export function messageRows(body: Record<string, unknown>) {
       text: String(message.text || ''),
       bitrixMessageId: String(im.message_id || ''),
       userId: String(message.user_id || ''),
+      ...(Array.isArray(message.files) && message.files.length ? { files: message.files.map(value => {
+        const file = record(value)
+        return { url: String(file.url || file.link || ''), name: String(file.name || 'file') }
+      }) } : {}),
     }
   }).filter(row => row.bitrixMessageId && row.chatId)
 }
@@ -163,7 +167,7 @@ export const messengerChannelNames = { max: 'MAX', telegram: 'Telegram', whatsap
 const dialogBrand = { max: 'AM.MAX', telegram: 'AM.Telegram', whatsapp: 'AM.WhatsApp' } as const
 
 // Подпись диалога: @юзернейм, иначе имя, иначе телефон, затем AM.WhatsApp / AM.Telegram / AM.MAX.
-export function messengerSession(channel: string, phone: string, messageId: string, text: string, person: { name?: string, username?: string, peer?: string } = {}) {
+export function messengerSession(channel: string, phone: string, messageId: string, text: string, person: { name?: string, username?: string, peer?: string } = {}, files: { url: string, name: string }[] = []) {
   const brand = dialogBrand[channel as keyof typeof dialogBrand]
   const national = nationalPhone(phone)
   const readable = national ? `+${national}` : ''
@@ -172,7 +176,7 @@ export function messengerSession(channel: string, phone: string, messageId: stri
   const personName = (person.name || '').replace(/\s+/g, ' ').trim().slice(0, 80)
   const peer = person.peer && /^[A-Za-z0-9@._:-]{1,100}$/.test(person.peer) ? person.peer : ''
   const who = safeUsername ? `@${safeUsername}` : personName || readable || (peer ? 'Клиент' : '')
-  if (!brand || !who || !messageId || !text) return null
+  if (!brand || !who || !messageId || (!text && !files.length)) return null
   if (!readable && !safeUsername && !peer) return null
   // WhatsApp can report the same recipient as a phone JID and a LID.
   // Preserve the phone-based chat created by "Написать первым" when the phone is known.
@@ -182,8 +186,8 @@ export function messengerSession(channel: string, phone: string, messageId: stri
   if (channel === 'telegram' && safeUsername) user.url = `https://t.me/${safeUsername}`
   return {
     user,
-    message: { id: messageId, date: Math.floor(Date.now() / 1000), text },
-    chat: { id, name: `${who} - ${brand}`, url: 'https://avgst.ru' },
+    message: { id: messageId, date: Math.floor(Date.now() / 1000), ...(text ? { text } : {}), ...(files.length ? { files } : {}) },
+    chat: { id, name: `${who} - ${brand}` },
   }
 }
 
