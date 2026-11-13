@@ -74,6 +74,20 @@ export async function processJob(payload: Payload, kind: string, data: Record<st
     await relayOperatorText(channel, String(data.chatId || ''), String(data.text || ''))
     return { sent: true }
   }
+  if (kind === 'passport-comment') {
+    const { attachPassportComment } = await import('./passport-comment')
+    return attachPassportComment(payload, {
+      requestId: String(data.requestId || ''),
+      phone: String(data.phone || ''),
+      slug: String(data.slug || ''),
+      region: String(data.region || ''),
+      projectName: String(data.projectName || ''),
+      channel: typeof data.channel === 'string' ? data.channel : '',
+      title: String(data.title || ''),
+      createdAfter: typeof data.createdAfter === 'string' ? data.createdAfter : undefined,
+      attempts: Number(data.attempts || 0),
+    })
+  }
   if (kind === 'email') return sendMail(payload, data)
   if (kind === 'crm-sync') return syncCrm(payload, data)
   if (kind === 'intake') {
@@ -147,7 +161,7 @@ export function startAutomationWorker(payload: Payload) {
         const claimed = await claimJob(payload, !automationActive)
         if (!claimed) break
         const { job, lease } = claimed
-        try { const result = await processJob(payload, job.kind, { ...(job.data as Record<string, unknown>), deliveryKey: job.key }); await finishJob(payload, job.id, lease, result) }
+        try { const result = await processJob(payload, job.kind, { ...(job.data as Record<string, unknown>), deliveryKey: job.key, attempts: job.attempts || 0 }); await finishJob(payload, job.id, lease, result) }
         catch (error) { await failJob(payload, job.id, lease, job.attempts || 1, error, error instanceof Paused) }
       }
     } catch (error) { payload.logger.error({ failure: error instanceof Error ? error.name : 'Error' }, 'Ошибка очереди автоматизации') }

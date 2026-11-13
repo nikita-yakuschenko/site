@@ -17,16 +17,9 @@ const PASSPORT_CHANNELS = [
 ] as const;
 
 const SUCCESS_MESSAGES = [
-  'Вы на шаг ближе к мечте',
-  'Отличное начало! Так держать!',
-  'Мечта стала ближе',
-  'Мечта стала ближе к реальности',
-  'Первый шаг к мечте уже сделан',
-  'Большая мечта. Хорошее начало!',
-  'Вот так и начинается свой дом',
-  'От мечты к своему дому',
-  'Пусть всё начнётся с этого дома',
-  'Вашей мечте пора сбываться',
+  'Заявка принята. Менеджер отправит паспорт сам',
+  'Паспорт у менеджера. Он напишет вам',
+  'Готово. Менеджер пришлёт паспорт в мессенджер',
 ];
 
 /** Shared passport interaction for the project hero and its media viewers. */
@@ -160,19 +153,22 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       const response = await fetch('/api/passport-concept', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ phone: phoneE164(phone), project, slug: projectSlug, region: readRegionCode(), channel, requestId: requestId.current, dwellMs: passportDwell(projectSlug), leftFast: passportLeftFast(projectSlug) }) });
       const receipt = await response.json().catch(() => ({}));
       if (response.status === 429 || receipt.error === 'passport-banned') { lockPassportDownload('hour'); notifyPassportPace('banned'); await feedbackLap; setStatus('idle'); return; }
-      if (!response.ok || receipt.accepted !== true || !receipt.downloadUrl) throw new Error('not-accepted');
+      if (!response.ok || receipt.accepted !== true) throw new Error('not-accepted');
       if (receipt.pace === 'nudge' || receipt.pace === 'joke') notifyPassportPace('nudge');
       if (receipt.lead === true) trackMetricaFormSuccess(String(receipt.id || requestId.current), 'project-passport');
-      const file = await fetch(receipt.downloadUrl);
-      if (!file.ok) throw new Error('download-failed');
-      const blob = await file.blob();
+      // Шуточный режим по-прежнему скачивает файл. Рабочий паспорт уходит менеджеру в Битрикс.
+      if (receipt.pace === 'joke' && receipt.downloadUrl) {
+        const file = await fetch(receipt.downloadUrl);
+        if (!file.ok) throw new Error('download-failed');
+        const blob = await file.blob();
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a'); link.href = url; link.download = receipt.filename || `AVGST_${projectSlug}.pdf`; link.click();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+      }
       rememberPassportDownload();
       rememberPassportHop(projectSlug);
       markPageDownloaded(projectSlug);
       await feedbackLap;
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a'); link.href = url; link.download = receipt.filename || `AVGST_${projectSlug}.pdf`; link.click();
-      setTimeout(() => URL.revokeObjectURL(url), 30000);
       const message = SUCCESS_MESSAGES[Math.floor(Math.random() * SUCCESS_MESSAGES.length)]!;
       completedRef.current = true;
       setDismissed(!visibleRef.current);
@@ -197,7 +193,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
           <div className="passport-concept__channel" data-shown={open && status !== 'done'} inert={!open || status === 'done'}>
             <div className="passport-concept__channel-clip">
               <fieldset className="passport-concept__channel-card">
-                <p id={`${formId}-channel`} className="passport-concept__channel-title">Куда отправить?</p>
+                <p id={`${formId}-channel`} className="passport-concept__channel-title">Куда менеджеру написать?</p>
                 <RadioGroup value={channel} onValueChange={setChannel} aria-labelledby={`${formId}-channel`} disabled={status === 'sending' || status === 'done'}>
                   {PASSPORT_CHANNELS.map(item => (
                     <label key={item.id} className="passport-concept__channel-option">
@@ -212,9 +208,9 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
           </div>
           <p className="passport-concept__note" aria-hidden={status === 'done'} inert={status === 'done'}>Отправляя запрос, вы соглашаетесь на <a href="/privacy" target="_blank" rel="noreferrer">обработку данных</a></p>
         </div>
-        <span className="passport-concept__announcement" role="status">{status === 'error' ? 'Не удалось отправить. Попробуйте ещё раз.' : status === 'done' ? 'Паспорт получен' : ''}</span>
+        <span className="passport-concept__announcement" role="status">{status === 'error' ? 'Не удалось отправить. Попробуйте ещё раз.' : status === 'done' ? 'Заявка принята' : ''}</span>
       </form>
-      <div className="passport-concept__action-flight">        <button form={formId} inert={!open || status === 'done'} className="passport-concept__download" type="submit" disabled={!isValidRuMobile(phone) || !channel || status === 'sending' || status === 'done'} data-valid={isValidRuMobile(phone) && Boolean(channel)} data-status={status} aria-label={status === 'sending' ? 'Готовим паспорт' : status === 'done' ? 'Паспорт получен' : status === 'error' ? 'Повторить запрос' : 'Получить паспорт'} title={status === 'error' ? 'Не удалось получить паспорт. Нажмите, чтобы повторить.' : undefined}>
+      <div className="passport-concept__action-flight">        <button form={formId} inert={!open || status === 'done'} className="passport-concept__download" type="submit" disabled={!isValidRuMobile(phone) || !channel || status === 'sending' || status === 'done'} data-valid={isValidRuMobile(phone) && Boolean(channel)} data-status={status} aria-label={status === 'sending' ? 'Отправляем заявку' : status === 'done' ? 'Заявка принята' : status === 'error' ? 'Повторить запрос' : 'Получить паспорт'} title={status === 'error' ? 'Не удалось отправить заявку. Нажмите, чтобы повторить.' : undefined}>
           {status === 'sending' ? <IconLoader2 className="passport-concept__spinner" size={19} aria-hidden="true" /> : status === 'done' ? <IconCheck className="passport-concept__check" size={20} stroke={2.2} aria-hidden="true" /> : status === 'error' ? <IconExclamationMark size={20} aria-hidden="true" /> : <IconSend className="passport-concept__send" size={18} stroke={1.8} aria-hidden="true" />}
         </button>
       </div>

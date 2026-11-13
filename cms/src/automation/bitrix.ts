@@ -7,9 +7,9 @@ export class BitrixClient {
     const url = new URL(base)
     if (url.protocol !== 'https:' || url.hostname !== domain || !/^\/rest\/\d+\/[^/]+\/?$/.test(url.pathname) || url.search || url.hash) throw new Error('Укажите входящий вебхук CRM для настроенного портала')
   }
-  async call<T = CrmRecord>(method: string, params: Record<string, unknown> = {}): Promise<T> {
+  async call<T = CrmRecord>(method: string, params: Record<string, unknown> = {}, timeoutMs = 20000): Promise<T> {
     if (!/^(crm|user|event)\.[a-zA-Z0-9.]+$/.test(method)) throw new Error('Недопустимый метод CRM')
-    const response = await this.request(this.base.replace(/\/?$/, '/') + method + '.json', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params), signal: AbortSignal.timeout(20000), redirect: 'error' })
+    const response = await this.request(this.base.replace(/\/?$/, '/') + method + '.json', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params), signal: AbortSignal.timeout(timeoutMs), redirect: 'error' })
     const body = await response.json() as { result: T; error?: string }
     if (!response.ok || body.error) throw new Error('Ошибка CRM: ' + String(body.error || response.status))
     return body.result

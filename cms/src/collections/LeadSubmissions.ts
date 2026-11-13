@@ -116,6 +116,28 @@ export const LeadSubmissions: CollectionConfig = {
       save: requestId => req.payload.create({ collection: 'lead-submissions', data: { requestId, formId: lead.formId!, status: 'pending', title, payload: { ...lead, title } }, overrideAccess: true }),
       defer: work => after(async () => {
         await work()
+        if (lead.formId === 'project-passport') {
+          const meta = lead.meta || {}
+          const slug = typeof meta.project === 'string' ? meta.project : ''
+          const region = typeof meta.region === 'string' ? meta.region : ''
+          const projectName = typeof meta.projectName === 'string' ? meta.projectName : slug
+          const channel = typeof meta.channel === 'string' ? meta.channel : ''
+          try {
+            await enqueue(req.payload, 'passport-comment', {
+              requestId: lead.requestId,
+              phone: lead.phone,
+              slug,
+              region,
+              projectName,
+              channel,
+              title,
+              createdAfter: new Date(Date.now() - 15 * 60 * 1000).toISOString(),
+            }, `passport-comment:${lead.requestId}`, new Date(Date.now() + 20000).toISOString())
+          } catch (error) {
+            req.payload.logger.error({ failure: error instanceof Error ? error.name : 'Error', requestId: lead.requestId, msg: 'Passport comment was not queued' })
+          }
+          return
+        }
         try { await noteVisitorLead(req.payload, lead) } catch (error) { req.payload.logger.error({ failure: error instanceof Error ? error.name : 'Error', requestId: lead.requestId, msg: 'Messenger dialog was not opened' }) }
       }),
       deliver: requestId => deliverLead(settings, lead, requestId, fetch, title),
