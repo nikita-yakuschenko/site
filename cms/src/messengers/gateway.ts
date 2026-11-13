@@ -18,7 +18,8 @@ export function accountViews() {
 export async function beginLogin(payload: Payload, channel: MessengerChannel) {
   payloadRef = payload
   const current = runtime(channel)
-  if (current.view.status === 'qr' || current.view.status === 'password' || current.view.status === 'on') return { ...current.view }
+  if ((current.view.status === 'qr' && current.view.qr) || current.view.status === 'password' || current.view.status === 'on') return { ...current.view }
+  await current.handle?.stop().catch(() => undefined)
   const generation = current.generation + 1
   current.generation = generation
   current.view = { ...current.view, status: 'qr', qr: '', hint: 'Готовим код для входа.', phone: '' }

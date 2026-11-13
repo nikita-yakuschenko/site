@@ -1,4 +1,4 @@
-import makeWASocket, { Browsers, DisconnectReason, fetchLatestBaileysVersion, useMultiFileAuthState, type WASocket } from '@whiskeysockets/baileys'
+import makeWASocket, { Browsers, DisconnectReason, useMultiFileAuthState, type WASocket } from '@whiskeysockets/baileys'
 import { createRequire } from 'node:module'
 import { nationalPhone } from './phone'
 
@@ -22,27 +22,30 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
   const open = async () => {
     if (stopped) return
     const { state, saveCreds } = await useMultiFileAuthState(directory)
-    const { version } = await fetchLatestBaileysVersion()
-    const socket = makeWASocket({ version, auth: state, logger: quiet as never, printQRInTerminal: false, browser: Browsers.macOS('Desktop'), syncFullHistory: false, markOnlineOnConnect: false, shouldSyncHistoryMessage: () => false })
+    const socket = makeWASocket({ auth: state, logger: quiet as never, browser: Browsers.macOS('Chrome'), syncFullHistory: false, markOnlineOnConnect: false, shouldSyncHistoryMessage: () => false })
     current = socket
-    socket.ev.on('creds.update', async () => { await saveCreds(); hooks.onSaved() })
-    socket.ev.on('connection.update', update => {
-      if (update.qr) void qrCode.toDataURL(update.qr).then(hooks.onQr)
-      if (update.connection === 'open') {
+    // В этой версии Baileys события приходят одним пакетом, отдельные on('connection.update') не вызываются.
+    socket.ev.process(async events => {
+      if (events['creds.update']) { await saveCreds(); hooks.onSaved() }
+      const update = events['connection.update']
+      if (update?.qr) {
+        try { hooks.onQr(await qrCode.toDataURL(update.qr)) } catch { hooks.onError('Не удалось нарисовать код') }
+      }
+      if (update?.connection === 'open') {
         attempt = 0
         hooks.onConnected(nationalPhone((socket.user?.id || '').split('@')[0].split(':')[0]))
         hooks.onSaved()
       }
-      if (update.connection === 'close' && !stopped) {
+      if (update?.connection === 'close' && !stopped) {
         const code = (update.lastDisconnect?.error as { output?: { statusCode?: number } } | undefined)?.output?.statusCode
+        console.error(`whatsapp-link close ${code || 'unknown'}`)
         if (code === DisconnectReason.loggedOut) { hooks.onError('logged-out'); return }
         if (attempt++ < 5) setTimeout(() => void open(), 500)
         else hooks.onError('closed')
       }
-    })
-    socket.ev.on('messages.upsert', event => {
-      if (event.type !== 'notify') return
-      for (const item of event.messages) {
+      const upsert = events['messages.upsert']
+      if (!upsert || upsert.type !== 'notify') return
+      for (const item of upsert.messages) {
         if (item.key.fromMe) continue
         const jid = item.key.remoteJid || ''
         if (!jid.endsWith('@s.whatsapp.net')) continue
