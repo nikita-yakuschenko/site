@@ -29,6 +29,7 @@ export async function beginLogin(payload: Payload, channel: MessengerChannel) {
     onConnected: (phone: string) => { if (current.generation === generation) current.view = { ...current.view, status: 'on', qr: '', phone, hint: '' } },
     onMessage: (phone: string, text: string, person?: { name?: string, username?: string }) => { if (payloadRef) void openVisitorChat(payloadRef, { channel, phone, text, person, messageId: `${channel}-in-${Date.now()}` }).catch(() => undefined) },
     onSaved: () => { if (payloadRef) void rememberSession(payloadRef, channel) },
+    onHint: (hint: string) => { if (current.generation === generation && current.view.status === 'qr') current.view = { ...current.view, hint } },
     onError: (hint: string) => {
       if (current.generation !== generation) return
       if (hint === 'logged-out') { void disconnectAccount(payload, channel); return }
