@@ -57,6 +57,15 @@ async function syncCrm(payload: Payload, data: Record<string, unknown>) {
   return { synced: Boolean(record.crmContactId) }
 }
 export async function processJob(payload: Payload, kind: string, data: Record<string, unknown>): Promise<Record<string, unknown>> {
+  if (kind === 'messenger-contact-profile') {
+    const { isMessengerChannel } = await import('../messengers/phone')
+    const { saveMessengerContactProfile } = await import('../messengers/contact-profile')
+    const channel = String(data.channel || '')
+    if (!isMessengerChannel(channel)) throw new Error('Неизвестный мессенджер')
+    return saveMessengerContactProfile(payload, {
+      channel, phone: String(data.phone || ''), name: String(data.name || ''), username: String(data.username || ''),
+    })
+  }
   if (kind === 'messenger-inbound') {
     const { isMessengerChannel } = await import('../messengers/phone')
     const { openVisitorChat } = await import('../messengers/visitor-chat')

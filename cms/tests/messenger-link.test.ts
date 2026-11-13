@@ -43,3 +43,20 @@ test('настройка линии показывает один мессенд
   assert.match(ready, /Написать первым/)
   assert.equal(ready.includes('Telegram'), false)
 })
+
+test('WhatsApp keeps the same chat after a phone-based outbound and an inbound LID with known phone', async () => {
+  const { messengerSession } = await import('../src/messengers/bitrix-connector')
+  const first = messengerSession('whatsapp', '79990000000', 'first', 'Привет')
+  const reply = messengerSession('whatsapp', '79990000000', 'reply', 'Ответ', { name: 'Клиент', peer: '987654321@lid' })
+  assert.equal(first?.chat.id, 'whatsapp:79990000000')
+  assert.equal(reply?.chat.id, first?.chat.id)
+  assert.equal(reply?.user.id, first?.user.id)
+  assert.equal(reply?.user.name, 'Клиент')
+  assert.equal(messengerSession('whatsapp', '', 'unknown', 'Ответ', { peer: '987654321@lid' })?.chat.id, 'whatsapp:peer:987654321@lid')
+})
+
+test('operator text removes the Bitrix header and preserves line breaks', async () => {
+  const { operatorMessageText } = await import('../src/messengers/phone')
+  assert.equal(operatorMessageText('[b]Оператор:[/b] [br]Привет[br][i]Как дела?[/i]'), 'Привет\nКак дела?')
+  assert.equal(operatorMessageText('Смета [1]'), 'Смета [1]')
+})

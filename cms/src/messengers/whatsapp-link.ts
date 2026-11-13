@@ -169,8 +169,11 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       for (const item of upsert.messages) {
         if (item.key.fromMe) continue
         const primary = item.key.remoteJid || ''
-        const jid = primary.endsWith('@lid') ? item.key.remoteJidAlt || '' : primary
         const lid = /^\d+@lid$/.test(primary) ? primary : ''
+        let jid = primary.endsWith('@lid') ? item.key.remoteJidAlt || '' : primary
+        if (lid && !jid.endsWith('@s.whatsapp.net')) {
+          jid = await socket.signalRepository.lidMapping.getPNForLID(lid).catch(() => null) || ''
+        }
         if (!jid.endsWith('@s.whatsapp.net') && !lid) continue
         const text = item.message?.conversation || item.message?.extendedTextMessage?.text || ''
         const phone = jid.endsWith('@s.whatsapp.net') ? nationalPhone(jid.split('@')[0].split(':')[0]) : ''

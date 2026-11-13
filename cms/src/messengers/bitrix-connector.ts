@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { messengerTitles, type MessengerChannel } from './phone'
+import { messengerTitles, nationalPhone, type MessengerChannel } from './phone'
 
 // Видимое имя канала в Битрикс24. Оба слова с большой буквы.
 export const connectorName = 'Avangard Messengers'
@@ -165,9 +165,8 @@ const dialogBrand = { max: 'AM.MAX', telegram: 'AM.Telegram', whatsapp: 'AM.What
 // Подпись диалога: @юзернейм, иначе имя, иначе телефон, затем AM.WhatsApp / AM.Telegram / AM.MAX.
 export function messengerSession(channel: string, phone: string, messageId: string, text: string, person: { name?: string, username?: string, peer?: string } = {}) {
   const brand = dialogBrand[channel as keyof typeof dialogBrand]
-  const digits = phone.replace(/\D/g, '')
-  const national = digits.length === 11 && digits.startsWith('8') ? `7${digits.slice(1)}` : digits
-  const readable = national.length >= 10 ? `+${national}` : ''
+  const national = nationalPhone(phone)
+  const readable = national ? `+${national}` : ''
   const username = (person.username || '').trim().replace(/^@/, '')
   const safeUsername = /^[A-Za-z0-9_]{3,32}$/.test(username) ? username : ''
   const personName = (person.name || '').replace(/\s+/g, ' ').trim().slice(0, 80)
@@ -175,9 +174,12 @@ export function messengerSession(channel: string, phone: string, messageId: stri
   const who = safeUsername ? `@${safeUsername}` : personName || readable || (peer ? 'Клиент' : '')
   if (!brand || !who || !messageId || !text) return null
   if (!readable && !safeUsername && !peer) return null
-  const id = peer ? `${channel}:peer:${peer}` : readable ? `${channel}:${national}` : `${channel}:@${safeUsername}`
-  const user: { id: string, name: string, phone?: string } = { id, name: who }
+  // WhatsApp can report the same recipient as a phone JID and a LID.
+  // Preserve the phone-based chat created by "Написать первым" when the phone is known.
+  const id = readable ? `${channel}:${national}` : peer ? `${channel}:peer:${peer}` : `${channel}:@${safeUsername}`
+  const user: { id: string, name: string, phone?: string, url?: string } = { id, name: personName || who }
   if (readable) user.phone = readable
+  if (channel === 'telegram' && safeUsername) user.url = `https://t.me/${safeUsername}`
   return {
     user,
     message: { id: messageId, date: Math.floor(Date.now() / 1000), text },

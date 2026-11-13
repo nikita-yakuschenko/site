@@ -34,3 +34,11 @@ export function readablePhone(phone: string) {
   const national = nationalPhone(phone)
   return national ? `+${national}` : ''
 }
+
+export function operatorMessageText(text: string) {
+  return text
+    .replace(/^\s*\[b\][^\r\n\[\]]{1,120}:\[\/b\]\s*\[br\s*\/?\]/i, '')
+    .replace(/\[br\s*\/?\]/gi, '\n')
+    .replace(/\[\/?(?:b|i|u|s)\]/gi, '')
+    .trim()
+}

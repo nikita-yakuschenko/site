@@ -1,4 +1,5 @@
 import type { Payload } from 'payload'
+import { enqueue } from '../automation/store'
 import { bitrixCall, connectorId, messengerSession, portalDomain } from './bitrix-connector'
 import { currentMessengerToken } from './authorize-lead'
 import type { MessengerChannel } from './phone'
@@ -18,4 +19,11 @@ export async function openVisitorChat(payload: Payload, input: { channel: Messen
   }
   const token = await currentMessengerToken(payload)
   await bitrixCall(portalDomain, token, 'imconnector.send.messages', { CONNECTOR: connectorId, LINE: line, MESSAGES: [message] })
+  if (message.user.phone && (input.person?.name || input.person?.username)) {
+    await enqueue(payload, 'messenger-contact-profile', {
+      channel: input.channel, phone: message.user.phone, name: input.person.name || '', username: input.person.username || '',
+    }, `messenger-profile:${line}:${input.messageId}`).catch(() => {
+      payload.logger.error('Не удалось поставить обновление контакта мессенджера в очередь')
+    })
+  }
 }

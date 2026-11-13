@@ -36,7 +36,7 @@ export async function claimJob(payload: Payload, messengersOnly = false) {
   const lease = randomUUID(), adapter = payload.db as unknown as Adapter
   const result = await adapter.drizzle.execute(sql`
     UPDATE automation_jobs SET status='running', lease=${lease}, locked_at=now(), attempts=coalesce(attempts,0)+1, updated_at=now()
-    WHERE id=(SELECT id FROM automation_jobs WHERE (NOT ${messengersOnly} OR kind IN ('messenger-reply','messenger-inbound','passport-comment')) AND ((status='queued' AND run_at<=now()) OR (status='running' AND locked_at<now()-interval '10 minutes')) ORDER BY run_at,id FOR UPDATE SKIP LOCKED LIMIT 1)
+    WHERE id=(SELECT id FROM automation_jobs WHERE (NOT ${messengersOnly} OR kind IN ('messenger-reply','messenger-inbound','messenger-contact-profile','passport-comment')) AND ((status='queued' AND run_at<=now()) OR (status='running' AND locked_at<now()-interval '10 minutes')) ORDER BY run_at,id FOR UPDATE SKIP LOCKED LIMIT 1)
     RETURNING id,lease
   `)
   if (!result.rows[0]) return null

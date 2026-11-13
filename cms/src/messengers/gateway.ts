@@ -4,7 +4,7 @@ import { enqueue } from '../automation/store'
 import { readdir } from 'node:fs/promises'
 import { bitrixCall, portalDomain } from './bitrix-connector'
 import { currentMessengerToken } from './authorize-lead'
-import { messengerChannels, messengerTitles, nationalPhone, readChat, type AccountView, type MessengerChannel } from './phone'
+import { messengerChannels, messengerTitles, nationalPhone, operatorMessageText, readChat, type AccountView, type MessengerChannel } from './phone'
 import { clearSession, rememberSession, restoreSession } from './session-store'
 import { openVisitorChat } from './visitor-chat'
 import { channelLine } from './lines'
@@ -92,12 +92,13 @@ export async function disconnectAccount(payload: Payload, channel: MessengerChan
 
 export async function relayOperatorText(channel: MessengerChannel, chatId: string, text: string) {
   const parsed = readChat(chatId)
+  const message = operatorMessageText(text)
   if (parsed.channel !== channel) throw new Error('Канал диалога не совпадает с привязкой линии')
   const phone = parsed.phone || (/^(?:@|peer:)/.test(parsed.id) ? parsed.id : '')
-  if (!phone || !text.trim()) throw new Error('Нет адреса получателя или текст сообщения пуст')
+  if (!phone || !message) throw new Error('Нет адреса получателя или текст сообщения пуст')
   const current = runtimes.get(channel)
   if (current?.view.status !== 'on' || !current.handle) throw new Error('Мессенджер отключён')
-  await current.handle.send(phone, text.trim())
+  await current.handle.send(phone, message)
 }
 
 export async function startOutgoing(payload: Payload, channel: MessengerChannel, phone: string, text: string) {
