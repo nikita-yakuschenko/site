@@ -206,7 +206,7 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
       const national = nationalPhone(phone)
       if (!current || !national) throw new Error('WhatsApp не подключён')
       const rows = await current.onWhatsApp(`${national}@s.whatsapp.net`)
-      return rows.some(row => row.exists) ? 'found' : 'missing'
+      return (rows || []).some(row => row.exists) ? 'found' : 'missing'
     },
     stop: async () => {
       stopped = true
