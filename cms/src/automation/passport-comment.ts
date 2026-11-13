@@ -7,7 +7,7 @@ export function passportCommentText(input: { projectName: string, phone: string,
   const where = input.channel ? channels[input.channel] || input.channel : ''
   return [
     `Паспорт проекта «${input.projectName}».`,
-    where ? `Куда отправить клиенту: ${where}.` : '',
+    where ? `Куда направить: ${where}.` : '',
     `Телефон клиента: ${input.phone}.`,
     'Файл во вложении. Ознакомьтесь и отправьте клиенту сами.',
   ].filter(Boolean).join('\n')

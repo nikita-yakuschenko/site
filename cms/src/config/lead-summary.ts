@@ -13,7 +13,7 @@ export function requestDetails(lead: LeadInput) {
   add('Обращение', lead.formId === 'mortgage-calculator' || lead.formId === 'mortgage-consultation' ? 'Консультация по ипотеке' : value(meta.formHeading) || leadTitle(lead).replace(/^Новая заявка с сайта: /, ''))
   add('Сообщение клиента', lead.message)
   add('Проект', value(meta.projectName) || value(meta.project))
-  if (lead.formId === 'project-passport') add('Куда менеджеру написать', ({ max: 'MAX', telegram: 'Telegram', whatsapp: 'WhatsApp' } as Record<string, string>)[value(meta.channel)])
+  if (lead.formId === 'project-passport') add('Куда направить', ({ max: 'MAX', telegram: 'Telegram', whatsapp: 'WhatsApp' } as Record<string, string>)[value(meta.channel)])
   add('Комплектация', meta.tier)
   add('Регион строительства', value(meta.construction_region) || regions[value(meta.region)])
   add('Местоположение дома', meta.location)

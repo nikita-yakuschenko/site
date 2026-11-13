@@ -193,7 +193,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
           <div className="passport-concept__channel" data-shown={open && status !== 'done'} inert={!open || status === 'done'}>
             <div className="passport-concept__channel-clip">
               <fieldset className="passport-concept__channel-card">
-                <p id={`${formId}-channel`} className="passport-concept__channel-title">Куда менеджеру написать?</p>
+                <p id={`${formId}-channel`} className="passport-concept__channel-title">Куда направить?</p>
                 <RadioGroup value={channel} onValueChange={setChannel} aria-labelledby={`${formId}-channel`} disabled={status === 'sending' || status === 'done'}>
                   {PASSPORT_CHANNELS.map(item => (
                     <label key={item.id} className="passport-concept__channel-option">
