@@ -326,7 +326,7 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
         </div>
         <div className="plan-change-form" data-on={step === 2} inert={measure || step !== 2}>
           <p className="plan-change__title">Давайте познакомимся!</p>
-          <LeadForm active={!measure && step === 2} siteId={SITE.id} formId={measure ? "plan-change-measure" : "plan-change"} variant="card" compact nameLabel="Ваше имя" heading="Хотите изменить планировку?" submitLabel="Жду звонка" successText="Заявка принята. Перезвоним и разберём планировку." meta={{
+          <LeadForm active={!measure && step === 2} siteId={SITE.id} formId={measure ? "plan-change-measure" : "plan-change"} variant="card" compact nameLabel="Ваше имя" heading="Хотите изменить или подобрать другую планировку?" submitLabel="Жду звонка" successText="Заявка принята. Перезвоним и разберём планировку." meta={{
             planLabel: planLabel || undefined,
             ...(areaMoved ? { areaFrom: area[0], areaTo: area[1] } : {}),
             ...(floors.length ? { floors } : {}),
@@ -353,9 +353,9 @@ export function PlanChangePrompt({ planLabel }: { planLabel?: string }) {
 function Teaser({ onOpen }: { onOpen: () => void }) {
   return (
     <>
-      <p className="plan-change__title">Хотите изменить планировку?</p>
+      <p className="plan-change__title">Хотите изменить или подобрать другую планировку?</p>
       <p className="plan-change__text">Расскажите нам о своих пожеланиях, мы обязательно подберём решение</p>
-      <button type="button" className="btn btn-yellow plan-change__open" onClick={onOpen}>Обсудить планировку<IconArrowUpRight size={18} stroke={2} aria-hidden="true" /></button>
+      <button type="button" className="btn btn-yellow plan-change__open" onClick={onOpen}>Обсудить изменения<IconArrowUpRight size={18} stroke={2} aria-hidden="true" /></button>
     </>
   );
 }
