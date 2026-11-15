@@ -1,12 +1,13 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
-import { IconBrandWhatsapp, IconCheck, IconExclamationMark, IconLoader2, IconPlayerPlay, IconSend } from '@tabler/icons-react';
+import { IconArrowRight, IconBrandWhatsapp, IconCheck, IconExclamationMark, IconGift, IconLoader2, IconPercentage, IconPlayerPlay, IconSend } from '@tabler/icons-react';
 import { PhoneInput } from './phone-input';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
 import { readRegionCode } from '../lib/regions';
 import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
+import { submitLead, type LeadAttempt } from '../lib/submit-lead';
 import { lockPassportDownload, markPageDownloaded, nextPageAttempt, notifyPassportPace, passportBanNotice, passportDevice, passportDwell, passportLeftFast, passportPaceDecision, rememberPassportDownload, rememberPassportHop, watchPassportLeave } from '../lib/passport-pace';
 import './project-passport-concept.css';
 
@@ -41,8 +42,10 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   const phoneRef = useRef<HTMLInputElement>(null);
   const busy = useRef(false);
   const requestId = useRef<string | null>(null);
+  const mortgageAttempt = useRef<LeadAttempt>({ current: null });
   const [inView, setInView] = useState(false);
   const [imageReady, setImageReady] = useState(false);
+  const isHero = placement === 'hero';
   useEffect(() => {
     const frame = requestAnimationFrame(() => setStorageChecked(true));
     return () => cancelAnimationFrame(frame);
@@ -135,6 +138,35 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     });
     return () => { stopped = true; observer?.disconnect(); };
   }, [imageReady, storageChecked, run]);
+  async function sendMortgage(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (!isValidRuMobile(phone) || busy.current || status === 'done') return;
+    busy.current = true;
+    setStatus('sending');
+    const feedbackLap = new Promise<void>(resolve => requestAnimationFrame(() => setTimeout(resolve, 950)));
+    try {
+      await submitLead({
+        phone: phoneE164(phone),
+        siteId: 'avgst',
+        formId: 'mortgage-consultation',
+        consent: true,
+        sourcePath: `/catalog/${projectSlug}`,
+        message: 'Заявка на семейную ипотеку 3,9%',
+        meta: { program: 'family', project, projectName: project, action: 'hero-mortgage-promo', rate: '3.9', termYears: 30 },
+      }, mortgageAttempt.current);
+      await feedbackLap;
+      completedRef.current = true;
+      setSuccessMessage('Заявка принята. Перезвоним по акции');
+      setOpen(false);
+      setStatus('done');
+      setDismissed(!visibleRef.current);
+    } catch {
+      await feedbackLap;
+      setStatus('error');
+    } finally {
+      busy.current = false;
+    }
+  }
   async function send(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isValidRuMobile(phone) || !PASSPORT_CHANNELS.some(item => item.id === channel) || busy.current || status === 'done') return;
@@ -181,46 +213,74 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   }
   function replay() { setOpen(false); setReady(false); setRun(value => value + 1); }
   return <>
-    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
-      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label="Получить паспорт проекта" onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
+    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${isHero ? ' passport-concept--hero' : ''}${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
+      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label={isHero ? 'Ипотека под 3,9% на 30 лет' : 'Получить паспорт проекта'} onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
         <span className="passport-concept__surface" aria-hidden="true" />
-        <span className="passport-concept__label">Получить паспорт проекта</span>
+        <span className="passport-concept__label">{isHero ? <span>Ипотека под <span className="passport-concept__rate">3,9%</span> на 30 лет</span> : 'Получить паспорт проекта'}</span>
       </button>
-      <form id={formId} inert={!open || status === 'done'} aria-hidden={!open || status === 'done'} className="passport-concept__form" data-status={status} onSubmit={send} aria-busy={status === 'sending'}>
-        {status === 'sending' && <svg className="passport-concept__perimeter" aria-hidden="true"><rect x="1.5" y="1.5" rx="20" pathLength="100" /></svg>}
-        <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
-        <div className="passport-concept__below">
-          <div className="passport-concept__channel" data-shown={open && status !== 'done'} inert={!open || status === 'done'}>
-            <div className="passport-concept__channel-clip">
-              <fieldset className="passport-concept__channel-card">
-                <p id={`${formId}-channel`} className="passport-concept__channel-title">Куда направить?</p>
-                <RadioGroup value={channel} onValueChange={setChannel} aria-labelledby={`${formId}-channel`} disabled={status === 'sending' || status === 'done'}>
-                  {PASSPORT_CHANNELS.map(item => (
-                    <label key={item.id} className="passport-concept__channel-option">
-                      <RadioGroupItem value={item.id} />
-                      {item.logo ? /* eslint-disable-next-line @next/next/no-img-element */ <img className="passport-concept__channel-logo" src={item.logo} width={18} height={18} alt="" /> : <IconBrandWhatsapp className="passport-concept__channel-logo passport-concept__channel-logo--whatsapp" size={18} stroke={1.7} aria-hidden="true" />}
-                      <span>{item.label}</span>
-                    </label>
-                  ))}
-                </RadioGroup>
-              </fieldset>
-            </div>
-          </div>
-          <p className="passport-concept__note" aria-hidden={status === 'done'} inert={status === 'done'}>Отправляя запрос, вы соглашаетесь на <a href="/privacy" target="_blank" rel="noreferrer">обработку данных</a></p>
+      {isHero ? <>
+        <div className="passport-concept__action-flight" aria-hidden={open || status === 'done'}>
+          <span className="passport-concept__download" data-valid="true" data-status="idle"><IconPercentage size={18} stroke={1.8} aria-hidden="true" /></span>
         </div>
-        <span className="passport-concept__announcement" role="status">{status === 'error' ? 'Не удалось отправить. Попробуйте ещё раз.' : status === 'done' ? 'Заявка принята' : ''}</span>
-      </form>
-      <div className="passport-concept__action-flight">        <button form={formId} inert={!open || status === 'done'} className="passport-concept__download" type="submit" disabled={!isValidRuMobile(phone) || !channel || status === 'sending' || status === 'done'} data-valid={isValidRuMobile(phone) && Boolean(channel)} data-status={status} aria-label={status === 'sending' ? 'Отправляем заявку' : status === 'done' ? 'Заявка принята' : status === 'error' ? 'Повторить запрос' : 'Получить паспорт'} title={status === 'error' ? 'Не удалось отправить заявку. Нажмите, чтобы повторить.' : undefined}>
-          {status === 'sending' ? <IconLoader2 className="passport-concept__spinner" size={19} aria-hidden="true" /> : status === 'done' ? <IconCheck className="passport-concept__check" size={20} stroke={2.2} aria-hidden="true" /> : status === 'error' ? <IconExclamationMark size={20} aria-hidden="true" /> : <IconSend className="passport-concept__send" size={18} stroke={1.8} aria-hidden="true" />}
-        </button>
-      </div>
+        <div className="passport-concept__mortgage" data-shown={open && status !== 'done'} inert={!open || status === 'done'}>
+          <p className="passport-concept__mortgage-badge"><IconGift size={14} stroke={1.8} aria-hidden="true" />Новогодняя акция</p>
+          <h2 className="passport-concept__mortgage-title">Семейная ипотека</h2>
+          <div className="passport-concept__mortgage-rates" aria-label="Ставка снизилась с 6% на 15 лет до 3,9% на 30 лет">
+            <div className="passport-concept__mortgage-old"><span>6%</span><small>на 15 лет</small></div>
+            <span className="passport-concept__mortgage-arrow" aria-hidden="true">→</span>
+            <div className="passport-concept__mortgage-new"><span>3,9%</span><small>на 30 лет</small></div>
+          </div>
+          <ul className="passport-concept__mortgage-facts">
+            <li>Получите одобрение до 11 декабря</li>
+            <li>Осталось <span className="passport-concept__mortgage-slots">8 из 11</span> слотов</li>
+          </ul>
+          <form className="passport-concept__mortgage-form" data-status={status} onSubmit={sendMortgage} aria-busy={status === 'sending'}>
+            <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
+            <button className="passport-concept__mortgage-submit" type="submit" disabled={!isValidRuMobile(phone) || status === 'sending' || status === 'done'}>
+              {status === 'sending' ? 'Отправляем…' : status === 'error' ? 'Повторить' : <>Успеть по акции <IconArrowRight size={16} stroke={2} aria-hidden="true" /></>}
+            </button>
+            <p className="passport-concept__mortgage-note">Отправляя заявку, вы соглашаетесь на <a href="/privacy" target="_blank" rel="noreferrer">обработку данных</a></p>
+            <span className="passport-concept__announcement" role="status">{status === 'error' ? 'Не удалось отправить. Попробуйте ещё раз.' : ''}</span>
+          </form>
+        </div>
+      </> : <>
+        <form id={formId} inert={!open || status === 'done'} aria-hidden={!open || status === 'done'} className="passport-concept__form" data-status={status} onSubmit={send} aria-busy={status === 'sending'}>
+          {status === 'sending' && <svg className="passport-concept__perimeter" aria-hidden="true"><rect x="1.5" y="1.5" rx="20" pathLength="100" /></svg>}
+          <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
+          <div className="passport-concept__below">
+            <div className="passport-concept__channel" data-shown={open && status !== 'done'} inert={!open || status === 'done'}>
+              <div className="passport-concept__channel-clip">
+                <fieldset className="passport-concept__channel-card">
+                  <p id={`${formId}-channel`} className="passport-concept__channel-title">Куда направить?</p>
+                  <RadioGroup value={channel} onValueChange={setChannel} aria-labelledby={`${formId}-channel`} disabled={status === 'sending' || status === 'done'}>
+                    {PASSPORT_CHANNELS.map(item => (
+                      <label key={item.id} className="passport-concept__channel-option">
+                        <RadioGroupItem value={item.id} />
+                        {item.logo ? /* eslint-disable-next-line @next/next/no-img-element */ <img className="passport-concept__channel-logo" src={item.logo} width={18} height={18} alt="" /> : <IconBrandWhatsapp className="passport-concept__channel-logo passport-concept__channel-logo--whatsapp" size={18} stroke={1.7} aria-hidden="true" />}
+                        <span>{item.label}</span>
+                      </label>
+                    ))}
+                  </RadioGroup>
+                </fieldset>
+              </div>
+            </div>
+            <p className="passport-concept__note" aria-hidden={status === 'done'} inert={status === 'done'}>Отправляя запрос, вы соглашаетесь на <a href="/privacy" target="_blank" rel="noreferrer">обработку данных</a></p>
+          </div>
+          <span className="passport-concept__announcement" role="status">{status === 'error' ? 'Не удалось отправить. Попробуйте ещё раз.' : status === 'done' ? 'Заявка принята' : ''}</span>
+        </form>
+        <div className="passport-concept__action-flight">
+          <button form={formId} inert={!open || status === 'done'} className="passport-concept__download" type="submit" disabled={!isValidRuMobile(phone) || !channel || status === 'sending' || status === 'done'} data-valid={isValidRuMobile(phone) && Boolean(channel)} data-status={status} aria-label={status === 'sending' ? 'Отправляем заявку' : status === 'done' ? 'Заявка принята' : status === 'error' ? 'Повторить запрос' : 'Получить паспорт'} title={status === 'error' ? 'Не удалось отправить заявку. Нажмите, чтобы повторить.' : undefined}>
+            {status === 'sending' ? <IconLoader2 className="passport-concept__spinner" size={19} aria-hidden="true" /> : status === 'done' ? <IconCheck className="passport-concept__check" size={20} stroke={2.2} aria-hidden="true" /> : status === 'error' ? <IconExclamationMark size={20} aria-hidden="true" /> : <IconSend className="passport-concept__send" size={18} stroke={1.8} aria-hidden="true" />}
+          </button>
+        </div>
+      </>}
       {successMessage && <div className="passport-concept__success" role="status" onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade') setReady(true); }}>
         <span className="passport-concept__success-text">{successMessage}</span>
         <span className="passport-concept__success-check"><IconCheck size={20} stroke={2.2} aria-hidden="true" /></span>
       </div>}
     </div>}
-    {process.env.NODE_ENV === 'development' && placement === 'hero' && <aside className="passport-concept-tools" aria-label="Управление прототипом анимации">
-      <span>PDF · прототип</span>
+    {process.env.NODE_ENV === 'development' && isHero && <aside className="passport-concept-tools" aria-label="Управление прототипом анимации">
+      <span>Ипотека · прототип</span>
       <button type="button" onClick={replay}><IconPlayerPlay size={14} aria-hidden="true" />Повторить</button>
       <label><input type="checkbox" checked={slow} onChange={event => { setSlow(event.target.checked); replay(); }} />Замедлить ×3</label>
     </aside>}
