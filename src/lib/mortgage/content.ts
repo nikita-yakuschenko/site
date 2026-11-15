@@ -111,6 +111,8 @@ export type MortgageContent = {
   headingLine: string;
   headingBefore: string;
   headingRate: string;
+  /** Хвост после ставки в заголовке, например « на 30 лет». */
+  headingRateSuffix?: string;
   lead: string;
   midCtaHeading: string;
   midCtaLead: string;
@@ -164,7 +166,10 @@ export function hasFaq(content: MortgageContent): content is WithFaq {
   return Boolean(content.faq);
 }
 
-const MORTGAGE_CONTENT: Record<MortgageProgramId, MortgageContent> = {
+const MORTGAGE_CONTENT: Record<
+  Exclude<MortgageProgramId, "family39">,
+  MortgageContent
+> = {
   family: copy.familyMortgage,
   it: copy.itMortgage,
   rural: copy.ruralMortgage,
@@ -172,5 +177,7 @@ const MORTGAGE_CONTENT: Record<MortgageProgramId, MortgageContent> = {
 };
 
 export function mortgageContent(id: MortgageProgramId): MortgageContent {
+  /* Семейная 3,9% — вариант калькулятора на странице семейной, не отдельный URL. */
+  if (id === "family39") return MORTGAGE_CONTENT.family;
   return MORTGAGE_CONTENT[id];
 }

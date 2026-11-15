@@ -48,7 +48,7 @@ export function MortgagePageContent({
       <MortgageHero content={content} />
       <MortgageCalculator
         projects={projects}
-        initialProgramId={programId}
+        initialProgramId={programId === "family" ? "family39" : programId}
         showEyebrow={false}
       />
       {hasWho(content) ? <MortgageWhoFits data-cms-content-connected content={content} /> : null}
@@ -74,9 +74,21 @@ function MortgageHero({ content }: { content: MortgageContent }) {
             <br />
             {nbspText(content.headingBefore)}
             <em>{content.headingRate}</em>
+            {content.headingRateSuffix
+              ? nbspText(content.headingRateSuffix)
+              : null}
           </>
         }
-        description={nbspText(content.lead)}
+        description={
+          content.lead.includes("\n")
+            ? content.lead.split("\n").map((line, index, lines) => (
+                <Fragment key={index}>
+                  {nbspText(line)}
+                  {index < lines.length - 1 ? <br /> : null}
+                </Fragment>
+              ))
+            : nbspText(content.lead)
+        }
         image={content.heroImage}
         variant={content.heroCutout ? "cutout" : "family"}
         actions={

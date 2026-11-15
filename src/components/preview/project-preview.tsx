@@ -310,7 +310,7 @@ export function ProjectPreview() {
               <p className="pp__total-sum">{rub(total)}</p>
               <p className="pp__total-pay">
                 {rub(monthly)} в месяц
-                <span>семейная ипотека, взнос 20%, 30 лет</span>
+                <span>семейная ипотека 3,9%, взнос 20%, 30 лет</span>
               </p>
               <button type="button" className="btn btn-yellow">
                 Получить расчёт

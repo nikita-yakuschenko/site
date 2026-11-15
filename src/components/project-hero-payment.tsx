@@ -1,7 +1,7 @@
 'use client'
 import { useRegionCode } from './region-bootstrap'
 import { tiersForRegion, type PricedTier } from '../lib/catalog/tiers'
-import { getMortgageProgram, monthlyPaymentForProject } from '../lib/mortgage'
+import { monthlyPaymentForProject } from '../lib/mortgage'
 import { formatRub } from '../lib/locale'
 import { copy } from '../lib/copy'
 import { LeadDialogButton } from './lead-dialog'
@@ -9,7 +9,7 @@ import { LeadDialogButton } from './lead-dialog'
 export function ProjectHeroPayment({ tiers, projectName }: { tiers: PricedTier[]; projectName?: string }) {
   const region = useRegionCode()
   const prices = tiersForRegion(tiers, region).filter(tier => tier.mortgage && tier.price > 0).map(tier => tier.price)
-  const payment = prices.length ? monthlyPaymentForProject({ propertyPrice: Math.min(...prices), region, combinedMarketRateOverride: getMortgageProgram('market').rate }) : null
+  const payment = prices.length ? monthlyPaymentForProject({ propertyPrice: Math.min(...prices), region, programId: 'family39' }) : null
   const amount = payment ? `${formatRub(payment)}${copy.perMonth}` : 'Стоимость уточняется'
   return <div className="project-hero__aside">
     <div className="project-hero__pay-copy">

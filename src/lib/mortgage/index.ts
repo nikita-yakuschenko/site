@@ -8,6 +8,8 @@ export {
 export {
   MORTGAGE_PROGRAMS,
   getMortgageProgram,
+  isClassicFamily,
+  isFamilyProgram,
   maxLoanAmount,
   subsidizedLimit,
   type MortgageProgram,

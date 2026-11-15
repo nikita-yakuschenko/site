@@ -53,7 +53,7 @@ import type { CatalogProject } from "../../lib/catalog/types";
 import { displayedTierPrice, hasSpecialTierPrice, type PricedTier } from "../../lib/catalog/tiers";
 import { formatRub, RUB_UNIT } from "../../lib/locale";
 import { copy, nbspText } from "../../lib/copy";
-import { getMortgageProgram, monthlyPaymentForProject } from "../../lib/mortgage";
+import { monthlyPaymentForProject } from "../../lib/mortgage";
 import "./comparison.css";
 
 const SHEET_GAP = 16;
@@ -806,7 +806,7 @@ function ComparisonBody({
                 ? monthlyPaymentForProject({
                     propertyPrice: tier.price,
                     region,
-                    combinedMarketRateOverride: getMortgageProgram("market").rate,
+                    programId: "family39",
                   })
                 : null;
               return (
@@ -842,7 +842,7 @@ function ComparisonBody({
                       </b>
                       {monthly ? (
                         <p className="comparison-mobile-sheet__mortgage">
-                          <span className="project-config__special-badge">Цена в ипотеку</span>
+                          <span className="project-config__special-badge">Цена в ипотеку до 11 декабря</span>
                           {text(`от ${formatRub(monthly).replace(RUB_UNIT, "руб./мес.")}`)}
                           <span>{text(copy.configPayNote)}</span>
                         </p>

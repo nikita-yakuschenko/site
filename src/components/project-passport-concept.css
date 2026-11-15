@@ -277,6 +277,67 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
   .photo-lightbox:has(> .viewer-passport), .lightbox:has(> .viewer-passport) { padding-top: max(150px, calc(env(safe-area-inset-top) + 134px)); }
 }
 
+/* Планировка: статичный бейдж, рост формы от левого края. */
+.passport-concept.passport-concept--plans,
+.passport-concept.passport-concept--plans[data-open="true"] {
+  position: relative;
+  top: auto;
+  left: auto;
+  width: min(270px, 100%);
+  max-width: 100%;
+  height: 44px;
+  transform: none;
+  overflow: visible;
+}
+.passport-concept--plans[data-open="true"] { width: min(360px, 100%); }
+.passport-concept--plans .passport-concept__button {
+  width: min(270px, 100%);
+  height: 40px;
+  margin: 0;
+  padding-left: 48px;
+  padding-right: 16px;
+  animation: none;
+  pointer-events: auto;
+}
+.passport-concept--plans .passport-concept__surface,
+.passport-concept--plans .passport-concept__label,
+.passport-concept--plans .passport-concept__action-flight,
+.passport-concept--plans .passport-concept__action-flight .passport-concept__download {
+  animation: none;
+}
+.passport-concept--plans[data-ready="false"] .passport-concept__button { pointer-events: auto; }
+.passport-concept--plans .passport-concept__form {
+  left: 0;
+  height: 40px;
+  transform: none;
+}
+.passport-concept--plans .passport-concept__form::before {
+  transform-origin: left center;
+}
+/* Иконка вписана в капсулу с равным зазором — радиусы концентрические. */
+.passport-concept--plans .passport-concept__action-flight .passport-concept__download {
+  width: 32px;
+  min-width: 32px;
+  height: 32px;
+}
+.passport-concept--plans[data-open="false"] .passport-concept__action-flight .passport-concept__download {
+  transform: translate(var(--passport-action-closed-x, 4px), var(--passport-action-closed-y, 4px));
+}
+.passport-concept--plans[data-open="true"] .passport-concept__action-flight .passport-concept__download {
+  transform: translate(var(--passport-action-open-x, 260px), var(--passport-action-open-y, 4px));
+}
+.passport-concept--plans .passport-concept__success {
+  left: 0;
+  right: auto;
+  transform: none;
+}
+.passport-concept--plans .passport-concept__note,
+.passport-concept--plans .passport-concept__status {
+  color: rgb(var(--avgst-ink-rgb) / .72);
+  text-shadow: none;
+  text-align: left;
+}
+
 /* Hero mortgage promo: open card keeps the closed plaque width (270). */
 .passport-concept.passport-concept--hero,
 .passport-concept.passport-concept--hero[data-open="true"] {
@@ -316,6 +377,23 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
   transform: translateY(0) scale(1);
   pointer-events: auto;
 }
+.passport-concept__mortgage-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 1;
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--tint);
+  color: var(--avgst-ink);
+  cursor: pointer;
+}
+.passport-concept__mortgage-close:hover { background: var(--line); }
 .passport-concept__mortgage-badge {
   display: inline-flex;
   align-items: center;

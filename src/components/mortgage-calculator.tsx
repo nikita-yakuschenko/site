@@ -36,6 +36,8 @@ import {
   catalogHrefWithMaxPrice,
   getEligibleProjects,
   getMortgageProgram,
+  isClassicFamily,
+  isFamilyProgram,
   MORTGAGE_PROGRAMS,
   type MortgageProgramId,
 } from "../lib/mortgage";
@@ -52,6 +54,8 @@ const PRICE_MIN = 2_500_000;
 const PRICE_MAX = 30_000_000;
 const PAY_MIN = 15_000;
 const PAY_MAX = 250_000;
+/* Стартовая стоимость на ипотечных страницах: ориентир по ходовым домам. */
+const DEFAULT_PROPERTY_PRICE = 4_700_000;
 
 const DOWN_PERCENT_PILLS = [20, 30, 50] as const;
 const TERM_YEAR_PILLS = [10, 15, 20, 25, 30] as const;
@@ -110,7 +114,7 @@ function fieldWidthInChars(max: number): number {
 export function MortgageCalculator({
   projects,
   initialPropertyPrice,
-  initialProgramId = "family",
+  initialProgramId = "family39",
   showMatches = true,
   projectTiers,
   showEyebrow = true,
@@ -152,14 +156,17 @@ export function MortgageCalculator({
   const [programId, setProgramId] =
     useState<MortgageProgramId>(initialProgramId);
   const program = getMortgageProgram(programId);
-  const showFamilyDetails = initialProgramId === "family";
+  /* Семейная страница: и 3,9%, и государственная 6% — один контекст UI. */
+  const showFamilyDetails = isFamilyProgram(initialProgramId);
+  const isFamily39 = programId === "family39";
+  const resultCtaLabel = isFamily39 ? t.approvalCta : t.resultCta;
 
   const [propertyPrice, setPropertyPrice] = useState(
-    () => (selectedTier && selectedTier.price > 0 ? selectedTier.price : initialPropertyPrice) ?? 8_000_000,
+    () => (selectedTier && selectedTier.price > 0 ? selectedTier.price : initialPropertyPrice) ?? DEFAULT_PROPERTY_PRICE,
   );
   const [comfortPayment, setComfortPayment] = useState(60_000);
   const [downPayment, setDownPayment] = useState(() => {
-    const price = (selectedTier && selectedTier.price > 0 ? selectedTier.price : initialPropertyPrice) ?? 8_000_000;
+    const price = (selectedTier && selectedTier.price > 0 ? selectedTier.price : initialPropertyPrice) ?? DEFAULT_PROPERTY_PRICE;
     return Math.round(price * program.minDownPaymentPercent);
   });
   const [termYears, setTermYears] = useState(program.maxTermYears);
@@ -219,7 +226,9 @@ export function MortgageCalculator({
      значение вне границ, и только потом исправленное. Проверка сходится с
      первого раза, потому что после поправки условие уже ложно. */
   const minDownPayment = Math.round(propertyPrice * program.minDownPaymentPercent);
-  if (downPayment < minDownPayment && (mode === "payment" || programId !== "family")) setDownPayment(minDownPayment);
+  if (downPayment < minDownPayment && (mode === "payment" || !isClassicFamily(programId))) {
+    setDownPayment(minDownPayment);
+  }
 
   const boundedTerm = Math.min(
     program.maxTermYears,
@@ -293,7 +302,7 @@ export function MortgageCalculator({
       loan_amount: Math.round(activeResult.loanAmount),
       is_combined: activeResult.isCombined,
       construction_region: constructionRegionName,
-      children_count: programId === "family" ? childrenCount : undefined,
+      children_count: isClassicFamily(programId) ? childrenCount : undefined,
       subsidy_months: activeResult.subsidyMonths,
       remaining_after_subsidy: activeResult.remainingAfterSubsidy,
       parts: activeResult.parts.map((part) => ({
@@ -359,6 +368,8 @@ export function MortgageCalculator({
 
   function selectProgram(id: MortgageProgramId) {
     setProgramId(id);
+    /* Субсидированная 3,9% считается на полный срок — сразу ставим 30 лет. */
+    if (id === "family39") setTermYears(30);
     trackEvent({ type: "mortgage_program_selected", program: id });
     scheduleAnalytics();
   }
@@ -478,8 +489,8 @@ export function MortgageCalculator({
             )}
 
             {showFamilyDetails ? <div className="mortgage-calc__family-options">
-              <span className={`mortgage-calc__select-slot mortgage-calc__select-slot--children${programId !== "family" ? " is-hidden" : ""}`}>
-                <Select value={String(childrenCount)} disabled={programId !== "family"} onValueChange={(value) => { setChildrenCount(Number(value)); scheduleAnalytics(); }}>
+              <span className={`mortgage-calc__select-slot mortgage-calc__select-slot--children${!isClassicFamily(programId) ? " is-hidden" : ""}`}>
+                <Select value={String(childrenCount)} disabled={!isClassicFamily(programId)} onValueChange={(value) => { setChildrenCount(Number(value)); scheduleAnalytics(); }}>
                   <SelectTrigger aria-label="Количество детей"><SelectValue>{childrenCount === 1 ? '1 ребёнок' : childrenCount === 2 ? '2 ребёнка' : '3+ детей'}</SelectValue></SelectTrigger>
                   <SelectContent className="mortgage-calc__select-content">
                     <SelectItem value="1">1 ребёнок</SelectItem>
@@ -507,8 +518,10 @@ export function MortgageCalculator({
                     }
                     onClick={() => selectProgram(p.id)}
                   >
-                    <span>{p.label}</span>
-                    <strong>от {formatRate(p.rate)}</strong>
+                    <span>{p.id === "family39" ? "Семейная" : p.label}</span>
+                    <strong>
+                      {p.id === "family39" ? formatRate(p.rate) : `от ${formatRate(p.rate)}`}
+                    </strong>
                   </button>
                 ))}
               </div>
@@ -602,20 +615,24 @@ export function MortgageCalculator({
           >
             {isProjectCalculator ? (
               <LeadReveal variant="panel" data-cms-content-connected formId="mortgage-calculator" siteId={SITE.id}
-                label={t.resultCta} heading={t.resultCta} submitLabel={t.resultCta}
+                label={resultCtaLabel} heading={resultCtaLabel} submitLabel={resultCtaLabel}
                 projectExternalId={project?.id}
                 meta={{ ...leadMeta, ...(project ? { project: project.name } : {}), ...(selectedTier ? { tier: selectedTier.name } : {}) }}
                 classes={{ root: 'mortgage-calc__reveal mortgage-calc__reveal--project', copy: 'mortgage-calc__reveal-copy', slot: 'mortgage-calc__reveal-slot', card: 'mortgage-calc__reveal-card' }}
                 formIntro={<div className="mortgage-calc__quote-summary">
                   {project?.name ? <p className="mortgage-calc__quote-name">{project.name}</p> : null}
-                  <p className="mortgage-calc__quote-rate">{program.label} ипотека под {displayRate}</p>
+                  <p className="mortgage-calc__quote-rate">
+                    {isFamily39
+                      ? `Семейная ипотека под ${displayRate}`
+                      : `${program.label} ипотека под ${displayRate}`}
+                  </p>
                   <p className="mortgage-calc__quote-pay">Платёж от {formatRub(Math.round(paymentResult.monthlyPayment))}/мес</p>
                 </div>}>
                 <div className="mortgage-calc__project-payment">
                   <p className="mortgage-calc__hero-num">
                     {formatRub(Math.round(paymentResult.monthlyPayment))}
                   </p>
-                  <p className="mortgage-calc__hero-label">{programId === "family" && termYears > 15 ? "Платёж в первые 15 лет" : t.paymentSub}</p>
+                  <p className="mortgage-calc__hero-label">{isClassicFamily(programId) && termYears > 15 ? "Платёж в первые 15 лет" : t.paymentSub}</p>
                 </div>
                 <dl className="mortgage-calc__receipt">
                   <div>
@@ -628,8 +645,16 @@ export function MortgageCalculator({
                     <span aria-hidden="true" />
                     <dd>{formatRub(Math.round(downPayment))}</dd>
                   </div>
-
                 </dl>
+                {isFamily39 ? (
+                  <div
+                    className="mortgage-calc__approval mortgage-calc__approval--project"
+                    aria-label={`${t.approvalLabel} ${t.approvalRate}`}
+                  >
+                    <strong className="mortgage-calc__approval-rate">{t.approvalRate}</strong>
+                    <span className="mortgage-calc__approval-label">{t.approvalLabel}</span>
+                  </div>
+                ) : null}
               </LeadReveal>
             ) : (
               <>
@@ -637,13 +662,17 @@ export function MortgageCalculator({
             <LeadReveal variant="panel" data-cms-content-connected
               formId="mortgage-calculator"
               siteId={SITE.id}
-              label={t.resultCta}
+              label={resultCtaLabel}
               heading={fm.formHeading}
-              submitLabel={t.resultCta}
+              submitLabel={resultCtaLabel}
               meta={leadMeta}
               buttonClassName="btn btn-yellow mortgage-calc__result-cta"
               formIntro={<div className="mortgage-calc__quote-summary">
-                <p className="mortgage-calc__quote-rate">{program.label} ипотека под {displayRate}</p>
+                <p className="mortgage-calc__quote-rate">
+                  {isFamily39
+                    ? `Семейная ипотека под ${displayRate}`
+                    : `${program.label} ипотека под ${displayRate}`}
+                </p>
                 <p className="mortgage-calc__quote-pay">{mode === 'payment' ? `Платёж от ${formatRub(Math.round(activeResult.monthlyPayment))}/мес` : `Стоимость дома до ${formatRub(Math.round(budgetPack.maxPropertyPrice))}`}</p>
               </div>}
               classes={{
@@ -660,7 +689,7 @@ export function MortgageCalculator({
             </p>
             <p className="mortgage-calc__hero-label">
               {mode === "payment"
-                ? programId === "family" && termYears > 15 ? "Платёж в первые 15 лет" : t.paymentSub
+                ? isClassicFamily(programId) && termYears > 15 ? "Платёж в первые 15 лет" : t.paymentSub
                 : `${t.about} · ${t.budgetSub}`}
             </p>
 
@@ -729,7 +758,12 @@ export function MortgageCalculator({
                 ни по месту. Высота бокса задана, поэтому появление разбивки
                 не дёргает карточку. */}
             <div className="mortgage-calc__parts-slot">
-              {activeResult.isCombined ? (
+              {isFamily39 ? (
+                <div className="mortgage-calc__approval" aria-label={`${t.approvalLabel} ${t.approvalRate}`}>
+                  <strong className="mortgage-calc__approval-rate">{t.approvalRate}</strong>
+                  <span className="mortgage-calc__approval-label">{t.approvalLabel}</span>
+                </div>
+              ) : activeResult.isCombined ? (
                 <div className="mortgage-calc__parts">
                   {activeResult.parts.map((part) => (
                     <p key={part.kind}>

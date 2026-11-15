@@ -5,6 +5,7 @@ const siteSuffix = /\s*\|\s*Авангард Строй\s*$/
 
 // Названия ипотечных программ. Дублируются из src/lib/mortgage/routes, чтобы не тащить в образ CMS цепочку consent.
 const mortgageTitles: Record<string, string> = {
+  family39: 'Семейная ипотека 3,9%',
   family: 'Семейная ипотека',
   it: 'IT-ипотека',
   rural: 'Сельская ипотека',

@@ -6831,6 +6831,15 @@ html.is-dialog-open {
   animation: technology-popover-in 0.34s var(--ease-out) both;
 }
 
+/* Окно технологии вызывается пользователем — выше статичной пилюли паспорта
+   (z-index 3 у sibling stage) и рейки связи (fixed 35). */
+.project-hero:has(.technology-popover) .project-hero__stage {
+  z-index: 36;
+}
+.project-hero:has(.technology-popover) .passport-concept {
+  z-index: 2;
+}
+
 .technology-popover[data-closing] {
   pointer-events: none;
   animation: technology-popover-out 0.22s var(--ease-out) both;

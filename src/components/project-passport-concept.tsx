@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
-import { IconArrowRight, IconBrandWhatsapp, IconCheck, IconExclamationMark, IconGift, IconLoader2, IconPercentage, IconPlayerPlay, IconSend } from '@tabler/icons-react';
+import { IconArrowRight, IconBrandWhatsapp, IconCheck, IconExclamationMark, IconGift, IconLoader2, IconPercentage, IconPlayerPlay, IconSend, IconX } from '@tabler/icons-react';
 import { PhoneInput } from './phone-input';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
+import { copy } from '../lib/copy';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
 import { readRegionCode } from '../lib/regions';
 import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
@@ -24,7 +25,7 @@ const SUCCESS_MESSAGES = [
 ];
 
 /** Shared passport interaction for the project hero and its media viewers. */
-export function ProjectPassportConcept({ project, projectSlug, placement = 'hero', active = true }: { project: string; projectSlug: string; placement?: 'hero' | 'viewer' | 'comparison'; active?: boolean }) {
+export function ProjectPassportConcept({ project, projectSlug, placement = 'hero', active = true }: { project: string; projectSlug: string; placement?: 'hero' | 'viewer' | 'comparison' | 'plans'; active?: boolean }) {
   const formId = useId();
   const [run, setRun] = useState(0);
   const [slow, setSlow] = useState(false);
@@ -46,6 +47,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   const [inView, setInView] = useState(false);
   const [imageReady, setImageReady] = useState(false);
   const isHero = placement === 'hero';
+  const isPlans = placement === 'plans';
   useEffect(() => {
     const frame = requestAnimationFrame(() => setStorageChecked(true));
     return () => cancelAnimationFrame(frame);
@@ -54,6 +56,11 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     watchPassportLeave();
     passportDwell(projectSlug);
   }, [projectSlug]);
+  // На планировке бейдж статичный: без вылета сразу готов к клику.
+  useEffect(() => {
+    if (!isPlans) return;
+    setReady(true);
+  }, [isPlans, run]);
   useEffect(() => {
     if (placement !== 'hero') { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
     const image = document.querySelector<HTMLImageElement>('.project-hero__media img');
@@ -130,14 +137,23 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
         container.style.setProperty('--passport-phone-width', `${width}px`);
         container.style.setProperty('--passport-form-width', `${total}px`);
         container.style.setProperty('--passport-form-scale', String(trigger.offsetWidth / total));
-        container.style.setProperty('--passport-action-closed-x', `${(container.clientWidth - trigger.offsetWidth) / 2 + 5}px`);
-        container.style.setProperty('--passport-action-open-x', `${(container.clientWidth + total) / 2 - 6 - icon}px`);
+        if (isPlans) {
+          // Зазор = (высота капсулы − иконка) / 2, чтобы скругления были концентрическими.
+          const nest = Math.max(0, Math.round((trigger.offsetHeight - icon) / 2));
+          container.style.setProperty('--passport-action-closed-x', `${nest}px`);
+          container.style.setProperty('--passport-action-closed-y', `${nest}px`);
+          container.style.setProperty('--passport-action-open-x', `${Math.max(0, total - nest - icon)}px`);
+          container.style.setProperty('--passport-action-open-y', `${nest}px`);
+        } else {
+          container.style.setProperty('--passport-action-closed-x', `${(container.clientWidth - trigger.offsetWidth) / 2 + 5}px`);
+          container.style.setProperty('--passport-action-open-x', `${(container.clientWidth + total) / 2 - 6 - icon}px`);
+        }
       };
       observer = new ResizeObserver(measure); observer.observe(container); observer.observe(trigger);
       measure();
     });
     return () => { stopped = true; observer?.disconnect(); };
-  }, [imageReady, storageChecked, run]);
+  }, [imageReady, storageChecked, run, isPlans]);
   async function sendMortgage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!isValidRuMobile(phone) || busy.current || status === 'done') return;
@@ -213,7 +229,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   }
   function replay() { setOpen(false); setReady(false); setRun(value => value + 1); }
   return <>
-    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${isHero ? ' passport-concept--hero' : ''}${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
+    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${isHero ? ' passport-concept--hero' : ''}${isPlans ? ' passport-concept--plans' : ''}${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
       <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label={isHero ? 'Ипотека под 3,9% на 30 лет' : 'Получить паспорт проекта'} onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
         <span className="passport-concept__surface" aria-hidden="true" />
         <span className="passport-concept__label">{isHero ? <span>Ипотека под <span className="passport-concept__rate">3,9%</span> на 30 лет</span> : 'Получить паспорт проекта'}</span>
@@ -223,6 +239,9 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
           <span className="passport-concept__download" data-valid="true" data-status="idle"><IconPercentage size={18} stroke={1.8} aria-hidden="true" /></span>
         </div>
         <div className="passport-concept__mortgage" data-shown={open && status !== 'done'} inert={!open || status === 'done'}>
+          <button type="button" className="passport-concept__mortgage-close" aria-label={copy.close} onClick={() => setOpen(false)}>
+            <IconX size={16} stroke={2.2} aria-hidden="true" />
+          </button>
           <p className="passport-concept__mortgage-badge"><IconGift size={14} stroke={1.8} aria-hidden="true" />Новогодняя акция</p>
           <h2 className="passport-concept__mortgage-title">Семейная ипотека</h2>
           <div className="passport-concept__mortgage-rates" aria-label="Ставка снизилась с 6% на 15 лет до 3,9% на 30 лет">
@@ -232,7 +251,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
           </div>
           <ul className="passport-concept__mortgage-facts">
             <li>Получите одобрение до 11 декабря</li>
-            <li>Осталось <span className="passport-concept__mortgage-slots">8 из 11</span> слотов</li>
+            <li>Осталось <span className="passport-concept__mortgage-slots">8 из 11</span> мест</li>
           </ul>
           <form className="passport-concept__mortgage-form" data-status={status} onSubmit={sendMortgage} aria-busy={status === 'sending'}>
             <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />

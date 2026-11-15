@@ -451,7 +451,41 @@
 .mortgage-calc__parts-slot {
   display: grid;
   align-content: center;
-  height: 56px;
+  min-height: 56px;
+}
+
+/* Как блок платежа: рамка, крупная цифра сверху, подпись снизу. */
+.mortgage-calc__approval {
+  display: grid;
+  justify-items: start;
+  align-content: center;
+  gap: 4px;
+  box-sizing: border-box;
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--avgst-ink);
+  background: transparent;
+}
+.mortgage-calc__approval-rate {
+  margin: 0;
+  font-size: clamp(24px, 2.4vw, 30px);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+  color: var(--avgst-green);
+}
+.mortgage-calc__approval-label {
+  margin: 0;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 1.3;
+  color: var(--ink-2);
+}
+
+.mortgage-calc__approval--project {
+  margin-top: 14px;
 }
 
 .mortgage-calc__parts {

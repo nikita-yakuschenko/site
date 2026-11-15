@@ -85,7 +85,11 @@ function buildParts(
     loanAmount > limit;
 
   if (!useSplit) {
-    const rate = program.id === "family" ? program.rate : rateOverride ?? program.rate;
+    /* У семейных ставка задана программой; override нужен только рынку. */
+    const rate =
+      program.id === "family" || program.id === "family39"
+        ? program.rate
+        : rateOverride ?? program.rate;
     return {
       isCombined: false,
       parts: [
@@ -169,7 +173,9 @@ export function calculateMortgage(
   }
 
   let loanAmount = Math.max(0, propertyPrice - downPayment);
-  if (program.id === "family") loanAmount = Math.round(loanAmount * 100) / 100;
+  if (program.id === "family" || program.id === "family39") {
+    loanAmount = Math.round(loanAmount * 100) / 100;
+  }
   const maxLoan = maxLoanAmount(program, input.region);
   let cappedByMaxLoan = false;
   if (loanAmount > maxLoan) {
@@ -188,6 +194,7 @@ export function calculateMortgage(
     input.childrenCount,
   );
   const monthlyPayment = parts.reduce((s, p) => s + p.monthlyPayment, 0);
+  /* У 3,9% ставка держится весь срок — льготного «окна» 15 лет нет. */
   const subsidyMonths = program.id === "family" ? Math.min(180, termMonths) : null;
   const remainingAfterSubsidy = subsidyMonths === null ? null : parts.reduce(
     (sum, part) => sum + remainingPrincipal(part.principal, part.annualRate, termMonths, subsidyMonths), 0,
@@ -270,7 +277,9 @@ export function calculateMaxPropertyPrice(input: {
   const fromMinDownShare =
     program.minDownPaymentPercent > 0 &&
     program.minDownPaymentPercent < 1
-      ? (program.id === "family" ? downPayment / program.minDownPaymentPercent : maxLoan / (1 - program.minDownPaymentPercent))
+      ? (program.id === "family" || program.id === "family39"
+          ? downPayment / program.minDownPaymentPercent
+          : maxLoan / (1 - program.minDownPaymentPercent))
       : fromLoanAndDown;
   // Если заданный ПВ больше минимального — цена = кредит + ПВ.
   // Если ПВ мал относительно кредита — цена ограничена долей ПВ.
@@ -293,7 +302,14 @@ export function calculateMaxPropertyPrice(input: {
     childrenCount: input.childrenCount,
   });
 
-  return { maxLoan: program.id === "family" ? result.loanAmount : maxLoan, maxPropertyPrice, result };
+  return {
+    maxLoan:
+      program.id === "family" || program.id === "family39"
+        ? result.loanAmount
+        : maxLoan,
+    maxPropertyPrice,
+    result,
+  };
 }
 
 function paymentForLoan(
@@ -330,7 +346,9 @@ export function monthlyPaymentForProject(input: {
   combinedMarketRateOverride?: number;
 }): number | null {
   if (!(input.propertyPrice > 0)) return null;
-  const programId = input.programId ?? "family";
+  /* По умолчанию субсидированная 3,9%: её показывают в комплектациях,
+     hero и CTA проекта. Государственную 6% передают явно. */
+  const programId = input.programId ?? "family39";
   const program = getMortgageProgram(programId);
   const downPct = input.downPaymentPercent ?? program.minDownPaymentPercent;
   const termYears = input.termYears ?? program.maxTermYears;

@@ -25,28 +25,27 @@ export function passportPricing(tiers: readonly PricedTier[], technology: Catalo
     }
     const specialPrice = tier.specialPrice ?? null
     const displayedPrice = specialPrice ?? tier.price
-    const program = getMortgageProgram('family')
+    /* Hero и CTA считают семейную 3,9% от той же цены, что раньше шла в 6%. */
+    const program = getMortgageProgram('family39')
     const mortgage = mortgageAllowed(key) && tier.mortgage !== false ? calculateMortgage({
       programId: program.id, region, propertyPrice: tier.price,
       downPayment: tier.price * program.minDownPaymentPercent, termYears: program.maxTermYears,
-      combinedMarketRateOverride: getMortgageProgram('market').rate,
     }) : null
     const payment = mortgage && !mortgage.errors.length && !mortgage.cappedByMaxLoan && mortgage.monthlyPayment > 0
-      ? monthlyPaymentForProject({ propertyPrice: tier.price, region, combinedMarketRateOverride: getMortgageProgram('market').rate }) : null
+      ? monthlyPaymentForProject({ propertyPrice: tier.price, programId: program.id, region }) : null
     return { mortgagePaymentLabel: payment === null ? null : `${formatRub(payment)}/мес.`, key, name: tier.name, priceLabel: formatRub(displayedPrice),
       ...(specialPrice !== null ? { regularPriceLabel: formatRub(tier.price) } : {}),
       special: specialPrice !== null, regularPrice: tier.price, specialPrice, displayedPrice }
   }) as PassportPricing['tiers']
   const standardMortgageBasePrice = normalized.find(tier => tier.key === 'standard')!.regularPrice
-  const program = getMortgageProgram('family')
+  const program = getMortgageProgram('family39')
   const result = calculateMortgage({ programId: program.id, region, propertyPrice: standardMortgageBasePrice,
-    downPayment: standardMortgageBasePrice * program.minDownPaymentPercent, termYears: program.maxTermYears,
-    combinedMarketRateOverride: getMortgageProgram('market').rate })
-  const monthlyMortgagePayment = result.errors.length || result.cappedByMaxLoan || !Number.isFinite(result.monthlyPayment) || result.monthlyPayment <= 0 ? null : monthlyPaymentForProject({ propertyPrice: standardMortgageBasePrice, region, combinedMarketRateOverride: getMortgageProgram('market').rate })
+    downPayment: standardMortgageBasePrice * program.minDownPaymentPercent, termYears: program.maxTermYears })
+  const monthlyMortgagePayment = result.errors.length || result.cappedByMaxLoan || !Number.isFinite(result.monthlyPayment) || result.monthlyPayment <= 0 ? null : monthlyPaymentForProject({ propertyPrice: standardMortgageBasePrice, programId: program.id, region })
   return { tiers: normalized, standardMortgageBasePrice, monthlyMortgagePayment,
     mortgagePaymentLabel: monthlyMortgagePayment === null ? null : `${formatRub(monthlyMortgagePayment)}/мес.`,
     mortgageNote: monthlyMortgagePayment === null ? 'Ипотечный платёж не может быть корректно рассчитан.' :
-      `${program.label} ипотека. Первоначальный взнос ${program.minDownPaymentPercent * 100}%, срок ${program.maxTermYears} лет. Льготная ставка ${program.rate * 100}% действует первые 15 лет; сверх льготного лимита — ${getMortgageProgram('market').rate * 100}%. Расчёт от обычной стоимости стандартной комплектации. Условия предоставления определяет банк.` }
+      `${program.label}. Первоначальный взнос ${program.minDownPaymentPercent * 100}%, срок ${program.maxTermYears} лет. Ставка ${(program.rate * 100).toFixed(1).replace('.', ',')}% на весь срок. Расчёт от обычной стоимости стандартной комплектации. Условия предоставления определяет банк.` }
 }
 
 export const resolvePassportPricing = passportPricing

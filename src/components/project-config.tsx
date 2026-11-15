@@ -5,7 +5,7 @@ import { IconArrowUpRight, IconCheck, IconGiftFilled, IconPlus, IconX } from "@t
 import { useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { copy, nbspText } from "../lib/copy";
 import { formatRub, RUB_UNIT } from "../lib/locale";
-import { getMortgageProgram, monthlyPaymentForProject } from "../lib/mortgage";
+import { monthlyPaymentForProject } from "../lib/mortgage";
 import { displayedTierPrice, hasSpecialTierPrice, tiersForProject, tiersForRegion, type PricedTier } from "../lib/catalog/tiers";
 import {
   DEFAULT_TIER,
@@ -57,7 +57,7 @@ function SpecialPriceBadge({ tier }: { tier: PricedTier }) {
 function MortgagePayment({ monthly }: { monthly: number }) {
   const amount = configText(`от ${formatRub(monthly).replace(RUB_UNIT, "руб./мес.")}`);
   return <p className="project-config__total-sum project-config__total-mortgage">
-    <span className="project-config__special-badge">Цена в ипотеку</span>
+    <span className="project-config__special-badge">Цена в ипотеку до 11 декабря</span>
     {amount}
     <span className="project-config__pay-note">{configText(copy.configPayNote)}</span>
   </p>;
@@ -120,15 +120,13 @@ export function ProjectConfig({ project, configurations, previewTier, onPreviewT
   const hasStartingTier = tiers.some(item => item.id === 'start');
   const tier = tiers.find((item) => item.id === tierId) ?? tiers.find(item => item.id === 'standard') ?? tiers[0]!;
 
-  /* Та же модель, что и в калькуляторе карточки: льготная часть ограничена
-     лимитом региона, а остаток комбо-кредита считается по ставке из
-     переключателя «Рыночная». Масштабировать платёж по цене здесь нельзя. */
+  /* Та же модель, что в калькуляторе и hero: семейная 3,9% на 30 лет. */
   const monthly =
     tier.mortgage && tier.price > 0
       ? monthlyPaymentForProject({
           propertyPrice: tier.price,
           region,
-          combinedMarketRateOverride: getMortgageProgram("market").rate,
+          programId: "family39",
         })
       : null;
 
@@ -257,7 +255,7 @@ function ConfigurationTierCard({ item, project, region, selected, onSelect, chil
   const previousHeight = useRef<number | null>(null);
   const animationRef = useRef<Animation | null>(null);
   const monthly = item.mortgage && item.price > 0 ? monthlyPaymentForProject({
-    propertyPrice: item.price, region, combinedMarketRateOverride: getMortgageProgram("market").rate,
+    propertyPrice: item.price, region, programId: "family39",
   }) : null;
   const [detailsOpen, setDetailsOpen] = useState(false);
   const described = packageCanBeDescribed(project.technology, item.id);

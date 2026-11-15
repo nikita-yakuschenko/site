@@ -152,7 +152,7 @@ try {
       if (calculatorIndex < 0 || configIndex >= 0 && calculatorIndex !== configIndex - 1) {
         if (calculatorIndex >= 0) layout.splice(calculatorIndex, 1)
         const target = layout.findIndex(row => rowID(row) === projectConfig?.id)
-        layout.splice(target >= 0 ? target : layout.length, 0, previous || { component: { relationTo: 'blocks', value: calculator.id }, parameters: { showMatches: false, initialProgramId: 'family', recordType: 'project', priceSource: 'configurations.standard.price', mortgageEligibilitySource: 'configurations.mortgage' } })
+        layout.splice(target >= 0 ? target : layout.length, 0, previous || { component: { relationTo: 'blocks', value: calculator.id }, parameters: { showMatches: false, initialProgramId: 'family39', recordType: 'project', priceSource: 'configurations.standard.price', mortgageEligibilitySource: 'configurations.mortgage' } })
         await payload.update({ collection: 'pages', id: page.id, data: { layout }, req, overrideAccess: false })
         changed++
       }

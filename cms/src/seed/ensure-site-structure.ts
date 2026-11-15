@@ -55,7 +55,7 @@ async function run(payload: Payload) {
     const rows = page.kind === 'redirect' ? [] : ['technicalHeader', 'mainHeader'].flatMap(key => componentRow(refs, key))
     const content = page.route === '/'
       ? siteIndex.homeBlocks.filter(block => block.blockType !== 'advantagesBar').flatMap(block => componentRow(refs, block.blockType, block))
-      : page.components.flatMap(key => componentRow(refs, key, key === 'MortgageCalculator' && page.route === '/catalog/[slug]' ? { showMatches: false, initialProgramId: 'family', recordType: 'project', priceSource: 'configurations.standard.price', mortgageEligibilitySource: 'configurations.mortgage' } : undefined))
+      : page.components.flatMap(key => componentRow(refs, key, key === 'MortgageCalculator' && page.route === '/catalog/[slug]' ? { showMatches: false, initialProgramId: 'family39', recordType: 'project', priceSource: 'configurations.standard.price', mortgageEligibilitySource: 'configurations.mortgage' } : undefined))
     const footer = page.kind === 'redirect' ? [] : componentRow(refs, 'footer')
     await payload.create({
       collection: 'pages',

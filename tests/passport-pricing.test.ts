@@ -17,8 +17,8 @@ test('ordinary prices are displayed without specials; mortgage uses standard, no
   assert.equal(result.standardMortgageBasePrice, 2_000_000)
   assert.deepEqual(result.tiers.map(tier => [tier.key, tier.regularPrice, tier.specialPrice, tier.displayedPrice, tier.special]),
     [['start', 1_000_000, null, 1_000_000, false], ['standard', 2_000_000, null, 2_000_000, false], ['project', 500_000, null, 500_000, false]])
-  assert.equal(result.monthlyMortgagePayment, calculateMortgage({ programId: 'family', region: 'nn', propertyPrice: 2_000_000,
-    downPayment: 400_000, termYears: 30, combinedMarketRateOverride: 0.16 }).monthlyPayment)
+  assert.equal(result.monthlyMortgagePayment, calculateMortgage({ programId: 'family39', region: 'nn', propertyPrice: 2_000_000,
+    downPayment: 400_000, termYears: 30 }).monthlyPayment)
   assert.ok(result.tiers.every(tier => tier.priceLabel.includes('руб.')))
 })
 
@@ -162,7 +162,7 @@ test('unpublished and incomplete plans fail before creating a passport', async (
 })
 
 
-test('combined mortgage reacts to the shared market rate and preserves the ordinary principal', () => {
+test('hero mortgage uses family 3.9% and ignores market rate swings', () => {
   const input = tiers()
   input[1]!.regionalPrices.nn = 9_000_000
   const market = getMortgageProgram('market')
@@ -171,7 +171,17 @@ test('combined mortgage reacts to the shared market rate and preserves the ordin
     const before = passportPricing(input, 'panel', 'nn')
     market.rate = .2
     const after = passportPricing(input, 'panel', 'nn')
-    assert.ok(before.monthlyMortgagePayment && after.monthlyMortgagePayment && after.monthlyMortgagePayment > before.monthlyMortgagePayment)
+    assert.equal(before.monthlyMortgagePayment, after.monthlyMortgagePayment)
     assert.equal(after.standardMortgageBasePrice, 9_000_000)
+    assert.equal(
+      after.monthlyMortgagePayment,
+      calculateMortgage({
+        programId: 'family39',
+        region: 'nn',
+        propertyPrice: 9_000_000,
+        downPayment: 1_800_000,
+        termYears: 30,
+      }).monthlyPayment,
+    )
   } finally { market.rate = previous }
 })

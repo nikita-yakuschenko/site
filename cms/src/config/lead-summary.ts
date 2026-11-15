@@ -1,7 +1,7 @@
 import type { LeadInput } from '../../../src/lib/leads'
 import { leadTitle } from './lead-title'
 
-const programs: Record<string, string> = { family: 'Семейная ипотека', it: 'IT-ипотека', rural: 'Сельская ипотека', market: 'Рыночная ипотека' }
+const programs: Record<string, string> = { family39: 'Семейная ипотека 3,9%', family: 'Семейная ипотека', it: 'IT-ипотека', rural: 'Сельская ипотека', market: 'Рыночная ипотека' }
 const regions: Record<string, string> = { nn: 'Нижегородская область', msk: 'Московская область' }
 const value = (input: unknown) => typeof input === 'string' ? input.trim() : typeof input === 'number' && Number.isFinite(input) ? String(input) : ''
 const money = (input: unknown) => typeof input === 'number' && Number.isFinite(input) ? `${Math.round(input).toLocaleString('ru-RU')} ₽` : ''

@@ -1,7 +1,7 @@
 import type { RegionCode } from "../regions";
 
 /** Идентификаторы программ — расширение без переписывания UI. */
-export type MortgageProgramId = "family" | "it" | "rural" | "market";
+export type MortgageProgramId = "family39" | "family" | "it" | "rural" | "market";
 
 export type MortgageProgram = {
   id: MortgageProgramId;
@@ -21,12 +21,36 @@ export type MortgageProgram = {
   allowCombined: boolean;
 };
 
+/** Государственная семейная 6% с лимитом и льготным периодом 15 лет. */
+export function isClassicFamily(id: MortgageProgramId): boolean {
+  return id === "family";
+}
+
+/** Семейные программы в калькуляторе на странице семейной ипотеки. */
+export function isFamilyProgram(id: MortgageProgramId): boolean {
+  return id === "family" || id === "family39";
+}
+
 /**
  * Числовая модель программ.
  * Маркетинговые тексты остаются в copy.familyMortgage;
  * ставки/лимиты для формул — здесь (единый источник для калькулятора и CTA проектов).
  */
 export const MORTGAGE_PROGRAMS: readonly MortgageProgram[] = [
+  {
+    /* Субсидированная ставка застройщика на весь срок: без лимита льготной
+       части и без перелома через 15 лет, как у государственной семейной. */
+    id: "family39",
+    label: "Семейная 3,9%",
+    rate: 0.039,
+    minDownPaymentPercent: 0.2,
+    minTermYears: 1,
+    maxTermYears: 30,
+    subsidizedLimitByRegion: null,
+    maxLoanByRegion: { nn: 15_000_000, msk: 30_000_000 },
+    marketRate: 0.16,
+    allowCombined: false,
+  },
   {
     id: "family",
     label: "Семейная",
