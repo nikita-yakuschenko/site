@@ -265,15 +265,15 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
           </ul>
           <form className="passport-concept__mortgage-form" data-status={status} onSubmit={sendMortgage} aria-busy={status === 'sending'}>
             <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
-            <label className="passport-concept__mortgage-consent">
-              <input name="consent" type="checkbox" checked={consent} disabled={status === 'sending' || status === 'done'} onChange={event => setConsent(event.target.checked)} />
-              <span>{copy.consentPrefix}<a href={copy.personalDataHref} target="_blank" rel="noreferrer" onClick={event => event.stopPropagation()}>{copy.consentLinkLabel}</a></span>
-            </label>
             {/* Виджет капчи не должен участвовать в сетке — иначе поле телефона «уезжает». */}
             <span className="passport-concept__mortgage-captcha" aria-hidden="true">{captcha.widget}</span>
             <button className="passport-concept__mortgage-submit" type="submit" disabled={!isValidRuMobile(phone) || !consent || status === 'sending' || status === 'done' || captcha.reloadRequired}>
               {status === 'sending' ? 'Отправляем…' : status === 'error' ? 'Повторить' : <>Успеть по акции <IconArrowRight size={16} stroke={2} aria-hidden="true" /></>}
             </button>
+            <label className="passport-concept__mortgage-consent">
+              <input name="consent" type="checkbox" checked={consent} disabled={status === 'sending' || status === 'done'} onChange={event => setConsent(event.target.checked)} />
+              <span>{copy.consentPrefix}<a href={copy.personalDataHref} target="_blank" rel="noreferrer" onClick={event => event.stopPropagation()}>{copy.consentLinkLabel}</a></span>
+            </label>
             <span className="passport-concept__announcement" role="status">{status === 'error' ? (captcha.reloadRequired ? 'Не удалось загрузить проверку. Обновите страницу.' : 'Не удалось отправить. Попробуйте ещё раз.') : ''}</span>
           </form>
         </div>
