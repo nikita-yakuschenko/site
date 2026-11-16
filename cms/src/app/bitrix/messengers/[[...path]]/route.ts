@@ -46,7 +46,19 @@ async function receive(request: Request, route: string) {
     const crmMessage = parseCrmMessageSend(body)
     if (crmMessage) return await crmMessageSend(payload, auth, crmMessage)
     return Response.json({ accepted: true, ignored: true })
-  } catch (error) { return safeRequestError(error, data => console.error(data)) }
+  } catch (error) {
+    return safeRequestError(error, data => {
+      const message = error instanceof Error
+        ? error.message.replace(/https?:\/\/\S+/gi, '[address]').replace(/\b[\w.+-]+@[\w.-]+\.\w+\b/g, '[email]').slice(0, 240)
+        : 'unknown'
+      console.error(JSON.stringify({
+        component: 'messengers-webhook',
+        ...data,
+        message,
+        route: route || 'root',
+      }))
+    })
+  }
 }
 
 async function install(payload: Awaited<ReturnType<typeof getPayload>>, auth: BitrixAuth) {
@@ -98,9 +110,14 @@ async function settingsPage(payload: Awaited<ReturnType<typeof getPayload>>, aut
     notice = 'Битрикс24 не обновил подписи каналов сделки. Повторите открытие настроек позже.'
   }
   if (line) {
-    await bitrixCall(auth.domain, token, 'imconnector.activate', { CONNECTOR: connectorId, LINE: line, ACTIVE: 1 })
+    // Опрос настроек линии из Битрикс не должен валить весь webhook обезличенным 400.
+    await bitrixCall(auth.domain, token, 'imconnector.activate', { CONNECTOR: connectorId, LINE: line, ACTIVE: 1 }).catch(error => {
+      console.error(`messenger-line-activate ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`)
+    })
     await ensureOpenLineCrm(auth.domain, token, line)
-    await publishLineName(payload, auth.domain, token, line)
+    await publishLineName(payload, auth.domain, token, line).catch(error => {
+      console.error(`messenger-line-name ${error instanceof Error ? error.message.slice(0, 200) : 'Error'}`)
+    })
   }
   const channel = await lineChannel(payload, line)
   const view = channel ? accountViews().find(item => item.channel === channel) : undefined
