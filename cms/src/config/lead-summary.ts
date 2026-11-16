@@ -10,7 +10,7 @@ export function requestDetails(lead: LeadInput) {
   const meta = lead.meta || {}
   const lines: string[] = []
   const add = (label: string, input: unknown) => { const text = value(input); if (text) lines.push(`${label}: ${text}`) }
-  add('Обращение', lead.formId === 'mortgage-calculator' || lead.formId === 'mortgage-consultation' ? 'Консультация по ипотеке' : value(meta.formHeading) || leadTitle(lead).replace(/^Новая заявка с сайта: /, ''))
+  add('Обращение', lead.formId === 'mortgage-calculator' || lead.formId === 'mortgage-consultation' || lead.formId === 'mortgage-hero-39' ? 'Консультация по ипотеке' : value(meta.formHeading) || leadTitle(lead).replace(/^Новая заявка с сайта: /, ''))
   add('Сообщение клиента', lead.message)
   add('Проект', value(meta.projectName) || value(meta.project))
   if (lead.formId === 'project-passport') add('Куда направить', ({ max: 'MAX', telegram: 'Telegram', whatsapp: 'WhatsApp' } as Record<string, string>)[value(meta.channel)])
