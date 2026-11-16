@@ -77,6 +77,7 @@ jobs:
           CMS_PUBLIC_URL: http://127.0.0.1:3001
           CMS_SEED: '0'
           PAYLOAD_DB_PUSH: 'false'
+          CMS_MAINTENANCE: '1'
           NODE_ENV: development
         run: node node_modules/tsx/dist/cli.mjs scripts/check-schema-drift.ts
 

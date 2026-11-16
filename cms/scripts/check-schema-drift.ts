@@ -45,5 +45,6 @@ try {
   }
 } finally {
   await payload.destroy()
+  await (payload.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
 }
 process.exit(process.exitCode ?? 0)
