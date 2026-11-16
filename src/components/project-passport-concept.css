@@ -472,7 +472,7 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
   gap: 8px;
   width: 100%;
 }
-.passport-concept__mortgage-form input {
+.passport-concept__mortgage-form input:not([type="checkbox"]) {
   box-sizing: border-box;
   width: 100%;
   max-width: 100%;
@@ -486,9 +486,31 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
   font: inherit;
   font-size: 15px;
 }
-.passport-concept__mortgage-form input:focus {
+.passport-concept__mortgage-form input:not([type="checkbox"]):focus {
   outline: 2px solid var(--brand-yellow);
   outline-offset: 1px;
+}
+.passport-concept__mortgage-consent {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 8px;
+  margin: 0;
+  color: rgb(var(--avgst-ink-rgb) / .7);
+  font-size: 11px;
+  line-height: 1.35;
+  cursor: pointer;
+}
+.passport-concept__mortgage-consent input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  margin: 1px 0 0;
+  accent-color: #0b1020;
+}
+.passport-concept__mortgage-consent a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 .passport-concept__mortgage-submit {
   box-sizing: border-box;
@@ -502,7 +524,7 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
   padding: 0 14px;
   border: 0;
   border-radius: 12px;
-  background: #2d3e33;
+  background: #0b1020;
   color: #fff;
   font: inherit;
   font-size: 14px;
@@ -510,14 +532,6 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
   cursor: pointer;
 }
 .passport-concept__mortgage-submit:disabled { opacity: .55; cursor: default; }
-.passport-concept__mortgage-note {
-  margin: 0;
-  color: rgb(var(--avgst-ink-rgb) / .55);
-  font-size: 10px;
-  line-height: 1.35;
-  text-align: center;
-}
-.passport-concept__mortgage-note a { color: inherit; }
 @media (max-width: 899px) {
   .passport-concept.passport-concept--hero,
   .passport-concept.passport-concept--hero[data-open="true"] {
