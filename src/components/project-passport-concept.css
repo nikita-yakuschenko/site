@@ -468,9 +468,17 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
   font-weight: 700;
 }
 .passport-concept__mortgage-form {
+  position: relative;
   display: grid;
   gap: 8px;
   width: 100%;
+}
+.passport-concept__mortgage-captcha {
+  position: absolute;
+  width: 0;
+  height: 0;
+  overflow: hidden;
+  pointer-events: none;
 }
 .passport-concept__mortgage-form input:not([type="checkbox"]) {
   box-sizing: border-box;

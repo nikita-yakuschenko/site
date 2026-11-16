@@ -269,7 +269,8 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
               <input name="consent" type="checkbox" checked={consent} disabled={status === 'sending' || status === 'done'} onChange={event => setConsent(event.target.checked)} />
               <span>{copy.consentPrefix}<a href={copy.personalDataHref} target="_blank" rel="noreferrer" onClick={event => event.stopPropagation()}>{copy.consentLinkLabel}</a></span>
             </label>
-            {captcha.widget}
+            {/* Виджет капчи не должен участвовать в сетке — иначе поле телефона «уезжает». */}
+            <span className="passport-concept__mortgage-captcha" aria-hidden="true">{captcha.widget}</span>
             <button className="passport-concept__mortgage-submit" type="submit" disabled={!isValidRuMobile(phone) || !consent || status === 'sending' || status === 'done' || captcha.reloadRequired}>
               {status === 'sending' ? 'Отправляем…' : status === 'error' ? 'Повторить' : <>Успеть по акции <IconArrowRight size={16} stroke={2} aria-hidden="true" /></>}
             </button>
