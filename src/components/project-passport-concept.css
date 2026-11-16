@@ -475,10 +475,11 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
 }
 .passport-concept__mortgage-captcha {
   position: absolute;
+  left: 0;
+  bottom: 0;
   width: 0;
   height: 0;
-  overflow: hidden;
-  pointer-events: none;
+  overflow: visible;
 }
 .passport-concept__mortgage-form input:not([type="checkbox"]) {
   box-sizing: border-box;
