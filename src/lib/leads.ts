@@ -30,7 +30,7 @@ export const leadInputSchema = z.object({
   projectExternalId: z.string().trim().max(120).optional(),
   sourcePath: z.string().trim().max(500).optional(),
   consent: z.literal(true),
-}).refine(lead => lead.name.length >= 2 || (lead.formId === 'project-passport' && lead.name === ''), {
+}).refine(lead => lead.name.length >= 2 || ((lead.formId === 'project-passport' || lead.formId === 'mortgage-consultation') && lead.name === ''), {
   path: ['name'],
   message: 'Укажите имя',
 })
