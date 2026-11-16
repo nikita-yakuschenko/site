@@ -14,29 +14,43 @@ import { importCrm } from '../../src/automation/import'
 test('durable registrations, independent confirmations, email queue, DMP idempotency and leases', { skip: process.env.CMS_AUTOMATION_TEST_DATABASE !== 'true', timeout: 120000 }, async () => {
   assert.ok(['localhost', '127.0.0.1'].includes(new URL(process.env.DATABASE_URL!).hostname), 'Only an explicitly designated local test DB')
   process.env.CMS_MAINTENANCE = '1'
+  const step = (label: string) => console.error(`automation-test: ${label}`)
+  const hrefOf = (input: string | URL | Request) => typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
   const { default: config } = await import('../../src/payload.config')
+  step('getPayload')
   const payload = await getPayload({ config }), suffix = randomUUID()
   const fetchBefore = globalThis.fetch, mailBefore = nodemailer.createTransport
+  // Любой незамоканный fetch/SMTP должен падать сразу — иначе CI ждёт AbortSignal/connectionTimeout ~120с.
+  globalThis.fetch = (async (input: string | URL | Request) => {
+    throw new Error(`unexpected fetch: ${hrefOf(input)}`)
+  }) as typeof fetch
+  const delivered: Record<string, unknown>[] = []
+  Object.assign(nodemailer, { createTransport: () => ({ sendMail: async (mail: Record<string, unknown>) => { delivered.push(mail); return { accepted: [mail.to] } }, close: () => {} }) })
   try {
+    step('seedOpenDay')
     await seedOpenDay(payload)
     const event = (await payload.find({ collection: 'events', where: { slug: { equals: 'factory-open-day' } }, limit: 1 })).docs[0]
+    step('update event')
     await payload.update({ collection: 'events', id: event.id, data: { startsAt: '2099-11-14T07:00:00Z', endsAt: '2099-11-14T10:05:00Z' } })
+    step('saveSettings')
     await saveSettings(payload, { ...defaultConfig, referral: { ...defaultConfig.referral, enabled: true }, mail: { ...defaultConfig.mail, enabled: true, host: 'smtp.example.test', from: 'test@example.test' }, dmp: { ...defaultConfig.dmp, enabled: true, dryRun: false, targetStage: 'C77:NEW' } }, { tokenSecret: 'legacy-secret', smtpPassword: 'never-return-this', bitrixWebhook: 'https://avgstroy.bitrix24.ru/rest/1/test/', dmpWebhook: 'https://avgstroy.bitrix24.ru/rest/1/test/' }, { active: true })
     assert.equal((await settings(payload)).secret('smtpPassword'), 'never-return-this')
     const person = { name: '<Участник>', email: `automation-${suffix}@example.test`, phone: '+79991234567' }
+    step('register')
     const referral = await register(payload, 'referral', person)
     const registration = await register(payload, 'event', person)
     assert.equal(referral.status, 'pending'); assert.equal(registration.status, 'pending')
+    step('confirm referral')
     await confirmRegistration(payload, 'referral', referral)
     assert.equal((await payload.findByID({ collection: 'event-registrations', id: registration.id })).status, 'pending')
     const before = (await payload.count({ collection: 'automation-jobs' })).totalDocs
     await confirmRegistration(payload, 'referral', referral)
     assert.equal((await payload.count({ collection: 'automation-jobs' })).totalDocs, before, 'confirmation is repeatable without duplicate jobs')
     const token = signToken({ flow: 'event', recordId: registration.id, email: person.email, version: registration.tokenVersion, exp: Date.now() + 60000 }, 'legacy-secret')
+    step('confirmToken')
     await confirmToken(payload, token)
     assert.equal((await payload.findByID({ collection: 'event-registrations', id: registration.id })).status, 'confirmed')
-    const delivered: Record<string, unknown>[] = []
-    Object.assign(nodemailer, { createTransport: () => ({ sendMail: async (mail: Record<string, unknown>) => { delivered.push(mail); return { accepted: [person.email] } }, close: () => {} }) })
+    step('processJob email')
     await processJob(payload, 'email', { flow: 'event', recordId: registration.id, template: 'programme', deliveryKey: 'integration-test' })
     assert.equal(delivered.length, 1)
     assert.equal(delivered[0].to, person.email)
@@ -44,23 +58,24 @@ test('durable registrations, independent confirmations, email queue, DMP idempot
     assert.ok(String((delivered[0].icalEvent as { content: string }).content).includes('20991114T070000Z'))
     let moved = false, updates = 0
     globalThis.fetch = (async (input: string | URL | Request) => {
-      const href = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
-      const method = href.split('/').at(-1)
+      const method = hrefOf(input).split('/').at(-1)
       const result = method === 'crm.deal.get.json' ? { ID: '123', CATEGORY_ID: moved ? '77' : '0', STAGE_ID: moved ? 'C77:NEW' : 'NEW', SOURCE_ID: 'DMP', TITLE: 'DMP | Лид | Test' } : method === 'crm.status.list.json' ? [{ STATUS_ID: 'DMP', NAME: 'DMP' }] : (updates++, moved = true, {})
       return Response.json({ result })
     }) as typeof fetch
+    step('processJob dmp')
     assert.equal((await processJob(payload, 'dmp', { dealId: '123' })).matched, true)
     assert.equal((await processJob(payload, 'dmp', { dealId: '123' })).matched, false)
     assert.equal(updates, 1)
     const jobCountBeforeImport = (await payload.count({ collection: 'automation-jobs' })).totalDocs
     const contactIds = [String(Date.now()), String(Date.now() + 1)]
     globalThis.fetch = (async (input: string | URL | Request) => {
-      const href = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      const href = hrefOf(input)
       const contacts = href.includes('crm.contact.list')
         ? contactIds.map(ID => ({ ID, NAME: 'Импорт', EMAIL: [{ VALUE: `shared-${suffix}@example.test` }], [defaultConfig.referral.participantField]: '1', [defaultConfig.referral.linkField]: `https://avgst.ru/?ref=${ID}` }))
         : []
       return Response.json({ result: contacts })
     }) as typeof fetch
+    step('importCrm')
     await importCrm(payload)
     const imported = await payload.find({ collection: 'referral-participants', where: { email: { equals: `shared-${suffix}@example.test` } } })
     assert.equal(imported.totalDocs, 2, 'different CRM participants sharing email retain separate codes')
