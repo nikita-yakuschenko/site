@@ -9,6 +9,7 @@ import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
 import { readRegionCode } from '../lib/regions';
 import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
 import { submitLead, type LeadAttempt } from '../lib/submit-lead';
+import { useLeadCaptcha } from './use-lead-captcha';
 import { lockPassportDownload, markPageDownloaded, nextPageAttempt, notifyPassportPace, passportBanNotice, passportDevice, passportDwell, passportLeftFast, passportPaceDecision, rememberPassportDownload, rememberPassportHop, watchPassportLeave } from '../lib/passport-pace';
 import './project-passport-concept.css';
 
@@ -48,6 +49,8 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   const [imageReady, setImageReady] = useState(false);
   const isHero = placement === 'hero';
   const isPlans = placement === 'plans';
+  // Ипотечная промо-форма идёт в /next/leads — там обязателен токен SmartCaptcha.
+  const captcha = useLeadCaptcha(Boolean(active && isHero && open && status !== 'done'));
   useEffect(() => {
     const frame = requestAnimationFrame(() => setStorageChecked(true));
     return () => cancelAnimationFrame(frame);
@@ -156,20 +159,25 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   }, [imageReady, storageChecked, run, isPlans]);
   async function sendMortgage(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!isValidRuMobile(phone) || busy.current || status === 'done') return;
+    if (!isValidRuMobile(phone) || busy.current || status === 'done' || captcha.reloadRequired) return;
     busy.current = true;
     setStatus('sending');
     const feedbackLap = new Promise<void>(resolve => requestAnimationFrame(() => setTimeout(resolve, 950)));
     try {
+      const captchaToken = await captcha.verify();
+      if (!captcha.isActive()) return;
       await submitLead({
         phone: phoneE164(phone),
         siteId: 'avgst',
         formId: 'mortgage-consultation',
         consent: true,
+        captchaToken,
+        sourceUrl: typeof window !== 'undefined' ? window.location.href : undefined,
         sourcePath: `/catalog/${projectSlug}`,
         message: 'Заявка на семейную ипотеку 3,9%',
         meta: { program: 'family', project, projectName: project, action: 'hero-mortgage-promo', rate: '3.9', termYears: 30 },
-      }, mortgageAttempt.current);
+      }, mortgageAttempt.current, fetch, captcha.submissionSignal());
+      if (!captcha.isActive()) return;
       await feedbackLap;
       completedRef.current = true;
       setSuccessMessage('Заявка принята. Перезвоним по акции');
@@ -178,7 +186,8 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       setDismissed(!visibleRef.current);
     } catch {
       await feedbackLap;
-      setStatus('error');
+      if (captcha.isActive()) setStatus('error');
+      else if (captcha.isMounted()) setStatus('idle');
     } finally {
       busy.current = false;
     }
@@ -255,11 +264,12 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
           </ul>
           <form className="passport-concept__mortgage-form" data-status={status} onSubmit={sendMortgage} aria-busy={status === 'sending'}>
             <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
-            <button className="passport-concept__mortgage-submit" type="submit" disabled={!isValidRuMobile(phone) || status === 'sending' || status === 'done'}>
+            {captcha.widget}
+            <button className="passport-concept__mortgage-submit" type="submit" disabled={!isValidRuMobile(phone) || status === 'sending' || status === 'done' || captcha.reloadRequired}>
               {status === 'sending' ? 'Отправляем…' : status === 'error' ? 'Повторить' : <>Успеть по акции <IconArrowRight size={16} stroke={2} aria-hidden="true" /></>}
             </button>
             <p className="passport-concept__mortgage-note">Отправляя заявку, вы соглашаетесь на <a href="/privacy" target="_blank" rel="noreferrer">обработку данных</a></p>
-            <span className="passport-concept__announcement" role="status">{status === 'error' ? 'Не удалось отправить. Попробуйте ещё раз.' : ''}</span>
+            <span className="passport-concept__announcement" role="status">{status === 'error' ? (captcha.reloadRequired ? 'Не удалось загрузить проверку. Обновите страницу.' : 'Не удалось отправить. Попробуйте ещё раз.') : ''}</span>
           </form>
         </div>
       </> : <>
