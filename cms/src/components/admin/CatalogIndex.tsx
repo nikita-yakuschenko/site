@@ -10,7 +10,7 @@ import { TECHNOLOGY_OPTIONS, technologyLabel } from '../../../../src/lib/catalog
 import type { PriceKind } from '../../config/price-kinds'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { toast } from 'sonner'
-import { IconExternalLink, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus, IconCopy } from '@tabler/icons-react'
+import { IconExternalLink, IconTrash, IconDots, IconPencil, IconCircleCheckFilled, IconCircleDashed, IconPlus, IconCopy, IconBrandVk } from '@tabler/icons-react'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '../ui/dropdown-menu'
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '../ui/dialog'
 import { Input } from '../ui/input'
@@ -114,21 +114,21 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
   const [busy, setBusy] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [exportDialogOpen, setExportDialogOpen] = useState(false)
-  const [priceOptions, setPriceOptions] = useState<{ value: PriceKind; label: string; count: number; feedUrl: string | null }[]>([])
+  const [priceOptions, setPriceOptions] = useState<{ value: PriceKind; label: string; count: number; feedUrl: string | null; vkFeedUrl: string | null }[]>([])
   const [selectedPriceKind, setSelectedPriceKind] = useState<PriceKind | null>(null)
   const [loadingPriceOptions, setLoadingPriceOptions] = useState(false)
   const [priceOptionsError, setPriceOptionsError] = useState('')
   const exportLock = useRef(false)
-  const copyFeedUrl = async (event: MouseEvent, option: { label: string; feedUrl: string | null }) => {
+  const copyFeedLink = async (event: MouseEvent, href: string | null, label: string) => {
     event.preventDefault()
     event.stopPropagation()
-    if (!option.feedUrl) {
+    if (!href) {
       toast.error('Ссылка на фид не настроена. Задайте CMS_YML_FEED_TOKEN.')
       return
     }
     try {
-      await navigator.clipboard.writeText(option.feedUrl)
-      toast.success('Ссылка на фид скопирована')
+      await navigator.clipboard.writeText(href)
+      toast.success(`${label}: ссылка скопирована`)
     } catch {
       toast.error('Не удалось скопировать ссылку')
     }
@@ -143,7 +143,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       const response = await fetch('/api/projects/export-yml/options', { credentials: 'include', cache: 'no-store' })
       const body = await response.json()
       if (!response.ok) throw new Error(body?.error || 'Не удалось получить типы цен')
-      const options = body.options as { value: PriceKind; label: string; count: number; feedUrl: string | null }[]
+      const options = body.options as { value: PriceKind; label: string; count: number; feedUrl: string | null; vkFeedUrl: string | null }[]
       setPriceOptions(options)
       setSelectedPriceKind(options.find(option => option.value === 'nn')?.value ?? options[0]?.value ?? null)
     } catch (error) {
@@ -290,15 +290,18 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       </TableRow> })}{table.rows.length === 0 && <TableRow className="hover:bg-transparent"><TableCell colSpan={11} className="h-24 text-center text-muted-foreground">Записи не найдены</TableCell></TableRow>}</TableBody>
     </Table></DataTableFrame>
     <Dialog open={exportDialogOpen} onOpenChange={open => { if (!exporting) setExportDialogOpen(open) }}><DialogContent className="shadcn-surface">
-      <DialogHeader><DialogTitle>Выгрузить каталог в YML</DialogTitle><DialogDescription>Выберите тип цены для предложений в файле.</DialogDescription></DialogHeader>
+      <DialogHeader><DialogTitle>Выгрузить каталог в YML</DialogTitle><DialogDescription>Скачивание — фид Директа. Иконки копируют постоянные ссылки: обычная — Директ, VK — отдельно для НН и МСК.</DialogDescription></DialogHeader>
       {loadingPriceOptions ? <p className="text-sm text-muted-foreground">Загрузка типов цен…</p> : priceOptionsError ? <p role="alert" className="text-sm text-destructive">{priceOptionsError}</p> : priceOptions.length === 0 ? <p className="text-sm text-muted-foreground">Нет опубликованных проектов с ценой и данными для выгрузки.</p> : <fieldset className="grid gap-2" disabled={exporting}>
         <legend className="sr-only">Тип цены</legend>
         {priceOptions.map(option => <label key={option.value} className="flex cursor-pointer items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm has-checked:border-primary has-checked:bg-muted">
           <span className="flex items-center gap-2"><input type="radio" name="yml-price-kind" value={option.value} checked={selectedPriceKind === option.value} onChange={() => setSelectedPriceKind(option.value)} />{option.label}</span>
           <span className="flex items-center gap-2">
-            <Button type="button" size="icon" variant="ghost" className="size-8 shrink-0 text-muted-foreground" aria-label={`Скопировать ссылку на фид: ${option.label}`} title={`Скопировать ссылку на фид: ${option.label}`} onClick={event => void copyFeedUrl(event, option)}>
+            <Button type="button" size="icon" variant="ghost" className="size-8 shrink-0 text-muted-foreground" aria-label={`Скопировать ссылку Директа: ${option.label}`} title={`Директ: ${option.label}`} onClick={event => void copyFeedLink(event, option.feedUrl, 'Директ')}>
               <IconCopy className="size-4" />
             </Button>
+            {option.vkFeedUrl ? <Button type="button" size="icon" variant="ghost" className="size-8 shrink-0 text-muted-foreground" aria-label={`Скопировать ссылку ВКонтакте: ${option.label}`} title={`ВКонтакте: ${option.label}`} onClick={event => void copyFeedLink(event, option.vkFeedUrl, 'ВКонтакте')}>
+              <IconBrandVk className="size-4" />
+            </Button> : null}
             <span className="text-muted-foreground tabular-nums">{option.count} проектов</span>
           </span>
         </label>)}
