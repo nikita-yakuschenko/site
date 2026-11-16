@@ -67,28 +67,42 @@ function RangeFilter({ title, min, max, onMin, onMax }: { title: string; min: st
 }
 
 export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; projects: Project[]; leads: Record<string, number> }) {
-  function downloadStatistics() {
-    const rows = [
-      ['Название проекта', 'Технология', 'Площадь, м²', 'Этажность', 'Спальни', 'Просмотры', 'Лайки', 'Шеры', 'Заявки'],
-      ...projects.map(project => [
-        project.name, technologyLabel(project.technologyBadge), project.areaValue?.toLocaleString('ru-RU', { useGrouping: false }),
-        project.floorsValue, project.bedrooms, stat(project.viewCount), stat(project.likeCount),
-        stat(project.shareCount), leads[project.id] ?? 0,
-      ]),
-    ]
-    const csv = rows.map(row => row.map(value => {
-      const text = String(value ?? '')
-      const plainText = typeof value === 'string' && /^[\s]*[=+\-@]|^[\t\r\n]/.test(text) ? "'" + text : text
-      return '"' + plainText.replaceAll('"', '""') + '"'
-    }).join(';')).join('\r\n')
-    const url = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }))
-    const link = document.createElement('a')
-    link.href = url
-    link.download = 'catalog-statistics.csv'
-    document.body.append(link)
-    link.click()
-    link.remove()
-    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  const [downloadingStatistics, setDownloadingStatistics] = useState(false)
+  async function downloadStatistics() {
+    setDownloadingStatistics(true)
+    try {
+      const { default: ExcelJS } = await import('exceljs')
+      const workbook = new ExcelJS.Workbook()
+      const sheet = workbook.addWorksheet('Статистика каталога', {
+        views: [{ state: 'frozen', ySplit: 1 }],
+      })
+      sheet.addRows([
+        ['Название проекта', 'Технология', 'Площадь, м²', 'Этажность', 'Спальни', 'Просмотры', 'Лайки', 'Шеры', 'Заявки'],
+        ...projects.map(project => [
+          project.name, technologyLabel(project.technologyBadge), project.areaValue,
+          project.floorsValue, project.bedrooms, stat(project.viewCount), stat(project.likeCount),
+          stat(project.shareCount), leads[project.id] ?? 0,
+        ]),
+      ])
+      sheet.getRow(1).font = { bold: true }
+      sheet.columns.forEach((column, index) => { column.width = index < 2 ? 32 : 14 })
+      sheet.autoFilter = 'A1:I1'
+      const buffer = await workbook.xlsx.writeBuffer()
+      const url = URL.createObjectURL(new Blob([buffer], {
+        type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+      }))
+      const link = document.createElement('a')
+      link.href = url
+      link.download = 'catalog-statistics.xlsx'
+      document.body.append(link)
+      link.click()
+      link.remove()
+      setTimeout(() => URL.revokeObjectURL(url), 1000)
+    } catch {
+      toast.error('Не удалось скачать статистику')
+    } finally {
+      setDownloadingStatistics(false)
+    }
   }
   const projectCopy = useProjectCopy()
   const initial = useSearchParams()
@@ -239,7 +253,9 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
         <DataTableSearch label="Поиск проектов" value={search} onChange={value => { setSearch(value); table.setPage(0) }} />
         <Button asChild variant="outline"><Link href="/catalog/redirects">Редиректы</Link></Button>
         <Button type="button" variant="outline" onClick={openExportDialog}>Выгрузить YML</Button>
-        <Button type="button" variant="outline" onClick={downloadStatistics}>Скачать статистику</Button>
+        <Button type="button" variant="outline" onClick={downloadStatistics} disabled={downloadingStatistics}>
+          {downloadingStatistics ? 'Подготовка файла…' : 'Скачать статистику'}
+        </Button>
         <Button asChild><Link href="/collections/projects/create">Создать</Link></Button>
       </div>
     </div>
