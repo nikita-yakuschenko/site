@@ -377,6 +377,30 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
   transform: translateY(0) scale(1);
   pointer-events: auto;
 }
+/* Success: светлая карточка, частицы не режутся overflow родителя. */
+.passport-concept__mortgage[data-success="true"] {
+  overflow: visible;
+  padding: 28px 14px 22px;
+}
+.passport-concept__mortgage-success {
+  --form-success-background: transparent;
+  --form-success-text: var(--avgst-ink);
+  --form-success-description: rgb(var(--avgst-ink-rgb) / .68);
+  --form-success-logo-filter: brightness(0);
+  --form-success-check: #187640;
+  --form-success-greeting-size: 15px;
+  --form-success-title-size: 18px;
+  --form-success-title-gap: 10px;
+  --form-success-description-size: 13px;
+  --form-success-description-leading: 1.45;
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 0;
+  padding: 8px 0 0;
+  border-radius: 0;
+  gap: 18px;
+  overflow: visible;
+}
 .passport-concept__mortgage-close {
   position: absolute;
   top: 10px;

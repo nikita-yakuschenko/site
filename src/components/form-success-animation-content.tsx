@@ -9,9 +9,13 @@ export type MessengerAction = 'max' | 'telegram' | 'whatsapp'
 
 export type FormSuccessAnimationProps = {
   active: boolean
+  /** Мелкий надзаголовок над title, например «Спасибо!». */
+  greeting?: string
   title?: string
   description?: string
   className?: string
+  /** Разрешить частицам и свечению выходить за границы корня. */
+  unclipped?: boolean
   onComplete?: () => void
   actionHref?: string
   actionLabel?: string
@@ -58,7 +62,7 @@ function redirectLine(seconds: number) {
   return `Вы будете перенаправлены через ${seconds} ${word}`
 }
 
-export function FormSuccessAnimationContent({ active, title = 'Спасибо! Заявка принята', description = 'Мы свяжемся с вами в ближайшее время.', className = '', onComplete, actionHref, actionLabel, actionChannel }: FormSuccessAnimationProps) {
+export function FormSuccessAnimationContent({ active, greeting, title = 'Спасибо! Заявка принята', description = 'Мы свяжемся с вами в ближайшее время.', className = '', unclipped = false, onComplete, actionHref, actionLabel, actionChannel }: FormSuccessAnimationProps) {
   const complete = useRef(onComplete)
   const left = useRef(false)
   const [seconds, setSeconds] = useState(redirectSeconds)
@@ -89,7 +93,7 @@ export function FormSuccessAnimationContent({ active, title = 'Спасибо! �
 
   if (!active) return null
   const tone = actionChannel === 'max' ? styles.max : actionChannel === 'telegram' ? styles.telegram : actionChannel === 'whatsapp' ? styles.whatsapp : styles.yellow
-  return <div data-form-success-animation className={`${styles.root} ${className}`}>
+  return <div data-form-success-animation className={`${styles.root}${unclipped ? ` ${styles.rootUnclipped}` : ''} ${className}`}>
     <div className={styles.stage} aria-hidden="true">
       <div className={styles.glow} />
       <img className={styles.logo} src="/logo-success.svg" alt="" width={72} height={72} />
@@ -101,6 +105,7 @@ export function FormSuccessAnimationContent({ active, title = 'Спасибо! �
     </div>
     <div className={`${styles.copy}${actionHref ? ` ${styles.copyNow}` : ''}`}>
       <div role="status">
+        {greeting ? <p className={styles.greeting}>{greeting}</p> : null}
         <p className={styles.title}>{title}</p>
         <p className={styles.description}>{description}</p>
       </div>

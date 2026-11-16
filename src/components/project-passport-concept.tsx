@@ -10,6 +10,7 @@ import { readRegionCode } from '../lib/regions';
 import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
 import { submitLead, type LeadAttempt } from '../lib/submit-lead';
 import { useLeadCaptcha } from './use-lead-captcha';
+import { FormSuccessAnimation } from './form-success-animation';
 import { lockPassportDownload, markPageDownloaded, nextPageAttempt, notifyPassportPace, passportBanNotice, passportDevice, passportDwell, passportLeftFast, passportPaceDecision, rememberPassportDownload, rememberPassportHop, watchPassportLeave } from '../lib/passport-pace';
 import './project-passport-concept.css';
 
@@ -181,8 +182,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       if (!captcha.isActive()) return;
       await feedbackLap;
       completedRef.current = true;
-      setSuccessMessage('Заявка принята. Перезвоним по акции');
-      setOpen(false);
+      // Карточка остаётся открытой: вместо пилюли — анимация лого → галочка.
       setStatus('done');
       setDismissed(!visibleRef.current);
     } catch {
@@ -248,34 +248,46 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
         <div className="passport-concept__action-flight" aria-hidden={open || status === 'done'}>
           <span className="passport-concept__download" data-valid="true" data-status="idle"><IconPercentage size={18} stroke={1.8} aria-hidden="true" /></span>
         </div>
-        <div className="passport-concept__mortgage" data-shown={open && status !== 'done'} inert={!open || status === 'done'}>
-          <button type="button" className="passport-concept__mortgage-close" aria-label={copy.close} onClick={() => setOpen(false)}>
-            <IconX size={16} stroke={2.2} aria-hidden="true" />
-          </button>
-          <p className="passport-concept__mortgage-badge"><IconGift size={14} stroke={1.8} aria-hidden="true" />Новогодняя акция</p>
-          <h2 className="passport-concept__mortgage-title">Семейная ипотека</h2>
-          <div className="passport-concept__mortgage-rates" aria-label="Ставка снизилась с 6% на 15 лет до 3,9% на 30 лет">
-            <div className="passport-concept__mortgage-old"><span>6%</span><small>на 15 лет</small></div>
-            <span className="passport-concept__mortgage-arrow" aria-hidden="true">→</span>
-            <div className="passport-concept__mortgage-new"><span>3,9%</span><small>на 30 лет</small></div>
-          </div>
-          <ul className="passport-concept__mortgage-facts">
-            <li>Получите одобрение до 11 декабря</li>
-            <li>Осталось <span className="passport-concept__mortgage-slots">8 из 11</span> мест</li>
-          </ul>
-          <form className="passport-concept__mortgage-form" data-status={status} onSubmit={sendMortgage} aria-busy={status === 'sending'}>
-            <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
-            {/* Виджет капчи не должен участвовать в сетке — иначе поле телефона «уезжает». */}
-            <span className="passport-concept__mortgage-captcha" aria-hidden="true">{captcha.widget}</span>
-            <button className="passport-concept__mortgage-submit" type="submit" disabled={!isValidRuMobile(phone) || !consent || status === 'sending' || status === 'done' || captcha.reloadRequired}>
-              {status === 'sending' ? 'Отправляем…' : status === 'error' ? 'Повторить' : <>Успеть по акции <IconArrowRight size={16} stroke={2} aria-hidden="true" /></>}
+        <div className="passport-concept__mortgage" data-shown={open} data-success={status === 'done'} inert={!open}>
+          {status === 'done' ? (
+            <FormSuccessAnimation
+              active
+              unclipped
+              greeting="Спасибо!"
+              title={'Заявка на ипотеку\nпод 3,9%\u00A0принята'}
+              description={'Менеджер свяжемся с вами,\nрасскажет об условиях и поможет\nс оформлением'}
+              className="passport-concept__mortgage-success"
+              onComplete={() => setReady(true)}
+            />
+          ) : <>
+            <button type="button" className="passport-concept__mortgage-close" aria-label={copy.close} onClick={() => setOpen(false)}>
+              <IconX size={16} stroke={2.2} aria-hidden="true" />
             </button>
-            <label className="passport-concept__mortgage-consent">
-              <input name="consent" type="checkbox" checked={consent} disabled={status === 'sending' || status === 'done'} onChange={event => setConsent(event.target.checked)} />
-              <span>{copy.consentPrefix}<a href={copy.personalDataHref} target="_blank" rel="noreferrer" onClick={event => event.stopPropagation()}>{copy.consentLinkLabel}</a></span>
-            </label>
-            <span className="passport-concept__announcement" role="status">{status === 'error' ? (captcha.reloadRequired ? 'Не удалось загрузить проверку. Обновите страницу.' : 'Не удалось отправить. Попробуйте ещё раз.') : ''}</span>
-          </form>
+            <p className="passport-concept__mortgage-badge"><IconGift size={14} stroke={1.8} aria-hidden="true" />Новогодняя акция</p>
+            <h2 className="passport-concept__mortgage-title">Семейная ипотека</h2>
+            <div className="passport-concept__mortgage-rates" aria-label="Ставка снизилась с 6% на 15 лет до 3,9% на 30 лет">
+              <div className="passport-concept__mortgage-old"><span>6%</span><small>на 15 лет</small></div>
+              <span className="passport-concept__mortgage-arrow" aria-hidden="true">→</span>
+              <div className="passport-concept__mortgage-new"><span>3,9%</span><small>на 30 лет</small></div>
+            </div>
+            <ul className="passport-concept__mortgage-facts">
+              <li>Получите одобрение до 11 декабря</li>
+              <li>Осталось <span className="passport-concept__mortgage-slots">8 из 11</span> мест</li>
+            </ul>
+            <form className="passport-concept__mortgage-form" data-status={status} onSubmit={sendMortgage} aria-busy={status === 'sending'}>
+              <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
+              {/* Виджет капчи не должен участвовать в сетке — иначе поле телефона «уезжает». */}
+              <span className="passport-concept__mortgage-captcha" aria-hidden="true">{captcha.widget}</span>
+              <button className="passport-concept__mortgage-submit" type="submit" disabled={!isValidRuMobile(phone) || !consent || status === 'sending' || status === 'done' || captcha.reloadRequired}>
+                {status === 'sending' ? 'Отправляем…' : status === 'error' ? 'Повторить' : <>Успеть по акции <IconArrowRight size={16} stroke={2} aria-hidden="true" /></>}
+              </button>
+              <label className="passport-concept__mortgage-consent">
+                <input name="consent" type="checkbox" checked={consent} disabled={status === 'sending' || status === 'done'} onChange={event => setConsent(event.target.checked)} />
+                <span>{copy.consentPrefix}<a href={copy.personalDataHref} target="_blank" rel="noreferrer" onClick={event => event.stopPropagation()}>{copy.consentLinkLabel}</a></span>
+              </label>
+              <span className="passport-concept__announcement" role="status">{status === 'error' ? (captcha.reloadRequired ? 'Не удалось загрузить проверку. Обновите страницу.' : 'Не удалось отправить. Попробуйте ещё раз.') : ''}</span>
+            </form>
+          </>}
         </div>
       </> : <>
         <form id={formId} inert={!open || status === 'done'} aria-hidden={!open || status === 'done'} className="passport-concept__form" data-status={status} onSubmit={send} aria-busy={status === 'sending'}>
