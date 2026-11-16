@@ -34,7 +34,7 @@ test('frame upgrade preserves every panel/modular row and seeds only the indepen
       throw rollback
     }), error => error === rollback)
   } finally {
-    await p.destroy()
-    await (p.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
+    // Не вызывать pool.end(): зависает на занятых клиентах; CI закрывает процесс через --test-force-exit.
+    await p.destroy().catch(() => undefined)
   }
 })

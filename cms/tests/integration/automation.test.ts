@@ -106,8 +106,8 @@ test('durable registrations, independent confirmations, email queue, DMP idempot
   } finally {
     globalThis.fetch = fetchBefore
     Object.assign(nodemailer, { createTransport: mailBefore })
-    await payload.destroy()
-    // destroy() Payload только сбрасывает drizzle-схему и не закрывает pg.Pool.
-    await (payload.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
+    // Не вызывать pool.end(): он ждёт занятые клиенты и зависает до timeout теста (~120с).
+    // Хендлы пула закрывает --test-force-exit в CI.
+    await payload.destroy().catch(() => undefined)
   }
 })

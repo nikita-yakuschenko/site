@@ -80,9 +80,15 @@ jobs:
           NODE_ENV: development
         run: node node_modules/tsx/dist/cli.mjs scripts/check-schema-drift.ts
 
-      # Временно выключено: automation.test зависает ровно на 120с (importCrm/сеть) и валит каждый выпуск.
-      # Юнит-тесты VK/YML и остальные integration-шаги ниже остаются обязательными.
-      # - name: Проверить обработку регистраций, писем и DMP
+      - name: Проверить обработку регистраций, писем и DMP
+        working-directory: cms
+        env:
+          DATABASE_URL: postgresql://cms:cms@localhost:5432/cms
+          PAYLOAD_SECRET: ci-payload-secret-is-at-least-32-chars
+          CMS_PUBLIC_URL: http://127.0.0.1:3001
+          CMS_MAINTENANCE: '1'
+          CMS_AUTOMATION_TEST_DATABASE: 'true'
+        run: npx tsx --test --test-force-exit tests/integration/automation.test.ts
 
       - name: Проверить полное дублирование проектов и атомарность цен
         working-directory: cms

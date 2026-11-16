@@ -72,7 +72,7 @@ test('PostgreSQL, bootstrap, REST authorization, roles, blocking and health', { 
     }
     assert.equal((await call('/api/users/login', 'POST', { email: lockedEmail, password })).ok, false, 'Five failed attempts must lock the account')
   } finally {
-    await payload.destroy()
-    await (payload.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
+    // Не вызывать pool.end(): зависает на занятых клиентах; CI закрывает процесс через --test-force-exit.
+    await payload.destroy().catch(() => undefined)
   }
 })
