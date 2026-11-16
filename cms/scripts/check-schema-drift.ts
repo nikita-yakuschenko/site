@@ -1,5 +1,6 @@
 process.env.CMS_SEED = '0'
 process.env.PAYLOAD_DB_PUSH = 'false'
+process.env.CMS_MAINTENANCE = '1'
 
 export {}
 
@@ -31,7 +32,10 @@ try {
   }
   const pushSchema = adapter.requireDrizzleKit?.().pushSchema
   if (!pushSchema) throw new Error('В адаптере PostgreSQL нет проверки схемы')
-  const result = await pushSchema(adapter.schema, adapter.drizzle, undefined, ['!whatsapp_dialog_aliases'])
+  const result = await Promise.race([
+    pushSchema(adapter.schema, adapter.drizzle, undefined, ['!whatsapp_dialog_aliases']),
+    new Promise<never>((_, reject) => setTimeout(() => reject(new Error('pushSchema timeout 90s')), 90000)),
+  ])
   const statements = result.statementsToExecute ?? []
   const blocking = statements.filter(blocksRelease)
   if (blocking.length) {
@@ -43,8 +47,17 @@ try {
   } else {
     console.log('Схема совпадает с конфигурацией Payload.')
   }
+} catch (error) {
+  console.error(error instanceof Error ? error.message : error)
+  process.exitCode = 1
 } finally {
-  await payload.destroy()
-  await (payload.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
+  // destroy() Payload не закрывает pg.Pool и иногда не резолвится — не блокируем выход.
+  await Promise.race([
+    (async () => {
+      await payload.destroy().catch(() => undefined)
+      await (payload.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
+    })(),
+    new Promise<void>(resolve => setTimeout(resolve, 5000)),
+  ])
 }
 process.exit(process.exitCode ?? 0)
