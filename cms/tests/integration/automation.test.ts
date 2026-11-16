@@ -43,8 +43,9 @@ test('durable registrations, independent confirmations, email queue, DMP idempot
     assert.ok(String(delivered[0].html).includes('&lt;Участник&gt;'))
     assert.ok(String((delivered[0].icalEvent as { content: string }).content).includes('20991114T070000Z'))
     let moved = false, updates = 0
-    globalThis.fetch = (async (url: string | URL | Request) => {
-      const method = String(url).split('/').at(-1)
+    globalThis.fetch = (async (input: string | URL | Request) => {
+      const href = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      const method = href.split('/').at(-1)
       const result = method === 'crm.deal.get.json' ? { ID: '123', CATEGORY_ID: moved ? '77' : '0', STAGE_ID: moved ? 'C77:NEW' : 'NEW', SOURCE_ID: 'DMP', TITLE: 'DMP | Лид | Test' } : method === 'crm.status.list.json' ? [{ STATUS_ID: 'DMP', NAME: 'DMP' }] : (updates++, moved = true, {})
       return Response.json({ result })
     }) as typeof fetch
@@ -53,7 +54,13 @@ test('durable registrations, independent confirmations, email queue, DMP idempot
     assert.equal(updates, 1)
     const jobCountBeforeImport = (await payload.count({ collection: 'automation-jobs' })).totalDocs
     const contactIds = [String(Date.now()), String(Date.now() + 1)]
-    globalThis.fetch = (async (url: string | URL | Request) => Response.json({ result: String(url).includes('crm.contact.list') ? contactIds.map(ID => ({ ID, NAME: 'Импорт', EMAIL: [{ VALUE: `shared-${suffix}@example.test` }], [defaultConfig.referral.participantField]: '1', [defaultConfig.referral.linkField]: `https://avgst.ru/?ref=${ID}` })) : [] })) as typeof fetch
+    globalThis.fetch = (async (input: string | URL | Request) => {
+      const href = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url
+      const contacts = href.includes('crm.contact.list')
+        ? contactIds.map(ID => ({ ID, NAME: 'Импорт', EMAIL: [{ VALUE: `shared-${suffix}@example.test` }], [defaultConfig.referral.participantField]: '1', [defaultConfig.referral.linkField]: `https://avgst.ru/?ref=${ID}` }))
+        : []
+      return Response.json({ result: contacts })
+    }) as typeof fetch
     await importCrm(payload)
     const imported = await payload.find({ collection: 'referral-participants', where: { email: { equals: `shared-${suffix}@example.test` } } })
     assert.equal(imported.totalDocs, 2, 'different CRM participants sharing email retain separate codes')

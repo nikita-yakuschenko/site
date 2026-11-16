@@ -3,25 +3,26 @@ import { settings } from './store'
 
 export type CrmRecord = Record<string, unknown>
 export class BitrixClient {
-  constructor(private readonly base: string, readonly domain: string, private readonly request: typeof fetch = fetch) {
+  constructor(private readonly base: string, readonly domain: string) {
     const url = new URL(base)
     if (url.protocol !== 'https:' || url.hostname !== domain || !/^\/rest\/\d+\/[^/]+\/?$/.test(url.pathname) || url.search || url.hash) throw new Error('Укажите входящий вебхук CRM для настроенного портала')
   }
   async call<T = CrmRecord>(method: string, params: Record<string, unknown> = {}, timeoutMs = 20000): Promise<T> {
     if (!/^(crm|user|event)\.[a-zA-Z0-9.]+$/.test(method)) throw new Error('Недопустимый метод CRM')
-    const response = await this.request(this.base.replace(/\/?$/, '/') + method + '.json', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params), signal: AbortSignal.timeout(timeoutMs), redirect: 'error' })
+    // Только globalThis.fetch: иначе захваченный fetch в конструкторе игнорирует тестовый мок и call() висит до AbortSignal.timeout (цикл падений CI ~120с).
+    const response = await globalThis.fetch(this.base.replace(/\/?$/, '/') + method + '.json', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(params), signal: AbortSignal.timeout(timeoutMs), redirect: 'error' })
     const body = await response.json() as { result: T; error?: string }
     if (!response.ok || body.error) throw new Error('Ошибка CRM: ' + String(body.error || response.status))
     return body.result
   }
   async page(method: string, filter: Record<string, unknown>, select: string[], start = 0) {
-    return this.call<CrmRecord[]>(method, { filter, select, order: { ID: 'ASC' }, start })
+    const rows = await this.call<CrmRecord[] | null>(method, { filter, select, order: { ID: 'ASC' }, start })
+    return Array.isArray(rows) ? rows : []
   }
 }
 export async function crm(payload: Payload, dmp = false) {
   const saved = await settings(payload)
-  // Всегда брать текущий globalThis.fetch — иначе тестовый мок не подхватывается и call() висит до AbortSignal.timeout.
-  return new BitrixClient(saved.secret(dmp ? 'dmpWebhook' : 'bitrixWebhook'), saved.config.crm.domain, globalThis.fetch.bind(globalThis))
+  return new BitrixClient(saved.secret(dmp ? 'dmpWebhook' : 'bitrixWebhook'), saved.config.crm.domain)
 }
 export function crmEmail(contact: CrmRecord) {
   const values = contact.EMAIL

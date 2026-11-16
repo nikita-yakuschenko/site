@@ -5,7 +5,7 @@ import { register } from './registrations'
 import { matchEvent } from './event-match'
 
 async function* pages(api: Awaited<ReturnType<typeof crm>>, method: string, filter: Record<string, unknown>, select: string[]) {
-  for (let start = 0; ; start += 50) {
+  for (let start = 0; start <= 500; start += 50) {
     const rows = await api.page(method, filter, select, start)
     for (const row of rows) yield row
     if (rows.length < 50) break
