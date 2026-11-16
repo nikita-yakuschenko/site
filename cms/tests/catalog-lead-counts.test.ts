@@ -9,10 +9,19 @@ test('a project lead is counted once even when several identifiers match', () =>
   assert.equal(counts.get(1), 1)
 })
 
-test('failed delivery and unrelated forms are not applications', () => {
+test('saved applications count even when CRM delivery failed', () => {
   const counts = countProjectLeads(projects, [
     { status: 'failed', payload: { projectId: 'PROJ08AB' } },
     { status: 'sent', payload: { name: 'Тест' } },
   ])
-  assert.equal(counts.get(1), undefined)
+  assert.equal(counts.get(1), 1)
+})
+
+test('project page takes priority and attributes forms without a project identifier', () => {
+  const counts = countProjectLeads([...projects, { id: 2, slug: 'another-project' }], [
+    { payload: { sourcePath: '/catalog/barnhouse-113', projectExternalId: 'another-project' } },
+    { payload: { sourceUrl: 'https://avgst.ru/catalog/barnhouse-113/?utm_source=yandex' } },
+    { payload: { sourcePath: '/catalog' } },
+  ])
+  assert.deepEqual([...counts], [[1, 2]])
 })
