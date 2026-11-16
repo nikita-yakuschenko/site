@@ -78,9 +78,6 @@ jobs:
           CMS_SEED: '0'
           PAYLOAD_DB_PUSH: 'false'
           NODE_ENV: development
-        # Временно: check-schema-drift/pushSchema зависает в CI (№292–293), не держим выпуск VK.
-        continue-on-error: true
-        timeout-minutes: 2
         run: node node_modules/tsx/dist/cli.mjs scripts/check-schema-drift.ts
 
       - name: Проверить обработку регистраций, писем и DMP
@@ -91,10 +88,7 @@ jobs:
           CMS_PUBLIC_URL: http://127.0.0.1:3001
           CMS_MAINTENANCE: '1'
           CMS_AUTOMATION_TEST_DATABASE: 'true'
-        # force-exit нужен: без него процесс висит на открытых хендлах пула Postgres после destroy().
-        # Не блокируем выпуск VK/CMS из‑за флака automation: шаг виден в логе, publish идёт дальше.
-        continue-on-error: true
-        timeout-minutes: 3
+        # force-exit: pg.Pool остаётся открытым после Payload.destroy(); закрываем pool.end() в finally теста.
         run: npx tsx --test --test-force-exit tests/integration/automation.test.ts
 
       - name: Проверить полное дублирование проектов и атомарность цен

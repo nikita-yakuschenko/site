@@ -20,7 +20,8 @@ export class BitrixClient {
 }
 export async function crm(payload: Payload, dmp = false) {
   const saved = await settings(payload)
-  return new BitrixClient(saved.secret(dmp ? 'dmpWebhook' : 'bitrixWebhook'), saved.config.crm.domain)
+  // Всегда брать текущий globalThis.fetch — иначе тестовый мок не подхватывается и call() висит до AbortSignal.timeout.
+  return new BitrixClient(saved.secret(dmp ? 'dmpWebhook' : 'bitrixWebhook'), saved.config.crm.domain, globalThis.fetch.bind(globalThis))
 }
 export function crmEmail(contact: CrmRecord) {
   const values = contact.EMAIL
