@@ -88,8 +88,8 @@ jobs:
           CMS_PUBLIC_URL: http://127.0.0.1:3001
           CMS_MAINTENANCE: '1'
           CMS_AUTOMATION_TEST_DATABASE: 'true'
-        # Без --test-force-exit: иначе destroy() Payload ещё не закончил, а раннер уже рвёт промис.
-        run: npx tsx --test tests/integration/automation.test.ts
+        # force-exit нужен: без него процесс висит на открытых хендлах пула Postgres после destroy().
+        run: npx tsx --test --test-force-exit tests/integration/automation.test.ts
 
       - name: Проверить полное дублирование проектов и атомарность цен
         working-directory: cms
@@ -99,7 +99,7 @@ jobs:
           CMS_PUBLIC_URL: http://127.0.0.1:3001
           CMS_MAINTENANCE: '1'
           CMS_PROJECT_COPY_TEST_DATABASE: 'true'
-        run: npx tsx --test tests/integration/project-copy.test.ts
+        run: npx tsx --test --test-force-exit tests/integration/project-copy.test.ts
 
       - name: Проверить изоляцию каркасных комплектаций при обновлении
         working-directory: cms
@@ -109,7 +109,7 @@ jobs:
           CMS_PUBLIC_URL: http://127.0.0.1:3001
           CMS_MAINTENANCE: '1'
           CMS_FRAME_CONFIG_TEST_DATABASE: 'true'
-        run: npx tsx --test tests/integration/frame-configurations.test.ts
+        run: npx tsx --test --test-force-exit tests/integration/frame-configurations.test.ts
 
 
       - name: Проверить атомарные ограничения запросов
@@ -122,7 +122,7 @@ jobs:
           PAYLOAD_DB_PUSH: 'false'
           CMS_MAINTENANCE: '1'
           CMS_HARDENING_TEST_DATABASE: 'true'
-        run: npx tsx --test tests/integration/request-hardening.test.ts
+        run: npx tsx --test --test-force-exit tests/integration/request-hardening.test.ts
 
   publish:
     name: Сборка и публикация образа CMS
