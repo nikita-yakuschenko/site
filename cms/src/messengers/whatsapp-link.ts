@@ -118,7 +118,8 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
     clearTimeout(waiting)
     waiting = setTimeout(() => hooks.onHint?.('WhatsApp не отвечает. Ждём код ещё несколько секунд.'), 8000)
     const { state, saveCreds } = await loadAuthState(directory)
-    const useProxy = Boolean(proxyAgent) && proxyFailures < 2
+    // Один заход через прокси; после 408 — DNS, потом fallback IP.
+    const useProxy = Boolean(proxyAgent) && proxyFailures === 0
     const agent = useProxy ? proxyAgent! : (attempt > 0 ? fallbackAgent : directAgent)
     const route = useProxy ? 'proxy' : agent === directAgent ? 'dns' : 'fallback'
     stage('connecting', { route, timeoutMs: 20000, registered: Boolean(state.creds.registered), proxyFailures })
@@ -169,8 +170,8 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
         const error = update.lastDisconnect?.error as (Error & { code?: string }) | undefined
         const reason = error?.message === 'WebSocket Error (Opening handshake has timed out)' ? 'websocket-handshake-timeout' : undefined
         const connectedMs = connectedAt ? Date.now() - connectedAt : null
-        const usedProxy = Boolean(proxyAgent) && proxyFailures < 2
-        stage('closed', { previousStage: lastStage, status: code, reason, connectedMs, networkCode: /^[A-Z0-9_]{1,40}$/.test(error?.code ?? '') ? error?.code : undefined, route: usedProxy ? 'proxy' : undefined })
+        const usedProxy = Boolean(proxyAgent) && proxyFailures === 0
+        stage('closed', { previousStage: lastStage, status: code, reason, connectedMs, networkCode: /^[A-Z0-9_]{1,40}$/.test(error?.code ?? '') ? error?.code : undefined, route: usedProxy ? 'proxy' : (agent === directAgent ? 'dns' : 'fallback') })
         current = null
         connectedAt = 0
         clearTimeout(waiting)
@@ -179,18 +180,19 @@ export async function startWhatsApp(directory: string, hooks: LinkHooks): Promis
           hooks.onError(`WhatsApp остановил сессию (код ${code}). Проверьте связанные устройства.`)
           return
         }
-        // 408 / handshake timeout на прокси — не крутимся в нём вечно.
+        // 408 / handshake timeout на прокси — следующий заход уже без него.
         if (usedProxy && connectedMs === null && (code === 408 || reason === 'websocket-handshake-timeout' || lastStage === 'connecting' || lastStage === 'proxy-connect')) {
-          proxyFailures += 1
+          proxyFailures = 1
           diagnostic('proxy-bypass', { proxyFailures, status: code, reason })
         }
         if (connectedMs !== null && connectedMs >= 60_000) {
           attempt = 0
           proxyFailures = 0
         }
-        if (state.creds.registered || connectedMs !== null || attempt < 1) {
+        // Без сессии тоже пробуем DNS/fallback после отказа прокси (раньше хватало одной попытки).
+        if (state.creds.registered || connectedMs !== null || attempt < 3) {
           const delayMs = Math.min(60_000, 1000 * 2 ** Math.min(attempt++, 6))
-          const nextRoute = Boolean(proxyAgent) && proxyFailures < 2 ? 'proxy' : (attempt > 1 ? (fallbackAgent === directAgent ? 'dns' : 'fallback') : 'dns')
+          const nextRoute = Boolean(proxyAgent) && proxyFailures === 0 ? 'proxy' : (attempt > 1 ? (fallbackAgent === directAgent ? 'dns' : 'fallback') : 'dns')
           diagnostic('retry-scheduled', { delayMs, route: nextRoute, proxyFailures })
           hooks.onReconnecting?.('Связь с WhatsApp прервалась. Восстанавливаем соединение.')
           retry = setTimeout(() => void open().catch(() => {
