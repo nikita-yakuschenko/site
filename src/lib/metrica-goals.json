@@ -5,6 +5,7 @@
   { "event": "lead_mortgage_it", "name": "JS:Заявка - IT-ипотека", "formIds": [] },
   { "event": "lead_mortgage_family", "name": "JS:Заявка - Семейная ипотека", "formIds": [] },
   { "event": "lead_mortgage_market", "name": "JS:Заявка - Рыночная ипотека", "formIds": [] },
+  { "event": "lead_mortgage_hero_39", "name": "JS:Заявка - Ипотека 3,9% Hero-блок проекта", "formIds": ["mortgage-hero-39"] },
   { "event": "lead_exhibition", "name": "JS:Заявка - выставка", "formIds": ["exhibition-visit"] },
   { "event": "lead_factory_tour", "name": "JS:Заявка - экскурсия на производство", "formIds": ["factory-tour"] },
   { "event": "lead_architect", "name": "JS:Заявка - архитектор", "formIds": ["architect-consultation"] },
@@ -13,7 +14,7 @@
   { "event": "lead_referral", "name": "JS:Заявка - реферальная программа", "formIds": ["referral-program"] },
   { "event": "lead_promo", "name": "JS:Заявка - промо на главной", "formIds": ["hero-promo"] },
   { "event": "lead_plan_change", "name": "JS:Заявка - планировка", "formIds": ["plan-change", "plan-change-measure"] },
-  { "event": "lead_passport", "name": "JS:Заявка - паспорт проекта", "formIds": ["project-passport"] },
+  { "event": "lead_passport", "name": "JS:Заявка - Получить паспорт проекта (из блоков где оставили)", "formIds": ["project-passport"] },
   { "event": "lead_meeting", "name": "JS:Заявка - встреча в офисе", "formIds": ["consultation-dialog"] },
   { "event": "lead_telegram", "name": "JS:Заявка - Виджет, заявка, связаться в Telegram", "formIds": ["contact-rail-telegram"] },
   { "event": "lead_whatsapp", "name": "JS:Заявка - Виджет, заявка, связаться в WhatsApp", "formIds": ["contact-rail-whatsapp"] },
@@ -38,5 +39,7 @@
   { "event": "contact_telegram_click", "name": "JS:Действие - Виджет, клик связаться в Telegram", "formIds": [] },
   { "event": "contact_whatsapp_click", "name": "JS:Действие - Виджет, клик связаться в WhatsApp", "formIds": [] },
   { "event": "contact_max_click", "name": "JS:Действие - Виджет, клик связаться в MAX", "formIds": [] },
-  { "event": "contact_callback_click", "name": "JS:Действие - Виджет, клик перезвоните мне", "formIds": [] }
+  { "event": "contact_callback_click", "name": "JS:Действие - Виджет, клик перезвоните мне", "formIds": [] },
+  { "event": "home_mortgage_promo_click", "name": "JS:Действие - Переход с главной на ипотеку через промо 3,9%", "formIds": [] },
+  { "event": "mortgage_hero_form_open", "name": "JS:Действие - открыл форму Ипотека 3,9% Hero-блок проекта", "formIds": [] }
 ]

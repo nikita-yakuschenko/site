@@ -7,7 +7,7 @@ import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { copy } from '../lib/copy';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
 import { readRegionCode } from '../lib/regions';
-import { trackMetricaFormSuccess } from '../lib/metrica-form-goals';
+import { trackMetricaAction, trackMetricaFormSuccess } from '../lib/metrica-form-goals';
 import { submitLead, type LeadAttempt } from '../lib/submit-lead';
 import { useLeadCaptcha } from './use-lead-captcha';
 import { FormSuccessAnimation } from './form-success-animation';
@@ -171,7 +171,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       await submitLead({
         phone: phoneE164(phone),
         siteId: 'avgst',
-        formId: 'mortgage-consultation',
+        formId: 'mortgage-hero-39',
         consent,
         captchaToken,
         sourceUrl: typeof window !== 'undefined' ? window.location.href : undefined,
@@ -240,7 +240,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   function replay() { setOpen(false); setReady(false); setRun(value => value + 1); }
   return <>
     {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${isHero ? ' passport-concept--hero' : ''}${isPlans ? ' passport-concept--plans' : ''}${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
-      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label={isHero ? 'Ипотека под 3,9% на 30 лет' : 'Получить паспорт проекта'} onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
+      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label={isHero ? 'Ипотека под 3,9% на 30 лет' : 'Получить паспорт проекта'} onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { if (isHero) trackMetricaAction('mortgage_hero_form_open'); setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
         <span className="passport-concept__surface" aria-hidden="true" />
         <span className="passport-concept__label">{isHero ? <span>Ипотека под <span className="passport-concept__rate">3,9%</span> на 30 лет</span> : 'Получить паспорт проекта'}</span>
       </button>

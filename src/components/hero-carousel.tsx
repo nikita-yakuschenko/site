@@ -9,6 +9,7 @@ import {
 } from "@tabler/icons-react";
 import { copy, nbspText } from "../lib/copy";
 import { optimizedSrc, optimizedSrcSet, resizedSrc, resizedSrcSet } from "../lib/media";
+import { trackMetricaAction } from "../lib/metrica-form-goals";
 import { CarouselProgress, CAROUSEL_SLIDE_MS } from "./carousel-progress";
 import { LeadDialog } from "./lead-dialog";
 import { useIPRegion } from './use-ip-region';
@@ -58,6 +59,12 @@ export type HeroPromo = {
   video?: string;
   cutout?: boolean;
 };
+
+/** Промо 3,9% на главной: ссылка на ипотеку или текст про семейную ставку. */
+function isMortgage39Promo(promo: HeroPromo) {
+  const hay = `${promo.heading} ${promo.eyebrow || ""} ${promo.text || ""} ${promo.url || ""} ${promo.cta || ""}`.toLowerCase();
+  return /3[,.]9/.test(hay) || /family-mortgage/.test(promo.url || "") || (/ипотек/.test(hay) && /семейн/.test(hay));
+}
 
 // Длительность слота. Текста в карточке три-четыре строки, шести секунд
 // на прочтение не хватало. Значение отсюда же уходит в CSS-переменную, чтобы
@@ -370,6 +377,7 @@ export function HeroCarousel({
   }
 
   function openPromo(promo: HeroPromo) {
+    if (isMortgage39Promo(promo)) trackMetricaAction("home_mortgage_promo_click");
     if (promo.action === "link") {
       const url = promo.url || "";
       if (/^https?:\/\//i.test(url) || url.startsWith("/")) window.location.assign(url);
