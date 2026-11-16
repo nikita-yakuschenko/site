@@ -16,7 +16,7 @@ import { projectPlansEndpoint } from './project-plans-endpoint'
 import { blankRoom, normalizePlans, validRoomArea } from '../config/project-plans'
 import { projectNextStepsEndpoint } from './project-next-steps-endpoint'
 import { projectConfigurationsEndpoint } from './project-configurations-endpoint'
-import { projectYmlEndpoint, projectYmlOptionsEndpoint } from './project-yml-endpoint'
+import { projectYmlEndpoint, projectYmlFeedEndpoint, projectYmlOptionsEndpoint } from './project-yml-endpoint'
 import { projectCatalogEndpoint } from './project-catalog-endpoint'
 import { projectPartnerCabinetEndpoint } from './project-partner-cabinet-endpoint'
 import { projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint } from './project-reactions-endpoint'
@@ -45,7 +45,7 @@ export const Projects: CollectionConfig = {
   disableDuplicate: true,
   versions: { drafts: true, maxPerDoc: 20 },
   access: { read: authenticated, create: contentWriter, update: contentWriter, delete: contentManager },
-  endpoints: [projectCopyEndpoint, ...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectPartnerCabinetEndpoint, projectYmlOptionsEndpoint, projectYmlEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
+  endpoints: [projectCopyEndpoint, ...projectOrderEndpoints, projectHeroEndpoint, projectExteriorsEndpoint, projectInteriorsEndpoint, projectBuiltEndpoint, projectNextStepsEndpoint, projectPlansEndpoint, projectConfigurationsEndpoint, projectCatalogEndpoint, projectPartnerCabinetEndpoint, projectYmlOptionsEndpoint, projectYmlEndpoint, projectYmlFeedEndpoint, projectReactionsEndpoint, projectReactionsWriteEndpoint, projectViewsEndpoint],
   hooks: { afterChange: [({ doc }) => { clearPublicMediaCache(); return doc }], afterDelete: [({ doc }) => { clearPublicMediaCache(); return doc }], beforeDelete: [async ({ id, req }) => {
     // Price rows require a project, so they go first
     await req.payload.delete({ collection: 'project-prices', where: { project: { equals: id } }, req, overrideAccess: true })

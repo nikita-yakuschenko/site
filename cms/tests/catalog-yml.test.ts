@@ -4,7 +4,7 @@ import { execFileSync } from 'node:child_process'
 import type { Project, ProjectPrice } from '../src/payload-types'
 import type { PayloadRequest } from 'payload'
 import { catalogYml } from '../src/config/catalog-yml'
-import { projectYmlEndpoint } from '../src/collections/project-yml-endpoint'
+import { projectYmlEndpoint, projectYmlFeedEndpoint, ymlFeedUrl } from '../src/collections/project-yml-endpoint'
 const p = (overrides = {}) => ({ id: 1, name: 'Дом & <лес> "уют"', slug: 'house-1', _status: 'published', technologyBadge: 'Модульный', areaValue: 42, bedrooms: 0, bathrooms: 1, floorsValue: 1, imageUrl: '/house.jpg?a=1&b=2', priceAmount: 3000000, ...overrides }) as Project
 const price = { project: 1, configuration: 'standard', region: 'nn', price: 4500000 } as ProjectPrice
 
@@ -89,4 +89,68 @@ test('offer description uses CMS text, escapes XML and falls back to actual spec
   const fallback = catalogYml([p({ bathrooms: null })], []).xml
   assert.match(fallback, /Площадь: 42 м²\. Этажей: 1\. Спален: 0\./)
   assert.doesNotMatch(fallback, /Санузлов:/)
+})
+
+function feedRequest(url: string) {
+  const calls: Record<string, unknown>[] = []
+  const req = {
+    url,
+    user: null,
+    payload: {
+      find: async (args: Record<string, unknown>) => { calls.push(args); return { docs: args.collection === 'projects' ? [p()] : [price] } },
+      logger: { error: () => {} },
+    },
+  } as unknown as PayloadRequest
+  return { req, calls }
+}
+
+test('yml feed rejects missing or wrong token before catalogue read', async () => {
+  const previous = process.env.CMS_YML_FEED_TOKEN
+  process.env.CMS_YML_FEED_TOKEN = 'feed-token-for-tests-32chars-min!!'
+  try {
+    for (const url of ['http://cms.test/api/projects/yml?kind=nn', 'http://cms.test/api/projects/yml?kind=nn&token=wrong']) {
+      const { req, calls } = feedRequest(url)
+      assert.equal((await projectYmlFeedEndpoint.handler(req)).status, 401)
+      assert.equal(calls.length, 0)
+    }
+  } finally {
+    if (previous === undefined) delete process.env.CMS_YML_FEED_TOKEN
+    else process.env.CMS_YML_FEED_TOKEN = previous
+  }
+})
+
+test('yml feed serves inline XML for a valid token and kind', async () => {
+  const previous = process.env.CMS_YML_FEED_TOKEN
+  const previousUrl = process.env.CMS_PUBLIC_URL
+  process.env.CMS_YML_FEED_TOKEN = 'feed-token-for-tests-32chars-min!!'
+  process.env.CMS_PUBLIC_URL = 'https://cms.avgst.ru'
+  try {
+    const { req, calls } = feedRequest('http://cms.test/api/projects/yml?kind=nn&token=feed-token-for-tests-32chars-min!!')
+    const response = await projectYmlFeedEndpoint.handler(req)
+    assert.equal(response.status, 200)
+    assert.equal(response.headers.get('Content-Type'), 'application/xml; charset=utf-8')
+    assert.equal(response.headers.get('Content-Disposition'), null)
+    assert.equal(response.headers.get('X-Export-Count'), '1')
+    assert.match(await response.text(), /<yml_catalog/)
+    assert.ok(calls.every(call => call.overrideAccess === true))
+    assert.equal(ymlFeedUrl('nn'), 'https://cms.avgst.ru/api/projects/yml?kind=nn&token=feed-token-for-tests-32chars-min%21%21')
+  } finally {
+    if (previous === undefined) delete process.env.CMS_YML_FEED_TOKEN
+    else process.env.CMS_YML_FEED_TOKEN = previous
+    if (previousUrl === undefined) delete process.env.CMS_PUBLIC_URL
+    else process.env.CMS_PUBLIC_URL = previousUrl
+  }
+})
+
+test('yml feed rejects unknown price kind', async () => {
+  const previous = process.env.CMS_YML_FEED_TOKEN
+  process.env.CMS_YML_FEED_TOKEN = 'feed-token-for-tests-32chars-min!!'
+  try {
+    const { req, calls } = feedRequest('http://cms.test/api/projects/yml?kind=dealer-extra&token=feed-token-for-tests-32chars-min!!')
+    assert.equal((await projectYmlFeedEndpoint.handler(req)).status, 400)
+    assert.equal(calls.length, 0)
+  } finally {
+    if (previous === undefined) delete process.env.CMS_YML_FEED_TOKEN
+    else process.env.CMS_YML_FEED_TOKEN = previous
+  }
 })

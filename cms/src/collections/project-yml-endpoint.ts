@@ -1,19 +1,60 @@
-import type { Endpoint } from 'payload'
+import type { Endpoint, PayloadRequest } from 'payload'
+import { equalSecret } from '../automation/crypto'
 import { authenticated } from '../access/staff'
 import { catalogYml } from '../config/catalog-yml'
-import { isPriceKind, priceKindsInForm, summaryConfiguration } from '../config/price-kinds'
+import { isPriceKind, priceKindsInForm, summaryConfiguration, type PriceKind } from '../config/price-kinds'
 
-const publishedProjects = (req: Parameters<Endpoint['handler']>[0]) => req.payload.find({ collection: 'projects', draft: false, pagination: false, depth: 1, sort: 'id', req, overrideAccess: false, where: { _status: { equals: 'published' } } })
+const feedToken = () => process.env.CMS_YML_FEED_TOKEN?.trim() || ''
+
+const publishedProjects = (req: PayloadRequest, overrideAccess: boolean) => req.payload.find({
+  collection: 'projects', draft: false, pagination: false, depth: 1, sort: 'id', req, overrideAccess,
+  where: { _status: { equals: 'published' } },
+})
+
+async function buildCatalogYml(req: PayloadRequest, priceKind: PriceKind, overrideAccess: boolean) {
+  const projects = await publishedProjects(req, overrideAccess)
+  const prices = await req.payload.find({
+    collection: 'project-prices', pagination: false, depth: 0, req, overrideAccess,
+    where: { and: [{ region: { equals: priceKind } }, { configuration: { equals: summaryConfiguration(priceKind) } }] },
+  })
+  return catalogYml(projects.docs, prices.docs, new Date(), process.env.CMS_PUBLIC_URL, priceKind)
+}
+
+export function ymlFeedUrl(priceKind: PriceKind) {
+  const token = feedToken()
+  if (!token) return null
+  const origin = (process.env.CMS_PUBLIC_URL || 'https://cms.avgst.ru').replace(/\/$/, '')
+  const url = new URL(`${origin}/api/projects/yml`)
+  url.searchParams.set('kind', priceKind)
+  url.searchParams.set('token', token)
+  return url.href
+}
+
+function xmlResponse(result: { xml: string; count: number; skipped: number }, attachment?: string) {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/xml; charset=utf-8',
+    'Cache-Control': 'no-store',
+    'X-Export-Count': String(result.count),
+    'X-Export-Skipped': String(result.skipped),
+  }
+  if (attachment) headers['Content-Disposition'] = `attachment; filename="${attachment}"`
+  return new Response(result.xml, { headers })
+}
 
 export const projectYmlOptionsEndpoint: Endpoint = {
   path: '/export-yml/options', method: 'get', handler: async req => {
     try {
       if (!await authenticated({ req })) return Response.json({ error: 'Нет доступа к выгрузке каталога' }, { status: 403 })
       const [projects, prices] = await Promise.all([
-        publishedProjects(req),
+        publishedProjects(req, false),
         req.payload.find({ collection: 'project-prices', pagination: false, depth: 0, req, overrideAccess: false }),
       ])
-      const options = priceKindsInForm.map(kind => ({ value: kind.value, label: kind.label, count: catalogYml(projects.docs, prices.docs, new Date(), process.env.CMS_PUBLIC_URL, kind.value).count })).filter(kind => kind.count > 0)
+      const options = priceKindsInForm.map(kind => ({
+        value: kind.value,
+        label: kind.label,
+        count: catalogYml(projects.docs, prices.docs, new Date(), process.env.CMS_PUBLIC_URL, kind.value).count,
+        feedUrl: ymlFeedUrl(kind.value),
+      })).filter(kind => kind.count > 0)
       return Response.json({ options }, { headers: { 'Cache-Control': 'no-store' } })
     } catch (error) {
       req.payload.logger.error({ err: error, msg: 'Catalog YML price options failed' })
@@ -29,15 +70,31 @@ export const projectYmlEndpoint: Endpoint = {
       const body = await req.json?.().catch(() => null)
       const priceKind = body?.priceKind ?? 'nn'
       if (!isPriceKind(priceKind)) return Response.json({ error: 'Неизвестный тип цены' }, { status: 400 })
-      // draft:false reads the live document, never the latest draft version.
-      const projects = await publishedProjects(req)
-      const prices = await req.payload.find({ collection: 'project-prices', pagination: false, depth: 0, req, overrideAccess: false, where: { and: [{ region: { equals: priceKind } }, { configuration: { equals: summaryConfiguration(priceKind) } }] } })
-      const result = catalogYml(projects.docs, prices.docs, new Date(), process.env.CMS_PUBLIC_URL, priceKind)
+      const result = await buildCatalogYml(req, priceKind, false)
       if (!result.count) return Response.json({ error: 'Нет опубликованных проектов с корректной ценой, технологией и изображением' }, { status: 422 })
       const filename = priceKind === 'nn' ? 'avgst-catalog.yml' : `avgst-catalog-${priceKind}.yml`
-      return new Response(result.xml, { headers: { 'Content-Type': 'application/xml; charset=utf-8', 'Content-Disposition': `attachment; filename="${filename}"`, 'Cache-Control': 'no-store', 'X-Export-Count': String(result.count), 'X-Export-Skipped': String(result.skipped) } })
+      return xmlResponse(result, filename)
     } catch (error) {
       req.payload.logger.error({ err: error, msg: 'Catalog YML export failed' })
+      return Response.json({ error: 'Не удалось сформировать YML. Попробуйте ещё раз.' }, { status: 500 })
+    }
+  },
+}
+
+export const projectYmlFeedEndpoint: Endpoint = {
+  path: '/yml', method: 'get', handler: async req => {
+    try {
+      const expected = feedToken()
+      const url = new URL(req.url || 'http://localhost')
+      const token = url.searchParams.get('token') || ''
+      if (!expected || !equalSecret(token, expected)) return Response.json({ error: 'Нет доступа' }, { status: 401 })
+      const priceKind = url.searchParams.get('kind') || 'nn'
+      if (!isPriceKind(priceKind)) return Response.json({ error: 'Неизвестный тип цены' }, { status: 400 })
+      const result = await buildCatalogYml(req, priceKind, true)
+      if (!result.count) return Response.json({ error: 'Нет опубликованных проектов с корректной ценой, технологией и изображением' }, { status: 422 })
+      return xmlResponse(result)
+    } catch (error) {
+      req.payload.logger.error({ err: error, msg: 'Catalog YML feed failed' })
       return Response.json({ error: 'Не удалось сформировать YML. Попробуйте ещё раз.' }, { status: 500 })
     }
   },

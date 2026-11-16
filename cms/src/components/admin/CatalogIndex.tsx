@@ -3,7 +3,7 @@
 import { projectPublicationStatus } from '../../config/project-publication-status'
 
 import { useProjectCopy } from './ProjectCopyButton'
-import { useRef, useState } from 'react'
+import { useRef, useState, type MouseEvent } from 'react'
 import Link from 'next/link'
 import type { Project } from '../../payload-types'
 import { TECHNOLOGY_OPTIONS, technologyLabel } from '../../../../src/lib/catalog/types'
@@ -67,6 +67,29 @@ function RangeFilter({ title, min, max, onMin, onMax }: { title: string; min: st
 }
 
 export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; projects: Project[]; leads: Record<string, number> }) {
+  function downloadStatistics() {
+    const rows = [
+      ['Название проекта', 'Технология', 'Площадь, м²', 'Этажность', 'Спальни', 'Просмотры', 'Лайки', 'Шеры', 'Заявки'],
+      ...projects.map(project => [
+        project.name, technologyLabel(project.technologyBadge), project.areaValue?.toLocaleString('ru-RU', { useGrouping: false }),
+        project.floorsValue, project.bedrooms, stat(project.viewCount), stat(project.likeCount),
+        stat(project.shareCount), leads[project.id] ?? 0,
+      ]),
+    ]
+    const csv = rows.map(row => row.map(value => {
+      const text = String(value ?? '')
+      const plainText = typeof value === 'string' && /^[\s]*[=+\-@]|^[\t\r\n]/.test(text) ? "'" + text : text
+      return '"' + plainText.replaceAll('"', '""') + '"'
+    }).join(';')).join('\r\n')
+    const url = URL.createObjectURL(new Blob(['\uFEFF', csv], { type: 'text/csv;charset=utf-8' }))
+    const link = document.createElement('a')
+    link.href = url
+    link.download = 'catalog-statistics.csv'
+    document.body.append(link)
+    link.click()
+    link.remove()
+    setTimeout(() => URL.revokeObjectURL(url), 1000)
+  }
   const projectCopy = useProjectCopy()
   const initial = useSearchParams()
   const [sorting, setSorting] = useState(() => sortingFrom(initial))
@@ -77,11 +100,25 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
   const [busy, setBusy] = useState(false)
   const [exporting, setExporting] = useState(false)
   const [exportDialogOpen, setExportDialogOpen] = useState(false)
-  const [priceOptions, setPriceOptions] = useState<{ value: PriceKind; label: string; count: number }[]>([])
+  const [priceOptions, setPriceOptions] = useState<{ value: PriceKind; label: string; count: number; feedUrl: string | null }[]>([])
   const [selectedPriceKind, setSelectedPriceKind] = useState<PriceKind | null>(null)
   const [loadingPriceOptions, setLoadingPriceOptions] = useState(false)
   const [priceOptionsError, setPriceOptionsError] = useState('')
   const exportLock = useRef(false)
+  const copyFeedUrl = async (event: MouseEvent, option: { label: string; feedUrl: string | null }) => {
+    event.preventDefault()
+    event.stopPropagation()
+    if (!option.feedUrl) {
+      toast.error('Ссылка на фид не настроена. Задайте CMS_YML_FEED_TOKEN.')
+      return
+    }
+    try {
+      await navigator.clipboard.writeText(option.feedUrl)
+      toast.success('Ссылка на фид скопирована')
+    } catch {
+      toast.error('Не удалось скопировать ссылку')
+    }
+  }
   const openExportDialog = async () => {
     setExportDialogOpen(true)
     setLoadingPriceOptions(true)
@@ -92,7 +129,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
       const response = await fetch('/api/projects/export-yml/options', { credentials: 'include', cache: 'no-store' })
       const body = await response.json()
       if (!response.ok) throw new Error(body?.error || 'Не удалось получить типы цен')
-      const options = body.options as { value: PriceKind; label: string; count: number }[]
+      const options = body.options as { value: PriceKind; label: string; count: number; feedUrl: string | null }[]
       setPriceOptions(options)
       setSelectedPriceKind(options.find(option => option.value === 'nn')?.value ?? options[0]?.value ?? null)
     } catch (error) {
@@ -202,6 +239,7 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
         <DataTableSearch label="Поиск проектов" value={search} onChange={value => { setSearch(value); table.setPage(0) }} />
         <Button asChild variant="outline"><Link href="/catalog/redirects">Редиректы</Link></Button>
         <Button type="button" variant="outline" onClick={openExportDialog}>Выгрузить YML</Button>
+        <Button type="button" variant="outline" onClick={downloadStatistics}>Скачать статистику</Button>
         <Button asChild><Link href="/collections/projects/create">Создать</Link></Button>
       </div>
     </div>
@@ -241,7 +279,12 @@ export function CatalogIndex({ siteUrl, projects, leads }: { siteUrl: string; pr
         <legend className="sr-only">Тип цены</legend>
         {priceOptions.map(option => <label key={option.value} className="flex cursor-pointer items-center justify-between gap-3 rounded-md border px-3 py-2 text-sm has-checked:border-primary has-checked:bg-muted">
           <span className="flex items-center gap-2"><input type="radio" name="yml-price-kind" value={option.value} checked={selectedPriceKind === option.value} onChange={() => setSelectedPriceKind(option.value)} />{option.label}</span>
-          <span className="text-muted-foreground">{option.count} проектов</span>
+          <span className="flex items-center gap-2">
+            <Button type="button" size="icon" variant="ghost" className="size-8 shrink-0 text-muted-foreground" aria-label={`Скопировать ссылку на фид: ${option.label}`} title={`Скопировать ссылку на фид: ${option.label}`} onClick={event => void copyFeedUrl(event, option)}>
+              <IconCopy className="size-4" />
+            </Button>
+            <span className="text-muted-foreground tabular-nums">{option.count} проектов</span>
+          </span>
         </label>)}
       </fieldset>}
       <DialogFooter><Button type="button" variant="outline" disabled={exporting} onClick={() => setExportDialogOpen(false)}>Отмена</Button><Button type="button" disabled={!selectedPriceKind || loadingPriceOptions || exporting} aria-busy={exporting} onClick={exportYml}>{exporting ? 'Формирование…' : 'Скачать YML'}</Button></DialogFooter>
