@@ -19,13 +19,8 @@ export function passportPricing(tiers: readonly PricedTier[], technology: Catalo
     if (!tier.name?.trim() || !Number.isSafeInteger(tier.price) || tier.price <= 0) {
       throw new PassportDataError('price', `Missing ordinary ${region} price or name for ${key}`)
     }
-    // An absent special price means ordinary pricing, never coefficient pricing.
-    if (tier.specialPrice != null && (!Number.isSafeInteger(tier.specialPrice) || tier.specialPrice <= 0)) {
-      throw new PassportDataError('price', `Invalid special ${region} price for ${key}`)
-    }
-    const specialPrice = tier.specialPrice ?? null
-    const displayedPrice = specialPrice ?? tier.price
-    /* Hero и CTA считают семейную 3,9% от той же цены, что раньше шла в 6%. */
+    const displayedPrice = tier.price
+    /* Hero и CTA считают семейную 3,9% от той же базовой цены комплектации. */
     const program = getMortgageProgram('family39')
     const mortgage = mortgageAllowed(key) && tier.mortgage !== false ? calculateMortgage({
       programId: program.id, region, propertyPrice: tier.price,
@@ -34,8 +29,7 @@ export function passportPricing(tiers: readonly PricedTier[], technology: Catalo
     const payment = mortgage && !mortgage.errors.length && !mortgage.cappedByMaxLoan && mortgage.monthlyPayment > 0
       ? monthlyPaymentForProject({ propertyPrice: tier.price, programId: program.id, region }) : null
     return { mortgagePaymentLabel: payment === null ? null : `${formatRub(payment)}/мес.`, key, name: tier.name, priceLabel: formatRub(displayedPrice),
-      ...(specialPrice !== null ? { regularPriceLabel: formatRub(tier.price) } : {}),
-      special: specialPrice !== null, regularPrice: tier.price, specialPrice, displayedPrice }
+      special: false, regularPrice: tier.price, specialPrice: null, displayedPrice }
   }) as PassportPricing['tiers']
   const standardMortgageBasePrice = normalized.find(tier => tier.key === 'standard')!.regularPrice
   const program = getMortgageProgram('family39')

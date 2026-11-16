@@ -1,10 +1,10 @@
 import type { CatalogProject } from './types'
 
-/** Customer prices for cards and catalog filtering; mortgage prices stay untouched. */
+/** Карточки и фильтры каталога берут ту же базовую цену, что и страница проекта. */
 export function catalogDisplayPrice(project: Pick<CatalogProject, 'priceAmount' | 'regionalPrices' | 'regionalSpecialPrices' | 'readyHome'>, region: 'nn' | 'msk' = 'nn'): number | null {
   const price = project.readyHome ? project.readyHome.salePrice
-    : project.regionalSpecialPrices !== undefined ? project.regionalSpecialPrices[region]
-      : project.regionalPrices ? project.regionalPrices[region] : project.priceAmount
+    : project.regionalPrices ? project.regionalPrices[region] ?? project.priceAmount
+      : project.priceAmount
   return typeof price === 'number' && Number.isFinite(price) && price > 0 ? price : null
 }
 

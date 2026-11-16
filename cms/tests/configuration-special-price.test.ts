@@ -7,16 +7,16 @@ import { configurationTiers } from '../../src/lib/catalog/project-configurations
 import { displayedTierPrice, tiersForRegion } from '../../src/lib/catalog/tiers'
 import { monthlyPaymentForProject } from '../../src/lib/mortgage'
 
-test('special prices replace displayed prices while mortgage principal stays regional and ordinary', () => {
+test('displayed configuration price is the same base price used for mortgage', () => {
   const data = normalizeConfigurations([], 'Каркасный').map(row => ({ ...row, price: 5000000, regionalPrices: { nn: 5000000, msk: 6000000 }, specialPrices: { nn: 4000000 } }))
   const tiers = configurationTiers(data, 'Каркасный')!
   const nn = tiersForRegion(tiers, 'nn')[1]!
   assert.equal(nn.price, 5000000)
-  assert.equal(displayedTierPrice(nn), 4000000)
-  assert.notEqual(monthlyPaymentForProject({ propertyPrice: nn.price, region: 'nn' }), monthlyPaymentForProject({ propertyPrice: displayedTierPrice(nn), region: 'nn' }))
+  assert.equal(displayedTierPrice(nn), 5000000)
+  assert.equal(monthlyPaymentForProject({ propertyPrice: nn.price, region: 'nn' }), monthlyPaymentForProject({ propertyPrice: displayedTierPrice(nn), region: 'nn' }))
   const msk = tiersForRegion(tiers, 'msk')[1]!
   assert.equal(msk.price, 6000000)
-  assert.equal(displayedTierPrice(msk), 0, 'missing special price neither borrows NN nor displays the ordinary price')
+  assert.equal(displayedTierPrice(msk), 6000000)
   assert.equal(tiers[2]!.id, 'project')
   assert.equal(tiers[2]!.name, 'Расширенная')
   assert.equal(configurationTiers(normalizeConfigurations([], 'Модульный'), 'Модульный')![1]!.name, 'Проектная')

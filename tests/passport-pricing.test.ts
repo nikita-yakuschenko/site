@@ -22,21 +22,20 @@ test('ordinary prices are displayed without specials; mortgage uses standard, no
   assert.ok(result.tiers.every(tier => tier.priceLabel.includes('руб.')))
 })
 
-test('special display never becomes mortgage principal; regional snapshots stay independent', () => {
+test('legacy special prices are ignored; display and mortgage use the same base price', () => {
   const input = tiers().map(tier => ({ ...tier, regionalSpecialPrices: { nn: 123_000, msk: 456_000 } }))
   const nn = passportPricing(input, 'panel', 'nn')
   const msk = passportPricing(input, 'panel', 'msk')
   assert.deepEqual([nn.standardMortgageBasePrice, msk.standardMortgageBasePrice], [2_000_000, 4_000_000])
-  assert.deepEqual([nn.tiers[1].displayedPrice, msk.tiers[1].displayedPrice], [123_000, 456_000])
-  assert.ok(nn.tiers[1].regularPriceLabel)
-  assert.equal(nn.tiers[1].special, true)
+  assert.deepEqual([nn.tiers[1].displayedPrice, msk.tiers[1].displayedPrice], [2_000_000, 4_000_000])
+  assert.equal(nn.tiers[1].special, false)
+  assert.equal(nn.tiers[1].specialPrice, null)
 })
 
-test('reject missing regional ordinary prices, incomplete or duplicate tiers and invalid specials', () => {
+test('reject missing regional ordinary prices, incomplete or duplicate tiers', () => {
   assert.throws(() => passportPricing(tiers().slice(1), 'panel', 'nn'))
   assert.throws(() => passportPricing([tiers()[0]!, tiers()[0]!, tiers()[2]!], 'panel', 'nn'))
   assert.throws(() => passportPricing(tiers().map(tier => ({ ...tier, regionalPrices: { nn: tier.price } })), 'panel', 'msk'))
-  assert.throws(() => passportPricing(tiers().map(tier => ({ ...tier, specialPrice: -1 })), 'panel', 'nn'))
   assert.throws(() => passportPricing(tiers(), 'panel', 'dealer' as 'nn'))
 })
 

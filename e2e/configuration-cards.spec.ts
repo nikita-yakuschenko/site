@@ -15,7 +15,8 @@ for (const width of [1280, 1024, 390]) {
       expect(await card.locator('.project-config__tier-gift').count()).toBeGreaterThan(0);
       await expect(card.locator('.project-config__tier-gift svg')).toHaveCount(0);
       await expect(card.locator('.project-config__tier-band svg')).toHaveCount(1);
-      await expect(card.locator('.project-config__tier-price')).toHaveText(/^Специальная цена\s*[\d\s]+руб\.$/);
+      await expect(card.locator('.project-config__tier-price')).toHaveText(/^[\d\s]+руб\.$/);
+      await expect(card.locator('.project-config__tier-price')).not.toContainText('Специальная цена');
       expect(await card.innerText()).not.toMatch(/[₽—–]|Стоимость/);
       await expect(card.locator('.project-config__tier-price')).toHaveCSS('white-space', 'nowrap');
       expect(await card.locator('.project-config__tier-band').evaluate(element => getComputedStyle(element, '::before').borderTopStyle)).toBe('dashed');
