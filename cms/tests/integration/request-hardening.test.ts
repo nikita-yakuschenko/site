@@ -16,5 +16,8 @@ test('distributed request counters enforce atomic limits across concurrent reque
   assert.equal(result.filter(r=>r.status==='rejected').length,7)
   const db=p.db as unknown as {drizzle:{execute:(q:ReturnType<typeof sql>)=>Promise<unknown>}}
   await db.drizzle.execute(sql`DELETE FROM request_limits WHERE key LIKE ${`lead:%:${identity}`}`)
- }finally{await p.destroy()}
+ }finally{
+  await p.destroy()
+  await (p.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
+ }
 })

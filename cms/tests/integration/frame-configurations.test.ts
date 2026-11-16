@@ -33,5 +33,8 @@ test('frame upgrade preserves every panel/modular row and seeds only the indepen
       assert.equal((await db.execute(sql`SELECT count(*)::integer AS count FROM cfg_f_project_gift WHERE "_parent_id"=${row.id}`)).rows[0].count, 0)
       throw rollback
     }), error => error === rollback)
-  } finally { await p.destroy() }
+  } finally {
+    await p.destroy()
+    await (p.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
+  }
 })

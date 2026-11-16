@@ -81,5 +81,11 @@ test('durable registrations, independent confirmations, email queue, DMP idempot
     assert.ok(intake, 'lead receipt and durable intake job are saved together')
     await processJob(payload, 'intake', intake.data as Record<string, unknown>)
     assert.equal((await payload.find({ collection: 'referral-participants', where: { email: { equals: `intake-${suffix}@example.test` } } })).totalDocs, 1)
-  } finally { globalThis.fetch = fetchBefore; Object.assign(nodemailer, { createTransport: mailBefore }); await payload.destroy() }
+  } finally {
+    globalThis.fetch = fetchBefore
+    Object.assign(nodemailer, { createTransport: mailBefore })
+    await payload.destroy()
+    // destroy() Payload только сбрасывает drizzle-схему и не закрывает pg.Pool.
+    await (payload.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
+  }
 })

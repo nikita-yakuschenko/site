@@ -76,5 +76,6 @@ test('complete project copies are independent drafts with atomic prices, unique 
     for (const id of projects.reverse()) await p.delete({ collection: 'projects', id })
     for (const id of users.filter(id => id !== admin.id)) await p.delete({ collection: 'users', id, req: adminReq })
     await p.destroy()
+    await (p.db as { pool?: { end: () => Promise<void> } }).pool?.end().catch(() => undefined)
   }
 })
