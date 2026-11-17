@@ -11,6 +11,7 @@
   align-items: center;
   justify-content: space-between;
 }
+.journal-technical-actions { display: flex; align-items: center; gap: 4px; white-space: nowrap; }
 .journal-technical-inner :is(a,button) {
   display: inline-flex;
   align-items: center;
@@ -30,6 +31,9 @@
   cursor: pointer;
 }
 .journal-technical-inner :is(a,button):focus-visible { outline: 2px solid currentColor; outline-offset: -2px; }
+@media (max-width: 520px) {
+  .journal-technical-logo { width: min(36vw, 155px); height: auto; }
+}
 .journal {
   width: min(100% - 2rem, 1160px);
   margin-inline: auto;
