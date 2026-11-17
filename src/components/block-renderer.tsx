@@ -15,6 +15,7 @@ import type { CatalogProject } from "../lib/catalog/types";
 import type { PublicStory } from "../lib/stories";
 import { BankStrip } from "./bank-strip";
 import { ContactsPlace } from "./contacts-place";
+import { ContactsRegionHeading } from "./contacts-region-heading";
 import { CopyButton } from "./copy-button";
 import { FactoryVideo, FACTORY_VIDEO_EMBED } from "./factory-video";
 import {
@@ -369,7 +370,11 @@ export function ContactsSection({
             {block.showEyebrow !== false ? (
               <p className="eyebrow">{copy.contactsEyebrow}</p>
             ) : null}
-            <h2>{String(block.heading || copy.contacts)}</h2>
+            {!block.heading || block.heading === copy.contacts ? (
+              <ContactsRegionHeading />
+            ) : (
+              <h2>{String(block.heading)}</h2>
+            )}
             <p className="contacts__lead">
               {block.body ? String(block.body) : copy.contactsBody}
             </p>
