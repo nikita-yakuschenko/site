@@ -61,12 +61,13 @@ export function selectRegionCode(code: RegionCode): void {
 
 export function readRegionCode(): RegionCode {
   if (typeof window === "undefined") return "nn";
-  if (sessionRegion) return sessionRegion;
+  // Cookie — источник для SSR и смены региона; session/localStorage не перекрывают его.
   const fromCookie = readCookieRegionCode();
   if (fromCookie) {
     sessionRegion = fromCookie;
     return fromCookie;
   }
+  if (sessionRegion) return sessionRegion;
   try {
     return regionByCode(window.localStorage.getItem(STORAGE_KEY)).code;
   } catch {

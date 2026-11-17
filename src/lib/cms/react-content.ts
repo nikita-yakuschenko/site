@@ -77,6 +77,8 @@ export function bindReactContent(block: string, children: ReactNode, parts: read
     if (typeof original.className === 'string' && original.className.split(/\s+/).includes('site-header__subrow')) return node
     // Another connected block owns its own fields and paths.
     if (original.cmsBlockKey || original['data-cms-content-root'] || original['data-cms-content-connected']) return node
+    // Телефон региональный + Roistat: CMS не должна замораживать сохранённый tel:/текст.
+    if (typeof original.href === 'string' && original.href.startsWith('tel:')) return node
     const tag = typeof element.type === 'string' ? element.type : ''
     if (['svg', 'script', 'style', 'noscript', 'input', 'select', 'textarea'].includes(tag)) return node
     const props: Record<string, unknown> = {}
