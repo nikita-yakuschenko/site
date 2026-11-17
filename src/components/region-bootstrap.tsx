@@ -3,6 +3,7 @@
 import { createContext, Suspense, useContext, useEffect, useSyncExternalStore, type ReactNode } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { applyRegionFromSearch, readRegionCode, readSelectedRegionCode, subscribeRegion, type RegionCode } from '../lib/regions';
+import { applyRegionCalltracking } from '../lib/roistat-region';
 
 /** Начальный регион из конкретного серверного запроса, без общих SSR-переменных. */
 const InitialRegion = createContext<RegionCode>('nn');
@@ -15,7 +16,10 @@ export function useSelectedRegionCode(): RegionCode | null {
 }
 function RegionTrafficSync() {
   const search = useSearchParams().toString();
-  useEffect(() => { applyRegionFromSearch(search); }, [search]);
+  useEffect(() => {
+    const marked = applyRegionFromSearch(search);
+    if (marked) applyRegionCalltracking(marked);
+  }, [search]);
   return null;
 }
 export function RegionBootstrap({ region, children }: { region: RegionCode; children: ReactNode }) {

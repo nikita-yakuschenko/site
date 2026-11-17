@@ -29,7 +29,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { LeadDialog } from "./lead-dialog";
 import { copy } from "../lib/copy";
-import { copyrightYears, FOOTER_SOCIALS, footerSocialHref } from "../lib/site";
+import { copyrightYears, FOOTER_SOCIALS, footerSocialHref, phoneForRegion } from "../lib/site";
 import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
 import { OfficeStatusIndicator } from "./office-status";
@@ -177,6 +177,8 @@ export function SiteChrome({
     () => "light" as TechBarTheme,
   );
   const regionCode = useRegionCode();
+  // Регион важнее пропа: при переключении НН/МСК меняется базовый номер для Roistat.
+  const displayPhone = phoneForRegion(regionCode) || phone || null;
 
   function toggleTechBarTheme() {
     writeTechBarTheme(techBarTheme === "light" ? "dark" : "light");
@@ -292,9 +294,9 @@ export function SiteChrome({
             </nav>
 
             <div className="site-header__aside" data-cms-block="mainHeader.contacts">
-              {phone ? (
-                <TrackedPhone className="site-header__phone" href={telHref(phone)}>
-                  {phone}
+              {displayPhone ? (
+                <TrackedPhone key={regionCode} className="site-header__phone" href={telHref(displayPhone)}>
+                  {displayPhone}
                 </TrackedPhone>
               ) : null}
               <button
@@ -384,13 +386,14 @@ export function SiteChrome({
                 </Fragment>
               ))}
             </nav>
-            {phone ? (
+            {displayPhone ? (
               <TrackedPhone
+                key={`menu-${regionCode}`}
                 className="site-menu__phone"
-                href={telHref(phone)} suppressHydrationWarning
+                href={telHref(displayPhone)} suppressHydrationWarning
                 onClick={() => setMenuOpen(false)}
               >
-                {phone}
+                {displayPhone}
               </TrackedPhone>
             ) : null}
             <button
@@ -537,13 +540,14 @@ export function SiteChrome({
                   </span>
                 </p>
               </div>
-              {phone ? (
+              {displayPhone ? (
                 <TrackedPhone
+                  key={`footer-${regionCode}`}
                   className="footer-contacts__row footer-contacts__row--link"
-                  href={telHref(phone)} suppressHydrationWarning
+                  href={telHref(displayPhone)} suppressHydrationWarning
                 >
                   <IconPhone size={18} stroke={1.75} aria-hidden="true" />
-                  <span suppressHydrationWarning>{phone}</span>
+                  <span suppressHydrationWarning>{displayPhone}</span>
                 </TrackedPhone>
               ) : null}
               {email ? (

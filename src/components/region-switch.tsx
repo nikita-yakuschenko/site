@@ -10,6 +10,7 @@ import {
   selectRegionCode,
   type RegionCode,
 } from '../lib/regions'
+import { applyRegionCalltracking } from '../lib/roistat-region'
 
 export function RegionSwitch() {
   const router = useRouter()
@@ -37,6 +38,7 @@ export function RegionSwitch() {
   function select(next: RegionCode): void {
     if (next !== code) trackMetricaAction('region_switch')
     selectRegionCode(next)
+    applyRegionCalltracking(next)
     setOpen(false)
     router.refresh()
   }

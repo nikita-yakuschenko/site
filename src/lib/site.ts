@@ -1,4 +1,5 @@
 import { copy } from './copy'
+import type { RegionCode } from './regions'
 
 /**
  * Описание корпоративного сайта.
@@ -14,6 +15,11 @@ export const SITE = {
   code: 'corporate',
   contacts: {
     phone: '+7 (831) 266-66-45',
+    /** Базовые номера до подмены Roistat: НН и МСК (как на msk.avgst.ru в Тильде). */
+    phones: {
+      nn: '+7 (831) 266-66-45',
+      msk: '+7 (495) 492-77-60',
+    },
     email: 'avgst@avgst.ru',
     address: 'Деловой центр «Ока», проспект Гагарина 27А к1',
   },
@@ -81,6 +87,11 @@ export function footerSocialHref(
 ): string {
   if (region === "msk" && "hrefMsk" in item && item.hrefMsk) return item.hrefMsk
   return item.href
+}
+
+/** Базовый телефон региона — его Roistat подменяет на номер коллтрекинга. */
+export function phoneForRegion(region: RegionCode | null | undefined): string {
+  return region === 'msk' ? SITE.contacts.phones.msk : SITE.contacts.phones.nn
 }
 
 /** Год основания компании — нижняя граница копирайта в подвале. */

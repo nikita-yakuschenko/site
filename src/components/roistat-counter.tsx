@@ -1,8 +1,19 @@
+import { REGION_COOKIE } from '../lib/region-traffic'
+
 /** Стандартный сниппет виден в исходном HTML и запускается до гидратации. */
 export function RoistatCounter({ projectId }: { projectId: string }) {
   if (!/^[a-zA-Z0-9]{8,64}$/.test(projectId)) return null
+  const scriptNn = process.env.NEXT_PUBLIC_ROISTAT_SCRIPT_NN?.trim() || ''
+  const scriptMsk = process.env.NEXT_PUBLIC_ROISTAT_SCRIPT_MSK?.trim() || ''
+  const nnId = /^\d{1,10}$/.test(scriptNn) ? scriptNn : ''
+  const mskId = /^\d{1,10}$/.test(scriptMsk) ? scriptMsk : ''
   const code = `(function(w, d, s, h, id) {
     if (w.roistatProjectId) return;
+    var regionMatch = d.cookie.match(/(?:^|; )${REGION_COOKIE}=([^;]*)/);
+    var region = regionMatch ? decodeURIComponent(regionMatch[1]) : 'nn';
+    var scripts = { nn: ${JSON.stringify(nnId)}, msk: ${JSON.stringify(mskId)} };
+    var scriptId = scripts[region] || scripts.nn;
+    if (scriptId) w.roistatCalltrackingScripts = [Number(scriptId)];
     w.roistatProjectId = id; w.roistatHost = h;
     var previous = w.onRoistatAllModulesLoaded;
     w.onRoistatAllModulesLoaded = function() {
