@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { IconArrowRight, IconBook, IconSearch } from '@tabler/icons-react'
-import { getTopic, stories, topics, articleUrl, readingMinutes, type Story, type Topic } from './content'
+import { IconArrowRight, IconBook } from '@tabler/icons-react'
+import { getTopic, stories, articleUrl, readingMinutes, type Story, type Topic } from './content'
 
 export function StoryCard({ story, featured = false }: { story: Story; featured?: boolean }) {
   return <article className={featured ? 'journal-card journal-card-featured' : 'journal-card'}>
@@ -32,20 +32,8 @@ export function JournalView({ topic, query, page }: { topic?: Topic; query?: str
     return params.size ? `${path}?${params}` : path
   }
   return <>
-    {topic && <nav className="journal-crumb" aria-label="Хлебные крошки"><Link href="/journal">Журнал</Link><span>{topic.title}</span></nav>}
-    <header className="journal-intro">
-      <h1>{topic?.title ?? 'Журнал о строительстве и загородной жизни'}</h1>
-      <p>{topic?.description ?? 'Практические материалы о выборе проекта, строительстве дома и жизни за городом.'}</p>
-    </header>
-    <form className="journal-search" action={path} role="search">
-      <IconSearch size={20} aria-hidden />
-      <input type="search" name="q" aria-label="Поиск по журналу" placeholder="Найти статью, например, об отоплении" defaultValue={query} maxLength={100} />
-      <button type="submit">Найти</button>
-    </form>
-    <nav className="journal-topics" aria-label="Темы журнала">
-      <Link href="/journal" aria-current={!topic ? 'page' : undefined}>Все материалы</Link>
-      {topics.map(item => <Link key={item.slug} href={`/journal/topic/${item.slug}`} aria-current={topic?.slug === item.slug ? 'page' : undefined}>{item.title}</Link>)}
-    </nav>
+    {topic && <nav className="journal-crumb" aria-label="Хлебные крошки"><Link href="/journal">Главная</Link><span aria-current="page">{topic.title}</span></nav>}
+    {topic && <header className="journal-intro"><h1>{topic.title}</h1></header>}
     {featured && <section className="journal-featured" aria-label="Выбор редакции">
       <StoryCard story={featured} featured />
       <div className="journal-featured-side">{items.slice(1, 3).map(story => <StoryCard key={story.slug} story={story} />)}</div>

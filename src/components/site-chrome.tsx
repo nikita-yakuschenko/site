@@ -65,7 +65,6 @@ const META_LINK_GROUPS: readonly MetaGroup[] = [
     // покупатель, а не человек, которому нужна справка.
     links: [
       { label: copy.about, href: "/about" },
-      ...(process.env.NODE_ENV === "development" ? [{ label: "Журнал", href: "/journal" }] : []),
       { label: copy.business, href: "/business" },
       { label: copy.dealers, href: "https://b2b.avgst.ru/" },
     ],
@@ -189,7 +188,8 @@ export function SiteChrome({
                       : "site-meta-nav__group"
                   }
                 >
-                  {group.links.map((item) => (
+                  {group.links.map((item, index) => (
+                    <Fragment key={item.href}>
                     <Link
                       className="site-meta-link"
                       href={item.href}
@@ -197,6 +197,8 @@ export function SiteChrome({
                     >
                       {item.label}
                     </Link>
+                    {index === 0 && process.env.NODE_ENV === "development" && <Link className="site-meta-link" href="/journal" data-cms-content-connected="true">Журнал</Link>}
+                    </Fragment>
                   ))}
                 </span>
               ))}
@@ -332,7 +334,8 @@ export function SiteChrome({
                   {groupIndex === 0 ? (
                     <span className="site-menu__rule" aria-hidden="true" />
                   ) : null}
-                  {group.links.map((item) => (
+                  {group.links.map((item, index) => (
+                    <Fragment key={item.href}>
                     <Link
                       key={`menu-${item.href}`}
                       href={item.href}
@@ -340,6 +343,8 @@ export function SiteChrome({
                     >
                       {item.label}
                     </Link>
+                    {index === 0 && process.env.NODE_ENV === "development" && <Link href="/journal" onClick={() => setMenuOpen(false)}>Журнал</Link>}
+                    </Fragment>
                   ))}
                 </Fragment>
               ))}

@@ -27,7 +27,7 @@ export default async function ArticlePage(props: Props) {
   const related = stories.filter(item => item.slug !== story.slug).sort((a, b) => Number(b.topic === story.topic) - Number(a.topic === story.topic)).slice(0, 3)
   const minutes = readingMinutes(story)
   return <>
-    <nav className="journal-crumb" aria-label="Хлебные крошки"><Link href="/journal">Журнал</Link>{topic && <Link href={`/journal/topic/${topic.slug}`}>{topic.title}</Link>}<span aria-current="page">{story.title}</span></nav>
+    <nav className="journal-crumb" aria-label="Хлебные крошки"><Link href="/journal">Главная</Link>{topic && <Link href={`/journal/topic/${topic.slug}`}>{topic.title}</Link>}<span aria-current="page">{story.title}</span></nav>
     <article>
       <header className="journal-article-hero">
         <div className="journal-article-heading">

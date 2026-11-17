@@ -8,5 +8,6 @@ export default function JournalLayout({ children }: { children: ReactNode }) {
   return <>
     <JournalHeader />
     <main className="journal section">{children}</main>
+    <footer className="journal-footer">Журнал о строительстве домов и загородной жизни</footer>
   </>
 }
