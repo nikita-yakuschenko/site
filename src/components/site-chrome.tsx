@@ -10,7 +10,6 @@ import {
   useEffect,
   useRef,
   useState,
-  useSyncExternalStore,
   type ReactNode,
   type ComponentProps,
 } from "react";
@@ -34,42 +33,7 @@ import { mediaUrl } from "../lib/media";
 import { telHref } from "../lib/phone";
 import { OfficeStatusIndicator } from "./office-status";
 import { RegionSwitch } from "./region-switch";
-
-/* Временная тема только технической полосы. Хранится у посетителя, на
-   сервер не уходит. Снять вместе с кнопкой в meta-ряду. */
-const TECH_BAR_THEME_KEY = "avgst:tech-bar-theme";
-type TechBarTheme = "dark" | "light";
-
-const techBarThemeListeners = new Set<() => void>();
-
-function subscribeTechBarTheme(listener: () => void) {
-  techBarThemeListeners.add(listener);
-  window.addEventListener("storage", listener);
-  return () => {
-    techBarThemeListeners.delete(listener);
-    window.removeEventListener("storage", listener);
-  };
-}
-
-function readTechBarTheme(): TechBarTheme {
-  try {
-    // Явно тёмная — иначе светлая (дефолт для сверки с маркетологом).
-    return window.localStorage.getItem(TECH_BAR_THEME_KEY) === "dark"
-      ? "dark"
-      : "light";
-  } catch {
-    return "light";
-  }
-}
-
-function writeTechBarTheme(theme: TechBarTheme) {
-  try {
-    window.localStorage.setItem(TECH_BAR_THEME_KEY, theme);
-  } catch {
-    // Не сохранилось — тема живёт до перезагрузки.
-  }
-  techBarThemeListeners.forEach((listener) => listener());
-}
+import { useTechBarTheme } from "./use-tech-bar-theme";
 
 type NavItem = { label?: string | null; href?: string | null };
 function HeaderNavLink({ available, ...props }: ComponentProps<typeof Link> & { available: boolean }) {
@@ -101,6 +65,7 @@ const META_LINK_GROUPS: readonly MetaGroup[] = [
     // покупатель, а не человек, которому нужна справка.
     links: [
       { label: copy.about, href: "/about" },
+      ...(process.env.NODE_ENV === "development" ? [{ label: "Журнал", href: "/journal" }] : []),
       { label: copy.business, href: "/business" },
       { label: copy.dealers, href: "https://b2b.avgst.ru/" },
     ],
@@ -171,18 +136,11 @@ export function SiteChrome({
   /* Форма из шапки: открывается поверх страницы, а не уводит якорем. */
   const [askOpen, setAskOpen] = useState(false);
 
-  const techBarTheme = useSyncExternalStore(
-    subscribeTechBarTheme,
-    readTechBarTheme,
-    () => "light" as TechBarTheme,
-  );
+  const { theme: techBarTheme, toggle: toggleTechBarTheme } = useTechBarTheme();
   const regionCode = useRegionCode();
   // Регион важнее пропа: при переключении НН/МСК меняется базовый номер для Roistat.
   const displayPhone = phoneForRegion(regionCode) || phone || null;
 
-  function toggleTechBarTheme() {
-    writeTechBarTheme(techBarTheme === "light" ? "dark" : "light");
-  }
   const src = mediaUrl(logo) || "/logo_lg.svg";
   // CMS привязывает содержимое к позиции ссылки. HeaderNavLink сохраняет
   // позиции при привязке CMS, но не выводит недоступную ссылку в HTML.

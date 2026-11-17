@@ -23,8 +23,13 @@ function channels(links: MessengerLinks) {
 
 /** Shared contact actions; the footer remains the source of messenger assets. */
 export function ContactRail({ links = fallbackMessengerLinks() }: { links?: MessengerLinks }) {
-  const messengers = channels(links)
   const pathname = usePathname()
+  if (pathname === '/journal' || pathname.startsWith('/journal/')) return null
+  return <ContactRailContent links={links} pathname={pathname} />
+}
+
+function ContactRailContent({ links, pathname }: { links: MessengerLinks; pathname: string }) {
+  const messengers = channels(links)
   const [dialog, setDialog] = useState<RailDialog | null>(null)
   const [belowHero, setBelowHero] = useState(false)
   const [expanded, setExpanded] = useState(false)
