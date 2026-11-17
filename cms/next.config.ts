@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 
 const root = path.dirname(fileURLToPath(import.meta.url))
 const config: NextConfig = {
+  experimental: { agentUpgrade: 'security' },
   output: 'standalone',
   outputFileTracingRoot: path.resolve(root, '..'),
   turbopack: { root: path.resolve(root, '..') },

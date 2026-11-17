@@ -7,6 +7,7 @@ const identity = process.env.NODE_ENV === 'production' && existsSync('build/iden
   : null
 
 const nextConfig: NextConfig = {
+  experimental: { agentUpgrade: 'security' },
   // Сборка в самодостаточный сервер: в образ едет только то, что нужно рантайму.
   output: 'standalone',
   reactStrictMode: true,
