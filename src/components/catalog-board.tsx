@@ -51,12 +51,14 @@ export function CatalogBoard({
   matched,
   rest,
   picked,
+  banner,
 }: {
   filters: Filters;
   facets: CatalogFacets;
   matched: BoardItem[];
   rest: BoardItem[];
   picked: boolean;
+  banner?: ReactNode;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -260,6 +262,7 @@ export function CatalogBoard({
       </div>
 
       <div ref={results} className="catalog__results" aria-busy={searchPending || filterPending}>
+        {!narrowed && shownMatched.length > 0 ? banner : null}
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку
             не важно, сколько вариантов он отбросил и насколько велик каталог.
             Важно одно, есть ли в нём то, что он искал. Поэтому говорим только

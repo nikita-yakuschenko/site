@@ -55,6 +55,7 @@ export function leadTitle(lead: LeadInput, formTitle = '') {
     case 'mortgage-calculator': return join('Консультация по ипотеке', project, mortgageName(meta.program))
     case 'mortgage-consultation': return join('Консультация по ипотеке', project, mortgageName(meta.program))
     case 'mortgage-hero-39': return join('Ипотека 3,9% — Hero проекта', project)
+    case 'mortgage-catalog-banner-39': return 'Ипотека 3,9% — Баннер в каталоге'
     case 'factory-tour': return prefix + 'Экскурсия на производство'
     case 'FactoryOpenDayForm': return prefix + `Регистрация на день открытых дверей ${text(meta.date)}`.trim()
     case 'contacts-question':

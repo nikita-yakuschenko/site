@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type FormEvent } from 'react';
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { IconArrowRight, IconBrandWhatsapp, IconCheck, IconExclamationMark, IconGift, IconLoader2, IconPercentage, IconPlayerPlay, IconSend, IconX } from '@tabler/icons-react';
 import { PhoneInput } from './phone-input';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
@@ -27,7 +27,9 @@ const SUCCESS_MESSAGES = [
 ];
 
 /** Shared passport interaction for the project hero and its media viewers. */
-export function ProjectPassportConcept({ project, projectSlug, placement = 'hero', active = true }: { project: string; projectSlug: string; placement?: 'hero' | 'viewer' | 'comparison' | 'plans'; active?: boolean }) {
+export function ProjectPassportConcept({ project, projectSlug, placement = 'hero', active = true, catalogBanner }: { project: string; projectSlug: string; placement?: 'hero' | 'viewer' | 'comparison' | 'plans'; active?: boolean; catalogBanner?: ReactNode }) {
+  const isCatalogBanner = Boolean(catalogBanner);
+  const bannerDialog = useRef<HTMLDialogElement>(null);
   const formId = useId();
   const [run, setRun] = useState(0);
   const [slow, setSlow] = useState(false);
@@ -52,21 +54,23 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   const isHero = placement === 'hero';
   const isPlans = placement === 'plans';
   // Ипотечная промо-форма идёт в /next/leads — там обязателен токен SmartCaptcha.
-  const captcha = useLeadCaptcha(Boolean(active && isHero && open && status !== 'done'));
+  const captcha = useLeadCaptcha(Boolean(active && (isHero || isCatalogBanner) && open && status !== 'done'));
   useEffect(() => {
     const frame = requestAnimationFrame(() => setStorageChecked(true));
     return () => cancelAnimationFrame(frame);
   }, []);
   useEffect(() => {
+    if (isCatalogBanner) return;
     watchPassportLeave();
     passportDwell(projectSlug);
-  }, [projectSlug]);
+  }, [projectSlug, isCatalogBanner]);
   // На планировке бейдж статичный: без вылета сразу готов к клику.
   useEffect(() => {
     if (!isPlans) return;
     setReady(true);
   }, [isPlans, run]);
   useEffect(() => {
+    if (isCatalogBanner) return;
     if (placement !== 'hero') { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
     const image = document.querySelector<HTMLImageElement>('.project-hero__media img');
     if (!image || image.complete) { const frame = requestAnimationFrame(() => setImageReady(true)); return () => cancelAnimationFrame(frame); }
@@ -74,8 +78,9 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     image.addEventListener('load', loaded, { once: true });
     image.addEventListener('error', loaded, { once: true });
     return () => { image.removeEventListener('load', loaded); image.removeEventListener('error', loaded); };
-  }, [placement]);
+  }, [placement, isCatalogBanner]);
   useEffect(() => {
+    if (isCatalogBanner) return;
     if (placement !== 'hero') {
       const frame = requestAnimationFrame(() => { visibleRef.current = active; setInView(active); if (!active) setOpen(false); });
       return () => cancelAnimationFrame(frame);
@@ -95,9 +100,9 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     }, { threshold: [0, .8] });
     observer.observe(hero);
     return () => observer.disconnect();
-  }, [placement, active]);
+  }, [placement, active, isCatalogBanner]);
   useEffect(() => {
-    if (!open) return;
+    if (!open || isCatalogBanner) return;
     const outside = (event: PointerEvent) => {
       if (event.target instanceof Node && !containerRef.current?.contains(event.target)) setOpen(false);
     };
@@ -110,7 +115,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     document.addEventListener('pointerdown', outside);
     document.addEventListener('keydown', escape);
     return () => { document.removeEventListener('pointerdown', outside); document.removeEventListener('keydown', escape); };
-  }, [open]);
+  }, [open, isCatalogBanner]);
   useEffect(() => {
     if (status !== 'done' || dismissed) return;
     const timer = window.setTimeout(() => setDismissed(true), 5000);
@@ -171,13 +176,13 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       await submitLead({
         phone: phoneE164(phone),
         siteId: 'avgst',
-        formId: 'mortgage-hero-39',
+        formId: isCatalogBanner ? 'mortgage-catalog-banner-39' : 'mortgage-hero-39',
         consent,
         captchaToken,
         sourceUrl: typeof window !== 'undefined' ? window.location.href : undefined,
-        sourcePath: `/catalog/${projectSlug}`,
+        sourcePath: isCatalogBanner ? '/catalog' : `/catalog/${projectSlug}`,
         message: 'Заявка на семейную ипотеку 3,9%',
-        meta: { program: 'family', project, projectName: project, action: 'hero-mortgage-promo', rate: '3.9', termYears: 30 },
+        meta: { program: 'family', ...(isCatalogBanner ? { action: 'catalog-mortgage-banner', formHeading: 'Баннер в каталоге' } : { project, projectName: project, action: 'hero-mortgage-promo' }), rate: '3.9', termYears: 30 },
       }, mortgageAttempt.current, fetch, captcha.submissionSignal());
       if (!captcha.isActive()) return;
       await feedbackLap;
@@ -238,29 +243,19 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     } catch { await feedbackLap; setStatus('error'); } finally { busy.current = false; }
   }
   function replay() { setOpen(false); setReady(false); setRun(value => value + 1); }
-  return <>
-    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${isHero ? ' passport-concept--hero' : ''}${isPlans ? ' passport-concept--plans' : ''}${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
-      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label={isHero ? 'Ипотека под 3,9% на 30 лет' : 'Получить паспорт проекта'} onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { if (isHero) trackMetricaAction('mortgage_hero_form_open'); setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
-        <span className="passport-concept__surface" aria-hidden="true" />
-        <span className="passport-concept__label">{isHero ? <span>Ипотека под <span className="passport-concept__rate">3,9%</span> на 30 лет</span> : 'Получить паспорт проекта'}</span>
-      </button>
-      {isHero ? <>
-        <div className="passport-concept__action-flight" aria-hidden={open || status === 'done'}>
-          <span className="passport-concept__download" data-valid="true" data-status="idle"><IconPercentage size={18} stroke={1.8} aria-hidden="true" /></span>
-        </div>
-        <div className="passport-concept__mortgage" data-shown={open} data-success={status === 'done'} inert={!open}>
+  const mortgageCard = (<div className="passport-concept__mortgage" data-shown={open} data-success={status === 'done'} inert={!open}>
           {status === 'done' ? (
             <FormSuccessAnimation
               active
               unclipped
               greeting="Спасибо!"
               title={'Заявка на ипотеку\nпод 3,9%\u00A0принята'}
-              description={'Менеджер свяжемся с вами,\nрасскажет об условиях и поможет\nс оформлением'}
+              description={'Менеджер свяжется с вами,\nрасскажет об условиях и поможет\nс оформлением'}
               className="passport-concept__mortgage-success"
               onComplete={() => setReady(true)}
             />
           ) : <>
-            <button type="button" className="passport-concept__mortgage-close" aria-label={copy.close} onClick={() => setOpen(false)}>
+            <button type="button" className="passport-concept__mortgage-close" aria-label={copy.close} onClick={() => { if (isCatalogBanner) bannerDialog.current?.close(); else setOpen(false); }}>
               <IconX size={16} stroke={2.2} aria-hidden="true" />
             </button>
             <p className="passport-concept__mortgage-badge"><IconGift size={14} stroke={1.8} aria-hidden="true" />Новогодняя акция</p>
@@ -288,7 +283,28 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
               <span className="passport-concept__announcement" role="status">{status === 'error' ? (captcha.reloadRequired ? 'Не удалось загрузить проверку. Обновите страницу.' : 'Не удалось отправить. Попробуйте ещё раз.') : ''}</span>
             </form>
           </>}
+        </div>);
+  if (isCatalogBanner) return <div className="catalog__mortgage-banner">
+    <button type="button" className="catalog__mortgage-trigger" aria-haspopup="dialog" onClick={() => {
+      bannerDialog.current?.showModal();
+      setOpen(true);
+      requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true }));
+    }}>{catalogBanner}</button>
+    <dialog ref={bannerDialog} className="catalog__mortgage-dialog" aria-label="Семейная ипотека" onClose={() => setOpen(false)}>
+      {mortgageCard}
+    </dialog>
+  </div>;
+  return <>
+    {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${isHero ? ' passport-concept--hero' : ''}${isPlans ? ' passport-concept--plans' : ''}${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
+      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label={isHero ? 'Ипотека под 3,9% на 30 лет' : 'Получить паспорт проекта'} onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { if (isHero) trackMetricaAction('mortgage_hero_form_open'); setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
+        <span className="passport-concept__surface" aria-hidden="true" />
+        <span className="passport-concept__label">{isHero ? <span>Ипотека под <span className="passport-concept__rate">3,9%</span> на 30 лет</span> : 'Получить паспорт проекта'}</span>
+      </button>
+      {isHero ? <>
+        <div className="passport-concept__action-flight" aria-hidden={open || status === 'done'}>
+          <span className="passport-concept__download" data-valid="true" data-status="idle"><IconPercentage size={18} stroke={1.8} aria-hidden="true" /></span>
         </div>
+        {mortgageCard}
       </> : <>
         <form id={formId} inert={!open || status === 'done'} aria-hidden={!open || status === 'done'} className="passport-concept__form" data-status={status} onSubmit={send} aria-busy={status === 'sending'}>
           {status === 'sending' && <svg className="passport-concept__perimeter" aria-hidden="true"><rect x="1.5" y="1.5" rx="20" pathLength="100" /></svg>}
