@@ -80,7 +80,7 @@
     pointer-events: none;
   }
   .site-shell--catalog .catalog__bar::after { content: none; }
-  .site-shell--catalog .catalog__results { margin-top: 16px; }
+  .site-shell--catalog .catalog__results { margin-top: var(--catalog-banner-gap); }
   .catalog__bar { background: transparent; pointer-events: none; }
   .catalog__bar::after { right: auto; width: calc(240px + var(--page-gutter) * 2); }
   .catalog__barrow { position: relative; width: 240px; pointer-events: auto; }
@@ -440,6 +440,7 @@
 }
 
 .catalog__results {
+  --catalog-banner-gap: 16px;
   min-width: 0;
 }
 
@@ -490,11 +491,12 @@ html:has(.catalog__mortgage-dialog[open]) { overflow: hidden; }
     display: block;
     width: 100%;
     height: auto;
-    margin-block-end: 14px;
+    margin-block-end: var(--catalog-banner-gap);
   }
 }
 
-.catalog__results .grid-2:first-of-type {
+.catalog__results .grid-2:first-of-type,
+.catalog__desktop-mortgage + .grid-2 {
   margin-top: 0;
 }
 .section .catalog__band {
