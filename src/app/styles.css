@@ -4785,18 +4785,19 @@ a {
 }
 
 .card[data-card-accent] {
-  color-scheme: dark;
+  --card-accent-scheme: dark;
 }
 
 @media (max-width: 639px) {
-  [data-card-accent-mobile] > .card { color-scheme: dark; }
+  [data-card-accent-mobile] > .card { --card-accent-scheme: dark; }
 }
 
 @media (min-width: 640px) {
-  [data-card-accent-wide] > .card { color-scheme: dark; }
+  [data-card-accent-wide] > .card { --card-accent-scheme: dark; }
 }
 
 :is(.card[data-card-accent], :is([data-card-accent-mobile], [data-card-accent-wide]) > .card) {
+  color-scheme: var(--card-accent-scheme, light);
   background: light-dark(white, #141b2b);
   outline-color: light-dark(rgb(0 0 0 / .05), #2c3546);
   color: light-dark(var(--foreground), #f3f5fa);
