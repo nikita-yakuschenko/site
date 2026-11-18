@@ -18,7 +18,7 @@ import { resizedSrc, resizedSrcSet } from '../lib/media'
 import type { CatalogProject } from '../lib/catalog/types'
 import { catalogDisplayPrice } from '../lib/catalog/display-price'
 
-export function ProjectCard({ project, showPrice = true, locationLabel, priority = false }: { project: CatalogProject; showPrice?: boolean; locationLabel?: string; priority?: boolean }) {
+export function ProjectCard({ project, showPrice = true, locationLabel, priority = false, darkAccent = false }: { project: CatalogProject; showPrice?: boolean; locationLabel?: string; priority?: boolean; darkAccent?: boolean }) {
   const region = useRegionCode()
   const price = catalogDisplayPrice(project, region)
   const priceLabel = price ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется'
@@ -42,7 +42,7 @@ export function ProjectCard({ project, showPrice = true, locationLabel, priority
 
   const badge = project.readyHome ? copy.readyOnly : project.technologyBadge
   return (
-    <article className="card">
+    <article className="card" data-card-accent={darkAccent || undefined}>
       <div className="card__top">
         <Link href={project.href} prefetch={false} className="card__media" aria-label={badge ? `${project.name}. ${badge}` : project.name}>
           {imageMissing ? (

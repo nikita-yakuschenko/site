@@ -4784,6 +4784,36 @@ a {
   margin-top: 8px;
 }
 
+.card[data-card-accent] {
+  color-scheme: dark;
+}
+
+@media (max-width: 639px) {
+  [data-card-accent-mobile] > .card { color-scheme: dark; }
+}
+
+@media (min-width: 640px) {
+  [data-card-accent-wide] > .card { color-scheme: dark; }
+}
+
+:is(.card[data-card-accent], :is([data-card-accent-mobile], [data-card-accent-wide]) > .card) {
+  background: light-dark(white, #141b2b);
+  outline-color: light-dark(rgb(0 0 0 / .05), #2c3546);
+  color: light-dark(var(--foreground), #f3f5fa);
+
+  & .card__media { background: light-dark(var(--surface-sunken), #202a3b); }
+  & .card__empty { color: light-dark(var(--ink-3), #aab5c7); }
+  & .specs { color: light-dark(var(--ink-2), #b2bdce); }
+  & h3 { color: light-dark(currentColor, #6cda8b); }
+  &:hover h3, & .specs svg, & .icon-btn:hover, & .icon-btn .is-fav {
+    color: light-dark(var(--avgst-green), #6cda8b);
+  }
+  & .badge, & .icon-btn { background: light-dark(var(--on-dark-0), #151d2c); }
+  & .icon-btn:not(:hover) { color: light-dark(var(--ink-2), #eef2f9); }
+  & .badge, & .card__location-badge { color: light-dark(var(--foreground), #eef2f9); }
+  & .card__location-badge { border-color: light-dark(var(--line), #364258); }
+}
+
 /* На узком экране строки прозрачны, и порядок остаётся прежним:
    название, метрики, цена, кнопка. */
 .card__line {

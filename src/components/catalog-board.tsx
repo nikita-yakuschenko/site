@@ -45,6 +45,33 @@ import { trackMetricaAction } from "../lib/metrica-form-goals";
 export type BoardItem = SortableProject & { card: ReactNode };
 
 
+function catalogAccentPositions(firstGroupLength: number, restLength: number) {
+  const mobile = new Set<number>();
+  const wide = new Set<number>();
+  const total = firstGroupLength + restLength;
+  const mobileGaps = [4, 7, 3, 6, 5];
+  const wideGaps = [6, 9, 5, 7, 8];
+  const column = (index: number) => (index < firstGroupLength ? index : index - firstGroupLength) % 2;
+
+  for (let index = -1, step = 0; ; step++) {
+    index += mobileGaps[step % mobileGaps.length] ?? 4;
+    if (index >= total) break;
+    mobile.add(index);
+  }
+  for (let index = -1, step = 0; ; step++) {
+    let next = index + (wideGaps[step % wideGaps.length] ?? 6);
+    if (index >= 0 && column(next) === column(index)) {
+      // Both groups start in the left column, so the split can repeat a side.
+      if (column(next + 1) !== column(index)) next++;
+      else next += next - index === 9 ? -1 : 2;
+    }
+    if (next >= total) break;
+    wide.add(next);
+    index = next;
+  }
+  return { mobile, wide };
+}
+
 export function CatalogBoard({
   filters: appliedFilters,
   facets,
@@ -91,6 +118,7 @@ export function CatalogBoard({
   const region = useRegionCode();
   const shownMatched = sortCatalog(keep(matched), appliedFilters.sort, region);
   const shownRest = keep(rest);
+  const accentPositions = catalogAccentPositions(shownMatched.length, picked && !onlyFavorites ? shownRest.length : 0);
   const narrowed = picked || onlyFavorites;
 
   /* Растворение под полосой нужно только когда она закреплена. В покое оно
@@ -276,8 +304,8 @@ export function CatalogBoard({
 
         {shownMatched.length ? (
           <div className="grid-2">
-            {shownMatched.map((item) => (
-              <div key={item.id}>{item.card}</div>
+            {shownMatched.map((item, index) => (
+              <div key={item.id} data-card-accent-mobile={accentPositions.mobile.has(index) || undefined} data-card-accent-wide={accentPositions.wide.has(index) || undefined}>{item.card}</div>
             ))}
           </div>
         ) : null}
@@ -290,8 +318,8 @@ export function CatalogBoard({
               <span>{copy.catalogRest}</span>
             </h2>
             <div className="grid-2">
-              {shownRest.map((item) => (
-                <div key={item.id}>{item.card}</div>
+              {shownRest.map((item, index) => (
+                <div key={item.id} data-card-accent-mobile={accentPositions.mobile.has(shownMatched.length + index) || undefined} data-card-accent-wide={accentPositions.wide.has(shownMatched.length + index) || undefined}>{item.card}</div>
               ))}
             </div>
           </>
