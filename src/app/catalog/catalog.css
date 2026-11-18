@@ -443,7 +443,9 @@
   min-width: 0;
 }
 
-.catalog__mortgage-banner { display: none; }
+.catalog__mortgage-banner { border-radius: var(--surface-radius); }
+.catalog__desktop-mortgage { display: none; }
+.catalog__mobile-mortgage { margin-block-end: 4px; }
 .catalog__mortgage-trigger {
   display: block;
   width: 100%;
@@ -469,12 +471,12 @@
 .catalog__mortgage-dialog .passport-concept__mortgage { position: relative; }
 
 @media (min-width: 1024px) {
-  .catalog__mortgage-banner {
+  .catalog__mobile-mortgage { display: none; }
+  .catalog__desktop-mortgage {
     display: block;
     width: 100%;
     height: auto;
     margin-block-end: 14px;
-    border-radius: var(--surface-radius);
   }
 }
 

@@ -52,6 +52,7 @@ export function CatalogBoard({
   rest,
   picked,
   banner,
+  mobileBanner,
 }: {
   filters: Filters;
   facets: CatalogFacets;
@@ -59,6 +60,7 @@ export function CatalogBoard({
   rest: BoardItem[];
   picked: boolean;
   banner?: ReactNode;
+  mobileBanner?: ReactNode;
 }) {
   const router = useRouter();
   const pathname = usePathname();
@@ -209,6 +211,7 @@ export function CatalogBoard({
 
   return (
     <>
+      {!narrowed && shownMatched.length > 0 && mobileBanner ? <div className="catalog__mobile-mortgage">{mobileBanner}</div> : null}
       <div className="catalog__layout">
       <div ref={sidebar} className="catalog__sidebar">
       {/* Поиск липнет вместе с отбором: искать по названию и смотреть
@@ -262,7 +265,7 @@ export function CatalogBoard({
       </div>
 
       <div ref={results} className="catalog__results" aria-busy={searchPending || filterPending}>
-        {!narrowed && shownMatched.length > 0 ? banner : null}
+        {!narrowed && shownMatched.length > 0 && banner ? <div className="catalog__desktop-mortgage">{banner}</div> : null}
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку
             не важно, сколько вариантов он отбросил и насколько велик каталог.
             Важно одно, есть ли в нём то, что он искал. Поэтому говорим только

@@ -2,6 +2,7 @@ import { Suspense } from 'react'
 import Image from 'next/image'
 import { ProjectPassportConcept } from '../../components/project-passport-concept'
 import mortgageBanner from '../../../public/promo/banner_ipoteka.png'
+import mobileMortgageBanner from '../../../public/promo/mobile_banner_ipoteka.png'
 import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from 'next'
 import { permanentRedirect } from 'next/navigation'
@@ -111,6 +112,9 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
               banner={<ProjectPassportConcept project="" projectSlug="" catalogBanner={<Image src={mortgageBanner}
                 alt="Авангард Строй и Сбер. Семейная ипотека на строительство дома: 3,9% на срок до 30 лет. Получите одобрение до 11 декабря. Осталось 8 из 11 мест."
                 sizes="(min-width: 1280px) 866px, (min-width: 1024px) 72vw, 1px" />} />}
+              mobileBanner={<ProjectPassportConcept project="" projectSlug="" catalogBanner={<Image src={mobileMortgageBanner}
+                alt="Авангард Строй и Сбер. Семейная ипотека 3,9% на 30 лет. Получите одобрение до 11 декабря."
+                sizes="(max-width: 1023px) 100vw, 1px" />} />}
             />
           </div>
         </section></CMSStaticBlock>
