@@ -6,6 +6,7 @@ import { optimizedSrc } from '../lib/media';
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LeadDialog } from "./lead-dialog";
+import { architectConsultation, exhibitionVisit } from './project-lead-offers';
 import { defaultNextStepsSettings, isNextStepsSettings, type NextStepsSettings } from '../lib/catalog/project-next-steps-data';
 
 /** Два следующих шага после выбора комплектации: увидеть дом и обсудить
@@ -127,10 +128,7 @@ export function ProjectNextSteps({
 
       {!readyHome && current.visitEnabled && visitOpen ? (
         <LeadDialog
-          heading="Хотите посетить выставочный дом?"
-          body="Оставьте имя и телефон — свяжемся с вами, подберём удобное время и расскажем, как добраться. В доме можно оценить планировку, материалы и задать вопросы."
-          submitLabel="Записаться на просмотр"
-          formId="exhibition-visit"
+          {...exhibitionVisit}
           meta={{ pageTitle: document.title }}
           onClose={() => setVisitOpen(false)}
         />
@@ -138,10 +136,7 @@ export function ProjectNextSteps({
 
       {!readyHome && current.secondaryEnabled && consultOpen ? (
         <LeadDialog
-          heading="Консультация с архитектором"
-          body="Оставьте контакты — перезвоним и запишем на консультацию. Архитектор разместит дом на участке, рассчитает траекторию движения солнца и поможет принять решение."
-          submitLabel="Записаться"
-          formId="architect-consultation"
+          {...architectConsultation}
           onClose={() => setConsultOpen(false)}
         />
       ) : null}

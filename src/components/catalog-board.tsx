@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useOptimistic, useRef, useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
+import { Fragment, useEffect, useOptimistic, useRef, useState, useSyncExternalStore, useTransition, type ReactNode } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { CatalogFilters, CatalogSort } from "./catalog-filters";
 import { CatalogSearch } from "./catalog-search";
+import { CatalogFeedOffer } from "./catalog-feed-offer";
 import * as Popover from "@radix-ui/react-popover";
 import { flushSync } from 'react-dom';
 import {
@@ -72,6 +73,25 @@ function catalogAccentPositions(firstGroupLength: number, restLength: number) {
   return { mobile, wide };
 }
 
+function catalogOfferPositions(groupLengths: number[], columns: number) {
+  const gaps = [3, 5, 4] as const;
+  const totalRows = groupLengths.reduce((sum, length) => sum + Math.ceil(length / columns), 0);
+  let row = 0;
+  let offer = 0;
+  let nextRow: number = gaps[0];
+  return groupLengths.map(length => {
+    const positions = new Map<number, number>();
+    for (let end = columns; end < length + columns; end += columns) {
+      row++;
+      if (row !== nextRow || row >= totalRows) continue;
+      positions.set(Math.min(end, length) - 1, offer);
+      offer++;
+      nextRow += gaps[offer % gaps.length] ?? gaps[0];
+    }
+    return positions;
+  });
+}
+
 export function CatalogBoard({
   filters: appliedFilters,
   facets,
@@ -118,7 +138,23 @@ export function CatalogBoard({
   const region = useRegionCode();
   const shownMatched = sortCatalog(keep(matched), appliedFilters.sort, region);
   const shownRest = keep(rest);
-  const accentPositions = catalogAccentPositions(shownMatched.length, picked && !onlyFavorites ? shownRest.length : 0);
+  const restLength = picked && !onlyFavorites ? shownRest.length : 0;
+  const accentPositions = catalogAccentPositions(shownMatched.length, restLength);
+  const groupLengths = [shownMatched.length, restLength];
+  const mobileOffers = catalogOfferPositions(groupLengths, 1);
+  const wideOffers = catalogOfferPositions(groupLengths, 2);
+  const renderCards = (items: BoardItem[], group: 0 | 1) => items.map((item, index) => {
+    const position = group === 0 ? index : shownMatched.length + index;
+    const mobileOffer = mobileOffers[group]?.get(index);
+    const wideOffer = wideOffers[group]?.get(index);
+    return (
+      <Fragment key={item.id}>
+        <div data-card-accent-mobile={accentPositions.mobile.has(position) || undefined} data-card-accent-wide={accentPositions.wide.has(position) || undefined}>{item.card}</div>
+        {mobileOffer !== undefined && <CatalogFeedOffer key={`mobile-${mobileOffer}`} index={mobileOffer} layout="mobile" />}
+        {wideOffer !== undefined && <CatalogFeedOffer key={`wide-${wideOffer}`} index={wideOffer} layout="wide" />}
+      </Fragment>
+    );
+  });
   const narrowed = picked || onlyFavorites;
 
   /* Растворение под полосой нужно только когда она закреплена. В покое оно
@@ -304,9 +340,7 @@ export function CatalogBoard({
 
         {shownMatched.length ? (
           <div className="grid-2">
-            {shownMatched.map((item, index) => (
-              <div key={item.id} data-card-accent-mobile={accentPositions.mobile.has(index) || undefined} data-card-accent-wide={accentPositions.wide.has(index) || undefined}>{item.card}</div>
-            ))}
+            {renderCards(shownMatched, 0)}
           </div>
         ) : null}
 
@@ -318,9 +352,7 @@ export function CatalogBoard({
               <span>{copy.catalogRest}</span>
             </h2>
             <div className="grid-2">
-              {shownRest.map((item, index) => (
-                <div key={item.id} data-card-accent-mobile={accentPositions.mobile.has(shownMatched.length + index) || undefined} data-card-accent-wide={accentPositions.wide.has(shownMatched.length + index) || undefined}>{item.card}</div>
-              ))}
+              {renderCards(shownRest, 1)}
             </div>
           </>
         ) : null}

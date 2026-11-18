@@ -459,6 +459,19 @@
 }
 .catalog__mortgage-trigger img { display: block; width: 100%; height: auto; }
 .catalog__mortgage-trigger:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 3px; }
+.catalog__feed-offer {
+  grid-column: 1 / -1;
+  border-radius: var(--surface-radius);
+}
+
+@media (width < 640px) {
+  .catalog__feed-offer[data-layout="wide"] { display: none; }
+}
+
+@media (width >= 640px) {
+  .catalog__feed-offer[data-layout="mobile"] { display: none; }
+}
+
 .catalog__mortgage-dialog {
   width: min(360px, calc(100vw - 32px));
   max-height: calc(100dvh - 32px);
