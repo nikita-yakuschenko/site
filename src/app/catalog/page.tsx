@@ -1,5 +1,6 @@
 import { Suspense } from 'react'
 import Image from 'next/image'
+import { optimizedSrc } from '../../lib/media'
 import { ProjectPassportConcept } from '../../components/project-passport-concept'
 import mortgageBanner from '../../../public/promo/banner_ipoteka.png'
 import mobileMortgageBanner from '../../../public/promo/mobile_banner_ipoteka.png'
@@ -109,12 +110,10 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
               matched={toBoard(catalogOrder(items, sessionSeed), true)}
               rest={filters.status === 'ready' ? [] : toBoard(rest, items.length === 0)}
               picked={!isEmpty(filters)}
-              banner={<ProjectPassportConcept project="" projectSlug="" catalogBanner={<Image src={mortgageBanner}
-                alt="Авангард Строй и Сбер. Семейная ипотека на строительство дома: 3,9% на срок до 30 лет. Получите одобрение до 11 декабря. Осталось 8 из 11 мест."
-                sizes="(min-width: 1280px) 866px, (min-width: 1024px) 72vw, 1px" />} />}
-              mobileBanner={<ProjectPassportConcept project="" projectSlug="" catalogBanner={<Image src={mobileMortgageBanner}
-                alt="Авангард Строй и Сбер. Семейная ипотека 3,9% на 30 лет. Получите одобрение до 11 декабря."
-                sizes="(max-width: 1023px) 100vw, 1px" />} />}
+              banner={<ProjectPassportConcept project="" projectSlug="" catalogBanner={<Image src={optimizedSrc("/promo/banner_ipoteka.png")} width={mortgageBanner.width} height={mortgageBanner.height} unoptimized
+                alt="Авангард Строй и Сбер. Семейная ипотека на строительство дома: 3,9% на срок до 30 лет. Получите одобрение до 11 декабря. Осталось 8 из 11 мест." />} />}
+              mobileBanner={<ProjectPassportConcept project="" projectSlug="" catalogBanner={<Image src={optimizedSrc("/promo/mobile_banner_ipoteka.png")} width={mobileMortgageBanner.width} height={mobileMortgageBanner.height} unoptimized
+                alt="Авангард Строй и Сбер. Семейная ипотека 3,9% на 30 лет. Получите одобрение до 11 декабря." />} />}
             />
           </div>
         </section></CMSStaticBlock>

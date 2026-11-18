@@ -41,7 +41,10 @@ export async function prepareWebpAssets(root = process.cwd()) {
       const relative = path.relative(directory, source).split(path.sep).join('/')
       // Семья и цех показываются в ячейке уже этого размера. Меньший файл
       // с тем же кадрированием в CSS; остальные картинки кодируются как раньше.
-      const fitted = relative === 'persons/family_1.png'
+      const catalogPromo = /^promo\/(?:catalog-(?:architect|exhibition|site-planning)(?:-mobile)?|(?:mobile_)?banner_ipoteka)\.png$/.test(relative)
+      const fitted = catalogPromo
+        ? { tag: 'webp-v3-catalog-promo-q85', width: null, quality: 85, lossless: false }
+        : relative === 'persons/family_1.png'
         ? { tag: 'webp-v2-family-1600-q82', width: 1600, quality: 82, lossless: false }
         : relative === 'production/factory.jpg' || relative === 'production/factory-portrait.jpg'
           ? { tag: 'webp-v2-slot-1440-q80', width: 1440, quality: 80, lossless: false }

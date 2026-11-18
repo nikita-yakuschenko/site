@@ -1,15 +1,16 @@
 'use client'
 
 import { useState } from 'react'
-import { getImageProps } from 'next/image'
+import Image from 'next/image'
+import { optimizedSrc } from '../lib/media'
 import { LeadDialog } from './lead-dialog'
 import { architectConsultation, exhibitionVisit } from './project-lead-offers'
-import exhibition from '../../public/promo/catalog-exhibition.png'
-import exhibitionMobile from '../../public/promo/catalog-exhibition-mobile.png'
-import architect from '../../public/promo/catalog-architect.png'
-import architectMobile from '../../public/promo/catalog-architect-mobile.png'
-import sitePlanning from '../../public/promo/catalog-site-planning.png'
-import sitePlanningMobile from '../../public/promo/catalog-site-planning-mobile.png'
+const exhibition = '/promo/catalog-exhibition.png'
+const exhibitionMobile = '/promo/catalog-exhibition-mobile.png'
+const architect = '/promo/catalog-architect.png'
+const architectMobile = '/promo/catalog-architect-mobile.png'
+const sitePlanning = '/promo/catalog-site-planning.png'
+const sitePlanningMobile = '/promo/catalog-site-planning-mobile.png'
 
 const offers = [
   { label: 'Записаться на просмотр выставочного дома', desktop: exhibition, mobile: exhibitionMobile, form: exhibitionVisit },
@@ -21,19 +22,11 @@ export function CatalogFeedOffer({ index, layout }: { index: number; layout: 'mo
   const [open, setOpen] = useState(false)
   const offer = offers[index % offers.length]
   if (!offer) return null
-  const wide = layout === 'wide'
-  const { props } = getImageProps({
-    src: wide ? offer.desktop : offer.mobile,
-    alt: '',
-    sizes: wide ? '(min-width: 1280px) 866px, (min-width: 1024px) 72vw, 100vw' : '100vw',
-  })
-
+  const image = layout === 'wide' ? offer.desktop : offer.mobile
   return (
     <div className="catalog__feed-offer" data-layout={layout}>
       <button type="button" className="catalog__mortgage-trigger" aria-label={offer.label} aria-haspopup="dialog" onClick={() => setOpen(true)}>
-        {/* getImageProps supplies the responsive sources and intrinsic dimensions. */}
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img {...props} />
+        <Image src={optimizedSrc(image)} alt="" width={layout === 'wide' ? 866 : 373} height={layout === 'wide' ? 120 : image === architectMobile ? 88 : 84} unoptimized />
       </button>
       {open && <LeadDialog {...offer.form} onClose={() => setOpen(false)} />}
     </div>
