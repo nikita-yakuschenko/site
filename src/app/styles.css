@@ -4784,35 +4784,50 @@ a {
   margin-top: 8px;
 }
 
-.card[data-card-accent] {
-  --card-accent-scheme: dark;
+@media (width < 640px) {
+  :is(.card[data-card-accent], [data-card-accent-mobile] > .card) {
+    --card-accent-background: #141b2b;
+    --card-accent-outline: #2c3546;
+    --card-accent-text: #f3f5fa;
+    --card-accent-media: #202a3b;
+    --card-accent-muted: #b2bdce;
+    --card-accent-green: #6cda8b;
+    --card-accent-control: #151d2c;
+    --card-accent-control-text: #eef2f9;
+    --card-accent-control-border: #364258;
+  }
 }
 
-@media (max-width: 639px) {
-  [data-card-accent-mobile] > .card { --card-accent-scheme: dark; }
-}
-
-@media (min-width: 640px) {
-  [data-card-accent-wide] > .card { --card-accent-scheme: dark; }
+@media (width >= 640px) {
+  :is(.card[data-card-accent], [data-card-accent-wide] > .card) {
+    --card-accent-background: #141b2b;
+    --card-accent-outline: #2c3546;
+    --card-accent-text: #f3f5fa;
+    --card-accent-media: #202a3b;
+    --card-accent-muted: #b2bdce;
+    --card-accent-green: #6cda8b;
+    --card-accent-control: #151d2c;
+    --card-accent-control-text: #eef2f9;
+    --card-accent-control-border: #364258;
+  }
 }
 
 :is(.card[data-card-accent], :is([data-card-accent-mobile], [data-card-accent-wide]) > .card) {
-  color-scheme: var(--card-accent-scheme, light);
-  background: light-dark(white, #141b2b);
-  outline-color: light-dark(rgb(0 0 0 / .05), #2c3546);
-  color: light-dark(var(--foreground), #f3f5fa);
+  background: var(--card-accent-background, white);
+  outline-color: var(--card-accent-outline, rgb(0 0 0 / .05));
+  color: var(--card-accent-text, var(--foreground));
 
-  & .card__media { background: light-dark(var(--surface-sunken), #202a3b); }
-  & .card__empty { color: light-dark(var(--ink-3), #aab5c7); }
-  & .specs { color: light-dark(var(--ink-2), #b2bdce); }
-  & h3 { color: light-dark(currentColor, #6cda8b); }
+  & .card__media { background: var(--card-accent-media, var(--surface-sunken)); }
+  & .card__empty { color: var(--card-accent-muted, var(--ink-3)); }
+  & .specs { color: var(--card-accent-muted, var(--ink-2)); }
+  & h3 { color: var(--card-accent-green, inherit); }
   &:hover h3, & .specs svg, & .icon-btn:hover, & .icon-btn .is-fav {
-    color: light-dark(var(--avgst-green), #6cda8b);
+    color: var(--card-accent-green, var(--avgst-green));
   }
-  & .badge, & .icon-btn { background: light-dark(var(--on-dark-0), #151d2c); }
-  & .icon-btn:not(:hover) { color: light-dark(var(--ink-2), #eef2f9); }
-  & .badge, & .card__location-badge { color: light-dark(var(--foreground), #eef2f9); }
-  & .card__location-badge { border-color: light-dark(var(--line), #364258); }
+  & .badge, & .icon-btn { background: var(--card-accent-control, var(--on-dark-0)); }
+  & .icon-btn:not(:hover) { color: var(--card-accent-control-text, var(--ink-2)); }
+  & .badge, & .card__location-badge { color: var(--card-accent-control-text, var(--foreground)); }
+  & .card__location-badge { border-color: var(--card-accent-control-border, var(--line)); }
 }
 
 /* На узком экране строки прозрачны, и порядок остаётся прежним:
