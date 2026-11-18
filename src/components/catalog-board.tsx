@@ -211,7 +211,6 @@ export function CatalogBoard({
 
   return (
     <>
-      {!narrowed && shownMatched.length > 0 && mobileBanner ? <div className="catalog__mobile-mortgage">{mobileBanner}</div> : null}
       <div className="catalog__layout">
       <div ref={sidebar} className="catalog__sidebar">
       {/* Поиск липнет вместе с отбором: искать по названию и смотреть
@@ -265,6 +264,7 @@ export function CatalogBoard({
       </div>
 
       <div ref={results} className="catalog__results" aria-busy={searchPending || filterPending}>
+        {!narrowed && shownMatched.length > 0 && mobileBanner ? <div className="catalog__mobile-mortgage">{mobileBanner}</div> : null}
         {!narrowed && shownMatched.length > 0 && banner ? <div className="catalog__desktop-mortgage">{banner}</div> : null}
         {/* Счёта здесь нет намеренно. Ни «2 из 37», ни «37 проектов»: человеку
             не важно, сколько вариантов он отбросил и насколько велик каталог.

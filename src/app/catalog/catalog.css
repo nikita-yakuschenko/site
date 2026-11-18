@@ -446,7 +446,7 @@
 
 .catalog__mortgage-banner { border-radius: var(--surface-radius); }
 .catalog__desktop-mortgage { display: none; }
-.catalog__mobile-mortgage { margin-block: 28px 12px; }
+.catalog__mobile-mortgage { margin-block-end: var(--catalog-banner-gap); }
 .catalog__mortgage-trigger {
   display: block;
   width: 100%;
