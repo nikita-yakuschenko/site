@@ -466,9 +466,23 @@
   border: 0;
   border-radius: 24px;
   background: transparent;
+  overflow: auto;
+  scrollbar-width: none;
 }
+.catalog__mortgage-dialog::-webkit-scrollbar { display: none; }
 .catalog__mortgage-dialog::backdrop { background: rgb(11 16 32 / .48); }
-.catalog__mortgage-dialog .passport-concept__mortgage { position: relative; }
+.catalog__mortgage-dialog .passport-concept__mortgage {
+  position: relative;
+  box-shadow: none;
+  transform: none;
+}
+.section .catalog__mortgage-dialog h2.passport-concept__mortgage-title {
+  margin: 0;
+  font-size: 22px;
+  line-height: 1.15;
+  text-transform: none;
+}
+html:has(.catalog__mortgage-dialog[open]) { overflow: hidden; }
 
 @media (min-width: 1024px) {
   .catalog__mobile-mortgage { display: none; }
