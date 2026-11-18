@@ -446,7 +446,7 @@
 
 .catalog__mortgage-banner { border-radius: var(--surface-radius); }
 .catalog__desktop-mortgage { display: none; }
-.catalog__mobile-mortgage { margin-block-start: 16px; }
+.catalog__mobile-mortgage { margin-block: 24px 8px; }
 .catalog__mortgage-trigger {
   display: block;
   width: 100%;
@@ -474,16 +474,21 @@
 .catalog__mortgage-dialog::backdrop { background: rgb(11 16 32 / .48); }
 .catalog__mortgage-dialog .passport-concept__mortgage {
   position: relative;
+  padding: 22px 20px 20px;
   box-shadow: none;
   transform: none;
 }
 .section .catalog__mortgage-dialog h2.passport-concept__mortgage-title {
-  margin: 0;
+  margin: 0 0 14px;
   font-size: 22px;
   line-height: 1.15;
   text-transform: none;
 }
 html:has(.catalog__mortgage-dialog[open]) { overflow: hidden; }
+
+@media (max-width: 1023px) {
+  .catalog__mortgage-dialog { width: min(320px, calc(100vw - 40px)); }
+}
 
 @media (min-width: 1024px) {
   .catalog__mobile-mortgage { display: none; }
