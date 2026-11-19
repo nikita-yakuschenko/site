@@ -1433,6 +1433,11 @@ html:has(.catalog__mortgage-dialog[open]) { overflow: hidden; }
   color: #fff;
 }
 
+.project-config__total[data-form="true"] .floating-field,
+.plan-change[data-form="true"] .floating-field {
+  --floating-label-color: var(--on-dark-1);
+}
+
 .project-config__total[data-form="true"] .lead-card input::placeholder {
   color: var(--on-dark-4);
 }

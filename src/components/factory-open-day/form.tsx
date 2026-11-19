@@ -6,6 +6,7 @@ import { CMSContentBlock } from '../cms-content'
 import { useEffect, useRef, useState } from 'react'
 import { isValidName, isValidRuMobile, phoneE164, sanitizeName } from '../../lib/phone'
 import { PhoneInput } from '../phone-input'
+import { FloatingField } from '../floating-field'
 import { copy } from '../../lib/copy'
 import { OpenDayArrow, OpenDayRules } from './rules'
 import { useLeadCaptcha } from '../use-lead-captcha'
@@ -96,18 +97,15 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
   }, [open])
 
   const fields = status === 'ok' ? <FormSuccessAnimation active title="Вы записаны на день открытых дверей!" description="Программу мероприятия и напоминание накануне пришлём на почту, указанную при регистрации." className="ags-form ags-form--success" /> : <form className="ags-form" onSubmit={onSubmit} noValidate>
-    <div className="ags-field">
-      <label className="ags-field__label" htmlFor="ags-name">Имя</label>
-      <input className="ags-field__input" id="ags-name" name="name" type="text" autoComplete="name" placeholder="Иван Иванов" value={name} aria-invalid={Boolean(invalid.name)} aria-required="true" onChange={event => { setName(event.target.value); setInvalid(prev => ({ ...prev, name: false })) }} />
-    </div>
-    <div className="ags-field">
-      <label className="ags-field__label" htmlFor="ags-phone">Телефон</label>
+    <FloatingField className="ags-field" label="Имя">
+      <input className="ags-field__input" id="ags-name" name="name" type="text" autoComplete="name" placeholder=" " value={name} aria-invalid={Boolean(invalid.name)} aria-required="true" onChange={event => { setName(event.target.value); setInvalid(prev => ({ ...prev, name: false })) }} />
+    </FloatingField>
+    <FloatingField className="ags-field" label="Телефон">
       <PhoneInput className="ags-field__input" id="ags-phone" name="phone" type="tel" autoComplete="tel" placeholder={copy.phonePlaceholder} inputMode="tel" value={phone} aria-invalid={Boolean(invalid.phone)} aria-required="true" onValueChange={setPhone} onEdited={() => setInvalid(prev => ({ ...prev, phone: false }))} />
-    </div>
-    <div className="ags-field">
-      <label className="ags-field__label" htmlFor="ags-email">Email</label>
-      <input className="ags-field__input" id="ags-email" name="email" type="email" autoComplete="email" placeholder="name@example.ru" value={email} aria-invalid={Boolean(invalid.email)} aria-required="true" onChange={event => { setEmail(event.target.value); setInvalid(prev => ({ ...prev, email: false })) }} />
-    </div>
+    </FloatingField>
+    <FloatingField className="ags-field" label="Email">
+      <input className="ags-field__input" id="ags-email" name="email" type="email" autoComplete="email" placeholder=" " value={email} aria-invalid={Boolean(invalid.email)} aria-required="true" onChange={event => { setEmail(event.target.value); setInvalid(prev => ({ ...prev, email: false })) }} />
+    </FloatingField>
     <label className="ags-agree">
       <input className="ags-agree__box" type="checkbox" name="consent" aria-required="true" aria-invalid={Boolean(invalid.consent)} onChange={() => setInvalid(prev => ({ ...prev, consent: false }))} />
       <span className="ags-agree__tick" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none"><path d="M4.5 12.5 9.5 17.5 19.5 6.5" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" /></svg></span>

@@ -3,6 +3,7 @@
 import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { IconArrowRight, IconBrandWhatsapp, IconCheck, IconExclamationMark, IconGift, IconLoader2, IconPercentage, IconPlayerPlay, IconSend, IconX } from '@tabler/icons-react';
 import { PhoneInput } from './phone-input';
+import { FloatingField } from './floating-field';
 import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 import { copy } from '../lib/copy';
 import { isValidRuMobile, phoneE164, maskPhone } from '../lib/phone';
@@ -141,9 +142,13 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
         const widest = [...'0123456789'].sort((a, b) => context.measureText(b).width - context.measureText(a).width)[0]!;
         const mask = maskPhone('9'.repeat(10));
         const worst = mask.slice(0, 2) + mask.slice(2).replace(/\d/g, widest);
-        const width = Math.ceil(context.measureText(worst).width + (parseFloat(style.letterSpacing) || 0) * (worst.length - 1)) + 3;
+        const letterSpacing = parseFloat(style.letterSpacing) || 0;
+        const width = Math.ceil(Math.max(...[worst, input.placeholder].map(text =>
+          context.measureText(text).width + letterSpacing * Math.max(0, text.length - 1),
+        ))) + 6;
         const icon = action.offsetWidth;
-        const total = width + parseFloat(getComputedStyle(form).paddingLeft) + parseFloat(getComputedStyle(form).gap) + icon + 6;
+        const formStyle = getComputedStyle(form);
+        const total = width + parseFloat(formStyle.paddingLeft) + parseFloat(formStyle.paddingRight);
         container.style.setProperty('--passport-phone-width', `${width}px`);
         container.style.setProperty('--passport-form-width', `${total}px`);
         container.style.setProperty('--passport-form-scale', String(trigger.offsetWidth / total));
@@ -270,7 +275,9 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
               <li>Осталось <span className="passport-concept__mortgage-slots">8 из 11</span> мест</li>
             </ul>
             <form className="passport-concept__mortgage-form" data-status={status} onSubmit={sendMortgage} aria-busy={status === 'sending'}>
-              <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending'} />
+              <FloatingField label={copy.phone}>
+                <PhoneInput ref={phoneRef} name="phone" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder={copy.phonePlaceholder} disabled={status === 'sending'} />
+              </FloatingField>
               {/* Виджет капчи не должен участвовать в сетке — иначе поле телефона «уезжает». */}
               <span className="passport-concept__mortgage-captcha" aria-hidden="true">{captcha.widget}</span>
               <button className="passport-concept__mortgage-submit" type="submit" disabled={!isValidRuMobile(phone) || !consent || status === 'sending' || captcha.reloadRequired}>
@@ -288,7 +295,6 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
     <button type="button" className="catalog__mortgage-trigger" aria-haspopup="dialog" onClick={() => {
       bannerDialog.current?.showModal();
       setOpen(true);
-      requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true }));
     }}>{catalogBanner}</button>
     <dialog ref={bannerDialog} className="catalog__mortgage-dialog" aria-label="Семейная ипотека" onClose={() => setOpen(false)}>
       {mortgageCard}
@@ -296,7 +302,11 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
   </div>;
   return <>
     {imageReady && storageChecked && <div inert={dismissed} aria-hidden={dismissed} ref={containerRef} key={run} className={`passport-concept${isHero ? ' passport-concept--hero' : ''}${isPlans ? ' passport-concept--plans' : ''}${placement === 'viewer' ? ' passport-concept--viewer' : ''}${placement === 'comparison' ? ' passport-concept--comparison' : ''}`} data-slow={slow} data-ready={ready} data-open={open} data-visible={inView && !dismissed} data-completed={status === 'done'}>
-      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label={isHero ? 'Ипотека под 3,9% на 30 лет' : 'Получить паспорт проекта'} onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => { if (isHero) trackMetricaAction('mortgage_hero_form_open'); setOpen(true); requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true })); }}>
+      <button inert={open || status === 'done'} aria-hidden={open || status === 'done'} className="passport-concept__button" type="button" aria-label={isHero ? 'Ипотека под 3,9% на 30 лет' : 'Получить паспорт проекта'} onAnimationEnd={event => { if (event.animationName === 'passport-flight' || event.animationName === 'passport-fade' || event.animationName === 'passport-dialog-settle') setReady(true); }} onFocus={() => setReady(true)} onClick={() => {
+        setOpen(true);
+        if (isHero) trackMetricaAction('mortgage_hero_form_open');
+        else requestAnimationFrame(() => phoneRef.current?.focus({ preventScroll: true }));
+      }}>
         <span className="passport-concept__surface" aria-hidden="true" />
         <span className="passport-concept__label">{isHero ? <span>Ипотека под <span className="passport-concept__rate">3,9%</span> на 30 лет</span> : 'Получить паспорт проекта'}</span>
       </button>
@@ -308,7 +318,9 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
       </> : <>
         <form id={formId} inert={!open || status === 'done'} aria-hidden={!open || status === 'done'} className="passport-concept__form" data-status={status} onSubmit={send} aria-busy={status === 'sending'}>
           {status === 'sending' && <svg className="passport-concept__perimeter" aria-hidden="true"><rect x="1.5" y="1.5" rx="20" pathLength="100" /></svg>}
-          <PhoneInput ref={phoneRef} aria-label="Номер телефона" name="phone" type="tel" inputMode="tel" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder="Ваш телефон" disabled={status === 'sending' || status === 'done'} />
+          <FloatingField label={copy.phone}>
+            <PhoneInput ref={phoneRef} name="phone" autoComplete="tel" value={phone} onValueChange={value => { setPhone(value); if (status !== 'sending') setStatus('idle'); }} placeholder={copy.phonePlaceholder} disabled={status === 'sending' || status === 'done'} />
+          </FloatingField>
           <div className="passport-concept__below">
             <div className="passport-concept__channel" data-shown={open && status !== 'done'} inert={!open || status === 'done'}>
               <div className="passport-concept__channel-clip">

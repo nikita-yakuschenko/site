@@ -34,6 +34,7 @@ import { metricaBootstrapScript } from '../lib/metrica-snippet'
 import { isCMSUnavailable } from '../server/cms-request'
 import { unstable_rethrow } from 'next/navigation'
 import './styles.css'
+import './floating-field.css'
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 

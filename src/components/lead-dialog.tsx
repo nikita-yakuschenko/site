@@ -5,7 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { copy } from "../lib/copy";
 import { LeadForm } from "./lead-form";
-import { MessengerFormArtwork } from './messenger-form-artwork';
+import { MessengerFormArtwork, type ContactFormTheme } from './messenger-form-artwork';
 import './messenger-form.css';
 import { SITE } from "../lib/site";
 
@@ -30,7 +30,7 @@ export function LeadDialog({
   actionHref,
   actionLabel,
   actionChannel,
-  messengerTheme,
+  contactTheme,
   phoneOnly = false,
   pageId,
   formId = "consultation-dialog",
@@ -47,7 +47,7 @@ export function LeadDialog({
   actionHref?: string;
   actionLabel?: string;
   actionChannel?: 'max' | 'telegram' | 'whatsapp';
-  messengerTheme?: 'max' | 'telegram' | 'whatsapp';
+  contactTheme?: ContactFormTheme;
   phoneOnly?: boolean;
   /** Откуда пришла заявка: страница сама себя и называет. */
   pageId?: string;
@@ -121,9 +121,9 @@ export function LeadDialog({
       onClick={onClose}
     >
       <div
-        className={`ask-dialog__card${messengerTheme ? ' messenger-form' : ''}`}
+        className={`ask-dialog__card${contactTheme ? ' messenger-form' : ''}`}
         style={cardBackground ? { backgroundColor: cardBackground } : undefined}
-        data-messenger={messengerTheme}
+        data-messenger={contactTheme}
         onClick={(event) => event.stopPropagation()}
       >
         <button
@@ -134,8 +134,8 @@ export function LeadDialog({
         >
           <IconX size={18} stroke={2.2} />
         </button>
-        {messengerTheme && <MessengerFormArtwork channel={messengerTheme} />}
-        <LeadForm phoneOnly={phoneOnly || Boolean(messengerTheme)} formId={formId}
+        {contactTheme && <MessengerFormArtwork channel={contactTheme} />}
+        <LeadForm phoneOnly={phoneOnly || Boolean(contactTheme)} formId={formId}
           siteId={SITE.id}
           pageId={pageId}
           variant="card"

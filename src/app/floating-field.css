@@ -1,0 +1,56 @@
+.floating-field {
+  position: relative;
+  display: block;
+  min-width: 0;
+  height: fit-content;
+}
+
+.floating-field > :is(input, textarea) {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+}
+
+.floating-field__label {
+  position: absolute;
+  inset-inline: var(--floating-label-inset, 13px);
+  top: var(--floating-label-rest, 50%);
+  transform: translateY(var(--floating-label-shift, -50%)) scale(1);
+  transform-origin: top left;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 14px;
+  line-height: 1.2;
+  color: var(--floating-label-color, inherit);
+  pointer-events: none;
+}
+
+.floating-field:has(> textarea) {
+  --floating-label-rest: 12px;
+  --floating-label-shift: 0%;
+}
+
+.floating-field:has(> :is(input, textarea):is(:focus, :not(:placeholder-shown), :autofill)) > .floating-field__label {
+  top: var(--floating-label-top, 4px);
+  transform: translateY(0) scale(var(--floating-label-scale, .8));
+  color: var(--floating-label-color, var(--ink-1));
+}
+
+/* The telephone example is visible only while the empty field has focus. */
+.floating-field > :is(input, textarea):not(:focus)::placeholder {
+  opacity: 0;
+}
+
+.floating-field:has(> [aria-invalid="true"], > .is-invalid) > .floating-field__label {
+  color: var(--floating-label-error, var(--danger));
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .floating-field__label {
+    transition:
+      top 240ms cubic-bezier(.4, 0, .2, 1),
+      transform 240ms cubic-bezier(.4, 0, .2, 1),
+      color 180ms ease-out;
+  }
+}

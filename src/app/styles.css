@@ -3615,22 +3615,17 @@ a {
 .referral__field {
   display: block;
   margin: 0 0 16px;
-}
-
-.referral__field span {
-  display: block;
-  margin: 0 0 10px;
-  font-size: 12px;
-  line-height: 1.3;
+  --floating-label-inset: 15px;
+  --floating-label-color: var(--on-dark-1);
+  font-size: 14px;
   font-weight: 500;
-  color: var(--on-dark-3);
 }
 
 .referral__field input {
   display: block;
   width: 100%;
   height: 48px;
-  padding: 0 14px;
+  padding: 15px 14px 0;
   border: 1px solid var(--line-on-dark);
   border-radius: 12px;
   background: var(--tint-on-dark);
@@ -6048,14 +6043,14 @@ a {
   color: var(--danger);
 }
 
-/* Знак стоит у правого края поля: поле — последняя строка подписи,
-   поэтому отсчёт от низа. Высота формы не меняется. */
+/* Знак центрируется по высоте поля, не занимая места в сетке. */
 .lead-card label:has(.lead-field__error.is-quiet)::after,
 .lead-form label:has(.lead-field__error.is-quiet)::after {
   content: "!";
   position: absolute;
   right: 1px;
-  bottom: 1px;
+  top: 50%;
+  transform: translateY(-50%);
   display: grid;
   place-items: center;
   width: 32px;
@@ -6097,6 +6092,15 @@ a {
   height: auto;
   padding: 10px 12px;
   resize: none;
+}
+
+:is(.lead-card, .lead-form) > .floating-field > input {
+  height: 48px;
+  padding-block: 15px 2px;
+}
+
+:is(.lead-card, .lead-form) > .floating-field > textarea {
+  padding-block: 17px 3px;
 }
 .lead-card__submit {
   gap: 8px;
@@ -6584,6 +6588,7 @@ html.is-dialog-open {
      Запас задан сразу, чтобы после отправки карточка не росла и не обрезала анимацию. */
   min-height: 440px;
 }
+
 
 /* Поле в фокусе отмечается своей гранью: зелёная рамка общего правила
    ложилась поверх скруглённого поля вторым контуром. */
@@ -8952,8 +8957,7 @@ html.is-dialog-open {
 
 /* Первая подпись уходит вверх на свою высоту: выровнять по верху надо
    рамку поля, а не слово над ней — поле замещает первую строку текста. */
-.lead-reveal__card .lead-card > label:first-of-type,
-.lead-reveal__card .lead-form > label:first-of-type {
+.lead-reveal__card :is(.lead-card, .lead-form) > label:first-of-type:not(.floating-field) {
   margin-top: calc(var(--lead-caption) * -1);
 }
 
@@ -9821,6 +9825,8 @@ html.is-dialog-open {
 .mortgage-request .panel-lead__form .lead-card { height: auto; gap: 16px; padding-top: 16px; }
 .mortgage-request .lead-card button[type="submit"] { width: 100%; align-self: stretch; }
 .mortgage-request.is-open .lead-card { --lead-ink: 255 255 255; }
+.mortgage-request.is-open .floating-field,
+.ready-home-offer__total .floating-field { --floating-label-color: var(--on-dark-1); }
 .mortgage-request.is-open .lead-card input { border-color: var(--on-dark-4); background: var(--tint-on-dark); color: #fff; }
 .mortgage-request.is-open .lead-card input::placeholder { color: var(--on-dark-4); }
 .mortgage-request.is-open .lead-card input:focus { border-color: var(--on-dark-2); }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useRef, useState, type ReactNode } from 'react'
+import { useId, useRef, useState, type ReactNode } from 'react'
 import Link from 'next/link'
 import { useProjectLeadContext } from './project-lead-context'
 import { readRegionCode } from '../lib/regions'
@@ -16,6 +16,7 @@ import { noAutofillFieldProps, noAutofillFormProps } from '../lib/no-autofill'
 import { LeadSubmitFeedback } from './lead-submit-feedback'
 import { submitLead, type LeadAttempt } from '../lib/submit-lead'
 import { PhoneInput } from './phone-input'
+import { FloatingField } from './floating-field'
 import { useLeadCaptcha } from './use-lead-captcha'
 
 function documentProject(): { id: string; cmsId?: string; slug: string; name: string } | null {
@@ -106,6 +107,7 @@ export function LeadForm({
     consent?: boolean
   }>({})
   const phoneRef = useRef<HTMLInputElement>(null)
+  const fieldId = useId()
   const attempt = useRef<LeadAttempt['current']>(null)
   const submitting = useRef(false)
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
@@ -182,12 +184,13 @@ export function LeadForm({
         </div>
       )}
       {children}
-      {!phoneOnly && <label>
-        {nameLabel || copy.name}
+      {!phoneOnly && <FloatingField label={nameLabel || copy.name} labelId={`${fieldId}-name-label`}>
         <input
           name="name"
           {...noAutofillFieldProps}
-          placeholder={copy.namePlaceholder}
+          placeholder=" "
+          aria-labelledby={`${fieldId}-name-label`}
+          aria-describedby={invalid.name ? `${fieldId}-name-error` : undefined}
           aria-invalid={invalid.name || undefined}
           className={['ym-disable-keys', 'ym-hide-content', invalid.name ? 'is-invalid' : '']
             .filter(Boolean)
@@ -204,13 +207,12 @@ export function LeadForm({
           }}
         />
         {invalid.name ? (
-          <span className="lead-field__error is-quiet" role="alert">
+          <span id={`${fieldId}-name-error`} className="lead-field__error is-quiet" role="alert">
             {copy.leadNameInvalid}
           </span>
         ) : null}
-      </label>}
-      <label>
-        {copy.phone}
+      </FloatingField>}
+      <FloatingField label={copy.phone} labelId={`${fieldId}-phone-label`}>
         <PhoneInput
           ref={phoneRef}
           name="phone"
@@ -218,6 +220,8 @@ export function LeadForm({
           inputMode="tel"
           {...noAutofillFieldProps}
           placeholder={copy.phonePlaceholder}
+          aria-labelledby={`${fieldId}-phone-label`}
+          aria-describedby={invalid.phone ? `${fieldId}-phone-error` : undefined}
           value={phone}
           aria-invalid={invalid.phone || undefined}
           className={['ym-disable-keys', 'ym-hide-content', invalid.phone ? 'is-invalid' : '']
@@ -227,22 +231,21 @@ export function LeadForm({
           onEdited={() => setInvalid(prev => ({ ...prev, phone: false }))}
         />
         {invalid.phone ? (
-          <span className="lead-field__error is-quiet" role="alert">
+          <span id={`${fieldId}-phone-error`} className="lead-field__error is-quiet" role="alert">
             {copy.leadPhoneInvalid}
           </span>
         ) : null}
-      </label>
+      </FloatingField>
       {compact || !withMessage ? null : (
-        <label>
-          {copy.message}
+        <FloatingField label={copy.message}>
           <textarea
             name="message"
             rows={5}
-            placeholder={copy.messagePlaceholder}
+            placeholder=" "
             className="ym-disable-keys ym-hide-content"
             {...noAutofillFieldProps}
           />
-        </label>
+        </FloatingField>
       )}
       <label
         className={

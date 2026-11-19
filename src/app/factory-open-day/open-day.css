@@ -884,15 +884,12 @@ html body .ags.ags-hero .ags-hero__photo img {
 .ags-book .ags-spec dd{ margin:0; font-size:.875rem; line-height:1.5; color:var(--t-2); display:flex; flex-direction:column; gap:7px; }
 
 /* форма: поля живут на тех же волосяных линейках, что и вся страница */
-.ags-field{ margin-bottom:26px; }
-.ags-field__label{
-  display:block; margin-bottom:9px;
-  font-size:.75rem; text-transform:uppercase; letter-spacing:.08em;
-  color:var(--t-3); font-weight:500;
-}
+.ags-field{ margin-bottom:26px; --floating-label-color:var(--t-2); --floating-label-error:var(--bad); }
+.ags-field .floating-field__label{ font-weight:500; }
 .ags-field__input{
+  display:block; min-height:43px;
   width:100%; background:transparent; color:var(--t-1);
-  font:inherit; font-size:1rem; padding:6px 0 12px;
+  font:inherit; font-size:1rem; padding:15px 0 0;
   border:0; border-bottom:1px solid var(--rule-strong); border-radius:0;
   caret-color:var(--signal);
   transition:border-color .2s var(--ease);

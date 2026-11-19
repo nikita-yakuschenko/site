@@ -33,7 +33,7 @@
 .messenger-form .lead-card__body { color: var(--messenger-secondary); margin-top: 10px; line-height: 1.5; }
 .messenger-form .lead-card label { color: white; }
 .messenger-form .lead-card input:not([type="checkbox"]) { height: 46px; font-size: 16px; background: rgb(255 255 255 / .13); border-color: rgb(255 255 255 / .65); color: white; border-radius: 12px; }
-.messenger-form .lead-card input::placeholder { color: var(--messenger-secondary); opacity: 1; }
+.messenger-form .lead-card input:focus::placeholder { color: var(--messenger-secondary); opacity: 1; }
 .ask-dialog__card.messenger-form input:not([type="checkbox"]):focus { border-color: white; box-shadow: 0 0 0 1px rgb(255 255 255 / .2); }
 .messenger-form .lead-card .lead-form__consent { color: var(--messenger-secondary); white-space: normal; align-items: start; line-height: 1.45; }
 .messenger-form .lead-form__consent input[type="checkbox"] { margin-top: 2px; }
@@ -41,6 +41,10 @@
 .messenger-form .lead-card__submit { min-height: 44px; }
 .ask-dialog__card.messenger-form .ask-dialog__close { top: 20px; right: 20px; width: 36px; height: 36px; color: white; background: rgb(255 255 255 / .15); }
 .messenger-form .lead-card label:has(.is-invalid) { color: #fff0cf; }
+.messenger-form .floating-field {
+  --floating-label-color: var(--messenger-secondary);
+  --floating-label-error: #fff0cf;
+}
 .messenger-form .lead-card input.is-invalid { border-color: #fff0cf; }
 @media (hover: hover) and (pointer: fine) {
   .ask-dialog__card.messenger-form .ask-dialog__close:hover { background: rgb(255 255 255 / .25); }
@@ -53,3 +57,43 @@
 }
 
 .messenger-form[data-messenger="telegram"] .messenger-form__watermark { opacity: .3; }
+
+.messenger-form[data-messenger="callback"] {
+  --messenger-top: #ffdc59;
+  --messenger-bottom: var(--brand-yellow);
+  --messenger-glow: #fff2b3;
+  --messenger-secondary: var(--ink-1);
+  color: var(--avgst-ink);
+}
+
+.messenger-form[data-messenger="callback"] :is(
+  .messenger-form__mark,
+  .messenger-form__watermark,
+  .lead-card,
+  .lead-card__title,
+  .lead-card label,
+  .lead-form__consent-link,
+  .ask-dialog__close
+) {
+  color: var(--avgst-ink);
+}
+.messenger-form[data-messenger="callback"] .messenger-form__watermark { opacity: .12; }
+.messenger-form[data-messenger="callback"] .ask-dialog__close:focus-visible { outline-color: var(--avgst-ink); }
+.messenger-form[data-messenger="callback"] .lead-card input[type="tel"] {
+  background: rgb(255 255 255 / .4);
+  border-color: var(--ink-4);
+  color: var(--avgst-ink);
+}
+.messenger-form[data-messenger="callback"] .lead-card input[type="tel"]:focus {
+  border-color: var(--avgst-ink);
+}
+.messenger-form[data-messenger="callback"] .floating-field { --floating-label-error: #8e231a; }
+.messenger-form[data-messenger="callback"] .lead-card input[type="tel"].is-invalid { border-color: #8e231a; }
+.messenger-form[data-messenger="callback"] .lead-card__submit {
+  border-color: var(--avgst-ink);
+  background: var(--avgst-ink);
+  color: white;
+}
+.messenger-form[data-messenger="callback"] .lead-card__submit:hover {
+  background: color-mix(in srgb, var(--avgst-ink), white 10%);
+}

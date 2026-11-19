@@ -126,11 +126,11 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
 .passport-concept__form { position: absolute; top: 0; left: 0; width: 100%; opacity: 0; pointer-events: none; clip-path: inset(0 max(0px, calc((100% - 270px) / 2)) -70px round 22px); transition: clip-path 280ms cubic-bezier(.77,0,.175,1), opacity 130ms ease 150ms; }
 .passport-concept__form::before { animation: none; }
 .passport-concept[data-open="true"] .passport-concept__form { opacity: 1; pointer-events: auto; clip-path: inset(0 0 -70px round 22px); transition-delay: 0ms; }
-.passport-concept__form input,
+.passport-concept__form > .floating-field,
 .passport-concept__download,
 .passport-concept__note,
 .passport-concept__status { animation: none; opacity: 0; transition: opacity 100ms ease; }
-.passport-concept[data-open="true"] .passport-concept__form input,
+.passport-concept[data-open="true"] .passport-concept__form > .floating-field,
 .passport-concept[data-open="true"] .passport-concept__download,
 .passport-concept[data-open="true"] .passport-concept__note,
 .passport-concept[data-open="true"] .passport-concept__status { opacity: 1; transition-delay: 100ms; }
@@ -207,7 +207,13 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
 .passport-concept[data-open="true"] .passport-concept__form { clip-path: none; }
 .passport-concept__form::before { transform: scaleX(var(--passport-form-scale, 1.08)); transition: transform 280ms cubic-bezier(.77,0,.175,1); }
 .passport-concept[data-open="true"] .passport-concept__form::before { transform: scaleX(1); }
-.passport-concept__form input { width: var(--passport-phone-width, 168px); flex: 0 0 var(--passport-phone-width, 168px); }
+.passport-concept__form > .floating-field {
+  width: var(--passport-phone-width, 168px);
+  flex: 0 1 var(--passport-phone-width, 168px);
+  --floating-label-inset: 0px;
+  --floating-label-top: 0px;
+  --floating-label-scale: .72;
+}
 .passport-concept__action-flight { position: absolute; inset: 0; pointer-events: none; animation: passport-flight 1400ms cubic-bezier(.23,1,.32,1) 650ms both; }
 .passport-concept__action-flight .passport-concept__download { position: absolute; left: 0; top: 0; padding: 0; opacity: 1; transform: translate(var(--passport-action-closed-x, 50px), 3px); transition: transform 300ms cubic-bezier(.23,1,.32,1), background-color 180ms ease, color 180ms ease; pointer-events: none; }
 .passport-concept[data-open="false"] .passport-concept__action-flight .passport-concept__download { background: var(--avgst-green); color: white; }
@@ -219,7 +225,6 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
 @media (max-width: 899px) {
   .passport-concept__button { padding-left: 46px; padding-right: 12px; }
   .passport-concept__form { padding-right: 45px; }
-  .passport-concept__form input { width: var(--passport-phone-width, 168px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .passport-concept__action-flight { animation-name: passport-fade; animation-delay: 0ms; animation-duration: 150ms; }
@@ -229,7 +234,7 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
 
 /* More horizontal breathing room, with a lighter 40/36px phone capsule. */
 .passport-concept__form { height: 40px; padding-left: 18px; padding-right: 54px; gap: 16px; }
-.passport-concept__form input { height: 32px; }
+.passport-concept__form input { height: 32px; padding-block: 10px 0; }
 .passport-concept__action-flight .passport-concept__download { width: 32px; min-width: 32px; height: 32px; }
 .passport-concept[data-open="true"] .passport-concept__action-flight .passport-concept__download { transform: translate(var(--passport-action-open-x, 260px), 4px); }
 .passport-concept[data-open="false"] .passport-concept__action-flight .passport-concept__download { transform: translate(var(--passport-action-closed-x, 50px), 5px); }
@@ -511,13 +516,16 @@ html:has(.comparison-overlay[data-state="open"]) .passport-concept-tools { visib
   max-width: 100%;
   height: 40px;
   margin: 0;
-  padding: 0 12px;
+  padding: 14px 12px 0;
   border: 1px solid #d7dde4;
   border-radius: 12px;
   background: #fff;
   color: inherit;
   font: inherit;
   font-size: 15px;
+}
+@media (pointer: coarse) {
+  .passport-concept__mortgage-form input[type="tel"] { font-size: 16px; }
 }
 .passport-concept__mortgage-form input:not([type="checkbox"]):focus {
   outline: 2px solid var(--brand-yellow);

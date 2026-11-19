@@ -11,6 +11,7 @@ import { copy, nbspText } from "../lib/copy";
 import { noAutofillFieldProps, noAutofillFormProps } from "../lib/no-autofill";
 
 import { PhoneInput } from './phone-input'
+import { FloatingField } from './floating-field'
 import { useLeadCaptcha } from './use-lead-captcha'
 import { isMobileFormViewport, useMobileFormReveal } from './use-mobile-form-reveal'
 
@@ -212,12 +213,13 @@ export function ReferralProgram({
                         {nbspText(data.formLead)}
                       </p>
 
-                      <label className="referral__field">
-                        <span>{data.nameLabel}</span>
+                      <FloatingField className="referral__field" label={data.nameLabel}>
                         <input
                           ref={nameRef}
                           name="name"
                           type="text"
+                          placeholder=" "
+                          aria-invalid={invalid.name || undefined}
                           {...noAutofillFieldProps}
                           className={[
                             "ym-disable-keys",
@@ -239,10 +241,9 @@ export function ReferralProgram({
                           }}
                           required
                         />
-                      </label>
+                      </FloatingField>
 
-                      <label className="referral__field">
-                        <span>{data.phoneLabel}</span>
+                      <FloatingField className="referral__field" label={data.phoneLabel}>
                         <PhoneInput
                           ref={phoneRef}
                           placeholder={copy.phonePlaceholder}
@@ -251,6 +252,7 @@ export function ReferralProgram({
                           inputMode="tel"
                           {...noAutofillFieldProps}
                           value={phone}
+                          aria-invalid={invalid.phone || undefined}
                           className={[
                             "ym-disable-keys",
                             "ym-hide-content",
@@ -262,13 +264,14 @@ export function ReferralProgram({
                           onEdited={() => setInvalid(prev => ({ ...prev, phone: false }))}
                           required
                         />
-                      </label>
+                      </FloatingField>
 
-                      <label className="referral__field">
-                        <span>{data.emailLabel}</span>
+                      <FloatingField className="referral__field" label={data.emailLabel}>
                         <input
                           name="email"
                           type="email"
+                          placeholder=" "
+                          aria-invalid={invalid.email || undefined}
                           inputMode="email"
                           {...noAutofillFieldProps}
                           className={[
@@ -283,7 +286,7 @@ export function ReferralProgram({
                           }
                           required
                         />
-                      </label>
+                      </FloatingField>
 
                       <label
                         className={

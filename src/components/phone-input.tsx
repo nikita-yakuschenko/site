@@ -49,6 +49,7 @@ export function PhoneInput({ value, onValueChange, onEdited, ref, ...props }: Pr
     Object.assign(layer.style, {
       position: 'fixed', left: `${left}px`, top: `${rect.top + parseFloat(style.borderTopWidth)}px`,
       height: `${input.clientHeight}px`, display: 'inline-grid', alignItems: 'center',
+      boxSizing: 'border-box', paddingBlock: `${style.paddingTop} ${style.paddingBottom}`,
       font: style.font, letterSpacing: style.letterSpacing, color: style.color,
       pointerEvents: 'none', whiteSpace: 'pre', zIndex: '2147483647',
     })
