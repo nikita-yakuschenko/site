@@ -35,6 +35,7 @@ export function LeadDialog({
   pageId,
   formId = "consultation-dialog",
   withMessage = false,
+  cardBackground,
   meta,
 }: {
   onClose: () => void;
@@ -52,6 +53,7 @@ export function LeadDialog({
   pageId?: string;
   formId?: string;
   withMessage?: boolean;
+  cardBackground?: string;
   meta?: Record<string, unknown>;
 }) {
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -120,6 +122,7 @@ export function LeadDialog({
     >
       <div
         className={`ask-dialog__card${messengerTheme ? ' messenger-form' : ''}`}
+        style={cardBackground ? { backgroundColor: cardBackground } : undefined}
         data-messenger={messengerTheme}
         onClick={(event) => event.stopPropagation()}
       >

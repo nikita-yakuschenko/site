@@ -462,14 +462,126 @@
 .catalog__feed-offer {
   grid-column: 1 / -1;
   border-radius: var(--surface-radius);
+  --offer-art-width: 185px;
+  --offer-art-height: 96px;
+  --offer-art-visible-height: .92;
+}
+
+.catalog__feed-offer[data-offer="architect"] { --offer-art-width: 310px; --offer-art-visible-height: .96; }
+.catalog__feed-offer[data-offer="site-planning"] { --offer-art-width: 230px; --offer-art-visible-height: .97; }
+.catalog__feed-offer[data-offer="mortgage"] { --offer-art-width: 230px; --offer-art-visible-height: .96; }
+
+.catalog__feed-offer-trigger {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  width: 100%;
+  padding: 14px 24px;
+  padding-inline-end: calc(min(var(--offer-art-width), 30%) + 12px);
+  overflow: hidden;
+  border: 0;
+  border-radius: inherit;
+  color: var(--avgst-ink);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.catalog__feed-offer-trigger:focus-visible { outline: 2px solid var(--avgst-ink); outline-offset: 3px; }
+.catalog__feed-offer-copy { position: relative; z-index: 1; display: grid; width: 100%; gap: 6px; justify-items: start; }
+.catalog__feed-offer-copy strong { font-size: clamp(15px, 2.2vw, 24px); line-height: 1.15; text-transform: uppercase; }
+.catalog__feed-offer-description { font-size: clamp(13px, 1.5vw, 16px); line-height: 1.3; }
+.catalog__feed-offer-topics { display: flex; flex-wrap: wrap; gap: 5px; }
+.catalog__feed-offer-topics > span,
+.catalog__feed-offer-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 9px;
+  border-radius: 99px;
+  background: rgb(255 255 255 / .83);
+  font-size: 12px;
+  line-height: 1.2;
+}
+.catalog__feed-offer-cta { background: var(--brand-yellow); border-radius: 6px; font-weight: 600; }
+.catalog__feed-offer-cta,
+.catalog__feed-offer-topics { margin-top: 6px; }
+.catalog__feed-offer-trigger svg { width: 15px; height: 15px; flex: none; }
+
+.catalog__feed-offer-trigger:focus-visible .catalog__feed-offer-cta,
+.catalog__feed-offer-trigger:active .catalog__feed-offer-cta {
+  background: color-mix(in srgb, var(--brand-yellow), var(--avgst-ink) 6%);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .catalog__feed-offer-trigger:hover .catalog__feed-offer-cta {
+    background: color-mix(in srgb, var(--brand-yellow), var(--avgst-ink) 6%);
+  }
+
+  .catalog__feed-offer-topics > span:hover {
+    background: white;
+    box-shadow: inset 0 0 0 1px rgb(var(--avgst-ink-rgb) / .12);
+  }
+}
+
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  .catalog__feed-offer-cta { transition: background-color 150ms ease-out; }
+  .catalog__feed-offer-topics > span { transition: background-color 150ms ease-out, box-shadow 150ms ease-out; }
+  .catalog__feed-offer-cta svg { transition: transform 150ms ease-out; }
+  .catalog__feed-offer-trigger:hover .catalog__feed-offer-cta svg { transform: translate(1px, -1px); }
+}
+
+.catalog__feed-offer-art {
+  position: absolute;
+  inset: 0 0 0 auto;
+  width: min(var(--offer-art-width), 30%);
+  pointer-events: none;
+}
+.catalog__feed-offer-art img {
+  position: absolute;
+  top: 50%;
+  right: 0;
+  width: auto;
+  max-width: none;
+  height: calc(var(--offer-art-height) / var(--offer-art-visible-height));
+  transform: translateY(-50%);
 }
 
 @media (width < 640px) {
   .catalog__feed-offer[data-layout="wide"] { display: none; }
+  .catalog__feed-offer { --offer-art-height: clamp(64px, 18vw, 90px); }
+  .catalog__feed-offer-trigger { padding: 14px 12px 12px; }
+  .catalog__feed-offer-cta { min-height: 34px; padding-inline: 16px; }
+  .catalog__feed-offer-art { top: 24px; width: 42%; }
+  .catalog__feed-offer-copy strong { font-size: clamp(11.5px, calc(2.15vw + 4.6px), 13px); }
+  .catalog__feed-offer-copy > :not(strong) { max-width: calc(58% + 4px); }
+  .catalog__feed-offer-copy > .catalog__feed-offer-topics {
+    display: grid;
+    grid-template-columns: repeat(2, max-content);
+    max-width: 100%;
+    justify-items: start;
+  }
+  .catalog__feed-offer[data-offer="architect"] .catalog__feed-offer-topics > :nth-child(2) { order: 1; }
+  .catalog__feed-offer[data-offer="architect"] .catalog__feed-offer-topics > :nth-child(2),
+  .catalog__feed-offer[data-offer="site-planning"] .catalog__feed-offer-topics > :nth-child(3) { grid-column: 1 / -1; }
+  .catalog__feed-offer-description { font-size: 12px; }
+  .catalog__feed-offer-topics > span { font-size: 10px; padding: 3px 5px; }
+  .catalog__feed-offer-topics svg { width: 12px; height: 12px; }
+}
+
+@media (width < 360px) {
+  .catalog__feed-offer-art { display: none; }
+  .catalog__feed-offer-copy > :not(strong) { max-width: 100%; }
 }
 
 @media (width >= 640px) {
   .catalog__feed-offer[data-layout="mobile"] { display: none; }
+  .catalog__feed-offer-cta {
+    min-height: 34px;
+    padding-inline: 16px;
+    gap: 6px;
+    font-size: 13px;
+  }
 }
 
 .catalog__mortgage-dialog {
