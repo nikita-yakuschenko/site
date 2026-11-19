@@ -370,6 +370,7 @@ function MortgageMidCta({ content, programId }: { content: MortgageContent; prog
             heading={fm.formHeading}
             body={fm.formBody}
             submitLabel={fm.formHeading}
+            formIntro={<h3 className="mortgage-mid-cta__form-title">Консультация по ипотеке</h3>}
           >
             <h2 id="mortgage-mid-cta-title">
               {nbspText(content.midCtaHeading)}

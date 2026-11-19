@@ -9041,6 +9041,36 @@ html.is-dialog-open {
   color: var(--on-dark-1);
 }
 
+.mortgage-mid-cta .lead-reveal__slot {
+  align-content: center;
+}
+
+.mortgage-mid-cta .lead-reveal__card,
+.mortgage-mid-cta .lead-reveal__card .lead-card {
+  height: auto;
+}
+
+.mortgage-mid-cta__form-title {
+  margin: 0 0 16px;
+  padding-right: 40px;
+  font-size: 20px;
+  line-height: 1.25;
+  font-weight: 600;
+}
+
+.mortgage-mid-cta .lead-reveal__close {
+  top: -4px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgb(var(--lead-ink) / .08);
+  color: rgb(var(--lead-ink));
+}
+
+.mortgage-mid-cta .lead-reveal__card .lead-card__submit {
+  margin-top: 4px;
+}
+
 .mortgage-faq {
   margin-top: var(--gap-stack);
   margin-bottom: 0;
