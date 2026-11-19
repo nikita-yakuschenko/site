@@ -22,7 +22,7 @@
   white-space: nowrap;
   font-size: 14px;
   line-height: 1.2;
-  color: var(--floating-label-color, inherit);
+  color: var(--floating-label-color, var(--avgst-ink));
   pointer-events: none;
 }
 
