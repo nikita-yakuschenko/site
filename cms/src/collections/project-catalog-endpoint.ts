@@ -33,6 +33,9 @@ export const projectCatalogEndpoint: Endpoint = {
         hero_product: record.recordType === 'project' ? record.hero_product ?? null : null,
         area: String(record.areaValue), areaValue: record.areaValue, floors: String(record.floorsValue), floorsValue: record.floorsValue, bedrooms: String(record.bedrooms), bathrooms: String(record.bathrooms),
         technology: technologyFromBadge(record.technologyBadge), technologyBadge: record.technologyBadge, series: record.series || (modular ? 'modular' : 'panel'),
+        hasBuiltPhotos: record.builtContentSource === 'database' && Boolean(record.built?.some(row =>
+          row.type !== 'video' && (row.photo ? typeof row.photo === 'object' && Boolean(row.photo.url) : Boolean(row.image?.trim())),
+        )),
         imageUrl: mediaURL(record.desktopImage, record.imageUrl), mobileImageUrl: mediaURL(record.mobileImage, record.mobileImageUrl) || null,
         priceAmount: price && price > 0 ? price : null, priceLabel: price && price > 0 ? `от ${price.toLocaleString('ru-RU')} руб.` : 'Цена уточняется', regionalPrices, regionalSpecialPrices,
         description: record.searchDescription?.trim() || record.name,

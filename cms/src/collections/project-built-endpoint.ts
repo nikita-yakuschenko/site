@@ -6,11 +6,17 @@ export const projectBuiltEndpoint: Endpoint = {
   path: '/built', method: 'get', handler: async req => {
     const denied = authorizeSiteRequest(req)
     if (denied) return denied
-    const slug = new URL(req.url!).searchParams.get('slug')
+    const { searchParams } = new URL(req.url!)
+    const slug = searchParams.get('slug')
+    const publishedOnly = searchParams.get('published') === '1'
     if (!slug || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(slug)) return Response.json({ error: 'Некорректный адрес' }, { status: 400 })
     const result = await req.payload.find({
       collection: 'projects', limit: 1, depth: 1, req, overrideAccess: true,
-      where: { and: [{ builtContentSource: { equals: 'database' } }, { or: [{ slug: { equals: slug } }, { importKey: { equals: `catalog:${slug}` } }] }] },
+      where: { and: [
+        { builtContentSource: { equals: 'database' } },
+        { or: [{ slug: { equals: slug } }, { importKey: { equals: `catalog:${slug}` } }] },
+        ...(publishedOnly ? [{ _status: { equals: 'published' } }] : []),
+      ] },
       select: { built: true },
     })
     const record = result.docs[0]

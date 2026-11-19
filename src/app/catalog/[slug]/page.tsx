@@ -3,7 +3,7 @@ import { resolveProjectConfigurations } from '../../../lib/catalog/project-confi
 import { ProjectHeroPayment } from '../../../components/project-hero-payment'
 import { ProjectSectionTones } from '../../../components/project-section-tones'
 import type { Metadata } from 'next'
-import { cookies } from 'next/headers'
+import { cookies, headers } from 'next/headers'
 import { readProjectReactions, VOTER_COOKIE } from '../../../lib/reactions'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
@@ -29,7 +29,8 @@ import { copy, footerAboutFor } from '../../../lib/copy'
 import { formatRub } from '../../../lib/locale'
 import { resolveProjectHero } from '../../../lib/catalog/project-hero'
 import { resolveProjectExteriors, resolveProjectInteriors } from '../../../lib/catalog/project-exteriors'
-import { resolveProjectBuilt } from '../../../lib/catalog/project-built'
+import { resolveBuiltPhotoFallback, resolveProjectBuilt } from '../../../lib/catalog/project-built'
+import { BUILT_GALLERY_HEADER } from '../../../lib/catalog/session'
 import { resolveProjectNextSteps } from '../../../lib/catalog/project-next-steps'
 import { ProjectHeroContent } from '../../../components/project-hero-content'
 import type { ProjectHeroData } from '../../../lib/catalog/project-hero-data'
@@ -114,6 +115,17 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
   const blockStyle = (key: string) => ({ order: pageOrder.indexOf(key), width: '100%' })
 
   const catalogProjects = similarCatalog.items
+  const gallerySeed = draft || query.cmsPreview === '1' ? null : (await headers()).get(BUILT_GALLERY_HEADER)
+  const fallbackPhotos = gallerySeed && pageOrder.includes('ProjectBuilt')
+    ? await resolveBuiltPhotoFallback(heroProject, built, catalogProjects, gallerySeed)
+    : []
+  const ownTour = project.builtTour
+  const builtGalleryItems = fallbackPhotos.length
+    ? [
+        ...(built ?? (ownTour ? [{ type: 'video' as const, video: ownTour.video, cover: ownTour.cover, caption: ownTour.title }] : [])),
+        ...fallbackPhotos,
+      ]
+    : built ?? undefined
   const similarProjects = catalogProjects
     .filter((item) => item.id !== project.id)
     .sort((a, b) => similarityScore(project, a) - similarityScore(project, b))
@@ -179,7 +191,7 @@ export default async function ProjectPage({ params, searchParams }: { params: Pr
             ProjectExteriors: <ProjectExteriors project={project} images={exteriors ?? undefined} connected={exteriors !== null} />,
             ProjectPlans: <ProjectPlans project={project} variants={plans ?? undefined} connected={plans !== null} />,
             ProjectInteriors: <ProjectInteriors project={project} images={interiors ?? undefined} connected={interiors !== null} />,
-            ProjectBuilt: <ProjectBuilt project={project} items={built ?? undefined} />,
+            ProjectBuilt: <ProjectBuilt project={heroProject} items={builtGalleryItems} representative={fallbackPhotos.length > 0} />,
             ReadyHomeOffer: readyHome ? <ReadyHomeOffer project={project} /> : null,
             MortgageCalculator: !readyHome && tiers && !draft ? <MortgageCalculator projects={[]} initialPropertyPrice={standardPrice || undefined} initialProgramId="family39" showMatches={false} projectTiers={tiers} showEyebrow={false} project={{ id: heroProject.id, name: heroProject.name }} /> : null,
             ProjectConfig: !readyHome ? <ProjectConfig project={heroProject} configurations={configurations ?? []} /> : null,

@@ -23,8 +23,8 @@ import { isProjectHeroData } from '../lib/catalog/project-hero-data';
  * листать их уместнее, чем раскладывать очередной сеткой — третьей
  * подряд на этой странице.
  *
- * Снимков у проекта может не быть — тогда раздела нет. Подставлять сюда
- * рендеры нельзя: это ровно то, чего раздел не должен делать.
+ * При отсутствии своих снимков показываем реальные фото одного другого
+ * проекта той же технологии под общим заголовком.
  */
 /** Сколько снимков стоит в ряду. Шесть — как у фасадов и интерьеров;
  *  остальное прячется за последней плиткой. */
@@ -44,11 +44,11 @@ function ProjectName({ name }: { name: string }) {
   return <span style={{ color: 'var(--brand-yellow)' }}>{draft ?? name}</span>;
 }
 
-export function ProjectBuilt({ project, items }: { project: CatalogProject; items?: BuiltItem[] }) {
-  return items ? <ConnectedProjectBuilt project={project} items={items} /> : <LegacyProjectBuilt project={project} />;
+export function ProjectBuilt({ project, items, representative = false }: { project: CatalogProject; items?: BuiltItem[]; representative?: boolean }) {
+  return items ? <ConnectedProjectBuilt project={project} items={items} representative={representative} /> : <LegacyProjectBuilt project={project} />;
 }
 
-function ConnectedProjectBuilt({ project, items }: { project: CatalogProject; items: BuiltItem[] }) {
+function ConnectedProjectBuilt({ project, items, representative }: { project: CatalogProject; items: BuiltItem[]; representative: boolean }) {
   const [draft, setDraft] = useState<BuiltItem[] | null>(null);
   const [open, setOpen] = useState<number | null>(null);
   const [videoOpen, setVideoOpen] = useState<number | null>(null);
@@ -67,7 +67,9 @@ function ConnectedProjectBuilt({ project, items }: { project: CatalogProject; it
   const video = videoOpen === null ? null : entries[videoOpen];
   if (!lead) return null;
   return <section className="section" data-cms-block="ProjectBuilt" aria-labelledby="project-built-title"><div className="section__inner">
-    <h2 id="project-built-title" data-cms-block="ProjectBuilt.heading">Как <ProjectName name={project.name} /> выглядит в жизни</h2>
+    <h2 id="project-built-title" data-cms-block="ProjectBuilt.heading">{representative
+      ? 'Как наши дома выглядят в жизни'
+      : <>Как <ProjectName name={project.name} /> выглядит в жизни</>}</h2>
     {lead.type === 'photo' ? <BuiltLeadPhoto image={lead.image} caption={lead.caption} onOpen={() => setOpen(0)} /> : <BuiltVideoTile item={lead} main onOpen={() => setVideoOpen(0)} />}
     {displayEntries.length ? <div className="project-strip">
       {displayEntries.map((item, index) => item.type === 'photo' ? <button key={index} type="button" aria-label={item.caption || copy.galleryOpen} onClick={() => setOpen(photos.indexOf(item))}>

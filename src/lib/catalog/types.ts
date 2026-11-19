@@ -133,6 +133,7 @@ export type CatalogProject = {
   technologyBadge: string
   series: CatalogSeries
   technology: CatalogTechnology
+  hasBuiltPhotos?: boolean
   href: string
   description: string
   /** Данные конкретного готового дома. Без поля запись является проектом. */
