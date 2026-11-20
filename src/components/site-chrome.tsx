@@ -505,19 +505,19 @@ export function SiteChrome({
             <h3>{copy.contacts}</h3>
             <div className="footer-contacts">
               <div className="footer-contacts__place">
-                <span className="footer-contacts__eyebrow">
+                <span className="footer-contacts__eyebrow" data-cms-content-connected={regionCode === 'msk' || undefined}>
                   {regionCode === 'msk' ? copy.headOfficeLabel : copy.contactsPlaceOffice}
                 </span>
                 <p className="footer-contacts__row">
                   <IconBuilding size={18} stroke={1.75} aria-hidden="true" />
                   <span>
-                    {regionCode === 'msk' ? <span className="footer-contacts__hint">{copy.headOfficeCity}</span> : null}
                     <span className="footer-contacts__primary">
                       {copy.officeAddressLine}
                     </span>
                     <span className="footer-contacts__hint">
                       {copy.officeAddressTitle}
                     </span>
+                    {regionCode === 'msk' ? <span className="footer-contacts__hint" data-cms-content-connected style={{ order: -1 }}>{copy.headOfficeCity}</span> : null}
                   </span>
                 </p>
               </div>
@@ -532,13 +532,13 @@ export function SiteChrome({
                     aria-hidden="true"
                   />
                   <span>
-                    {regionCode === 'msk' ? <span className="footer-contacts__hint">{copy.headOfficeCity}</span> : null}
                     <span className="footer-contacts__primary">
                       {copy.factoryAddressTitle}
                     </span>
                     <span className="footer-contacts__hint">
                       {copy.factoryAddressLine}
                     </span>
+                    {regionCode === 'msk' ? <span className="footer-contacts__hint" data-cms-content-connected style={{ order: -1 }}>{copy.headOfficeCity}</span> : null}
                   </span>
                 </p>
               </div>
