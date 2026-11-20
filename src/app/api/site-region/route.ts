@@ -9,8 +9,8 @@ export function GET(request: NextRequest) {
   const returnTo = request.nextUrl.searchParams.get('returnTo') ?? '/'
   const target = new URL('/', origin)
   if (returnTo.startsWith('/') && !returnTo.startsWith('//')) {
-    const candidate = new URL(returnTo, origin)
-    if (candidate.origin === origin && candidate.pathname !== '/api/site-region' && candidate.pathname !== '/api/site-region/') {
+    const candidate = URL.parse(returnTo, origin)
+    if (candidate?.origin === origin && candidate.pathname !== '/api/site-region' && candidate.pathname !== '/api/site-region/') {
       target.pathname = candidate.pathname
       target.search = candidate.search
       target.hash = candidate.hash
