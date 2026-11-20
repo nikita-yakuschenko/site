@@ -143,6 +143,7 @@ function TextSection({ block }: { block: LayoutBlock }) {
 }
 
 function MortgageShowcase({ block }: { block: LayoutBlock }) {
+  const offer = copy.familyMortgage;
   const partners = [
     { name: "СберБанк", src: "/logos/banks/sber.svg" },
     { name: "ВТБ", src: "/logos/banks/vtb.svg" },
@@ -165,27 +166,22 @@ function MortgageShowcase({ block }: { block: LayoutBlock }) {
             {block.showEyebrow !== false ? (
               <p className="eyebrow">Семейная ипотека</p>
             ) : null}
-            <h2 id="mortgage-showcase-title">
-              {nbspText(String(block.heading || "Дом в ипотеку"))}
+            <h2 id="mortgage-showcase-title" data-cms-content-connected>
+              {nbspText(offer.headingLine)}
               <span className="mortgage-family__heading-tail">
-                {nbspText(String(block.headingTail || "под"))} {" "}
-                <em>{String(block.headingRate || "6%")}</em>
+                {nbspText(offer.headingBefore)}
+                <em>{offer.headingRate}</em>
+                {nbspText(offer.headingRateSuffix)}
               </span>
             </h2>
-            <p>
-              {/* Тире приклеено к предыдущему слову: иначе оно уходит в начало строки. */}
-              {nbspText("Семейная ипотека\u00a0- государственная программа для семей с детьми, которая позволяет построить дом ")}
-              <strong>{nbspText("по льготной ставке")}</strong>
-              {nbspText(". Подберём банк, рассчитаем платёж, поможем собрать документы и получить одобрение.")}
-            </p>
+            <p data-cms-content-connected>{nbspText(offer.lead)}</p>
             <div className="mortgage-family__actions">
-              {/* Форму расчёта подключим отдельно; кнопка уже на месте. */}
-              <a className="btn btn-yellow" href="/family-mortgage">
-                {copy.mortgageCta}
+              <a className="btn btn-yellow" href="/family-mortgage" data-cms-content-connected>
+                {copy.mortgageCalcCta}
                 <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
               </a>
-              <a className="mortgage-family__more" href="/family-mortgage">
-                {copy.mortgageMore}
+              <a className="mortgage-family__more" href="/catalog" data-cms-content-connected>
+                {copy.mortgageChooseProject}
               </a>
             </div>
           </div>
