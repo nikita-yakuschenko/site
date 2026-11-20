@@ -506,11 +506,12 @@ export function SiteChrome({
             <div className="footer-contacts">
               <div className="footer-contacts__place">
                 <span className="footer-contacts__eyebrow">
-                  {copy.contactsPlaceOffice}
+                  {regionCode === 'msk' ? copy.headOfficeLabel : copy.contactsPlaceOffice}
                 </span>
                 <p className="footer-contacts__row">
                   <IconBuilding size={18} stroke={1.75} aria-hidden="true" />
                   <span>
+                    {regionCode === 'msk' ? <span className="footer-contacts__hint">{copy.headOfficeCity}</span> : null}
                     <span className="footer-contacts__primary">
                       {copy.officeAddressLine}
                     </span>
@@ -531,6 +532,7 @@ export function SiteChrome({
                     aria-hidden="true"
                   />
                   <span>
+                    {regionCode === 'msk' ? <span className="footer-contacts__hint">{copy.headOfficeCity}</span> : null}
                     <span className="footer-contacts__primary">
                       {copy.factoryAddressTitle}
                     </span>

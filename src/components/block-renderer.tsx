@@ -15,7 +15,7 @@ import type { CatalogProject } from "../lib/catalog/types";
 import type { PublicStory } from "../lib/stories";
 import { BankStrip } from "./bank-strip";
 import { ContactsPlace } from "./contacts-place";
-import { ContactsRegionHeading } from "./contacts-region-heading";
+import { ContactsRegionAddressLabel, ContactsRegionHeading } from "./contacts-region-heading";
 import { CopyButton } from "./copy-button";
 import { FactoryVideo, FACTORY_VIDEO_EMBED } from "./factory-video";
 import {
@@ -398,7 +398,7 @@ export function ContactsSection({
                 </div>
               ) : null}
               <div>
-                <p>{copy.addressLabel}</p>
+                <ContactsRegionAddressLabel />
                 <div className="contact-list__value">
                   <span>{nbspText(copy.officeAddressLine)}</span>
                   <CopyButton value={copy.officeAddressLine} />

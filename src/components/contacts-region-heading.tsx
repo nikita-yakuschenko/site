@@ -12,3 +12,8 @@ export function ContactsRegionHeading() {
     </h2>
   )
 }
+
+export function ContactsRegionAddressLabel() {
+  const region = useRegionCode()
+  return <p data-cms-content-connected>{region === 'msk' ? copy.headOfficeCity : copy.addressLabel}</p>
+}
