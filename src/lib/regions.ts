@@ -4,6 +4,7 @@ import {
   REGION_COOKIE,
   SELECTED_REGION_COOKIE,
   regionFromSearch,
+  regionFromSiteHost,
   type TrafficRegion,
 } from "./region-traffic";
 
@@ -44,6 +45,7 @@ export function readCookieRegionCode(): RegionCode | null {
 }
 
 export function readSelectedRegionCode(): RegionCode | null {
+  if (typeof window !== "undefined" && regionFromSiteHost(window.location.hostname) === "msk") return "msk";
   return readRegionCookie(SELECTED_REGION_COOKIE);
 }
 
@@ -61,6 +63,7 @@ export function selectRegionCode(code: RegionCode): void {
 
 export function readRegionCode(): RegionCode {
   if (typeof window === "undefined") return "nn";
+  if (regionFromSiteHost(window.location.hostname) === "msk") return "msk";
   // Cookie — источник для SSR и смены региона; session/localStorage не перекрывают его.
   const fromCookie = readCookieRegionCode();
   if (fromCookie) {
@@ -96,6 +99,7 @@ export function writeRegionCode(code: RegionCode): void {
 export function applyRegionFromSearch(
   search: string = typeof window !== "undefined" ? window.location.search : "",
 ): TrafficRegion | null {
+  if (typeof window !== "undefined" && (regionFromSiteHost(window.location.hostname) === "msk" || readSelectedRegionCode())) return null;
   const marked = regionFromSearch(search);
   if (marked === "msk") {
     writeRegionCode("msk");

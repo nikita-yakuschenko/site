@@ -1,7 +1,7 @@
 import { managedRedirect } from './lib/managed-redirects'
 import { NextResponse, type NextRequest } from 'next/server'
 import { legacyRedirect } from '../config/legacy-redirects'
-import { REGION_COOKIE, regionFromSearch } from './lib/region-traffic'
+import { REGION_COOKIE, SELECTED_REGION_COOKIE, regionFromSearch, regionFromSiteHost } from './lib/region-traffic'
 import { attributionFromUrl, LEAD_ATTRIBUTION_COOKIE, readAttribution } from './lib/lead-attribution'
 import { BUILT_GALLERY_COOKIE, BUILT_GALLERY_HEADER, BUILT_GALLERY_MAX_AGE, CATALOG_SESSION_COOKIE, CATALOG_SESSION_HEADER, catalogSessionSeed } from './lib/catalog/session'
 
@@ -21,7 +21,10 @@ export async function proxy(request: NextRequest) {
   if (catalogSeed) headers.set(CATALOG_SESSION_HEADER, catalogSeed)
   headers.delete(BUILT_GALLERY_HEADER)
   if (gallerySeed) headers.set(BUILT_GALLERY_HEADER, gallerySeed)
-  const marked = regionFromSearch(request.nextUrl.search)
+  const hostRegion = regionFromSiteHost(request.headers.get('host') ?? request.nextUrl.hostname)
+  const selected = request.cookies.get(SELECTED_REGION_COOKIE)?.value
+  const manual = selected === 'nn' || selected === 'msk' ? selected : null
+  const marked = hostRegion === 'msk' ? 'msk' : manual ?? regionFromSearch(request.nextUrl.search)
   const saved = request.cookies.get(REGION_COOKIE)?.value
   headers.set('x-avgst-region', marked ?? (saved === 'msk' ? 'msk' : 'nn'))
   const managed = await managedRedirect(new URL(request.url))
@@ -30,7 +33,7 @@ export async function proxy(request: NextRequest) {
   response.headers.set('X-Request-ID', requestId)
   if (catalogSeed && catalogSeed !== savedCatalogSeed) response.cookies.set(CATALOG_SESSION_COOKIE, catalogSeed, { path: '/', httpOnly: true, sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
   if (gallerySeed && gallerySeed !== savedGallerySeed) response.cookies.set(BUILT_GALLERY_COOKIE, gallerySeed, { path: '/catalog', maxAge: BUILT_GALLERY_MAX_AGE, httpOnly: true, sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
-  if (marked) response.cookies.set(REGION_COOKIE, marked, { path: '/', sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
+  if (marked && marked !== saved) response.cookies.set(REGION_COOKIE, marked, { path: '/', sameSite: 'lax', secure: request.nextUrl.protocol === 'https:' })
   const attribution = attributionFromUrl(request.url)
   const previous = readAttribution(request.cookies.get(LEAD_ATTRIBUTION_COOKIE)?.value)
   if (Object.keys(attribution).length && previous.ref && !attribution.ref) attribution.ref = previous.ref
