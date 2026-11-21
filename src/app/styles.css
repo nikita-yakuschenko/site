@@ -4556,7 +4556,8 @@ a {
 
 .series-bento__tile:hover .series-bento__go,
 .mortgage-finance__card:hover .series-bento__go,
-.mortgage-program:hover .series-bento__go {
+.mortgage-program:hover .series-bento__go,
+.journal-card a:is(:hover, :focus-visible) .series-bento__go {
   background: var(--brand-yellow);
   color: var(--avgst-ink);
   transform: translate(2px, -2px);
@@ -4572,6 +4573,7 @@ a {
   .series-bento__tile:hover > img,
   .series-bento__tile:hover .series-bento__go,
   .mortgage-program:hover .series-bento__go,
+  .journal-card a:is(:hover, :focus-visible) .series-bento__go,
   .mortgage-program:hover .mortgage-program__art {
     transform: none;
   }

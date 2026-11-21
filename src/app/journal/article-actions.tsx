@@ -1,46 +1,52 @@
 'use client'
 
-import { useState, useSyncExternalStore } from 'react'
-import { IconBookmark, IconShare } from '@tabler/icons-react'
+import { useRef, useState } from 'react'
+import { ReactionButtons } from '@/components/reaction-buttons'
+import { shareLink } from '../../lib/share'
+import { recordJournalReaction } from './reactions'
 
-const changeEvent = 'journal:saved-change'
-function subscribe(callback: () => void) {
-  window.addEventListener(changeEvent, callback)
-  window.addEventListener('storage', callback)
-  return () => {
-    window.removeEventListener(changeEvent, callback)
-    window.removeEventListener('storage', callback)
-  }
-}
+type Counts = { likes: number; shares: number; liked: boolean }
 
-export function ArticleActions({ slug, title }: { slug: string; title: string }) {
-  const key = `journal:saved:${slug}`
-  const saved = useSyncExternalStore(subscribe, () => {
-    try { return localStorage.getItem(key) === '1' } catch { return false }
-  }, () => false)
+export function ArticleActions({ slug, title, initial }: { slug: string; title: string; initial: Counts }) {
+  const [counts, setCounts] = useState(initial)
   const [message, setMessage] = useState('')
-  function toggle() {
+  const pending = useRef(false)
+
+  async function react(action: 'like' | 'unlike' | 'share') {
     try {
-      if (saved) localStorage.removeItem(key)
-      else localStorage.setItem(key, '1')
-      window.dispatchEvent(new Event(changeEvent))
-      setMessage(saved ? 'Удалено из сохранённых' : 'Сохранено в этом браузере')
-    } catch { setMessage('Не удалось сохранить материал') }
-  }
-  async function share() {
-    try {
-      if (navigator.share) await navigator.share({ title, url: location.href })
-      else {
-        await navigator.clipboard.writeText(location.href)
-        setMessage('Ссылка скопирована')
-      }
-    } catch (error) {
-      if (!(error instanceof DOMException && error.name === 'AbortError')) setMessage('Не удалось поделиться ссылкой')
+      const result = await recordJournalReaction(slug, action)
+      if (!result) throw new Error('Reaction unavailable')
+      setCounts(result)
+    } catch {
+      setMessage('Не удалось обновить счётчик')
+    } finally {
+      pending.current = false
     }
   }
+
+  async function share() {
+    if (pending.current) return
+    pending.current = true
+    const result = await shareLink({ title, url: location.href })
+    if (result === 'copied') setMessage('Ссылка скопирована')
+    if (result === 'failed') setMessage('Не удалось поделиться ссылкой')
+    if (result === 'copied' || result === 'shared') await react('share')
+    else pending.current = false
+  }
+
   return <div className="journal-actions">
-    <button type="button" aria-pressed={saved} onClick={toggle}><IconBookmark size={18} aria-hidden />{saved ? 'Сохранено' : 'Сохранить'}</button>
-    <button type="button" onClick={share}><IconShare size={18} aria-hidden />Поделиться</button>
-    <span role="status">{message}</span>
+    <ReactionButtons
+      likes={counts.likes}
+      shares={counts.shares}
+      pressed={counts.liked}
+      likeLabel="Нравится"
+      onLike={() => {
+        if (pending.current) return
+        pending.current = true
+        void react(counts.liked ? 'unlike' : 'like')
+      }}
+      onShare={() => void share()}
+    />
+    <span className="visually-hidden" role="status">{message}</span>
   </div>
 }

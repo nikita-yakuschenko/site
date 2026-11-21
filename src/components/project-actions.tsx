@@ -1,8 +1,9 @@
 'use client'
 
 import { useEffect, useId, useRef, useState, useSyncExternalStore } from 'react'
-import { IconHeart, IconShare3, IconX } from '@tabler/icons-react'
+import { IconHeart, IconX } from '@tabler/icons-react'
 import Image from 'next/image'
+import { ReactionButtons } from './reaction-buttons'
 import { useConsent } from '../consent/ConsentProvider'
 import { canPersistFunctional } from '../consent/functional-persist'
 import { copy } from '../lib/copy'
@@ -175,30 +176,14 @@ export function ProjectActions({
           </div>
         </aside>
       )}
-      <button
-        type="button"
-        className="project-actions__btn"
-        aria-label={favorite ? copy.favoriteRemove : copy.favoriteAdd}
-        aria-pressed={pressed}
-        onClick={() => void onFavorite()}
-      >
-        <IconHeart
-          size={26}
-          stroke={1.6}
-          fill={pressed ? 'currentColor' : 'none'}
-          aria-hidden="true"
-        />
-        <span>{counts.likes}</span>
-      </button>
-      <button
-        type="button"
-        className="project-actions__btn"
-        aria-label={copy.share}
-        onClick={() => void onShare()}
-      >
-        <IconShare3 size={26} stroke={1.6} aria-hidden="true" />
-        <span>{counts.shares}</span>
-      </button>
+      <ReactionButtons
+        likes={counts.likes}
+        shares={counts.shares}
+        pressed={pressed}
+        likeLabel={favorite ? copy.favoriteRemove : copy.favoriteAdd}
+        onLike={() => void onFavorite()}
+        onShare={() => void onShare()}
+      />
     </div>
   )
 }

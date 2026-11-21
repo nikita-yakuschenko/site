@@ -29,10 +29,12 @@ function playerSeconds(data: unknown): number | null {
 export function VideoLightbox({
   title,
   embedSrc,
+  mediaKind = 'embed',
   onClose,
 }: {
   title: string
   embedSrc: string
+  mediaKind?: 'embed' | 'video' | 'audio'
   onClose: () => void
 }) {
   const { closing, close } = useViewerClose(onClose);
@@ -75,7 +77,7 @@ export function VideoLightbox({
     >
       <ViewerPassport active={!closing} />
       <div
-        className="factory-video__modal"
+        className={mediaKind === 'audio' ? 'factory-video__modal factory-video__modal--audio' : 'factory-video__modal'}
         onClick={(event) => event.stopPropagation()}
       >
         <div className="factory-video__overlay">
@@ -89,12 +91,16 @@ export function VideoLightbox({
             <IconX size={20} stroke={2.2} />
           </button>
         </div>
+        {mediaKind === 'audio' ? <audio controls src={embedSrc} /> : mediaKind === 'video' ? (
+          <video controls playsInline src={embedSrc} />
+        ) : (
           <iframe
             title={title}
             src={embedSrc}
             allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
             allowFullScreen
           />
+        )}
       </div>
     </div>
   )

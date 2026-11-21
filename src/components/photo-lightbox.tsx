@@ -4,6 +4,8 @@ import Image from "next/image";
 import {
   IconChevronLeft,
   IconChevronRight,
+  IconMaximize,
+  IconMinimize,
   IconX,
 } from "@tabler/icons-react";
 import { useCallback, useEffect, useRef, useState } from "react";
@@ -87,7 +89,7 @@ function useZoom(
      на p. Отсюда и пределы ниже. */
   const clamp = (scale: number, x: number, y: number) => {
     const stage = box.current?.getBoundingClientRect();
-    const shot = box.current?.querySelector("img");
+    const shot = box.current?.querySelector<HTMLImageElement>(".photo-lightbox__slide:nth-child(2) img");
     if (!stage || !shot) return { scale, x, y };
 
     const axis = (value: number, size: number, room: number) => {
@@ -266,8 +268,10 @@ export function PhotoLightbox({
   onIndex,
   onClose,
   navEvent,
+  expandable = false,
 }: {
   backdrop?: 'dark' | 'form';
+  expandable?: boolean;
   images: readonly string[];
   /** Подписи к кадрам: у планировок это вариант, и без подписи, открыв
    *  чертёж, уже не понять, какой из них смотришь. */
@@ -340,7 +344,8 @@ export function PhotoLightbox({
     [slideTo],
   );
 
-  const zoom = useZoom(index, shot, onDrag, onDragEnd);
+  const [expanded, setExpanded] = useState(false);
+  const zoom = useZoom(`${index}:${expanded}`, shot, onDrag, onDragEnd);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -365,6 +370,12 @@ export function PhotoLightbox({
   }, [index]);
 
   const src = images[index];
+  const setImageRatio = expandable ? (event: React.SyntheticEvent<HTMLImageElement>) => {
+    const image = event.currentTarget;
+    if (image.naturalWidth && image.naturalHeight) {
+      image.style.setProperty("--photo-ratio", String(image.naturalWidth / image.naturalHeight));
+    }
+  } : undefined;
   /* Соседи по ленте. По кругу: с последнего кадра следующий — первый, и
      наоборот, — иначе у краёв лента упиралась бы в пустоту. */
   const before = total > 1 ? images[(index - 1 + total) % total] : undefined;
@@ -376,6 +387,7 @@ export function PhotoLightbox({
       className={`photo-lightbox${backdrop === 'form' ? ' photo-lightbox--form' : ''}`}
       role="dialog"
       aria-modal="true"
+      data-expanded={expandable ? expanded : undefined}
       onClick={close}
     >
       <ViewerPassport active={!closing} />
@@ -387,6 +399,19 @@ export function PhotoLightbox({
       >
         <IconX size={20} stroke={2.2} />
       </button>
+      {expandable && (
+        <button
+          type="button"
+          className="photo-lightbox__close photo-lightbox__expand"
+          aria-label={expanded ? "Свернуть просмотр" : "Развернуть просмотр"}
+          onClick={(event) => {
+            event.stopPropagation();
+            setExpanded(current => !current);
+          }}
+        >
+          {expanded ? <IconMinimize size={20} /> : <IconMaximize size={20} />}
+        </button>
+      )}
 
       {total > 1 ? (
         <button
@@ -469,6 +494,7 @@ export function PhotoLightbox({
                   width={2000}
                   height={1400}
                   sizes="100vw"
+                  onLoad={setImageRatio}
                 />
               ) : null}
             </div>
@@ -483,6 +509,7 @@ export function PhotoLightbox({
                 height={1400}
                 sizes="100vw"
                 priority
+                onLoad={setImageRatio}
                 style={zoom.style}
               />
             </div>
@@ -496,6 +523,7 @@ export function PhotoLightbox({
                   width={2000}
                   height={1400}
                   sizes="100vw"
+                  onLoad={setImageRatio}
                 />
               ) : null}
             </div>

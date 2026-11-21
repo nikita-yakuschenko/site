@@ -12,21 +12,25 @@ export async function shareProject(project: CatalogProject): Promise<boolean> {
   sharedUrl.searchParams.set('share', '1')
   const url = sharedUrl.href
   const payload = { title: project.name, text: `Проект «${project.name}»`, url }
+  const result = await shareLink(payload)
+  return result === 'shared' || result === 'copied'
+}
+
+export async function shareLink(payload: { title: string; text?: string; url: string }): Promise<'shared' | 'copied' | 'cancelled' | 'failed'> {
   try {
     if (typeof navigator.share === 'function') {
       await navigator.share(payload)
-      return true
+      return 'shared'
     }
-    await navigator.clipboard.writeText(url)
-    return true
   } catch (error) {
-    if (error instanceof DOMException && error.name === 'AbortError') return false
-    try {
-      await navigator.clipboard.writeText(url)
-      return true
-    } catch (clipboardError) {
-      console.error(clipboardError)
-      return false
-    }
+    if (error instanceof DOMException && error.name === 'AbortError') return 'cancelled'
+  }
+
+  try {
+    await navigator.clipboard.writeText(payload.url)
+    return 'copied'
+  } catch (error) {
+    console.error(error)
+    return 'failed'
   }
 }

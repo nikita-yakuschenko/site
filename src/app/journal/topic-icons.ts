@@ -1,5 +1,5 @@
-import { IconArticle, IconBuildingBank, IconBulb, IconClipboardList, IconCube3dSphere, IconHomeHeart, IconMessageStar, IconNews, IconScale } from '@tabler/icons-react'
-import type { Topic } from './content'
+import { IconArticle, IconBuildingBank, IconBuildingFactory, IconBulb, IconClipboardList, IconCube3dSphere, IconHomeHeart, IconMessageStar, IconNews, IconScale } from '@tabler/icons-react'
+import type { JournalSection } from './content'
 
 export const topicIcons = {
   news: IconNews,
@@ -10,5 +10,6 @@ export const topicIcons = {
   idea: IconBulb,
   lifestile: IconHomeHeart,
   reviews: IconClipboardList,
+  company: IconBuildingFactory,
   testimonials: IconMessageStar,
-} satisfies Record<Topic['slug'], typeof IconNews>
+} satisfies Record<JournalSection['slug'], typeof IconNews>

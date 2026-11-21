@@ -10,9 +10,12 @@ from urllib.parse import urljoin, urlsplit
 
 from bs4 import BeautifulSoup
 
+LEGACY_RUBRICS = json.loads((Path(__file__).resolve().parents[1] / 'src/app/journal/legacy-rubrics.json').read_text(encoding='utf-8'))
+
 TOPICS = {
     'Технологии': 'technology', 'Ипотека': 'mortgage', 'Законодательство': 'law',
-    'Идеи': 'idea', 'Загородная жизнь': 'lifestile',
+    'Идеи': 'idea', 'Загородная жизнь': 'lifestile', 'О компании': 'company',
+    'Обзоры': 'reviews', 'Отзывы': 'testimonials',
 }
 VALID_TAGS = {'p', 'br', 'div', 'span', 'h2', 'h3', 'h4', 'strong', 'b', 'em', 'i',
               'ul', 'ol', 'li', 'blockquote', 'figure', 'figcaption', 'img', 'a',
@@ -23,6 +26,46 @@ def safe_url(value, base=''):
     url = urljoin(base, value or '')
     parsed = urlsplit(url)
     return url if parsed.scheme == 'https' and parsed.hostname and not parsed.username and not parsed.password else ''
+
+
+def normalize_article_tables(soup):
+    for table in soup.find_all('table'):
+        if 'journal-table-scroll' in table.parent.get('class', []):
+            continue
+        rows = [row for row in table.find_all('tr') if row.find_parent('table') is table]
+        if not rows:
+            continue
+        cells = [row.find_all(['td', 'th'], recursive=False) for row in rows]
+        headings = [cell.get_text(' ', strip=True).casefold() for cell in cells[0]]
+        if headings == ['вопрос', 'ответ'] and len(cells) > 1 and all(len(row) == 2 for row in cells):
+            faq = soup.new_tag('dl', attrs={'class': 'journal-faq'})
+            for question, answer in cells[1:]:
+                pair = soup.new_tag('div')
+                term = soup.new_tag('dt')
+                term.string = question.get_text(' ', strip=True)
+                description = soup.new_tag('dd')
+                for content in list(answer.contents):
+                    description.append(content.extract())
+                pair.append(term)
+                pair.append(description)
+                faq.append(pair)
+            table.replace_with(faq)
+            continue
+
+        if table.thead is None and cells[0]:
+            head = soup.new_tag('thead')
+            for cell in cells[0]:
+                cell.name = 'th'
+                cell['scope'] = 'col'
+            head.append(rows[0].extract())
+            table.insert(0, head)
+        table['class'] = ['journal-comparison']
+        if len(cells[0]) > 3:
+            table['class'].append('journal-comparison-wide')
+        table.wrap(soup.new_tag('div', attrs={
+            'class': 'journal-table-scroll', 'role': 'region',
+            'aria-label': 'Таблица статьи', 'tabindex': '0',
+        }))
 
 
 def sanitize(source, base):
@@ -47,23 +90,43 @@ def sanitize(source, base):
                 continue
             attrs = {'href': href}
         tag.attrs = attrs
-    return str(soup), soup.get_text(' ', strip=True)
+    body_text = soup.get_text(' ', strip=True)
+    normalize_article_tables(soup)
+    return str(soup), body_text
 
 
-def classify(title, rubric):
+def classify(title, rubric, slug):
     title = title.lower()
     if re.search(r'отзыв|клиенты о |владельцы о |разговор с заказчик|рассказ заказчик', title):
         return 'testimonials'
     if re.search(r'обзор|внутри норвегии|визуальный тур|прогулка по дому', title):
         return 'reviews'
-    return TOPICS.get(rubric, 'articles')
+    return TOPICS.get(rubric) or LEGACY_RUBRICS.get(slug, '')
 
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('source_dir', type=Path)
+    parser.add_argument('source_dir', type=Path, nargs='?')
+    parser.add_argument('--normalize-existing', action='store_true', help='Update table and FAQ markup in an existing archive')
     parser.add_argument('--database', type=Path, default=Path('.local/journal.sqlite'))
     args = parser.parse_args()
+    if args.normalize_existing:
+        if not args.database.is_file():
+            parser.error('the archive database does not exist')
+        with sqlite3.connect(args.database) as db:
+            rows = db.execute("SELECT slug, body_html FROM journal_posts WHERE body_html LIKE '%<table%'").fetchall()
+            updates = []
+            for slug, body in rows:
+                soup = BeautifulSoup(body, 'html.parser')
+                normalize_article_tables(soup)
+                normalized = str(soup)
+                if normalized != body:
+                    updates.append((normalized, slug))
+            db.executemany('UPDATE journal_posts SET body_html = ? WHERE slug = ?', updates)
+        print(f'{len(updates)} posts updated')
+        return
+    if args.source_dir is None:
+        parser.error('source_dir or --normalize-existing is required')
     source = json.loads((args.source_dir / 'tilda-journal-source.json').read_text(encoding='utf-8-sig'))
     by_url = {record['old_url']: record for record in source}
     with (args.source_dir / 'journal-rubrics-draft.csv').open(encoding='utf-8-sig', newline='') as file:
@@ -108,7 +171,7 @@ def main():
             if not cover and record['media_type'] == 'image':
                 cover = safe_url(record['media_data'], base)
             video_url = safe_url(record['media_data'], base) if record['media_type'] == 'video' else ''
-            topic = 'testimonials' if item['format'] == 'Отзыв' else classify(title, item['proposed_section'])
+            topic = 'testimonials' if item['format'] == 'Отзыв' else classify(title, item['proposed_section'], slug)
             tags = [tag for tag in item['proposed_tags'].split(' | ') if tag]
             if item['proposed_section'] == 'О компании':
                 tags.append('О компании')

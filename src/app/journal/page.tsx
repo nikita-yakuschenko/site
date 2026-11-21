@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 }
 
-export default async function JournalPage({ searchParams }: { searchParams: Promise<{ q?: string; page?: string }> }) {
-  const { q, page } = await searchParams
-  return <JournalView query={typeof q === 'string' ? q : undefined} page={Math.max(1, Number.parseInt(page ?? '', 10) || 1)} />
+export default async function JournalPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
+  const { q } = await searchParams
+  return <JournalView query={typeof q === 'string' ? q : undefined} />
 }
