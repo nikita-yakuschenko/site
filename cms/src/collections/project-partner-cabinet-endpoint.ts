@@ -38,7 +38,8 @@ export const projectPartnerCabinetEndpoint: Endpoint = {
       : null
     const prices = await req.payload.find({ collection: 'project-prices', limit: 1, depth: 0, req, overrideAccess: true,
       where: { and: [{ project: { equals: record.id } }, { region: { equals: 'dealer' } }, { configuration: { equals: 'start' } }] } })
-    const dealerPrice = prices.docs[0]?.price
+    const dealer = prices.docs[0]
+    const dealerPrice = dealer?.price
     const document = (kind: string, title: string, url: unknown, note: unknown) => ({ kind, title, url: text(url), note: text(note) })
     return Response.json({
       slug: record.slug,
@@ -67,6 +68,8 @@ export const projectPartnerCabinetEndpoint: Endpoint = {
         mountingNote: text(cabinet?.transportMounting),
       },
       dealerPrice: typeof dealerPrice === 'number' && dealerPrice > 0 ? dealerPrice : null,
+      dealerOptions: Array.isArray(dealer?.dealerOptions) ? dealer.dealerOptions : null,
+      dealerOptionsUpdatedAt: Array.isArray(dealer?.dealerOptions) ? dealer.updatedAt : null,
     }, { headers: { 'Cache-Control': 'no-store' } })
   },
 }

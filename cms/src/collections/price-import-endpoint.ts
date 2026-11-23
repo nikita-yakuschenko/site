@@ -23,7 +23,7 @@ export const priceImportEndpoint: Endpoint = {
         const name = row.label || row.projectSlug || row.projectId
         if (!project || project.recordType === 'ready-home') throw new Error(`Проект ${name} не найден`)
         if (!priceConfigurationKeys(isModularTechnology(project.technologyBadge)).includes(row.configuration)) throw new Error(`${name}: комплектация ${row.configuration} не подходит для технологии`)
-        return { lookupKey: `${project.id}:${row.configuration}:${row.region}`, project: project.id, configuration: row.configuration, region: row.region, price: row.price }
+        return { lookupKey: `${project.id}:${row.configuration}:${row.region}`, project: project.id, configuration: row.configuration, region: row.region, price: row.price, ...(row.dealerOptions !== undefined ? { dealerOptions: row.dealerOptions } : {}) }
       })
       if (new Set(prepared.map(row => row.lookupKey)).size !== prepared.length) throw new Error('Один проект повторён под разными адресами')
       if (!dryRun) for (const row of prepared) {

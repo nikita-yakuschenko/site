@@ -32,4 +32,5 @@ export const requiredMigrations = [
   '20261106_100000_messenger_settings',
   '20261107_200000_partner_cabinet',
   '20261113_120000_whatsapp_dialogs',
+  '20261123_130000_dealer_options',
 ]

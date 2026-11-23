@@ -1017,6 +1017,7 @@ export interface ProjectPrice {
     | number
     | boolean
     | null;
+  dealerOptions?: { [k: string]: unknown } | unknown[] | string | number | boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -2172,6 +2173,7 @@ export interface StoriesSelect<T extends boolean = true> {
  * via the `definition` "project-prices_select".
  */
 export interface ProjectPricesSelect<T extends boolean = true> {
+  dealerOptions?: T;
   lookupKey?: T;
   project?: T;
   configuration?: T;

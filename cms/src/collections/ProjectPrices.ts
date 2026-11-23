@@ -34,5 +34,6 @@ export const ProjectPrices: CollectionConfig = {
     { name: 'region', label: 'Тип цены', type: 'select', required: true, options: priceKinds.map(kind => ({ value: kind.value, label: kind.label })) },
     { name: 'price', label: 'Цена, ₽', type: 'number', required: true, min: 1, validate: (value: unknown) => typeof value === 'number' && Number.isSafeInteger(value) && value > 0 ? true : 'Укажите положительную целую цену в рублях' },
     { name: 'history', label: 'История цены', type: 'json', admin: { hidden: true } },
+    { name: 'dealerOptions', label: 'Дилерские допы', type: 'json', admin: { hidden: true } },
   ],
 }

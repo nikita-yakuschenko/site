@@ -1,11 +1,12 @@
 import { priceConfigurationKeys, type ConfigurationKey } from '../../../src/lib/catalog/configuration-rules'
 import type { PriceKind } from './price-kinds'
+import type { DealerOption } from './price-import'
 import type { CatalogTechnology } from '../../../src/lib/catalog/types'
 
 const kitLabels: Record<string, ConfigurationKey> = { 'старт': 'start', 'стартовая': 'start', 'базовая': 'standard', 'стандартная': 'standard', 'проектная': 'project', 'расширенная': 'project', 'под ключ': 'turnkey' }
 
 export type MarketingChoice = { projectName: string; sourceName: string; skipped: string[] }
-export type MarketingPriceRow = { projectName: string; configuration: ConfigurationKey; region: PriceKind; price: number }
+export type MarketingPriceRow = { projectName: string; configuration: ConfigurationKey; region: PriceKind; price: number; dealerOptions?: DealerOption[] }
 
 // Имя файла говорит, чьи это цены и какая технология. «Базовая» в файле — стандартная комплектация.
 export function marketingFileKind(filename: string): { technology: CatalogTechnology; modular: boolean; house: PriceKind; special: PriceKind } {
@@ -35,7 +36,7 @@ export function priceProjectName(name: string) {
 const text = (value: unknown) => typeof value === 'string' ? value.replace(/\s+/g, ' ').trim() : typeof value === 'number' && Number.isFinite(value) ? String(value) : ''
 const money = (value: unknown) => typeof value === 'number' && Number.isFinite(value) && value > 0 ? Math.round(value) : null
 
-type Quote = { sourceName: string; house: Partial<Record<ConfigurationKey, number>>; special: Partial<Record<ConfigurationKey, number>> }
+type Quote = { sourceName: string; house: Partial<Record<ConfigurationKey, number>>; special: Partial<Record<ConfigurationKey, number>>; dealerOptions: DealerOption[] }
 
 function score(quote: Quote) {
   const house = Object.values(quote.house).reduce((sum, price) => sum + price, 0)
@@ -64,14 +65,17 @@ export function parseMarketingGrid(grid: unknown[][], filename: string) {
       if ([...columns.values()].filter(item => item === kit).length > 1) throw new Error(`${sourceName}: комплектация «${text(grid[index]?.[column])}» повторяется`)
     }
     if (kind.house === 'dealer' && [...columns.values()].some(kit => kit !== 'start')) throw new Error(`${sourceName}: у дилера ожидается только комплектация «Старт»`)
-    const quote: Quote = { sourceName, house: {}, special: {} }
+    const quote: Quote = { sourceName, house: {}, special: {}, dealerOptions: [] }
     for (let row = index + 1; row < grid.length && !(grid[row] || []).some(cell => kitOf(cell)); row++) {
-      const label = text(grid[row]?.[0]).toLowerCase()
+      const name = text(grid[row]?.[0])
+      const label = name.toLowerCase().replace(/ё/g, 'е')
+      if (label === 'название проекта') break
       const target = label === 'стоимость дома' ? quote.house : /^(?:наличные\s*\(\s*)?специальное предложение\s*\)?$/.test(label) ? quote.special : null
-      if (!target) continue
       for (const [column, kit] of columns) {
         const price = money(grid[row]?.[column])
-        if (price) target[kit] = price
+        if (!price) continue
+        if (target) target[kit] = price
+        else if (kind.house === 'dealer' && name) quote.dealerOptions.push({ name, price, kind: label.startsWith('сборка') ? 'assembly' : 'extra' })
       }
     }
     if (!Object.keys(quote.house).length) throw new Error(`${sourceName}: нет стоимости дома`)
@@ -89,7 +93,7 @@ export function parseMarketingGrid(grid: unknown[][], filename: string) {
     const winner = [...variants].sort((left, right) => score(right) - score(left) || variants.indexOf(right) - variants.indexOf(left))[0]
     const projectName = priceProjectName(key)
     choices.push({ projectName, sourceName: winner.sourceName, skipped: variants.filter(item => item !== winner).map(item => item.sourceName) })
-    for (const [configuration, price] of Object.entries(winner.house) as [ConfigurationKey, number][]) rows.push({ projectName, configuration, region: kind.house, price })
+    for (const [configuration, price] of Object.entries(winner.house) as [ConfigurationKey, number][]) rows.push({ projectName, configuration, region: kind.house, price, ...(kind.house === 'dealer' ? { dealerOptions: winner.dealerOptions } : {}) })
     for (const [configuration, price] of Object.entries(winner.special) as [ConfigurationKey, number][]) rows.push({ projectName, configuration, region: kind.special, price })
   }
   choices.sort((left, right) => left.projectName.localeCompare(right.projectName, 'ru'))
@@ -134,7 +138,7 @@ export function matchMarketingCatalog(parsed: { choices: MarketingChoice[]; rows
   }).map(choice => choice.projectName)
   const rows = parsed.rows.flatMap(row => {
     const project = byKey.get(priceNameKey(row.projectName))
-    return project ? [{ projectId: project.id, projectSlug: project.slug, label: project.name, configuration: row.configuration, region: row.region, price: row.price }] : []
+    return project ? [{ projectId: project.id, projectSlug: project.slug, label: project.name, configuration: row.configuration, region: row.region, price: row.price, ...(row.dealerOptions !== undefined ? { dealerOptions: row.dealerOptions } : {}) }] : []
   })
   return { rows, unmatched, issues }
 }

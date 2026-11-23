@@ -31,6 +31,8 @@ import * as migration_20261023_160000_frame_technology from './20261023_160000_f
 import * as migration_20261023_180000_hero_product from './20261023_180000_hero_product';
 import * as migration_20261024_160000_automation from './20261024_160000_automation';
 
+import * as migration_20261123_130000_dealer_options from './20261123_130000_dealer_options';
+
 export const migrations = [
   {
     up: migration_20261014_074208_initial_record_ids.up,
@@ -160,4 +162,5 @@ export const migrations = [
  {up:migration_20261106_100000_messenger_settings.up,down:migration_20261106_100000_messenger_settings.down,name:'20261106_100000_messenger_settings'},
  {up:migration_20261107_200000_partner_cabinet.up,down:migration_20261107_200000_partner_cabinet.down,name:'20261107_200000_partner_cabinet'},
   { up: migration_20261113_120000_whatsapp_dialogs.up, down: migration_20261113_120000_whatsapp_dialogs.down, name: '20261113_120000_whatsapp_dialogs' },
+  { up: migration_20261123_130000_dealer_options.up, down: migration_20261123_130000_dealer_options.down, name: '20261123_130000_dealer_options' },
 ];

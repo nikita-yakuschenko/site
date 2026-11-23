@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { configurationKeys, priceConfigurationKeys } from '../../src/lib/catalog/configuration-rules'
 import { summaryConfiguration } from '../src/config/price-kinds'
 import { marketingFileKind, matchMarketingCatalog, parseMarketingGrid, priceNameKey } from '../src/config/marketing-prices'
-import { mergePriceRows, type PriceInput } from '../src/config/price-import'
+import { mergePriceRows, parsePriceRows, type PriceInput } from '../src/config/price-import'
 
 const kits = [null, null, null, null, null, 'Старт', 'Базовая', 'Проектная', 'Под ключ']
 
@@ -57,11 +57,34 @@ test('a dealer file keeps the start price and the dealer special', () => {
     ['Сборка Нижний Новгород', null, null, null, null, 80000],
   ], '16. Дилер. ПКД. Маркетинг. Октябрь 2026.xlsx')
   assert.deepEqual(parsed.rows, [
-    { projectName: 'А-фрейм 52', configuration: 'start', region: 'dealer', price: 745000 },
+    { projectName: 'А-фрейм 52', configuration: 'start', region: 'dealer', price: 745000, dealerOptions: [{ name: 'Сборка Нижний Новгород', price: 80000, kind: 'assembly' }] },
     { projectName: 'А-фрейм 52', configuration: 'start', region: 'special-dealer', price: 656000 },
   ])
   assert.equal(marketingFileKind('16. Дилер. МД. Маркетинг. Октябрь 2026.xlsx').modular, true)
   assert.equal(priceNameKey('Барн 90 (23,8)'), 'барнхаус 90')
+})
+
+test('dealer options survive the import from the selected layout only', () => {
+  const parsed = parseMarketingGrid([
+    ['Название проекта', 'Барн 46 (1К)'],
+    [null, 'Старт'],
+    ['Стоимость дома', 904000],
+    ['Допы'],
+    ['Окна', 337000],
+    ['Терраса', 294000],
+    ['Название проекта', 'Барн 46 (2К)'],
+    [null, 'Старт'],
+    ['Стоимость дома', 915000],
+    ['Допы'],
+    ['Окна', 304000],
+    ['Электрика', '—'],
+  ], '17.1 Дилер. МД. Маркетинг.xlsx')
+  const matched = matchMarketingCatalog(parsed, [{ id: '1', name: 'Барнхаус 46', slug: 'barn-46', technology: 'modular' }], 'modular')
+  assert.equal(parsed.choices[0].sourceName, 'Барн 46 (2К)')
+  const [row] = parsePriceRows(matched.rows)
+  assert.equal(row.price, 915000)
+  assert.deepEqual(row.dealerOptions, [{ name: 'Окна', price: 304000, kind: 'extra' }])
+  assert.throws(() => parsePriceRows([{ ...row, region: 'nn' }]), /дилерской цены/)
 })
 
 test('later price file replaces the same project price', () => {

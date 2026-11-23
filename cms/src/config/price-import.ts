@@ -1,7 +1,20 @@
 import { configurationNames, type ConfigurationKey } from '../../../src/lib/catalog/configuration-rules'
 import { isPriceKind, priceKinds, type PriceKind } from './price-kinds'
 
-export type PriceInput = { projectSlug: string; projectId?: string; label?: string; configuration: ConfigurationKey; region: PriceKind; price: number }
+export type DealerOption = { name: string; price: number; kind: 'assembly' | 'extra' }
+export type PriceInput = { projectSlug: string; projectId?: string; label?: string; configuration: ConfigurationKey; region: PriceKind; price: number; dealerOptions?: DealerOption[] }
+
+function parseDealerOptions(value: unknown): DealerOption[] {
+  if (!Array.isArray(value) || value.length > 200) throw new Error('Некорректный список дилерских опций')
+  const seen = new Set<string>()
+  return value.map(option => {
+    const name = typeof option?.name === 'string' ? option.name.trim() : ''
+    const key = name.toLowerCase().replace(/ё/g, 'е').replace(/\s+/g, ' ')
+    if (!name || name.length > 500 || seen.has(key) || !Number.isSafeInteger(option.price) || option.price <= 0 || !['assembly', 'extra'].includes(option.kind)) throw new Error('Некорректная или повторяющаяся дилерская опция')
+    seen.add(key)
+    return { name, price: option.price, kind: option.kind }
+  })
+}
 
 const priceIdentity = (row: { projectSlug?: string; projectId?: string }) => row.projectId || row.projectSlug || ''
 
@@ -16,7 +29,8 @@ export function parsePriceRows(value: unknown): PriceInput[] {
     const key = `${priceIdentity({ projectSlug, projectId })}:${row.configuration}:${row.region}`
     if (seen.has(key)) throw new Error(`Строка ${index + 1}: повтор цены ${key}`)
     seen.add(key)
-    return { projectSlug, ...(projectId ? { projectId } : {}), ...(label ? { label } : {}), configuration: row.configuration, region: row.region, price: row.price }
+    if (row.dealerOptions !== undefined && (row.region !== 'dealer' || row.configuration !== 'start')) throw new Error('Опции доступны только для дилерской цены «Старт»')
+    return { projectSlug, ...(projectId ? { projectId } : {}), ...(label ? { label } : {}), configuration: row.configuration, region: row.region, price: row.price, ...(row.dealerOptions !== undefined ? { dealerOptions: parseDealerOptions(row.dealerOptions) } : {}) }
   })
 }
 
