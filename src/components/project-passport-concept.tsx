@@ -272,7 +272,7 @@ export function ProjectPassportConcept({ project, projectSlug, placement = 'hero
             </div>
             <ul className="passport-concept__mortgage-facts">
               <li>Получите одобрение до 11 декабря</li>
-              <li>Осталось <span className="passport-concept__mortgage-slots">8 из 11</span> мест</li>
+              <li>Осталось <span className="passport-concept__mortgage-slots">6 из 11</span> мест</li>
             </ul>
             <form className="passport-concept__mortgage-form" data-status={status} onSubmit={sendMortgage} aria-busy={status === 'sending'}>
               <FloatingField label={copy.phone}>

@@ -2,7 +2,7 @@ import { Suspense } from 'react'
 import Image from 'next/image'
 import { optimizedSrc } from '../../lib/media'
 import { ProjectPassportConcept } from '../../components/project-passport-concept'
-import mortgageBanner from '../../../public/promo/banner_ipoteka.png'
+import mortgageBanner from '../../../public/head_bunner.png'
 import mobileMortgageBanner from '../../../public/promo/mobile_banner_ipoteka.png'
 import { CMSStaticBlock } from '../../components/cms-static-content'
 import type { Metadata } from 'next'
@@ -110,8 +110,8 @@ export default async function CatalogPage({ searchParams }: { searchParams: Sear
               matched={toBoard(catalogOrder(items, sessionSeed), true)}
               rest={filters.status === 'ready' ? [] : toBoard(rest, items.length === 0)}
               picked={!isEmpty(filters)}
-              banner={<ProjectPassportConcept project="" projectSlug="" catalogBanner={<Image src={optimizedSrc("/promo/banner_ipoteka.png")} width={mortgageBanner.width} height={mortgageBanner.height} unoptimized
-                alt="Авангард Строй и Сбер. Семейная ипотека на строительство дома: 3,9% на срок до 30 лет. Получите одобрение до 11 декабря. Осталось 8 из 11 мест." />} />}
+              banner={<ProjectPassportConcept project="" projectSlug="" catalogBanner={<Image src={optimizedSrc("/head_bunner.png")} width={mortgageBanner.width} height={mortgageBanner.height} unoptimized
+                alt="Авангард Строй и Сбер. Семейная ипотека на строительство дома: 3,9% на срок до 30 лет. Получите одобрение до 11 декабря. Осталось 6 из 11 мест." />} />}
               mobileBanner={<ProjectPassportConcept project="" projectSlug="" catalogBanner={<Image src={optimizedSrc("/promo/mobile_banner_ipoteka.png")} width={mobileMortgageBanner.width} height={mobileMortgageBanner.height} unoptimized
                 alt="Авангард Строй и Сбер. Семейная ипотека 3,9% на 30 лет. Получите одобрение до 11 декабря." />} />}
             />
