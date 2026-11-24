@@ -106,6 +106,12 @@ export default buildConfig({
   onInit: async (payload) => {
     if (process.env.CMS_MAINTENANCE === '1') return
     if (process.env.NEXT_PHASE !== 'phase-production-build' && process.env.npm_lifecycle_event !== 'build' && !process.env.DATABASE_URL?.includes('://build:build@')) {
+      try {
+        const { ensureOpenDayContent } = await import('./seed/ensure-open-day-content')
+        await ensureOpenDayContent(payload)
+      } catch (error) {
+        payload.logger.error({ err: error }, 'Не удалось подготовить поля страницы Дня открытых дверей')
+      }
       const { startAutomationWorker } = await import('./automation/worker')
       startAutomationWorker(payload)
       void import('./messengers/gateway').then(gateway => gateway.restoreCompanyNumbers(payload)).catch(error => payload.logger.error({ err: error }, 'Не удалось восстановить рабочие номера мессенджеров'))

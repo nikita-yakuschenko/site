@@ -69,6 +69,8 @@ async function run(payload: Payload) {
   const storyNote = await ensureStories(payload)
   const storyMetaNote = await enrichStoryVideoMeta(payload)
   await attachContentPhotos(payload)
+  const { ensureOpenDayContent } = await import('./ensure-open-day-content')
+  await ensureOpenDayContent(payload)
   console.log(`Структура сайта: страниц +${createdPages}, блоков +${createdBlocks}. ${samples} ${storyNote} ${storyMetaNote}`)
 }
 

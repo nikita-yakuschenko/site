@@ -2,6 +2,8 @@
 import { submitLead, type LeadAttempt } from '../../lib/submit-lead'
 import { FormSuccessAnimation } from '../form-success-animation'
 import { CMSContentBlock } from '../cms-content'
+import { formFields } from '../../lib/open-day/content'
+import { useOpenDayContent } from './content'
 
 import { useEffect, useRef, useState } from 'react'
 import { isValidName, isValidRuMobile, phoneE164, sanitizeName } from '../../lib/phone'
@@ -19,6 +21,7 @@ export function OpenDayBookButton({ className, children }: { className: string; 
 }
 
 export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date: string; registrationEnabled?: boolean }) {
+  const { key, text, mark } = useOpenDayContent('FactoryOpenDayForm', formFields)
   const submitting = useRef(false)
   const attempt = useRef<LeadAttempt['current']>(null)
   const [phone, setPhone] = useState('')
@@ -96,14 +99,14 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
     } else if (node.open) node.close()
   }, [open])
 
-  const fields = status === 'ok' ? <FormSuccessAnimation active title="Вы записаны на день открытых дверей!" description="Программу мероприятия и напоминание накануне пришлём на почту, указанную при регистрации." className="ags-form ags-form--success" /> : <form className="ags-form" onSubmit={onSubmit} noValidate>
-    <FloatingField className="ags-field" label="Имя">
+  const fields = status === 'ok' ? <FormSuccessAnimation active title={text('successTitle')} description={text('successText')} className="ags-form ags-form--success" /> : <form className="ags-form" onSubmit={onSubmit} noValidate>
+    <FloatingField className="ags-field" label={text('nameLabel')}>
       <input className="ags-field__input" id="ags-name" name="name" type="text" autoComplete="name" placeholder=" " value={name} aria-invalid={Boolean(invalid.name)} aria-required="true" onChange={event => { setName(event.target.value); setInvalid(prev => ({ ...prev, name: false })) }} />
     </FloatingField>
-    <FloatingField className="ags-field" label="Телефон">
+    <FloatingField className="ags-field" label={text('phoneLabel')}>
       <PhoneInput className="ags-field__input" id="ags-phone" name="phone" type="tel" autoComplete="tel" placeholder={copy.phonePlaceholder} inputMode="tel" value={phone} aria-invalid={Boolean(invalid.phone)} aria-required="true" onValueChange={setPhone} onEdited={() => setInvalid(prev => ({ ...prev, phone: false }))} />
     </FloatingField>
-    <FloatingField className="ags-field" label="Email">
+    <FloatingField className="ags-field" label={text('emailLabel')}>
       <input className="ags-field__input" id="ags-email" name="email" type="email" autoComplete="email" placeholder=" " value={email} aria-invalid={Boolean(invalid.email)} aria-required="true" onChange={event => { setEmail(event.target.value); setInvalid(prev => ({ ...prev, email: false })) }} />
     </FloatingField>
     <label className="ags-agree">
@@ -113,20 +116,20 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
     </label>
     {captcha.widget}
     <button className="ags-submit" type="submit" disabled={status === 'sending' || !registrationEnabled || captcha.reloadRequired}>
-      <span className="ags-submit-label">{!registrationEnabled ? 'Регистрация закрыта' : status === 'sending' ? 'Отправка…' : 'Записаться'}</span>
+      <span className="ags-submit-label" {...mark('submit')}>{!registrationEnabled ? 'Регистрация закрыта' : status === 'sending' ? 'Отправка…' : text('submit')}</span>
       <OpenDayArrow />
     </button>
     {status === 'error' ? <p className="ags-form__status" data-error="true" role="alert">{captcha.reloadRequired ? 'Не удалось загрузить проверку безопасности. Обновите страницу и повторите отправку.' : 'Не удалось отправить. Попробуйте ещё раз.'}</p> : null}
     {status === 'error' && captcha.reloadRequired ? <button type="button" className="ags-submit" onClick={() => window.location.reload()}>Обновить страницу</button> : null}
   </form>
 
-  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayForm">{<section className="ags ags-book" id="ags-form">
+  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayForm" initialFields={formFields}>{<section className="ags ags-book" id="ags-form" data-cms-block={key}>
     <OpenDayRules />
     <div className="ags-sheet">
       <div className="ags-book__body">
         <div className="ags-book__col">
-          <h2 className="ags-book__title">До встречи <span data-cms-content-connected>{date}</span></h2>
-          <p className="ags-book__note">Участие бесплатное, по записи. Заполните форму <span className="ags-form-direction--desktop">справа</span><span className="ags-form-direction--compact">ниже</span>, мы пришлём программу мероприятия и напоминание накануне</p>
+          <h2 className="ags-book__title"><span {...mark('heading')}>{text('heading')}</span>{' '}<span data-cms-content-connected>{date}</span></h2>
+          <p className="ags-book__note" {...mark('note')}>{text('note')}</p>
         </div>
         <div ref={slot} style={{ display: 'contents' }}>{open ? <div className="ags-form-placeholder" style={{ height: hold }} /> : fields}</div>
       </div>
@@ -143,7 +146,7 @@ export function FactoryOpenDayForm({ date, registrationEnabled = true }: { date:
       <button type="button" className="ags-dialog__close" aria-label="Закрыть окно" onClick={() => setOpen(false)}>
         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="2" /></svg>
       </button>
-      <h2 id="ags-dialog-title">Записаться<span className="ags-dialog__title-line">на <span className="ags-highlight">День открытых дверей</span></span></h2>
+      <h2 id="ags-dialog-title"><span {...mark('dialogAction')}>{text('dialogAction')}</span><span className="ags-dialog__title-line">на <span className="ags-highlight" {...mark('dialogEvent')}>{text('dialogEvent')}</span></span></h2>
       <div className="ags-dialog__form">{open ? fields : null}</div>
     </dialog>
   </section>}</CMSContentBlock>)

@@ -1,10 +1,13 @@
 'use client'
 import { CMSContentBlock } from '../cms-content'
+import { footerFields } from '../../lib/open-day/content'
+import { useOpenDayContent } from './content'
 import { OpenDayBookButton } from './form'
 import { OpenDayArrow, OpenDayRules } from './rules'
 
 export function FactoryOpenDayFooter({ date, phone = '+7 (831) 200-38-89', address }: { date: string; phone?: string; address?: string }) {
-  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayFooter">{<footer className="ags ags-foot">
+  const { key, text, mark } = useOpenDayContent("FactoryOpenDayFooter", footerFields)
+  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayFooter" initialFields={footerFields}>{<footer className="ags ags-foot" data-cms-block={key}>
     <OpenDayRules />
     <div className="ags-sheet">
       <div className="ags-foot__body">
@@ -16,14 +19,14 @@ export function FactoryOpenDayFooter({ date, phone = '+7 (831) 200-38-89', addre
           </div>
         </div>
         <nav className="ags-foot__col" aria-label="Контакты">
-          <p className="ags-foot__h"><span className="ags-footer-highlight">Связь</span></p>
+          <p className="ags-foot__h"><span className="ags-footer-highlight" {...mark("contact")}>{text("contact")}</span></p>
           <ul className="ags-list">
             <li><a href={`tel:${phone.replace(/[^+\d]/g, '')}`} className="ags-link ags-num">{phone}</a></li>
-            <li><a href="mailto:info@avgst.ru" className="ags-link">info@avgst.ru</a></li>
+            <li><a href={`mailto:${text("email")}`} className="ags-link" {...mark("email")}>{text("email")}</a></li>
           </ul>
         </nav>
         <nav className="ags-foot__col" aria-label="Соцсети">
-          <p className="ags-foot__h"><span className="ags-footer-highlight">Соцсети</span></p>
+          <p className="ags-foot__h"><span className="ags-footer-highlight" {...mark("social")}>{text("social")}</span></p>
           <ul className="ags-list">
             <li><a href="https://vk.ru/avg_st" className="ags-link ags-link--ext">ВКонтакте<OpenDayArrow size={13} /></a></li>
             <li><a href="https://t.me/avgstroy" className="ags-link ags-link--ext">Telegram<OpenDayArrow size={13} /></a></li>
@@ -31,15 +34,15 @@ export function FactoryOpenDayFooter({ date, phone = '+7 (831) 200-38-89', addre
           </ul>
         </nav>
         <div className="ags-foot__col ags-foot__col--last">
-          <p className="ags-foot__h"><span className="ags-footer-highlight">Производство</span></p>
+          <p className="ags-foot__h"><span className="ags-footer-highlight" {...mark("factory")}>{text("factory")}</span></p>
           <ul className="ags-list">
             <li className="ags-plain ags-foot__address">{address || <>город Нижний Новгород,<br />улица Зайцева 31, корпус 1 (проходная),<br />Территория бывшего завода ЗКПД-4</>}</li>
-            <li><OpenDayBookButton className="ags-link ags-link--go">Записаться на <span className="ags-footer-highlight" data-cms-content-connected>{date}</span><OpenDayArrow size={13} /></OpenDayBookButton></li>
+            <li><OpenDayBookButton className="ags-link ags-link--go"><span {...mark("cta")}>{text("cta")}</span>{" "}<span className="ags-footer-highlight" data-cms-content-connected>{date}</span><OpenDayArrow size={13} /></OpenDayBookButton></li>
           </ul>
         </div>
       </div>
       <div className="ags-foot__colophon">
-        <a href="/legal/privacy" className="ags-link ags-link--muted">Политика конфиденциальности</a>
+        <a href="/legal/privacy" className="ags-link ags-link--muted" {...mark("privacy")}>{text("privacy")}</a>
       </div>
     </div>
   </footer>}</CMSContentBlock>)

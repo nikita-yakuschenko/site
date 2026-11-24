@@ -23,7 +23,7 @@ const partFields: Record<string, { name: 'text' | 'textMore' | 'href'; label: st
   'popularProjects.button': [{ name: 'text', label: 'Текст кнопки', bare: true }],
   'seriesBento.heading': [{ name: 'text', label: 'Заголовок', bare: true }],
   'seriesBento.button': [{ name: 'text', label: 'Текст кнопки', bare: true }],
-  'openDay.date': [{ name: 'text', label: 'Дата, например «12 декабря»' }],
+  'openDay.date': [{ name: 'text', label: 'Резервная дата, если запись мероприятия недоступна' }],
 }
 
 const seriesOptions = [
@@ -431,25 +431,27 @@ export function PartContentFields({ path }: TextareaFieldClientProps) {
 
 const openDayProgrammeKey = 'FactoryOpenDayProgram'
 
-async function openDayProgrammeEditor(signal: AbortSignal) {
+async function openDayEventEditor(signal: AbortSignal, tab = 'programme') {
   const response = await fetch('/api/events?depth=0&limit=1&select[id]=true&where[slug][equals]=factory-open-day', { signal, cache: 'no-store' })
   if (!response.ok) throw new Error('Не удалось загрузить запись мероприятия')
   const { docs } = await response.json()
   const id = docs?.[0]?.id
-  return id == null ? null : `/collections/events/${encodeURIComponent(String(id))}?tab=programme`
+  return id == null ? null : `/collections/events/${encodeURIComponent(String(id))}?tab=${tab}`
 }
 
 export function BlockPartFocus() {
   const key = useFormFields(([fields]) => fields.key?.value)
+  const baseKey = typeof key === 'string' ? key.split('-page-')[0] : ''
+  const eventTab = baseKey === openDayProgrammeKey ? 'programme' : baseKey === 'FactoryOpenDayLocation' || baseKey === 'FactoryOpenDayFooter' ? 'venue' : baseKey === 'FactoryOpenDayHero' || baseKey === 'FactoryOpenDayForm' ? 'event' : null
   const [programmeEditor, setProgrammeEditor] = useState<{ href: string | null }>()
   useEffect(() => {
-    if (key !== openDayProgrammeKey) return
+    if (!eventTab) return
     const controller = new AbortController()
-    openDayProgrammeEditor(controller.signal)
+    openDayEventEditor(controller.signal, eventTab)
       .then(href => { if (!controller.signal.aborted) setProgrammeEditor({ href }) })
       .catch(() => { if (!controller.signal.aborted) setProgrammeEditor({ href: null }) })
     return () => controller.abort()
-  }, [key])
+  }, [eventTab])
 
   useEffect(() => {
     if (!window.location.hash.startsWith('#part-')) return
@@ -465,11 +467,11 @@ export function BlockPartFocus() {
     }, 200)
     return () => clearInterval(timer)
   }, [])
-  if (key !== openDayProgrammeKey) return null
+  if (!eventTab) return null
   return <div className="shadcn-surface flex flex-col items-start gap-3">
-    <p className="text-sm text-muted-foreground">Программа редактируется в записи мероприятия. Сайт и письма участникам используют эти же пункты.</p>
+    <p className="text-sm text-muted-foreground">{eventTab === 'programme' ? 'Программа редактируется в записи мероприятия. Сайт и письма участникам используют эти же пункты.' : eventTab === 'venue' ? 'Адрес и контакты берутся из записи мероприятия.' : 'Дата берётся из записи мероприятия.'}</p>
     {programmeEditor?.href
-      ? <Button size="sm" variant="outline" asChild><a href={programmeEditor.href}><IconPencil />Редактировать программу</a></Button>
+      ? <Button size="sm" variant="outline" asChild><a href={programmeEditor.href}><IconPencil />{eventTab === 'programme' ? 'Редактировать программу' : eventTab === 'venue' ? 'Редактировать адрес и контакты' : 'Редактировать дату'}</a></Button>
       : <p role="status" className="text-sm">{programmeEditor ? 'Запись мероприятия недоступна.' : 'Загружаем запись мероприятия…'}</p>}
   </div>
 }
@@ -499,8 +501,8 @@ export function PageBlockComposition({ path }: UIFieldClientProps) {
       if (!data) return
       const projectBlock = projectBlockParts[data.key]
       let editURL: string | undefined
-      const programme = data.key === openDayProgrammeKey
-      if (programme) editURL = (await openDayProgrammeEditor(controller.signal).catch(() => null)) ?? undefined
+      const programme = typeof data.key === 'string' && data.key.split('-page-')[0] === openDayProgrammeKey
+      if (programme) editURL = (await openDayEventEditor(controller.signal).catch(() => null)) ?? undefined
       if (projectBlock) {
         const type = data.key === 'ReadyHomeOffer' ? 'ready-home' : 'project'
         const response = await fetch(`/api/projects?limit=1&depth=0&sort=name&where[_status][equals]=published&where[recordType][equals]=${type}`, { signal: controller.signal })

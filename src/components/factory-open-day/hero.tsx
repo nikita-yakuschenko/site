@@ -1,20 +1,16 @@
 'use client'
 import { CMSContentBlock } from '../cms-content'
+import { heroFields } from '../../lib/open-day/content'
+import { useOpenDayContent } from './content'
 import Link from 'next/link'
 import { OpenDayBookButton } from './form'
 import { OpenDayArrow, OpenDayRules } from './rules'
 import { OpenDayThemeToggle } from './theme'
 
-const points = [
-  ['Узнайте, как строится ваш будущий дом', 'Покажем производство и технологии, которые используем.'],
-  ['Почувствуете себя как дома', 'Посетите выставочные дома, сравните планировки и выпейте согревающий глинтвейн.'],
-  ['Познакомитесь с трендами загородной архитектуры', 'Архитектор расскажет о последних тенденциях, цветовых решениях и актуальных проектах 2027 года.'],
-  ['Сколько стоит свой дом в 2027?', 'Разберём изменения на рынке ИЖС, условия по ипотеке и ежемесячный платёж.'],
-]
-
 export function FactoryOpenDayHero({ date }: { date: string }) {
-  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayHero">{(
-    <section className="ags ags-hero">
+  const { key, text, image, mark } = useOpenDayContent('FactoryOpenDayHero', heroFields)
+  return (<CMSContentBlock cmsBlockKey="FactoryOpenDayHero" initialFields={heroFields}>{(
+    <section className="ags ags-hero" data-cms-block={key}>
       <OpenDayRules />
       <div className="ags-sheet">
         <header className="ags-hero__rail">
@@ -30,28 +26,28 @@ export function FactoryOpenDayHero({ date }: { date: string }) {
         </header>
         <div className="ags-hero__body">
           <div className="ags-hero__lead">
-            <p className="ags-hero__format" data-cms-content-field="eventFormat" data-cms-content-label="Формат мероприятия">День открытых дверей</p>
-            <h1 className="ags-hero__title">Новый взгляд<br />на загородный дом</h1>
-            <p className="ags-hero__subtitle"><span className="ags-hero__subtitle-highlight">Какие дома будут строить в этом сезоне?</span></p>
+            <p className="ags-hero__format" {...mark("format")}>{text("format")}</p>
+            <h1 className="ags-hero__title" {...mark("heading")} style={{ whiteSpace: "pre-line" }}>{text("heading")}</h1>
+            <p className="ags-hero__subtitle"><span className="ags-hero__subtitle-highlight" {...mark("subtitle")}>{text("subtitle")}</span></p>
             <div className="ags-hero__intro">
-              <p className="ags-hero__text"><span data-cms-content-connected>{date}</span> разберём архитектурные тренды, цветовые решения, актуальные планировки и проекты, а главное — покажем, как они воплощаются в готовом доме.</p>
+              <p className="ags-hero__text"><span data-cms-content-connected>{date}</span>{" "}<span {...mark("intro")}>{text("intro")}</span></p>
               <ul className="ags-hero__benefits">
-                {points.map(([title, text]) => (
-                  <li key={title}>
-                    <strong>{title}</strong>
-                    <span>{text}</span>
+                {[1, 2, 3, 4].map(index => (
+                  <li key={index}>
+                    <strong {...mark(`benefit${index}Title`)}>{text(`benefit${index}Title`)}</strong>
+                    <span {...mark(`benefit${index}Text`)}>{text(`benefit${index}Text`)}</span>
                   </li>
                 ))}
               </ul>
             </div>
             <div className="ags-hero__act">
-              <OpenDayBookButton className="ags-cta">Записаться <OpenDayArrow /></OpenDayBookButton>
-              <p className="ags-hero__free">Бесплатно, по записи</p>
+              <OpenDayBookButton className="ags-cta"><span {...mark("cta")}>{text("cta")}</span> <OpenDayArrow /></OpenDayBookButton>
+              <p className="ags-hero__free" {...mark("free")}>{text("free")}</p>
             </div>
           </div>
           <figure className="ags-hero__photo">
-            <img src="/factory-open-day/hero.webp" alt="Гости в выставочном доме «Авангард Строй»" width={1024} height={1536} />
-            <figcaption>Выставочный дом «Авангард Строй», Нижний Новгород</figcaption>
+            <img src={image("photo.image")} alt={text("alt")} {...mark("photo.image")} width={1024} height={1536} />
+            <figcaption {...mark("caption")}>{text("caption")}</figcaption>
           </figure>
         </div>
       </div>

@@ -39,7 +39,8 @@ function EventPreview() {
 export function EventWorkspace() {
   const search = useSearchParams()
   const [selectedTab, setTab] = useState<string>()
-  const tab = selectedTab ?? (search.get('tab') === 'programme' ? 'programme' : 'event')
+  const requestedTab = search.get('tab')
+  const tab = selectedTab ?? (requestedTab === 'programme' || requestedTab === 'venue' ? requestedTab : 'event')
   const timezone = useField<string>({ path: 'timezone' }), title = useField<string>({ path: 'title' }), address = useField<string>({ path: 'address' }), phone = useField<string>({ path: 'phone' }), start = useField<string>({ path: 'startsAt' })
   const confirmation = useEmail('confirmationEmail'), programme = useEmail('programmeEmail'), reminder = useEmail('reminderEmail')
   const { id, data } = useDocumentInfo()
