@@ -20,11 +20,20 @@ export const resolveProjectBuilt = cache(async (slug: string, publishedOnly = fa
 export async function resolveBuiltPhotoFallback(project: CatalogProject, ownItems: BuiltItem[] | null, catalog: CatalogProject[], seed: string): Promise<BuiltItem[]> {
   if ((ownItems === null && (project.built?.length || project.hasBuiltPhotos)) || ownItems?.some(item => item.type === 'photo')) return []
 
-  const candidates = catalog
-    .filter(item => item.hasBuiltPhotos === true && item.technology === project.technology && item.slug !== project.slug)
+  const sameTechnology = catalog.filter(item => item.technology === project.technology && item.slug !== project.slug)
+  const candidates = sameTechnology
+    .filter(item => item.hasBuiltPhotos === true)
     .map(({ slug }) => ({ id: slug }))
-  const [donor] = catalogOrder(candidates, seed)
-  if (!donor) return []
+  if (!candidates.length) return []
+
+  const recipients = sameTechnology
+    .filter(item => item.hasBuiltPhotos !== true)
+    .map(({ slug }) => ({ id: slug }))
+  recipients.push({ id: project.slug })
+  // Deal one gallery to each recipient before repeating donors of this technology.
+  const position = catalogOrder(recipients, `${seed}:recipients`).findIndex(item => item.id === project.slug)
+  const donors = catalogOrder(candidates, `${seed}:donors`)
+  const donor = donors[position % donors.length]!
 
   const items = await resolveProjectBuilt(donor.id, true)
   return items?.filter(item => item.type === 'photo') ?? []
