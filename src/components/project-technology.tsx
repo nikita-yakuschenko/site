@@ -6,6 +6,7 @@ import { IconArrowUpRight, IconX } from '@tabler/icons-react'
 import { TECHNOLOGY_OPTIONS } from '../lib/catalog/types'
 import { copy } from '../lib/copy'
 import { LeadDialog } from './lead-dialog'
+import { exhibitionVisit } from './project-lead-offers'
 import { trackMetricaAction } from '../lib/metrica-form-goals'
 
 const prefab = {
@@ -18,16 +19,7 @@ const prefab = {
     'Приезжайте — всё покажем и\u00A0расскажем.',
   ],
 }
-const preCut = {
-  src: '/logos/AS%20Pre-Cut.svg',
-  alt: 'AS PRECUT',
-  lines: [
-    'На\u00A0заводе готовим все детали каркаса,',
-    'и\u00A0каждый элемент уже готов к\u00A0сборке.',
-    'Приезжайте на\u00A0экскурсию — покажем,',
-    'как устроен весь процесс производства.',
-  ],
-}
+const visitTitle = 'Просмотр готового дома'
 
 const CLOSE_DELAY = 5000
 
@@ -41,7 +33,7 @@ export function ProjectTechnology({ badge, project }: { badge: string; project: 
   const inside = useRef(false)
   const mode = useRef<'hover' | 'pinned' | null>(null)
   const technology = TECHNOLOGY_OPTIONS.find(option => option.value === badge)?.technology
-  const logo = technology === 'frame' ? preCut : prefab
+  const isFrame = technology === 'frame'
   const shown = phase === 'hover' || phase === 'pinned'
 
   const clearTimer = () => {
@@ -64,12 +56,12 @@ export function ProjectTechnology({ badge, project }: { badge: string; project: 
     clearTimer()
     mode.current = 'pinned'
     setPhase('pinned')
-    trackMetricaAction('technology_open', { technology: logo.alt })
+    if (!isFrame) trackMetricaAction('technology_open', { technology: prefab.alt })
   }
 
   useEffect(() => {
     const node = root.current
-    if (!node) return
+    if (!node || isFrame) return
     const onEnter = () => {
       if (mode.current === 'pinned') return
       mode.current = 'hover'
@@ -90,7 +82,7 @@ export function ProjectTechnology({ badge, project }: { badge: string; project: 
       node.removeEventListener('pointerenter', onEnter)
       node.removeEventListener('pointerleave', onLeave)
     }
-  }, [])
+  }, [isFrame])
 
   useEffect(() => {
     if (phase !== 'hover' && phase !== 'pinned') return
@@ -152,26 +144,35 @@ export function ProjectTechnology({ badge, project }: { badge: string; project: 
 
   if (!technology) return <p className="project-hero__badge">{badge}</p>
 
+  const toggle = () => mode.current === 'pinned' ? dismiss() : pin()
   return <>
     <div className="project-hero__technology" ref={root}>
-      <button type="button" className="project-hero__badge" aria-expanded={shown} onPointerDown={event => { if (event.button !== 0) return; mode.current === 'pinned' ? dismiss() : pin() }} onClick={event => { if (event.detail !== 0) return; mode.current === 'pinned' ? dismiss() : pin() }}>{badge}</button>
-      <button type="button" className="project-hero__badge" aria-expanded={shown} onPointerDown={event => { if (event.button !== 0) return; mode.current === 'pinned' ? dismiss() : pin() }} onClick={event => { if (event.detail !== 0) return; mode.current === 'pinned' ? dismiss() : pin() }}>
-        <Image src={logo.src} alt={logo.alt} className="project-hero__technology-logo" width={435} height={76} unoptimized />
+      {isFrame ? <p className="project-hero__badge">{badge}</p> :
+        <button type="button" className="project-hero__badge" aria-expanded={shown} onPointerDown={event => { if (event.button === 0) toggle() }} onClick={event => { if (event.detail === 0) toggle() }}>{badge}</button>}
+      <button type="button" className="project-hero__badge" aria-expanded={shown}
+        onPointerDown={event => { if (!isFrame && event.button === 0) toggle() }}
+        onClick={event => { if (isFrame || event.detail === 0) toggle() }}>
+        {isFrame ? visitTitle : <Image src={prefab.src} alt={prefab.alt} className="project-hero__technology-logo" width={435} height={76} unoptimized />}
       </button>
-      {phase !== 'closed' ? <div ref={popover} className="technology-popover" data-closing={phase === 'closing' ? '' : undefined} role="dialog" aria-modal="false" aria-label={logo.alt} onPointerDown={event => { if (event.button === 0 && mode.current !== 'pinned') pin() }} onAnimationEnd={event => { if (event.target === event.currentTarget && phase === 'closing') setPhase('closed') }}>
+      {phase !== 'closed' ? <div ref={popover} className="technology-popover" data-closing={phase === 'closing' ? '' : undefined} role="dialog" aria-modal="false" aria-label={isFrame ? visitTitle : prefab.alt} onPointerDown={event => { if (event.button === 0 && mode.current !== 'pinned') pin() }} onAnimationEnd={event => { if (event.target === event.currentTarget && phase === 'closing') setPhase('closed') }}>
         <button ref={close} type="button" className="ask-dialog__close" aria-label={copy.close} onClick={dismiss}>
           <IconX size={18} stroke={2.2} />
         </button>
         <div className="technology-dialog__intro">
-          <Image src={logo.src} alt="" width={435} height={76} className="technology-dialog__logo" unoptimized />
-          <p>{logo.lines.map((line, index) => <span key={line}>{index > 0 ? <br /> : null}{line}{index < logo.lines.length - 1 ? ' ' : null}</span>)}</p>
-          <button type="button" className="btn btn-yellow" onClick={() => { trackMetricaAction('technology_tour_click', { technology: logo.alt }); dismiss(); setBooking(true) }}>
-            Посетить производство <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
+          {isFrame ? <>
+            <h2 className="technology-dialog__title">{visitTitle}</h2>
+            <p>Посмотрите дом вживую, оцените планировку и материалы.</p>
+          </> : <>
+            <Image src={prefab.src} alt="" width={435} height={76} className="technology-dialog__logo" unoptimized />
+            <p>{prefab.lines.map((line, index) => <span key={line}>{index > 0 ? <br /> : null}{line}{index < prefab.lines.length - 1 ? ' ' : null}</span>)}</p>
+          </>}
+          <button type="button" className="btn btn-yellow" onClick={() => { if (!isFrame) trackMetricaAction('technology_tour_click', { technology: prefab.alt }); dismiss(); setBooking(true) }}>
+            {isFrame ? 'Посетить дом' : 'Посетить производство'} <IconArrowUpRight size={18} stroke={2} aria-hidden="true" />
           </button>
         </div>
       </div> : null}
     </div>
-    {booking ? <LeadDialog formId="factory-tour" heading={copy.factoryTour} submitLabel={copy.factoryTour}
+    {booking ? isFrame ? <LeadDialog {...exhibitionVisit} meta={{ projectName: project }} onClose={() => setBooking(false)} /> : <LeadDialog formId="factory-tour" heading={copy.factoryTour} submitLabel={copy.factoryTour}
       body="Оставьте контакты, мы свяжемся и согласуем удобное время."
       meta={{ projectName: project }} onClose={() => setBooking(false)} /> : null}
   </>

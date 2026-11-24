@@ -6850,7 +6850,7 @@ html.is-dialog-open {
   mix-blend-mode: multiply;
 }
 
-.project-hero__technology .project-hero__badge {
+.project-hero__technology button.project-hero__badge {
   display: inline-flex;
   align-items: center;
   height: 24px;
@@ -6862,8 +6862,8 @@ html.is-dialog-open {
   transition: background 150ms ease, transform 150ms var(--ease-out);
 }
 
-.project-hero__technology .project-hero__badge:hover { background: color-mix(in srgb, var(--avgst-ink) 6%, #fff); }
-.project-hero__technology .project-hero__badge:active { transform: scale(.97); }
+.project-hero__technology button.project-hero__badge:hover { background: color-mix(in srgb, var(--avgst-ink) 6%, #fff); }
+.project-hero__technology button.project-hero__badge:active { transform: scale(.97); }
 
 .technology-popover {
   position: absolute;
@@ -6932,6 +6932,7 @@ html.is-dialog-open {
 }
 
 .technology-dialog__logo { display: block; width: 168px; height: auto; margin-inline: auto; }
+.technology-dialog__title { margin: 0; padding-inline-end: 24px; font-size: 18px; line-height: 1.3; }
 .technology-dialog__intro p { margin: 0; color: var(--ink-2); font-size: 13px; line-height: 1.4; }
 .technology-dialog__intro .btn { width: 100%; }
 
