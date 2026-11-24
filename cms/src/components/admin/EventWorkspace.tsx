@@ -1,5 +1,6 @@
 'use client'
 import { useId, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { useDocumentInfo, useField, useForm, useFormFields } from '@payloadcms/ui'
 import { IconArrowDown, IconArrowUp, IconPlus, IconTrash } from '@tabler/icons-react'
 import { Input } from '../ui/input'
@@ -36,7 +37,9 @@ function EventPreview() {
   return <section className="event-preview rounded-lg border bg-card" aria-label="Превью мероприятия"><div className="border-b px-5 py-3 text-sm font-medium">Превью мероприятия</div><article className="mx-auto flex max-w-2xl flex-col gap-6 p-6 lg:p-8"><h2 className="text-2xl font-semibold tracking-tight">{values.title || 'Название мероприятия'}</h2><p className="font-mono text-sm">{format(values.start)}{values.end && <> — {format(values.end)}</>}</p><p className="whitespace-pre-wrap text-sm leading-relaxed">{values.description}</p>{values.programme.length > 0 && <div className="flex flex-col gap-5"><h3 className="text-base font-semibold">Программа</h3>{values.programme.map((step, i) => <div key={i} className="grid grid-cols-[5.5rem_1fr] gap-4"><span className="font-mono text-xs text-muted-foreground">{step.time}</span><div><h4 className="text-sm font-medium">{step.title}</h4><p className="mt-1 whitespace-pre-wrap text-sm text-muted-foreground">{step.description}</p></div></div>)}</div>}{values.address && <div className="flex flex-col gap-2 border-t pt-5"><h3 className="text-base font-semibold">Адрес и контакты</h3><p className="text-sm">{values.address}</p><p className="text-sm">{values.phone}</p></div>}</article></section>
 }
 export function EventWorkspace() {
-  const [tab, setTab] = useState('event')
+  const search = useSearchParams()
+  const [selectedTab, setTab] = useState<string>()
+  const tab = selectedTab ?? (search.get('tab') === 'programme' ? 'programme' : 'event')
   const timezone = useField<string>({ path: 'timezone' }), title = useField<string>({ path: 'title' }), address = useField<string>({ path: 'address' }), phone = useField<string>({ path: 'phone' }), start = useField<string>({ path: 'startsAt' })
   const confirmation = useEmail('confirmationEmail'), programme = useEmail('programmeEmail'), reminder = useEmail('reminderEmail')
   const { id, data } = useDocumentInfo()

@@ -15,7 +15,8 @@ const steps = [
 ]
 
 export function FactoryOpenDayProgram({ programme, durationLabel }: { programme?: { time?: string; title: string; description?: string }[] | null; durationLabel?: string }) {
-  const shown = programme?.length ? programme.map((step, index) => [String(index + 1).padStart(2, '0'), step.time, step.title, step.description]) : steps
+  const shown = programme?.map((step, index) => [String(index + 1).padStart(2, '0'), step.time, step.title, step.description]) ?? steps
+  if (!shown.length) return null
   return (<CMSContentBlock cmsBlockKey="FactoryOpenDayProgram">{(
     <section className="ags ags-prog">
       <OpenDayRules />

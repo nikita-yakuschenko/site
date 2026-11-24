@@ -429,9 +429,28 @@ export function PartContentFields({ path }: TextareaFieldClientProps) {
   </div>)}</div>
 }
 
-// Scrolls the block editor to the part named in the #part-key link
+const openDayProgrammeKey = 'FactoryOpenDayProgram'
+
+async function openDayProgrammeEditor(signal: AbortSignal) {
+  const response = await fetch('/api/events?depth=0&limit=1&select[id]=true&where[slug][equals]=factory-open-day', { signal, cache: 'no-store' })
+  if (!response.ok) throw new Error('Не удалось загрузить запись мероприятия')
+  const { docs } = await response.json()
+  const id = docs?.[0]?.id
+  return id == null ? null : `/collections/events/${encodeURIComponent(String(id))}?tab=programme`
+}
 
 export function BlockPartFocus() {
+  const key = useFormFields(([fields]) => fields.key?.value)
+  const [programmeEditor, setProgrammeEditor] = useState<{ href: string | null }>()
+  useEffect(() => {
+    if (key !== openDayProgrammeKey) return
+    const controller = new AbortController()
+    openDayProgrammeEditor(controller.signal)
+      .then(href => { if (!controller.signal.aborted) setProgrammeEditor({ href }) })
+      .catch(() => { if (!controller.signal.aborted) setProgrammeEditor({ href: null }) })
+    return () => controller.abort()
+  }, [key])
+
   useEffect(() => {
     if (!window.location.hash.startsWith('#part-')) return
     const key = decodeURIComponent(window.location.hash.slice('#part-'.length))
@@ -446,7 +465,13 @@ export function BlockPartFocus() {
     }, 200)
     return () => clearInterval(timer)
   }, [])
-  return null
+  if (key !== openDayProgrammeKey) return null
+  return <div className="shadcn-surface flex flex-col items-start gap-3">
+    <p className="text-sm text-muted-foreground">Программа редактируется в записи мероприятия. Сайт и письма участникам используют эти же пункты.</p>
+    {programmeEditor?.href
+      ? <Button size="sm" variant="outline" asChild><a href={programmeEditor.href}><IconPencil />Редактировать программу</a></Button>
+      : <p role="status" className="text-sm">{programmeEditor ? 'Запись мероприятия недоступна.' : 'Загружаем запись мероприятия…'}</p>}
+  </div>
 }
 
 export function BlockPartLabel() {
@@ -466,7 +491,7 @@ export function PageBlockComposition({ path }: UIFieldClientProps) {
   const component = useFormFields(([fields]) => fields[`${parent}.component`]?.value) as { relationTo: string; value: string | { id: string } } | undefined
   const id = typeof component?.value === 'object' ? component.value.id : component?.value
   const recordKey = `${component?.relationTo}:${id}`
-  const [record, setRecord] = useState<{ recordKey: string; structureOnly: boolean; editURL?: string; parts: { key: string; title: string }[] }>()
+  const [record, setRecord] = useState<{ recordKey: string; structureOnly: boolean; editURL?: string; programme?: boolean; parts: { key: string; title: string }[] }>()
   useEffect(() => {
     if (!id || !['blocks', 'forms'].includes(component?.relationTo || '')) return
     const controller = new AbortController()
@@ -474,6 +499,8 @@ export function PageBlockComposition({ path }: UIFieldClientProps) {
       if (!data) return
       const projectBlock = projectBlockParts[data.key]
       let editURL: string | undefined
+      const programme = data.key === openDayProgrammeKey
+      if (programme) editURL = (await openDayProgrammeEditor(controller.signal).catch(() => null)) ?? undefined
       if (projectBlock) {
         const type = data.key === 'ReadyHomeOffer' ? 'ready-home' : 'project'
         const response = await fetch(`/api/projects?limit=1&depth=0&sort=name&where[_status][equals]=published&where[recordType][equals]=${type}`, { signal: controller.signal })
@@ -481,7 +508,7 @@ export function PageBlockComposition({ path }: UIFieldClientProps) {
         if (project) editURL = `/collections/projects/${project.id}#block-${projectBlock.section}`
       }
       const configurationParts = data.key === 'ProjectConfig' ? [false, true].flatMap(modular => configurationKeys(modular).map(key => ({ key: `ProjectConfig.${modular ? 'modular' : 'panel'}.${key}`, title: `${modular ? 'Модульные' : 'Панельно-каркасные'}: ${configurationNames[key]}` }))) : null
-      setRecord({ recordKey, structureOnly: data.defaults?.structureOnly === true, editURL, parts: projectBlock?.parts || configurationParts || data.parts || [] })
+      if (!controller.signal.aborted) setRecord({ recordKey, structureOnly: data.defaults?.structureOnly === true, editURL, programme, parts: projectBlock?.parts || configurationParts || data.parts || [] })
     }).catch(() => {})
     return () => controller.abort()
   }, [id, component?.relationTo, recordKey])
@@ -493,7 +520,7 @@ export function PageBlockComposition({ path }: UIFieldClientProps) {
   return <div className="shadcn-surface mb-4">
     <div className="mb-2 flex items-start justify-between gap-2">
       <div><p className="text-sm font-medium">Состав блока</p>{record.parts.length > 0 && <p className="text-xs text-muted-foreground">Нажмите на часть, чтобы показать её в превью</p>}</div>
-      <Button size="sm" variant="outline" asChild><a href={editURL}><IconPencil />{component?.relationTo === 'forms' ? 'Редактировать форму' : 'Редактировать блок'}</a></Button>
+      <Button size="sm" variant="outline" asChild><a href={editURL}><IconPencil />{record.programme ? 'Редактировать программу' : component?.relationTo === 'forms' ? 'Редактировать форму' : 'Редактировать блок'}</a></Button>
     </div>
     <div className="flex flex-col gap-1">{parts.map(part => <div key={part.key}>
       <div className="group flex items-center gap-1">

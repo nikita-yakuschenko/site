@@ -338,7 +338,7 @@ export function PagePreview({ siteUrl, project = false, story = false, configura
     const timer = setTimeout(send, 80)
     return () => clearTimeout(timer)
   }, [heroParts, origin, revision])
-  const blockRoute = contentScope || (homeBlocks.has(blockKey) ? '/' : catalogBlocks.has(blockKey) && catalogSlug ? `/catalog/${catalogSlug}` : null)
+  const blockRoute = blockKey === 'FactoryOpenDayProgram' ? '/factory-open-day' : contentScope || (homeBlocks.has(blockKey) ? '/' : catalogBlocks.has(blockKey) && catalogSlug ? `/catalog/${catalogSlug}` : null)
   const route = configuration ? '/cms-preview/configurations' : story ? '/stories' : isolateBlock ? blockRoute : project ? (projectDraft ? '/catalog/__draft' : `/catalog/${data?.slug}`) : template ? catalogSlug ? `/catalog/${catalogSlug}` : null : typeof data?.route === 'string' ? data.route : null
   const validRoute = Boolean(route && !route.includes('['))
   useEffect(() => {
