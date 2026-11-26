@@ -28,7 +28,7 @@ export function useCMSBlock(cmsBlockKey: string) {
   const records = useContext(Context)
   const route = usePathname()
   const record = findCMSContentRecord(records, cmsBlockKey, route)
-  return { key: record?.key || cmsBlockKey, parts: record?.parts || [] }
+  return { key: record?.key || cmsBlockKey, parts: record?.parts || [], hasRecord: Boolean(record) }
 }
 
 export function useCMSMedia<T>(key: string, source: T): T {

@@ -12,11 +12,12 @@ export async function ensureOpenDayContent(payload: Payload) {
     const component = block.key?.split('-page-')[0]
     const fields = Object.entries(openDayContent).find(([key]) => key === component)?.[1]
     if (!fields) continue
+    const defaults = (block.defaults || {}) as Record<string, unknown>
+    // Once the block is initialized, missing fields can be intentional editor deletions.
+    if (defaults.contentBinding === 'react' && defaults.contentScope === '/factory-open-day') continue
     const current = block.parts || []
     const present = new Set(current.map(part => part.key))
     const missing = fields.filter(field => !present.has(field.key))
-    const defaults = (block.defaults || {}) as Record<string, unknown>
-    if (!missing.length && defaults.contentBinding === 'react' && defaults.contentScope === '/factory-open-day') continue
     await payload.update({
       collection: 'blocks', id: block.id, overrideAccess: true,
       data: {

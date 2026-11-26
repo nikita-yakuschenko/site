@@ -9,6 +9,11 @@ import { OpenDayThemeToggle } from './theme'
 
 export function FactoryOpenDayHero({ date }: { date: string }) {
   const { key, text, image, mark } = useOpenDayContent('FactoryOpenDayHero', heroFields)
+  const benefits = [1, 2, 3, 4].map(index => {
+    const titleKey = `benefit${index}Title`
+    const descriptionKey = `benefit${index}Text`
+    return { index, titleKey, descriptionKey, title: text(titleKey, true), description: text(descriptionKey, true) }
+  }).filter(({ title, description }) => title.trim() || description.trim())
   return (<CMSContentBlock cmsBlockKey="FactoryOpenDayHero" initialFields={heroFields}>{(
     <section className="ags ags-hero" data-cms-block={key}>
       <OpenDayRules />
@@ -31,14 +36,14 @@ export function FactoryOpenDayHero({ date }: { date: string }) {
             <p className="ags-hero__subtitle"><span className="ags-hero__subtitle-highlight" {...mark("subtitle")}>{text("subtitle")}</span></p>
             <div className="ags-hero__intro">
               <p className="ags-hero__text"><span data-cms-content-connected>{date}</span>{" "}<span {...mark("intro")}>{text("intro")}</span></p>
-              <ul className="ags-hero__benefits">
-                {[1, 2, 3, 4].map(index => (
+              {benefits.length > 0 && <ul className="ags-hero__benefits">
+                {benefits.map(({ index, titleKey, descriptionKey, title, description }) => (
                   <li key={index}>
-                    <strong {...mark(`benefit${index}Title`)}>{text(`benefit${index}Title`)}</strong>
-                    <span {...mark(`benefit${index}Text`)}>{text(`benefit${index}Text`)}</span>
+                    {title.trim() && <strong {...mark(titleKey)}>{title}</strong>}
+                    {description.trim() && <span {...mark(descriptionKey)}>{description}</span>}
                   </li>
                 ))}
-              </ul>
+              </ul>}
             </div>
             <div className="ags-hero__act">
               <OpenDayBookButton className="ags-cta"><span {...mark("cta")}>{text("cta")}</span> <OpenDayArrow /></OpenDayBookButton>
